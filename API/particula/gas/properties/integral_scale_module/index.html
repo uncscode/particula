@@ -16172,20 +16172,20 @@ turbulent eddies in a fluid flow.</p>
 <span class="normal">87</span>
 <span class="normal">88</span>
 <span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;fluid_rms_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>
+    <span class="p">{</span><span class="s2">"fluid_rms_velocity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"turbulent_dissipation"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_eulerian_integral_length</span><span class="p">(</span>
     <span class="n">fluid_rms_velocity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Eulerian integral length scale.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Eulerian integral length scale.</span>
 
 <span class="sd">    The Eulerian integral length scale is a measure of the size of the largest</span>
 <span class="sd">    turbulent eddies in a fluid flow.</span>
 
-<span class="sd">    - L_e = 0.5 × (u&#39;³) / ε</span>
+<span class="sd">    - L_e = 0.5 × (u'³) / ε</span>
 <span class="sd">        - L_e is Eulerian integral length scale [m].</span>
-<span class="sd">        - fluid_rms_velocity (u&#39;) is Fluid RMS fluctuation velocity [m/s].</span>
+<span class="sd">        - fluid_rms_velocity (u') is Fluid RMS fluctuation velocity [m/s].</span>
 <span class="sd">        - turbulent_dissipation (ε) is Turbulent energy dissipation rate</span>
 <span class="sd">            [m²/s³].</span>
 
@@ -16198,16 +16198,16 @@ turbulent eddies in a fluid flow.</p>
 <span class="sd">        - Eulerian integral length scale [m].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_eulerian_integral_length(0.3, 1e-4)</span>
 <span class="sd">        # Output: 1350.0</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Hinze, J. O., &quot;Turbulence,&quot; McGraw-Hill, 1975. [Check this reference]</span>
-<span class="sd">        - Wikipedia contributors, &quot;Turbulence,&quot; Wikipedia.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - Hinze, J. O., "Turbulence," McGraw-Hill, 1975. [Check this reference]</span>
+<span class="sd">        - Wikipedia contributors, "Turbulence," Wikipedia.</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">fluid_rms_velocity</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="n">turbulent_dissipation</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16333,20 +16333,20 @@ a fluid particle to travel a distance equal to the integral length scale.</p>
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;fluid_rms_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>
+    <span class="p">{</span><span class="s2">"fluid_rms_velocity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"turbulent_dissipation"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_lagrangian_integral_time</span><span class="p">(</span>
     <span class="n">fluid_rms_velocity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Lagrangian integral timescale.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Lagrangian integral timescale.</span>
 
 <span class="sd">    The Lagrangian integral timescale is a measure of the time it takes for</span>
 <span class="sd">    a fluid particle to travel a distance equal to the integral length scale.</span>
 
-<span class="sd">    - T_L = (u&#39;²) / ε</span>
+<span class="sd">    - T_L = (u'²) / ε</span>
 <span class="sd">        - T_L is Lagrangian integral timescale [s].</span>
-<span class="sd">        - fluid_rms_velocity (u&#39;) is Fluid RMS fluctuation velocity [m/s].</span>
+<span class="sd">        - fluid_rms_velocity (u') is Fluid RMS fluctuation velocity [m/s].</span>
 <span class="sd">        - turbulent_dissipation (ε) is Turbulent energy dissipation rate</span>
 <span class="sd">            [m²/s³].</span>
 
@@ -16359,17 +16359,17 @@ a fluid particle to travel a distance equal to the integral length scale.</p>
 <span class="sd">        - Lagrangian integral timescale [s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_lagrangian_integral_time(0.3, 1e-4)</span>
 <span class="sd">        # Output: 900.0</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Townsend, A. A., &quot;The Structure of Turbulent Shear Flow,&quot; 2nd ed.,</span>
+<span class="sd">        - Townsend, A. A., "The Structure of Turbulent Shear Flow," 2nd ed.,</span>
 <span class="sd">          Cambridge University Press, 1976. [Check this reference]</span>
-<span class="sd">        - Wikipedia contributors, &quot;Turbulence,&quot; Wikipedia.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - Wikipedia contributors, "Turbulence," Wikipedia.</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">fluid_rms_velocity</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">turbulent_dissipation</span>
 </code></pre></div></td></tr></table></div>
             </details>

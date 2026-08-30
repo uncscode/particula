@@ -16978,7 +16978,7 @@
 <span class="n">aerosol</span> <span class="o">=</span> <span class="o">...</span>  <span class="c1"># your Aerosol instance</span>
 <span class="n">coagulation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
     <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">)</span>
 
@@ -16994,7 +16994,7 @@
     <span class="n">wall_loss_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
         <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">coagulation</span> <span class="o">|</span> <span class="n">wall_loss</span>
@@ -17004,21 +17004,21 @@
 <p><code>BrownianCoagulationStrategy</code> implements the classical Brownian kernel using <code>get_brownian_kernel_via_system_state</code>. It works across discrete, continuous, and particle-resolved distributions.</p>
 <p>Typical initialization:</p>
 <div class="highlight"><pre><span></span><code><span class="n">brownian</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="charged-coagulation-with-kernel-strategies">Charged coagulation with kernel strategies<a class="headerlink" href="#charged-coagulation-with-kernel-strategies" title="Permanent link">&para;</a></h3>
 <p><code>ChargedCoagulationStrategy</code> wraps electrostatic kernel strategies (e.g., <code>HardSphereKernelStrategy</code>, <code>Coulomb*</code> variants). Provide a <code>ChargedKernelStrategyABC</code> instance:</p>
 <div class="highlight"><pre><span></span><code><span class="n">charged_kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">HardSphereKernelStrategy</span><span class="p">()</span>
 <span class="n">charged</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="n">kernel_strategy</span><span class="o">=</span><span class="n">charged_kernel</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 <p>Use the builder for validation and readability:</p>
 <div class="highlight"><pre><span></span><code><span class="n">charged</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedCoagulationBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_charged_kernel_strategy</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">HardSphereKernelStrategy</span><span class="p">())</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
@@ -17026,7 +17026,7 @@
 <h3 id="turbulent-shear-coagulation">Turbulent shear coagulation<a class="headerlink" href="#turbulent-shear-coagulation" title="Permanent link">&para;</a></h3>
 <p><code>TurbulentShearCoagulationStrategy</code> uses the Saffman–Turner (1956) shear kernel. Requires turbulent dissipation [m<sup>2/s</sup>3] and fluid density [kg/m^3]:</p>
 <div class="highlight"><pre><span></span><code><span class="n">turb_shear</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">TurbulentShearCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;continuous_pdf&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"continuous_pdf"</span><span class="p">,</span>
     <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="o">=</span><span class="mf">1.225</span><span class="p">,</span>
 <span class="p">)</span>
@@ -17034,16 +17034,16 @@
 <p>Builder example with unit conversion and validation:</p>
 <div class="highlight"><pre><span></span><code><span class="n">turb_shear</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">TurbulentShearCoagulationBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;continuous_pdf&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_turbulent_dissipation</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s2">&quot;m^2/s^3&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_fluid_density</span><span class="p">(</span><span class="mf">1.225</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"continuous_pdf"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_turbulent_dissipation</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s2">"m^2/s^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_fluid_density</span><span class="p">(</span><span class="mf">1.225</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="turbulent-dns-coagulation">Turbulent DNS coagulation<a class="headerlink" href="#turbulent-dns-coagulation" title="Permanent link">&para;</a></h3>
 <p><code>TurbulentDNSCoagulationStrategy</code> follows Ayala et al. (2008) DNS fits. Requires turbulent dissipation, fluid density, Reynolds lambda (dimensionless), and relative velocity [m/s]:</p>
 <div class="highlight"><pre><span></span><code><span class="n">turb_dns</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">TurbulentDNSCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="o">=</span><span class="mf">1.225</span><span class="p">,</span>
     <span class="n">reynolds_lambda</span><span class="o">=</span><span class="mf">74.0</span><span class="p">,</span>
@@ -17053,13 +17053,13 @@
 <p>Factory configuration dict example (via <code>CoagulationFactory</code>):</p>
 <div class="highlight"><pre><span></span><code><span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CoagulationFactory</span><span class="p">()</span>
 <span class="n">turb_dns</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;turbulent_dns&quot;</span><span class="p">,</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"turbulent_dns"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;distribution_type&quot;</span><span class="p">:</span> <span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span>      <span class="c1"># m^2/s^3</span>
-        <span class="s2">&quot;fluid_density&quot;</span><span class="p">:</span> <span class="mf">1.225</span><span class="p">,</span>             <span class="c1"># kg/m^3</span>
-        <span class="s2">&quot;reynolds_lambda&quot;</span><span class="p">:</span> <span class="mf">150.0</span><span class="p">,</span>           <span class="c1"># dimensionless</span>
-        <span class="s2">&quot;relative_velocity&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>           <span class="c1"># m/s</span>
+        <span class="s2">"distribution_type"</span><span class="p">:</span> <span class="s2">"discrete"</span><span class="p">,</span>
+        <span class="s2">"turbulent_dissipation"</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span>      <span class="c1"># m^2/s^3</span>
+        <span class="s2">"fluid_density"</span><span class="p">:</span> <span class="mf">1.225</span><span class="p">,</span>             <span class="c1"># kg/m^3</span>
+        <span class="s2">"reynolds_lambda"</span><span class="p">:</span> <span class="mf">150.0</span><span class="p">,</span>           <span class="c1"># dimensionless</span>
+        <span class="s2">"relative_velocity"</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>           <span class="c1"># m/s</span>
     <span class="p">},</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -17069,9 +17069,9 @@
 <p><code>CombineCoagulationStrategy</code> sums kernels from multiple strategies (distribution type must match). Example: Brownian + turbulent shear:</p>
 <div class="highlight"><pre><span></span><code><span class="n">combined</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CombineCoagulationStrategy</span><span class="p">(</span>
     <span class="n">strategies</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">),</span>
+        <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">),</span>
         <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">TurbulentShearCoagulationStrategy</span><span class="p">(</span>
-            <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+            <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
             <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
             <span class="n">fluid_density</span><span class="o">=</span><span class="mf">1.225</span><span class="p">,</span>
         <span class="p">),</span>
@@ -17089,7 +17089,7 @@
 <h3 id="particle-resolved-coagulation">Particle-resolved coagulation<a class="headerlink" href="#particle-resolved-coagulation" title="Permanent link">&para;</a></h3>
 <p><code>CoagulationStrategyABC.step</code> handles particle-resolved updates by mapping to a kernel radius grid, drawing collision pairs, and updating via <code>collide_pairs</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">particle_resolved</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;particle_resolved&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"particle_resolved"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particle_resolved</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
     <span class="n">particle</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
@@ -17105,14 +17105,14 @@
 <span class="c1"># Brownian via builder</span>
 <span class="n">brownian</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
 <span class="c1"># Charged via builder with kernel strategy</span>
 <span class="n">charged</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedCoagulationBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;continuous_pdf&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"continuous_pdf"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_charged_kernel_strategy</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">HardSphereKernelStrategy</span><span class="p">())</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
@@ -17120,10 +17120,10 @@
 <span class="c1"># Factory selection (combine)</span>
 <span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CoagulationFactory</span><span class="p">()</span>
 <span class="n">combined</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;combine&quot;</span><span class="p">,</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"combine"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;strategies&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">brownian</span><span class="p">,</span> <span class="n">charged</span><span class="p">],</span>
-        <span class="s2">&quot;distribution_type&quot;</span><span class="p">:</span> <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">,</span>
+        <span class="s2">"strategies"</span><span class="p">:</span> <span class="p">[</span><span class="n">brownian</span><span class="p">,</span> <span class="n">charged</span><span class="p">],</span>
+        <span class="s2">"distribution_type"</span><span class="p">:</span> <span class="s2">"continuous_pdf"</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -17136,7 +17136,7 @@
 
 <span class="c1"># 2. Configure Brownian coagulation</span>
 <span class="n">brownian</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># 3. Compute instantaneous kernel and rates</span>
@@ -17164,14 +17164,14 @@
 <p>Use preset builders or custom particle-resolved constructors:</p>
 <div class="highlight"><pre><span></span><code><span class="n">particle</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;m^3&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">"m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="2-configure-a-coagulation-strategy">2. Configure a coagulation strategy<a class="headerlink" href="#2-configure-a-coagulation-strategy" title="Permanent link">&para;</a></h3>
 <p>Pick a physical model and distribution type:</p>
 <div class="highlight"><pre><span></span><code><span class="n">coag_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">TurbulentShearCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
 <span class="p">)</span>
@@ -17197,7 +17197,7 @@
     <span class="n">wall_loss_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
         <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">condensation</span> <span class="o">|</span> <span class="n">coagulation</span> <span class="o">|</span> <span class="n">wall_loss</span>
@@ -17206,14 +17206,14 @@
 <h3 id="5-builderfactory-workflow-for-reproducibility">5. Builder/factory workflow for reproducibility<a class="headerlink" href="#5-builderfactory-workflow-for-reproducibility" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CoagulationFactory</span><span class="p">()</span>
 <span class="n">coag_strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;brownian&quot;</span><span class="p">,</span>
-    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;distribution_type&quot;</span><span class="p">:</span> <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">},</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"brownian"</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">"distribution_type"</span><span class="p">:</span> <span class="s2">"continuous_pdf"</span><span class="p">},</span>
 <span class="p">)</span>
 <span class="n">coagulation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span><span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">coag_strategy</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="6-particle-resolved-collision-loop">6. Particle-resolved collision loop<a class="headerlink" href="#6-particle-resolved-collision-loop" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="n">particle_resolved</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;particle_resolved&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"particle_resolved"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particle_resolved</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
     <span class="n">particle</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
@@ -17356,12 +17356,12 @@ support, unsupported-mechanism, or unsupported-distribution claim. See the
 <a href="../data-containers-and-gpu-foundations/">canonical ownership contract</a>
 and <a href="../Roadmap/coagulation-validation/">evidence/command record</a>.</p>
 <p>Focused baseline commands:</p>
-<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and gpu_parity&quot;</span><span class="w"> </span>-Werror
-pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and stochastic and not cuda&quot;</span><span class="w"> </span>-Werror
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"warp and gpu_parity"</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"warp and stochastic and not cuda"</span><span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/tests/gpu_coagulation_docs_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 </code></pre></div>
 <p><strong>Optional/local CUDA evidence:</strong></p>
-<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"warp and cuda"</span><span class="w"> </span>-Werror
 </code></pre></div>
 <p>This optional/local command is additive and skips cleanly when CUDA is
 unavailable.</p>

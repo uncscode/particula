@@ -16197,15 +16197,15 @@ but are limited to <code>"activation"</code> and <code>"kinetic"</code>.</p>
 <span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ActivationNucleationBuilder</span> <span class="o">|</span> <span class="n">KineticNucleationBuilder</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return fresh builders for the two supported identifiers.</span>
+<span class="w">    </span><span class="sd">"""Return fresh builders for the two supported identifiers.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        New activation and kinetic builders under their canonical lowercase</span>
 <span class="sd">        identifiers.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;activation&quot;</span><span class="p">:</span> <span class="n">ActivationNucleationBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;kinetic&quot;</span><span class="p">:</span> <span class="n">KineticNucleationBuilder</span><span class="p">(),</span>
+        <span class="s2">"activation"</span><span class="p">:</span> <span class="n">ActivationNucleationBuilder</span><span class="p">(),</span>
+        <span class="s2">"kinetic"</span><span class="p">:</span> <span class="n">KineticNucleationBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16322,10 +16322,10 @@ fails the selected builder's schema validation.</p>
     <span class="n">strategy_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActivationNucleationStrategy</span> <span class="o">|</span> <span class="n">KineticNucleationStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a validated strategy from a copied strict-schema payload.</span>
+<span class="w">    </span><span class="sd">"""Build a validated strategy from a copied strict-schema payload.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        strategy_type: Case-insensitive ``&quot;activation&quot;`` or ``&quot;kinetic&quot;``</span>
+<span class="sd">        strategy_type: Case-insensitive ``"activation"`` or ``"kinetic"``</span>
 <span class="sd">            identifier.</span>
 <span class="sd">        parameters: Required dictionary accepted by the selected builder.</span>
 
@@ -16334,15 +16334,15 @@ fails the selected builder's schema validation.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the identifier or payload is invalid, unsupported, or</span>
-<span class="sd">            fails the selected builder&#39;s schema validation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">            fails the selected builder's schema validation.</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strategy_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;strategy_type must be a string&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"strategy_type must be a string"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;parameters must be a dict&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"parameters must be a dict"</span><span class="p">)</span>
     <span class="n">builder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">strategy_type</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">builder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown strategy type: </span><span class="si">{</span><span class="n">strategy_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown strategy type: </span><span class="si">{</span><span class="n">strategy_type</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="n">builder</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>

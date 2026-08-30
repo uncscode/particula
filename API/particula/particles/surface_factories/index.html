@@ -16175,9 +16175,9 @@ mapped to the corresponding builder class.</li>
     <div class="highlight"><span class="filename">SurfaceFactory Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceFactory</span><span class="p">()</span>
 <span class="n">builders</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
-<span class="n">volume_builder</span> <span class="o">=</span> <span class="n">builders</span><span class="p">[</span><span class="s2">&quot;volume&quot;</span><span class="p">]</span>
-<span class="n">mass_builder</span> <span class="o">=</span> <span class="n">builders</span><span class="p">[</span><span class="s2">&quot;mass&quot;</span><span class="p">]</span>
-<span class="n">molar_builder</span> <span class="o">=</span> <span class="n">builders</span><span class="p">[</span><span class="s2">&quot;molar&quot;</span><span class="p">]</span>
+<span class="n">volume_builder</span> <span class="o">=</span> <span class="n">builders</span><span class="p">[</span><span class="s2">"volume"</span><span class="p">]</span>
+<span class="n">mass_builder</span> <span class="o">=</span> <span class="n">builders</span><span class="p">[</span><span class="s2">"mass"</span><span class="p">]</span>
+<span class="n">molar_builder</span> <span class="o">=</span> <span class="n">builders</span><span class="p">[</span><span class="s2">"molar"</span><span class="p">]</span>
 </code></pre></div>
 
 
@@ -16223,26 +16223,26 @@ mapped to the corresponding builder class.</li>
         <span class="n">SurfaceStrategyMolarBuilder</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a mapping of strategy types to builder instances.</span>
+<span class="w">    </span><span class="sd">"""Return a mapping of strategy types to builder instances.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        - Keys are &#39;volume&#39;, &#39;mass&#39;, or &#39;molar&#39;, each</span>
+<span class="sd">        - Keys are 'volume', 'mass', or 'molar', each</span>
 <span class="sd">          mapped to the corresponding builder class.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;SurfaceFactory Example&quot;</span>
+<span class="sd">        ```py title="SurfaceFactory Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        factory = par.particles.SurfaceFactory()</span>
 <span class="sd">        builders = factory.get_builders()</span>
-<span class="sd">        volume_builder = builders[&quot;volume&quot;]</span>
-<span class="sd">        mass_builder = builders[&quot;mass&quot;]</span>
-<span class="sd">        molar_builder = builders[&quot;molar&quot;]</span>
+<span class="sd">        volume_builder = builders["volume"]</span>
+<span class="sd">        mass_builder = builders["mass"]</span>
+<span class="sd">        molar_builder = builders["molar"]</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="n">SurfaceStrategyVolumeBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;mass&quot;</span><span class="p">:</span> <span class="n">SurfaceStrategyMassBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;molar&quot;</span><span class="p">:</span> <span class="n">SurfaceStrategyMolarBuilder</span><span class="p">(),</span>
+        <span class="s2">"volume"</span><span class="p">:</span> <span class="n">SurfaceStrategyVolumeBuilder</span><span class="p">(),</span>
+        <span class="s2">"mass"</span><span class="p">:</span> <span class="n">SurfaceStrategyMassBuilder</span><span class="p">(),</span>
+        <span class="s2">"molar"</span><span class="p">:</span> <span class="n">SurfaceStrategyMolarBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>

@@ -16456,16 +16456,16 @@ accounting inputs are supplied for <code>operation</code>.</p>
 <span class="normal">110</span>
 <span class="normal">111</span>
 <span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the exact closed diagnostic operation.</span>
+<span class="w">    </span><span class="sd">"""Validate the exact closed diagnostic operation.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``operation`` is not an exact supported operation.</span>
 <span class="sd">        ValueError: If required accounting inputs are missing or forbidden</span>
 <span class="sd">            accounting inputs are supplied for ``operation``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentDiagnosticOperation</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;operation must be an exact ResidentDiagnosticOperation.&quot;</span>
+            <span class="s2">"operation must be an exact ResidentDiagnosticOperation."</span>
         <span class="p">)</span>
     <span class="n">inputs</span> <span class="o">=</span> <span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_transfer</span><span class="p">,</span>
@@ -16477,7 +16477,7 @@ accounting inputs are supplied for <code>operation</code>.</p>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_transfer</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
             <span class="n">item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
         <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;latent energy requires only energy_transfer.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"latent energy requires only energy_transfer."</span><span class="p">)</span>
     <span class="k">elif</span> <span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operation</span> <span class="ow">is</span> <span class="n">ResidentDiagnosticOperation</span><span class="o">.</span><span class="n">CONSERVATION_RESIDUAL</span>
     <span class="p">):</span>
@@ -16486,10 +16486,10 @@ accounting inputs are supplied for <code>operation</code>.</p>
             <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_transfer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;residual requires baseline, source, and sink ledgers.&quot;</span>
+                <span class="s2">"residual requires baseline, source, and sink ledgers."</span>
             <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;diagnostic operation forbids accounting inputs.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"diagnostic operation forbids accounting inputs."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16619,7 +16619,7 @@ synchronize before inspecting outputs on the host.</p>
 <span class="normal">359</span>
 <span class="normal">360</span>
 <span class="normal">361</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and dispatch each registration in declared order.</span>
+<span class="w">    </span><span class="sd">"""Validate and dispatch each registration in declared order.</span>
 
 <span class="sd">    Matrix schemas complete without their writer launch when ``B == 0`` or</span>
 <span class="sd">    ``S == 0``. Particle number still launches for ``(B, 0)`` because its</span>
@@ -16632,7 +16632,7 @@ synchronize before inspecting outputs on the host.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``plan`` is not an exact diagnostics plan.</span>
 <span class="sd">        ValueError: If its bindings or output metadata are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">plan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_execute_validated</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16727,7 +16727,7 @@ is invalid.</p>
 <span class="normal">341</span>
 <span class="normal">342</span>
 <span class="normal">343</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResidentDiagnosticsPlan</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate one exact diagnostics plan without dispatching a kernel.</span>
+<span class="w">    </span><span class="sd">"""Validate one exact diagnostics plan without dispatching a kernel.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        plan: Candidate concrete diagnostics plan.</span>
@@ -16737,11 +16737,11 @@ is invalid.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``plan`` is not an exact diagnostics plan.</span>
-<span class="sd">        ValueError: If the plan&#39;s graph, bindings, or registration protocol</span>
+<span class="sd">        ValueError: If the plan's graph, bindings, or registration protocol</span>
 <span class="sd">            is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentDiagnosticsPlan</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;plan must be an exact ResidentDiagnosticsPlan.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"plan must be an exact ResidentDiagnosticsPlan."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">plan</span>
 </code></pre></div></td></tr></table></div>
@@ -16943,35 +16943,35 @@ executor so plan construction does not inspect Warp-array metadata.</p>
 <span class="normal">164</span>
 <span class="normal">165</span>
 <span class="normal">166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact types for the resident diagnostics binding.</span>
+<span class="w">    </span><span class="sd">"""Validate exact types for the resident diagnostics binding.</span>
 
 <span class="sd">    Structural graph, lifecycle, and output validation is deferred to the</span>
 <span class="sd">    executor so plan construction does not inspect Warp-array metadata.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a carrier or registration has an inexact type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.gpu_resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPUResourceRegistry</span>
 
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentSession</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;session must be an exact ResidentSession.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"session must be an exact ResidentSession."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">GPUResourceRegistry</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;registry must be an exact GPUResourceRegistry.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"registry must be an exact GPUResourceRegistry."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResolvedProcessGraph</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;graph must be an exact ResolvedProcessGraph.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"graph must be an exact ResolvedProcessGraph."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResolvedTimestepSchedule</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;schedule must be an exact ResolvedTimestepSchedule.&quot;</span>
+            <span class="s2">"schedule must be an exact ResolvedTimestepSchedule."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ProcessNode</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;node must be an exact ProcessNode.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"node must be an exact ProcessNode."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registrations</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
         <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">is</span> <span class="n">ResidentDiagnosticRegistration</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registrations</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;registrations must be exact &quot;</span>
-            <span class="s2">&quot;ResidentDiagnosticRegistration tuple.&quot;</span>
+            <span class="s2">"registrations must be exact "</span>
+            <span class="s2">"ResidentDiagnosticRegistration tuple."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

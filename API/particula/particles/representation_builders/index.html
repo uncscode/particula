@@ -16536,7 +16536,7 @@ radius-based, and particle-resolved distributions.</p>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
 <span class="normal">175</span>
 <span class="normal">176</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the mixin with no configured activity strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the mixin with no configured activity strategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">activity_strategy</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16631,7 +16631,7 @@ interface compatibility.</p>
     <span class="n">activity_strategy</span><span class="p">:</span> <span class="n">ActivityStrategy</span><span class="p">,</span>
     <span class="n">activity_strategy_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assign the activity strategy for the particle representation.</span>
+<span class="w">    </span><span class="sd">"""Assign the activity strategy for the particle representation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        activity_strategy: Strategy defining particle-phase activities.</span>
@@ -16640,9 +16640,9 @@ interface compatibility.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The builder instance for chaining.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">activity_strategy_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring units for activity strategy parameter.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for activity strategy parameter."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">activity_strategy</span> <span class="o">=</span> <span class="n">activity_strategy</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16691,7 +16691,7 @@ interface compatibility.</p>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
 <span class="normal">141</span>
 <span class="normal">142</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the mixin with no configured distribution strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the mixin with no configured distribution strategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">distribution_strategy</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16790,7 +16790,7 @@ interface compatibility.</p>
     <span class="n">distribution_strategy</span><span class="p">:</span> <span class="n">DistributionStrategy</span><span class="p">,</span>
     <span class="n">distribution_strategy_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assign the distribution strategy for the particle representation.</span>
+<span class="w">    </span><span class="sd">"""Assign the distribution strategy for the particle representation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        distribution_strategy: Strategy defining how the particle</span>
@@ -16800,10 +16800,10 @@ interface compatibility.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The builder instance for chaining.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">distribution_strategy_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;Ignoring units for distribution strategy parameter.&quot;</span>
+            <span class="s2">"Ignoring units for distribution strategy parameter."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">distribution_strategy</span> <span class="o">=</span> <span class="n">distribution_strategy</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -16853,7 +16853,7 @@ interface compatibility.</p>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">109</span>
 <span class="normal">110</span>
 <span class="normal">111</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the mixin with no configured surface strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the mixin with no configured surface strategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">surface_strategy</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16948,7 +16948,7 @@ interface compatibility.</p>
     <span class="n">surface_strategy</span><span class="p">:</span> <span class="n">SurfaceStrategy</span><span class="p">,</span>
     <span class="n">surface_strategy_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assign the surface strategy for the particle representation.</span>
+<span class="w">    </span><span class="sd">"""Assign the surface strategy for the particle representation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        surface_strategy: Strategy controlling surface properties.</span>
@@ -16957,9 +16957,9 @@ interface compatibility.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The builder instance for chaining.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">surface_strategy_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring units for surface strategy parameter.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for surface strategy parameter."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">surface_strategy</span> <span class="o">=</span> <span class="n">surface_strategy</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17026,15 +17026,15 @@ interface compatibility.</p>
 <span class="normal">227</span>
 <span class="normal">228</span>
 <span class="normal">229</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize required fields for mass-based representations.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize required fields for mass-based representations."""</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;distribution_strategy&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;activity_strategy&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;surface_strategy&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mass&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;concentration&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;charge&quot;</span><span class="p">,</span>
+        <span class="s2">"distribution_strategy"</span><span class="p">,</span>
+        <span class="s2">"activity_strategy"</span><span class="p">,</span>
+        <span class="s2">"surface_strategy"</span><span class="p">,</span>
+        <span class="s2">"mass"</span><span class="p">,</span>
+        <span class="s2">"density"</span><span class="p">,</span>
+        <span class="s2">"concentration"</span><span class="p">,</span>
+        <span class="s2">"charge"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderDistributionStrategyMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -17042,7 +17042,7 @@ interface compatibility.</p>
     <span class="n">BuilderSurfaceStrategyMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderDensityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-    <span class="n">BuilderConcentrationMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_units</span><span class="o">=</span><span class="s2">&quot;1/m^3&quot;</span><span class="p">)</span>
+    <span class="n">BuilderConcentrationMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_units</span><span class="o">=</span><span class="s2">"1/m^3"</span><span class="p">)</span>
     <span class="n">BuilderChargeMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -17121,12 +17121,12 @@ interface compatibility.</p>
 <span class="normal">252</span>
 <span class="normal">253</span>
 <span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a mass-based particle representation.</span>
+<span class="w">    </span><span class="sd">"""Build a mass-based particle representation.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A particle representation configured with the stored distribution,</span>
 <span class="sd">        activity, surface, density, concentration, and charge data.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="n">distribution_strategy</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
         <span class="n">DistributionStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_strategy</span>
@@ -17208,15 +17208,15 @@ interface compatibility.</p>
 <span class="normal">285</span>
 <span class="normal">286</span>
 <span class="normal">287</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize required fields for radius-based representations.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize required fields for radius-based representations."""</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;distribution_strategy&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;activity_strategy&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;surface_strategy&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;radius&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;concentration&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;charge&quot;</span><span class="p">,</span>
+        <span class="s2">"distribution_strategy"</span><span class="p">,</span>
+        <span class="s2">"activity_strategy"</span><span class="p">,</span>
+        <span class="s2">"surface_strategy"</span><span class="p">,</span>
+        <span class="s2">"radius"</span><span class="p">,</span>
+        <span class="s2">"density"</span><span class="p">,</span>
+        <span class="s2">"concentration"</span><span class="p">,</span>
+        <span class="s2">"charge"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderDistributionStrategyMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -17224,7 +17224,7 @@ interface compatibility.</p>
     <span class="n">BuilderSurfaceStrategyMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderRadiusMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderDensityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-    <span class="n">BuilderConcentrationMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_units</span><span class="o">=</span><span class="s2">&quot;1/m^3&quot;</span><span class="p">)</span>
+    <span class="n">BuilderConcentrationMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_units</span><span class="o">=</span><span class="s2">"1/m^3"</span><span class="p">)</span>
     <span class="n">BuilderChargeMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -17311,13 +17311,13 @@ interface compatibility.</p>
 <span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a radius-based particle representation.</span>
+<span class="w">    </span><span class="sd">"""Build a radius-based particle representation.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A particle representation configured with the stored radius,</span>
 <span class="sd">        strategy, activity, surface, density, concentration, and charge</span>
 <span class="sd">        data.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="n">distribution_strategy</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
         <span class="n">DistributionStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_strategy</span>
@@ -17410,11 +17410,11 @@ interface compatibility.</p>
 <span class="normal">356</span>
 <span class="normal">357</span>
 <span class="normal">358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize defaults for preset radius-bin representations.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize defaults for preset radius-bin representations."""</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;mode&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;geometric_standard_deviation&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;number_concentration&quot;</span><span class="p">,</span>
+        <span class="s2">"mode"</span><span class="p">,</span>
+        <span class="s2">"geometric_standard_deviation"</span><span class="p">,</span>
+        <span class="s2">"number_concentration"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderDistributionStrategyMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -17422,7 +17422,7 @@ interface compatibility.</p>
     <span class="n">BuilderSurfaceStrategyMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderRadiusMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderDensityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-    <span class="n">BuilderConcentrationMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_units</span><span class="o">=</span><span class="s2">&quot;1/m^3&quot;</span><span class="p">)</span>
+    <span class="n">BuilderConcentrationMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_units</span><span class="o">=</span><span class="s2">"1/m^3"</span><span class="p">)</span>
     <span class="n">BuilderChargeMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderLognormalMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -17436,9 +17436,9 @@ interface compatibility.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span>
         <span class="n">SurfaceStrategyVolume</span><span class="p">(</span><span class="n">surface_tension</span><span class="o">=</span><span class="mf">0.072</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
     <span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">radius_bins</span><span class="p">))</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">=</span> <span class="s2">&quot;pmf&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">=</span> <span class="s2">"pmf"</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -17549,7 +17549,7 @@ interface compatibility.</p>
 <span class="normal">459</span>
 <span class="normal">460</span>
 <span class="normal">461</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a radius-bin representation from preset lognormal inputs.</span>
+<span class="w">    </span><span class="sd">"""Build a radius-bin representation from preset lognormal inputs.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A particle representation containing the generated radius-bin</span>
@@ -17557,15 +17557,15 @@ interface compatibility.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the configured distribution type is unsupported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;pdf&quot;</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"pdf"</span><span class="p">:</span>
         <span class="n">number_concentration</span> <span class="o">=</span> <span class="n">get_lognormal_pdf_distribution</span><span class="p">(</span>
             <span class="n">x_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius_bins</span><span class="p">,</span>
             <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
             <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">geometric_standard_deviation</span><span class="p">,</span>
             <span class="n">number_of_particles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_concentration</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;pmf&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"pmf"</span><span class="p">:</span>
         <span class="n">number_concentration</span> <span class="o">=</span> <span class="n">get_lognormal_pmf_distribution</span><span class="p">(</span>
             <span class="n">x_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius_bins</span><span class="p">,</span>
             <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
@@ -17573,7 +17573,7 @@ interface compatibility.</p>
             <span class="n">number_of_particles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_concentration</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;The distribution type must be either &#39;pdf&#39; or &#39;pmf&#39;.&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">"The distribution type must be either 'pdf' or 'pmf'."</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 
@@ -17695,10 +17695,10 @@ interface compatibility.</p>
     <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">distribution_type_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose whether the preset distribution is generated as a PDF or PMF.</span>
+<span class="w">    </span><span class="sd">"""Choose whether the preset distribution is generated as a PDF or PMF.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        distribution_type: Either ``&quot;pdf&quot;`` or ``&quot;pmf&quot;``.</span>
+<span class="sd">        distribution_type: Either ``"pdf"`` or ``"pmf"``.</span>
 <span class="sd">        distribution_type_units: Unused units argument kept for builder</span>
 <span class="sd">            interface compatibility.</span>
 
@@ -17707,13 +17707,13 @@ interface compatibility.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``distribution_type`` is not supported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">distribution_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;pmf&quot;</span><span class="p">]:</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;The distribution type must be either &#39;pdf&#39; or &#39;pmf&#39;.&quot;</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">distribution_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"pdf"</span><span class="p">,</span> <span class="s2">"pmf"</span><span class="p">]:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">"The distribution type must be either 'pdf' or 'pmf'."</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">distribution_type_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring units for distribution type parameter.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for distribution type parameter."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">=</span> <span class="n">distribution_type</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17730,7 +17730,7 @@ interface compatibility.</p>
 
 
 <a href="#particula.particles.representation_builders.PresetParticleRadiusBuilder.set_radius_bins" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_radius_bins</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">radius_bins_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;m&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_radius_bins</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">radius_bins_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'m'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17815,13 +17815,13 @@ interface compatibility.</p>
 <span class="normal">385</span>
 <span class="normal">386</span>
 <span class="normal">387</span>
-<span class="normal">388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;radius_bins&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"radius_bins"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_radius_bins</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">radius_bins</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">radius_bins_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span>
+    <span class="n">radius_bins_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"m"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assign the radius-bin grid used to generate the distribution.</span>
+<span class="w">    </span><span class="sd">"""Assign the radius-bin grid used to generate the distribution.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        radius_bins: Radius bin values.</span>
@@ -17832,16 +17832,16 @@ interface compatibility.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If any radius bin is negative.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">radius_bins</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;The radius bins must be positive.&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">"The radius bins must be positive."</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">radius_bins_units</span> <span class="o">==</span> <span class="s2">&quot;m&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">radius_bins_units</span> <span class="o">==</span> <span class="s2">"m"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radius_bins</span> <span class="o">=</span> <span class="n">radius_bins</span>
         <span class="k">return</span> <span class="bp">self</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">radius_bins</span> <span class="o">=</span> <span class="n">radius_bins</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
-        <span class="n">radius_bins_units</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span>
+        <span class="n">radius_bins_units</span><span class="p">,</span> <span class="s2">"m"</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17921,13 +17921,13 @@ interface compatibility.</p>
 <span class="normal">571</span>
 <span class="normal">572</span>
 <span class="normal">573</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize defaults for preset particle-resolved representations.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize defaults for preset particle-resolved representations."""</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;mode&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;geometric_standard_deviation&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;number_concentration&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_resolved_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;volume&quot;</span><span class="p">,</span>
+        <span class="s2">"mode"</span><span class="p">,</span>
+        <span class="s2">"geometric_standard_deviation"</span><span class="p">,</span>
+        <span class="s2">"number_concentration"</span><span class="p">,</span>
+        <span class="s2">"particle_resolved_count"</span><span class="p">,</span>
+        <span class="s2">"volume"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderDistributionStrategyMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -17949,9 +17949,9 @@ interface compatibility.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span>
         <span class="n">SurfaceStrategyVolume</span><span class="p">(</span><span class="n">surface_tension</span><span class="o">=</span><span class="mf">0.072</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
     <span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particle_resolved_count</span><span class="p">))</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;m^3&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"m^3"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -18067,12 +18067,12 @@ interface compatibility.</p>
 <span class="normal">634</span>
 <span class="normal">635</span>
 <span class="normal">636</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a preset particle-resolved representation.</span>
+<span class="w">    </span><span class="sd">"""Build a preset particle-resolved representation.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A particle representation whose per-particle masses are sampled</span>
 <span class="sd">        from the configured lognormal distribution.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="n">mode</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
     <span class="n">geometric_standard_deviation</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
@@ -18192,15 +18192,15 @@ interface compatibility.</p>
 <span class="normal">492</span>
 <span class="normal">493</span>
 <span class="normal">494</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize required fields for resolved-mass representations.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize required fields for resolved-mass representations."""</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;distribution_strategy&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;activity_strategy&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;surface_strategy&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mass&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;charge&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;volume&quot;</span><span class="p">,</span>
+        <span class="s2">"distribution_strategy"</span><span class="p">,</span>
+        <span class="s2">"activity_strategy"</span><span class="p">,</span>
+        <span class="s2">"surface_strategy"</span><span class="p">,</span>
+        <span class="s2">"mass"</span><span class="p">,</span>
+        <span class="s2">"density"</span><span class="p">,</span>
+        <span class="s2">"charge"</span><span class="p">,</span>
+        <span class="s2">"volume"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderDistributionStrategyMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -18294,12 +18294,12 @@ interface compatibility.</p>
 <span class="normal">524</span>
 <span class="normal">525</span>
 <span class="normal">526</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a particle-resolved representation from resolved masses.</span>
+<span class="w">    </span><span class="sd">"""Build a particle-resolved representation from resolved masses.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A particle representation configured with per-particle masses,</span>
 <span class="sd">        normalized density and charge inputs, and the stored strategies.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="n">mass</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
     <span class="n">density_input</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">)</span>

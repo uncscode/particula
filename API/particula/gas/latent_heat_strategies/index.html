@@ -16311,13 +16311,13 @@ strategy.</p>
 <span class="normal">59</span>
 <span class="normal">60</span>
 <span class="normal">61</span>
-<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"latent_heat_ref"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the constant latent heat strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the constant latent heat strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        latent_heat_ref: Reference latent heat in J/kg.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">latent_heat_ref</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16409,7 +16409,7 @@ consistency.</p>
 <span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">latent_heat</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a constant latent heat value.</span>
+<span class="w">    </span><span class="sd">"""Return a constant latent heat value.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        temperature: Temperature in Kelvin. Accepted for interface</span>
@@ -16418,7 +16418,7 @@ consistency.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        Latent heat in J/kg. Returns a scalar for scalar input or an array</span>
 <span class="sd">        matching the input shape.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">temperature_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">temperature_array</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">():</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">)</span>
@@ -16545,14 +16545,14 @@ vaporization in J/kg for scalar or array temperature inputs.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">latent_heat</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return latent heat of vaporization for the given temperature.</span>
+<span class="w">    </span><span class="sd">"""Return latent heat of vaporization for the given temperature.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        temperature: Temperature in Kelvin.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Latent heat of vaporization in J/kg with shape matching the input.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16683,9 +16683,9 @@ temperature.</p>
 <span class="normal">121</span>
 <span class="normal">122</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;slope&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature_ref&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"latent_heat_ref"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"slope"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"temperature_ref"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -16694,13 +16694,13 @@ temperature.</p>
     <span class="n">slope</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">temperature_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the linear latent heat strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the linear latent heat strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        latent_heat_ref: Reference latent heat in J/kg.</span>
 <span class="sd">        slope: Linear slope in J/(kg·K).</span>
 <span class="sd">        temperature_ref: Reference temperature in Kelvin.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">latent_heat_ref</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">slope</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">slope</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">temperature_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">temperature_ref</span>
@@ -16797,7 +16797,7 @@ temperature.</p>
 <span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">latent_heat</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the latent heat for the given temperature.</span>
+<span class="w">    </span><span class="sd">"""Return the latent heat for the given temperature.</span>
 
 <span class="sd">    Uses the linear relation</span>
 <span class="sd">    :math:`L(T) = L_{ref} - slope * (T - T_{ref})`.</span>
@@ -16808,7 +16808,7 @@ temperature.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        Latent heat in J/kg. Returns a scalar for scalar input or an array</span>
 <span class="sd">        matching the input shape.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">temperature_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">latent_heat_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">slope</span> <span class="o">*</span> <span class="p">(</span>
         <span class="n">temperature_array</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature_ref</span>
@@ -16947,9 +16947,9 @@ The ratio is clipped to [0, 1] to enforce non-negative latent heat values.</p>
 <span class="normal">183</span>
 <span class="normal">184</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;critical_temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"latent_heat_ref"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"critical_temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"beta"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -16958,13 +16958,13 @@ The ratio is clipped to [0, 1] to enforce non-negative latent heat values.</p>
     <span class="n">critical_temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the power-law latent heat strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the power-law latent heat strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        latent_heat_ref: Reference latent heat in J/kg.</span>
 <span class="sd">        critical_temperature: Critical temperature in Kelvin.</span>
 <span class="sd">        beta: Power-law exponent (dimensionless).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">latent_heat_ref</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">critical_temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">critical_temperature</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">beta</span>
@@ -17072,7 +17072,7 @@ to the range [0, 1], ensuring latent heat values stay non-negative.</p>
 <span class="normal">219</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">latent_heat</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the latent heat for the given temperature.</span>
+<span class="w">    </span><span class="sd">"""Return the latent heat for the given temperature.</span>
 
 <span class="sd">    Temperatures are normalized by the critical temperature and clipped</span>
 <span class="sd">    to the range [0, 1], ensuring latent heat values stay non-negative.</span>
@@ -17083,7 +17083,7 @@ to the range [0, 1], ensuring latent heat values stay non-negative.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        Latent heat in J/kg. Returns a scalar for scalar input or an array</span>
 <span class="sd">        matching the input shape.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">temperature_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">temperature_array</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">():</span>
         <span class="n">temperature_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">temperature_array</span><span class="p">)</span>

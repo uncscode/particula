@@ -16157,15 +16157,15 @@ NDArray[np.float64].</li>
 <span class="normal">55</span>
 <span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_mass"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_mean_thermal_speed</span><span class="p">(</span>
     <span class="n">particle_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the mean thermal speed of a particle in a fluid.</span>
+<span class="w">    </span><span class="sd">"""Calculate the mean thermal speed of a particle in a fluid.</span>
 
 <span class="sd">    The mean thermal speed (v) is derived from kinetic theory and is given by:</span>
 
@@ -16184,7 +16184,7 @@ NDArray[np.float64].</li>
 <span class="sd">            NDArray[np.float64].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_mean_thermal_speed(1e-17, 298)</span>
 <span class="sd">        # Output: ...</span>
@@ -16194,7 +16194,7 @@ NDArray[np.float64].</li>
 <span class="sd">        - Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric Chemistry and</span>
 <span class="sd">          Physics, Section 9.5.3 Mean Free Path of an Aerosol Particle,</span>
 <span class="sd">          Equation 9.87.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
         <span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">BOLTZMANN_CONSTANT</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particle_mass</span><span class="p">)</span>
     <span class="p">)</span>

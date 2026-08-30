@@ -16502,59 +16502,59 @@ bound. Must be paired with <code>saturation_lower</code>.</p>
 <span class="normal">220</span>
 <span class="normal">221</span>
 <span class="normal">222</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate scalar-only configuration consistency.</span>
+<span class="w">    </span><span class="sd">"""Validate scalar-only configuration consistency.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a scalar or molecule count has an unsupported type.</span>
 <span class="sd">        ValueError: If a value is nonfinite, out of range, or inconsistent.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_law</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;activation&quot;</span><span class="p">,</span> <span class="s2">&quot;kinetic&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;rate_law must be activation or kinetic.&quot;</span><span class="p">)</span>
-    <span class="n">_real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">,</span> <span class="s2">&quot;coefficient&quot;</span><span class="p">)</span>
-    <span class="n">_real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">survival_factor</span><span class="p">,</span> <span class="s2">&quot;survival_factor&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_law</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"activation"</span><span class="p">,</span> <span class="s2">"kinetic"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"rate_law must be activation or kinetic."</span><span class="p">)</span>
+    <span class="n">_real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">,</span> <span class="s2">"coefficient"</span><span class="p">)</span>
+    <span class="n">_real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">survival_factor</span><span class="p">,</span> <span class="s2">"survival_factor"</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;precursor_index must be a nonnegative integer.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"precursor_index must be a nonnegative integer."</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;precursor_index must be nonnegative.&quot;</span><span class="p">)</span>
-    <span class="n">_real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formation_diameter</span><span class="p">,</span> <span class="s2">&quot;formation_diameter&quot;</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"precursor_index must be nonnegative."</span><span class="p">)</span>
+    <span class="n">_real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formation_diameter</span><span class="p">,</span> <span class="s2">"formation_diameter"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
         <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must be a nonempty tuple.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molecule_counts must be a nonempty tuple."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
         <span class="nb">isinstance</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">))</span>
         <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must contain integers.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"molecule_counts must contain integers."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">count</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
         <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;molecule_counts must be nonnegative with a positive count.&quot;</span>
+            <span class="s2">"molecule_counts must be nonnegative with a positive count."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_interval</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">precursor_number_concentration_lower</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">precursor_number_concentration_upper</span><span class="p">,</span>
-        <span class="s2">&quot;precursor_number_concentration&quot;</span><span class="p">,</span>
+        <span class="s2">"precursor_number_concentration"</span><span class="p">,</span>
         <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_interval</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temperature_lower</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temperature_upper</span><span class="p">,</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">,</span>
         <span class="n">positive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saturation_lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saturation_upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;saturation bounds must be supplied as a pair.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"saturation bounds must be supplied as a pair."</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">saturation_lower</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_interval</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">saturation_lower</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">saturation_upper</span><span class="p">,</span>
-            <span class="s2">&quot;saturation&quot;</span><span class="p">,</span>
+            <span class="s2">"saturation"</span><span class="p">,</span>
             <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16947,12 +16947,12 @@ exhausted rows not selected for resampling.</p>
 <span class="normal">340</span>
 <span class="normal">341</span>
 <span class="normal">342</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reject non-exact Boolean policy controls.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Reject non-exact Boolean policy controls."""</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resampling</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;resampling must be an exact Python bool.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resampling must be an exact Python bool."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">representative_volume_scaling</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;representative_volume_scaling must be an exact Python bool.&quot;</span>
+            <span class="s2">"representative_volume_scaling must be an exact Python bool."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17448,7 +17448,7 @@ finalized handoff validation fails.</p>
     <span class="n">saturation</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute one fixed-capacity direct-Warp nucleation step.</span>
+<span class="w">    </span><span class="sd">"""Execute one fixed-capacity direct-Warp nucleation step.</span>
 
 <span class="sd">    This direct-device boundary sequences P1 preflight, P2 inventory admission,</span>
 <span class="sd">    P3 slot staging, and P4 resampling-first/scaling-fallback resolution before</span>
@@ -17487,15 +17487,15 @@ finalized handoff validation fails.</p>
 <span class="sd">        TypeError: If a direct scalar input has an unsupported type.</span>
 <span class="sd">        ValueError: If P1--P5 validation, storage ownership, physical state, or</span>
 <span class="sd">            finalized handoff validation fails.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scratch</span><span class="p">,</span> <span class="n">NucleationScratchBuffers</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;scratch must be NucleationScratchBuffers.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"scratch must be NucleationScratchBuffers."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">finalized_demand</span><span class="p">,</span> <span class="n">NucleationFinalizedDemandBuffers</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;finalized_demand must be NucleationFinalizedDemandBuffers.&quot;</span>
+            <span class="s2">"finalized_demand must be NucleationFinalizedDemandBuffers."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">diagnostics</span><span class="p">,</span> <span class="n">NucleationDiagnosticBuffers</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;diagnostics must be NucleationDiagnosticBuffers.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"diagnostics must be NucleationDiagnosticBuffers."</span><span class="p">)</span>
     <span class="n">preflight</span> <span class="o">=</span> <span class="n">_preflight_nucleation</span><span class="p">(</span>
         <span class="n">particles</span><span class="p">,</span>
         <span class="n">gas</span><span class="p">,</span>

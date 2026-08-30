@@ -16335,11 +16335,11 @@ model by Ayala 2008.</p>
 <span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span>
-<span class="normal">126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"z"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_b1</span><span class="p">(</span>
     <span class="n">z</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute b₁, a dimensionless parameter in the Ayala 2008 model.</span>
+<span class="w">    </span><span class="sd">"""Compute b₁, a dimensionless parameter in the Ayala 2008 model.</span>
 
 <span class="sd">    - b₁ = (1 + √(1 - 2z²)) / (2 √(1 - 2z²))</span>
 <span class="sd">        - z is τ_T / T_L.</span>
@@ -16361,7 +16361,7 @@ model by Ayala 2008.</p>
 <span class="sd">            the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">            Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">            https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sqrt_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">sqrt_term</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sqrt_term</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16464,11 +16464,11 @@ model by Ayala 2008.</p>
 <span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
-<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"z"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_b2</span><span class="p">(</span>
     <span class="n">z</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute b₂, a dimensionless parameter in the Ayala 2008 model.</span>
+<span class="w">    </span><span class="sd">"""Compute b₂, a dimensionless parameter in the Ayala 2008 model.</span>
 
 <span class="sd">    - b₂ = (1 - √(1 - 2z²)) / (2 √(1 - 2z²))</span>
 <span class="sd">        - z is τ_T / T_L.</span>
@@ -16490,7 +16490,7 @@ model by Ayala 2008.</p>
 <span class="sd">            the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">            Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">            https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sqrt_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sqrt_term</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sqrt_term</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16610,15 +16610,15 @@ model by Ayala 2008.</p>
 <span class="normal">94</span>
 <span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;taylor_microscale&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;eulerian_integral_length&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"taylor_microscale"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"eulerian_integral_length"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_beta</span><span class="p">(</span>
     <span class="n">taylor_microscale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">eulerian_integral_length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute β, the ratio of microscale to integral length scale.</span>
+<span class="w">    </span><span class="sd">"""Compute β, the ratio of microscale to integral length scale.</span>
 
 <span class="sd">    - β = (√2 × λ) / L_e</span>
 <span class="sd">        - λ is Taylor microscale [m].</span>
@@ -16642,7 +16642,7 @@ model by Ayala 2008.</p>
 <span class="sd">            the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">            Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">            https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">taylor_microscale</span><span class="p">)</span> <span class="o">/</span> <span class="n">eulerian_integral_length</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16754,12 +16754,12 @@ model by Ayala 2008.</p>
 <span class="normal">187</span>
 <span class="normal">188</span>
 <span class="normal">189</span>
-<span class="normal">190</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;lagrangian_integral_scale&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">190</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"z"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"lagrangian_integral_scale"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_c1</span><span class="p">(</span>
     <span class="n">z</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">lagrangian_integral_scale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute c₁, a dimensionless timescale factor in the Ayala 2008 model.</span>
+<span class="w">    </span><span class="sd">"""Compute c₁, a dimensionless timescale factor in the Ayala 2008 model.</span>
 
 <span class="sd">    - c₁ = ((1 + √(1 - 2z²)) × T_L) / 2</span>
 <span class="sd">        - z is τ_T / T_L.</span>
@@ -16783,7 +16783,7 @@ model by Ayala 2008.</p>
 <span class="sd">            the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">            Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">            https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">lagrangian_integral_scale</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16895,12 +16895,12 @@ model by Ayala 2008.</p>
 <span class="normal">220</span>
 <span class="normal">221</span>
 <span class="normal">222</span>
-<span class="normal">223</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;lagrangian_integral_scale&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">223</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"z"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"lagrangian_integral_scale"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_c2</span><span class="p">(</span>
     <span class="n">z</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">lagrangian_integral_scale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute c₂, a dimensionless timescale factor in the Ayala 2008 model.</span>
+<span class="w">    </span><span class="sd">"""Compute c₂, a dimensionless timescale factor in the Ayala 2008 model.</span>
 
 <span class="sd">    - c₂ = ((1 - √(1 - 2z²)) × T_L) / 2</span>
 <span class="sd">        - z is τ_T / T_L.</span>
@@ -16924,7 +16924,7 @@ model by Ayala 2008.</p>
 <span class="sd">            the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">            Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">            https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">lagrangian_integral_scale</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17026,11 +17026,11 @@ model by Ayala 2008.</p>
 <span class="normal">251</span>
 <span class="normal">252</span>
 <span class="normal">253</span>
-<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"beta"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_d1</span><span class="p">(</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute d₁, another dimensionless coefficient from Ayala 2008.</span>
+<span class="w">    </span><span class="sd">"""Compute d₁, another dimensionless coefficient from Ayala 2008.</span>
 
 <span class="sd">    - d₁ = (1 + √(1 - 2β²)) / (2 √(1 - 2β²))</span>
 <span class="sd">        - β is defined as β = (√2 × λ) / L_e.</span>
@@ -17052,7 +17052,7 @@ model by Ayala 2008.</p>
 <span class="sd">            the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">            Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">            https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sqrt_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">sqrt_term</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sqrt_term</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -17155,11 +17155,11 @@ model by Ayala 2008.</p>
 <span class="normal">282</span>
 <span class="normal">283</span>
 <span class="normal">284</span>
-<span class="normal">285</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">285</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"beta"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_d2</span><span class="p">(</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute d₂, another dimensionless coefficient from Ayala 2008.</span>
+<span class="w">    </span><span class="sd">"""Compute d₂, another dimensionless coefficient from Ayala 2008.</span>
 
 <span class="sd">    - d₂ = (1 - √(1 - 2β²)) / (2 √(1 - 2β²))</span>
 <span class="sd">        - β is defined as β = (√2 × λ) / L_e.</span>
@@ -17181,7 +17181,7 @@ model by Ayala 2008.</p>
 <span class="sd">            the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">            Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">            https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sqrt_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sqrt_term</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sqrt_term</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -17294,12 +17294,12 @@ model by Ayala 2008.</p>
 <span class="normal">315</span>
 <span class="normal">316</span>
 <span class="normal">317</span>
-<span class="normal">318</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;eulerian_integral_length&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">318</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"beta"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"eulerian_integral_length"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_e1</span><span class="p">(</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">eulerian_integral_length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute e₁, which scales the integral length by a factor in Ayala 2008.</span>
+<span class="w">    </span><span class="sd">"""Compute e₁, which scales the integral length by a factor in Ayala 2008.</span>
 
 <span class="sd">    - e₁ = ((1 + √(1 - 2β²)) × L_e) / 2</span>
 <span class="sd">        - β is defined as β = (√2 × λ) / L_e.</span>
@@ -17323,7 +17323,7 @@ model by Ayala 2008.</p>
 <span class="sd">            the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">            Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">            https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">eulerian_integral_length</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17435,12 +17435,12 @@ model by Ayala 2008.</p>
 <span class="normal">348</span>
 <span class="normal">349</span>
 <span class="normal">350</span>
-<span class="normal">351</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;eulerian_integral_length&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">351</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"beta"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"eulerian_integral_length"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_e2</span><span class="p">(</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">eulerian_integral_length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute e₂, which scales the integral length by a factor in Ayala 2008.</span>
+<span class="w">    </span><span class="sd">"""Compute e₂, which scales the integral length by a factor in Ayala 2008.</span>
 
 <span class="sd">    - e₂ = ((1 - √(1 - 2β²)) × L_e) / 2</span>
 <span class="sd">        - β is defined as β = (√2 × λ) / L_e.</span>
@@ -17464,7 +17464,7 @@ model by Ayala 2008.</p>
 <span class="sd">            the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">            Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">            https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">eulerian_integral_length</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17587,15 +17587,15 @@ time [s].</p>
 <span class="normal">56</span>
 <span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;lagrangian_taylor_microscale_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;lagrangian_integral_scale&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"lagrangian_taylor_microscale_time"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"lagrangian_integral_scale"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_z</span><span class="p">(</span>
     <span class="n">lagrangian_taylor_microscale_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">lagrangian_integral_scale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute z, the ratio of Taylor microscale time to Lagrangian timescale.</span>
+<span class="w">    </span><span class="sd">"""Compute z, the ratio of Taylor microscale time to Lagrangian timescale.</span>
 
 <span class="sd">    Where the equation is</span>
 <span class="sd">    - z = τ_T / T_L</span>
@@ -17623,7 +17623,7 @@ time [s].</p>
 <span class="sd">            the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">            Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">            https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">lagrangian_taylor_microscale_time</span> <span class="o">/</span> <span class="n">lagrangian_integral_scale</span>
 </code></pre></div></td></tr></table></div>
             </details>

@@ -16245,7 +16245,7 @@ particles [dimensionless].</p>
     <span class="n">mean_thermal_speed_particle</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">alpha_collision_efficiency</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Brownian coagulation kernel for aerosol particles.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Brownian coagulation kernel for aerosol particles.</span>
 
 <span class="sd">    This function computes the Brownian coagulation kernel, which is</span>
 <span class="sd">    defined as the product of the diffusivity of the particles, the</span>
@@ -16278,7 +16278,7 @@ particles [dimensionless].</p>
 <span class="sd">        - Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry and</span>
 <span class="sd">          physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation</span>
 <span class="sd">          Coefficient K12 (with alpha collision efficiency term 13.56).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Convert 1D arrays to 2D square matrices</span>
     <span class="c1"># Type narrowing: convert scalar to array if needed for len() compatibility</span>
     <span class="n">diffusivity_arr</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">diffusivity_particle</span><span class="p">)</span>
@@ -16507,7 +16507,7 @@ particles [dimensionless].</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">alpha_collision_efficiency</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Brownian coagulation kernel using system state parameters.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Brownian coagulation kernel using system state parameters.</span>
 
 <span class="sd">    This function calculates the Brownian coagulation kernel for aerosol</span>
 <span class="sd">    particles by determining the necessary intermediate properties such as</span>
@@ -16537,7 +16537,7 @@ particles [dimensionless].</p>
 <span class="sd">        - Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry and</span>
 <span class="sd">          physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation</span>
 <span class="sd">          Coefficient K12.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># calculations to get particle diffusivity</span>
     <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
     <span class="n">air_mean_free_path</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">get_molecule_mean_free_path</span><span class="p">(</span>

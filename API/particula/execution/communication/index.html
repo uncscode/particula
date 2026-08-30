@@ -16433,28 +16433,28 @@ arrays.</p>
 <span class="normal">198</span>
 <span class="normal">199</span>
 <span class="normal">200</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate cheap nested carrier and unique-role metadata.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate cheap nested carrier and unique-role metadata."""</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">communication_map</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CommunicationMap</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;communication_map must be an exact CommunicationMap.&quot;</span>
+            <span class="s2">"communication_map must be an exact CommunicationMap."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prescribed_volume</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">PrescribedVolumeUpdate</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;prescribed_volume must be an exact PrescribedVolumeUpdate.&quot;</span>
+            <span class="s2">"prescribed_volume must be an exact PrescribedVolumeUpdate."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_shapes</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;resource_shapes must be an exact tuple.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resource_shapes must be an exact tuple."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
         <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">is</span> <span class="n">CommunicationResourceShape</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_shapes</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;resource_shapes must contain exact &quot;</span>
-            <span class="s2">&quot;CommunicationResourceShape values.&quot;</span>
+            <span class="s2">"resource_shapes must contain exact "</span>
+            <span class="s2">"CommunicationResourceShape values."</span>
         <span class="p">)</span>
     <span class="n">roles</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">role</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_shapes</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">roles</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">roles</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resource_shapes roles must be unique.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resource_shapes roles must be unique."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16612,19 +16612,19 @@ array in 1/s. Validation neither normalizes nor mutates these arrays.</p>
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate only fixed-cost carrier metadata.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate only fixed-cost carrier metadata."""</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CommunicationMapForm</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;map form must be CommunicationMapForm.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"map form must be CommunicationMapForm."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transport_mode</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CommunicationTransportMode</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;transport_mode must be CommunicationTransportMode.&quot;</span>
+            <span class="s2">"transport_mode must be CommunicationTransportMode."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">,</span> <span class="n">Integral</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;edge_capacity must be an integral, not bool.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"edge_capacity must be an integral, not bool."</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_capacity</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;edge_capacity must be nonnegative.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"edge_capacity must be nonnegative."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16789,14 +16789,14 @@ array in 1/s. Validation neither normalizes nor mutates these arrays.</p>
 <span class="normal">89</span>
 <span class="normal">90</span>
 <span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform cheap role and shape metadata validation.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Perform cheap role and shape metadata validation."""</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">role</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;resource role must be an exact str.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resource role must be an exact str."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">role</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">role</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resource role must be nonempty and unpadded.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resource role must be nonempty and unpadded."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape_kind</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CommunicationShapeKind</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;resource shape_kind must be CommunicationShapeKind.&quot;</span>
+            <span class="s2">"resource shape_kind must be CommunicationShapeKind."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17134,7 +17134,7 @@ before writers run.</p>
     <span class="n">dimensions</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CommunicationConfiguration</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read-only validate one fixed-shape communication configuration.</span>
+<span class="w">    </span><span class="sd">"""Read-only validate one fixed-shape communication configuration.</span>
 
 <span class="sd">    The validator retains and returns the exact configuration object. It writes</span>
 <span class="sd">    no caller-owned array or carrier and makes no payload copy; private status</span>
@@ -17164,7 +17164,7 @@ before writers run.</p>
 <span class="sd">        only. It has neither source-inventory nor time-step input and cannot</span>
 <span class="sd">        validate outbound population totals; P3 must enforce that condition</span>
 <span class="sd">        before writers run.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">typed</span><span class="p">,</span> <span class="n">boxes</span> <span class="o">=</span> <span class="n">_validate_metadata</span><span class="p">(</span><span class="n">configuration</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
     <span class="n">map_data</span> <span class="o">=</span> <span class="n">typed</span><span class="o">.</span><span class="n">communication_map</span>
     <span class="n">volumes</span> <span class="o">=</span> <span class="n">typed</span><span class="o">.</span><span class="n">prescribed_volume</span><span class="o">.</span><span class="n">final_volumes</span>

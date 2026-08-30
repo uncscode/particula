@@ -16197,7 +16197,7 @@ https://doi.org/10.1080/02786828308958636</p>
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">boltzmann_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate a rectangular coefficient from precomputed gas transport.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Calculate a rectangular coefficient from precomputed gas transport."""</span>
     <span class="n">knudsen_number</span> <span class="o">=</span> <span class="n">knudsen_number_wp</span><span class="p">(</span><span class="n">mean_free_path</span><span class="p">,</span> <span class="n">particle_radius</span><span class="p">)</span>
     <span class="n">slip_correction</span> <span class="o">=</span> <span class="n">cunningham_slip_correction_wp</span><span class="p">(</span><span class="n">knudsen_number</span><span class="p">)</span>
     <span class="n">aerodynamic_mobility</span> <span class="o">=</span> <span class="n">aerodynamic_mobility_wp</span><span class="p">(</span>
@@ -16475,7 +16475,7 @@ input validation or charged-particle correction.</p>
     <span class="n">ref_temperature</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">sutherland_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the neutral rectangular wall-loss coefficient in s^-1.</span>
+<span class="w">    </span><span class="sd">"""Calculate the neutral rectangular wall-loss coefficient in s^-1.</span>
 
 <span class="sd">    Combines side-wall turbulent deposition with gravitational sedimentation</span>
 <span class="sd">    using the Crump-Seinfeld rectangular-chamber relation. This concrete Warp</span>
@@ -16500,7 +16500,7 @@ input validation or charged-particle correction.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Neutral particle wall-loss coefficient in s^-1.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">dynamic_viscosity_wp</span><span class="p">(</span>
         <span class="n">temperature</span><span class="p">,</span>
         <span class="n">ref_viscosity</span><span class="p">,</span>
@@ -16601,7 +16601,7 @@ input validation or charged-particle correction.</p>
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">boltzmann_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate a spherical coefficient from precomputed gas transport.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Calculate a spherical coefficient from precomputed gas transport."""</span>
     <span class="n">knudsen_number</span> <span class="o">=</span> <span class="n">knudsen_number_wp</span><span class="p">(</span><span class="n">mean_free_path</span><span class="p">,</span> <span class="n">particle_radius</span><span class="p">)</span>
     <span class="n">slip_correction</span> <span class="o">=</span> <span class="n">cunningham_slip_correction_wp</span><span class="p">(</span><span class="n">knudsen_number</span><span class="p">)</span>
     <span class="n">aerodynamic_mobility</span> <span class="o">=</span> <span class="n">aerodynamic_mobility_wp</span><span class="p">(</span>
@@ -16848,7 +16848,7 @@ no public input validation or charged-particle correction.</p>
     <span class="n">ref_temperature</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">sutherland_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the neutral spherical wall-loss coefficient in s^-1.</span>
+<span class="w">    </span><span class="sd">"""Calculate the neutral spherical wall-loss coefficient in s^-1.</span>
 
 <span class="sd">    Combines diffusion-driven turbulent deposition with gravitational</span>
 <span class="sd">    sedimentation using the Crump-Seinfeld spherical-chamber relation. This</span>
@@ -16871,7 +16871,7 @@ no public input validation or charged-particle correction.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Neutral particle wall-loss coefficient in s^-1.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">dynamic_viscosity_wp</span><span class="p">(</span>
         <span class="n">temperature</span><span class="p">,</span>
         <span class="n">ref_viscosity</span><span class="p">,</span>

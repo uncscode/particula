@@ -16223,11 +16223,11 @@ Returns NaN when the aerosol has no mass.</li>
 <span class="normal">105</span>
 <span class="normal">106</span>
 <span class="normal">107</span>
-<span class="normal">108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;species_masses&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="normal">108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"species_masses"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_mixing_state_index</span><span class="p">(</span>
     <span class="n">species_masses</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the aerosol mixing-state index (χ).</span>
+<span class="w">    </span><span class="sd">"""Calculate the aerosol mixing-state index (χ).</span>
 
 <span class="sd">    The index quantifies how internally or externally mixed an aerosol</span>
 <span class="sd">    population is. Fully internally mixed aerosols</span>
@@ -16261,7 +16261,7 @@ Returns NaN when the aerosol has no mass.</li>
 <span class="sd">          Returns NaN when the aerosol has no mass.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Mixing State Index Calculation&quot;</span>
+<span class="sd">        ``` py title="Mixing State Index Calculation"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 
@@ -16281,7 +16281,7 @@ Returns NaN when the aerosol has no mass.</li>
 <span class="sd">      (2019). Aerosol Mixing State: Measurements, Modeling, and Impacts.</span>
 <span class="sd">      Reviews of Geophysics, 57(2), 187–249.</span>
 <span class="sd">      [DOI](https://doi.org/10.1029/2018RG000615)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">species_masses_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">species_masses</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
     <span class="c1"># only keep particles with non‑zero total mass</span>

@@ -16150,7 +16150,7 @@ for electrostatic kernel calculations.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example of using ChargedCoagulationBuilder</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">builder</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedCoagulationBuilder</span><span class="p">()</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
 <span class="n">builder</span><span class="o">.</span><span class="n">set_charged_kernel_strategy</span><span class="p">(</span><span class="n">charged_kernel_strategy</span><span class="p">)</span>
 <span class="n">coagulation_strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 </code></pre></div>
@@ -16192,15 +16192,15 @@ charged kernel strategy.</p>
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Charged coagulation builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Charged coagulation builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    ChargedCoagulationStrategy, including distribution type and</span>
 <span class="sd">    charged kernel strategy.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;distribution_type&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;charged_kernel_strategy&quot;</span><span class="p">,</span>
+        <span class="s2">"distribution_type"</span><span class="p">,</span>
+        <span class="s2">"charged_kernel_strategy"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderDistributionTypeMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16259,7 +16259,7 @@ charged coagulation strategy.</li>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example of using ChargedCoagulationBuilder build</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">builder</span> <span class="o">=</span> <span class="n">ChargedCoagulationBuilder</span><span class="p">()</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
 <span class="n">builder</span><span class="o">.</span><span class="n">set_charged_kernel_strategy</span><span class="p">(</span><span class="n">charged_kernel_strategy</span><span class="p">)</span>
 <span class="n">charged_strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 </code></pre></div>
@@ -16294,7 +16294,7 @@ charged coagulation strategy.</li>
 <span class="normal">138</span>
 <span class="normal">139</span>
 <span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoagulationStrategyABC</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and return the ChargedCoagulationStrategy object.</span>
+<span class="w">    </span><span class="sd">"""Validate and return the ChargedCoagulationStrategy object.</span>
 
 <span class="sd">    This method checks whether all required parameters have been</span>
 <span class="sd">    specified (e.g., distribution type, charged kernel strategy)</span>
@@ -16305,14 +16305,14 @@ charged coagulation strategy.</li>
 <span class="sd">          charged coagulation strategy.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of using ChargedCoagulationBuilder build&quot;</span>
+<span class="sd">        ```py title="Example of using ChargedCoagulationBuilder build"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        builder = ChargedCoagulationBuilder()</span>
-<span class="sd">        builder.set_distribution_type(&quot;discrete&quot;)</span>
+<span class="sd">        builder.set_distribution_type("discrete")</span>
 <span class="sd">        builder.set_charged_kernel_strategy(charged_kernel_strategy)</span>
 <span class="sd">        charged_strategy = builder.build()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">ChargedCoagulationStrategy</span><span class="p">(</span>
@@ -16415,7 +16415,7 @@ are unsupported.</p>
     <span class="n">charged_kernel_strategy</span><span class="p">:</span> <span class="n">ChargedKernelStrategyABC</span><span class="p">,</span>
     <span class="n">charged_kernel_strategy_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the charged kernel strategy for electrostatic coagulation.</span>
+<span class="w">    </span><span class="sd">"""Set the charged kernel strategy for electrostatic coagulation.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - charged_kernel_strategy : An instance of</span>
@@ -16426,19 +16426,19 @@ are unsupported.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If the kernel strategy is invalid or units passed</span>
 <span class="sd">          are unsupported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># check type</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">charged_kernel_strategy</span><span class="p">,</span> <span class="n">ChargedKernelStrategyABC</span><span class="p">):</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Invalid kernel strategy: </span><span class="si">{</span><span class="n">charged_kernel_strategy</span><span class="si">}</span><span class="s2">. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Valid types -&gt; </span><span class="si">{</span><span class="n">ChargedKernelStrategyABC</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Invalid kernel strategy: </span><span class="si">{</span><span class="n">charged_kernel_strategy</span><span class="si">}</span><span class="s2">. "</span>
+            <span class="sa">f</span><span class="s2">"Valid types -&gt; </span><span class="si">{</span><span class="n">ChargedKernelStrategyABC</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">()</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">charged_kernel_strategy_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Units for kernel strategy are not used. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Received: </span><span class="si">{</span><span class="n">charged_kernel_strategy_units</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Units for kernel strategy are not used. "</span>
+            <span class="sa">f</span><span class="s2">"Received: </span><span class="si">{</span><span class="n">charged_kernel_strategy_units</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">charged_kernel_strategy</span> <span class="o">=</span> <span class="n">charged_kernel_strategy</span>

@@ -16327,7 +16327,7 @@ spherical or tuple for rectangular). Zero disables drift.</p>
     <span class="n">wall_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">wall_electric_field</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate charged wall loss rate for spherical or rectangular chambers.</span>
+<span class="w">    </span><span class="sd">"""Calculate charged wall loss rate for spherical or rectangular chambers.</span>
 
 <span class="sd">    Combines neutral deposition with image-charge enhancement and optional</span>
 <span class="sd">    electric-field drift. Image-charge effects apply when particles carry</span>
@@ -16343,8 +16343,8 @@ spherical or tuple for rectangular). Zero disables drift.</p>
 <span class="sd">        particle_charge: Particle charge in elementary charge units.</span>
 <span class="sd">        temperature: Gas temperature in kelvin.</span>
 <span class="sd">        pressure: Gas pressure in pascals.</span>
-<span class="sd">        chamber_geometry: Geometry name, ``&quot;spherical&quot;`` or</span>
-<span class="sd">            ``&quot;rectangular&quot;``.</span>
+<span class="sd">        chamber_geometry: Geometry name, ``"spherical"`` or</span>
+<span class="sd">            ``"rectangular"``.</span>
 <span class="sd">        chamber_radius: Chamber radius in meters for spherical geometry.</span>
 <span class="sd">        chamber_dimensions: ``(length, width, height)`` in meters for</span>
 <span class="sd">            rectangular geometry.</span>
@@ -16359,7 +16359,7 @@ spherical or tuple for rectangular). Zero disables drift.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If geometry arguments are inconsistent or not finite.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">strategy</span> <span class="o">=</span> <span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
         <span class="n">chamber_geometry</span><span class="o">=</span><span class="n">chamber_geometry</span><span class="p">,</span>
@@ -16367,7 +16367,7 @@ spherical or tuple for rectangular). Zero disables drift.</p>
         <span class="n">chamber_dimensions</span><span class="o">=</span><span class="n">chamber_dimensions</span><span class="p">,</span>
         <span class="n">wall_potential</span><span class="o">=</span><span class="n">wall_potential</span><span class="p">,</span>
         <span class="n">wall_electric_field</span><span class="o">=</span><span class="n">wall_electric_field</span><span class="p">,</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">radius_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">density_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle_density</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -16567,7 +16567,7 @@ coefficient computed via
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the wall loss rate for a rectangular chamber.</span>
+<span class="w">    </span><span class="sd">"""Calculate the wall loss rate for a rectangular chamber.</span>
 
 <span class="sd">    The loss rate is computed as ``L = -k c`` where ``k`` is the wall</span>
 <span class="sd">    loss coefficient [1/s] and ``c`` is the particle concentration</span>
@@ -16601,8 +16601,8 @@ coefficient computed via
 <span class="sd">        &gt;&gt;&gt; loss_rate  # doctest: +SKIP</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Hinds, W. C. &quot;Aerosol Technology.&quot; 2nd ed. John Wiley &amp; Sons, 1999.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        Hinds, W. C. "Aerosol Technology." 2nd ed. John Wiley &amp; Sons, 1999.</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Calculate the wall loss coefficient</span>
     <span class="n">loss_coefficient</span> <span class="o">=</span> <span class="n">get_rectangle_wall_loss_coefficient_via_system_state</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
@@ -16804,7 +16804,7 @@ https://en.wikipedia.org/wiki/Aerosol.</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the wall loss rate for a spherical chamber.</span>
+<span class="w">    </span><span class="sd">"""Calculate the wall loss rate for a spherical chamber.</span>
 
 <span class="sd">    The loss rate is computed as ``L = -k c`` where ``k`` is the wall</span>
 <span class="sd">    loss coefficient [1/s] and ``c`` is the particle concentration</span>
@@ -16838,9 +16838,9 @@ https://en.wikipedia.org/wiki/Aerosol.</p>
 <span class="sd">        &gt;&gt;&gt; rate  # doctest: +SKIP</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Wikipedia contributors. &quot;Aerosol dynamics.&quot; *Wikipedia*.</span>
+<span class="sd">        Wikipedia contributors. "Aerosol dynamics." *Wikipedia*.</span>
 <span class="sd">        https://en.wikipedia.org/wiki/Aerosol.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Calculate the wall loss coefficient</span>
     <span class="n">loss_coefficient</span> <span class="o">=</span> <span class="n">get_spherical_wall_loss_coefficient_via_system_state</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>

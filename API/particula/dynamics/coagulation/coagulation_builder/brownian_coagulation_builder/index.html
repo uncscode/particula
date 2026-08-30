@@ -16127,7 +16127,7 @@ size distribution.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example of using BrownianCoagulationBuilder</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">builder</span> <span class="o">=</span> <span class="n">BrownianCoagulationBuilder</span><span class="p">()</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="c1"># strategy is now a BrownianCoagulationStrategy instance</span>
 </code></pre></div>
@@ -16154,12 +16154,12 @@ BrownianCoagulationStrategy.</p>
 <span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Brownian coagulation builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Brownian coagulation builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    BrownianCoagulationStrategy.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;distribution_type&quot;</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"distribution_type"</span><span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderDistributionTypeMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16232,7 +16232,7 @@ before creating and returning a <code>BrownianCoagulationStrategy</code>.</p>
 <span class="normal">78</span>
 <span class="normal">79</span>
 <span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoagulationStrategyABC</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and return the BrownianCoagulationStrategy object.</span>
+<span class="w">    </span><span class="sd">"""Validate and return the BrownianCoagulationStrategy object.</span>
 
 <span class="sd">    Checks that all required parameters (e.g., distribution_type) are set</span>
 <span class="sd">    before creating and returning a `BrownianCoagulationStrategy`.</span>
@@ -16240,7 +16240,7 @@ before creating and returning a <code>BrownianCoagulationStrategy</code>.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        BrownianCoagulationStrategy : The newly created</span>
 <span class="sd">        Brownian coagulation strategy.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>

@@ -16347,7 +16347,7 @@
 
 <span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">cunningham_correction</span><span class="p">(</span><span class="n">diameter</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mean_free_path</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cunningham slip correction factor for small particles.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Cunningham slip correction factor for small particles."""</span>
     <span class="n">kn</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">mean_free_path</span> <span class="o">/</span> <span class="n">diameter</span>
     <span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span> <span class="o">=</span> <span class="mf">1.257</span><span class="p">,</span> <span class="mf">0.400</span><span class="p">,</span> <span class="mf">0.55</span>
     <span class="k">return</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">kn</span> <span class="o">*</span> <span class="p">(</span><span class="n">A1</span> <span class="o">+</span> <span class="n">A2</span> <span class="o">*</span> <span class="n">wp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">A3</span> <span class="o">/</span> <span class="n">kn</span><span class="p">))</span>
@@ -16360,7 +16360,7 @@
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">k_boltzmann</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.BOLTZMANN_CONSTANT</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stokes-Einstein diffusion coefficient with slip correction.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Stokes-Einstein diffusion coefficient with slip correction."""</span>
     <span class="n">Cc</span> <span class="o">=</span> <span class="n">cunningham_correction</span><span class="p">(</span><span class="n">diameter</span><span class="p">,</span> <span class="n">mean_free_path</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">k_boltzmann</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">Cc</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">*</span> <span class="n">viscosity</span> <span class="o">*</span> <span class="n">diameter</span><span class="p">)</span>
 
@@ -16372,11 +16372,11 @@
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute Brownian coagulation kernel K(d_i, d_j).</span>
+<span class="w">    </span><span class="sd">"""Compute Brownian coagulation kernel K(d_i, d_j).</span>
 
 <span class="sd">    This is the rate coefficient for collision between particles</span>
 <span class="sd">    of diameters d_i and d_j due to Brownian motion.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Diffusion coefficients</span>
     <span class="n">D_i</span> <span class="o">=</span> <span class="n">diffusion_coefficient</span><span class="p">(</span><span class="n">d_i</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">viscosity</span><span class="p">,</span> <span class="n">mean_free_path</span><span class="p">)</span>
     <span class="n">D_j</span> <span class="o">=</span> <span class="n">diffusion_coefficient</span><span class="p">(</span><span class="n">d_j</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">viscosity</span><span class="p">,</span> <span class="n">mean_free_path</span><span class="p">)</span>
@@ -16395,7 +16395,7 @@
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">n_bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute coagulation loss rate for each size bin.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute coagulation loss rate for each size bin."""</span>
     <span class="n">i</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">d_i</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
     <span class="n">n_i</span> <span class="o">=</span> <span class="n">concentrations</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -16424,7 +16424,7 @@
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build full coagulation kernel matrix K[i,j].&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Build full coagulation kernel matrix K[i,j]."""</span>
     <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">kernel_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">brownian_coagulation_kernel</span><span class="p">(</span>
@@ -16447,7 +16447,7 @@
     <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">search_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find collision partners for each particle.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Find collision partners for each particle."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">pos_i</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
     <span class="n">d_i</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16490,7 +16490,7 @@
     <span class="n">random_values</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
     <span class="n">collision_probs</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge particles that collide (mass conserving).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Merge particles that collide (mass conserving)."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">active</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -16524,10 +16524,10 @@
 <h3 id="saturation-and-kelvin-effect">Saturation and Kelvin Effect<a class="headerlink" href="#saturation-and-kelvin-effect" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">saturation_vapor_pressure_water</span><span class="p">(</span><span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Saturation vapor pressure of water (Clausius-Clapeyron).</span>
+<span class="w">    </span><span class="sd">"""Saturation vapor pressure of water (Clausius-Clapeyron).</span>
 
 <span class="sd">    Returns pressure in Pa.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">T0</span> <span class="o">=</span> <span class="mf">273.15</span>  <span class="c1"># Reference temperature (K)</span>
     <span class="n">P0</span> <span class="o">=</span> <span class="mf">611.2</span>   <span class="c1"># Reference pressure (Pa)</span>
     <span class="n">L_v</span> <span class="o">=</span> <span class="mf">2.5e6</span>  <span class="c1"># Latent heat of vaporization (J/kg)</span>
@@ -16544,11 +16544,11 @@
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">gas_constant</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.GAS_CONSTANT</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Kelvin effect: increased vapor pressure over curved surface.</span>
+<span class="w">    </span><span class="sd">"""Kelvin effect: increased vapor pressure over curved surface.</span>
 
 <span class="sd">    Important for particles &lt; 100 nm.</span>
 <span class="sd">    gas_constant passed from particula.util.constants.GAS_CONSTANT.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">exponent</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">*</span> <span class="n">surface_tension</span> <span class="o">*</span> <span class="n">molar_mass</span><span class="p">)</span> <span class="o">/</span> \
                <span class="p">(</span><span class="n">gas_constant</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">density</span> <span class="o">*</span> <span class="n">diameter</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">exponent</span><span class="p">)</span>
@@ -16563,10 +16563,10 @@
     <span class="n">density</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Equilibrium saturation ratio including Raoult and Kelvin effects.</span>
+<span class="w">    </span><span class="sd">"""Equilibrium saturation ratio including Raoult and Kelvin effects.</span>
 
 <span class="sd">    Kappa-Kohler theory for hygroscopic growth.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Kelvin term</span>
     <span class="n">kelvin</span> <span class="o">=</span> <span class="n">kelvin_factor</span><span class="p">(</span><span class="n">diameter</span><span class="p">,</span> <span class="n">surface_tension</span><span class="p">,</span> <span class="n">molar_mass</span><span class="p">,</span> 
                            <span class="n">density</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
@@ -16586,7 +16586,7 @@
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">accommodation</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fuchs-Sutugin correction for transition regime mass transfer.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Fuchs-Sutugin correction for transition regime mass transfer."""</span>
     <span class="n">kn</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">mean_free_path</span> <span class="o">/</span> <span class="n">diameter</span>
 
     <span class="c1"># Fuchs-Sutugin factor</span>
@@ -16612,7 +16612,7 @@
     <span class="n">accommodation</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">gas_constant</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.GAS_CONSTANT</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute diameter growth rate dd/dt for each particle.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute diameter growth rate dd/dt for each particle."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">d</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16646,7 +16646,7 @@
     <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">min_diameter</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update particle diameters based on growth rates.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Update particle diameters based on growth rates."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">d_new</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span> <span class="o">+</span> <span class="n">growth_rates</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span> <span class="o">*</span> <span class="n">dt</span>
@@ -16668,11 +16668,11 @@
     <span class="n">random_y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">random_z</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute Brownian displacement for a timestep.</span>
+<span class="w">    </span><span class="sd">"""Compute Brownian displacement for a timestep.</span>
 
 <span class="sd">    Uses Box-Muller transform assumption that random values</span>
 <span class="sd">    are already normally distributed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Standard deviation of displacement</span>
     <span class="n">sigma</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">diffusion_coeff</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span>
 
@@ -16692,7 +16692,7 @@
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply Brownian diffusion to all particles.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Apply Brownian diffusion to all particles."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">d</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16710,7 +16710,7 @@
     <span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
     <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete aerosol dynamics simulation.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Complete aerosol dynamics simulation."""</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
     <span class="c1"># Environmental conditions</span>
@@ -16739,18 +16739,18 @@
     <span class="n">initial_diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_diameters</span><span class="p">)</span>
 
     <span class="c1"># Warp arrays</span>
-    <span class="n">diameters</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">initial_diameters</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
-    <span class="n">dry_diameters</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">initial_diameters</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="n">diameters</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">initial_diameters</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">)</span>
+    <span class="n">dry_diameters</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">initial_diameters</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">)</span>
     <span class="n">positions</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span>
     <span class="p">)</span>
     <span class="n">concentrations</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_particles</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">,</span>  <span class="c1"># #/m³</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span>
     <span class="p">)</span>
-    <span class="n">growth_rates</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
-    <span class="n">coag_rates</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="n">growth_rates</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">)</span>
+    <span class="n">coag_rates</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">)</span>
 
     <span class="c1"># Saturation ratio from relative humidity</span>
     <span class="n">saturation_ratio</span> <span class="o">=</span> <span class="n">relative_humidity</span>
@@ -16789,7 +16789,7 @@
         <span class="c1"># 3. Apply Brownian diffusion</span>
         <span class="n">random_vecs</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span>
         <span class="p">)</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
             <span class="n">apply_brownian_motion</span><span class="p">,</span>
@@ -16804,12 +16804,12 @@
 
         <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">d_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">diameters</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">: mean diameter = </span><span class="si">{</span><span class="n">d_mean</span><span class="o">*</span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> nm&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Step </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">: mean diameter = </span><span class="si">{</span><span class="n">d_mean</span><span class="o">*</span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> nm"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;diameters&quot;</span><span class="p">:</span> <span class="n">diameters</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-        <span class="s2">&quot;positions&quot;</span><span class="p">:</span> <span class="n">positions</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-        <span class="s2">&quot;concentrations&quot;</span><span class="p">:</span> <span class="n">concentrations</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+        <span class="s2">"diameters"</span><span class="p">:</span> <span class="n">diameters</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+        <span class="s2">"positions"</span><span class="p">:</span> <span class="n">positions</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+        <span class="s2">"concentrations"</span><span class="p">:</span> <span class="n">concentrations</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div>
 <h2 id="size-distribution-moment-calculations">Size Distribution Moment Calculations<a class="headerlink" href="#size-distribution-moment-calculations" title="Permanent link">&para;</a></h2>
@@ -16819,14 +16819,14 @@
     <span class="n">concentrations</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
     <span class="n">moments</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>  <span class="c1"># [M0, M1, M2, M3, M6]</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute moments of the size distribution.</span>
+<span class="w">    </span><span class="sd">"""Compute moments of the size distribution.</span>
 
 <span class="sd">    M0 = total number concentration</span>
 <span class="sd">    M1 = mean diameter weighted by number</span>
 <span class="sd">    M2 = proportional to surface area</span>
 <span class="sd">    M3 = proportional to volume/mass</span>
 <span class="sd">    M6 = needed for optical properties</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">d</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16845,7 +16845,7 @@
 <h2 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">&para;</a></h2>
 <h3 id="use-spatial-hashing-for-on-coagulation">Use Spatial Hashing for O(n) Coagulation<a class="headerlink" href="#use-spatial-hashing-for-on-coagulation" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_particle_grid</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create spatial hash grid for efficient neighbor queries.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Create spatial hash grid for efficient neighbor queries."""</span>
     <span class="n">grid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">HashGrid</span><span class="p">(</span><span class="n">dim_x</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">dim_y</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">dim_z</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
 
     <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>

@@ -16120,7 +16120,7 @@ We recommend the lightning‑fast uv tool—see the <a href="../Setup_UV/">uv s
 </code></pre></div>
    This will create <code>.venv</code> and automatically make it active for subsequent <code>uv</code> commands.</li>
 <li><strong>Install Editable:</strong> with virtual environment active, install Particula in <strong>development mode</strong> with the required dev dependencies:
-   <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev,extra]&quot;</span>
+   <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev,extra]"</span>
 </code></pre></div></li>
 </ul>
 <p>The <code>pip install -e ".[dev,extra]"</code> command tells pip to install the package in editable mode (<code>-e</code>) from the current directory (<code>.</code>) including the <code>[dev,extra]</code> optional dependencies (which include development and extra tools). This will pull in things like testing frameworks, linters, etc., as defined by Particula’s <code>pyproject.toml</code>. If using uv, run <code>uv pip install -e ".[dev,extra]"</code> equivalently.</p>

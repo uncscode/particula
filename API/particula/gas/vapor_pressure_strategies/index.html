@@ -16694,13 +16694,13 @@ which relates temperature in Kelvin to the logarithm of vapor pressure.</p>
     <span class="n">b</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">c</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Antoine Vapor Pressure strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Antoine Vapor Pressure strategy.</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        a: Coefficient &#39;a&#39; in the Antoine equation.</span>
-<span class="sd">        b: Coefficient &#39;b&#39; in the Antoine equation (K).</span>
-<span class="sd">        c: Coefficient &#39;c&#39; in the Antoine equation (K).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        a: Coefficient 'a' in the Antoine equation.</span>
+<span class="sd">        b: Coefficient 'b' in the Antoine equation (K).</span>
+<span class="sd">        c: Coefficient 'c' in the Antoine equation (K).</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">c</span>
@@ -16808,7 +16808,7 @@ which relates temperature in Kelvin to the logarithm of vapor pressure.</p>
 <span class="normal">330</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pure_vapor_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate vapor pressure using the Antoine equation.</span>
+<span class="w">    </span><span class="sd">"""Calculate vapor pressure using the Antoine equation.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature : Temperature in Kelvin.</span>
@@ -16817,7 +16817,7 @@ which relates temperature in Kelvin to the logarithm of vapor pressure.</p>
 <span class="sd">        Vapor pressure in Pascals.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Antoine Vapor Pressure Calculation&quot;</span>
+<span class="sd">        ``` py title="Antoine Vapor Pressure Calculation"</span>
 <span class="sd">        vapor_pressure = strategy.pure_vapor_pressure(</span>
 <span class="sd">            temperature=300</span>
 <span class="sd">        )</span>
@@ -16828,7 +16828,7 @@ which relates temperature in Kelvin to the logarithm of vapor pressure.</p>
 <span class="sd">        - https://en.wikipedia.org/wiki/Antoine_equation (but in Kelvin)</span>
 <span class="sd">        - Kelvin form:</span>
 <span class="sd">            https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781118135341.app1</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_antoine_vapor_pressure</span><span class="p">(</span>
         <span class="n">a</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span>
     <span class="p">)</span>
@@ -16915,11 +16915,11 @@ liquid metals. The relationship is expressed as:</p>
 <span class="normal">572</span>
 <span class="normal">573</span>
 <span class="normal">574</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize with the 5-term polynomial coefficients.</span>
+<span class="w">    </span><span class="sd">"""Initialize with the 5-term polynomial coefficients.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - coefficients : Tuple ``(A, B, C, D, E)`` for the correlation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="o">=</span> <span class="n">coefficients</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -17011,7 +17011,7 @@ liquid metals. The relationship is expressed as:</p>
 <span class="normal">600</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pure_vapor_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate vapor pressure from the 5-term polynomial.</span>
+<span class="w">    </span><span class="sd">"""Calculate vapor pressure from the 5-term polynomial.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature : Temperature in Kelvin.</span>
@@ -17020,10 +17020,10 @@ liquid metals. The relationship is expressed as:</p>
 <span class="sd">        Vapor pressure in Pascals.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Vapor pressure from polynomial&quot;</span>
+<span class="sd">        ``` py title="Vapor pressure from polynomial"</span>
 <span class="sd">        vp = strategy.pure_vapor_pressure(3000.0)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span>
     <span class="n">ln_p_bar</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">a</span>
@@ -17185,14 +17185,14 @@ heat of vaporization and the specific gas constant of the substance.</p>
     <span class="n">temperature_initial</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">pressure_initial</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes the Clausius-Clapeyron strategy with the specific latent</span>
+<span class="w">    </span><span class="sd">"""Initializes the Clausius-Clapeyron strategy with the specific latent</span>
 <span class="sd">    heat of vaporization and the specific gas constant of the substance.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - latent_heat : Latent heat of vaporization in J/mol.</span>
 <span class="sd">        - temperature_initial : Initial temperature in Kelvin.</span>
 <span class="sd">        - pressure_initial : Initial vapor pressure in Pascals.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span> <span class="o">=</span> <span class="n">latent_heat</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">temperature_initial</span> <span class="o">=</span> <span class="n">temperature_initial</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pressure_initial</span> <span class="o">=</span> <span class="n">pressure_initial</span>
@@ -17297,7 +17297,7 @@ heat of vaporization and the specific gas constant of the substance.</p>
 <span class="normal">413</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pure_vapor_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate vapor pressure using Clausius-Clapeyron equation.</span>
+<span class="w">    </span><span class="sd">"""Calculate vapor pressure using Clausius-Clapeyron equation.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature : Final temperature in Kelvin.</span>
@@ -17306,7 +17306,7 @@ heat of vaporization and the specific gas constant of the substance.</p>
 <span class="sd">        Pure vapor pressure in Pascals.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Clausius-Clapeyron Vapor Pressure Calculation&quot;</span>
+<span class="sd">        ``` py title="Clausius-Clapeyron Vapor Pressure Calculation"</span>
 <span class="sd">        vapor_pressure = strategy.pure_vapor_pressure(</span>
 <span class="sd">            temperature=300</span>
 <span class="sd">        )</span>
@@ -17314,7 +17314,7 @@ heat of vaporization and the specific gas constant of the substance.</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_clausius_clapeyron_vapor_pressure</span><span class="p">(</span>
         <span class="n">latent_heat</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span><span class="p">,</span>
         <span class="n">temperature_initial</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature_initial</span><span class="p">,</span>
@@ -17424,11 +17424,11 @@ model.</p>
 <span class="normal">223</span>
 <span class="normal">224</span>
 <span class="normal">225</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vapor_pressure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Constant Vapor Pressure strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Constant Vapor Pressure strategy.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        vapor_pressure: The constant vapor pressure value in Pascals.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">vapor_pressure</span> <span class="o">=</span> <span class="n">vapor_pressure</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -17517,7 +17517,7 @@ model.</p>
 <span class="normal">246</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pure_vapor_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the constant vapor pressure value.</span>
+<span class="w">    </span><span class="sd">"""Return the constant vapor pressure value.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature : Not used.</span>
@@ -17526,12 +17526,12 @@ model.</p>
 <span class="sd">        The constant vapor pressure value in Pascals.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Constant Vapor Pressure Calculation&quot;</span>
+<span class="sd">        ``` py title="Constant Vapor Pressure Calculation"</span>
 <span class="sd">        vapor_pressure = strategy.pure_vapor_pressure(</span>
 <span class="sd">            temperature=300</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># repeat the constant value for each element temperature</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vapor_pressure</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -17666,7 +17666,7 @@ boiling point. A logistic weight provides a smooth changeover.</p>
     <span class="n">boiling_point</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">transition_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the hybrid vapor pressure strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the hybrid vapor pressure strategy.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - coefficients : Polynomial coefficients ``(A, B, C, D, E)``.</span>
@@ -17675,7 +17675,7 @@ boiling point. A logistic weight provides a smooth changeover.</p>
 <span class="sd">        - pressure_initial : Reference pressure in Pascals.</span>
 <span class="sd">        - boiling_point : Temperature where weighting is 0.5.</span>
 <span class="sd">        - transition_width : Width of the logistic transition in Kelvin.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">liquid_strategy</span> <span class="o">=</span> <span class="n">ArblasterLiquidVaporPressureStrategy</span><span class="p">(</span>
         <span class="n">coefficients</span>
     <span class="p">)</span>
@@ -17772,7 +17772,7 @@ boiling point. A logistic weight provides a smooth changeover.</p>
 <span class="normal">664</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pure_vapor_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Smoothly combine liquid and Clausius–Clapeyron approaches.</span>
+<span class="w">    </span><span class="sd">"""Smoothly combine liquid and Clausius–Clapeyron approaches.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature : Temperature in Kelvin.</span>
@@ -17781,10 +17781,10 @@ boiling point. A logistic weight provides a smooth changeover.</p>
 <span class="sd">        Vapor pressure in Pascals.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Hybrid vapor pressure&quot;</span>
+<span class="sd">        ``` py title="Hybrid vapor pressure"</span>
 <span class="sd">        vp = strategy.pure_vapor_pressure(boiling_point + 50.0)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">p_liq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">liquid_strategy</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
     <span class="n">p_claus</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clausius_strategy</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
@@ -17945,7 +17945,7 @@ Temperatures in Kelvin corresponding to the vapor pressures.</p>
     <span class="n">vapor_pressures</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">temperatures</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Table Vapor Pressure strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Table Vapor Pressure strategy.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        vapor_pressures: Array of vapor pressure values in Pascals.</span>
@@ -17953,12 +17953,12 @@ Temperatures in Kelvin corresponding to the vapor pressures.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If temperature and pressure tables differ in length.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">table_pressures</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vapor_pressures</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">table_temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperatures</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">table_pressures</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">table_temps</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Temperature and pressure tables must be the same length&quot;</span>
+            <span class="s2">"Temperature and pressure tables must be the same length"</span>
         <span class="p">)</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">table_temps</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">vapor_pressures</span> <span class="o">=</span> <span class="n">table_pressures</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
@@ -18010,7 +18010,7 @@ Temperatures in Kelvin corresponding to the vapor pressures.</p>
 <span class="normal">543</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pure_vapor_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolate the vapor pressure for the given temperature.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Interpolate the vapor pressure for the given temperature."""</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temperatures</span><span class="p">,</span>
@@ -18199,7 +18199,7 @@ temperature.</p>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the concentration of the gas at a given pressure and</span>
+<span class="w">    </span><span class="sd">"""Calculate the concentration of the gas at a given pressure and</span>
 <span class="sd">    temperature.</span>
 
 <span class="sd">    Arguments:</span>
@@ -18211,14 +18211,14 @@ temperature.</p>
 <span class="sd">        The concentration of the gas in kg/m^3.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Concentration Calculation&quot;</span>
+<span class="sd">        ``` py title="Concentration Calculation"</span>
 <span class="sd">        concentration = strategy.concentration(</span>
 <span class="sd">            partial_pressure=101325,</span>
 <span class="sd">            molar_mass=18.01528,</span>
 <span class="sd">            temperature=298.15</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_concentration_from_pressure</span><span class="p">(</span>
         <span class="n">partial_pressure</span><span class="p">,</span> <span class="n">molar_mass</span><span class="p">,</span> <span class="n">temperature</span>
     <span class="p">)</span>
@@ -18324,7 +18324,7 @@ temperature.</p>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate partial pressure from concentration, molar mass, T.</span>
+<span class="w">    </span><span class="sd">"""Calculate partial pressure from concentration, molar mass, T.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - concentration : Concentration of the gas in kg/m^3.</span>
@@ -18335,14 +18335,14 @@ temperature.</p>
 <span class="sd">        Partial pressure of the gas in Pascals.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Partial Pressure Calculation&quot;</span>
+<span class="sd">        ``` py title="Partial Pressure Calculation"</span>
 <span class="sd">        partial_pressure = strategy.partial_pressure(</span>
 <span class="sd">            concentration=5.0,</span>
 <span class="sd">            molar_mass=18.01528,</span>
 <span class="sd">            temperature=298.15</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_partial_pressure</span><span class="p">(</span><span class="n">concentration</span><span class="p">,</span> <span class="n">molar_mass</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18398,12 +18398,12 @@ temperature. Units are in Pascals Pa=kg/(m·s²).</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">pure_vapor_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the pure (saturation) vapor pressure at a given</span>
+<span class="w">    </span><span class="sd">"""Calculate the pure (saturation) vapor pressure at a given</span>
 <span class="sd">    temperature. Units are in Pascals Pa=kg/(m·s²).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature : Temperature in Kelvin.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18498,7 +18498,7 @@ temperature.</p>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the saturation concentration of the gas at a given</span>
+<span class="w">    </span><span class="sd">"""Calculate the saturation concentration of the gas at a given</span>
 <span class="sd">    temperature.</span>
 
 <span class="sd">    Arguments:</span>
@@ -18509,13 +18509,13 @@ temperature.</p>
 <span class="sd">        The saturation concentration of the gas in kg/m^3.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Saturation Concentration Calculation&quot;</span>
+<span class="sd">        ``` py title="Saturation Concentration Calculation"</span>
 <span class="sd">        saturation_concentration = strategy.saturation_concentration(</span>
 <span class="sd">            molar_mass=18.01528,</span>
 <span class="sd">            temperature=298.15</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="n">temperature</span><span class="p">),</span> <span class="n">molar_mass</span><span class="p">,</span> <span class="n">temperature</span>
     <span class="p">)</span>
@@ -18625,7 +18625,7 @@ molar mass at a given temperature.</p>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the saturation ratio of the gas from its concentration and</span>
+<span class="w">    </span><span class="sd">"""Calculate the saturation ratio of the gas from its concentration and</span>
 <span class="sd">    molar mass at a given temperature.</span>
 
 <span class="sd">    Arguments:</span>
@@ -18637,14 +18637,14 @@ molar mass at a given temperature.</p>
 <span class="sd">        The saturation ratio of the gas.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Saturation Ratio Calculation&quot;</span>
+<span class="sd">        ``` py title="Saturation Ratio Calculation"</span>
 <span class="sd">        saturation_ratio = strategy.saturation_ratio(</span>
 <span class="sd">            concentration=5.0,</span>
 <span class="sd">            molar_mass=18.01528,</span>
 <span class="sd">            temperature=298.15</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_pressure</span><span class="p">(</span>
         <span class="n">concentration</span><span class="p">,</span> <span class="n">molar_mass</span><span class="p">,</span> <span class="n">temperature</span>
     <span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
@@ -18815,7 +18815,7 @@ the saturation vapor pressure of water.</p>
 <span class="normal">469</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pure_vapor_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate vapor pressure using the Buck equation for water vapor.</span>
+<span class="w">    </span><span class="sd">"""Calculate vapor pressure using the Buck equation for water vapor.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature: Temperature in Kelvin.</span>
@@ -18824,7 +18824,7 @@ the saturation vapor pressure of water.</p>
 <span class="sd">        Vapor pressure in Pascals.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Water Buck Vapor Pressure Calculation&quot;</span>
+<span class="sd">        ``` py title="Water Buck Vapor Pressure Calculation"</span>
 <span class="sd">        vapor_pressure = strategy.pure_vapor_pressure(</span>
 <span class="sd">            temperature=300</span>
 <span class="sd">        )</span>
@@ -18835,7 +18835,7 @@ the saturation vapor pressure of water.</p>
 <span class="sd">          Enhancement Factor. J. Appl. Meteor. Climatol., 20, 1527-1532,</span>
 <span class="sd">          https://doi.org/10.1175/1520-0450(1981)020&lt;1527:NEFCVP&gt;2.0.CO;2.</span>
 <span class="sd">        - https://en.wikipedia.org/wiki/Arden_Buck_equation</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_buck_vapor_pressure</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

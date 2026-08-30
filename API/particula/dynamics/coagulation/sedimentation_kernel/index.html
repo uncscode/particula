@@ -16202,7 +16202,7 @@ of radii radius1 and radius2, which can depend on additional factors
 <span class="normal">58</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calculate_collision_efficiency_function</span><span class="p">(</span>
     <span class="n">radius1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">radius2</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the collision efficiency between two particles (placeholder).</span>
+<span class="w">    </span><span class="sd">"""Calculate the collision efficiency between two particles (placeholder).</span>
 
 <span class="sd">    This function calculates the collision efficiency E for two particles</span>
 <span class="sd">    of radii radius1 and radius2, which can depend on additional factors</span>
@@ -16225,10 +16225,10 @@ of radii radius1 and radius2, which can depend on additional factors
 <span class="sd">    References:</span>
 <span class="sd">        - Saffman, P. G., &amp; Turner, J. S. (1956). On the collision of drops</span>
 <span class="sd">          in turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Implement the actual collision efficiency calculation here</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-        <span class="s2">&quot;Collision efficiency calculation not implemented yet.&quot;</span>
+        <span class="s2">"Collision efficiency calculation not implemented yet."</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16388,7 +16388,7 @@ efficiency or use 1. Defaults to True.</p>
     <span class="n">settling_velocities</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">calculate_collision_efficiency</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate sedimentation kernel for aerosol particles (Eq 13A.4).</span>
+<span class="w">    </span><span class="sd">"""Calculate sedimentation kernel for aerosol particles (Eq 13A.4).</span>
 
 <span class="sd">    This function computes the coagulation kernel due to gravitational</span>
 <span class="sd">    settling, where larger particles settle faster and overtake smaller</span>
@@ -16411,7 +16411,7 @@ efficiency or use 1. Defaults to True.</p>
 <span class="sd">        - Sedimentation kernel matrix [m³/s], shape (n, n).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 
 <span class="sd">        rads = np.array([1e-7, 2e-7])</span>
@@ -16423,7 +16423,7 @@ efficiency or use 1. Defaults to True.</p>
 <span class="sd">    References:</span>
 <span class="sd">        - Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry</span>
 <span class="sd">          and physics (3rd ed.). John Wiley &amp; Sons. Chapter 13, Equation 13A.4.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">diameter_matrix</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span>
         <span class="n">particle_radius</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">particle_radius</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
     <span class="p">)</span>
@@ -16603,7 +16603,7 @@ efficiency or use 1. Defaults to True.</p>
 <span class="normal">176</span>
 <span class="normal">177</span>
 <span class="normal">178</span>
-<span class="normal">179</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">179</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"pressure"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_sedimentation_kernel_sp2016_via_system_state</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">particle_density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -16611,7 +16611,7 @@ efficiency or use 1. Defaults to True.</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">calculate_collision_efficiency</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the sedimentation kernel (Equation 13A.4) via system state.</span>
+<span class="w">    </span><span class="sd">"""Calculate the sedimentation kernel (Equation 13A.4) via system state.</span>
 
 <span class="sd">    This function first derives settling velocities using the system state</span>
 <span class="sd">    (particle radius, density, temperature, pressure), then calls</span>
@@ -16629,7 +16629,7 @@ efficiency or use 1. Defaults to True.</p>
 <span class="sd">        - Sedimentation kernel matrix [m³/s], shape (n, n).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        rads = np.array([1e-7, 2e-7])</span>
 <span class="sd">        dens = np.array([1000, 1200])</span>
@@ -16645,7 +16645,7 @@ efficiency or use 1. Defaults to True.</p>
 <span class="sd">    References:</span>
 <span class="sd">        - Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry</span>
 <span class="sd">          and physics (3rd ed.). John Wiley &amp; Sons. Chapter 13, Equation 13A.4.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">settling_velocities</span> <span class="o">=</span> <span class="n">get_particle_settling_velocity_via_system_state</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
         <span class="n">particle_density</span><span class="o">=</span><span class="n">particle_density</span><span class="p">,</span>

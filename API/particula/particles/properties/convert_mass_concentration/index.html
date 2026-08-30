@@ -16191,13 +16191,13 @@ normalized row by row.</p>
 <span class="normal">167</span>
 <span class="normal">168</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_concentrations&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_concentrations"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_mass_fraction_from_mass</span><span class="p">(</span>
     <span class="n">mass_concentrations</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert mass concentrations to mass fractions.</span>
+<span class="w">    </span><span class="sd">"""Convert mass concentrations to mass fractions.</span>
 
 <span class="sd">    The mass fraction of each component is computed by normalizing each</span>
 <span class="sd">    composition vector by its total mass concentration. One-dimensional inputs</span>
@@ -16213,7 +16213,7 @@ normalized row by row.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``mass_concentrations`` is not one- or two-dimensional.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">mass_concentrations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mass_concentrations</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">mass_concentrations</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -16231,7 +16231,7 @@ normalized row by row.</p>
     <span class="c1"># Handle 2D arrays</span>
     <span class="k">if</span> <span class="n">mass_concentrations</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_normalize_rows</span><span class="p">(</span><span class="n">mass_concentrations</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mass_concentrations must be either 1D or 2D&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"mass_concentrations must be either 1D or 2D"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16363,14 +16363,14 @@ fraction vector, while two-dimensional inputs are normalized row by row.</p>
 <span class="normal">70</span>
 <span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_concentrations&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;molar_masses&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_concentrations"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"molar_masses"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_mole_fraction_from_mass</span><span class="p">(</span>
     <span class="n">mass_concentrations</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">molar_masses</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert mass concentrations to mole fractions.</span>
+<span class="w">    </span><span class="sd">"""Convert mass concentrations to mole fractions.</span>
 
 <span class="sd">    The mole fraction of each component is computed from the component moles,</span>
 <span class="sd">    ``mass_concentrations / molar_masses``, normalized by the total moles in</span>
@@ -16387,7 +16387,7 @@ fraction vector, while two-dimensional inputs are normalized row by row.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``mass_concentrations`` is not one- or two-dimensional.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">mass_concentrations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mass_concentrations</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">molar_masses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_masses</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
@@ -16410,7 +16410,7 @@ fraction vector, while two-dimensional inputs are normalized row by row.</p>
     <span class="c1"># Handle 2D arrays</span>
     <span class="k">if</span> <span class="n">moles</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_normalize_rows</span><span class="p">(</span><span class="n">moles</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mass_concentrations must be either 1D or 2D&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"mass_concentrations must be either 1D or 2D"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16542,14 +16542,14 @@ vector, while two-dimensional inputs are normalized row by row.</p>
 <span class="normal">122</span>
 <span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_concentrations&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;densities&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_concentrations"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"densities"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_volume_fraction_from_mass</span><span class="p">(</span>
     <span class="n">mass_concentrations</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">densities</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert mass concentrations to volume fractions.</span>
+<span class="w">    </span><span class="sd">"""Convert mass concentrations to volume fractions.</span>
 
 <span class="sd">    The volume fraction of each component is computed from component volumes,</span>
 <span class="sd">    ``mass_concentrations / densities``, normalized by the total volume in each</span>
@@ -16566,7 +16566,7 @@ vector, while two-dimensional inputs are normalized row by row.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``mass_concentrations`` is not one- or two-dimensional.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">mass_concentrations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mass_concentrations</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">densities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">densities</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
@@ -16589,7 +16589,7 @@ vector, while two-dimensional inputs are normalized row by row.</p>
     <span class="c1"># Handle 2D arrays</span>
     <span class="k">if</span> <span class="n">volumes</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_normalize_rows</span><span class="p">(</span><span class="n">volumes</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mass_concentrations must be either 1D or 2D&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"mass_concentrations must be either 1D or 2D"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

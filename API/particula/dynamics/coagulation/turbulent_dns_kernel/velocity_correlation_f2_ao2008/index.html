@@ -16203,9 +16203,9 @@ function of collisional radius R between two colliding droplets.</p>
 <span class="normal">86</span>
 <span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;collisional_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;taylor_microscale&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;eulerian_integral_length&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"collisional_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"taylor_microscale"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"eulerian_integral_length"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_f2_longitudinal_velocity_correlation</span><span class="p">(</span>
@@ -16213,7 +16213,7 @@ function of collisional radius R between two colliding droplets.</p>
     <span class="n">taylor_microscale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">eulerian_integral_length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the longitudinal velocity correlation function f₂(R) from</span>
+<span class="w">    </span><span class="sd">"""Compute the longitudinal velocity correlation function f₂(R) from</span>
 <span class="sd">    Ayala et al. (2008).</span>
 
 <span class="sd">    This function describes the correlation of velocity fluctuations as a</span>
@@ -16256,7 +16256,7 @@ function of collisional radius R between two colliding droplets.</p>
 <span class="sd">      the geometric collision rate of sedimenting droplets. Part 2. Theory</span>
 <span class="sd">      and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">      https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">beta</span> <span class="o">=</span> <span class="n">compute_beta</span><span class="p">(</span><span class="n">taylor_microscale</span><span class="p">,</span> <span class="n">eulerian_integral_length</span><span class="p">)</span>
 
     <span class="n">sqrt_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>

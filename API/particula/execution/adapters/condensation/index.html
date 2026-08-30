@@ -16651,7 +16651,7 @@ heat is enabled, or the runnable returns another aerosol.</p>
 <span class="normal">752</span>
 <span class="normal">753</span>
 <span class="normal">754</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ExecutionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute one exact CPU P3 state without fallback or recovery.</span>
+<span class="w">    </span><span class="sd">"""Execute one exact CPU P3 state without fallback or recovery.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        state: Exact selected CPU P3 execution state.</span>
@@ -16663,16 +16663,16 @@ heat is enabled, or the runnable returns another aerosol.</p>
 <span class="sd">        TypeError: If ``state`` or its time step has an invalid type.</span>
 <span class="sd">        ValueError: If controls or the selected profile are invalid, latent</span>
 <span class="sd">            heat is enabled, or the runnable returns another aerosol.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CPUCondensationExecutionState</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;state must be a CPUCondensationExecutionState.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"state must be a CPUCondensationExecutionState."</span><span class="p">)</span>
     <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">time_step</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">sub_steps</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">sub_steps</span><span class="p">,</span> <span class="n">Integral</span><span class="p">)</span>
         <span class="ow">or</span> <span class="n">state</span><span class="o">.</span><span class="n">sub_steps</span> <span class="o">&lt;=</span> <span class="mi">0</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sub_steps must be a positive integer.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"sub_steps must be a positive integer."</span><span class="p">)</span>
     <span class="n">configuration</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">configuration</span>
     <span class="n">require_condensation_profile</span><span class="p">(</span><span class="n">Backend</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="n">configuration</span><span class="p">)</span>
     <span class="n">_require_isothermal</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
@@ -16682,7 +16682,7 @@ heat is enabled, or the runnable returns another aerosol.</p>
         <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">sub_steps</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">aerosol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">aerosol</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CPU runnable must return the original aerosol.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"CPU runnable must return the original aerosol."</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ExecutionResult</span><span class="p">(</span>
         <span class="n">state</span><span class="p">,</span>
         <span class="p">(),</span>
@@ -16883,16 +16883,16 @@ type.</p>
 <span class="normal">608</span>
 <span class="normal">609</span>
 <span class="normal">610</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact P2-state and runnable carrier types.</span>
+<span class="w">    </span><span class="sd">"""Validate exact P2-state and runnable carrier types.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``state`` or ``runnable`` is not the required exact</span>
 <span class="sd">            type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CPUCondensationState</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;state must be an exact CPUCondensationState.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"state must be an exact CPUCondensationState."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runnable</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">MassCondensation</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;runnable must be an exact MassCondensation.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"runnable must be an exact MassCondensation."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17077,19 +17077,19 @@ caller-owned and mutable.</p>
 <span class="normal">100</span>
 <span class="normal">101</span>
 <span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate state inputs in configuration then aerosol order.</span>
+<span class="w">    </span><span class="sd">"""Validate state inputs in configuration then aerosol order.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``config`` is not an exact</span>
 <span class="sd">            ``CondensationExecutionConfig`` or ``aerosol`` is not an</span>
 <span class="sd">            ``Aerosol``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CondensationExecutionConfig</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;config must be an exact CondensationExecutionConfig.&quot;</span>
+            <span class="s2">"config must be an exact CondensationExecutionConfig."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">Aerosol</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;aerosol must be an Aerosol.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"aerosol must be an Aerosol."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17224,15 +17224,15 @@ Frozen status prevents field rebinding but does not copy the configuration.</p>
 <span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the exact configuration carrier type.</span>
+<span class="w">    </span><span class="sd">"""Validate the exact configuration carrier type.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``configuration`` is not an exact</span>
 <span class="sd">            ``CondensationConfiguration`` instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CondensationConfiguration</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;configuration must be an exact CondensationConfiguration.&quot;</span>
+            <span class="s2">"configuration must be an exact CondensationConfiguration."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17444,7 +17444,7 @@ successful preflight.</p>
 <span class="normal">825</span>
 <span class="normal">826</span>
 <span class="normal">827</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ExecutionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute one exact Warp P3 state with no post-launch recovery.</span>
+<span class="w">    </span><span class="sd">"""Execute one exact Warp P3 state with no post-launch recovery.</span>
 
 <span class="sd">    Profile preflight occurs before lazy kernel resolution. After that</span>
 <span class="sd">    preflight, this method forwards the caller-owned thermal sidecars by</span>
@@ -17465,9 +17465,9 @@ successful preflight.</p>
 <span class="sd">            Direct errors propagate unchanged.</span>
 <span class="sd">        ImportError: If the optional Warp kernel cannot be imported after</span>
 <span class="sd">            successful preflight.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">WarpCondensationExecutionState</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;state must be a WarpCondensationExecutionState.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"state must be a WarpCondensationExecutionState."</span><span class="p">)</span>
     <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">time_step</span><span class="p">)</span>
     <span class="n">p2_state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">state</span>
     <span class="n">configuration</span> <span class="o">=</span> <span class="n">p2_state</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">configuration</span>
@@ -17666,13 +17666,13 @@ Construction neither imports a kernel nor inspects retained resources.</p>
 <span class="normal">645</span>
 <span class="normal">646</span>
 <span class="normal">647</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the exact P2 Warp state carrier type.</span>
+<span class="w">    </span><span class="sd">"""Validate the exact P2 Warp state carrier type.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``state`` is not an exact ``WarpCondensationState``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">WarpCondensationState</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;state must be an exact WarpCondensationState.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"state must be an exact WarpCondensationState."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18017,7 +18017,7 @@ output ownership is invalid.</p>
 <span class="normal">397</span>
 <span class="normal">398</span>
 <span class="normal">399</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform ordered metadata and writable-output ownership validation.</span>
+<span class="w">    </span><span class="sd">"""Perform ordered metadata and writable-output ownership validation.</span>
 
 <span class="sd">    The lazy imports make importing this concrete module and constructing</span>
 <span class="sd">    CPU-only carriers independent of the optional Warp runtime.</span>
@@ -18028,19 +18028,19 @@ output ownership is invalid.</p>
 <span class="sd">        RuntimeError: If Warp is unavailable.</span>
 <span class="sd">        ValueError: If required metadata, thermodynamics, or writable</span>
 <span class="sd">            output ownership is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CondensationExecutionConfig</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;config must be an exact CondensationExecutionConfig.&quot;</span>
+            <span class="s2">"config must be an exact CondensationExecutionConfig."</span>
         <span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">warp</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">wp</span>
     <span class="k">except</span> <span class="ne">ModuleNotFoundError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;warp&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">"warp"</span><span class="p">:</span>
             <span class="k">raise</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;WarpCondensationState requires the optional Warp runtime.&quot;</span>
+            <span class="s2">"WarpCondensationState requires the optional Warp runtime."</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.warp_types</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">WarpEnvironmentData</span><span class="p">,</span>
@@ -18050,22 +18050,22 @@ output ownership is invalid.</p>
 
     <span class="c1"># ``@wp.struct`` exposes a Warp ``Struct`` descriptor.  Its callable</span>
     <span class="c1"># creates a generated instance subclass, so validate against the</span>
-    <span class="c1"># descriptor&#39;s underlying Python class instead of exact type identity.</span>
+    <span class="c1"># descriptor's underlying Python class instead of exact type identity.</span>
     <span class="n">particle_type</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">WarpParticleData</span><span class="p">)</span><span class="o">.</span><span class="n">cls</span>
     <span class="n">gas_type</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">WarpGasData</span><span class="p">)</span><span class="o">.</span><span class="n">cls</span>
     <span class="n">environment_type</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">WarpEnvironmentData</span><span class="p">)</span><span class="o">.</span><span class="n">cls</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">particle_type</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;particles must be a WarpParticleData.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"particles must be a WarpParticleData."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gas</span><span class="p">,</span> <span class="n">gas_type</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;gas must be a WarpGasData.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"gas must be a WarpGasData."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="p">,</span> <span class="n">environment_type</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;environment must be a WarpEnvironmentData.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"environment must be a WarpEnvironmentData."</span><span class="p">)</span>
 
     <span class="n">masses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_primary_arrays</span><span class="p">(</span><span class="n">wp</span><span class="p">)</span>
     <span class="n">boxes</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">species</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">device</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thermodynamics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;thermodynamics must not be None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"thermodynamics must not be None."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_optional_outputs</span><span class="p">(</span><span class="n">wp</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">species</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

@@ -16283,7 +16283,7 @@ settling_velocity, and L×W×H)</li>
     <span class="n">settling_velocity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the particle wall loss coefficient in a rectangular chamber.</span>
+<span class="w">    </span><span class="sd">"""Calculate the particle wall loss coefficient in a rectangular chamber.</span>
 
 <span class="sd">    This function computes the wall loss coefficient (β₀) for a rectangular</span>
 <span class="sd">    chamber of length (L), width (W), and height (H). It uses the wall eddy</span>
@@ -16303,7 +16303,7 @@ settling_velocity, and L×W×H)</li>
 <span class="sd">        - The wall loss coefficient β₀ (float or NDArray[np.float64]), in s⁻¹.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">    ```py title=&quot;Example (float inputs)&quot;</span>
+<span class="sd">    ```py title="Example (float inputs)"</span>
 <span class="sd">    from particula.dynamics.properties.wall_loss_coefficient import (</span>
 <span class="sd">        get_rectangle_wall_loss_coefficient</span>
 <span class="sd">    )</span>
@@ -16323,7 +16323,7 @@ settling_velocity, and L×W×H)</li>
 <span class="sd">      GRAVITATIONAL SEDIMENTATION OF AN AEROSOL IN A VESSEL OF ARBITRARY</span>
 <span class="sd">      SHAPE. J Aerosol Sci, 12(5).</span>
 <span class="sd">      https://doi.org/10.1016/0021-8502(81)90036-7</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">chamber_dimensions</span>  <span class="c1"># Unpack the dimensions tuple</span>
 
     <span class="c1"># Using 1/tanh(x) for coth(x)</span>
@@ -16515,11 +16515,11 @@ of the rectangular chamber in meters (m).</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the wall loss coefficient for a rectangular chamber based on</span>
+<span class="w">    </span><span class="sd">"""Calculate the wall loss coefficient for a rectangular chamber based on</span>
 <span class="sd">    the system state.</span>
 
 <span class="sd">    This function computes the wall loss coefficient for a rectangular chamber</span>
-<span class="sd">    using the system&#39;s physical state, including the wall eddy diffusivity,</span>
+<span class="sd">    using the system's physical state, including the wall eddy diffusivity,</span>
 <span class="sd">    particle properties (radius, density), and environmental conditions</span>
 <span class="sd">    (temperature, pressure). The chamber dimensions (length, width, height)</span>
 <span class="sd">    are also considered.</span>
@@ -16543,7 +16543,7 @@ of the rectangular chamber in meters (m).</p>
 <span class="sd">            GRAVITATIONAL SEDIMENTATION OF AN AEROSOL IN A VESSEL OF ARBITRARY</span>
 <span class="sd">            SHAPE. In J Aerosol Sct (Vol. 12, Issue 5).</span>
 <span class="sd">            https://doi.org/10.1016/0021-8502(81)90036-7</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Get particle settling velocity</span>
     <span class="n">settling_velocity</span> <span class="o">=</span> <span class="n">get_particle_settling_velocity_via_system_state</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
@@ -16740,7 +16740,7 @@ in m²/s.</p>
     <span class="n">settling_velocity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">chamber_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the particle wall loss coefficient in a spherical chamber.</span>
+<span class="w">    </span><span class="sd">"""Calculate the particle wall loss coefficient in a spherical chamber.</span>
 
 <span class="sd">    This function computes the wall loss coefficient based on a spherical</span>
 <span class="sd">    chamber approximation. It uses the wall eddy diffusivity, particle</span>
@@ -16767,7 +16767,7 @@ in m²/s.</p>
 <span class="sd">           (float or NDArray[np.float64]).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">    ```py title=&quot;Example (float inputs)&quot;</span>
+<span class="sd">    ```py title="Example (float inputs)"</span>
 <span class="sd">    from particula.dynamics.properties.wall_loss_coefficient import (</span>
 <span class="sd">        get_spherical_wall_loss_coefficient</span>
 <span class="sd">    )</span>
@@ -16786,7 +16786,7 @@ in m²/s.</p>
 <span class="sd">    - Crump, J. G., Flagan, R. C., &amp; Seinfeld, J. H. (1982). Particle wall</span>
 <span class="sd">      loss rates in vessels. Aerosol Science and Technology, 2(3), 303-309.</span>
 <span class="sd">      https://doi.org/10.1080/02786828308958636</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">debye_variable</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
         <span class="o">*</span> <span class="n">settling_velocity</span>
@@ -16999,9 +16999,9 @@ in s⁻¹.</li>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">chamber_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate spherical wall loss coefficient via system state.</span>
+<span class="w">    </span><span class="sd">"""Calculate spherical wall loss coefficient via system state.</span>
 
-<span class="sd">    Uses the system&#39;s physical conditions (particle radius, density,</span>
+<span class="sd">    Uses the system's physical conditions (particle radius, density,</span>
 <span class="sd">    temperature, pressure) to compute the needed diffusion and settling velocity</span>
 <span class="sd">    before calculating the spherical wall loss coefficient:</span>
 
@@ -17025,7 +17025,7 @@ in s⁻¹.</li>
 <span class="sd">            in s⁻¹.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">    ```py title=&quot;Example&quot;</span>
+<span class="sd">    ```py title="Example"</span>
 <span class="sd">    from particula.dynamics.properties.wall_loss_coefficient import (</span>
 <span class="sd">        get_spherical_wall_loss_coefficient_via_system_state</span>
 <span class="sd">    )</span>
@@ -17046,7 +17046,7 @@ in s⁻¹.</li>
 <span class="sd">    - Crump, J. G., Flagan, R. C., &amp; Seinfeld, J. H. (1982). Particle wall</span>
 <span class="sd">      loss rates in vessels. Aerosol Science and Technology, 2(3), 303-309.</span>
 <span class="sd">      https://doi.org/10.1080/02786828308958636</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Get particle diffusion coefficient</span>
     <span class="n">diffusion_coefficient</span> <span class="o">=</span> <span class="n">get_diffusion_coefficient_via_system_state</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>

@@ -16194,10 +16194,10 @@ or NDArray[np.float64].</li>
 <span class="normal">68</span>
 <span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;fluid_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"particle_density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"fluid_density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"kinematic_viscosity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_particle_inertia_time</span><span class="p">(</span>
@@ -16206,7 +16206,7 @@ or NDArray[np.float64].</li>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the particle inertia time (τ_p).</span>
+<span class="w">    </span><span class="sd">"""Compute the particle inertia time (τ_p).</span>
 
 <span class="sd">    The particle inertia time represents the response time of a particle to</span>
 <span class="sd">    changes in fluid velocity, given by:</span>
@@ -16229,7 +16229,7 @@ or NDArray[np.float64].</li>
 <span class="sd">            or NDArray[np.float64].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_particle_inertia_time(</span>
 <span class="sd">            particle_radius=1e-6,</span>
@@ -16241,11 +16241,11 @@ or NDArray[np.float64].</li>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). &quot;Effects of turbulence on</span>
+<span class="sd">        - Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). "Effects of turbulence on</span>
 <span class="sd">          the geometric collision rate of sedimenting droplets. Part 2. Theory</span>
-<span class="sd">          and parameterization.&quot; New Journal of Physics, 10.</span>
+<span class="sd">          and parameterization." New Journal of Physics, 10.</span>
 <span class="sd">          https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">9</span><span class="p">)</span>
         <span class="o">*</span> <span class="p">(</span><span class="n">particle_density</span> <span class="o">/</span> <span class="n">fluid_density</span><span class="p">)</span>

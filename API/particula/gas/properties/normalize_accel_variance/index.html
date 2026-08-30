@@ -16156,12 +16156,12 @@ fluctuations in turbulent flows.</p>
 <span class="normal">52</span>
 <span class="normal">53</span>
 <span class="normal">54</span>
-<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;re_lambda&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"re_lambda"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_normalized_accel_variance_ao2008</span><span class="p">(</span>
     <span class="n">re_lambda</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">numerical_stability_epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-14</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the normalized acceleration variance in isotropic turbulence.</span>
+<span class="w">    </span><span class="sd">"""Calculate the normalized acceleration variance in isotropic turbulence.</span>
 
 <span class="sd">    This coefficient describes the statistical behavior of acceleration</span>
 <span class="sd">    fluctuations in turbulent flows.</span>
@@ -16184,7 +16184,7 @@ fluctuations in turbulent flows.</p>
 <span class="sd">        - accel_variance : Normalized acceleration variance [-]</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ```py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_normalized_accel_variance_ao2008(500.0)</span>
 <span class="sd">        # Output: ~0.05</span>
@@ -16197,7 +16197,7 @@ fluctuations in turbulent flows.</p>
 <span class="sd">        the geometric collision rate of sedimenting droplets. Part 2. Theory</span>
 <span class="sd">        and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">        https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="mi">7</span> <span class="o">+</span> <span class="mi">11</span> <span class="o">/</span> <span class="p">(</span><span class="n">re_lambda</span> <span class="o">+</span> <span class="n">numerical_stability_epsilon</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span>
         <span class="mi">1</span> <span class="o">+</span> <span class="mi">205</span> <span class="o">/</span> <span class="p">(</span><span class="n">re_lambda</span> <span class="o">+</span> <span class="n">numerical_stability_epsilon</span><span class="p">)</span>
     <span class="p">)</span>

@@ -16263,7 +16263,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
     <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Blend Gibbs mixing energies across O:C regimes for BAT activity.</span>
+<span class="w">    </span><span class="sd">"""Blend Gibbs mixing energies across O:C regimes for BAT activity.</span>
 
 <span class="sd">    The BAT model interpolates between Gorkowski et al. (2019) fits for low,</span>
 <span class="sd">    mid, and high oxygen-to-carbon ratios via :func:`bat_blending_weights`. The</span>
@@ -16279,7 +16279,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">        oxygen2carbon: Oxygen-to-carbon atomic ratio of the organic compound.</span>
 <span class="sd">        density: Density of the organic compound in kg/m^3.</span>
 <span class="sd">        functional_group: Optional functional group for OH-equivalent</span>
-<span class="sd">            conversion (e.g., &quot;alcohol&quot;, &quot;carboxylic_acid&quot;, &quot;ether&quot;).</span>
+<span class="sd">            conversion (e.g., "alcohol", "carboxylic_acid", "ether").</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple containing:</span>
@@ -16300,7 +16300,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">    References:</span>
 <span class="sd">        Gorkowski et al. (2019), Section 2.2 and SI S2.</span>
 <span class="sd">        https://doi.org/10.5194/acp-19-13383-2019</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
     <span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">convert_to_oh_equivalent</span><span class="p">(</span>
@@ -16554,10 +16554,10 @@ Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="normal">116</span>
 <span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;molar_mass_ratio&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;organic_mole_fraction&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;oxygen2carbon&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass_ratio"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"organic_mole_fraction"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"oxygen2carbon"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">gibbs_of_mixing</span><span class="p">(</span>
@@ -16569,7 +16569,7 @@ Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
     <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the Gibbs free energy of mixing for a single fit region.</span>
+<span class="w">    </span><span class="sd">"""Compute the Gibbs free energy of mixing for a single fit region.</span>
 
 <span class="sd">    This helper evaluates the Gibbs energy and its derivative for the low,</span>
 <span class="sd">    mid, or high O:C fit indicated by ``fit_dict``. The calculation follows</span>
@@ -16604,7 +16604,7 @@ Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">    References:</span>
 <span class="sd">        Gorkowski, K., Preston, T. C., &amp; Zuend, A. (2019), Equations 1-6 and</span>
 <span class="sd">        Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">organic_mole_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">organic_mole_fraction</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">oxygen2carbon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>

@@ -16201,7 +16201,7 @@ arrays or environment fields.</p>
     <span class="n">device</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">caller_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate an environment source without broadcasting scalar inputs.</span>
+<span class="w">    </span><span class="sd">"""Validate an environment source without broadcasting scalar inputs.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        temperature: Direct scalar or ``(n_boxes,)`` Warp temperature [K].</span>
@@ -16220,32 +16220,32 @@ arrays or environment fields.</p>
 <span class="sd">        :func:`_ensure_environment_arrays`. It validates all input domains</span>
 <span class="sd">        before scalar broadcasting and does not mutate or replace caller-owned</span>
 <span class="sd">        arrays or environment fields.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">environment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">pressure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Cannot mix direct temperature/pressure inputs with &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;environment in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="s2">"Cannot mix direct temperature/pressure inputs with "</span>
+                <span class="sa">f</span><span class="s2">"environment in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">."</span>
             <span class="p">)</span>
-        <span class="k">for</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;pressure&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"temperature"</span><span class="p">,</span> <span class="s2">"pressure"</span><span class="p">):</span>
             <span class="n">values</span> <span class="o">=</span> <span class="n">_validate_box_array</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;environment.</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"environment.</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                 <span class="n">_get_environment_array</span><span class="p">(</span><span class="n">environment</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">caller_name</span><span class="p">),</span>
                 <span class="n">n_boxes</span><span class="p">,</span>
                 <span class="n">device</span><span class="p">,</span>
                 <span class="n">caller_name</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">_validate_positive_finite_array</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;environment.</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">caller_name</span>
+                <span class="sa">f</span><span class="s2">"environment.</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">caller_name</span>
             <span class="p">)</span>
         <span class="k">return</span>
 
     <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">pressure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;temperature and pressure must both be provided when environment &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;is omitted in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">"temperature and pressure must both be provided when environment "</span>
+            <span class="sa">f</span><span class="s2">"is omitted in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;pressure&quot;</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"temperature"</span><span class="p">,</span> <span class="n">temperature</span><span class="p">),</span> <span class="p">(</span><span class="s2">"pressure"</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)):</span>
         <span class="k">if</span> <span class="n">_is_warp_array_like</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="n">values</span> <span class="o">=</span> <span class="n">_validate_box_array</span><span class="p">(</span>
                 <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">caller_name</span>

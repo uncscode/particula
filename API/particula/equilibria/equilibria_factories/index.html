@@ -16074,12 +16074,12 @@ across particula factories.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">factory</span> <span class="o">=</span> <span class="n">EquilibriaFactory</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">&quot;liquid_vapor&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"liquid_vapor"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span><span class="o">.</span><span class="n">water_activity</span>
 <span class="go">0.5</span>
 </code></pre></div>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;liquid_vapor&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;water_activity&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">}</span>
+<span class="gp">... </span>    <span class="s2">"liquid_vapor"</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">"water_activity"</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span><span class="o">.</span><span class="n">water_activity</span>
 <span class="go">0.8</span>
@@ -16136,12 +16136,12 @@ across particula factories.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">factory</span> <span class="o">=</span> <span class="n">EquilibriaFactory</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">&quot;liquid_vapor&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"liquid_vapor"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span><span class="o">.</span><span class="n">water_activity</span>
 <span class="go">0.5</span>
 </code></pre></div>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;liquid_vapor&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;water_activity&quot;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">}</span>
+<span class="gp">... </span>    <span class="s2">"liquid_vapor"</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">"water_activity"</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span><span class="o">.</span><span class="n">water_activity</span>
 <span class="go">0.75</span>
@@ -16199,7 +16199,7 @@ across particula factories.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">factory</span> <span class="o">=</span> <span class="n">EquilibriaFactory</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">builders</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;liquid_vapor&quot;</span> <span class="ow">in</span> <span class="n">builders</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">"liquid_vapor"</span> <span class="ow">in</span> <span class="n">builders</span>
 <span class="go">True</span>
 </code></pre></div>
 
@@ -16221,7 +16221,7 @@ across particula factories.</p>
 <span class="normal">68</span>
 <span class="normal">69</span>
 <span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BuilderType</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return available equilibria builders keyed by strategy name.</span>
+<span class="w">    </span><span class="sd">"""Return available equilibria builders keyed by strategy name.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dict[str, BuilderType]: Mapping of strategy type to builder.</span>
@@ -16229,11 +16229,11 @@ across particula factories.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; factory = EquilibriaFactory()</span>
 <span class="sd">        &gt;&gt;&gt; builders = factory.get_builders()</span>
-<span class="sd">        &gt;&gt;&gt; &quot;liquid_vapor&quot; in builders</span>
+<span class="sd">        &gt;&gt;&gt; "liquid_vapor" in builders</span>
 <span class="sd">        True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;liquid_vapor&quot;</span><span class="p">:</span> <span class="n">LiquidVaporPartitioningBuilder</span><span class="p">(),</span>
+        <span class="s2">"liquid_vapor"</span><span class="p">:</span> <span class="n">LiquidVaporPartitioningBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16348,13 +16348,13 @@ invalid.</p>
     <span class="n">strategy_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EquilibriaStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an equilibria strategy using its corresponding builder.</span>
+<span class="w">    </span><span class="sd">"""Create an equilibria strategy using its corresponding builder.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        strategy_type: Name of the strategy to build. Case-insensitive.</span>
-<span class="sd">            Supported: &quot;liquid_vapor&quot;.</span>
+<span class="sd">            Supported: "liquid_vapor".</span>
 <span class="sd">        parameters: Optional parameter mapping for the builder.</span>
-<span class="sd">            For &quot;liquid_vapor&quot;: {&quot;water_activity&quot;: float}.</span>
+<span class="sd">            For "liquid_vapor": {"water_activity": float}.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Built equilibria strategy instance.</span>
@@ -16362,15 +16362,15 @@ invalid.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``strategy_type`` is unknown or parameters are</span>
 <span class="sd">            invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">builder_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
     <span class="n">builder</span> <span class="o">=</span> <span class="n">builder_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">strategy_type</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
 
     <span class="k">if</span> <span class="n">builder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">valid_types</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">builder_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Unknown strategy type: &#39;</span><span class="si">{</span><span class="n">strategy_type</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Valid types: </span><span class="si">{</span><span class="n">valid_types</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Unknown strategy type: '</span><span class="si">{</span><span class="n">strategy_type</span><span class="si">}</span><span class="s2">'. "</span>
+            <span class="sa">f</span><span class="s2">"Valid types: </span><span class="si">{</span><span class="n">valid_types</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="n">parameter_copy</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="k">if</span> <span class="n">parameters</span> <span class="k">else</span> <span class="p">{}</span>

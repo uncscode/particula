@@ -16229,7 +16229,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
     <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">fit_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute fitted BAT coefficients from published parameters.</span>
+<span class="w">    </span><span class="sd">"""Compute fitted BAT coefficients from published parameters.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        molar_mass_ratio: Water-to-organic molar mass ratio.</span>
@@ -16251,7 +16251,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">        ...     fit_values=G19_FIT_MID.a1,</span>
 <span class="sd">        ... )</span>
 <span class="sd">        0.025427174197017652</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># force to array</span>
     <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">oxygen2carbon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>

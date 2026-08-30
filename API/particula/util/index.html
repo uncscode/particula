@@ -16425,7 +16425,7 @@
 
 
 <a href="#particula.util.get_arbitrary_round" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_arbitrary_round</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">ndarray</span><span class="p">],</span> <span class="n">base</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;round&#39;</span><span class="p">,</span> <span class="n">nonzero_edge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_arbitrary_round</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">ndarray</span><span class="p">],</span> <span class="n">base</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'round'</span><span class="p">,</span> <span class="n">nonzero_edge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16488,13 +16488,13 @@ original values.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.7</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'round'</span><span class="p">))</span>
 <span class="c1"># Output: [1.  2.  4.  4.]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;floor&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'floor'</span><span class="p">))</span>
 <span class="c1"># Output: [1.  2.  3.5 4. ]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'round'</span><span class="p">))</span>
 <span class="c1"># Output: 2.0</span>
 </code></pre></div>
 
@@ -16577,18 +16577,18 @@ original values.</p>
 <span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_arbitrary_round</span><span class="p">(</span>
     <span class="n">values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
     <span class="n">base</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
-    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;round&quot;</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"round"</span><span class="p">,</span>
     <span class="n">nonzero_edge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Round values to the nearest multiple of a specified base.</span>
+<span class="w">    </span><span class="sd">"""Round values to the nearest multiple of a specified base.</span>
 
-<span class="sd">    The function supports &quot;round&quot;, &quot;floor&quot;, or &quot;ceil&quot; modes, and can retain</span>
+<span class="sd">    The function supports "round", "floor", or "ceil" modes, and can retain</span>
 <span class="sd">    original nonzero values if rounding returns zero.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - values : The values to be rounded.</span>
 <span class="sd">        - base : Positive float indicating the rounding interval.</span>
-<span class="sd">        - mode : Rounding mode, one of [&#39;round&#39;, &#39;floor&#39;, &#39;ceil&#39;].</span>
+<span class="sd">        - mode : Rounding mode, one of ['round', 'floor', 'ceil'].</span>
 <span class="sd">        - nonzero_edge : If True, zeros after rounding are replaced with the</span>
 <span class="sd">            original values.</span>
 
@@ -16596,35 +16596,35 @@ original values.</p>
 <span class="sd">        - The input values rounded according to the specified base and mode.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 
 <span class="sd">        arr = np.array([1.2, 2.5, 3.7, 4.0])</span>
-<span class="sd">        print(par.get_arbitrary_round(arr, base=1.0, mode=&#39;round&#39;))</span>
+<span class="sd">        print(par.get_arbitrary_round(arr, base=1.0, mode='round'))</span>
 <span class="sd">        # Output: [1.  2.  4.  4.]</span>
 
-<span class="sd">        print(par.get_arbitrary_round(arr, base=0.5, mode=&#39;floor&#39;))</span>
+<span class="sd">        print(par.get_arbitrary_round(arr, base=0.5, mode='floor'))</span>
 <span class="sd">        # Output: [1.  2.  3.5 4. ]</span>
 
-<span class="sd">        print(par.get_arbitrary_round(2.5, base=1.0, mode=&#39;round&#39;))</span>
+<span class="sd">        print(par.get_arbitrary_round(2.5, base=1.0, mode='round'))</span>
 <span class="sd">        # Output: 2.0</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Rounding,&quot; Python Documentation, docs.python.org.</span>
-<span class="sd">        - &quot;NumPy Rounding,&quot; NumPy Documentation, NumPy.org.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - "Rounding," Python Documentation, docs.python.org.</span>
+<span class="sd">        - "NumPy Rounding," NumPy Documentation, NumPy.org.</span>
+<span class="sd">    """</span>
     <span class="c1"># Check if values is a NumPy array</span>
     <span class="n">working_values</span> <span class="o">=</span> <span class="n">get_coerced_type</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
     <span class="n">base</span> <span class="o">=</span> <span class="n">get_coerced_type</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
 
     <span class="c1"># Validate base parameter</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">or</span> <span class="n">base</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;base must be a positive float&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"base must be a positive float"</span><span class="p">)</span>
     <span class="c1"># Validate mode parameter</span>
-    <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="s2">&quot;floor&quot;</span><span class="p">,</span> <span class="s2">&quot;ceil&quot;</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mode must be one of [&#39;round&#39;, &#39;floor&#39;, &#39;ceil&#39;]&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"round"</span><span class="p">,</span> <span class="s2">"floor"</span><span class="p">,</span> <span class="s2">"ceil"</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"mode must be one of ['round', 'floor', 'ceil']"</span><span class="p">)</span>
 
     <span class="c1"># Calculate rounding factors</span>
     <span class="n">factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
@@ -16632,7 +16632,7 @@ original values.</p>
     <span class="c1"># Compute rounded values</span>
     <span class="n">rounded</span> <span class="o">=</span> <span class="n">base</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span>
         <span class="n">working_values</span> <span class="o">/</span> <span class="n">base</span>
-        <span class="o">+</span> <span class="n">factor</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;floor&quot;</span><span class="p">,</span> <span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="s2">&quot;ceil&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mode</span><span class="p">)]</span>
+        <span class="o">+</span> <span class="n">factor</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">"floor"</span><span class="p">,</span> <span class="s2">"round"</span><span class="p">,</span> <span class="s2">"ceil"</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mode</span><span class="p">)]</span>
     <span class="p">)</span>
 
     <span class="c1"># Apply round_nonzero mode</span>
@@ -16699,10 +16699,10 @@ registry number.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <p><div class="highlight"><span class="filename">Exact CAS lookup</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.materials.chemical_search</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_chemical_search</span>
-<span class="k">assert</span> <span class="n">get_chemical_search</span><span class="p">(</span><span class="s2">&quot;64-17-5&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;64-17-5&quot;</span>      <span class="c1"># ethanol</span>
+<span class="k">assert</span> <span class="n">get_chemical_search</span><span class="p">(</span><span class="s2">"64-17-5"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"64-17-5"</span>      <span class="c1"># ethanol</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">Fuzzy text match</span><pre><span></span><code><span class="n">hit</span> <span class="o">=</span> <span class="n">get_chemical_search</span><span class="p">(</span><span class="s2">&quot;soodim chlorid&quot;</span><span class="p">)</span>             <span class="c1"># typo</span>
-<span class="c1"># hit -&gt; &quot;7647-14-5&quot;  (sodium chloride)</span>
+<div class="highlight"><span class="filename">Fuzzy text match</span><pre><span></span><code><span class="n">hit</span> <span class="o">=</span> <span class="n">get_chemical_search</span><span class="p">(</span><span class="s2">"soodim chlorid"</span><span class="p">)</span>             <span class="c1"># typo</span>
+<span class="c1"># hit -&gt; "7647-14-5"  (sodium chloride)</span>
 </code></pre></div></p>
 
 
@@ -16778,7 +16778,7 @@ registry number.</p>
 <span class="normal">81</span>
 <span class="normal">82</span>
 <span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_chemical_search</span><span class="p">(</span><span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a chemical identifier to a canonical name or CAS number.</span>
+<span class="w">    </span><span class="sd">"""Resolve a chemical identifier to a canonical name or CAS number.</span>
 
 <span class="sd">    The resolution proceeds in two stages:</span>
 
@@ -16796,27 +16796,27 @@ registry number.</p>
 <span class="sd">          ``None``.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Exact CAS lookup&quot;</span>
+<span class="sd">        ``` py title="Exact CAS lookup"</span>
 <span class="sd">        from particula.util.materials.chemical_search import get_chemical_search</span>
-<span class="sd">        assert get_chemical_search(&quot;64-17-5&quot;) == &quot;64-17-5&quot;      # ethanol</span>
+<span class="sd">        assert get_chemical_search("64-17-5") == "64-17-5"      # ethanol</span>
 <span class="sd">        ```</span>
-<span class="sd">        ``` py title=&quot;Fuzzy text match&quot;</span>
-<span class="sd">        hit = get_chemical_search(&quot;soodim chlorid&quot;)             # typo</span>
-<span class="sd">        # hit -&gt; &quot;7647-14-5&quot;  (sodium chloride)</span>
+<span class="sd">        ``` py title="Fuzzy text match"</span>
+<span class="sd">        hit = get_chemical_search("soodim chlorid")             # typo</span>
+<span class="sd">        # hit -&gt; "7647-14-5"  (sodium chloride)</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Wilson, N., et al., &quot;Open-source tools for chemical identifiers,&quot;</span>
+<span class="sd">        - Wilson, N., et al., "Open-source tools for chemical identifiers,"</span>
 <span class="sd">          *J. Chem. Inf. Model.* **60** (2020) 833–839.</span>
-<span class="sd">        - &quot;Chemical identifier,&quot;</span>
+<span class="sd">        - "Chemical identifier,"</span>
 <span class="sd">          [Wikipedia](https://en.wikipedia.org/wiki/Chemical_identifier).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># --- new guard -------------------------------------------------</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">CHEMICALS_AVAILABLE</span><span class="p">:</span>  <span class="c1"># thermo must be present</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;The &#39;thermo&#39; package is required for chemical search &quot;</span>
-            <span class="s2">&quot;operations but is not installed.&quot;</span>
-            <span class="s2">&quot;Please install it via &#39;pip install thermo&#39;.&quot;</span>
+            <span class="s2">"The 'thermo' package is required for chemical search "</span>
+            <span class="s2">"operations but is not installed."</span>
+            <span class="s2">"Please install it via 'pip install thermo'."</span>
         <span class="p">)</span>
     <span class="c1"># ---------------------------------------------------------------</span>
 
@@ -16835,8 +16835,8 @@ registry number.</p>
         <span class="n">matches</span> <span class="o">=</span> <span class="n">get_close_matches</span><span class="p">(</span>
             <span class="n">identifier</span><span class="p">,</span> <span class="n">candidate_names</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.6</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">matches</span> <span class="k">else</span> <span class="s2">&quot;No Match&quot;</span>
-    <span class="k">return</span> <span class="s2">&quot;No Match&quot;</span>
+        <span class="k">return</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">matches</span> <span class="k">else</span> <span class="s2">"No Match"</span>
+    <span class="k">return</span> <span class="s2">"No Match"</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16911,7 +16911,7 @@ registry number.</p>
 <span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_chemical_stp_properties</span><span class="p">(</span><span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return selected thermodynamic properties of *identifier* at STP.</span>
+<span class="w">    </span><span class="sd">"""Return selected thermodynamic properties of *identifier* at STP.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -16922,16 +16922,16 @@ registry number.</p>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
 <span class="sd">        {</span>
-<span class="sd">            &quot;molar_mass&quot;: kg mol⁻¹,</span>
-<span class="sd">            &quot;density&quot;: kg m⁻³,</span>
-<span class="sd">            &quot;surface_tension&quot;: N m⁻¹,</span>
-<span class="sd">            &quot;pure_vapor_pressure&quot;: Pa,</span>
+<span class="sd">            "molar_mass": kg mol⁻¹,</span>
+<span class="sd">            "density": kg m⁻³,</span>
+<span class="sd">            "surface_tension": N m⁻¹,</span>
+<span class="sd">            "pure_vapor_pressure": Pa,</span>
 <span class="sd">        }</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">Chemical</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;The &#39;thermo&#39; package is required. &quot;</span>
-            <span class="s2">&quot;Please install it using &#39;pip install thermo&#39;.&quot;</span>
+            <span class="s2">"The 'thermo' package is required. "</span>
+            <span class="s2">"Please install it using 'pip install thermo'."</span>
         <span class="p">)</span>
 
     <span class="n">chem</span> <span class="o">=</span> <span class="n">Chemical</span><span class="p">(</span>
@@ -16939,15 +16939,15 @@ registry number.</p>
     <span class="p">)</span>  <span class="c1"># Explicitly set STP: T=298.15 K, P=101325 Pa</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">MW</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span>  <span class="c1"># kg/mol</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">rho</span><span class="p">,</span>  <span class="c1"># kg/m³</span>
-        <span class="s2">&quot;surface_tension&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span>  <span class="c1"># N/m</span>
-        <span class="s2">&quot;pure_vapor_pressure&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">Psat</span><span class="p">,</span>  <span class="c1"># Pa</span>
-        <span class="s2">&quot;cas_number&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">CAS</span><span class="p">,</span>  <span class="c1"># CAS number</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>  <span class="c1"># Chemical name</span>
-        <span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">smiles</span><span class="p">,</span>  <span class="c1"># SMILES representation</span>
-        <span class="s2">&quot;formula&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">formula</span><span class="p">,</span>  <span class="c1"># Chemical formula</span>
-        <span class="s2">&quot;pubchem_id&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">PubChem</span><span class="p">,</span>  <span class="c1"># PubChem ID</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">MW</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span>  <span class="c1"># kg/mol</span>
+        <span class="s2">"density"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">rho</span><span class="p">,</span>  <span class="c1"># kg/m³</span>
+        <span class="s2">"surface_tension"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span>  <span class="c1"># N/m</span>
+        <span class="s2">"pure_vapor_pressure"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">Psat</span><span class="p">,</span>  <span class="c1"># Pa</span>
+        <span class="s2">"cas_number"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">CAS</span><span class="p">,</span>  <span class="c1"># CAS number</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>  <span class="c1"># Chemical name</span>
+        <span class="s2">"smiles"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">smiles</span><span class="p">,</span>  <span class="c1"># SMILES representation</span>
+        <span class="s2">"formula"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">formula</span><span class="p">,</span>  <span class="c1"># Chemical formula</span>
+        <span class="s2">"pubchem_id"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">PubChem</span><span class="p">,</span>  <span class="c1"># PubChem ID</span>
     <span class="p">}</span>  <span class="c1"># type: ignore</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17017,13 +17017,13 @@ A scalar input returns a 0-d <code>numpy.ndarray</code> for consistency.</li>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Scalar temperature</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.materials.surface_tension</span><span class="w"> </span><span class="kn">import</span>             <span class="n">get_surface_tension</span>
-<span class="n">get_surface_tension</span><span class="p">(</span><span class="s2">&quot;water&quot;</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span>
+<span class="n">get_surface_tension</span><span class="p">(</span><span class="s2">"water"</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span>
 <span class="c1"># Output: 0.072 (≈ N/m)</span>
 </code></pre></div>
 <div class="highlight"><span class="filename">Array temperature</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.materials.surface_tension</span><span class="w"> </span><span class="kn">import</span>             <span class="n">get_surface_tension</span>
 <span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">280.0</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">,</span> <span class="mf">320.0</span><span class="p">])</span>
-<span class="n">get_surface_tension</span><span class="p">(</span><span class="s2">&quot;water&quot;</span><span class="p">,</span> <span class="n">temps</span><span class="p">)</span>
+<span class="n">get_surface_tension</span><span class="p">(</span><span class="s2">"water"</span><span class="p">,</span> <span class="n">temps</span><span class="p">)</span>
 <span class="c1"># Output: array([0.076, 0.072, 0.065])</span>
 </code></pre></div>
 
@@ -17099,7 +17099,7 @@ A scalar input returns a 0-d <code>numpy.ndarray</code> for consistency.</li>
 <span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_chemical_surface_tension</span><span class="p">(</span>
     <span class="n">chemical_identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the surface tension of a pure chemical in N/m.</span>
+<span class="w">    </span><span class="sd">"""Calculate the surface tension of a pure chemical in N/m.</span>
 
 <span class="sd">    The calculation delegates to ``thermo.chemical.Chemical.SurfaceTension``,</span>
 <span class="sd">    evaluated at the requested temperature(s):</span>
@@ -17118,32 +17118,32 @@ A scalar input returns a 0-d <code>numpy.ndarray</code> for consistency.</li>
 <span class="sd">          A scalar input returns a 0-d ``numpy.ndarray`` for consistency.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Scalar temperature&quot;</span>
+<span class="sd">        ``` py title="Scalar temperature"</span>
 <span class="sd">        from particula.util.materials.surface_tension import \</span>
 <span class="sd">            get_surface_tension</span>
-<span class="sd">        get_surface_tension(&quot;water&quot;, 298.15)</span>
+<span class="sd">        get_surface_tension("water", 298.15)</span>
 <span class="sd">        # Output: 0.072 (≈ N/m)</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Array temperature&quot;</span>
+<span class="sd">        ``` py title="Array temperature"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        from particula.util.materials.surface_tension import \</span>
 <span class="sd">            get_surface_tension</span>
 <span class="sd">        temps = np.array([280.0, 298.15, 320.0])</span>
-<span class="sd">        get_surface_tension(&quot;water&quot;, temps)</span>
+<span class="sd">        get_surface_tension("water", temps)</span>
 <span class="sd">        # Output: array([0.076, 0.072, 0.065])</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Surface tension&quot;,</span>
+<span class="sd">        - "Surface tension",</span>
 <span class="sd">          [Wikipedia](https://en.wikipedia.org/wiki/Surface_tension)</span>
 <span class="sd">        - D. R. Lide, *CRC Handbook of Chemistry and Physics*, 90th ed.,</span>
 <span class="sd">          CRC Press, 2009.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">Chemical</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;The &#39;thermo&#39; package is required for vapor pressure calculations.&quot;</span>
-            <span class="s2">&quot;Please install it using &#39;pip install thermo&#39;.&quot;</span>
+            <span class="s2">"The 'thermo' package is required for vapor pressure calculations."</span>
+            <span class="s2">"Please install it using 'pip install thermo'."</span>
         <span class="p">)</span>
 
     <span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -17222,13 +17222,13 @@ temperature, a 0-d NumPy array is returned for consistency.</li>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example Usage – scalar input</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.materials.vapor_pressure</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_vapor_pressure</span>
-<span class="n">p_sat</span> <span class="o">=</span> <span class="n">get_vapor_pressure</span><span class="p">(</span><span class="s2">&quot;water&quot;</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span>
+<span class="n">p_sat</span> <span class="o">=</span> <span class="n">get_vapor_pressure</span><span class="p">(</span><span class="s2">"water"</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span>
 <span class="c1"># p_sat ≈ 3169.0  # Pa</span>
 </code></pre></div>
 <div class="highlight"><span class="filename">Example Usage – vectorised input</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.materials.vapor_pressure</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_vapor_pressure</span>
 <span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">280.0</span><span class="p">,</span> <span class="mf">290.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">])</span>
-<span class="n">p_sat</span> <span class="o">=</span> <span class="n">get_vapor_pressure</span><span class="p">(</span><span class="s2">&quot;water&quot;</span><span class="p">,</span> <span class="n">temps</span><span class="p">)</span>
+<span class="n">p_sat</span> <span class="o">=</span> <span class="n">get_vapor_pressure</span><span class="p">(</span><span class="s2">"water"</span><span class="p">,</span> <span class="n">temps</span><span class="p">)</span>
 <span class="c1"># p_sat → array([...])  # Pa</span>
 </code></pre></div>
 
@@ -17303,7 +17303,7 @@ temperature, a 0-d NumPy array is returned for consistency.</li>
 <span class="normal">66</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_chemical_vapor_pressure</span><span class="p">(</span>
     <span class="n">chemical_identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve the saturation-vapor pressure of a chemical at temperature.</span>
+<span class="w">    </span><span class="sd">"""Retrieve the saturation-vapor pressure of a chemical at temperature.</span>
 
 <span class="sd">    The saturation-vapor pressure (Pₛₐₜ) is obtained by calling the correlation</span>
 <span class="sd">    implemented in ``thermo.chemical.Chemical``:</span>
@@ -17323,30 +17323,30 @@ temperature, a 0-d NumPy array is returned for consistency.</li>
 <span class="sd">          temperature, a 0-d NumPy array is returned for consistency.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage – scalar input&quot;</span>
+<span class="sd">        ``` py title="Example Usage – scalar input"</span>
 <span class="sd">        from particula.util.materials.vapor_pressure import get_vapor_pressure</span>
-<span class="sd">        p_sat = get_vapor_pressure(&quot;water&quot;, 298.15)</span>
+<span class="sd">        p_sat = get_vapor_pressure("water", 298.15)</span>
 <span class="sd">        # p_sat ≈ 3169.0  # Pa</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Example Usage – vectorised input&quot;</span>
+<span class="sd">        ``` py title="Example Usage – vectorised input"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        from particula.util.materials.vapor_pressure import get_vapor_pressure</span>
 <span class="sd">        temps = np.array([280.0, 290.0, 300.0])</span>
-<span class="sd">        p_sat = get_vapor_pressure(&quot;water&quot;, temps)</span>
+<span class="sd">        p_sat = get_vapor_pressure("water", temps)</span>
 <span class="sd">        # p_sat → array([...])  # Pa</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Vapour pressure,&quot;</span>
+<span class="sd">        - "Vapour pressure,"</span>
 <span class="sd">          [Wikipedia](https://en.wikipedia.org/wiki/Vapour_pressure)</span>
-<span class="sd">        - R. H. Perry &amp; D. W. Green, *Perry&#39;s Chemical Engineers&#39; Handbook*,</span>
+<span class="sd">        - R. H. Perry &amp; D. W. Green, *Perry's Chemical Engineers' Handbook*,</span>
 <span class="sd">          8th ed., McGraw-Hill, 2007.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">Chemical</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;The &#39;thermo&#39; package is required for vapor pressure calculations.&quot;</span>
-            <span class="s2">&quot; Please install it using &#39;pip install thermo&#39;.&quot;</span>
+            <span class="s2">"The 'thermo' package is required for vapor pressure calculations."</span>
+            <span class="s2">" Please install it using 'pip install thermo'."</span>
         <span class="p">)</span>
 
     <span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -17485,7 +17485,7 @@ type.</p>
 <span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_coerced_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coerce the given data to the specified dtype if it is not already of that</span>
+<span class="w">    </span><span class="sd">"""Coerce the given data to the specified dtype if it is not already of that</span>
 <span class="sd">    type.</span>
 
 <span class="sd">    Arguments:</span>
@@ -17499,14 +17499,14 @@ type.</p>
 <span class="sd">        - ValueError : If the data cannot be coerced to the desired dtype.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Coerce integer to float&quot;</span>
+<span class="sd">        ``` py title="Coerce integer to float"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        x = par.get_coerced_type(1, float)</span>
 <span class="sd">        print(x)</span>
 <span class="sd">        # 1.0</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Coerce list to numpy array&quot;</span>
+<span class="sd">        ``` py title="Coerce list to numpy array"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        arr = par.get_coerced_type([1, 2, 3], np.ndarray)</span>
@@ -17516,12 +17516,12 @@ type.</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - NumPy Documentation: https://numpy.org/doc/</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="k">else</span> <span class="n">dtype</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not coerce </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not coerce </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">dtype</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
     <span class="k">return</span> <span class="n">data</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17587,10 +17587,10 @@ index.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Convert list of strings to dictionary</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
-<span class="n">str_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="s2">&quot;gamma&quot;</span><span class="p">]</span>
+<span class="n">str_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"alpha"</span><span class="p">,</span> <span class="s2">"beta"</span><span class="p">,</span> <span class="s2">"gamma"</span><span class="p">]</span>
 <span class="n">mapping</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_dict_from_list</span><span class="p">(</span><span class="n">str_list</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mapping</span><span class="p">)</span>
-<span class="c1"># {&#39;alpha&#39;: 0, &#39;beta&#39;: 1, &#39;gamma&#39;: 2}</span>
+<span class="c1"># {'alpha': 0, 'beta': 1, 'gamma': 2}</span>
 </code></pre></div>
 
 
@@ -17632,7 +17632,7 @@ index.</p>
 <span class="normal">91</span>
 <span class="normal">92</span>
 <span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_dict_from_list</span><span class="p">(</span><span class="n">list_of_str</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a list of strings into a dictionary mapping each string to its</span>
+<span class="w">    </span><span class="sd">"""Convert a list of strings into a dictionary mapping each string to its</span>
 <span class="sd">    index.</span>
 
 <span class="sd">    Arguments:</span>
@@ -17645,23 +17645,23 @@ index.</p>
 <span class="sd">        - TypeError : If the list is empty or contains non-string items.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Convert list of strings to dictionary&quot;</span>
+<span class="sd">        ``` py title="Convert list of strings to dictionary"</span>
 <span class="sd">        import particula as par</span>
 
-<span class="sd">        str_list = [&quot;alpha&quot;, &quot;beta&quot;, &quot;gamma&quot;]</span>
+<span class="sd">        str_list = ["alpha", "beta", "gamma"]</span>
 <span class="sd">        mapping = par.get_dict_from_list(str_list)</span>
 <span class="sd">        print(mapping)</span>
-<span class="sd">        # {&#39;alpha&#39;: 0, &#39;beta&#39;: 1, &#39;gamma&#39;: 2}</span>
+<span class="sd">        # {'alpha': 0, 'beta': 1, 'gamma': 2}</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># basic type / emptiness check</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">list_of_str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">list_of_str</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;list_of_str must be a non-empty sequence of strings.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"list_of_str must be a non-empty sequence of strings."</span><span class="p">)</span>
 
     <span class="c1"># one pass: ensure every element is a non-empty string</span>
-    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">list_of_str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">""</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">list_of_str</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;All elements in list_of_str must be non-empty strings.&quot;</span>
+            <span class="s2">"All elements in list_of_str must be non-empty strings."</span>
         <span class="p">)</span>
 
     <span class="c1"># Create a dictionary from the list of strings using a dictionary</span>
@@ -17823,7 +17823,7 @@ index.</p>
     <span class="n">volume_zero</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">volume_one</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the effective refractive index of a two-solute mixture.</span>
+<span class="w">    </span><span class="sd">"""Calculate the effective refractive index of a two-solute mixture.</span>
 
 <span class="sd">    The calculation uses volume-weighted molar refraction, described by:</span>
 <span class="sd">    - r_eff = (v0 / (v0 + v1)) * ((m0 - 1) / (m0 + 2)) +</span>
@@ -17845,7 +17845,7 @@ index.</p>
 <span class="sd">        - Effective refractive index of the mixture (float or complex).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        n_mix = par.get_effective_refractive_index(1.33, 1.50, 2.0, 1.0)</span>
 <span class="sd">        print(n_mix)</span>
@@ -17853,13 +17853,13 @@ index.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Y. Liu &amp; P. H. Daum, &quot;Relationship of refractive index to mass</span>
+<span class="sd">        - Y. Liu &amp; P. H. Daum, "Relationship of refractive index to mass</span>
 <span class="sd">          density and self-consistency mixing rules for multicomponent</span>
-<span class="sd">          mixtures like ambient aerosols,&quot; Journal of Aerosol Science,</span>
+<span class="sd">          mixtures like ambient aerosols," Journal of Aerosol Science,</span>
 <span class="sd">          vol. 39(11), pp. 974–986, 2008.</span>
 <span class="sd">          DOI: 10.1016/j.jaerosci.2008.06.006</span>
-<span class="sd">        - Wikipedia contributors, &quot;Refractive index,&quot; Wikipedia.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - Wikipedia contributors, "Refractive index," Wikipedia.</span>
+<span class="sd">    """</span>
     <span class="n">volume_total</span> <span class="o">=</span> <span class="n">volume_zero</span> <span class="o">+</span> <span class="n">volume_one</span>
     <span class="n">r_effective</span> <span class="o">=</span> <span class="n">volume_zero</span> <span class="o">/</span> <span class="n">volume_total</span> <span class="o">*</span> <span class="p">(</span><span class="n">m_zero</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
         <span class="n">m_zero</span> <span class="o">+</span> <span class="mi">2</span>
@@ -17985,7 +17985,7 @@ index.</p>
 <span class="normal">111</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_reduced_self_broadcast</span><span class="p">(</span>
     <span class="n">alpha_array</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a square matrix of pairwise reduced values using a single array.</span>
+<span class="w">    </span><span class="sd">"""Return a square matrix of pairwise reduced values using a single array.</span>
 
 <span class="sd">    Each element is calculated by broadcasting the array with its transpose:</span>
 <span class="sd">    - r_ij = (α_i × α_j) / (α_i + α_j),</span>
@@ -17998,7 +17998,7 @@ index.</p>
 <span class="sd">        - A 2D square matrix of pairwise reduced values.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        from particula.util.reduced_quantity import get_reduced_self_broadcast</span>
 <span class="sd">        import numpy as np</span>
 
@@ -18011,13 +18011,13 @@ index.</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - [Reduced Mass, Wikipedia](https://en.wikipedia.org/wiki/Reduced_mass)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Use broadcasting to create matrix and its transpose</span>
     <span class="n">alpha_matrix</span> <span class="o">=</span> <span class="n">alpha_array</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
     <span class="n">alpha_matrix_transpose</span> <span class="o">=</span> <span class="n">alpha_array</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
     <span class="n">denominator</span> <span class="o">=</span> <span class="n">alpha_matrix</span> <span class="o">+</span> <span class="n">alpha_matrix_transpose</span>
     <span class="c1"># Perform element-wise multiplication and division with np.errstate</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
             <span class="n">denominator</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">alpha_matrix</span> <span class="o">*</span> <span class="n">alpha_matrix_transpose</span> <span class="o">/</span> <span class="n">denominator</span><span class="p">,</span>
@@ -18174,7 +18174,7 @@ index.</p>
     <span class="n">alpha</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the reduced value of two parameters.</span>
+<span class="w">    </span><span class="sd">"""Return the reduced value of two parameters.</span>
 
 <span class="sd">    The reduced value is computed using:</span>
 <span class="sd">    - r = (α × β) / (α + β),</span>
@@ -18192,7 +18192,7 @@ index.</p>
 <span class="sd">        - ValueError : If arrays have incompatible shapes.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        from particula.util.reduced_quantity import get_reduced_value</span>
 <span class="sd">        import numpy as np</span>
 
@@ -18207,20 +18207,20 @@ index.</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - [Reduced Mass, Wikipedia](https://en.wikipedia.org/wiki/Reduced_mass)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Ensure input compatibility, especially when both are arrays</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="nb">isinstance</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="ow">and</span> <span class="p">(</span><span class="n">alpha</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">beta</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;The shapes of alpha and beta must be identical.&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The shapes of alpha and beta must be identical.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"The shapes of alpha and beta must be identical."</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"The shapes of alpha and beta must be identical."</span><span class="p">)</span>
 
     <span class="c1"># Calculation of the reduced value, with safety against division by zero</span>
     <span class="n">denominator</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">+</span> <span class="n">beta</span>
     <span class="c1"># Using np.errstate to suppress divide by zero warnings</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">denominator</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">/</span> <span class="n">denominator</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
@@ -18327,7 +18327,7 @@ protection.</p>
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_safe_exp</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the exponential of each element in the input array, with overflow</span>
+<span class="w">    </span><span class="sd">"""Compute the exponential of each element in the input array, with overflow</span>
 <span class="sd">    protection.</span>
 
 <span class="sd">    The exponential is calculated using:</span>
@@ -18340,7 +18340,7 @@ protection.</p>
 <span class="sd">        - np.ndarray of exponentiated values, with machine-level clipping.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 
@@ -18350,8 +18350,8 @@ protection.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Floating Point Arithmetic,&quot; NumPy Documentation, NumPy.org.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - "Floating Point Arithmetic," NumPy Documentation, NumPy.org.</span>
+<span class="sd">    """</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">max_exp_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_exp_input</span><span class="p">))</span>
@@ -18459,7 +18459,7 @@ underflow protection.</p>
 <span class="normal">70</span>
 <span class="normal">71</span>
 <span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_safe_log</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the natural logarithm of each element in the input array, with</span>
+<span class="w">    </span><span class="sd">"""Compute the natural logarithm of each element in the input array, with</span>
 <span class="sd">    underflow protection.</span>
 
 <span class="sd">    The natural log is calculated using:</span>
@@ -18472,7 +18472,7 @@ underflow protection.</p>
 <span class="sd">        - np.ndarray of natural logarithms, with machine-level clipping.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 
@@ -18482,8 +18482,8 @@ underflow protection.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Logarithms and Machine Precision,&quot; NumPy Documentation, NumPy.org.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - "Logarithms and Machine Precision," NumPy Documentation, NumPy.org.</span>
+<span class="sd">    """</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">min_positive_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">min_positive_value</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
@@ -18591,7 +18591,7 @@ underflow protection.</p>
 <span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_safe_log10</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the base-10 logarithm of each element in the input array, with</span>
+<span class="w">    </span><span class="sd">"""Compute the base-10 logarithm of each element in the input array, with</span>
 <span class="sd">    underflow protection.</span>
 
 <span class="sd">    The base-10 log is calculated using:</span>
@@ -18604,7 +18604,7 @@ underflow protection.</p>
 <span class="sd">        - np.ndarray of base-10 logarithms, with machine-level clipping.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 
@@ -18614,8 +18614,8 @@ underflow protection.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Logarithms and Machine Precision,&quot; NumPy Documentation, NumPy.org.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - "Logarithms and Machine Precision," NumPy Documentation, NumPy.org.</span>
+<span class="sd">    """</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">min_positive_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">min_positive_value</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
@@ -18703,7 +18703,7 @@ or if data is 1D but header has more than one entry.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">time_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="n">data_2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sensor1&#39;</span><span class="p">,</span> <span class="s1">&#39;sensor2&#39;</span><span class="p">,</span> <span class="s1">&#39;sensor3&#39;</span><span class="p">,</span> <span class="s1">&#39;sensor4&#39;</span><span class="p">,</span> <span class="s1">&#39;sensor5&#39;</span><span class="p">]</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'sensor1'</span><span class="p">,</span> <span class="s1">'sensor2'</span><span class="p">,</span> <span class="s1">'sensor3'</span><span class="p">,</span> <span class="s1">'sensor4'</span><span class="p">,</span> <span class="s1">'sensor5'</span><span class="p">]</span>
 <span class="n">reshaped_data</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_shape_check</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">data_2d</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">reshaped_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="c1"># Should be (10, 5)</span>
@@ -18786,7 +18786,7 @@ or if data is 1D but header has more than one entry.</p>
     <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">header</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate or reshape data array for compatibility with time array</span>
+<span class="w">    </span><span class="sd">"""Validate or reshape data array for compatibility with time array</span>
 <span class="sd">    and header list.</span>
 
 <span class="sd">    If data is 2D, the function attempts to align the time dimension with one</span>
@@ -18811,19 +18811,19 @@ or if data is 1D but header has more than one entry.</p>
 <span class="sd">        import particula as par</span>
 <span class="sd">        time_array = np.arange(0, 10)</span>
 <span class="sd">        data_2d = np.random.rand(10, 5)</span>
-<span class="sd">        headers = [&#39;sensor1&#39;, &#39;sensor2&#39;, &#39;sensor3&#39;, &#39;sensor4&#39;, &#39;sensor5&#39;]</span>
+<span class="sd">        headers = ['sensor1', 'sensor2', 'sensor3', 'sensor4', 'sensor5']</span>
 <span class="sd">        reshaped_data = par.get_shape_check(time_array, data_2d, headers)</span>
 <span class="sd">        print(reshaped_data.shape)</span>
 <span class="sd">        # Should be (10, 5)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Check if data_new is 2D or 1D</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="c1"># Check if time matches the dimensions of data</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="n">concatenate_axis_new</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Default to the axis=1</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Find the axis that doesn&#39;t match the length of time</span>
+            <span class="c1"># Find the axis that doesn't match the length of time</span>
             <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
             <span class="c1"># NumPy 2.0 requires a Python int for axis values</span>
             <span class="n">concatenate_axis_new</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
@@ -18833,13 +18833,13 @@ or if data is 1D but header has more than one entry.</p>
         <span class="c1"># check header list length matches data_new shape</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">!=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="nb">print</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;header len: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span><span class="si">}</span><span class="s2"> vs. data.shape: </span><span class="se">\</span>
-<span class="s2">                  </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"header len: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span><span class="si">}</span><span class="s2"> vs. data.shape: </span><span class="se">\</span>
+<span class="s2">                  </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Header list length must match the second </span><span class="se">\</span>
-<span class="s2">                              dimension of data_new.&quot;</span>
+                <span class="s2">"Header list length must match the second </span><span class="se">\</span>
+<span class="s2">                              dimension of data_new."</span>
             <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="c1"># Reshape new data so the concatenate axis is axis=1</span>
@@ -18847,8 +18847,8 @@ or if data is 1D but header has more than one entry.</p>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Header list must be a single entry if data_new </span><span class="se">\</span>
-<span class="s2">                              is 1D.&quot;</span>
+            <span class="s2">"Header list must be a single entry if data_new </span><span class="se">\</span>
+<span class="s2">                              is 1D."</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">data</span>
 </code></pre></div></td></tr></table></div>
@@ -18935,12 +18935,12 @@ factor or the fully converted value in the target unit.</li>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example Multi-Unit Conversion</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="n">factor</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_unit_conversion</span><span class="p">(</span><span class="s2">&quot;ug/m^3&quot;</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+<span class="n">factor</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_unit_conversion</span><span class="p">(</span><span class="s2">"ug/m^3"</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span>
 <span class="c1"># 1e-9</span>
 </code></pre></div>
 <div class="highlight"><span class="filename">Example Temperature Conversion</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="n">degF</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_unit_conversion</span><span class="p">(</span><span class="s2">&quot;degC&quot;</span><span class="p">,</span> <span class="s2">&quot;degF&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">degF</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_unit_conversion</span><span class="p">(</span><span class="s2">"degC"</span><span class="p">,</span> <span class="s2">"degF"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">degF</span><span class="p">)</span>
 <span class="c1"># ~77.0</span>
 </code></pre></div>
@@ -19026,7 +19026,7 @@ factor or the fully converted value in the target unit.</li>
     <span class="n">new</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReturnType</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a numeric value or unit expression from one unit to another using</span>
+<span class="w">    </span><span class="sd">"""Convert a numeric value or unit expression from one unit to another using</span>
 <span class="sd">    Pint.</span>
 
 <span class="sd">    For simple multiplicative units, if no value is provided, this function</span>
@@ -19035,7 +19035,7 @@ factor or the fully converted value in the target unit.</li>
 <span class="sd">    numeric value is returned instead.</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        - old : A string representing the current unit (e.g., &quot;m&quot;, &quot;degC&quot;).</span>
+<span class="sd">        - old : A string representing the current unit (e.g., "m", "degC").</span>
 <span class="sd">        - new : A string representing the target unit.</span>
 <span class="sd">        - value : An optional numeric value to convert. If omitted, returns the</span>
 <span class="sd">            conversion factor between old and new.</span>
@@ -19049,29 +19049,29 @@ factor or the fully converted value in the target unit.</li>
 <span class="sd">          factor or the fully converted value in the target unit.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Multi-Unit Conversion&quot;</span>
+<span class="sd">        ``` py title="Example Multi-Unit Conversion"</span>
 <span class="sd">        import particula as par</span>
-<span class="sd">        factor = par.get_unit_conversion(&quot;ug/m^3&quot;, &quot;kg/m^3&quot;)</span>
+<span class="sd">        factor = par.get_unit_conversion("ug/m^3", "kg/m^3")</span>
 <span class="sd">        print(factor)</span>
 <span class="sd">        # 1e-9</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Example Temperature Conversion&quot;</span>
+<span class="sd">        ``` py title="Example Temperature Conversion"</span>
 <span class="sd">        import particula as par</span>
-<span class="sd">        degF = par.get_unit_conversion(&quot;degC&quot;, &quot;degF&quot;, value=25)</span>
+<span class="sd">        degF = par.get_unit_conversion("degC", "degF", value=25)</span>
 <span class="sd">        print(degF)</span>
 <span class="sd">        # ~77.0</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Pint documentation: https://pint.readthedocs.io/</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">unit_registry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;Install pint to use unit conversion features: pip install pint&quot;</span>
+            <span class="s2">"Install pint to use unit conversion features: pip install pint"</span>
         <span class="p">)</span>
 
-    <span class="n">offset_units</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;degC&quot;</span><span class="p">,</span> <span class="s2">&quot;degF&quot;</span><span class="p">,</span> <span class="s2">&quot;degR&quot;</span><span class="p">,</span> <span class="s2">&quot;degK&quot;</span><span class="p">]</span>
+    <span class="n">offset_units</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"degC"</span><span class="p">,</span> <span class="s2">"degF"</span><span class="p">,</span> <span class="s2">"degR"</span><span class="p">,</span> <span class="s2">"degK"</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">old</span> <span class="ow">in</span> <span class="n">offset_units</span> <span class="ow">or</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
         <span class="n">old_quantity</span> <span class="o">=</span> <span class="n">unit_registry</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">old</span><span class="p">)</span>
@@ -19157,8 +19157,8 @@ factor or the fully converted value in the target unit.</li>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="n">my_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
-<span class="n">vals</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_values_of_dict</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span> <span class="n">my_dict</span><span class="p">)</span>
+<span class="n">my_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'a'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+<span class="n">vals</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_values_of_dict</span><span class="p">([</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">],</span> <span class="n">my_dict</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
 <span class="c1"># [1, 3]</span>
 </code></pre></div>
@@ -19202,7 +19202,7 @@ factor or the fully converted value in the target unit.</li>
 <span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_values_of_dict</span><span class="p">(</span>
     <span class="n">key_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">dict_to_check</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve a list of index values from a dictionary for the specified keys.</span>
+<span class="w">    </span><span class="sd">"""Retrieve a list of index values from a dictionary for the specified keys.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - key_list : The keys to look up in the dictionary.</span>
@@ -19217,20 +19217,20 @@ factor or the fully converted value in the target unit.</li>
 <span class="sd">    Examples:</span>
 <span class="sd">        ``` py</span>
 <span class="sd">        import particula as par</span>
-<span class="sd">        my_dict = {&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 3}</span>
-<span class="sd">        vals = par.get_values_of_dict([&#39;a&#39;, &#39;c&#39;], my_dict)</span>
+<span class="sd">        my_dict = {'a': 1, 'b': 2, 'c': 3}</span>
+<span class="sd">        vals = par.get_values_of_dict(['a', 'c'], my_dict)</span>
 <span class="sd">        print(vals)</span>
 <span class="sd">        # [1, 3]</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">key_list</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict_to_check</span><span class="p">:</span>
             <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dict_to_check</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Key &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; not found in the dictionary. Available keys:&quot;</span>
-                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">dict_to_check</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Key '</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">' not found in the dictionary. Available keys:"</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">dict_to_check</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
     <span class="k">return</span> <span class="n">values</span>
 </code></pre></div></td></tr></table></div>

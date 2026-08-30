@@ -16198,12 +16198,12 @@ consistent before instantiating an <code>Aerosol</code>.</p>
 <span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an empty builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize an empty builder.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">    - None</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;atmosphere&quot;</span><span class="p">,</span> <span class="s2">&quot;particles&quot;</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"atmosphere"</span><span class="p">,</span> <span class="s2">"particles"</span><span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Atmosphere</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ParticleRepresentation</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -16295,7 +16295,7 @@ consistent before instantiating an <code>Aerosol</code>.</p>
 <span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Finalize and construct an `Aerosol` object.</span>
+<span class="w">    </span><span class="sd">"""Finalize and construct an `Aerosol` object.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If either component is missing or validation fails.</span>
@@ -16312,7 +16312,7 @@ consistent before instantiating an <code>Aerosol</code>.</p>
 <span class="sd">        .build()</span>
 <span class="sd">    )</span>
 <span class="sd">    ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_species_length</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
@@ -16407,8 +16407,8 @@ consistent before instantiating an <code>Aerosol</code>.</p>
 <span class="normal">85</span>
 <span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_atmosphere</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">atmosphere</span><span class="p">:</span> <span class="n">Atmosphere</span><span class="p">,</span> <span class="n">atmosphere_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AerosolBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Attach an `Atmosphere` to the builder.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AerosolBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Attach an `Atmosphere` to the builder.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        atmosphere: Atmosphere to embed in the aerosol.</span>
@@ -16421,9 +16421,9 @@ consistent before instantiating an <code>Aerosol</code>.</p>
 <span class="sd">        ```py</span>
 <span class="sd">        builder = AerosolBuilder().set_atmosphere(atm)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">atmosphere_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring units for atmosphere parameter.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for atmosphere parameter."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span> <span class="o">=</span> <span class="n">atmosphere</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16506,8 +16506,8 @@ consistent before instantiating an <code>Aerosol</code>.</p>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">particles_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AerosolBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Attach a `ParticleRepresentation` to the builder.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AerosolBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Attach a `ParticleRepresentation` to the builder.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        particles: Particle representation to embed in the aerosol.</span>
@@ -16515,9 +16515,9 @@ consistent before instantiating an <code>Aerosol</code>.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The builder instance (for chaining).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">particles_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring units for particles parameter.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for particles parameter."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particles</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>

@@ -16507,7 +16507,7 @@ rollback, recovery, transfer, or synchronization.</p>
 <span class="normal">275</span>
 <span class="normal">276</span>
 <span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and delegate one dilution request.</span>
+<span class="w">    </span><span class="sd">"""Validate and delegate one dilution request.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        request: Exact dilution request retaining the pinned session and</span>
@@ -16518,14 +16518,14 @@ rollback, recovery, transfer, or synchronization.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``request`` is not an exact dilution request.</span>
-<span class="sd">        ValueError: If the request session is not the registry&#39;s active,</span>
+<span class="sd">        ValueError: If the request session is not the registry's active,</span>
 <span class="sd">            pinned session.</span>
 
 <span class="sd">    Direct-kernel exceptions and mutations propagate without adapter retry,</span>
 <span class="sd">    rollback, recovery, transfer, or synchronization.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentDilutionRequest</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;request must be an exact ResidentDilutionRequest.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"request must be an exact ResidentDilutionRequest."</span><span class="p">)</span>
     <span class="n">request</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">)</span>
     <span class="n">step</span> <span class="o">=</span> <span class="n">_get_dilution_step_gpu</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">step</span><span class="p">(</span>
@@ -16681,17 +16681,17 @@ concrete type.</p>
 <span class="normal">69</span>
 <span class="normal">70</span>
 <span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact resident dependency types without kernel imports.</span>
+<span class="w">    </span><span class="sd">"""Validate exact resident dependency types without kernel imports.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``session`` or ``registry`` is not its exact required</span>
 <span class="sd">            concrete type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentSession</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;session must be an exact ResidentSession.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"session must be an exact ResidentSession."</span><span class="p">)</span>
     <span class="n">registry_type</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_resource_types</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">registry_type</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;registry must be an exact GPUResourceRegistry.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"registry must be an exact GPUResourceRegistry."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16856,7 +16856,7 @@ rollback, recovery, transfer, or synchronization.</p>
 <span class="normal">410</span>
 <span class="normal">411</span>
 <span class="normal">412</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and delegate one nucleation request without altering result.</span>
+<span class="w">    </span><span class="sd">"""Validate and delegate one nucleation request without altering result.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        request: Exact nucleation request retaining the pinned published</span>
@@ -16873,10 +16873,10 @@ rollback, recovery, transfer, or synchronization.</p>
 
 <span class="sd">    Direct-kernel exceptions and mutations propagate without adapter retry,</span>
 <span class="sd">    rollback, recovery, transfer, or synchronization.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentNucleationRequest</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;request must be an exact ResidentNucleationRequest.&quot;</span>
+            <span class="s2">"request must be an exact ResidentNucleationRequest."</span>
         <span class="p">)</span>
     <span class="n">request</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">)</span>
     <span class="n">request</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">validate_nucleation_resources</span><span class="p">(</span>
@@ -17068,19 +17068,19 @@ exact required concrete type.</p>
 <span class="normal">207</span>
 <span class="normal">208</span>
 <span class="normal">209</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact dependencies without inspecting kernel arguments.</span>
+<span class="w">    </span><span class="sd">"""Validate exact dependencies without inspecting kernel arguments.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a resident dependency or resource view is not its</span>
 <span class="sd">            exact required concrete type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentSession</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;session must be an exact ResidentSession.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"session must be an exact ResidentSession."</span><span class="p">)</span>
     <span class="n">registry_type</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">nucleation_type</span> <span class="o">=</span> <span class="n">_resource_types</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">registry_type</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;registry must be an exact GPUResourceRegistry.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"registry must be an exact GPUResourceRegistry."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">nucleation_type</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;resources must be an exact NucleationResources.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resources must be an exact NucleationResources."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17278,7 +17278,7 @@ rollback, recovery, transfer, or synchronization.</p>
 <span class="normal">358</span>
 <span class="normal">359</span>
 <span class="normal">360</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and delegate one wall-loss request.</span>
+<span class="w">    </span><span class="sd">"""Validate and delegate one wall-loss request.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        request: Exact wall-loss request retaining the pinned published</span>
@@ -17297,9 +17297,9 @@ rollback, recovery, transfer, or synchronization.</p>
 <span class="sd">    selection, direct dispatch receives a private selected-box launch set.</span>
 <span class="sd">    Direct-kernel exceptions and mutations propagate without adapter retry,</span>
 <span class="sd">    rollback, recovery, transfer, or synchronization.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentWallLossRequest</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;request must be an exact ResidentWallLossRequest.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"request must be an exact ResidentWallLossRequest."</span><span class="p">)</span>
     <span class="n">request</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">)</span>
     <span class="n">request</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">validate_wall_loss_resources</span><span class="p">(</span>
         <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">resources</span>
@@ -17540,21 +17540,21 @@ exact required concrete type.</p>
 <span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact dependencies without inspecting kernel arguments.</span>
+<span class="w">    </span><span class="sd">"""Validate exact dependencies without inspecting kernel arguments.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a resident dependency or resource view is not its</span>
 <span class="sd">            exact required concrete type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentSession</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;session must be an exact ResidentSession.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"session must be an exact ResidentSession."</span><span class="p">)</span>
     <span class="n">registry_type</span><span class="p">,</span> <span class="n">wall_loss_type</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_resource_types</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">registry_type</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;registry must be an exact GPUResourceRegistry.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"registry must be an exact GPUResourceRegistry."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">wall_loss_type</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;resources must be an exact WallLossResources.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resources must be an exact WallLossResources."</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialize_rng</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resident wall_loss initialize_rng must be False.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resident wall_loss initialize_rng must be False."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate_enabled_box_indices</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17664,7 +17664,7 @@ outside the resident box range.</p>
 <span class="normal">164</span>
 <span class="normal">165</span>
 <span class="normal">166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_enabled_box_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and return the scheduler-owned wall-loss launch set.</span>
+<span class="w">    </span><span class="sd">"""Validate and return the scheduler-owned wall-loss launch set.</span>
 
 <span class="sd">    ``None`` selects every logical box in ascending order. An explicit tuple</span>
 <span class="sd">    must already be strictly ascending, unique, and within the resident</span>
@@ -17680,26 +17680,26 @@ outside the resident box range.</p>
 <span class="sd">            non-integral or boolean index.</span>
 <span class="sd">        ValueError: If an index is negative, repeated, unordered, or</span>
 <span class="sd">            outside the resident box range.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled_box_indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">))</span>
     <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled_box_indices</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;enabled_box_indices must be a tuple or None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"enabled_box_indices must be a tuple or None."</span><span class="p">)</span>
     <span class="n">previous</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">Integral</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;enabled_box_indices must contain integral indices.&quot;</span>
+                <span class="s2">"enabled_box_indices must contain integral indices."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;=</span> <span class="n">previous</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;enabled_box_indices must be sorted unique nonnegative &quot;</span>
-                <span class="s2">&quot;indices.&quot;</span>
+                <span class="s2">"enabled_box_indices must be sorted unique nonnegative "</span>
+                <span class="s2">"indices."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;enabled_box_indices must be within session boxes.&quot;</span>
+                <span class="s2">"enabled_box_indices must be within session boxes."</span>
             <span class="p">)</span>
         <span class="n">previous</span> <span class="o">=</span> <span class="n">index</span>
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>

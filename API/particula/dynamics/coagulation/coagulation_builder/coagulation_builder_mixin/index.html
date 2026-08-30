@@ -16281,8 +16281,8 @@ strategies. Ensures the chosen <code>distribution_type</code> is valid.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example of using BuilderDistributionTypeMixin</span><pre><span></span><code><span class="n">builder</span> <span class="o">=</span> <span class="n">SomeCoagulationBuilder</span><span class="p">()</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
-<span class="c1"># builder.distribution_type -&gt; &quot;discrete&quot;</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
+<span class="c1"># builder.distribution_type -&gt; "discrete"</span>
 </code></pre></div>
 
         <p>Initialize the distribution type mixin.</p>
@@ -16303,10 +16303,10 @@ strategies. Ensures the chosen <code>distribution_type</code> is valid.</p>
 <span class="normal">48</span>
 <span class="normal">49</span>
 <span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the distribution type mixin.</span>
+<span class="w">    </span><span class="sd">"""Initialize the distribution type mixin.</span>
 
 <span class="sd">    Sets the distribution_type attribute to None, to be configured later.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16388,8 +16388,8 @@ distribution_type attribute.</li>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example of using set_distribution_type</span><pre><span></span><code><span class="n">builder</span> <span class="o">=</span> <span class="n">SomeCoagulationBuilder</span><span class="p">()</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
-<span class="c1"># builder.distribution_type -&gt; &quot;discrete&quot;</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
+<span class="c1"># builder.distribution_type -&gt; "discrete"</span>
 </code></pre></div>
 
 
@@ -16445,11 +16445,11 @@ distribution_type attribute.</li>
     <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">distribution_type_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the distribution type.</span>
+<span class="w">    </span><span class="sd">"""Set the distribution type.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        distribution_type : The distribution type to be set.</span>
-<span class="sd">            Options are &quot;discrete&quot;, &quot;continuous_pdf&quot;, &quot;particle_resolved&quot;.</span>
+<span class="sd">            Options are "discrete", "continuous_pdf", "particle_resolved".</span>
 <span class="sd">        distribution_type_units : Not used.</span>
 
 <span class="sd">    Returns:</span>
@@ -16460,28 +16460,28 @@ distribution_type attribute.</li>
 <span class="sd">        ValueError: If the distribution type is not valid.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of using set_distribution_type&quot;</span>
+<span class="sd">        ```py title="Example of using set_distribution_type"</span>
 <span class="sd">        builder = SomeCoagulationBuilder()</span>
-<span class="sd">        builder.set_distribution_type(&quot;discrete&quot;)</span>
-<span class="sd">        # builder.distribution_type -&gt; &quot;discrete&quot;</span>
+<span class="sd">        builder.set_distribution_type("discrete")</span>
+<span class="sd">        # builder.distribution_type -&gt; "discrete"</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">valid_distribution_types</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_resolved&quot;</span><span class="p">,</span>
+        <span class="s2">"discrete"</span><span class="p">,</span>
+        <span class="s2">"continuous_pdf"</span><span class="p">,</span>
+        <span class="s2">"particle_resolved"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="k">if</span> <span class="n">distribution_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_distribution_types</span><span class="p">:</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Invalid distribution type: </span><span class="si">{</span><span class="n">distribution_type</span><span class="si">}</span><span class="s2">. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Valid types are: </span><span class="si">{</span><span class="n">valid_distribution_types</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Invalid distribution type: </span><span class="si">{</span><span class="n">distribution_type</span><span class="si">}</span><span class="s2">. "</span>
+            <span class="sa">f</span><span class="s2">"Valid types are: </span><span class="si">{</span><span class="n">valid_distribution_types</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">distribution_type_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Units for distribution type are not used. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Received: </span><span class="si">{</span><span class="n">distribution_type_units</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Units for distribution type are not used. "</span>
+            <span class="sa">f</span><span class="s2">"Received: </span><span class="si">{</span><span class="n">distribution_type_units</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">=</span> <span class="n">distribution_type</span>
@@ -16538,7 +16538,7 @@ in kg/m^3 (default units).</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><span class="filename">Example of using BuilderFluidDensityMixin</span><pre><span></span><code><span class="n">builder</span><span class="o">.</span><span class="n">set_fluid_density</span><span class="p">(</span><span class="mf">1.225</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+    <div class="highlight"><span class="filename">Example of using BuilderFluidDensityMixin</span><pre><span></span><code><span class="n">builder</span><span class="o">.</span><span class="n">set_fluid_density</span><span class="p">(</span><span class="mf">1.225</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
 </code></pre></div>
 
         <p>Initialize the fluid density mixin.</p>
@@ -16559,10 +16559,10 @@ in kg/m^3 (default units).</p>
 <span class="normal">222</span>
 <span class="normal">223</span>
 <span class="normal">224</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the fluid density mixin.</span>
+<span class="w">    </span><span class="sd">"""Initialize the fluid density mixin.</span>
 
 <span class="sd">    Sets the fluid_density attribute to None, to be configured later.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">fluid_density</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16643,7 +16643,7 @@ fluid_density attribute.</li>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example of using set_fluid_density</span><pre><span></span><code><span class="n">builder</span> <span class="o">=</span> <span class="n">SomeCoagulationBuilder</span><span class="p">()</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">set_fluid_density</span><span class="p">(</span><span class="mf">1.225</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_fluid_density</span><span class="p">(</span><span class="mf">1.225</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
 <span class="c1"># builder.fluid_density -&gt; 1.225</span>
 </code></pre></div>
 
@@ -16682,13 +16682,13 @@ fluid_density attribute.</li>
 <span class="normal">255</span>
 <span class="normal">256</span>
 <span class="normal">257</span>
-<span class="normal">258</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;fluid_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">258</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"fluid_density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_fluid_density</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">fluid_density_units</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the density of the particle in kg/m^3.</span>
+<span class="w">    </span><span class="sd">"""Set the density of the particle in kg/m^3.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        density : Density of the particle.</span>
@@ -16702,17 +16702,17 @@ fluid_density attribute.</li>
 <span class="sd">        ValueError: Must be positive value.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of using set_fluid_density&quot;</span>
+<span class="sd">        ```py title="Example of using set_fluid_density"</span>
 <span class="sd">        builder = SomeCoagulationBuilder()</span>
-<span class="sd">        builder.set_fluid_density(1.225, &quot;kg/m^3&quot;)</span>
+<span class="sd">        builder.set_fluid_density(1.225, "kg/m^3")</span>
 <span class="sd">        # builder.fluid_density -&gt; 1.225</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">fluid_density_units</span> <span class="o">==</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">fluid_density_units</span> <span class="o">==</span> <span class="s2">"kg/m^3"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fluid_density</span> <span class="o">=</span> <span class="n">fluid_density</span>
         <span class="k">return</span> <span class="bp">self</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">fluid_density</span> <span class="o">=</span> <span class="n">fluid_density</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
-        <span class="n">fluid_density_units</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span>
+        <span class="n">fluid_density_units</span><span class="p">,</span> <span class="s2">"kg/m^3"</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16769,7 +16769,7 @@ rate in m<sup>2/s</sup>3 (default units).</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><span class="filename">Example of using BuilderTurbulentDissipationMixin</span><pre><span></span><code><span class="n">builder</span><span class="o">.</span><span class="n">set_turbulent_dissipation</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s2">&quot;m^2/s^3&quot;</span><span class="p">)</span>
+    <div class="highlight"><span class="filename">Example of using BuilderTurbulentDissipationMixin</span><pre><span></span><code><span class="n">builder</span><span class="o">.</span><span class="n">set_turbulent_dissipation</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s2">"m^2/s^3"</span><span class="p">)</span>
 </code></pre></div>
 
         <p>Initialize the turbulent dissipation mixin.</p>
@@ -16790,10 +16790,10 @@ rate in m<sup>2/s</sup>3 (default units).</p>
 <span class="normal">159</span>
 <span class="normal">160</span>
 <span class="normal">161</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the turbulent dissipation mixin.</span>
+<span class="w">    </span><span class="sd">"""Initialize the turbulent dissipation mixin.</span>
 
 <span class="sd">    Sets the turbulent_dissipation attribute to None.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">turbulent_dissipation</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16875,7 +16875,7 @@ turbulent_dissipation attribute.</li>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example of using set_turbulent_dissipation</span><pre><span></span><code><span class="n">builder</span> <span class="o">=</span> <span class="n">SomeCoagulationBuilder</span><span class="p">()</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">set_turbulent_dissipation</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s2">&quot;m^2/s^3&quot;</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_turbulent_dissipation</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s2">"m^2/s^3"</span><span class="p">)</span>
 <span class="c1"># builder.turbulent_dissipation -&gt; 1e-3</span>
 </code></pre></div>
 
@@ -16916,13 +16916,13 @@ turbulent_dissipation attribute.</li>
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
-<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"turbulent_dissipation"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_turbulent_dissipation</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">turbulent_dissipation_units</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the turbulent dissipation rate.</span>
+<span class="w">    </span><span class="sd">"""Set the turbulent dissipation rate.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        turbulent_dissipation : Turbulent dissipation rate.</span>
@@ -16937,18 +16937,18 @@ turbulent_dissipation attribute.</li>
 <span class="sd">        ValueError: Must be non-negative value.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of using set_turbulent_dissipation&quot;</span>
+<span class="sd">        ```py title="Example of using set_turbulent_dissipation"</span>
 <span class="sd">        builder = SomeCoagulationBuilder()</span>
-<span class="sd">        builder.set_turbulent_dissipation(1e-3, &quot;m^2/s^3&quot;)</span>
+<span class="sd">        builder.set_turbulent_dissipation(1e-3, "m^2/s^3")</span>
 <span class="sd">        # builder.turbulent_dissipation -&gt; 1e-3</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">turbulent_dissipation_units</span> <span class="o">==</span> <span class="s2">&quot;m^2/s^3&quot;</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">turbulent_dissipation_units</span> <span class="o">==</span> <span class="s2">"m^2/s^3"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">turbulent_dissipation</span> <span class="o">=</span> <span class="n">turbulent_dissipation</span>
         <span class="k">return</span> <span class="bp">self</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">turbulent_dissipation</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">turbulent_dissipation</span>
-        <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="n">turbulent_dissipation_units</span><span class="p">,</span> <span class="s2">&quot;m^2/s^3&quot;</span><span class="p">)</span>
+        <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="n">turbulent_dissipation_units</span><span class="p">,</span> <span class="s2">"m^2/s^3"</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17013,7 +17013,7 @@ directly instead of using interpolation.</p>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">111</span>
 <span class="normal">112</span>
 <span class="normal">113</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the direct kernel mixin.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the direct kernel mixin."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">use_direct_kernel</span> <span class="o">=</span> <span class="kc">False</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -17105,7 +17105,7 @@ particle-resolved coagulation.</p>
 <span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_use_direct_kernel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the direct kernel evaluation flag.</span>
+<span class="w">    </span><span class="sd">"""Set the direct kernel evaluation flag.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value: True to compute direct pairwise kernels for</span>
@@ -17116,9 +17116,9 @@ particle-resolved coagulation.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If value is not a boolean.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Direct kernel flag must be bool, got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Direct kernel flag must be bool, got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">."</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">use_direct_kernel</span> <span class="o">=</span> <span class="n">value</span>

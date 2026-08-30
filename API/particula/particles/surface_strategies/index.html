@@ -16474,7 +16474,7 @@ and the Kelvin effect in particulate phases.</p>
     <span class="n">surface_tension_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">temperature_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the surface strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the surface strategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">surface_tension</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">surface_tension</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">surface_tension_table</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">surface_tension_table</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -16577,7 +16577,7 @@ and the Kelvin effect in particulate phases.</p>
     <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the effective surface tension of the species mixture.</span>
+<span class="w">    </span><span class="sd">"""Calculate the effective surface tension of the species mixture.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - mass_concentration : Concentration of the species in kg/m^3.</span>
@@ -16585,7 +16585,7 @@ and the Kelvin effect in particulate phases.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Effective surface tension in N/m.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16636,11 +16636,11 @@ and the Kelvin effect in particulate phases.</p>
 <span class="normal">219</span>
 <span class="normal">220</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get density of the species mixture.</span>
+<span class="w">    </span><span class="sd">"""Get density of the species mixture.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - density in kg/m^3.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16668,7 +16668,7 @@ and the Kelvin effect in particulate phases.</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">222</span>
 <span class="normal">223</span>
 <span class="normal">224</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the type of the surface strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return the type of the surface strategy."""</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16775,7 +16775,7 @@ pressure.</p>
     <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Kelvin radius, which sets the curvature effect on vapor</span>
+<span class="w">    </span><span class="sd">"""Calculate the Kelvin radius, which sets the curvature effect on vapor</span>
 <span class="sd">    pressure.</span>
 
 <span class="sd">    Arguments:</span>
@@ -16789,7 +16789,7 @@ pressure.</p>
 <span class="sd">    References:</span>
 <span class="sd">        - r = 2 × surface_tension × molar_mass / (R × T × density)</span>
 <span class="sd">          [Kelvin Equation](https://en.wikipedia.org/wiki/Kelvin_equation)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_kelvin_radius</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">effective_surface_tension</span><span class="p">(</span><span class="n">mass_concentration</span><span class="p">,</span> <span class="n">temperature</span><span class="p">),</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_density</span><span class="p">(),</span>
@@ -16907,7 +16907,7 @@ pressure.</p>
     <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the exponential Kelvin term that adjusts vapor pressure.</span>
+<span class="w">    </span><span class="sd">"""Calculate the exponential Kelvin term that adjusts vapor pressure.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - radius : Particle radius in meters.</span>
@@ -16921,7 +16921,7 @@ pressure.</p>
 <span class="sd">    References:</span>
 <span class="sd">        - P_eff = P_sat × exp(kelvin_radius / particle_radius)</span>
 <span class="sd">          [Kelvin Equation](https://en.wikipedia.org/wiki/Kelvin_equation)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_kelvin_term</span><span class="p">(</span>
         <span class="n">radius</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kelvin_radius</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="p">,</span> <span class="n">temperature</span><span class="p">),</span>
@@ -16986,7 +16986,7 @@ temperature.</p>
 <span class="normal">299</span>
 <span class="normal">300</span>
 <span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update_surface_tension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update the surface tension attribute based on the given temperature.</span>
+<span class="w">    </span><span class="sd">"""Update the surface tension attribute based on the given temperature.</span>
 
 <span class="sd">    If a temperature-dependent surface tension table is provided,</span>
 <span class="sd">    it interpolates the surface tension value for the specified</span>
@@ -16994,7 +16994,7 @@ temperature.</p>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature : Temperature in K to update the surface tension.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface_tension_table</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span>
 
@@ -17117,12 +17117,12 @@ properties.</p>
     <span class="n">surface_tension_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">temperature_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the SurfaceStrategyMass.</span>
+<span class="w">    </span><span class="sd">"""Initialize the SurfaceStrategyMass.</span>
 
 <span class="sd">    Sets up the mass-fraction-based surface strategy with surface</span>
 <span class="sd">    tension and density parameters for calculating effective surface</span>
 <span class="sd">    properties.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">surface_tension</span><span class="o">=</span><span class="n">surface_tension</span><span class="p">,</span>
         <span class="n">surface_tension_table</span><span class="o">=</span><span class="n">surface_tension_table</span><span class="p">,</span>
@@ -17204,11 +17204,11 @@ properties.</p>
     <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate effective surface tension using mass-fraction weighting.</span>
+<span class="w">    </span><span class="sd">"""Calculate effective surface tension using mass-fraction weighting.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Effective surface tension in N/m.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_surface_tension</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
 
@@ -17264,11 +17264,11 @@ properties.</p>
 <span class="normal">450</span>
 <span class="normal">451</span>
 <span class="normal">452</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get density of the species mixture.</span>
+<span class="w">    </span><span class="sd">"""Get density of the species mixture.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Density in kg/m^3.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17415,12 +17415,12 @@ effective surface properties.</p>
     <span class="n">surface_tension_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">temperature_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the SurfaceStrategyMolar.</span>
+<span class="w">    </span><span class="sd">"""Initialize the SurfaceStrategyMolar.</span>
 
 <span class="sd">    Sets up the molar-fraction-based surface strategy with surface</span>
 <span class="sd">    tension, density, and molar mass parameters for calculating</span>
 <span class="sd">    effective surface properties.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">surface_tension</span><span class="o">=</span><span class="n">surface_tension</span><span class="p">,</span>
         <span class="n">surface_tension_table</span><span class="o">=</span><span class="n">surface_tension_table</span><span class="p">,</span>
@@ -17506,11 +17506,11 @@ effective surface properties.</p>
     <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate effective surface tension using mole-fraction weighting.</span>
+<span class="w">    </span><span class="sd">"""Calculate effective surface tension using mole-fraction weighting.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Effective surface tension in N/m.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_surface_tension</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
 
@@ -17569,11 +17569,11 @@ effective surface properties.</p>
 <span class="normal">380</span>
 <span class="normal">381</span>
 <span class="normal">382</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get density of the species mixture.</span>
+<span class="w">    </span><span class="sd">"""Get density of the species mixture.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Density in kg/m^3.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17691,12 +17691,12 @@ properties.</p>
     <span class="n">surface_tension_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">temperature_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the SurfaceStrategyVolume.</span>
+<span class="w">    </span><span class="sd">"""Initialize the SurfaceStrategyVolume.</span>
 
 <span class="sd">    Sets up the volume-fraction-based surface strategy with surface</span>
 <span class="sd">    tension and density parameters for calculating effective surface</span>
 <span class="sd">    properties.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">surface_tension</span><span class="o">=</span><span class="n">surface_tension</span><span class="p">,</span>
         <span class="n">surface_tension_table</span><span class="o">=</span><span class="n">surface_tension_table</span><span class="p">,</span>
@@ -17781,11 +17781,11 @@ properties.</p>
     <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate effective surface tension using volume-fraction weighting.</span>
+<span class="w">    </span><span class="sd">"""Calculate effective surface tension using volume-fraction weighting.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Effective surface tension in N/m.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_surface_tension</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
 
@@ -17844,11 +17844,11 @@ properties.</p>
 <span class="normal">523</span>
 <span class="normal">524</span>
 <span class="normal">525</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get density of the species mixture.</span>
+<span class="w">    </span><span class="sd">"""Get density of the species mixture.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Density in kg/m^3.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span>
 </code></pre></div></td></tr></table></div>
             </details>

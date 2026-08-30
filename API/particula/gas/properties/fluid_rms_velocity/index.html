@@ -16184,9 +16184,9 @@ energy [m²/s³]</p>
 <span class="normal">67</span>
 <span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;re_lambda&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"re_lambda"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"kinematic_viscosity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"turbulent_dissipation"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_fluid_rms_velocity</span><span class="p">(</span>
@@ -16194,13 +16194,13 @@ energy [m²/s³]</p>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the fluid RMS fluctuation velocity.</span>
+<span class="w">    </span><span class="sd">"""Calculate the fluid RMS fluctuation velocity.</span>
 
 <span class="sd">    The fluid root-mean-square (RMS) velocity fluctuation quantifies</span>
 <span class="sd">    turbulence intensity in a fluid flow. It is calculated as:</span>
 
-<span class="sd">    - u&#39; = (R_λ^(1/2) v_K) / 15^(1/4)</span>
-<span class="sd">        - u&#39; is Fluid RMS fluctuation velocity [m/s]</span>
+<span class="sd">    - u' = (R_λ^(1/2) v_K) / 15^(1/4)</span>
+<span class="sd">        - u' is Fluid RMS fluctuation velocity [m/s]</span>
 <span class="sd">        - R_λ (re_lambda) is Taylor-microscale Reynolds number [-]</span>
 <span class="sd">        - v_K is Kolmogorov velocity scale, computed as v_K = ( ε)^(1/4) [m/s]</span>
 <span class="sd">        - v (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s]</span>
@@ -16217,12 +16217,12 @@ energy [m²/s³]</p>
 <span class="sd">        - Fluid RMS fluctuation velocity [m/s]</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        velocity = get_fluid_rms_velocity(500, 1.5e-5, 0.1)</span>
 <span class="sd">        # Output (example): 0.35</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Example Usage with Array Input&quot;</span>
+<span class="sd">        ``` py title="Example Usage with Array Input"</span>
 <span class="sd">        velocity = get_fluid_rms_velocity(</span>
 <span class="sd">            np.array([500, 600]),</span>
 <span class="sd">            np.array([1.5e-5, 1.7e-5]),</span>
@@ -16232,9 +16232,9 @@ energy [m²/s³]</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - H. Tennekes and J. L. Lumley, &quot;A First Course in Turbulence,&quot;</span>
+<span class="sd">        - H. Tennekes and J. L. Lumley, "A First Course in Turbulence,"</span>
 <span class="sd">          MIT Press, 1972. [check this]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">kolmogorov_velocity</span> <span class="o">=</span> <span class="n">get_kolmogorov_velocity</span><span class="p">(</span>
         <span class="n">kinematic_viscosity</span><span class="p">,</span> <span class="n">turbulent_dissipation</span>
     <span class="p">)</span>

@@ -16614,7 +16614,7 @@ for calculating the pure vapor pressure of the gas species.</p>
     <div class="highlight"><span class="filename">GasSpecies usage example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">constant_vapor_pressure</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mi">2330</span><span class="p">)</span>
 <span class="n">species</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpecies</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Water&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"Water"</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">constant_vapor_pressure</span><span class="p">,</span>
     <span class="n">partitioning</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -16740,7 +16740,7 @@ calculating vapor pressure.</p>
 <span class="normal">141</span>
 <span class="normal">142</span>
 <span class="normal">143</span>
-<span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-positional-arguments</span>
     <span class="c1"># pylint: disable=too-many-arguments</span>
     <span class="bp">self</span><span class="p">,</span>
@@ -16752,7 +16752,7 @@ calculating vapor pressure.</p>
     <span class="n">partitioning</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize with name, molar mass, and vapor pressure strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize with name, molar mass, and vapor pressure strategy.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - name : The name of the gas species.</span>
@@ -16764,7 +16764,7 @@ calculating vapor pressure.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If molar_mass is non-positive.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_warn_deprecated</span><span class="p">(</span><span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">pure_vapor_pressure_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure_strategy</span>
@@ -17026,8 +17026,8 @@ flags.</p>
 <span class="normal">298</span>
 <span class="normal">299</span>
 <span class="normal">300</span>
-<span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Addition of two GasSpecies objects (non-mutating).</span>
+<span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">"GasSpecies"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"GasSpecies"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Addition of two GasSpecies objects (non-mutating).</span>
 
 <span class="sd">    Creates and returns a new GasSpecies instance that contains the</span>
 <span class="sd">    combined attributes of *self* and *other*.</span>
@@ -17044,10 +17044,10 @@ flags.</p>
 <span class="sd">          flags.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Using the + operator&quot;</span>
+<span class="sd">        ```py title="Using the + operator"</span>
 <span class="sd">        merged_species = species1 + species2</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">new_species</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">new_species</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">new_species</span>
@@ -17150,8 +17150,8 @@ flags.</p>
 <span class="normal">272</span>
 <span class="normal">273</span>
 <span class="normal">274</span>
-<span class="normal">275</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;In-place addition: append another GasSpecies object to this one.</span>
+<span class="normal">275</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">"GasSpecies"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"GasSpecies"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""In-place addition: append another GasSpecies object to this one.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - other : The GasSpecies instance whose attributes will be</span>
@@ -17167,10 +17167,10 @@ flags.</p>
 <span class="sd">          flags.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Using the += operator&quot;</span>
+<span class="sd">        ```py title="Using the += operator"</span>
 <span class="sd">        species1 += species2</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17227,16 +17227,16 @@ flags.</p>
 <span class="normal">249</span>
 <span class="normal">250</span>
 <span class="normal">251</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the number of gas species.</span>
+<span class="w">    </span><span class="sd">"""Return the number of gas species.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - float or int : Number of species (array length or 1).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of len()&quot;</span>
+<span class="sd">        ```py title="Example of len()"</span>
 <span class="sd">        len(gas_object)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">n_species</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17282,11 +17282,11 @@ flags.</p>
 <span class="normal">236</span>
 <span class="normal">237</span>
 <span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a string representation of the GasSpecies object.</span>
+<span class="w">    </span><span class="sd">"""Return a string representation of the GasSpecies object.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - str : The string name of the gas species.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17345,16 +17345,16 @@ flags.</p>
 <span class="normal">518</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">added_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add concentration (kg/m^3) to the gas species.</span>
+<span class="w">    </span><span class="sd">"""Add concentration (kg/m^3) to the gas species.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - added_concentration : The amount to add in kg/m^3.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of add_concentration()&quot;</span>
+<span class="sd">        ```py title="Example of add_concentration()"</span>
 <span class="sd">        gas_object.add_concentration(1e-10)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concentration</span> <span class="o">+</span> <span class="n">added_concentration</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17514,8 +17514,8 @@ concatenated with those of the current object.</p>
 <span class="normal">614</span>
 <span class="normal">615</span>
 <span class="normal">616</span>
-<span class="normal">617</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Append another GasSpecies instance to this one (in-place).</span>
+<span class="normal">617</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">"GasSpecies"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Append another GasSpecies instance to this one (in-place).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - other : The GasSpecies object whose attributes will be</span>
@@ -17529,17 +17529,17 @@ concatenated with those of the current object.</p>
 <span class="sd">        - ValueError : If *other* has a different ``partitioning`` flag.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Appending two GasSpecies objects&quot;</span>
+<span class="sd">        ```py title="Appending two GasSpecies objects"</span>
 <span class="sd">        species1.append(species2)</span>
 <span class="sd">        # species1 now represents both original species</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">GasSpecies</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;other&#39; must be a GasSpecies object.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Argument 'other' must be a GasSpecies object."</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">partitioning</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">partitioning</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Cannot append GasSpecies with different &#39;partitioning&#39; flags&quot;</span>
+            <span class="s2">"Cannot append GasSpecies with different 'partitioning' flags"</span>
         <span class="p">)</span>
 
     <span class="n">self_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -17565,7 +17565,7 @@ concatenated with those of the current object.</p>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Cannot append GasSpecies with different box dimensions&quot;</span>
+            <span class="s2">"Cannot append GasSpecies with different box dimensions"</span>
         <span class="p">)</span>
 
     <span class="n">new_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
@@ -17583,8 +17583,8 @@ concatenated with those of the current object.</p>
     <span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">new_data</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_single_species_name_mode</span> <span class="o">=</span> <span class="s2">&quot;array&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_single_species_molar_mass_mode</span> <span class="o">=</span> <span class="s2">&quot;array&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_single_species_name_mode</span> <span class="o">=</span> <span class="s2">"array"</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_single_species_molar_mass_mode</span> <span class="o">=</span> <span class="s2">"array"</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_single_species_concentration_mode</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># always keep strategies in a list, then extend</span>
@@ -17710,8 +17710,8 @@ strategies to retain behavior on the facade.</p>
     <span class="n">vapor_pressure_strategy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">VaporPressureStrategy</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">VaporPressureStrategy</span><span class="p">]</span>
     <span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a facade from GasData without a deprecation warning.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"GasSpecies"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Create a facade from GasData without a deprecation warning.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data: GasData instance to wrap.</span>
@@ -17720,27 +17720,27 @@ strategies to retain behavior on the facade.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        GasSpecies facade over the provided GasData.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">unique_partitioning</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">partitioning</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_partitioning</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">part_list</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">partitioning</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;GasData has mixed partitioning values &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">part_list</span><span class="si">}</span><span class="s2">, but GasSpecies requires uniform partitioning&quot;</span>
+            <span class="s2">"GasData has mixed partitioning values "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">part_list</span><span class="si">}</span><span class="s2">, but GasSpecies requires uniform partitioning"</span>
         <span class="p">)</span>
     <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
     <span class="n">instance</span><span class="o">.</span><span class="n">pure_vapor_pressure_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure_strategy</span>
     <span class="n">instance</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
     <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">n_species</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_name_mode</span> <span class="o">=</span> <span class="s2">&quot;str&quot;</span>
-        <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_molar_mass_mode</span> <span class="o">=</span> <span class="s2">&quot;scalar&quot;</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_name_mode</span> <span class="o">=</span> <span class="s2">"str"</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_molar_mass_mode</span> <span class="o">=</span> <span class="s2">"scalar"</span>
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">n_boxes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_concentration_mode</span> <span class="o">=</span> <span class="s2">&quot;scalar&quot;</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_concentration_mode</span> <span class="o">=</span> <span class="s2">"scalar"</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_concentration_mode</span> <span class="o">=</span> <span class="s2">&quot;array&quot;</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_concentration_mode</span> <span class="o">=</span> <span class="s2">"array"</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_name_mode</span> <span class="o">=</span> <span class="s2">&quot;array&quot;</span>
-        <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_molar_mass_mode</span> <span class="o">=</span> <span class="s2">&quot;array&quot;</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_name_mode</span> <span class="o">=</span> <span class="s2">"array"</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_molar_mass_mode</span> <span class="o">=</span> <span class="s2">"array"</span>
         <span class="n">instance</span><span class="o">.</span><span class="n">_single_species_concentration_mode</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">instance</span>
 </code></pre></div></td></tr></table></div>
@@ -17788,11 +17788,11 @@ strategies to retain behavior on the facade.</p>
 <span class="normal">337</span>
 <span class="normal">338</span>
 <span class="normal">339</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the concentration of the gas species in kg/m^3.</span>
+<span class="w">    </span><span class="sd">"""Return the concentration of the gas species in kg/m^3.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Species concentration.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17849,16 +17849,16 @@ strategies to retain behavior on the facade.</p>
 <span class="normal">325</span>
 <span class="normal">326</span>
 <span class="normal">327</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_molar_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the molar mass of the gas species in kg/mol.</span>
+<span class="w">    </span><span class="sd">"""Return the molar mass of the gas species in kg/mol.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Molar mass in kg/mol.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of get_molar_mass()&quot;</span>
+<span class="sd">        ```py title="Example of get_molar_mass()"</span>
 <span class="sd">        gas_object.get_molar_mass()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17915,16 +17915,16 @@ strategies to retain behavior on the facade.</p>
 <span class="normal">312</span>
 <span class="normal">313</span>
 <span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the name of the gas species.</span>
+<span class="w">    </span><span class="sd">"""Return the name of the gas species.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Name of the gas species.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of get_name()&quot;</span>
+<span class="sd">        ```py title="Example of get_name()"</span>
 <span class="sd">        gas_object.get_name()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18038,7 +18038,7 @@ strategies to retain behavior on the facade.</p>
 <span class="normal">418</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_partial_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the partial pressure of the gas at a given temperature (K).</span>
+<span class="w">    </span><span class="sd">"""Calculate the partial pressure of the gas at a given temperature (K).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature : The temperature in Kelvin.</span>
@@ -18050,10 +18050,10 @@ strategies to retain behavior on the facade.</p>
 <span class="sd">        - ValueError : If the vapor pressure strategy is not set.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of get_partial_pressure()&quot;</span>
+<span class="sd">        ```py title="Example of get_partial_pressure()"</span>
 <span class="sd">        gas_object.get_partial_pressure(temperature=298)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Handle multiple vapor pressure strategies</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pure_vapor_pressure_strategy</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="c1"># Calculate partial pressure for each strategy</span>
@@ -18105,7 +18105,7 @@ strategies to retain behavior on the facade.</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">329</span>
 <span class="normal">330</span>
 <span class="normal">331</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_partitioning</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the partitioning flag (True if the species can partition).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return the partitioning flag (True if the species can partition)."""</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">partitioning</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18210,7 +18210,7 @@ strategies to retain behavior on the facade.</p>
 <span class="normal">374</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_pure_vapor_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the pure vapor pressure at a given temperature (K).</span>
+<span class="w">    </span><span class="sd">"""Calculate the pure vapor pressure at a given temperature (K).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature : The temperature in Kelvin.</span>
@@ -18222,10 +18222,10 @@ strategies to retain behavior on the facade.</p>
 <span class="sd">        - ValueError : If no vapor pressure strategy is set.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        gas_object.get_pure_vapor_pressure(temperature=298)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pure_vapor_pressure_strategy</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="c1"># Handle a list of strategies: calculate and return a list of vapor</span>
         <span class="c1"># pressures</span>
@@ -18350,7 +18350,7 @@ strategies to retain behavior on the facade.</p>
 <span class="normal">503</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_saturation_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the saturation concentration at a given temperature (K).</span>
+<span class="w">    </span><span class="sd">"""Calculate the saturation concentration at a given temperature (K).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature : The temperature in Kelvin.</span>
@@ -18362,10 +18362,10 @@ strategies to retain behavior on the facade.</p>
 <span class="sd">        - ValueError : If the vapor pressure strategy is not set.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of get_saturation_concentration()&quot;</span>
+<span class="sd">        ```py title="Example of get_saturation_concentration()"</span>
 <span class="sd">        gas_object.get_saturation_concentration(temperature=298)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Handle multiple vapor pressure strategies</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pure_vapor_pressure_strategy</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="c1"># Calculate saturation concentration for each strategy</span>
@@ -18499,7 +18499,7 @@ strategies to retain behavior on the facade.</p>
 <span class="normal">462</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_saturation_ratio</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the saturation ratio of the gas at a given temperature (K).</span>
+<span class="w">    </span><span class="sd">"""Calculate the saturation ratio of the gas at a given temperature (K).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - temperature : The temperature in Kelvin.</span>
@@ -18511,10 +18511,10 @@ strategies to retain behavior on the facade.</p>
 <span class="sd">        - ValueError : If the vapor pressure strategy is not set.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of get_saturation_ratio()&quot;</span>
+<span class="sd">        ```py title="Example of get_saturation_ratio()"</span>
 <span class="sd">        gas_object.get_saturation_ratio(temperature=298)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Handle multiple vapor pressure strategies</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pure_vapor_pressure_strategy</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="c1"># Calculate saturation ratio for each strategy</span>
@@ -18596,16 +18596,16 @@ strategies to retain behavior on the facade.</p>
 <span class="normal">533</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">new_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Overwrite the concentration of the gas species in kg/m^3.</span>
+<span class="w">    </span><span class="sd">"""Overwrite the concentration of the gas species in kg/m^3.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - new_concentration : The new concentration value in kg/m^3.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example of set_concentration()&quot;</span>
+<span class="sd">        ```py title="Example of set_concentration()"</span>
 <span class="sd">        gas_object.set_concentration(1e-10)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_set_concentration</span><span class="p">(</span><span class="n">new_concentration</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

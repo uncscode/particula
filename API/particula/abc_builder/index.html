@@ -16201,8 +16201,8 @@ pre_build_check, or if trying to set an invalid parameter.</p>
 
 <span class="n">strategy</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">MyBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_parameters1</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_parameters2</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_parameters1</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">'m'</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_parameters2</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="s1">'s'</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -16229,7 +16229,7 @@ pre_build_check, or if trying to set an invalid parameter.</p>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize builder with required parameters.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize builder with required parameters."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span> <span class="o">=</span> <span class="n">required_parameters</span> <span class="ow">or</span> <span class="p">[]</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16301,7 +16301,7 @@ pre_build_check, or if trying to set an invalid parameter.</p>
 <span class="normal">164</span>
 <span class="normal">165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return the strategy object with the set parameters.</span>
+<span class="w">    </span><span class="sd">"""Build and return the strategy object with the set parameters.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Any: The built strategy object.</span>
@@ -16311,7 +16311,7 @@ pre_build_check, or if trying to set an invalid parameter.</p>
 <span class="sd">        builder = Builder()</span>
 <span class="sd">        strategy = builder.build()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16362,8 +16362,8 @@ an invalid parameter.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="n">builder</span> <span class="o">=</span> <span class="n">Builder</span><span class="p">()</span>
 <span class="n">builder</span><span class="o">.</span><span class="n">check_keys</span><span class="p">({</span>
-    <span class="s2">&quot;parameter1&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s2">&quot;parameter2&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">"parameter1"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"parameter2"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
 <span class="p">})</span>
 </code></pre></div>
 
@@ -16412,7 +16412,7 @@ an invalid parameter.</p>
 <span class="normal">92</span>
 <span class="normal">93</span>
 <span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">check_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the keys are present and valid.</span>
+<span class="w">    </span><span class="sd">"""Check if the keys are present and valid.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - parameters: The parameters dictionary to check.</span>
@@ -16425,17 +16425,17 @@ an invalid parameter.</p>
 <span class="sd">        ```py</span>
 <span class="sd">        builder = Builder()</span>
 <span class="sd">        builder.check_keys({</span>
-<span class="sd">            &quot;parameter1&quot;: 1,</span>
-<span class="sd">            &quot;parameter2&quot;: 2,</span>
+<span class="sd">            "parameter1": 1,</span>
+<span class="sd">            "parameter2": 2,</span>
 <span class="sd">        })</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Check if all required keys are present</span>
     <span class="k">if</span> <span class="n">missing</span> <span class="o">:=</span> <span class="p">[</span>
         <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameters</span>
     <span class="p">]:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Missing required parameter(s): </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Missing required parameter(s): </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
@@ -16443,13 +16443,13 @@ an invalid parameter.</p>
     <span class="c1"># Generate a set of all valid keys</span>
     <span class="n">valid_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span>
-        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span><span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span><span class="p">]</span>
     <span class="p">)</span>
     <span class="c1"># Check for any invalid keys and handle them within the if condition</span>
     <span class="k">if</span> <span class="n">invalid_keys</span> <span class="o">:=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_keys</span><span class="p">]:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Trying to set an invalid parameter(s) &#39;</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;The valid parameter(s) &#39;</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Trying to set an invalid parameter(s) '</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">'. "</span>
+            <span class="sa">f</span><span class="s2">"The valid parameter(s) '</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">'."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
@@ -16515,7 +16515,7 @@ an invalid parameter.</p>
 <span class="normal">149</span>
 <span class="normal">150</span>
 <span class="normal">151</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pre_build_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if all required attribute parameters are set before building.</span>
+<span class="w">    </span><span class="sd">"""Check if all required attribute parameters are set before building.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError: If any required parameter is missing.</span>
@@ -16525,12 +16525,12 @@ an invalid parameter.</p>
 <span class="sd">        builder = Builder()</span>
 <span class="sd">        builder.pre_build_check()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">missing</span> <span class="o">:=</span> <span class="p">[</span>
         <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
     <span class="p">]:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Required parameter(s) not set: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Required parameter(s) not set: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
@@ -16601,9 +16601,9 @@ an invalid parameter.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="n">builder</span> <span class="o">=</span> <span class="n">Builder</span><span class="p">()</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">({</span>
-    <span class="s2">&quot;parameter1&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s2">&quot;parameter2&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="s2">&quot;parameter2_units&quot;</span><span class="p">:</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span>
+    <span class="s2">"parameter1"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"parameter2"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">"parameter2_units"</span><span class="p">:</span> <span class="s2">"K"</span><span class="p">,</span>
 <span class="p">})</span>
 </code></pre></div>
 
@@ -16644,8 +16644,8 @@ an invalid parameter.</p>
 <span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
-<span class="normal">130</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;BuilderABC&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set parameters from a dictionary, handling any &#39;_units&#39; suffix.</span>
+<span class="normal">130</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"BuilderABC"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set parameters from a dictionary, handling any '_units' suffix.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - parameters: The parameters dictionary to set.</span>
@@ -16660,24 +16660,24 @@ an invalid parameter.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        ```py</span>
 <span class="sd">        builder = Builder().set_parameters({</span>
-<span class="sd">            &quot;parameter1&quot;: 1,</span>
-<span class="sd">            &quot;parameter2&quot;: 2,</span>
-<span class="sd">            &quot;parameter2_units&quot;: &quot;K&quot;,</span>
+<span class="sd">            "parameter1": 1,</span>
+<span class="sd">            "parameter2": 2,</span>
+<span class="sd">            "parameter2_units": "K",</span>
 <span class="sd">        })</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">check_keys</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span><span class="p">:</span>
-        <span class="n">unit_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span>
+        <span class="n">unit_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span>
         <span class="k">if</span> <span class="n">unit_key</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
             <span class="c1"># Call set method with units</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)(</span>
                 <span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">unit_key</span><span class="p">]</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using default units for parameter: &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Using default units for parameter: '</span><span class="si">%s</span><span class="s2">'."</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
             <span class="c1"># Call set method without units</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
             </details>

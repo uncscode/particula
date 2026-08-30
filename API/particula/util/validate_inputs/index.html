@@ -16150,7 +16150,7 @@ arguments are positive, negative, nonzero, finite, etc.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.validate_inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_inputs</span>
 
-<span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">example_function</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">concentration</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">radius</span> <span class="o">*</span> <span class="n">concentration</span>
 </code></pre></div>
@@ -16236,7 +16236,7 @@ arguments are positive, negative, nonzero, finite, etc.</p>
 <span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_finite</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate that a numeric array or scalar has no infinities or NaNs.</span>
+<span class="w">    </span><span class="sd">"""Validate that a numeric array or scalar has no infinities or NaNs.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - value : Array-like numeric values to check.</span>
@@ -16244,9 +16244,9 @@ arguments are positive, negative, nonzero, finite, etc.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If any element is inf or NaN.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Argument &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; must be finite (no inf or NaN).&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Argument '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' must be finite (no inf or NaN)."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16309,7 +16309,7 @@ constraint_type is one of:
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.validate_inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_inputs</span>
 
-<span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">some_function</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">temperature</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">mass</span> <span class="o">*</span> <span class="n">temperature</span>
 </code></pre></div>
@@ -16392,10 +16392,10 @@ constraint_type is one of:
 <span class="normal">178</span>
 <span class="normal">179</span>
 <span class="normal">180</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_inputs</span><span class="p">(</span><span class="n">dict_args</span><span class="p">):</span>  <span class="c1"># noqa: C901</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A decorator to validate function inputs against specified constraints.</span>
+<span class="w">    </span><span class="sd">"""A decorator to validate function inputs against specified constraints.</span>
 
 <span class="sd">    The constraints are defined by a dictionary of argument names and their</span>
-<span class="sd">    validation types (e.g., &quot;positive&quot;, &quot;negative&quot;, &quot;nonnegative&quot;, etc.). If</span>
+<span class="sd">    validation types (e.g., "positive", "negative", "nonnegative", etc.). If</span>
 <span class="sd">    any argument violates its constraint, a ValueError is raised. Arguments</span>
 <span class="sd">    explicitly passed as ``None`` are ignored and no validation is performed</span>
 <span class="sd">    on them.</span>
@@ -16403,12 +16403,12 @@ constraint_type is one of:
 <span class="sd">    Arguments:</span>
 <span class="sd">        - dict_args : Dictionary {argument_name: constraint_type}, where the</span>
 <span class="sd">            constraint_type is one of:</span>
-<span class="sd">            - &quot;positive&quot; : Must be strictly &gt; 0.</span>
-<span class="sd">            - &quot;negative&quot; : Must be strictly &lt; 0.</span>
-<span class="sd">            - &quot;nonpositive&quot; : Must be &lt;= 0.</span>
-<span class="sd">            - &quot;nonnegative&quot; : Must be &gt;= 0.</span>
-<span class="sd">            - &quot;nonzero&quot; : Must be != 0.</span>
-<span class="sd">            - &quot;finite&quot; : Must not contain inf or NaN.</span>
+<span class="sd">            - "positive" : Must be strictly &gt; 0.</span>
+<span class="sd">            - "negative" : Must be strictly &lt; 0.</span>
+<span class="sd">            - "nonpositive" : Must be &lt;= 0.</span>
+<span class="sd">            - "nonnegative" : Must be &gt;= 0.</span>
+<span class="sd">            - "nonzero" : Must be != 0.</span>
+<span class="sd">            - "finite" : Must not contain inf or NaN.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - A decorator that applies the specified input validations.</span>
@@ -16417,11 +16417,11 @@ constraint_type is one of:
 <span class="sd">        ``` py</span>
 <span class="sd">        from particula.util.validate_inputs import validate_inputs</span>
 
-<span class="sd">        @validate_inputs({&quot;mass&quot;: &quot;positive&quot;, &quot;temperature&quot;: &quot;nonnegative&quot;})</span>
+<span class="sd">        @validate_inputs({"mass": "positive", "temperature": "nonnegative"})</span>
 <span class="sd">        def some_function(mass, temperature):</span>
 <span class="sd">            return mass * temperature</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>  <span class="c1"># noqa: C901</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
@@ -16434,32 +16434,32 @@ constraint_type is one of:
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">dict_args</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;Invalid validation target &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; for function &#39;</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                        <span class="s2">"Invalid validation target "</span>
+                        <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' for function '</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">'."</span>
                     <span class="p">)</span>
                 <span class="k">if</span> <span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-                <span class="k">if</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">&quot;positive&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">"positive"</span><span class="p">:</span>
                     <span class="n">validate_positive</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
                     <span class="n">validate_finite</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">&quot;negative&quot;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">"negative"</span><span class="p">:</span>
                     <span class="n">validate_negative</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
                     <span class="n">validate_finite</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">&quot;nonpositive&quot;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">"nonpositive"</span><span class="p">:</span>
                     <span class="n">validate_nonpositive</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
                     <span class="n">validate_finite</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">"nonnegative"</span><span class="p">:</span>
                     <span class="n">validate_nonnegative</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
                     <span class="n">validate_finite</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">&quot;nonzero&quot;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">"nonzero"</span><span class="p">:</span>
                     <span class="n">validate_nonzero</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
                     <span class="n">validate_finite</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">&quot;finite&quot;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s2">"finite"</span><span class="p">:</span>
                     <span class="n">validate_finite</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Unknown validation &#39;</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2">&#39; for argument &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                        <span class="sa">f</span><span class="s2">"Unknown validation '</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2">' for argument '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">'."</span>
                     <span class="p">)</span>
             <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -16533,7 +16533,7 @@ constraint_type is one of:
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_negative</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate that a numeric array or scalar is strictly negative.</span>
+<span class="w">    </span><span class="sd">"""Validate that a numeric array or scalar is strictly negative.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - value : Array-like numeric values to check.</span>
@@ -16541,9 +16541,9 @@ constraint_type is one of:
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If any element is &gt;= 0.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Argument &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; must be negative.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Argument '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' must be negative."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16611,7 +16611,7 @@ constraint_type is one of:
 <span class="normal">73</span>
 <span class="normal">74</span>
 <span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_nonnegative</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate that a numeric array or scalar is nonnegative (&gt;= 0).</span>
+<span class="w">    </span><span class="sd">"""Validate that a numeric array or scalar is nonnegative (&gt;= 0).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - value : Array-like numeric values to check.</span>
@@ -16619,9 +16619,9 @@ constraint_type is one of:
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If any element is &lt; 0.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Argument &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; must be nonnegative.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Argument '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' must be nonnegative."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16689,7 +16689,7 @@ constraint_type is one of:
 <span class="normal">59</span>
 <span class="normal">60</span>
 <span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_nonpositive</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate that a numeric array or scalar is nonpositive (&lt;= 0).</span>
+<span class="w">    </span><span class="sd">"""Validate that a numeric array or scalar is nonpositive (&lt;= 0).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - value : Array-like numeric values to check.</span>
@@ -16697,9 +16697,9 @@ constraint_type is one of:
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If any element is &gt; 0.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Argument &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; must be nonpositive.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Argument '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' must be nonpositive."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16767,7 +16767,7 @@ constraint_type is one of:
 <span class="normal">87</span>
 <span class="normal">88</span>
 <span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_nonzero</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate that a numeric array or scalar is nonzero.</span>
+<span class="w">    </span><span class="sd">"""Validate that a numeric array or scalar is nonzero.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - value : Array-like numeric values to check.</span>
@@ -16775,9 +16775,9 @@ constraint_type is one of:
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If any element is 0.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Argument &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; must be nonzero.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Argument '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' must be nonzero."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16845,7 +16845,7 @@ constraint_type is one of:
 <span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_positive</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate that a numeric array or scalar is strictly positive.</span>
+<span class="w">    </span><span class="sd">"""Validate that a numeric array or scalar is strictly positive.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - value : Array-like numeric values to check.</span>
@@ -16853,9 +16853,9 @@ constraint_type is one of:
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If any element is &lt;= 0.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Argument &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; must be positive.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Argument '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' must be positive."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

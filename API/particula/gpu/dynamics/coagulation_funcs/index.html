@@ -16395,7 +16395,7 @@ with the Stokes-Einstein relation.</p>
     <span class="n">aerodynamic_mobility</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">boltzmann_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate Brownian diffusivity via Stokes-Einstein scaling.</span>
+<span class="w">    </span><span class="sd">"""Calculate Brownian diffusivity via Stokes-Einstein scaling.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.dynamics.coagulation.brownian_kernel._brownian_diffusivity``</span>
@@ -16409,7 +16409,7 @@ with the Stokes-Einstein relation.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Brownian diffusivity in square meters per second.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">boltzmann_constant</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">aerodynamic_mobility</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16587,7 +16587,7 @@ a scalar particle pair using the Fuchs correction to the continuum kernel.</p>
     <span class="n">speed_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the scalar Brownian coagulation kernel for a pair.</span>
+<span class="w">    </span><span class="sd">"""Calculate the scalar Brownian coagulation kernel for a pair.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.dynamics.coagulation.brownian_kernel.get_brownian_kernel`` for</span>
@@ -16606,7 +16606,7 @@ a scalar particle pair using the Fuchs correction to the continuum kernel.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Brownian coagulation kernel for the pair in cubic meters per second.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">pi_value</span> <span class="o">=</span> <span class="n">_PI</span>
     <span class="n">sum_radius</span> <span class="o">=</span> <span class="n">radius_i</span> <span class="o">+</span> <span class="n">radius_j</span>
     <span class="n">sum_diffusivity</span> <span class="o">=</span> <span class="n">diff_i</span> <span class="o">+</span> <span class="n">diff_j</span>
@@ -17111,11 +17111,11 @@ https://doi.org/10.1063/1.2713719</p>
     <span class="n">ref_temperature</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">sutherland_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate an internal charged hard-sphere pair rate in SI units.</span>
+<span class="w">    </span><span class="sd">"""Calculate an internal charged hard-sphere pair rate in SI units.</span>
 
 <span class="sd">    This device-only, concrete-module-only helper is the pair-rate primitive for</span>
 <span class="sd">    charged-only and canonical Brownian-plus-charged particle-resolved low-level</span>
-<span class="sd">    GPU coagulation. It receives each particle&#39;s total mass across species and</span>
+<span class="sd">    GPU coagulation. It receives each particle's total mass across species and</span>
 <span class="sd">    is used for candidate rates and compact-active majorants. It ports the</span>
 <span class="sd">    charged CPU calculation from</span>
 <span class="sd">    ``particula.dynamics.coagulation.charged_dimensional_kernel`` and the</span>
@@ -17167,7 +17167,7 @@ https://doi.org/10.1063/1.2713719</p>
 <span class="sd">        Coagulation of particles in the transition regime: The effect of the</span>
 <span class="sd">        Coulomb potential. *Journal of Chemical Physics*, 126(12).</span>
 <span class="sd">        https://doi.org/10.1063/1.2713719</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">zero</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="ow">not</span> <span class="n">wp</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">radius_i</span><span class="p">)</span>
@@ -17442,7 +17442,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">coulomb_continuum_limit_wp</span><span class="p">(</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the dimensionless continuum Coulomb enhancement factor.</span>
+<span class="w">    </span><span class="sd">"""Calculate the dimensionless continuum Coulomb enhancement factor.</span>
 
 <span class="sd">    Computes ``phi / (1 - exp(-phi))``. A neutral potential safely returns the</span>
 <span class="sd">    limiting value ``1.0``.</span>
@@ -17457,7 +17457,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="sd">        Gopalakrishnan, R., &amp; Hogan, C. J. (2012). Coulomb-influenced</span>
 <span class="sd">        collisions in aerosols and dusty plasmas. *Physical Review E*, 85(2).</span>
 <span class="sd">        https://doi.org/10.1103/PhysRevE.85.026410</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">coulomb_potential_ratio</span> <span class="o">==</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
@@ -17557,7 +17557,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">coulomb_kinetic_limit_wp</span><span class="p">(</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the dimensionless kinetic Coulomb enhancement factor.</span>
+<span class="w">    </span><span class="sd">"""Calculate the dimensionless kinetic Coulomb enhancement factor.</span>
 
 <span class="sd">    Computes ``1 + phi`` for ``phi &gt;= 0`` and ``exp(phi)`` otherwise. Finite</span>
 <span class="sd">    scalar inputs have no fallback condition.</span>
@@ -17572,7 +17572,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="sd">        Gopalakrishnan, R., &amp; Hogan, C. J. (2012). Coulomb-influenced</span>
 <span class="sd">        collisions in aerosols and dusty plasmas. *Physical Review E*, 85(2).</span>
 <span class="sd">        https://doi.org/10.1103/PhysRevE.85.026410</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">coulomb_potential_ratio</span> <span class="o">&gt;=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">+</span> <span class="n">coulomb_potential_ratio</span>
     <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">coulomb_potential_ratio</span><span class="p">)</span>
@@ -17786,7 +17786,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
     <span class="n">elementary_charge_value</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">electric_permittivity</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the dimensionless pair Coulomb potential ratio.</span>
+<span class="w">    </span><span class="sd">"""Calculate the dimensionless pair Coulomb potential ratio.</span>
 
 <span class="sd">    Computes ``-(q_i * q_j * e**2) / (4 * pi * epsilon_0 * (r_i + r_j)</span>
 <span class="sd">    * k_B * T)``. A non-positive radius sum or temperature, or a non-finite</span>
@@ -17812,7 +17812,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="sd">        Gopalakrishnan, R., &amp; Hogan, C. J. (2012). Coulomb-influenced</span>
 <span class="sd">        collisions in aerosols and dusty plasmas. *Physical Review E*, 85(2).</span>
 <span class="sd">        https://doi.org/10.1103/PhysRevE.85.026410</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sum_radius</span> <span class="o">=</span> <span class="n">radius_i</span> <span class="o">+</span> <span class="n">radius_j</span>
     <span class="k">if</span> <span class="n">sum_radius</span> <span class="o">&lt;=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">temperature</span> <span class="o">&lt;=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
@@ -18060,7 +18060,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">boltzmann_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the dimensionless pair diffusive Knudsen number.</span>
+<span class="w">    </span><span class="sd">"""Calculate the dimensionless pair diffusive Knudsen number.</span>
 
 <span class="sd">    Computes ``[sqrt(k_B * T * m_red) / f_red] / [(r_i + r_j) * Gamma_c /</span>
 <span class="sd">    Gamma_k]``. A non-positive radius sum, temperature, reduced mass, or</span>
@@ -18090,7 +18090,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="sd">        Gopalakrishnan, R., &amp; Hogan, C. J. (2012). Coulomb-influenced</span>
 <span class="sd">        collisions in aerosols and dusty plasmas. *Physical Review E*, 85(2).</span>
 <span class="sd">        https://doi.org/10.1103/PhysRevE.85.026410</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sum_radius</span> <span class="o">=</span> <span class="n">radius_i</span> <span class="o">+</span> <span class="n">radius_j</span>
     <span class="k">if</span> <span class="n">sum_radius</span> <span class="o">&lt;=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">temperature</span> <span class="o">&lt;=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
@@ -18204,7 +18204,7 @@ the Fuchs form for the collection enhancement term.</p>
     <span class="n">mean_free_path_particle</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Brownian coagulation collection term ``g``.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Brownian coagulation collection term ``g``.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.dynamics.coagulation.brownian_kernel._g_collection_term`` using</span>
@@ -18216,7 +18216,7 @@ the Fuchs form for the collection enhancement term.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Collection term ``g`` as a dimensionless quantity.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">two_radius</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">particle_radius</span>
     <span class="n">numerator</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
         <span class="n">two_radius</span> <span class="o">+</span> <span class="n">mean_free_path_particle</span><span class="p">,</span>
@@ -18311,7 +18311,7 @@ Public-input validation is intentionally deferred to the calling boundary.</p>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate kinematic viscosity from device-native SI transport inputs.</span>
+<span class="w">    </span><span class="sd">"""Calculate kinematic viscosity from device-native SI transport inputs.</span>
 
 <span class="sd">    This device-only helper applies ``nu = mu / rho`` for positive finite</span>
 <span class="sd">    dynamic viscosity ``mu`` [Pa s] and fluid density ``rho`` [kg/m³].</span>
@@ -18323,7 +18323,7 @@ Public-input validation is intentionally deferred to the calling boundary.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Kinematic viscosity ``nu`` [m²/s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">dynamic_viscosity</span> <span class="o">/</span> <span class="n">fluid_density</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18413,7 +18413,7 @@ second.</p>
     <span class="n">diffusivity_particle</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">mean_thermal_speed_particle</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the particle mean free path for coagulation.</span>
+<span class="w">    </span><span class="sd">"""Calculate the particle mean free path for coagulation.</span>
 
 <span class="sd">    Port of ``particula.dynamics.coagulation.brownian_kernel._mean_free_path_l``</span>
 <span class="sd">    using ``lambda = 8 * diffusivity_particle / (pi * mean_thermal_speed)``.</span>
@@ -18425,7 +18425,7 @@ second.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Particle mean free path in meters.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">pi_value</span> <span class="o">=</span> <span class="n">_PI</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">8.0</span><span class="p">)</span>
@@ -18536,7 +18536,7 @@ https://doi.org/10.1080/02786826.2019.1614522</p>
 <span class="normal">389</span>
 <span class="normal">390</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">reduced_value_wp</span><span class="p">(</span><span class="n">left</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate a scalar reduced value for mass or friction inputs.</span>
+<span class="w">    </span><span class="sd">"""Calculate a scalar reduced value for mass or friction inputs.</span>
 
 <span class="sd">    Computes ``(left * right) / (left + right)``. Inputs retain their supplied</span>
 <span class="sd">    units. A non-positive input sum safely returns ``0.0``.</span>
@@ -18556,7 +18556,7 @@ https://doi.org/10.1080/02786826.2019.1614522</p>
 <span class="sd">        molecular regime Coulombic collisions in aerosols and dusty plasmas.</span>
 <span class="sd">        *Aerosol Science and Technology*, 53(8), 933-957.</span>
 <span class="sd">        https://doi.org/10.1080/02786826.2019.1614522</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">denominator</span> <span class="o">=</span> <span class="n">left</span> <span class="o">+</span> <span class="n">right</span>
     <span class="k">if</span> <span class="n">denominator</span> <span class="o">&lt;=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
@@ -18710,7 +18710,7 @@ Physics</em> (3<sup>rd</sup> ed.), Eq. 13A.4.</p>
     <span class="n">velocity_i</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">velocity_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the fp64 SP2016 Eq. 13A.4 sedimentation pair rate.</span>
+<span class="w">    </span><span class="sd">"""Calculate the fp64 SP2016 Eq. 13A.4 sedimentation pair rate.</span>
 
 <span class="sd">    This device-only helper applies unit collision efficiency to</span>
 <span class="sd">    ``K = π (r_i + r_j)² |v_i - v_j|``. Non-finite or negative inputs and</span>
@@ -18730,7 +18730,7 @@ Physics</em> (3<sup>rd</sup> ed.), Eq. 13A.4.</p>
 <span class="sd">    References:</span>
 <span class="sd">        Seinfeld, J. H., &amp; Pandis, S. N. (2016). *Atmospheric Chemistry and</span>
 <span class="sd">        Physics* (3rd ed.), Eq. 13A.4.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">zero</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="ow">not</span> <span class="n">wp</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">radius_i</span><span class="p">)</span>
@@ -18891,7 +18891,7 @@ Physics</em> (3<sup>rd</sup> ed.), Eq. 13A.2.</p>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the ST1956 turbulent-shear pair rate in SI units.</span>
+<span class="w">    </span><span class="sd">"""Calculate the ST1956 turbulent-shear pair rate in SI units.</span>
 
 <span class="sd">    This device-only helper applies</span>
 <span class="sd">    ``K = sqrt(pi * epsilon / (120 * nu)) * (2 r_i + 2 r_j)**3`` for finite</span>
@@ -18915,7 +18915,7 @@ Physics</em> (3<sup>rd</sup> ed.), Eq. 13A.2.</p>
 <span class="sd">        turbulent clouds. *Journal of Fluid Mechanics*, 1(1), 16-30.</span>
 <span class="sd">        Seinfeld, J. H., &amp; Pandis, S. N. (2016). *Atmospheric Chemistry and</span>
 <span class="sd">        Physics* (3rd ed.), Eq. 13A.2.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">zero</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">turbulent_dissipation</span> <span class="o">==</span> <span class="n">zero</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">zero</span>

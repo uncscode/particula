@@ -17719,13 +17719,13 @@ valid state.</p>
 <span class="normal">1029</span>
 <span class="normal">1030</span>
 <span class="normal">1031</span>
-<span class="normal">1032</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runnable</span><span class="p">:</span> <span class="s2">&quot;_CPURunnable | RunnableABC&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retain the runnable by identity without inspecting it.</span>
+<span class="normal">1032</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runnable</span><span class="p">:</span> <span class="s2">"_CPURunnable | RunnableABC"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Retain the runnable by identity without inspecting it.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        runnable: CPU runnable invoked once by :meth:`execute` for each</span>
 <span class="sd">            valid state.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_runnable</span> <span class="o">=</span> <span class="n">runnable</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -17879,7 +17879,7 @@ different aerosol object.</p>
 <span class="normal">1081</span>
 <span class="normal">1082</span>
 <span class="normal">1083</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ExecutionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dispatch one concrete CPU state and retain its identity.</span>
+<span class="w">    </span><span class="sd">"""Dispatch one concrete CPU state and retain its identity.</span>
 
 <span class="sd">    This method performs local state and control preflight before one</span>
 <span class="sd">    positional runnable call. It does not split time steps, catch runnable</span>
@@ -17899,29 +17899,29 @@ different aerosol object.</p>
 <span class="sd">            non-boolean real scalar.</span>
 <span class="sd">        ValueError: If controls are invalid or the runnable returns a</span>
 <span class="sd">            different aerosol object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CPUExecutionState</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;state must be a CPUExecutionState.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"state must be a CPUExecutionState."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="n">state</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span> <span class="n">Real</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;time_step must be a real scalar.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"time_step must be a real scalar."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_isfinite_real</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">time_step</span><span class="p">)</span> <span class="ow">or</span> <span class="n">state</span><span class="o">.</span><span class="n">time_step</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;time_step must be finite and nonnegative.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"time_step must be finite and nonnegative."</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">sub_steps</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">sub_steps</span><span class="p">,</span> <span class="n">Integral</span><span class="p">)</span>
         <span class="ow">or</span> <span class="n">state</span><span class="o">.</span><span class="n">sub_steps</span> <span class="o">&lt;=</span> <span class="mi">0</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sub_steps must be a positive integer.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"sub_steps must be a positive integer."</span><span class="p">)</span>
 
     <span class="n">returned_aerosol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runnable</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-        <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Aerosol&quot;</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">aerosol</span><span class="p">),</span>
+        <span class="n">cast</span><span class="p">(</span><span class="s2">"Aerosol"</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">aerosol</span><span class="p">),</span>
         <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">time_step</span><span class="p">),</span>
         <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">sub_steps</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">returned_aerosol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">aerosol</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CPU runnable must return the original aerosol.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"CPU runnable must return the original aerosol."</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ExecutionResult</span><span class="p">(</span>
         <span class="n">state</span><span class="p">,</span>
         <span class="p">(),</span>
@@ -18217,13 +18217,13 @@ boundary. The carrier neither copies nor validates the aerosol or controls.</p>
 <span class="normal">170</span>
 <span class="normal">171</span>
 <span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the capability name.</span>
+<span class="w">    </span><span class="sd">"""Validate the capability name.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If the name is not a str.</span>
 <span class="sd">        ValueError: If the name is not a lowercase identifier-style name.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_validate_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Capability.name&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_validate_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"Capability.name"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18382,19 +18382,19 @@ boundary. The carrier neither copies nor validates the aerosol or controls.</p>
 <span class="normal">269</span>
 <span class="normal">270</span>
 <span class="normal">271</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the declaration&#39;s typed value objects.</span>
+<span class="w">    </span><span class="sd">"""Validate the declaration's typed value objects.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If any declaration field has the wrong type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">Device</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;CapabilityDeclaration.device must be a Device.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"CapabilityDeclaration.device must be a Device."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="n">Process</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;CapabilityDeclaration.process must be a Process.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"CapabilityDeclaration.process must be a Process."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requirements</span><span class="p">,</span> <span class="n">CapabilityRequirements</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;CapabilityDeclaration.requirements must be a &quot;</span>
-            <span class="s2">&quot;CapabilityRequirements.&quot;</span>
+            <span class="s2">"CapabilityDeclaration.requirements must be a "</span>
+            <span class="s2">"CapabilityRequirements."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18535,22 +18535,22 @@ an execution adapter.</p>
 <span class="normal">307</span>
 <span class="normal">308</span>
 <span class="normal">309</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the exact immutable declaration collection type.</span>
+<span class="w">    </span><span class="sd">"""Validate the exact immutable declaration collection type.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If the collection or one of its members is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">declarations</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">frozenset</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;CapabilityMatrix.declarations must be a frozenset.&quot;</span>
+            <span class="s2">"CapabilityMatrix.declarations must be a frozenset."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
         <span class="nb">isinstance</span><span class="p">(</span><span class="n">declaration</span><span class="p">,</span> <span class="n">CapabilityDeclaration</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">declaration</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">declarations</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;CapabilityMatrix.declarations must contain only &quot;</span>
-            <span class="s2">&quot;CapabilityDeclaration instances.&quot;</span>
+            <span class="s2">"CapabilityMatrix.declarations must contain only "</span>
+            <span class="s2">"CapabilityDeclaration instances."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18668,7 +18668,7 @@ an execution adapter.</p>
     <span class="n">process</span><span class="p">:</span> <span class="n">Process</span><span class="p">,</span>
     <span class="n">requirements</span><span class="p">:</span> <span class="n">CapabilityRequirements</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Require a declared capability request without executing it.</span>
+<span class="w">    </span><span class="sd">"""Require a declared capability request without executing it.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        device: Device requested for the process.</span>
@@ -18678,12 +18678,12 @@ an execution adapter.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If an argument is not its declared metadata type.</span>
 <span class="sd">        ValueError: If the valid request is not declared by this matrix.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_request</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">requirements</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">requirements</span><span class="p">):</span>
         <span class="k">return</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="s2">&quot;Unsupported capability declaration: &quot;</span>
+        <span class="s2">"Unsupported capability declaration: "</span>
         <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">CapabilityDeclaration</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">requirements</span><span class="p">))</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -18812,7 +18812,7 @@ an execution adapter.</p>
     <span class="n">process</span><span class="p">:</span> <span class="n">Process</span><span class="p">,</span>
     <span class="n">requirements</span><span class="p">:</span> <span class="n">CapabilityRequirements</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return whether the matrix exactly declares a capability request.</span>
+<span class="w">    </span><span class="sd">"""Return whether the matrix exactly declares a capability request.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        device: Device requested for the process.</span>
@@ -18824,7 +18824,7 @@ an execution adapter.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If an argument is not its declared metadata type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_request</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">requirements</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">requirements</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
@@ -18969,19 +18969,19 @@ features inferred by the matrix.</p>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the exact immutable capability collection type.</span>
+<span class="w">    </span><span class="sd">"""Validate the exact immutable capability collection type.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If the collection or one of its members is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">frozenset</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;CapabilityRequirements.values must be a frozenset.&quot;</span>
+            <span class="s2">"CapabilityRequirements.values must be a frozenset."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Capability</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;CapabilityRequirements.values must contain only Capability &quot;</span>
-            <span class="s2">&quot;instances.&quot;</span>
+            <span class="s2">"CapabilityRequirements.values must contain only Capability "</span>
+            <span class="s2">"instances."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -19207,25 +19207,25 @@ It also does not select an adapter or determine runtime availability.</p>
 <span class="normal">457</span>
 <span class="normal">458</span>
 <span class="normal">459</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the exact semantic configuration field types.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate the exact semantic configuration field types."""</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">execution_mode</span><span class="p">,</span> <span class="n">CondensationExecutionMode</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;CondensationConfiguration.execution_mode must be a &quot;</span>
-            <span class="s2">&quot;CondensationExecutionMode.&quot;</span>
+            <span class="s2">"CondensationConfiguration.execution_mode must be a "</span>
+            <span class="s2">"CondensationExecutionMode."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;CondensationConfiguration.latent_heat must be a bool.&quot;</span>
+            <span class="s2">"CondensationConfiguration.latent_heat must be a bool."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activity_mode</span><span class="p">,</span> <span class="n">CondensationActivityMode</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;CondensationConfiguration.activity_mode must be a &quot;</span>
-            <span class="s2">&quot;CondensationActivityMode.&quot;</span>
+            <span class="s2">"CondensationConfiguration.activity_mode must be a "</span>
+            <span class="s2">"CondensationActivityMode."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surface_mode</span><span class="p">,</span> <span class="n">CondensationSurfaceMode</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;CondensationConfiguration.surface_mode must be a &quot;</span>
-            <span class="s2">&quot;CondensationSurfaceMode.&quot;</span>
+            <span class="s2">"CondensationConfiguration.surface_mode must be a "</span>
+            <span class="s2">"CondensationSurfaceMode."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -19524,20 +19524,20 @@ or checked against backend availability.</p>
 <span class="normal">122</span>
 <span class="normal">123</span>
 <span class="normal">124</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the declared backend and opaque native identifier.</span>
+<span class="w">    </span><span class="sd">"""Validate the declared backend and opaque native identifier.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If the backend or native identifier has the wrong type.</span>
 <span class="sd">        ValueError: If the native identifier is empty or padded.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="n">Backend</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Device.backend must be a Backend.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Device.backend must be a Backend."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">native</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Device.native must be a str.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Device.native must be a str."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">native</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">native</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">native</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Device.native must be a nonempty str without surrounding &quot;</span>
-            <span class="s2">&quot;whitespace.&quot;</span>
+            <span class="s2">"Device.native must be a nonempty str without surrounding "</span>
+            <span class="s2">"whitespace."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -19888,7 +19888,7 @@ contract.</p>
     <span class="n">state</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fallback_boundary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the structured capability error.</span>
+<span class="w">    </span><span class="sd">"""Initialize the structured capability error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        reason: Stable reason code for the error.</span>
@@ -19901,21 +19901,21 @@ contract.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a reason or context field has an unsupported type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">ExecutionCapabilityReason</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;reason must be an ExecutionCapabilityReason.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"reason must be an ExecutionCapabilityReason."</span><span class="p">)</span>
 
     <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="n">backend</span><span class="p">,</span>
-        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
-        <span class="s2">&quot;process&quot;</span><span class="p">:</span> <span class="n">process</span><span class="p">,</span>
-        <span class="s2">&quot;capability&quot;</span><span class="p">:</span> <span class="n">capability</span><span class="p">,</span>
-        <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
-        <span class="s2">&quot;fallback_boundary&quot;</span><span class="p">:</span> <span class="n">fallback_boundary</span><span class="p">,</span>
+        <span class="s2">"backend"</span><span class="p">:</span> <span class="n">backend</span><span class="p">,</span>
+        <span class="s2">"device"</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
+        <span class="s2">"process"</span><span class="p">:</span> <span class="n">process</span><span class="p">,</span>
+        <span class="s2">"capability"</span><span class="p">:</span> <span class="n">capability</span><span class="p">,</span>
+        <span class="s2">"state"</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
+        <span class="s2">"fallback_boundary"</span><span class="p">:</span> <span class="n">fallback_boundary</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a str or None.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a str or None."</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
@@ -19984,17 +19984,17 @@ contract.</p>
 <span class="normal">107</span>
 <span class="normal">108</span>
 <span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render deterministic structured error context.</span>
+<span class="w">    </span><span class="sd">"""Render deterministic structured error context.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Error class name, reason code, and ordered context fields.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(reason=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">reason</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">, &quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;backend=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="si">!r}</span><span class="s2">, device=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="si">!r}</span><span class="s2">, &quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;process=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="si">!r}</span><span class="s2">, capability=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="si">!r}</span><span class="s2">, &quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;state=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="si">!r}</span><span class="s2">, &quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;fallback_boundary=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fallback_boundary</span><span class="si">!r}</span><span class="s2">)&quot;</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(reason=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">reason</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">, "</span>
+        <span class="sa">f</span><span class="s2">"backend=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="si">!r}</span><span class="s2">, device=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="si">!r}</span><span class="s2">, "</span>
+        <span class="sa">f</span><span class="s2">"process=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="si">!r}</span><span class="s2">, capability=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">capability</span><span class="si">!r}</span><span class="s2">, "</span>
+        <span class="sa">f</span><span class="s2">"state=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="si">!r}</span><span class="s2">, "</span>
+        <span class="sa">f</span><span class="s2">"fallback_boundary=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fallback_boundary</span><span class="si">!r}</span><span class="s2">)"</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -20134,16 +20134,16 @@ transfers data.</p>
 <span class="normal">1177</span>
 <span class="normal">1178</span>
 <span class="normal">1179</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">:</span> <span class="n">CapabilityMatrix</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Store a matrix and create an empty private adapter registry.</span>
+<span class="w">    </span><span class="sd">"""Store a matrix and create an empty private adapter registry.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        matrix: Immutable capability declarations used for selection.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``matrix`` is not a CapabilityMatrix.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">CapabilityMatrix</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;matrix must be a CapabilityMatrix.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"matrix must be a CapabilityMatrix."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_matrix</span> <span class="o">=</span> <span class="n">matrix</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span> <span class="o">=</span> <span class="n">_AdapterRegistry</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
@@ -20265,7 +20265,7 @@ order.</p>
     <span class="n">backend</span><span class="p">:</span> <span class="n">Backend</span><span class="p">,</span>
     <span class="n">adapter</span><span class="p">:</span> <span class="n">ExecutionAdapter</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Register one context-local adapter for selection only.</span>
+<span class="w">    </span><span class="sd">"""Register one context-local adapter for selection only.</span>
 
 <span class="sd">    Registration never invokes or probes the adapter, transfers data, or</span>
 <span class="sd">    loads an optional backend. The adapter is available only from this</span>
@@ -20280,7 +20280,7 @@ order.</p>
 <span class="sd">        TypeError: If arguments are invalid in process, backend, adapter</span>
 <span class="sd">            order.</span>
 <span class="sd">        ValueError: If the process/backend pair is already registered.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">_register_adapter</span><span class="p">(</span><span class="n">process</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">adapter</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -20386,7 +20386,7 @@ method does not catch adapter errors because it never executes adapters.</p>
 <span class="normal">1224</span>
 <span class="normal">1225</span>
 <span class="normal">1226</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ExecutionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionAdapter</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return one exact adapter after validation without invoking it.</span>
+<span class="w">    </span><span class="sd">"""Return one exact adapter after validation without invoking it.</span>
 
 <span class="sd">    Capability support is checked before the single registry lookup. This</span>
 <span class="sd">    method does not catch adapter errors because it never executes adapters.</span>
@@ -20401,9 +20401,9 @@ method does not catch adapter errors because it never executes adapters.</p>
 <span class="sd">        TypeError: If request is not an ExecutionRequest.</span>
 <span class="sd">        ValueError: If CPU device spelling is invalid or support is absent.</span>
 <span class="sd">        LookupError: If supported request has no exact registered adapter.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">ExecutionRequest</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;request must be an ExecutionRequest.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"request must be an ExecutionRequest."</span><span class="p">)</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">_normalize_request_device</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_matrix</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">requirements</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">_lookup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">backend</span><span class="p">)</span>
@@ -20596,26 +20596,26 @@ state, nor establishes execution state or result contracts.</p>
 <span class="normal">737</span>
 <span class="normal">738</span>
 <span class="normal">739</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate request metadata without resolving or executing it.</span>
+<span class="w">    </span><span class="sd">"""Validate request metadata without resolving or executing it.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a field is not its declared metadata type.</span>
 <span class="sd">        ValueError: If backend and device backend differ.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="n">Backend</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;ExecutionRequest.backend must be a Backend.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"ExecutionRequest.backend must be a Backend."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">Device</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;ExecutionRequest.device must be a Device.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"ExecutionRequest.device must be a Device."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="n">Process</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;ExecutionRequest.process must be a Process.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"ExecutionRequest.process must be a Process."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requirements</span><span class="p">,</span> <span class="n">CapabilityRequirements</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;ExecutionRequest.requirements must be a &quot;</span>
-            <span class="s2">&quot;CapabilityRequirements.&quot;</span>
+            <span class="s2">"ExecutionRequest.requirements must be a "</span>
+            <span class="s2">"CapabilityRequirements."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;ExecutionRequest.backend must match device.backend.&quot;</span>
+            <span class="s2">"ExecutionRequest.backend must match device.backend."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -20987,7 +20987,7 @@ the same state object supplied by the caller and retains it by identity.</p>
     <span class="n">capability</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">state</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize a fallback-disallowed error.</span>
+<span class="w">    </span><span class="sd">"""Initialize a fallback-disallowed error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fallback_boundary: Boundary that disallows the fallback request.</span>
@@ -20996,7 +20996,7 @@ the same state object supplied by the caller and retains it by identity.</p>
 <span class="sd">        process: Optional process context.</span>
 <span class="sd">        capability: Optional capability context.</span>
 <span class="sd">        state: Optional execution-state context.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">ExecutionCapabilityReason</span><span class="o">.</span><span class="n">FALLBACK_DISALLOWED</span><span class="p">,</span>
         <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
@@ -21197,7 +21197,7 @@ the same state object supplied by the caller and retains it by identity.</p>
     <span class="n">process</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">capability</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an invalid-execution-state error.</span>
+<span class="w">    </span><span class="sd">"""Initialize an invalid-execution-state error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        state: Execution state that is invalid for the request.</span>
@@ -21205,7 +21205,7 @@ the same state object supplied by the caller and retains it by identity.</p>
 <span class="sd">        device: Optional execution device context.</span>
 <span class="sd">        process: Optional process context.</span>
 <span class="sd">        capability: Optional capability context.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">ExecutionCapabilityReason</span><span class="o">.</span><span class="n">INVALID_STATE</span><span class="p">,</span>
         <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
@@ -21334,7 +21334,7 @@ the same state object supplied by the caller and retains it by identity.</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">795</span>
 <span class="normal">796</span>
 <span class="normal">797</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the closed, immutable mutation declaration.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate the closed, immutable mutation declaration."""</span>
     <span class="n">_validate_mutation_scopes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -21520,13 +21520,13 @@ verify that a declared mutation occurred.</p>
 <span class="normal">146</span>
 <span class="normal">147</span>
 <span class="normal">148</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the process name.</span>
+<span class="w">    </span><span class="sd">"""Validate the process name.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If the name is not a str.</span>
 <span class="sd">        ValueError: If the name is not a lowercase identifier-style name.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_validate_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Process.name&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_validate_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"Process.name"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21607,12 +21607,12 @@ verify that a declared mutation occurred.</p>
 <span class="normal">183</span>
 <span class="normal">184</span>
 <span class="normal">185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unavailable-device error.</span>
+<span class="w">    </span><span class="sd">"""Initialize an unavailable-device error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        device: Device that is unavailable for execution.</span>
 <span class="sd">        backend: Optional execution backend context.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">ExecutionCapabilityReason</span><span class="o">.</span><span class="n">DEVICE_UNAVAILABLE</span><span class="p">,</span>
         <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
@@ -21729,7 +21729,7 @@ verify that a declared mutation occurred.</p>
     <span class="n">state</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fallback_boundary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the structured capability error.</span>
+<span class="w">    </span><span class="sd">"""Initialize the structured capability error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        reason: Stable reason code for the error.</span>
@@ -21742,21 +21742,21 @@ verify that a declared mutation occurred.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a reason or context field has an unsupported type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">ExecutionCapabilityReason</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;reason must be an ExecutionCapabilityReason.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"reason must be an ExecutionCapabilityReason."</span><span class="p">)</span>
 
     <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="n">backend</span><span class="p">,</span>
-        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
-        <span class="s2">&quot;process&quot;</span><span class="p">:</span> <span class="n">process</span><span class="p">,</span>
-        <span class="s2">&quot;capability&quot;</span><span class="p">:</span> <span class="n">capability</span><span class="p">,</span>
-        <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
-        <span class="s2">&quot;fallback_boundary&quot;</span><span class="p">:</span> <span class="n">fallback_boundary</span><span class="p">,</span>
+        <span class="s2">"backend"</span><span class="p">:</span> <span class="n">backend</span><span class="p">,</span>
+        <span class="s2">"device"</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
+        <span class="s2">"process"</span><span class="p">:</span> <span class="n">process</span><span class="p">,</span>
+        <span class="s2">"capability"</span><span class="p">:</span> <span class="n">capability</span><span class="p">,</span>
+        <span class="s2">"state"</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
+        <span class="s2">"fallback_boundary"</span><span class="p">:</span> <span class="n">fallback_boundary</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a str or None.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a str or None."</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
@@ -21844,11 +21844,11 @@ verify that a declared mutation occurred.</p>
 <span class="normal">166</span>
 <span class="normal">167</span>
 <span class="normal">168</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unavailable-runtime error.</span>
+<span class="w">    </span><span class="sd">"""Initialize an unavailable-runtime error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        backend: Backend whose required runtime is unavailable.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">ExecutionCapabilityReason</span><span class="o">.</span><span class="n">RUNTIME_UNAVAILABLE</span><span class="p">,</span>
         <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
@@ -21931,11 +21931,11 @@ verify that a declared mutation occurred.</p>
 <span class="normal">134</span>
 <span class="normal">135</span>
 <span class="normal">136</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unknown-backend error.</span>
+<span class="w">    </span><span class="sd">"""Initialize an unknown-backend error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        backend: Unrecognized execution backend identifier.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">ExecutionCapabilityReason</span><span class="o">.</span><span class="n">UNKNOWN_BACKEND</span><span class="p">,</span>
         <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
@@ -22030,12 +22030,12 @@ verify that a declared mutation occurred.</p>
 <span class="normal">151</span>
 <span class="normal">152</span>
 <span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unknown-device error.</span>
+<span class="w">    </span><span class="sd">"""Initialize an unknown-device error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        device: Unrecognized execution device identifier.</span>
 <span class="sd">        backend: Optional execution backend context.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">ExecutionCapabilityReason</span><span class="o">.</span><span class="n">UNKNOWN_DEVICE</span><span class="p">,</span>
         <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
@@ -22152,7 +22152,7 @@ verify that a declared mutation occurred.</p>
     <span class="n">state</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fallback_boundary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the structured capability error.</span>
+<span class="w">    </span><span class="sd">"""Initialize the structured capability error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        reason: Stable reason code for the error.</span>
@@ -22165,21 +22165,21 @@ verify that a declared mutation occurred.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a reason or context field has an unsupported type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">ExecutionCapabilityReason</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;reason must be an ExecutionCapabilityReason.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"reason must be an ExecutionCapabilityReason."</span><span class="p">)</span>
 
     <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="n">backend</span><span class="p">,</span>
-        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
-        <span class="s2">&quot;process&quot;</span><span class="p">:</span> <span class="n">process</span><span class="p">,</span>
-        <span class="s2">&quot;capability&quot;</span><span class="p">:</span> <span class="n">capability</span><span class="p">,</span>
-        <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
-        <span class="s2">&quot;fallback_boundary&quot;</span><span class="p">:</span> <span class="n">fallback_boundary</span><span class="p">,</span>
+        <span class="s2">"backend"</span><span class="p">:</span> <span class="n">backend</span><span class="p">,</span>
+        <span class="s2">"device"</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
+        <span class="s2">"process"</span><span class="p">:</span> <span class="n">process</span><span class="p">,</span>
+        <span class="s2">"capability"</span><span class="p">:</span> <span class="n">capability</span><span class="p">,</span>
+        <span class="s2">"state"</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
+        <span class="s2">"fallback_boundary"</span><span class="p">:</span> <span class="n">fallback_boundary</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a str or None.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a str or None."</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
@@ -22317,14 +22317,14 @@ verify that a declared mutation occurred.</p>
     <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">process</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unsupported-capability error.</span>
+<span class="w">    </span><span class="sd">"""Initialize an unsupported-capability error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        capability: Execution capability that is not supported.</span>
 <span class="sd">        backend: Optional execution backend context.</span>
 <span class="sd">        device: Optional execution device context.</span>
 <span class="sd">        process: Optional process context.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">ExecutionCapabilityReason</span><span class="o">.</span><span class="n">CAPABILITY_UNSUPPORTED</span><span class="p">,</span>
         <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
@@ -22443,7 +22443,7 @@ verify that a declared mutation occurred.</p>
     <span class="n">state</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fallback_boundary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the structured capability error.</span>
+<span class="w">    </span><span class="sd">"""Initialize the structured capability error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        reason: Stable reason code for the error.</span>
@@ -22456,21 +22456,21 @@ verify that a declared mutation occurred.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a reason or context field has an unsupported type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">ExecutionCapabilityReason</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;reason must be an ExecutionCapabilityReason.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"reason must be an ExecutionCapabilityReason."</span><span class="p">)</span>
 
     <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="n">backend</span><span class="p">,</span>
-        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
-        <span class="s2">&quot;process&quot;</span><span class="p">:</span> <span class="n">process</span><span class="p">,</span>
-        <span class="s2">&quot;capability&quot;</span><span class="p">:</span> <span class="n">capability</span><span class="p">,</span>
-        <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
-        <span class="s2">&quot;fallback_boundary&quot;</span><span class="p">:</span> <span class="n">fallback_boundary</span><span class="p">,</span>
+        <span class="s2">"backend"</span><span class="p">:</span> <span class="n">backend</span><span class="p">,</span>
+        <span class="s2">"device"</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span>
+        <span class="s2">"process"</span><span class="p">:</span> <span class="n">process</span><span class="p">,</span>
+        <span class="s2">"capability"</span><span class="p">:</span> <span class="n">capability</span><span class="p">,</span>
+        <span class="s2">"state"</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
+        <span class="s2">"fallback_boundary"</span><span class="p">:</span> <span class="n">fallback_boundary</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a str or None.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a str or None."</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
@@ -22594,13 +22594,13 @@ verify that a declared mutation occurred.</p>
     <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unsupported-process error.</span>
+<span class="w">    </span><span class="sd">"""Initialize an unsupported-process error.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        process: Execution process that is not supported.</span>
 <span class="sd">        backend: Optional execution backend context.</span>
 <span class="sd">        device: Optional execution device context.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">ExecutionCapabilityReason</span><span class="o">.</span><span class="n">PROCESS_UNSUPPORTED</span><span class="p">,</span>
         <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
@@ -22716,7 +22716,7 @@ an adapter, import an optional backend, or determine runtime availability.</p>
     <span class="n">backend</span><span class="p">:</span> <span class="n">Backend</span><span class="p">,</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="n">CondensationConfiguration</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return whether a fixed backend profile declares a configuration.</span>
+<span class="w">    </span><span class="sd">"""Return whether a fixed backend profile declares a configuration.</span>
 
 <span class="sd">    This pure catalogue query does not accept or parse a native device, select</span>
 <span class="sd">    an adapter, import an optional backend, or determine runtime availability.</span>
@@ -22727,7 +22727,7 @@ an adapter, import an optional backend, or determine runtime availability.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        True when the exact configuration is declared by the backend profile.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">_condensation_profile_device</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
     <span class="n">requirements</span> <span class="o">=</span> <span class="n">get_condensation_requirements</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">CONDENSATION_CAPABILITY_MATRIX</span><span class="o">.</span><span class="n">supports</span><span class="p">(</span>
@@ -22845,7 +22845,7 @@ inspect runtime, device, or optional-backend state.</p>
 <span class="normal">553</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_condensation_requirements</span><span class="p">(</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="n">CondensationConfiguration</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CapabilityRequirements</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the exact four-axis semantic requirements for a configuration.</span>
+<span class="w">    </span><span class="sd">"""Return the exact four-axis semantic requirements for a configuration.</span>
 
 <span class="sd">    The pure mapping does not compose declarations, select an adapter, or</span>
 <span class="sd">    inspect runtime, device, or optional-backend state.</span>
@@ -22858,9 +22858,9 @@ inspect runtime, device, or optional-backend state.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``configuration`` is not a CondensationConfiguration.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">configuration</span><span class="p">,</span> <span class="n">CondensationConfiguration</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;configuration must be a CondensationConfiguration.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"configuration must be a CondensationConfiguration."</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">CapabilityRequirements</span><span class="p">(</span>
         <span class="nb">frozenset</span><span class="p">(</span>
             <span class="p">{</span>
@@ -22977,9 +22977,9 @@ import an optional backend, or determine runtime availability.</p>
     <span class="n">backend</span><span class="p">:</span> <span class="n">Backend</span><span class="p">,</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="n">CondensationConfiguration</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Require that a fixed backend profile declares a configuration.</span>
+<span class="w">    </span><span class="sd">"""Require that a fixed backend profile declares a configuration.</span>
 
-<span class="sd">    This pure catalogue check preserves the matrix&#39;s unsupported-declaration</span>
+<span class="sd">    This pure catalogue check preserves the matrix's unsupported-declaration</span>
 <span class="sd">    error. It does not accept or parse a native device, select an adapter,</span>
 <span class="sd">    import an optional backend, or determine runtime availability.</span>
 
@@ -22990,7 +22990,7 @@ import an optional backend, or determine runtime availability.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If either argument is not its declared metadata type.</span>
 <span class="sd">        ValueError: If the configuration is not declared by the profile.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">_condensation_profile_device</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
     <span class="n">requirements</span> <span class="o">=</span> <span class="n">get_condensation_requirements</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
     <span class="n">CONDENSATION_CAPABILITY_MATRIX</span><span class="o">.</span><span class="n">require</span><span class="p">(</span>
@@ -23119,7 +23119,7 @@ invalid.</p>
     <span class="n">original_state</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
     <span class="n">result</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and return an immutable P3 result without executing an adapter.</span>
+<span class="w">    </span><span class="sd">"""Validate and return an immutable P3 result without executing an adapter.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        original_state: Caller-owned state supplied before execution.</span>
@@ -23132,23 +23132,23 @@ invalid.</p>
 <span class="sd">        TypeError: If state, result layout, metadata, or declarations are</span>
 <span class="sd">            invalid.</span>
 <span class="sd">        ValueError: If state was replaced or metadata is otherwise invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_validate_execution_state</span><span class="p">(</span><span class="n">original_state</span><span class="p">,</span> <span class="s2">&quot;original_state&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_validate_execution_state</span><span class="p">(</span><span class="n">original_state</span><span class="p">,</span> <span class="s2">"original_state"</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ExecutionResult</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;result must be an ExecutionResult.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"result must be an ExecutionResult."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">original_state</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ExecutionResult.state must be original_state.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"ExecutionResult.state must be original_state."</span><span class="p">)</span>
     <span class="n">_validate_execution_metadata</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">mutation</span><span class="p">,</span> <span class="n">MutationDeclaration</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;ExecutionResult.mutation must be a MutationDeclaration.&quot;</span>
+            <span class="s2">"ExecutionResult.mutation must be a MutationDeclaration."</span>
         <span class="p">)</span>
     <span class="n">_validate_mutation_scopes</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">mutation</span><span class="o">.</span><span class="n">scopes</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">backend_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="n">result</span><span class="o">.</span><span class="n">backend_result</span><span class="p">,</span> <span class="n">BackendResult</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;ExecutionResult.backend_result must be a BackendResult.&quot;</span>
+            <span class="s2">"ExecutionResult.backend_result must be a BackendResult."</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>

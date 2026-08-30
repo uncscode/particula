@@ -16337,10 +16337,10 @@ fluctuations using the following equation:</p>
 <span class="normal">151</span>
 <span class="normal">152</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;fluid_rms_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;collisional_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_inertia_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"fluid_rms_velocity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"collisional_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"particle_inertia_time"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"particle_velocity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_relative_velocity_variance</span><span class="p">(</span>
@@ -16354,15 +16354,15 @@ fluctuations using the following equation:</p>
     <span class="n">lagrangian_taylor_microscale_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
     <span class="c1"># pylint: disable=too-many-arguments, disable=too-many-positional-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the variance of particle relative-velocity fluctuations.</span>
+<span class="w">    </span><span class="sd">"""Compute the variance of particle relative-velocity fluctuations.</span>
 
 <span class="sd">    This function calculates the variance of particle relative-velocity</span>
 <span class="sd">    fluctuations using the following equation:</span>
 
 <span class="sd">    Where the equation is:</span>
 
-<span class="sd">    - σ² = ⟨(v&#39;²)⟩₁ + ⟨(v&#39;²)⟩₂ - 2⟨v&#39;¹ v&#39;²⟩</span>
-<span class="sd">        - v&#39;¹, v&#39;² are the fluctuating velocities for droplets 1 and 2.</span>
+<span class="sd">    - σ² = ⟨(v'²)⟩₁ + ⟨(v'²)⟩₂ - 2⟨v'¹ v'²⟩</span>
+<span class="sd">        - v'¹, v'² are the fluctuating velocities for droplets 1 and 2.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].</span>
@@ -16397,7 +16397,7 @@ fluctuations using the following equation:</p>
 <span class="sd">          collision rate of sedimenting droplets. Part 2. Theory and</span>
 <span class="sd">          parameterization. New Journal of Physics, 10.</span>
 <span class="sd">          https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">z</span> <span class="o">=</span> <span class="n">compute_z</span><span class="p">(</span><span class="n">lagrangian_taylor_microscale_time</span><span class="p">,</span> <span class="n">lagrangian_integral_time</span><span class="p">)</span>
     <span class="n">beta</span> <span class="o">=</span> <span class="n">compute_beta</span><span class="p">(</span><span class="n">taylor_microscale</span><span class="p">,</span> <span class="n">eulerian_integral_length</span><span class="p">)</span>
 

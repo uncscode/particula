@@ -16750,12 +16750,12 @@ Shape: (n_boxes,)</p>
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate array shapes are consistent.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate array shapes are consistent."""</span>
     <span class="c1"># Validate masses is 3D</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;masses must be 3D (n_boxes, n_particles, n_species), &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;got shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">"masses must be 3D (n_boxes, n_particles, n_species), "</span>
+            <span class="sa">f</span><span class="s2">"got shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="c1"># Extract batch dimensions from masses</span>
@@ -16767,30 +16767,30 @@ Shape: (n_boxes,)</p>
     <span class="n">expected_2d</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">expected_2d</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;concentration shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> doesn&#39;t match &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="n">expected_2d</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"concentration shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> doesn't match "</span>
+            <span class="sa">f</span><span class="s2">"expected </span><span class="si">{</span><span class="n">expected_2d</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="c1"># Validate charge shape (n_boxes, n_particles)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">expected_2d</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;charge shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> doesn&#39;t match &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="n">expected_2d</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"charge shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> doesn't match "</span>
+            <span class="sa">f</span><span class="s2">"expected </span><span class="si">{</span><span class="n">expected_2d</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="c1"># Validate volume shape (n_boxes,)</span>
     <span class="n">expected_1d</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">expected_1d</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;volume shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> doesn&#39;t match &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="n">expected_1d</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"volume shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> doesn't match "</span>
+            <span class="sa">f</span><span class="s2">"expected </span><span class="si">{</span><span class="n">expected_1d</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="c1"># Validate density is 1D (n_species,)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;density must be 1D (n_species,), &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;got shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"density must be 1D (n_species,), "</span>
+            <span class="sa">f</span><span class="s2">"got shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="c1"># Broadcast scalar density to match n_species, then validate</span>
@@ -16802,8 +16802,8 @@ Shape: (n_boxes,)</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_species</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_species</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;n_species mismatch: masses has </span><span class="si">{</span><span class="n">n_species</span><span class="si">}</span><span class="s2"> species, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;but density has </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> species&quot;</span>
+            <span class="sa">f</span><span class="s2">"n_species mismatch: masses has </span><span class="si">{</span><span class="n">n_species</span><span class="si">}</span><span class="s2"> species, "</span>
+            <span class="sa">f</span><span class="s2">"but density has </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> species"</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16858,12 +16858,12 @@ Shape: (n_boxes,)</p>
 <span class="normal">229</span>
 <span class="normal">230</span>
 <span class="normal">231</span>
-<span class="normal">232</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a deep copy of this ParticleData.</span>
+<span class="normal">232</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ParticleData"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Create a deep copy of this ParticleData.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A new ParticleData instance with copied arrays.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">ParticleData</span><span class="p">(</span>
         <span class="n">masses</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">masses</span><span class="p">),</span>
         <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">),</span>
@@ -17038,7 +17038,7 @@ concentration/charge arrays.</p>
     <span class="n">representation</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a ParticleRepresentation to batched ParticleData.</span>
+<span class="w">    </span><span class="sd">"""Convert a ParticleRepresentation to batched ParticleData.</span>
 
 <span class="sd">    Uses raw concentration and charge arrays (no volume scaling) to avoid</span>
 <span class="sd">    double-division for ParticleResolved strategies. Per-species masses are</span>
@@ -17057,7 +17057,7 @@ concentration/charge arrays.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        ParticleData: Batched masses, concentration, charge, density, and</span>
 <span class="sd">        volume.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">masses_raw</span> <span class="o">=</span> <span class="n">representation</span><span class="o">.</span><span class="n">get_species_mass</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">representation</span><span class="o">.</span><span class="n">density</span><span class="p">)</span>
 
@@ -17070,8 +17070,8 @@ concentration/charge arrays.</p>
         <span class="n">masses</span> <span class="o">=</span> <span class="n">masses_raw</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;representation.get_species_mass() must be 1D or 2D; &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;got ndim=</span><span class="si">{</span><span class="n">masses_raw</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">"representation.get_species_mass() must be 1D or 2D; "</span>
+            <span class="sa">f</span><span class="s2">"got ndim=</span><span class="si">{</span><span class="n">masses_raw</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">representation</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span>
@@ -17080,9 +17080,9 @@ concentration/charge arrays.</p>
 
     <span class="k">if</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">density</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;n_species mismatch: representation masses and density must &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;align, got masses n_species=</span><span class="si">{</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> and &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;density n_species=</span><span class="si">{</span><span class="n">density</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">"n_species mismatch: representation masses and density must "</span>
+            <span class="sa">f</span><span class="s2">"align, got masses n_species=</span><span class="si">{</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> and "</span>
+            <span class="sa">f</span><span class="s2">"density n_species=</span><span class="si">{</span><span class="n">density</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="n">masses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">masses</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -17267,7 +17267,7 @@ representation.</p>
     <span class="n">surface</span><span class="p">:</span> <span class="n">SurfaceStrategy</span><span class="p">,</span>
     <span class="n">box_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ParticleData back to a ParticleRepresentation for one box.</span>
+<span class="w">    </span><span class="sd">"""Convert ParticleData back to a ParticleRepresentation for one box.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data: Batched particle data.</span>
@@ -17282,10 +17282,10 @@ representation.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If box_index is out of range.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">box_index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">box_index</span> <span class="o">&gt;=</span> <span class="n">data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;box_index </span><span class="si">{</span><span class="n">box_index</span><span class="si">}</span><span class="s2"> out of range for </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">n_boxes</span><span class="si">}</span><span class="s2"> boxes&quot;</span>
+            <span class="sa">f</span><span class="s2">"box_index </span><span class="si">{</span><span class="n">box_index</span><span class="si">}</span><span class="s2"> out of range for </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">n_boxes</span><span class="si">}</span><span class="s2"> boxes"</span>
         <span class="p">)</span>
 
     <span class="n">masses</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">masses</span><span class="p">[</span><span class="n">box_index</span><span class="p">]</span>
@@ -17304,8 +17304,8 @@ representation.</p>
         <span class="n">distribution</span> <span class="o">=</span> <span class="n">masses</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;Unsupported distribution strategy type: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">strategy</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">"Unsupported distribution strategy type: "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">strategy</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ParticleRepresentation</span><span class="p">(</span>

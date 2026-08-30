@@ -16291,11 +16291,11 @@ MassBasedMovingBin strategy instance.</p>
 <span class="normal">42</span>
 <span class="normal">43</span>
 <span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the MassBasedMovingBinBuilder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the MassBasedMovingBinBuilder.</span>
 
 <span class="sd">    Sets up the builder with no required parameters for creating a</span>
 <span class="sd">    MassBasedMovingBin strategy instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16369,19 +16369,19 @@ distributions.</li>
 <span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MassBasedMovingBin</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return a MassBasedMovingBin instance.</span>
+<span class="w">    </span><span class="sd">"""Build and return a MassBasedMovingBin instance.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - MassBasedMovingBin : A strategy for mass-based particle</span>
 <span class="sd">            distributions.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Build Example&quot;</span>
+<span class="sd">        ```py title="Build Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        builder = par.particles.MassBasedMovingBinBuilder()</span>
 <span class="sd">        strategy = builder.build()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">MassBasedMovingBin</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16452,11 +16452,11 @@ ParticleResolvedSpeciatedMass strategy instance.</p>
 <span class="normal">179</span>
 <span class="normal">180</span>
 <span class="normal">181</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the ParticleResolvedSpeciatedMassBuilder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the ParticleResolvedSpeciatedMassBuilder.</span>
 
 <span class="sd">    Sets up the builder with no required parameters for creating a</span>
 <span class="sd">    ParticleResolvedSpeciatedMass strategy instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16530,19 +16530,19 @@ each particle's species composition independently.</li>
 <span class="normal">195</span>
 <span class="normal">196</span>
 <span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleResolvedSpeciatedMass</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return a ParticleResolvedSpeciatedMass instance.</span>
+<span class="w">    </span><span class="sd">"""Build and return a ParticleResolvedSpeciatedMass instance.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - ParticleResolvedSpeciatedMass : A strategy that resolves</span>
-<span class="sd">          each particle&#39;s species composition independently.</span>
+<span class="sd">          each particle's species composition independently.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Build Example&quot;</span>
+<span class="sd">        ```py title="Build Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        builder = par.particles.ParticleResolvedSpeciatedMassBuilder()</span>
 <span class="sd">        strategy = builder.build()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">ParticleResolvedSpeciatedMass</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16613,11 +16613,11 @@ RadiiBasedMovingBin strategy instance.</p>
 <span class="normal">88</span>
 <span class="normal">89</span>
 <span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the RadiiBasedMovingBinBuilder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the RadiiBasedMovingBinBuilder.</span>
 
 <span class="sd">    Sets up the builder with no required parameters for creating a</span>
 <span class="sd">    RadiiBasedMovingBin strategy instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16691,19 +16691,19 @@ distributions.</li>
 <span class="normal">104</span>
 <span class="normal">105</span>
 <span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RadiiBasedMovingBin</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return a RadiiBasedMovingBin instance.</span>
+<span class="w">    </span><span class="sd">"""Build and return a RadiiBasedMovingBin instance.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - RadiiBasedMovingBin : A strategy for radius-based particle</span>
 <span class="sd">            distributions.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Build Example&quot;</span>
+<span class="sd">        ```py title="Build Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        builder = par.particles.RadiiBasedMovingBinBuilder()</span>
 <span class="sd">        strategy = builder.build()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">RadiiBasedMovingBin</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16774,11 +16774,11 @@ SpeciatedMassMovingBin strategy instance.</p>
 <span class="normal">134</span>
 <span class="normal">135</span>
 <span class="normal">136</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the SpeciatedMassMovingBinBuilder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the SpeciatedMassMovingBinBuilder.</span>
 
 <span class="sd">    Sets up the builder with no required parameters for creating a</span>
 <span class="sd">    SpeciatedMassMovingBin strategy instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16850,18 +16850,18 @@ distributions.</li>
 <span class="normal">149</span>
 <span class="normal">150</span>
 <span class="normal">151</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpeciatedMassMovingBin</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return a SpeciatedMassMovingBin instance.</span>
+<span class="w">    </span><span class="sd">"""Build and return a SpeciatedMassMovingBin instance.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - SpeciatedMassMovingBin : A strategy for speciated mass</span>
 <span class="sd">            distributions.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Build Example&quot;</span>
+<span class="sd">        ```py title="Build Example"</span>
 <span class="sd">        builder = SpeciatedMassMovingBinBuilder()</span>
 <span class="sd">        strategy = builder.build()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">SpeciatedMassMovingBin</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>

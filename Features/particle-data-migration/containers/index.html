@@ -16279,7 +16279,7 @@ boundaries.</p>
 
 <span class="c1"># Legacy facade</span>
 <span class="n">species</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpecies</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Water&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"Water"</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">2330.0</span><span class="p">),</span>
     <span class="n">concentration</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
@@ -16289,7 +16289,7 @@ boundaries.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">GasData</span>
 
 <span class="n">gas_data</span> <span class="o">=</span> <span class="n">GasData</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Water&quot;</span><span class="p">],</span>
+    <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s2">"Water"</span><span class="p">],</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.018</span><span class="p">]),</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1e-6</span><span class="p">]]),</span>  <span class="c1"># (n_boxes, n_species)</span>
     <span class="n">partitioning</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">]),</span>
@@ -16508,7 +16508,7 @@ is required.</p>
 <span class="n">vapor_pressure</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">2330.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">]])</span>  <span class="c1"># (1, n_species)</span>
 <span class="n">gpu_gas</span> <span class="o">=</span> <span class="n">to_warp_gas_data</span><span class="p">(</span>
     <span class="n">gas_data</span><span class="p">,</span>
-    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">,</span>
     <span class="n">vapor_pressure</span><span class="o">=</span><span class="n">vapor_pressure</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">restored</span> <span class="o">=</span> <span class="n">from_warp_gas_data</span><span class="p">(</span><span class="n">gpu_gas</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">gas_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>

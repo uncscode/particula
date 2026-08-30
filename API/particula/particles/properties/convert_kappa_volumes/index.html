@@ -16175,7 +16175,7 @@ water activity.</p>
     <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">kappa_val</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_kappa_from_volumes</span><span class="p">(</span><span class="mf">1e-19</span><span class="p">,</span> <span class="mf">4e-19</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">kappa_val</span><span class="p">)</span>
-<span class="c1"># ~indicative value for the solute&#39;s hygroscopicity</span>
+<span class="c1"># ~indicative value for the solute's hygroscopicity</span>
 </code></pre></div>
 
 
@@ -16232,7 +16232,7 @@ water activity.</p>
     <span class="n">volume_water</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
     <span class="n">water_activity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the κ parameter from known volumes of solute and water, given</span>
+<span class="w">    </span><span class="sd">"""Compute the κ parameter from known volumes of solute and water, given</span>
 <span class="sd">    water activity.</span>
 
 <span class="sd">    Rearranging κ-Köhler-based relationships, we have:</span>
@@ -16251,14 +16251,14 @@ water activity.</p>
 <span class="sd">        import particula as par</span>
 <span class="sd">        kappa_val = par.get_kappa_from_volumes(1e-19, 4e-19, 0.95)</span>
 <span class="sd">        print(kappa_val)</span>
-<span class="sd">        # ~indicative value for the solute&#39;s hygroscopicity</span>
+<span class="sd">        # ~indicative value for the solute's hygroscopicity</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Petters, M. D. &amp; Kreidenweis, S. M. (2007). &quot;A single parameter</span>
+<span class="sd">        - Petters, M. D. &amp; Kreidenweis, S. M. (2007). "A single parameter</span>
 <span class="sd">          representation of hygroscopic growth and cloud condensation nucleus</span>
-<span class="sd">          activity.&quot; Atmos. Chem. Phys.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">          activity." Atmos. Chem. Phys.</span>
+<span class="sd">    """</span>
     <span class="c1"># Avoid division by zero</span>
     <span class="n">water_activity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
         <span class="n">water_activity</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="mf">1e-16</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="mf">1e-16</span><span class="p">,</span> <span class="n">water_activity</span>
@@ -16397,7 +16397,7 @@ theory.</p>
     <span class="n">kappa</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
     <span class="n">water_activity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the solute volume from the total solution volume using κ-Köhler</span>
+<span class="w">    </span><span class="sd">"""Calculate the solute volume from the total solution volume using κ-Köhler</span>
 <span class="sd">    theory.</span>
 
 <span class="sd">    The relation for κ-Köhler can be written as:</span>
@@ -16414,7 +16414,7 @@ theory.</p>
 <span class="sd">        - Solute volume (float or NDArray).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py  title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py  title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        v_sol = par.get_solute_from_kappa_volume(1e-18, 0.8, 0.9)</span>
 <span class="sd">        print(v_sol)</span>
@@ -16422,10 +16422,10 @@ theory.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Petters, M. D. &amp; Kreidenweis, S. M. (2007). &quot;A single parameter</span>
+<span class="sd">        - Petters, M. D. &amp; Kreidenweis, S. M. (2007). "A single parameter</span>
 <span class="sd">          representation of hygroscopic growth and cloud condensation nucleus</span>
-<span class="sd">          activity.&quot; Atmos. Chem. Phys.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">          activity." Atmos. Chem. Phys.</span>
+<span class="sd">    """</span>
     <span class="n">kappa</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">kappa</span><span class="p">,</span> <span class="mf">1e-16</span><span class="p">)</span>  <span class="c1"># Avoid division by zero</span>
     <span class="k">if</span> <span class="n">water_activity</span> <span class="o">&lt;=</span> <span class="mf">1e-16</span><span class="p">:</span>  <span class="c1"># early return for low water activity</span>
         <span class="k">return</span> <span class="n">volume_total</span>
@@ -16563,7 +16563,7 @@ activity.</p>
     <span class="n">kappa</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">water_activity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the water volume from the solute volume, κ parameter, and water</span>
+<span class="w">    </span><span class="sd">"""Calculate the water volume from the solute volume, κ parameter, and water</span>
 <span class="sd">    activity.</span>
 
 <span class="sd">    This uses κ-Köhler-type relations where:</span>
@@ -16579,7 +16579,7 @@ activity.</p>
 <span class="sd">        - Water volume (float or NDArray).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        v_water = par.get_water_volume_from_kappa(1e-19, 0.5, 0.95)</span>
 <span class="sd">        print(v_water)</span>
@@ -16587,10 +16587,10 @@ activity.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Petters, M. D. &amp; Kreidenweis, S. M. (2007). &quot;A single parameter</span>
+<span class="sd">        - Petters, M. D. &amp; Kreidenweis, S. M. (2007). "A single parameter</span>
 <span class="sd">          representation of hygroscopic growth and cloud condensation nucleus</span>
-<span class="sd">          activity.&quot; Atmos. Chem. Phys.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">          activity." Atmos. Chem. Phys.</span>
+<span class="sd">    """</span>
     <span class="c1"># Avoid division by zero</span>
     <span class="n">water_activity</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">water_activity</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="mf">1e-16</span><span class="p">)</span>
 
@@ -16714,7 +16714,7 @@ activity.</p>
     <span class="n">volume_solute_dry</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
     <span class="n">volume_fraction_water</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate water volume in mixture from specified water fraction.</span>
+<span class="w">    </span><span class="sd">"""Calculate water volume in mixture from specified water fraction.</span>
 
 <span class="sd">    The relationship is:</span>
 
@@ -16730,7 +16730,7 @@ activity.</p>
 <span class="sd">        - The water volume (float), in the same units as volume_solute_dry.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        v_water = par.get_water_volume_in_mixture(100.0, 0.8)</span>
 <span class="sd">        print(v_water)</span>
@@ -16738,8 +16738,8 @@ activity.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Volume Fractions in Mixture Calculations,&quot; Standard Chemistry Texts.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - "Volume Fractions in Mixture Calculations," Standard Chemistry Texts.</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">volume_fraction_water</span> <span class="o">*</span> <span class="n">volume_solute_dry</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">volume_fraction_water</span><span class="p">)</span>
     <span class="p">)</span>

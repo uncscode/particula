@@ -16772,11 +16772,11 @@ optional electric-field drift effects. Configure it via
 <code>ChargedWallLossBuilder</code> or directly:</p>
 <div class="highlight"><pre><span></span><code><span class="n">charged_wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
-    <span class="n">chamber_geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
+    <span class="n">chamber_geometry</span><span class="o">=</span><span class="s2">"spherical"</span><span class="p">,</span>
     <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
     <span class="n">wall_potential</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>        <span class="c1"># volts (optional)</span>
     <span class="n">wall_electric_field</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span>  <span class="c1"># V/m (optional drift term)</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="runnable-entry-point-wallloss">Runnable entry point: <code>WallLoss</code><a class="headerlink" href="#runnable-entry-point-wallloss" title="Permanent link">&para;</a></h3>
@@ -16791,7 +16791,7 @@ distribution types.</p>
 <span class="n">wall_loss_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
     <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLoss</span><span class="p">(</span>
     <span class="n">wall_loss_strategy</span><span class="o">=</span><span class="n">wall_loss_strategy</span><span class="p">,</span>
@@ -16807,7 +16807,7 @@ distribution types.</p>
 <span class="c1"># Chain with another runnable in a single pipeline</span>
 <span class="n">coagulation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
     <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">combined</span> <span class="o">=</span> <span class="n">coagulation</span> <span class="o">|</span> <span class="n">wall_loss</span>
@@ -16822,10 +16822,10 @@ package; the configuration intentionally remains a concrete-module import:</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.wall_loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeutralWallLossConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">NeutralWallLossConfig</span><span class="p">(</span>
-    <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="s2">"spherical"</span><span class="p">,</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
     <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># m</span>
-    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;charged&quot;</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">"charged"</span><span class="p">,</span>
     <span class="n">wall_potential</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># V</span>
     <span class="n">wall_electric_field</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span>  <span class="c1"># V/m; signed spherical scalar</span>
 <span class="p">)</span>
@@ -16872,7 +16872,7 @@ replay, mandatory CUDA support, and performance claims remain deferred.</p>
 <div class="highlight"><pre><span></span><code><span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
     <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>          <span class="c1"># m</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="rectangular-wall-loss-strategy">Rectangular wall loss strategy<a class="headerlink" href="#rectangular-wall-loss-strategy" title="Permanent link">&para;</a></h3>
@@ -16884,20 +16884,20 @@ replay, mandatory CUDA support, and performance claims remain deferred.</p>
 <span class="c1"># Chained builder with unit conversion and validation</span>
 <span class="n">wall_loss</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_wall_eddy_diffusivity</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s2">&quot;1/s&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_chamber_radius</span><span class="p">(</span><span class="mf">50.0</span><span class="p">,</span> <span class="s2">&quot;cm&quot;</span><span class="p">)</span>  <span class="c1"># converts to 0.5 m</span>
-    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_wall_eddy_diffusivity</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s2">"1/s"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_chamber_radius</span><span class="p">(</span><span class="mf">50.0</span><span class="p">,</span> <span class="s2">"cm"</span><span class="p">)</span>  <span class="c1"># converts to 0.5 m</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </code></pre></div>
 <p>For rectangular chambers, use <code>set_chamber_dimensions((L, W, H), units)</code>; each side must be positive and provided as a 3-tuple.</p>
 <div class="highlight"><pre><span></span><code><span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLossFactory</span><span class="p">()</span>
 <span class="n">rectangular</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;rectangular&quot;</span><span class="p">,</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"rectangular"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">,</span>
-        <span class="s2">&quot;chamber_dimensions&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
-        <span class="s2">&quot;distribution_type&quot;</span><span class="p">:</span> <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">,</span>
+        <span class="s2">"wall_eddy_diffusivity"</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">,</span>
+        <span class="s2">"chamber_dimensions"</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="s2">"distribution_type"</span><span class="p">:</span> <span class="s2">"continuous_pdf"</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -16921,7 +16921,7 @@ replay, mandatory CUDA support, and performance claims remain deferred.</p>
 <span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
     <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># 3. Compute instantaneous wall loss rate</span>
@@ -16948,7 +16948,7 @@ replay, mandatory CUDA support, and performance claims remain deferred.</p>
 <p>Start by constructing a particle distribution using existing builders:</p>
 <div class="highlight"><pre><span></span><code><span class="n">particle</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;m^3&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">"m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -16958,7 +16958,7 @@ replay, mandatory CUDA support, and performance claims remain deferred.</p>
 <div class="highlight"><pre><span></span><code><span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
     <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>  <span class="c1"># or &quot;continuous_pdf&quot; / &quot;particle_resolved&quot;</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>  <span class="c1"># or "continuous_pdf" / "particle_resolved"</span>
 <span class="p">)</span>
 </code></pre></div>
 <p>At this point you can:</p>

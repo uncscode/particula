@@ -16273,10 +16273,10 @@ still allows charge-driven enhancement.</p>
 <span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the charged wall loss builder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the charged wall loss builder."""</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">,</span> <span class="s2">&quot;chamber_geometry&quot;</span><span class="p">],</span>
+        <span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">"wall_eddy_diffusivity"</span><span class="p">,</span> <span class="s2">"chamber_geometry"</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="n">BuilderWallEddyDiffusivityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderDistributionTypeMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16385,7 +16385,7 @@ missing, or required values are not provided.</p>
 <span class="normal">280</span>
 <span class="normal">281</span>
 <span class="normal">282</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChargedWallLossStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return a charged wall loss strategy.</span>
+<span class="w">    </span><span class="sd">"""Build and return a charged wall loss strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ChargedWallLossStrategy: Charged strategy with geometry-specific</span>
@@ -16394,14 +16394,14 @@ missing, or required values are not provided.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If geometry is unset, matching size parameters are</span>
 <span class="sd">            missing, or required values are not provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wall_eddy_diffusivity must be set before build&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"wall_eddy_diffusivity must be set before build"</span><span class="p">)</span>
     <span class="n">wall_eddy_diffusivity</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">==</span> <span class="s2">&quot;spherical&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">==</span> <span class="s2">"spherical"</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_radius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;chamber_radius must be set for spherical&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"chamber_radius must be set for spherical"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
             <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
             <span class="n">chamber_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span><span class="p">,</span>
@@ -16410,10 +16410,10 @@ missing, or required values are not provided.</p>
             <span class="n">wall_electric_field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_electric_field</span><span class="p">,</span>
             <span class="n">distribution_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">==</span> <span class="s2">&quot;rectangular&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">==</span> <span class="s2">"rectangular"</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;chamber_dimensions must be set for rectangular geometry&quot;</span>
+                <span class="s2">"chamber_dimensions must be set for rectangular geometry"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
             <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
@@ -16423,7 +16423,7 @@ missing, or required values are not provided.</p>
             <span class="n">wall_electric_field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_electric_field</span><span class="p">,</span>
             <span class="n">distribution_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;chamber_geometry must be set before build()&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"chamber_geometry must be set before build()"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16503,21 +16503,21 @@ missing, or required values are not provided.</p>
 <span class="normal">173</span>
 <span class="normal">174</span>
 <span class="normal">175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_chamber_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chamber_geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set chamber geometry.</span>
+<span class="w">    </span><span class="sd">"""Set chamber geometry.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        chamber_geometry: ``&quot;spherical&quot;`` or ``&quot;rectangular&quot;``.</span>
+<span class="sd">        chamber_geometry: ``"spherical"`` or ``"rectangular"``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ChargedWallLossBuilder: Self for method chaining.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``chamber_geometry`` is not supported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">normalized</span> <span class="o">=</span> <span class="n">chamber_geometry</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">normalized</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span> <span class="s2">&quot;rectangular&quot;</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">normalized</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"spherical"</span><span class="p">,</span> <span class="s2">"rectangular"</span><span class="p">}:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;chamber_geometry must be &#39;spherical&#39; or &#39;rectangular&#39;.&quot;</span>
+            <span class="s2">"chamber_geometry must be 'spherical' or 'rectangular'."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">=</span> <span class="n">normalized</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -16650,7 +16650,7 @@ provided.</p>
 <span class="normal">239</span>
 <span class="normal">240</span>
 <span class="normal">241</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set required and optional parameters from mapping.</span>
+<span class="w">    </span><span class="sd">"""Set required and optional parameters from mapping.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        parameters: Mapping containing required ``wall_eddy_diffusivity``</span>
@@ -16664,55 +16664,55 @@ provided.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required keys are missing or unexpected keys are</span>
 <span class="sd">            provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">,</span> <span class="s2">&quot;chamber_geometry&quot;</span><span class="p">}</span>
+<span class="sd">    """</span>
+    <span class="n">required</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"wall_eddy_diffusivity"</span><span class="p">,</span> <span class="s2">"chamber_geometry"</span><span class="p">}</span>
     <span class="n">optional</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;chamber_radius&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;chamber_dimensions&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;wall_potential&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;wall_electric_field&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;distribution_type&quot;</span><span class="p">,</span>
+        <span class="s2">"chamber_radius"</span><span class="p">,</span>
+        <span class="s2">"chamber_dimensions"</span><span class="p">,</span>
+        <span class="s2">"wall_potential"</span><span class="p">,</span>
+        <span class="s2">"wall_electric_field"</span><span class="p">,</span>
+        <span class="s2">"distribution_type"</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">required</span>
         <span class="o">|</span> <span class="n">optional</span>
-        <span class="o">|</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">optional</span> <span class="o">|</span> <span class="n">required</span><span class="p">}</span>
+        <span class="o">|</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">optional</span> <span class="o">|</span> <span class="n">required</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">missing</span> <span class="o">:=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Missing required parameter(s): </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Missing required parameter(s): </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">invalid</span> <span class="o">:=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Trying to set an invalid parameter(s) &#39;</span><span class="si">{</span><span class="n">invalid</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Trying to set an invalid parameter(s) '</span><span class="si">{</span><span class="n">invalid</span><span class="si">}</span><span class="s2">'."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_wall_eddy_diffusivity</span><span class="p">(</span>
-        <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">],</span>
-        <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wall_eddy_diffusivity_units&quot;</span><span class="p">,</span> <span class="s2">&quot;1/s&quot;</span><span class="p">),</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="s2">"wall_eddy_diffusivity"</span><span class="p">],</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wall_eddy_diffusivity_units"</span><span class="p">,</span> <span class="s2">"1/s"</span><span class="p">),</span>
     <span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">set_chamber_geometry</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;chamber_geometry&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;chamber_radius&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_chamber_geometry</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"chamber_geometry"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"chamber_radius"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_chamber_radius</span><span class="p">(</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;chamber_radius&quot;</span><span class="p">],</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chamber_radius_units&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">),</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"chamber_radius"</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"chamber_radius_units"</span><span class="p">,</span> <span class="s2">"m"</span><span class="p">),</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;chamber_dimensions&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"chamber_dimensions"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_chamber_dimensions</span><span class="p">(</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;chamber_dimensions&quot;</span><span class="p">],</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chamber_dimensions_units&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">),</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"chamber_dimensions"</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"chamber_dimensions_units"</span><span class="p">,</span> <span class="s2">"m"</span><span class="p">),</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;wall_potential&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"wall_potential"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_wall_potential</span><span class="p">(</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;wall_potential&quot;</span><span class="p">],</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wall_potential_units&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">),</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"wall_potential"</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wall_potential_units"</span><span class="p">,</span> <span class="s2">"V"</span><span class="p">),</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;wall_electric_field&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"wall_electric_field"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_wall_electric_field</span><span class="p">(</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;wall_electric_field&quot;</span><span class="p">],</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wall_electric_field_units&quot;</span><span class="p">,</span> <span class="s2">&quot;V/m&quot;</span><span class="p">),</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"wall_electric_field"</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wall_electric_field_units"</span><span class="p">,</span> <span class="s2">"V/m"</span><span class="p">),</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;distribution_type&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;distribution_type&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"distribution_type"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"distribution_type"</span><span class="p">])</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16802,12 +16802,12 @@ before constructing :class:<code>RectangularWallLossStrategy</code>.</p>
 <span class="normal">100</span>
 <span class="normal">101</span>
 <span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the rectangular wall loss builder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the rectangular wall loss builder."""</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;chamber_dimensions&quot;</span><span class="p">,</span>
+            <span class="s2">"wall_eddy_diffusivity"</span><span class="p">,</span>
+            <span class="s2">"chamber_dimensions"</span><span class="p">,</span>
         <span class="p">],</span>
     <span class="p">)</span>
     <span class="n">BuilderWallEddyDiffusivityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16891,19 +16891,19 @@ before constructing :class:<code>RectangularWallLossStrategy</code>.</p>
 <span class="normal">121</span>
 <span class="normal">122</span>
 <span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RectangularWallLossStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return the rectangular wall loss strategy.</span>
+<span class="w">    </span><span class="sd">"""Build and return the rectangular wall loss strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        RectangularWallLossStrategy: Configured wall loss strategy.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required parameters are missing or invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="n">wall_eddy_diffusivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span>
     <span class="n">chamber_dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_dimensions</span>
     <span class="k">if</span> <span class="n">wall_eddy_diffusivity</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">chamber_dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Required parameters not set.&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Required parameters not set."</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">RectangularWallLossStrategy</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
@@ -16995,10 +16995,10 @@ before constructing :class:<code>SphericalWallLossStrategy</code>.</p>
 <span class="normal">48</span>
 <span class="normal">49</span>
 <span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the spherical wall loss builder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the spherical wall loss builder."""</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">,</span> <span class="s2">&quot;chamber_radius&quot;</span><span class="p">],</span>
+        <span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">"wall_eddy_diffusivity"</span><span class="p">,</span> <span class="s2">"chamber_radius"</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="n">BuilderWallEddyDiffusivityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderChamberRadiusMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -17081,19 +17081,19 @@ before constructing :class:<code>SphericalWallLossStrategy</code>.</p>
 <span class="normal">69</span>
 <span class="normal">70</span>
 <span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SphericalWallLossStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return the spherical wall loss strategy.</span>
+<span class="w">    </span><span class="sd">"""Build and return the spherical wall loss strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        SphericalWallLossStrategy: Configured wall loss strategy.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required parameters are missing or invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="n">wall_eddy_diffusivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span>
     <span class="n">chamber_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_radius</span>
     <span class="k">if</span> <span class="n">wall_eddy_diffusivity</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">chamber_radius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Required parameters not set.&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Required parameters not set."</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>

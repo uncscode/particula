@@ -16143,7 +16143,7 @@
   Use the following format:  </li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">function_name</span><span class="p">(</span><span class="n">param1</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">param2</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">return_type</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Brief description of what the function does.</span>
 
 <span class="sd">    A description of the function, including the purpose</span>
@@ -16163,24 +16163,24 @@
 <span class="sd">        - Description of the return value.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example title&quot;</span>
+<span class="sd">        ``` py title="Example title"</span>
 <span class="sd">        import package_name as np</span>
 <span class="sd">        np.function_name(2, 3)</span>
 <span class="sd">        # Output: 1.5</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Example Usage 2 array input&quot;</span>
+<span class="sd">        ``` py title="Example Usage 2 array input"</span>
 <span class="sd">        import package_name as np</span>
 <span class="sd">        np.function_name(np.array([4,5,5]), np.array([2,3,4]))</span>
 <span class="sd">        # Output: array([4.0, 1.66666667, 1.25])</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Author Name, &quot;Title of the Article,&quot; Journal Name, Volume, Issue, Year.</span>
+<span class="sd">        - Author Name, "Title of the Article," Journal Name, Volume, Issue, Year.</span>
 <span class="sd">            [DOI](url_link)</span>
-<span class="sd">        - &quot;Article Title&quot;,</span>
+<span class="sd">        - "Article Title",</span>
 <span class="sd">          [Wikipedia](link)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">param1</span> <span class="o">*</span> <span class="n">param2</span><span class="p">)</span> <span class="o">/</span> <span class="n">CONSTANT</span>
 </code></pre></div>
 <ul>
@@ -16217,7 +16217,7 @@
 </ul>
 <p><strong>Example Before:</strong><br />
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calculate_concentration</span><span class="p">(</span><span class="n">partial_pressure</span><span class="p">,</span> <span class="n">molar_mass</span><span class="p">,</span> <span class="n">temperature</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the concentration of a gas from its partial pressure, molar mass, and temperature using the ideal gas law.</span>
+<span class="w">    </span><span class="sd">"""Calculate the concentration of a gas from its partial pressure, molar mass, and temperature using the ideal gas law.</span>
 
 <span class="sd">    Parameters:</span>
 <span class="sd">    pressure (float or NDArray[np.float64]): Partial pressure of the gas</span>
@@ -16228,7 +16228,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">    - concentration (float or NDArray[np.float64]): Concentration of the gas</span>
 <span class="sd">    in kg/m^3.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">partial_pressure</span> <span class="o">*</span> <span class="n">molar_mass</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">GAS_CONSTANT</span><span class="p">)</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">)</span>
 </code></pre></div></p>
 <p><strong>Example After (With Reference):</strong><br />
@@ -16237,7 +16237,7 @@
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Calculate the concentration of a gas using the ideal gas law.</span>
 
 <span class="sd">    The concentration is determined using the equation:</span>
@@ -16258,18 +16258,18 @@
 <span class="sd">        - Concentration of the gas in kg/m³.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_calculate_concentration(1.5, 0.02897, 298)</span>
 <span class="sd">        # Output: 1.6175</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Ideal Gas Law,&quot;</span>
+<span class="sd">        - "Ideal Gas Law,"</span>
 <span class="sd">          [Wikipedia](https://en.wikipedia.org/wiki/Ideal_gas_law)</span>
 <span class="sd">        - J. D. Lee, *Physical Chemistry*, 5th ed., Oxford University</span>
 <span class="sd">          Press, 2019.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">partial_pressure</span> <span class="o">*</span> <span class="n">molar_mass</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">GAS_CONSTANT</span><span class="p">)</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">)</span>
 </code></pre></div></p>
 <hr />

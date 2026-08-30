@@ -16398,8 +16398,8 @@ can be executed in a defined order.</p>
 <span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
-<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;RunnableABC&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RunnableSequence&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chain this Runnable with another using the &#39;|&#39; operator.</span>
+<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">"RunnableABC"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"RunnableSequence"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Chain this Runnable with another using the '|' operator.</span>
 
 <span class="sd">    This method enables an easy way to sequence processes, so they</span>
 <span class="sd">    can be executed in a defined order.</span>
@@ -16411,11 +16411,11 @@ can be executed in a defined order.</p>
 <span class="sd">        A sequence containing both processes.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Chaining two processes&quot;</span>
+<span class="sd">        ```py title="Chaining two processes"</span>
 <span class="sd">        combined_process = process1 | process2</span>
 <span class="sd">        final_aerosol = combined_process.execute(aerosol, time_step=1.0)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sequence</span> <span class="o">=</span> <span class="n">RunnableSequence</span><span class="p">()</span>
     <span class="n">sequence</span><span class="o">.</span><span class="n">add_process</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">sequence</span><span class="o">.</span><span class="n">add_process</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
@@ -16530,7 +16530,7 @@ default 1.</p>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">sub_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute the process, modifying the Aerosol in-place over a time step.</span>
+<span class="w">    </span><span class="sd">"""Execute the process, modifying the Aerosol in-place over a time step.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        aerosol: The Aerosol instance to be updated.</span>
@@ -16542,11 +16542,11 @@ default 1.</p>
 <span class="sd">        - The updated Aerosol after this process runs.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Executing the process&quot;</span>
+<span class="sd">        ```py title="Executing the process"</span>
 <span class="sd">        process = CustomProcess()</span>
 <span class="sd">        updated_aerosol = process.execute(my_aerosol, time_step=1.0)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16627,7 +16627,7 @@ default 1.</p>
 <span class="normal">80</span>
 <span class="normal">81</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate and return the rate of this process for the given Aerosol.</span>
+<span class="w">    </span><span class="sd">"""Calculate and return the rate of this process for the given Aerosol.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        aerosol: The Aerosol instance on which to calculate the rate.</span>
@@ -16636,12 +16636,12 @@ default 1.</p>
 <span class="sd">        - Any : The computed rate of this process.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Using the rate method&quot;</span>
+<span class="sd">        ```py title="Using the rate method"</span>
 <span class="sd">        process = CustomProcess()</span>
 <span class="sd">        process_rate = process.rate(my_aerosol)</span>
 <span class="sd">        print(process_rate)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16742,10 +16742,10 @@ to the next in the sequence.</p>
 <span class="normal">159</span>
 <span class="normal">160</span>
 <span class="normal">161</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the RunnableSequence.</span>
+<span class="w">    </span><span class="sd">"""Initialize the RunnableSequence.</span>
 
 <span class="sd">    Sets up an empty list to hold the sequence of Runnable processes.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">processes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RunnableABC</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16832,8 +16832,8 @@ to the next in the sequence.</p>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
-<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">:</span> <span class="n">RunnableABC</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RunnableSequence&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chain another Runnable into this sequence using the &#39;|&#39; operator.</span>
+<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">:</span> <span class="n">RunnableABC</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"RunnableSequence"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Chain another Runnable into this sequence using the '|' operator.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        process: The Runnable to add.</span>
@@ -16848,7 +16848,7 @@ to the next in the sequence.</p>
 <span class="sd">        # or</span>
 <span class="sd">        sequence = sequence | AnotherProcess()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_process</span><span class="p">(</span><span class="n">process</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16907,7 +16907,7 @@ to the next in the sequence.</p>
 <span class="normal">173</span>
 <span class="normal">174</span>
 <span class="normal">175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">:</span> <span class="n">RunnableABC</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a Runnable to the sequence.</span>
+<span class="w">    </span><span class="sd">"""Add a Runnable to the sequence.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        process: The Runnable to add.</span>
@@ -16917,7 +16917,7 @@ to the next in the sequence.</p>
 <span class="sd">        sequence = RunnableSequence()</span>
 <span class="sd">        sequence.add_process(CustomProcess())</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">processes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">process</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17044,7 +17044,7 @@ default 1.</p>
 <span class="normal">218</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute all processes in the sequence on the given Aerosol.</span>
+<span class="w">    </span><span class="sd">"""Execute all processes in the sequence on the given Aerosol.</span>
 
 <span class="sd">    Each Runnable in the sequence modifies the Aerosol and passes</span>
 <span class="sd">    it to the next Runnable until all have been executed. A full cycle is</span>
@@ -17060,20 +17060,20 @@ default 1.</p>
 <span class="sd">        - Aerosol : The resulting Aerosol after all processes run.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Executing a RunnableSequence&quot;</span>
+<span class="sd">        ```py title="Executing a RunnableSequence"</span>
 <span class="sd">        sequence = RunnableSequence()</span>
 <span class="sd">        final_aerosol = sequence.execute(</span>
 <span class="sd">            aerosol, time_step=1.0, sub_steps=4</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sub_step_time_step</span> <span class="o">=</span> <span class="n">time_step</span> <span class="o">/</span> <span class="n">sub_steps</span>
     <span class="c1"># If tqdm is available, wrap the process loop in a progress bar</span>
     <span class="n">loop_iterator</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">sub_steps</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">AVAILABLE_TQDM</span> <span class="ow">and</span> <span class="n">tqdm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">loop_iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
             <span class="nb">range</span><span class="p">(</span><span class="n">sub_steps</span><span class="p">),</span>
-            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Executing Runnable&quot;</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">"Executing Runnable"</span><span class="p">,</span>
             <span class="n">mininterval</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">loop_iterator</span><span class="p">:</span>

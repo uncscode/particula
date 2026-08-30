@@ -15982,6 +15982,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#e7-roadmap-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E7 roadmap inventory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#active" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -16079,9 +16090,14 @@ schedule.</p>
 <li><strong>GPU process completeness</strong>: Maintain the shipped GPU dilution, wall loss,
   nucleation, and fixed-capacity slot-management contracts from
   <a href="data-oriented-gpu/#epic-f-gpu-process-completeness">Epic F</a>.</li>
-<li><strong>GPU-resident user workflows</strong>: Advance backend selection and high-level
-  simulation integration through active
+<li><strong>GPU-resident user workflows</strong>: Maintain the shipped backend-selection,
+  resident scheduling, communication, checkpoint/restart, diagnostics, and RNG
+  contracts from
   <a href="data-oriented-gpu/#epic-g-backend-selection-and-gpu-resident-simulation">Epic G</a>.</li>
+<li><strong>Graph capture and performance</strong>: Begin active
+  <a href="data-oriented-gpu/#epic-h-graph-capture-and-performance">Epic H</a> with an
+  ADW plan and feature decomposition, then address capture boundaries,
+  preallocated buffers, scaling benchmarks, profiling, and memory budgets.</li>
 <li><strong>Documentation and examples</strong>: Expand practical examples that connect feature
   guides, theory pages, and runnable notebooks.</li>
 </ul>
@@ -16207,6 +16223,12 @@ meets its exit bar, the next pending epic in the sequence becomes active.</p>
   The release supplies the bounded direct dilution, wall-loss, fixed-slot,
   exhaustion, and nucleation contracts plus explicit five-call sequence
   evidence. High-level GPU orchestration remains deferred to Epic G.</li>
+<li><a href="data-oriented-gpu/#epic-g-backend-selection-and-gpu-resident-simulation">Epic G: Backend Selection and GPU-Resident Simulation</a>
+  (ADW plan E7) and all nine feature plans E7-F1 through E7-F9 shipped on
+  2026-08-30. The release closes backend selection, explicit fallback policy,
+  bounded process adapters, resident sessions and checkpoints, deterministic
+  scheduling, prescribed communication and volume evolution, persistent RNG
+  restart semantics, diagnostics, full-loop regressions, and documentation.</li>
 </ul>
 <h3 id="e6-roadmap-inventory">E6 roadmap inventory<a class="headerlink" href="#e6-roadmap-inventory" title="Permanent link">&para;</a></h3>
 <table>
@@ -16351,18 +16373,79 @@ document an explicit five-call sequence. Its <code>condensation_step_gpu</code>,
   and
   <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py">direct GPU coagulation example</a>.</li>
 </ul>
-<p>E5, E6, and all of their feature plans are shipped. Epic G is active next.</p>
+<h3 id="e7-roadmap-inventory">E7 roadmap inventory<a class="headerlink" href="#e7-roadmap-inventory" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Status text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>E7</code></td>
+<td>Backend Selection and GPU-Resident Simulation</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F1</code></td>
+<td>Backend-Selection and Execution-Context API</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F2</code></td>
+<td>Backend-Selected Condensation</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F3</code></td>
+<td>Backend-Selected Brownian Coagulation</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F4</code></td>
+<td>GPU-Resident Session State and Checkpoints</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F5</code></td>
+<td>Deterministic Full-Process Scheduling</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F6</code></td>
+<td>Fallback, Capability Errors, and API Stability</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F7</code></td>
+<td>Multi-Box Communication and Volume Evolution</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F8</code></td>
+<td>Persistent Per-Box RNG Streams and Restart Semantics</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F9</code></td>
+<td>Diagnostics, Full-Loop Regressions, Documentation, and Closeout</td>
+<td>Shipped</td>
+</tr>
+</tbody>
+</table>
+<p>E5, E6, E7, and all of their feature plans are shipped. Epic H is active next.</p>
 <h3 id="active">Active<a class="headerlink" href="#active" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="data-oriented-gpu/#epic-g-backend-selection-and-gpu-resident-simulation">Epic G: Backend Selection and GPU-Resident Simulation</a>
-  follows Epic F. It will expose backend selection through user-facing APIs and
-  keep complete simulation loops resident on the selected device between
-  checkpoints.</li>
+<li><a href="data-oriented-gpu/#epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance</a>
+  follows shipped Epic G. Its ADW plan is not yet scheduled; the first step is
+  to create the E8 feature decomposition and define graph-capture, benchmark,
+  profiling, and memory-budget boundaries.</li>
 </ul>
 <h3 id="pending">Pending<a class="headerlink" href="#pending" title="Permanent link">&para;</a></h3>
 <p>Listed in execution order; each becomes active when the previous epic ships.</p>
 <ul>
-<li><a href="data-oriented-gpu/#epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance</a></li>
 <li><a href="data-oriented-gpu/#epic-i-differentiability-and-global-optimization">Epic I: Differentiability and Global Optimization</a>
   — implementation companion:
   <a href="warp-autodiff-limitations/">Warp autodiff limitations</a></li>

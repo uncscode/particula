@@ -16134,16 +16134,16 @@ are missing or invalid.</p>
 <span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityFactory</span><span class="p">()</span>
 
 <span class="c1"># Ideal mass activity</span>
-<span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">&quot;mass_ideal&quot;</span><span class="p">)</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"mass_ideal"</span><span class="p">)</span>
 
 <span class="c1"># Non-ideal binary (BAT model)</span>
 <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="mf">0.200</span><span class="p">,</span>
-    <span class="s2">&quot;oxygen2carbon&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
-    <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="mf">1400.0</span><span class="p">,</span>
+    <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="mf">0.200</span><span class="p">,</span>
+    <span class="s2">"oxygen2carbon"</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+    <span class="s2">"density"</span><span class="p">:</span> <span class="mf">1400.0</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="n">bat_strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">&quot;non_ideal_binary&quot;</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-<span class="c1"># bat_strategy.get_name() -&gt; &quot;ActivityNonIdealBinary&quot;</span>
+<span class="n">bat_strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"non_ideal_binary"</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+<span class="c1"># bat_strategy.get_name() -&gt; "ActivityNonIdealBinary"</span>
 </code></pre></div>
 
 
@@ -16225,7 +16225,7 @@ are missing or invalid.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Builders Retrieval Example</span><pre><span></span><code><span class="n">factory</span> <span class="o">=</span> <span class="n">ActivityFactory</span><span class="p">()</span>
 <span class="n">builder_map</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
-<span class="n">non_ideal_builder</span> <span class="o">=</span> <span class="n">builder_map</span><span class="p">[</span><span class="s2">&quot;non_ideal_binary&quot;</span><span class="p">]</span>
+<span class="n">non_ideal_builder</span> <span class="o">=</span> <span class="n">builder_map</span><span class="p">[</span><span class="s2">"non_ideal_binary"</span><span class="p">]</span>
 <span class="c1"># non_ideal_builder -&gt; ActivityNonIdealBinaryBuilder()</span>
 </code></pre></div>
 
@@ -16263,35 +16263,35 @@ are missing or invalid.</p>
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a mapping of strategy types to their corresponding builders.</span>
+<span class="w">    </span><span class="sd">"""Return a mapping of strategy types to their corresponding builders.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict[str, Any]: A dictionary mapping the activity strategy type</span>
 <span class="sd">        to a builder instance.</span>
 
 <span class="sd">    Supported types:</span>
-<span class="sd">        - &quot;mass_ideal&quot;: ActivityIdealMassBuilder (Raoult&#39;s Law, mass)</span>
-<span class="sd">        - &quot;molar_ideal&quot;: ActivityIdealMolarBuilder (Raoult&#39;s Law, mole)</span>
-<span class="sd">        - &quot;kappa_parameter&quot;: ActivityKappaParameterBuilder (kappa model)</span>
-<span class="sd">        - &quot;kappa&quot;: Alias for &quot;kappa_parameter&quot;</span>
-<span class="sd">        - &quot;non_ideal_binary&quot;: ActivityNonIdealBinaryBuilder (BAT model)</span>
-<span class="sd">        - &quot;binary_non_ideal&quot;: Alias for &quot;non_ideal_binary&quot;</span>
+<span class="sd">        - "mass_ideal": ActivityIdealMassBuilder (Raoult's Law, mass)</span>
+<span class="sd">        - "molar_ideal": ActivityIdealMolarBuilder (Raoult's Law, mole)</span>
+<span class="sd">        - "kappa_parameter": ActivityKappaParameterBuilder (kappa model)</span>
+<span class="sd">        - "kappa": Alias for "kappa_parameter"</span>
+<span class="sd">        - "non_ideal_binary": ActivityNonIdealBinaryBuilder (BAT model)</span>
+<span class="sd">        - "binary_non_ideal": Alias for "non_ideal_binary"</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Builders Retrieval Example&quot;</span>
+<span class="sd">        ```py title="Builders Retrieval Example"</span>
 <span class="sd">        factory = ActivityFactory()</span>
 <span class="sd">        builder_map = factory.get_builders()</span>
-<span class="sd">        non_ideal_builder = builder_map[&quot;non_ideal_binary&quot;]</span>
+<span class="sd">        non_ideal_builder = builder_map["non_ideal_binary"]</span>
 <span class="sd">        # non_ideal_builder -&gt; ActivityNonIdealBinaryBuilder()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;mass_ideal&quot;</span><span class="p">:</span> <span class="n">ActivityIdealMassBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;molar_ideal&quot;</span><span class="p">:</span> <span class="n">ActivityIdealMolarBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;kappa_parameter&quot;</span><span class="p">:</span> <span class="n">ActivityKappaParameterBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;kappa&quot;</span><span class="p">:</span> <span class="n">ActivityKappaParameterBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;non_ideal_binary&quot;</span><span class="p">:</span> <span class="n">ActivityNonIdealBinaryBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;binary_non_ideal&quot;</span><span class="p">:</span> <span class="n">ActivityNonIdealBinaryBuilder</span><span class="p">(),</span>
+        <span class="s2">"mass_ideal"</span><span class="p">:</span> <span class="n">ActivityIdealMassBuilder</span><span class="p">(),</span>
+        <span class="s2">"molar_ideal"</span><span class="p">:</span> <span class="n">ActivityIdealMolarBuilder</span><span class="p">(),</span>
+        <span class="s2">"kappa_parameter"</span><span class="p">:</span> <span class="n">ActivityKappaParameterBuilder</span><span class="p">(),</span>
+        <span class="s2">"kappa"</span><span class="p">:</span> <span class="n">ActivityKappaParameterBuilder</span><span class="p">(),</span>
+        <span class="s2">"non_ideal_binary"</span><span class="p">:</span> <span class="n">ActivityNonIdealBinaryBuilder</span><span class="p">(),</span>
+        <span class="s2">"binary_non_ideal"</span><span class="p">:</span> <span class="n">ActivityNonIdealBinaryBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>

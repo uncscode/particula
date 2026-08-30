@@ -16186,7 +16186,7 @@ If the input is an array, returns an array of the same shape.</li>
 <span class="normal">70</span>
 <span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
+        <span class="s2">"variable"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_debye_function</span><span class="p">(</span>
@@ -16194,7 +16194,7 @@ If the input is an array, returns an array of the same shape.</li>
     <span class="n">integration_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
     <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the generalized Debye function for a given input.</span>
+<span class="w">    </span><span class="sd">"""Calculate the generalized Debye function for a given input.</span>
 
 <span class="sd">    The Debye function can be expressed as follows:</span>
 
@@ -16213,19 +16213,19 @@ If the input is an array, returns an array of the same shape.</li>
 <span class="sd">          If the input is an array, returns an array of the same shape.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Debye function with n=1 for a single float value&quot;</span>
+<span class="sd">        ``` py title="Debye function with n=1 for a single float value"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_debye_function(1.0)</span>
 <span class="sd">        # Output: 0.7765038970390566</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Debye function with n=2 for a single float value&quot;</span>
+<span class="sd">        ``` py title="Debye function with n=2 for a single float value"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_debye_function(1.0, n=2)</span>
 <span class="sd">        # Output: 0.6007582206816492</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Debye function with n=1 for a numpy array&quot;</span>
+<span class="sd">        ``` py title="Debye function with n=1 for a numpy array"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_debye_function(np.array([1.0, 2.0, 3.0]))</span>
 <span class="sd">        # Output: [0.84140566 0.42278434 0.28784241]</span>
@@ -16234,7 +16234,7 @@ If the input is an array, returns an array of the same shape.</li>
 <span class="sd">    References:</span>
 <span class="sd">        - [Debye function](https://en.wikipedia.org/wiki/Debye_function)</span>
 <span class="sd">        - [Wolfram MathWorld: Debye Functions](https://mathworld.wolfram.com/DebyeFunctions.html)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">integration_points</span><span class="p">)</span>
     <span class="n">exp_array</span> <span class="o">=</span> <span class="n">get_safe_exp</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
 

@@ -16110,20 +16110,20 @@ and <code>finalize_particle_source</code>, <code>commit_particle_source</code>, 
 factory, then select its precursor lane in <code>NucleationSourceConfig</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">strategy</span> <span class="o">=</span> <span class="n">ActivationNucleationBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;coefficient&quot;</span><span class="p">:</span> <span class="mf">1.0e-2</span><span class="p">,</span>
-        <span class="s2">&quot;coefficient_units&quot;</span><span class="p">:</span> <span class="s2">&quot;s^-1&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;coefficient_provenance&quot;</span><span class="p">:</span> <span class="s2">&quot;configured source&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;precursor_number_concentration_lower&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-        <span class="s2">&quot;precursor_number_concentration_lower_units&quot;</span><span class="p">:</span> <span class="s2">&quot;1/m^3&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;precursor_number_concentration_upper&quot;</span><span class="p">:</span> <span class="mf">1.0e30</span><span class="p">,</span>
-        <span class="s2">&quot;precursor_number_concentration_upper_units&quot;</span><span class="p">:</span> <span class="s2">&quot;1/m^3&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature_lower&quot;</span><span class="p">:</span> <span class="mf">200.0</span><span class="p">,</span>
-        <span class="s2">&quot;temperature_lower_units&quot;</span><span class="p">:</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature_upper&quot;</span><span class="p">:</span> <span class="mf">400.0</span><span class="p">,</span>
-        <span class="s2">&quot;temperature_upper_units&quot;</span><span class="p">:</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;injection_composition&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-        <span class="s2">&quot;formation_diameter&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-        <span class="s2">&quot;formation_diameter_units&quot;</span><span class="p">:</span> <span class="s2">&quot;nm&quot;</span><span class="p">,</span>
+        <span class="s2">"coefficient"</span><span class="p">:</span> <span class="mf">1.0e-2</span><span class="p">,</span>
+        <span class="s2">"coefficient_units"</span><span class="p">:</span> <span class="s2">"s^-1"</span><span class="p">,</span>
+        <span class="s2">"coefficient_provenance"</span><span class="p">:</span> <span class="s2">"configured source"</span><span class="p">,</span>
+        <span class="s2">"precursor_number_concentration_lower"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">"precursor_number_concentration_lower_units"</span><span class="p">:</span> <span class="s2">"1/m^3"</span><span class="p">,</span>
+        <span class="s2">"precursor_number_concentration_upper"</span><span class="p">:</span> <span class="mf">1.0e30</span><span class="p">,</span>
+        <span class="s2">"precursor_number_concentration_upper_units"</span><span class="p">:</span> <span class="s2">"1/m^3"</span><span class="p">,</span>
+        <span class="s2">"temperature_lower"</span><span class="p">:</span> <span class="mf">200.0</span><span class="p">,</span>
+        <span class="s2">"temperature_lower_units"</span><span class="p">:</span> <span class="s2">"K"</span><span class="p">,</span>
+        <span class="s2">"temperature_upper"</span><span class="p">:</span> <span class="mf">400.0</span><span class="p">,</span>
+        <span class="s2">"temperature_upper_units"</span><span class="p">:</span> <span class="s2">"K"</span><span class="p">,</span>
+        <span class="s2">"injection_composition"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">"formation_diameter"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">"formation_diameter_units"</span><span class="p">:</span> <span class="s2">"nm"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="n">source</span> <span class="o">=</span> <span class="n">NucleationSourceConfig</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span> <span class="n">precursor_index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>

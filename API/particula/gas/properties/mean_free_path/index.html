@@ -16207,7 +16207,7 @@ If None, it will be calculated based on the temperature.</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">101325</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the mean free path of a gas molecule in air.</span>
+<span class="w">    </span><span class="sd">"""Calculate the mean free path of a gas molecule in air.</span>
 
 <span class="sd">    This function calculates λ based on the input conditions. If</span>
 <span class="sd">    dynamic_viscosity is not provided, it is computed via</span>
@@ -16232,26 +16232,26 @@ If None, it will be calculated based on the temperature.</p>
 <span class="sd">        - Mean free path of the gas molecule in meters (m).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example usage&quot;</span>
+<span class="sd">        ```py title="Example usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_molecule_mean_free_path()</span>
 <span class="sd">        # Returns mean free path at ~298K and 101325Pa, ~6.5e-8 m</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Mean Free Path,&quot; Wikipedia, The Free Encyclopedia.</span>
+<span class="sd">        - "Mean Free Path," Wikipedia, The Free Encyclopedia.</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Mean_free_path</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># check inputs are positive</span>
     <span class="k">if</span> <span class="n">temperature</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Temperature must be positive [Kelvin]&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Temperature must be positive [Kelvin]&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Temperature must be positive [Kelvin]"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Temperature must be positive [Kelvin]"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">pressure</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Pressure must be positive [Pascal]&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pressure must be positive [Pascal]&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Pressure must be positive [Pascal]"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Pressure must be positive [Pascal]"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">molar_mass</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Molar mass must be positive [kg/mol]&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Molar mass must be positive [kg/mol]&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Molar mass must be positive [kg/mol]"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Molar mass must be positive [kg/mol]"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">dynamic_viscosity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
     <span class="n">gas_constant</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">GAS_CONSTANT</span><span class="p">)</span>

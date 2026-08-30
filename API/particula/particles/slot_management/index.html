@@ -16235,9 +16235,9 @@ prefix, or available free capacity is invalid.</p>
     <span class="n">request_charge</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">requested_counts</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Activate ascending free slots from per-box request prefixes.</span>
+<span class="w">    </span><span class="sd">"""Activate ascending free slots from per-box request prefixes.</span>
 
-<span class="sd">    Request rank ``r`` in each box is copied into that box&#39;s ``r``-th</span>
+<span class="sd">    Request rank ``r`` in each box is copied into that box's ``r``-th</span>
 <span class="sd">    ascending free slot. Only records below the corresponding requested count</span>
 <span class="sd">    are validated or read. The destination fields mutate in place after a</span>
 <span class="sd">    complete global preflight, and a newly allocated ``np.int32`` count array</span>
@@ -16260,9 +16260,9 @@ prefix, or available free capacity is invalid.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If an input schema, destination, slot state, requested</span>
 <span class="sd">            prefix, or available free capacity is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ParticleData</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data must be a ParticleData instance.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"data must be a ParticleData instance."</span><span class="p">)</span>
 
     <span class="n">masses</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">charge</span> <span class="o">=</span> <span class="n">_validate_destinations</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">destination_fields</span> <span class="o">=</span> <span class="p">(</span><span class="n">masses</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">charge</span><span class="p">)</span>
@@ -16460,7 +16460,7 @@ message is <code>"Invalid particle slot state."</code>.</p>
 <span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_slot_diagnostics</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">ParticleData</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return read-only fixed-shape diagnostics for particle slots.</span>
+<span class="w">    </span><span class="sd">"""Return read-only fixed-shape diagnostics for particle slots.</span>
 
 <span class="sd">    A slot is active when its concentration is positive and finite, each mass</span>
 <span class="sd">    lane is finite and nonnegative, and its total mass is positive and finite.</span>
@@ -16479,8 +16479,8 @@ message is <code>"Invalid particle slot state."</code>.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If any particle slot is neither active nor free. The error</span>
-<span class="sd">            message is ``&quot;Invalid particle slot state.&quot;``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">            message is ``"Invalid particle slot state."``.</span>
+<span class="sd">    """</span>
     <span class="n">masses</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">masses</span>
     <span class="n">concentration</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">concentration</span>
     <span class="n">charge</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">charge</span>
@@ -16491,11 +16491,11 @@ message is <code>"Invalid particle slot state."</code>.</p>
         <span class="ow">or</span> <span class="n">concentration</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">expected_shape</span>
         <span class="ow">or</span> <span class="n">charge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">expected_shape</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid particle slot state.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid particle slot state."</span><span class="p">)</span>
 
     <span class="n">mass_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">masses</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">masses</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">mass_zero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">masses</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
         <span class="n">total_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">masses</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
     <span class="n">active</span> <span class="o">=</span> <span class="p">(</span>
@@ -16514,7 +16514,7 @@ message is <code>"Invalid particle slot state."</code>.</p>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="p">(</span><span class="n">active</span> <span class="o">|</span> <span class="n">free</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid particle slot state.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid particle slot state."</span><span class="p">)</span>
 
     <span class="n">free_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">n_particles</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
     <span class="n">free_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">free</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>

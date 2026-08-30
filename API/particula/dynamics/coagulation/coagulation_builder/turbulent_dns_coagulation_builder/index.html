@@ -16277,19 +16277,19 @@ relative velocity.</p>
 <span class="normal"> 98</span>
 <span class="normal"> 99</span>
 <span class="normal">100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Turbulent DNS coagulation builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Turbulent DNS coagulation builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    TurbulentDNSCoagulationStrategy, including distribution type,</span>
 <span class="sd">    turbulent dissipation, fluid density, Reynolds lambda, and</span>
 <span class="sd">    relative velocity.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;distribution_type&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;fluid_density&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;reynolds_lambda&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;relative_velocity&quot;</span><span class="p">,</span>
+        <span class="s2">"distribution_type"</span><span class="p">,</span>
+        <span class="s2">"turbulent_dissipation"</span><span class="p">,</span>
+        <span class="s2">"fluid_density"</span><span class="p">,</span>
+        <span class="s2">"reynolds_lambda"</span><span class="p">,</span>
+        <span class="s2">"relative_velocity"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">coagulation_builder_mixin</span><span class="o">.</span><span class="n">BuilderDistributionTypeMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16373,7 +16373,7 @@ calculations.</p>
 <span class="normal">178</span>
 <span class="normal">179</span>
 <span class="normal">180</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoagulationStrategyABC</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct a TurbulentDNSCoagulationStrategy.</span>
+<span class="w">    </span><span class="sd">"""Construct a TurbulentDNSCoagulationStrategy.</span>
 
 <span class="sd">    Validates the required parameters, then instantiates a</span>
 <span class="sd">    `TurbulentDNSCoagulationStrategy` for DNS-based coagulation</span>
@@ -16382,7 +16382,7 @@ calculations.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        CoagulationStrategyABC: The configured DNS coagulation</span>
 <span class="sd">        strategy.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">TurbulentDNSCoagulationStrategy</span><span class="p">(</span>
         <span class="n">distribution_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span><span class="p">,</span>
@@ -16475,13 +16475,13 @@ sedimentation-adjusted velocity, excluding turbulence.</p>
 <span class="normal">157</span>
 <span class="normal">158</span>
 <span class="normal">159</span>
-<span class="normal">160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;relative_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">})</span>
+<span class="normal">160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"relative_velocity"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_relative_velocity</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">relative_velocity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">relative_velocity_units</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the relative particle-airflow velocity for DNS coagulation.</span>
+<span class="w">    </span><span class="sd">"""Set the relative particle-airflow velocity for DNS coagulation.</span>
 
 <span class="sd">    This value is typically a background flow velocity or a</span>
 <span class="sd">    sedimentation-adjusted velocity, excluding turbulence.</span>
@@ -16489,16 +16489,16 @@ sedimentation-adjusted velocity, excluding turbulence.</p>
 <span class="sd">    Arguments:</span>
 <span class="sd">        - relative_velocity : Numeric value of velocity.</span>
 <span class="sd">        - relative_velocity_units : Units of the velocity</span>
-<span class="sd">          (e.g., &quot;m/s&quot;).</span>
+<span class="sd">          (e.g., "m/s").</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - self : The builder instance for chaining.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">relative_velocity_units</span> <span class="o">==</span> <span class="s2">&quot;m/s&quot;</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">relative_velocity_units</span> <span class="o">==</span> <span class="s2">"m/s"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">relative_velocity</span> <span class="o">=</span> <span class="n">relative_velocity</span>
         <span class="k">return</span> <span class="bp">self</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">relative_velocity</span> <span class="o">=</span> <span class="n">relative_velocity</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
-        <span class="n">relative_velocity_units</span><span class="p">,</span> <span class="s2">&quot;m/s&quot;</span>
+        <span class="n">relative_velocity_units</span><span class="p">,</span> <span class="s2">"m/s"</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16597,22 +16597,22 @@ Any other unit triggers a warning and is treated as dimensionless.</p>
 <span class="normal">130</span>
 <span class="normal">131</span>
 <span class="normal">132</span>
-<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;reynolds_lambda&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"reynolds_lambda"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_reynolds_lambda</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">reynolds_lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">reynolds_lambda_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the Taylor-scale Reynolds number (Reλ).</span>
+<span class="w">    </span><span class="sd">"""Set the Taylor-scale Reynolds number (Reλ).</span>
 
 <span class="sd">    Represents a measure of turbulence intensity in DNS flows.</span>
-<span class="sd">    When specifying units, only &quot;dimensionless&quot; is recognized here.</span>
+<span class="sd">    When specifying units, only "dimensionless" is recognized here.</span>
 <span class="sd">    Any other unit triggers a warning and is treated as dimensionless.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - reynolds_lambda : Numeric value for Reλ.</span>
 <span class="sd">        - reynolds_lambda_units : String indicating units</span>
-<span class="sd">          (default &quot;dimensionless&quot;).</span>
+<span class="sd">          (default "dimensionless").</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - self : The builder instance for chaining.</span>
@@ -16621,12 +16621,12 @@ Any other unit triggers a warning and is treated as dimensionless.</p>
 <span class="sd">        ```py</span>
 <span class="sd">        builder.set_reynolds_lambda(250.)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">reynolds_lambda_units</span> <span class="o">==</span> <span class="s2">&quot;dimensionless&quot;</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">reynolds_lambda_units</span> <span class="o">==</span> <span class="s2">"dimensionless"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reynolds_lambda</span> <span class="o">=</span> <span class="n">reynolds_lambda</span>
         <span class="k">return</span> <span class="bp">self</span>
     <span class="k">if</span> <span class="n">reynolds_lambda_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Units for reynolds_lambda are not used. &quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Units for reynolds_lambda are not used. "</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">reynolds_lambda</span> <span class="o">=</span> <span class="n">reynolds_lambda</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>

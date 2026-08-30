@@ -16254,9 +16254,9 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="normal">125</span>
 <span class="normal">126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;molar_mass_ratio&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;organic_mole_fraction&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass_ratio"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"organic_mole_fraction"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">bat_activity_coefficients</span><span class="p">(</span>
@@ -16273,7 +16273,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
     <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the activity coefficients for water-organic mixtures.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Calculate the activity coefficients for water-organic mixtures.</span>
 
 <span class="sd">    Uses the BAT (Binary Activity Thermodynamics) model to compute activity</span>
 <span class="sd">    coefficients for binary organic-water mixtures based on AIOMFAC-derived</span>
@@ -16288,7 +16288,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">        oxygen2carbon: Oxygen-to-carbon ratio in the organic compound.</span>
 <span class="sd">        density: Density of the mixture, in kg/m^3.</span>
 <span class="sd">        functional_group: Optional functional group(s) of the organic compound</span>
-<span class="sd">            (e.g., &quot;alcohol&quot;, &quot;carboxylic_acid&quot;, &quot;ether&quot;).</span>
+<span class="sd">            (e.g., "alcohol", "carboxylic_acid", "ether").</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple of six values:</span>
@@ -16314,7 +16314,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">    References:</span>
 <span class="sd">        Gorkowski et al. (2019), Equations 1-6 and SI S1-S2.</span>
 <span class="sd">        https://doi.org/10.5194/acp-19-13383-2019</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">convert_to_oh_equivalent</span><span class="p">(</span>
         <span class="n">oxygen2carbon</span><span class="o">=</span><span class="n">oxygen2carbon</span><span class="p">,</span>
         <span class="n">molar_mass_ratio</span><span class="o">=</span><span class="n">molar_mass_ratio</span><span class="p">,</span>

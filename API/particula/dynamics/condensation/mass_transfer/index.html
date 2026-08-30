@@ -16403,7 +16403,7 @@ Defaults to 2e-5 (approx. air).</p>
 <span class="normal">105</span>
 <span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_first_order_mass_transport_k</span><span class="p">(</span>
@@ -16411,7 +16411,7 @@ Defaults to 2e-5 (approx. air).</p>
     <span class="n">vapor_transition</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">2e-5</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the first-order mass transport coefficient per particle.</span>
+<span class="w">    </span><span class="sd">"""Calculate the first-order mass transport coefficient per particle.</span>
 
 <span class="sd">    This function computes the coefficient K that governs how fast mass is</span>
 <span class="sd">    transported to or from a particle in a vapor. The equation is:</span>
@@ -16432,7 +16432,7 @@ Defaults to 2e-5 (approx. air).</p>
 <span class="sd">        - The first-order mass transport coefficient per particle [m³/s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Float input&quot;</span>
+<span class="sd">        ```py title="Float input"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.dynamics.get_first_order_mass_transport_k(</span>
 <span class="sd">            particle_radius=1e-6,</span>
@@ -16442,7 +16442,7 @@ Defaults to 2e-5 (approx. air).</p>
 <span class="sd">        # Output: 1.5079644737231005e-14</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ```py title=&quot;Array input&quot;</span>
+<span class="sd">        ```py title="Array input"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.dynamics.get_first_order_mass_transport_k(</span>
 <span class="sd">            particle_radius=np.array([1e-6, 2e-6]),</span>
@@ -16454,9 +16454,9 @@ Defaults to 2e-5 (approx. air).</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Aerosol Modeling: Chapter 2, Equation 2.49</span>
-<span class="sd">        - Wikipedia contributors, &quot;Mass diffusivity,&quot;</span>
+<span class="sd">        - Wikipedia contributors, "Mass diffusivity,"</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Mass_diffusivity</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="nb">isinstance</span><span class="p">(</span><span class="n">vapor_transition</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="ow">and</span> <span class="n">vapor_transition</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
@@ -16636,15 +16636,15 @@ transfer (evaporation) yields Q &lt; 0.</p>
 <span class="normal">396</span>
 <span class="normal">397</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_transfer&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;latent_heat&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_transfer"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"latent_heat"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_latent_heat_energy_released</span><span class="p">(</span>
     <span class="n">mass_transfer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">latent_heat</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate latent heat energy released during phase change.</span>
+<span class="w">    </span><span class="sd">"""Calculate latent heat energy released during phase change.</span>
 
 <span class="sd">    This diagnostic function converts the mass transferred in a time step into</span>
 <span class="sd">    energy released to (or absorbed from) the gas phase:</span>
@@ -16665,7 +16665,7 @@ transfer (evaporation) yields Q &lt; 0.</p>
 <span class="sd">        Latent heat energy released or absorbed [J].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Condensation releases heat&quot;</span>
+<span class="sd">        ```py title="Condensation releases heat"</span>
 <span class="sd">        import particula as par</span>
 
 <span class="sd">        par.dynamics.get_latent_heat_energy_released(</span>
@@ -16675,7 +16675,7 @@ transfer (evaporation) yields Q &lt; 0.</p>
 <span class="sd">        # Output: 2.454e-09</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ```py title=&quot;Evaporation absorbs heat&quot;</span>
+<span class="sd">        ```py title="Evaporation absorbs heat"</span>
 <span class="sd">        import particula as par</span>
 
 <span class="sd">        par.dynamics.get_latent_heat_energy_released(</span>
@@ -16689,13 +16689,13 @@ transfer (evaporation) yields Q &lt; 0.</p>
 <span class="sd">        ValueError: If mass_transfer is non-finite or latent_heat is negative.</span>
 
 <span class="sd">    Notes:</span>
-<span class="sd">        Large magnitudes may overflow following NumPy&#39;s float64 behavior.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        Large magnitudes may overflow following NumPy's float64 behavior.</span>
+<span class="sd">    """</span>
     <span class="n">mass_transfer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mass_transfer</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">latent_heat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">latent_heat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">latent_heat</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Argument &#39;latent_heat&#39; must be finite (no inf or NaN).&quot;</span>
+            <span class="s2">"Argument 'latent_heat' must be finite (no inf or NaN)."</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mass_transfer</span> <span class="o">*</span> <span class="n">latent_heat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16879,11 +16879,11 @@ involves:</p>
 <span class="normal">532</span>
 <span class="normal">533</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gas_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_rate"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"time_step"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"gas_mass"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"particle_mass"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"particle_concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_mass_transfer</span><span class="p">(</span>
@@ -16893,7 +16893,7 @@ involves:</p>
     <span class="n">particle_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">particle_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Route mass transfer calculation to single or multiple-species routines.</span>
+<span class="w">    </span><span class="sd">"""Route mass transfer calculation to single or multiple-species routines.</span>
 
 <span class="sd">    Depending on whether gas_mass represents one or multiple species, this</span>
 <span class="sd">    function calls either calculate_mass_transfer_single_species or</span>
@@ -16913,7 +16913,7 @@ involves:</p>
 <span class="sd">        - The mass transferred (array with the same shape as particle_mass).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Single species input&quot;</span>
+<span class="sd">        ```py title="Single species input"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.dynamics.get_mass_transfer(</span>
 <span class="sd">            mass_rate=np.array([0.1, 0.5]),</span>
@@ -16924,7 +16924,7 @@ involves:</p>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ```py title=&quot;Multiple species input&quot;</span>
+<span class="sd">        ```py title="Multiple species input"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.dynamics.get_mass_transfer(</span>
 <span class="sd">            mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),</span>
@@ -16934,7 +16934,7 @@ involves:</p>
 <span class="sd">            particle_concentration=np.array([5, 4])</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">gas_mass</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Single species case</span>
         <span class="k">return</span> <span class="n">get_mass_transfer_of_single_species</span><span class="p">(</span>
             <span class="n">mass_rate</span><span class="p">,</span>
@@ -17132,11 +17132,11 @@ of (particle_mass).</li>
 <span class="normal">676</span>
 <span class="normal">677</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gas_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_rate"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"time_step"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"gas_mass"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"particle_mass"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"particle_concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_mass_transfer_of_multiple_species</span><span class="p">(</span>
@@ -17146,7 +17146,7 @@ of (particle_mass).</li>
     <span class="n">particle_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">particle_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate mass transfer for multiple gas species.</span>
+<span class="w">    </span><span class="sd">"""Calculate mass transfer for multiple gas species.</span>
 
 <span class="sd">    Here, gas_mass has multiple elements (each species). For each species,</span>
 <span class="sd">    this function calculates mass_to_change for all particle bins:</span>
@@ -17175,7 +17175,7 @@ of (particle_mass).</li>
 <span class="sd">          of (particle_mass).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Multiple species input&quot;</span>
+<span class="sd">        ```py title="Multiple species input"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.dynamics.get_mass_transfer_of_multiple_species(</span>
 <span class="sd">            mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),</span>
@@ -17186,7 +17186,7 @@ of (particle_mass).</li>
 <span class="sd">        )</span>
 <span class="sd">        # Output: array([...])</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">mass_to_change</span> <span class="o">=</span> <span class="n">calc_mass_to_change</span><span class="p">(</span>
         <span class="n">mass_rate</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">particle_concentration</span>
     <span class="p">)</span>
@@ -17369,11 +17369,11 @@ like particle_mass.</li>
 <span class="normal">600</span>
 <span class="normal">601</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gas_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_rate"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"time_step"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"gas_mass"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"particle_mass"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"particle_concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_mass_transfer_of_single_species</span><span class="p">(</span>
@@ -17383,7 +17383,7 @@ like particle_mass.</li>
     <span class="n">particle_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">particle_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate mass transfer for a single gas species.</span>
+<span class="w">    </span><span class="sd">"""Calculate mass transfer for a single gas species.</span>
 
 <span class="sd">    This function assumes gas_mass has a size of 1 (single species).</span>
 <span class="sd">    It first computes the total mass_to_change per particle:</span>
@@ -17405,7 +17405,7 @@ like particle_mass.</li>
 <span class="sd">          like particle_mass.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Single species input&quot;</span>
+<span class="sd">        ```py title="Single species input"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.dynamics.get_mass_transfer_of_single_species(</span>
 <span class="sd">            mass_rate=np.array([0.1, 0.5]),</span>
@@ -17416,7 +17416,7 @@ like particle_mass.</li>
 <span class="sd">        )</span>
 <span class="sd">        # Output: array([...])</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">mass_to_change</span> <span class="o">=</span> <span class="n">calc_mass_to_change</span><span class="p">(</span>
         <span class="n">mass_rate</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">particle_concentration</span>
     <span class="p">)</span>
@@ -17621,10 +17621,10 @@ mass transport coefficient (K). The equation is:</p>
 <span class="normal">179</span>
 <span class="normal">180</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;pressure_delta&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;first_order_mass_transport&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"pressure_delta"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"first_order_mass_transport"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_mass_transfer_rate</span><span class="p">(</span>
@@ -17633,7 +17633,7 @@ mass transport coefficient (K). The equation is:</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the mass transfer rate for a particle.</span>
+<span class="w">    </span><span class="sd">"""Calculate the mass transfer rate for a particle.</span>
 
 <span class="sd">    This function calculates the mass transfer rate dm/dt, leveraging the</span>
 <span class="sd">    difference in partial pressure (pressure_delta) and the first-order</span>
@@ -17657,7 +17657,7 @@ mass transport coefficient (K). The equation is:</p>
 <span class="sd">        - The mass transfer rate [kg/s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Single value input&quot;</span>
+<span class="sd">        ```py title="Single value input"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.dynamics.mass_transfer_rate(</span>
 <span class="sd">            pressure_delta=10.0,</span>
@@ -17668,7 +17668,7 @@ mass transport coefficient (K). The equation is:</p>
 <span class="sd">        # Output: 1.16143004e-21</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ```py title=&quot;Array input&quot;</span>
+<span class="sd">        ```py title="Array input"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.dynamics.mass_transfer_rate(</span>
 <span class="sd">            pressure_delta=np.array([10.0, 15.0]),</span>
@@ -17681,9 +17681,9 @@ mass transport coefficient (K). The equation is:</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Aerosol Modeling: Chapter 2, Equation 2.41</span>
-<span class="sd">        - Seinfeld and Pandis, &quot;Atmospheric Chemistry and Physics,&quot;</span>
+<span class="sd">        - Seinfeld and Pandis, "Atmospheric Chemistry and Physics,"</span>
 <span class="sd">            Equation 13.3</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="n">first_order_mass_transport</span>
         <span class="o">*</span> <span class="n">pressure_delta</span>
@@ -17882,14 +17882,14 @@ constraints.</p>
 <span class="normal">330</span>
 <span class="normal">331</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;pressure_delta&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;first_order_mass_transport&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;latent_heat&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;thermal_conductivity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;vapor_pressure_surface&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"pressure_delta"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"first_order_mass_transport"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"latent_heat"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"thermal_conductivity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"vapor_pressure_surface"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_mass_transfer_rate_latent_heat</span><span class="p">(</span>
@@ -17902,7 +17902,7 @@ constraints.</p>
     <span class="n">vapor_pressure_surface</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate non-isothermal mass transfer rate with latent heat.</span>
+<span class="w">    </span><span class="sd">"""Calculate non-isothermal mass transfer rate with latent heat.</span>
 
 <span class="sd">    Applies the thermal resistance factor to the isothermal mass transfer</span>
 <span class="sd">    rate. When latent heat is zero, the correction equals unity and the</span>
@@ -17926,7 +17926,7 @@ constraints.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If any validated inputs violate positive/nonnegative</span>
 <span class="sd">          constraints.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">pressure_delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pressure_delta</span><span class="p">)</span>
     <span class="n">first_order_mass_transport</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">first_order_mass_transport</span><span class="p">)</span>
     <span class="n">temperature</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
@@ -18106,9 +18106,9 @@ change rate (dr/dt). The equation is:</p>
 <span class="normal">456</span>
 <span class="normal">457</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_rate"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_radius_transfer_rate</span><span class="p">(</span>
@@ -18116,7 +18116,7 @@ change rate (dr/dt). The equation is:</p>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert mass rate to radius growth/evaporation rate.</span>
+<span class="w">    </span><span class="sd">"""Convert mass rate to radius growth/evaporation rate.</span>
 
 <span class="sd">    This function converts the mass transfer rate (dm/dt) into a radius</span>
 <span class="sd">    change rate (dr/dt). The equation is:</span>
@@ -18136,7 +18136,7 @@ change rate (dr/dt). The equation is:</p>
 <span class="sd">        - The radius growth (or evaporation) rate [m/s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Single value input&quot;</span>
+<span class="sd">        ```py title="Single value input"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.dynamics.radius_transfer_rate(</span>
 <span class="sd">            mass_rate=1e-21,</span>
@@ -18146,7 +18146,7 @@ change rate (dr/dt). The equation is:</p>
 <span class="sd">        # Output: 7.95774715e-14</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ```py title=&quot;Array input&quot;</span>
+<span class="sd">        ```py title="Array input"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.dynamics.radius_transfer_rate(</span>
 <span class="sd">            mass_rate=np.array([1e-21, 2e-21]),</span>
@@ -18155,7 +18155,7 @@ change rate (dr/dt). The equation is:</p>
 <span class="sd">        )</span>
 <span class="sd">        # Output: array([7.95774715e-14, 1.98943679e-14])</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Type narrowing: handle 2D mass_rate with array particle_radius</span>
     <span class="n">radius_for_calc</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="n">particle_radius</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mass_rate</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">mass_rate</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
@@ -18368,12 +18368,12 @@ constraints.</p>
 <span class="normal">255</span>
 <span class="normal">256</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;latent_heat&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;vapor_pressure_surface&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;thermal_conductivity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"latent_heat"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"vapor_pressure_surface"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"thermal_conductivity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_thermal_resistance_factor</span><span class="p">(</span>
@@ -18384,7 +18384,7 @@ constraints.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the thermal resistance factor for mass transfer.</span>
+<span class="w">    </span><span class="sd">"""Calculate the thermal resistance factor for mass transfer.</span>
 
 <span class="sd">    Uses the non-isothermal correction from Topping &amp; Bane (2022),</span>
 <span class="sd">    Equation 2.36. Inputs include diffusion coefficient D [m²/s],</span>
@@ -18414,7 +18414,7 @@ constraints.</p>
 <span class="sd">    References:</span>
 <span class="sd">        - Topping, D., &amp; Bane, M. (2022). Introduction to Aerosol</span>
 <span class="sd">          Modelling. Equation 2.36.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">diffusion_coefficient</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">diffusion_coefficient</span><span class="p">)</span>
     <span class="n">latent_heat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">latent_heat</span><span class="p">)</span>
     <span class="n">vapor_pressure_surface</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vapor_pressure_surface</span><span class="p">)</span>
@@ -18437,7 +18437,7 @@ constraints.</p>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">thermal_factor</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Thermal resistance factor must be positive; check inputs.&quot;</span>
+            <span class="s2">"Thermal resistance factor must be positive; check inputs."</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">thermal_factor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>

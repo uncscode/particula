@@ -16399,7 +16399,7 @@ array of kernel values. Takes precedence over <code>kernel_func</code>.</p>
         <span class="n">Callable</span><span class="p">[[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
     <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform one stochastic coagulation step for a particle population.</span>
+<span class="w">    </span><span class="sd">"""Perform one stochastic coagulation step for a particle population.</span>
 
 <span class="sd">    Particles are binned by radius, kernel values are interpolated for each</span>
 <span class="sd">    bin pair, and random trials determine which collisions occur. Returned</span>
@@ -16423,7 +16423,7 @@ array of kernel values. Takes precedence over <code>kernel_func</code>.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        Array of shape ``(n, 2)`` with ``[small_index, large_index]`` pairs</span>
 <span class="sd">        describing coagulation events.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Bin the particles based on their radii into corresponding kernel</span>
     <span class="c1"># bins</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">bin_indices</span> <span class="o">=</span> <span class="n">_bin_particles</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">kernel_radius</span><span class="p">)</span>
@@ -16478,7 +16478,7 @@ array of kernel values. Takes precedence over <code>kernel_func</code>.</p>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="n">kernel_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">interp_kernel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Kernel interpolator is not initialized.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Kernel interpolator is not initialized."</span><span class="p">)</span>
             <span class="n">kernel_values</span> <span class="o">=</span> <span class="n">interp_kernel</span><span class="p">(</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">small_sample</span><span class="p">,</span> <span class="n">large_sample</span><span class="p">]])</span>
             <span class="p">)</span>
@@ -16531,7 +16531,7 @@ array of kernel values. Takes precedence over <code>kernel_func</code>.</p>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="n">kernel_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">interp_kernel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Kernel interpolator is not initialized.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Kernel interpolator is not initialized."</span><span class="p">)</span>
             <span class="n">kernel_value</span> <span class="o">=</span> <span class="n">interp_kernel</span><span class="p">(</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
                     <span class="p">(</span>
@@ -16720,7 +16720,7 @@ stored in <code>gain</code>.</p>
     <span class="n">small_index</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
     <span class="n">large_index</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update particle radii and track losses and gains from coagulation.</span>
+<span class="w">    </span><span class="sd">"""Update particle radii and track losses and gains from coagulation.</span>
 
 <span class="sd">    Smaller particles indexed by ``small_index`` are removed and their radii</span>
 <span class="sd">    recorded in ``loss``. The corresponding larger particles indexed by</span>
@@ -16736,7 +16736,7 @@ stored in <code>gain</code>.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Updated particle radii, loss, and gain arrays after coagulation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Calculate base volumes from pre-update radii.</span>
     <span class="n">base_volume</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">small_volume</span> <span class="o">=</span> <span class="n">base_volume</span><span class="p">[</span><span class="n">small_index</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>

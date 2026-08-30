@@ -16212,15 +16212,15 @@ mass fractions if input is 1D.</li>
 <span class="normal">92</span>
 <span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mole_fractions&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;molecular_weights&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"mole_fractions"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"molecular_weights"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_mass_fractions_from_moles</span><span class="p">(</span>
     <span class="n">mole_fractions</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">molecular_weights</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert mole fractions to mass fractions for N components.</span>
+<span class="w">    </span><span class="sd">"""Convert mole fractions to mass fractions for N components.</span>
 
 <span class="sd">    The relationship between mass fraction (wᵢ) and mole fraction (xᵢ) is:</span>
 
@@ -16242,7 +16242,7 @@ mass fractions if input is 1D.</li>
 <span class="sd">          mass fractions if input is 1D.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example 1: 1D&quot;</span>
+<span class="sd">        ``` py title="Example 1: 1D"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        x_1d = np.array([0.2, 0.5, 0.3])    # mole fractions</span>
@@ -16251,7 +16251,7 @@ mass fractions if input is 1D.</li>
 <span class="sd">        # Output: ([0.379..., 0.620..., 0.0])</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Example 2: 2D&quot;</span>
+<span class="sd">        ``` py title="Example 2: 2D"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        x_2d = np.array([</span>
@@ -16263,9 +16263,9 @@ mass fractions if input is 1D.</li>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Wikipedia contributors, &quot;Mass fraction (chemistry),&quot; Wikipedia,</span>
+<span class="sd">        - Wikipedia contributors, "Mass fraction (chemistry)," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Mass_fraction_(chemistry).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Multiply component-wise: xᵢ × Mᵢ</span>
     <span class="c1"># (Broadcasting handles 2D vs. 1D shapes automatically)</span>
     <span class="n">partial_masses</span> <span class="o">=</span> <span class="n">mole_fractions</span> <span class="o">*</span> <span class="n">molecular_weights</span>
@@ -16294,7 +16294,7 @@ mass fractions if input is 1D.</li>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">mass_fractions</span>
 
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mole_fractions must be either 1D or 2D&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"mole_fractions must be either 1D or 2D"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

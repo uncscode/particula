@@ -16119,13 +16119,13 @@
 <span class="c1"># Step 1: Build your individual strategies</span>
 <span class="n">brownian_strategy</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># using a builder for the Brownian kernel</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
 <span class="n">turbulent_strategy</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># directly creating the strategy</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">TurbulentShearCoagulationStrategy</span><span class="p">(</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
         <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>    <span class="c1"># example value [m^2/s^3]</span>
         <span class="n">fluid_density</span><span class="o">=</span><span class="mf">1.225</span>            <span class="c1"># air at sea level [kg/m^3]</span>
     <span class="p">)</span>

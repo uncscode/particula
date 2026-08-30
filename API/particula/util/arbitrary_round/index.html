@@ -16041,7 +16041,7 @@
 
 
 <a href="#particula.util.arbitrary_round.get_arbitrary_round" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_arbitrary_round</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">ndarray</span><span class="p">],</span> <span class="n">base</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;round&#39;</span><span class="p">,</span> <span class="n">nonzero_edge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_arbitrary_round</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">ndarray</span><span class="p">],</span> <span class="n">base</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'round'</span><span class="p">,</span> <span class="n">nonzero_edge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16104,13 +16104,13 @@ original values.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.7</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'round'</span><span class="p">))</span>
 <span class="c1"># Output: [1.  2.  4.  4.]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;floor&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'floor'</span><span class="p">))</span>
 <span class="c1"># Output: [1.  2.  3.5 4. ]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_arbitrary_round</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'round'</span><span class="p">))</span>
 <span class="c1"># Output: 2.0</span>
 </code></pre></div>
 
@@ -16193,18 +16193,18 @@ original values.</p>
 <span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_arbitrary_round</span><span class="p">(</span>
     <span class="n">values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
     <span class="n">base</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
-    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;round&quot;</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"round"</span><span class="p">,</span>
     <span class="n">nonzero_edge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Round values to the nearest multiple of a specified base.</span>
+<span class="w">    </span><span class="sd">"""Round values to the nearest multiple of a specified base.</span>
 
-<span class="sd">    The function supports &quot;round&quot;, &quot;floor&quot;, or &quot;ceil&quot; modes, and can retain</span>
+<span class="sd">    The function supports "round", "floor", or "ceil" modes, and can retain</span>
 <span class="sd">    original nonzero values if rounding returns zero.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - values : The values to be rounded.</span>
 <span class="sd">        - base : Positive float indicating the rounding interval.</span>
-<span class="sd">        - mode : Rounding mode, one of [&#39;round&#39;, &#39;floor&#39;, &#39;ceil&#39;].</span>
+<span class="sd">        - mode : Rounding mode, one of ['round', 'floor', 'ceil'].</span>
 <span class="sd">        - nonzero_edge : If True, zeros after rounding are replaced with the</span>
 <span class="sd">            original values.</span>
 
@@ -16212,35 +16212,35 @@ original values.</p>
 <span class="sd">        - The input values rounded according to the specified base and mode.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 
 <span class="sd">        arr = np.array([1.2, 2.5, 3.7, 4.0])</span>
-<span class="sd">        print(par.get_arbitrary_round(arr, base=1.0, mode=&#39;round&#39;))</span>
+<span class="sd">        print(par.get_arbitrary_round(arr, base=1.0, mode='round'))</span>
 <span class="sd">        # Output: [1.  2.  4.  4.]</span>
 
-<span class="sd">        print(par.get_arbitrary_round(arr, base=0.5, mode=&#39;floor&#39;))</span>
+<span class="sd">        print(par.get_arbitrary_round(arr, base=0.5, mode='floor'))</span>
 <span class="sd">        # Output: [1.  2.  3.5 4. ]</span>
 
-<span class="sd">        print(par.get_arbitrary_round(2.5, base=1.0, mode=&#39;round&#39;))</span>
+<span class="sd">        print(par.get_arbitrary_round(2.5, base=1.0, mode='round'))</span>
 <span class="sd">        # Output: 2.0</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Rounding,&quot; Python Documentation, docs.python.org.</span>
-<span class="sd">        - &quot;NumPy Rounding,&quot; NumPy Documentation, NumPy.org.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - "Rounding," Python Documentation, docs.python.org.</span>
+<span class="sd">        - "NumPy Rounding," NumPy Documentation, NumPy.org.</span>
+<span class="sd">    """</span>
     <span class="c1"># Check if values is a NumPy array</span>
     <span class="n">working_values</span> <span class="o">=</span> <span class="n">get_coerced_type</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
     <span class="n">base</span> <span class="o">=</span> <span class="n">get_coerced_type</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
 
     <span class="c1"># Validate base parameter</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">or</span> <span class="n">base</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;base must be a positive float&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"base must be a positive float"</span><span class="p">)</span>
     <span class="c1"># Validate mode parameter</span>
-    <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="s2">&quot;floor&quot;</span><span class="p">,</span> <span class="s2">&quot;ceil&quot;</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mode must be one of [&#39;round&#39;, &#39;floor&#39;, &#39;ceil&#39;]&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"round"</span><span class="p">,</span> <span class="s2">"floor"</span><span class="p">,</span> <span class="s2">"ceil"</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"mode must be one of ['round', 'floor', 'ceil']"</span><span class="p">)</span>
 
     <span class="c1"># Calculate rounding factors</span>
     <span class="n">factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
@@ -16248,7 +16248,7 @@ original values.</p>
     <span class="c1"># Compute rounded values</span>
     <span class="n">rounded</span> <span class="o">=</span> <span class="n">base</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span>
         <span class="n">working_values</span> <span class="o">/</span> <span class="n">base</span>
-        <span class="o">+</span> <span class="n">factor</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;floor&quot;</span><span class="p">,</span> <span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="s2">&quot;ceil&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mode</span><span class="p">)]</span>
+        <span class="o">+</span> <span class="n">factor</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">"floor"</span><span class="p">,</span> <span class="s2">"round"</span><span class="p">,</span> <span class="s2">"ceil"</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mode</span><span class="p">)]</span>
     <span class="p">)</span>
 
     <span class="c1"># Apply round_nonzero mode</span>

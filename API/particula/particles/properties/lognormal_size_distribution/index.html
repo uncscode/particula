@@ -16249,10 +16249,10 @@ across the provided x_values. Mathematically, for each mode i:</p>
 <span class="normal">89</span>
 <span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;x_values&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;geometric_standard_deviation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;number_of_particles&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"x_values"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"geometric_standard_deviation"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"number_of_particles"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_lognormal_pdf_distribution</span><span class="p">(</span>
@@ -16261,7 +16261,7 @@ across the provided x_values. Mathematically, for each mode i:</p>
     <span class="n">geometric_standard_deviation</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">number_of_particles</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a lognormal probability density function (PDF) for given modes.</span>
+<span class="w">    </span><span class="sd">"""Compute a lognormal probability density function (PDF) for given modes.</span>
 
 <span class="sd">    This function superimposes multiple lognormal PDFs, each with its own mode,</span>
 <span class="sd">    geometric standard deviation, and particle count. It then returns their sum</span>
@@ -16280,7 +16280,7 @@ across the provided x_values. Mathematically, for each mode i:</p>
 <span class="sd">        - 1D array of the total PDF values summed across all modes.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        x_vals = np.linspace(1e-9, 1e-6, 100)</span>
@@ -16297,7 +16297,7 @@ across the provided x_values. Mathematically, for each mode i:</p>
 <span class="sd">        - [Log-normal Distribution Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)</span>
 <span class="sd">        - [Probability Density Function Wikipedia](https://en.wikipedia.org/wiki/Probability_density_function)</span>
 <span class="sd">        - [Scipy Lognorm Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
         <span class="n">x_values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="ow">and</span> <span class="n">geometric_standard_deviation</span><span class="o">.</span><span class="n">shape</span>
@@ -16305,8 +16305,8 @@ across the provided x_values. Mathematically, for each mode i:</p>
         <span class="o">==</span> <span class="n">number_of_particles</span><span class="o">.</span><span class="n">shape</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;The shapes of geometric_standard_deviation, &quot;</span>
-            <span class="s2">&quot;mode, and number_of_particles must match.&quot;</span>
+            <span class="s2">"The shapes of geometric_standard_deviation, "</span>
+            <span class="s2">"mode, and number_of_particles must match."</span>
         <span class="p">)</span>
 
     <span class="c1"># Calculate PDF for each set of parameters</span>
@@ -16492,10 +16492,10 @@ integrating (or summing) over x_values. The result reflects discrete mass
 <span class="normal">162</span>
 <span class="normal">163</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;x_values&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;geometric_standard_deviation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;number_of_particles&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"x_values"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"geometric_standard_deviation"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"number_of_particles"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_lognormal_pmf_distribution</span><span class="p">(</span>
@@ -16504,7 +16504,7 @@ integrating (or summing) over x_values. The result reflects discrete mass
     <span class="n">geometric_standard_deviation</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">number_of_particles</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a lognormal probability mass function (PMF) for given modes.</span>
+<span class="w">    </span><span class="sd">"""Compute a lognormal probability mass function (PMF) for given modes.</span>
 
 <span class="sd">    This function first calculates the lognormal PDF using</span>
 <span class="sd">    get_lognormal_pdf_distribution(), then converts it to a PMF by</span>
@@ -16521,7 +16521,7 @@ integrating (or summing) over x_values. The result reflects discrete mass
 <span class="sd">        - 1D array of the total PMF values summed across all modes.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        x_vals = np.linspace(1e-9, 1e-6, 100)</span>
@@ -16538,7 +16538,7 @@ integrating (or summing) over x_values. The result reflects discrete mass
 <span class="sd">        - [Log-normal Distribution Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)</span>
 <span class="sd">        - [Probability Mass Function Wikipedia](https://en.wikipedia.org/wiki/Probability_mass_function)</span>
 <span class="sd">        - [Scipy Lognorm Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">distribution_pdf</span> <span class="o">=</span> <span class="n">get_lognormal_pdf_distribution</span><span class="p">(</span>
         <span class="n">x_values</span><span class="o">=</span><span class="n">x_values</span><span class="p">,</span>
         <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
@@ -16742,10 +16742,10 @@ combined according to the relative number of particles in each mode.</p>
 <span class="normal">248</span>
 <span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;geometric_standard_deviation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;number_of_particles&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;number_of_samples&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"geometric_standard_deviation"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"number_of_particles"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"number_of_samples"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_lognormal_sample_distribution</span><span class="p">(</span>
@@ -16757,7 +16757,7 @@ combined according to the relative number of particles in each mode.</p>
     <span class="n">lower_bound</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
     <span class="c1"># pylint: disable=too-many-arguments, too-many-positional-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate random samples from a lognormal distribution for given modes.</span>
+<span class="w">    </span><span class="sd">"""Generate random samples from a lognormal distribution for given modes.</span>
 
 <span class="sd">    This function uses scipy.stats.lognorm.rvs() to draw samples for each mode,</span>
 <span class="sd">    with a specified scale (mode) and shape (GSD). The total samples are then</span>
@@ -16773,7 +16773,7 @@ combined according to the relative number of particles in each mode.</p>
 <span class="sd">        - 1D array of sampled particle sizes, combining all modes.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_lognormal_sample_distribution(</span>
@@ -16789,7 +16789,7 @@ combined according to the relative number of particles in each mode.</p>
 <span class="sd">        - [Log-normal Distribution Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)</span>
 <span class="sd">        - [Probability Density Function Wikipedia](https://en.wikipedia.org/wiki/Probability_density_function)</span>
 <span class="sd">        - [Scipy Lognorm Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Calculate PDF for each set of parameters</span>
     <span class="n">distribution</span> <span class="o">=</span> <span class="n">lognorm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span>
         <span class="n">s</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">geometric_standard_deviation</span><span class="p">),</span>

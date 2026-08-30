@@ -16261,11 +16261,11 @@ partitioned to the particle phase.</p>
 <span class="normal">57</span>
 <span class="normal">58</span>
 <span class="normal">59</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the number of species in the gas mixture.</span>
+<span class="w">    </span><span class="sd">"""Return the number of species in the gas mixture.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - The number of gas species in the mixture.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partitioning_species</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gas_only_species</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16318,16 +16318,16 @@ gas only species.</li>
 <span class="normal">70</span>
 <span class="normal">71</span>
 <span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide a string representation of the Atmosphere object.</span>
+<span class="w">    </span><span class="sd">"""Provide a string representation of the Atmosphere object.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Includes the temperature, pressure, and lists of partitioning and</span>
 <span class="sd">          gas only species.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;Gas mixture at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2"> K, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">total_pressure</span><span class="si">}</span><span class="s2"> Pa, &quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;partitioning=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">partitioning_species</span><span class="si">}</span><span class="s2">, &quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;gas_only_species=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gas_only_species</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">"Gas mixture at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2"> K, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">total_pressure</span><span class="si">}</span><span class="s2"> Pa, "</span>
+        <span class="sa">f</span><span class="s2">"partitioning=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">partitioning_species</span><span class="si">}</span><span class="s2">, "</span>
+        <span class="sa">f</span><span class="s2">"gas_only_species=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gas_only_species</span><span class="si">}</span><span class="s2">"</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16372,11 +16372,11 @@ gas only species.</li>
 <span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_gas_only_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a GasSpecies to gas only (nonpartitioning) species list.</span>
+<span class="w">    </span><span class="sd">"""Add a GasSpecies to gas only (nonpartitioning) species list.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - gas_species : The gas species to be added.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">gas_only_species</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16421,11 +16421,11 @@ gas only species.</li>
 <span class="normal">41</span>
 <span class="normal">42</span>
 <span class="normal">43</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_partitioning_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a GasSpecies object to the partitioning species list.</span>
+<span class="w">    </span><span class="sd">"""Add a GasSpecies object to the partitioning species list.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - gas_species : The gas species to be added.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

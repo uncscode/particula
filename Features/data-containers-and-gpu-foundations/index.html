@@ -16822,15 +16822,15 @@ state, identity, or mutation guarantee.</p>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">LocalAdapter</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example-local adapter contract.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Example-local adapter contract."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return this example&#39;s message unchanged.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return this example's message unchanged."""</span>
         <span class="k">return</span> <span class="n">message</span>
 
 
-<span class="n">device</span> <span class="o">=</span> <span class="n">Device</span><span class="p">(</span><span class="n">Backend</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-<span class="n">process</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="s2">&quot;condensation&quot;</span><span class="p">)</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">Device</span><span class="p">(</span><span class="n">Backend</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">process</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="s2">"condensation"</span><span class="p">)</span>
 <span class="n">requirements</span> <span class="o">=</span> <span class="n">CapabilityRequirements</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">())</span>
 <span class="n">matrix</span> <span class="o">=</span> <span class="n">CapabilityMatrix</span><span class="p">(</span>
     <span class="nb">frozenset</span><span class="p">(</span>
@@ -16844,7 +16844,7 @@ state, identity, or mutation guarantee.</p>
 
 <span class="n">selected</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
 <span class="k">assert</span> <span class="n">selected</span> <span class="ow">is</span> <span class="n">adapter</span>
-<span class="k">assert</span> <span class="n">selected</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;example-local result&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;example-local result&quot;</span>
+<span class="k">assert</span> <span class="n">selected</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"example-local result"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"example-local result"</span>
 </code></pre></div>
 <p><code>selected is adapter</code> proves selection preserves adapter identity. No adapter
 <code>execute</code> call occurs before the final assertion, which the caller invokes.
@@ -17202,10 +17202,10 @@ pytest<span class="w"> </span>particula/execution/tests/<span class="w"> </span>
 <span class="w">  </span>--cov-report<span class="o">=</span>term-missing<span class="w"> </span>--cov-fail-under<span class="o">=</span><span class="m">80</span>
 mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
 pytest<span class="w"> </span>particula/execution/tests/multi_box_loop_test.py<span class="w"> </span>-q<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span>
+<span class="w">  </span>-m<span class="w"> </span><span class="s2">"warp and cuda"</span>
 pytest<span class="w"> </span>particula/execution/tests/condensation_integration_test.py<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>particula/execution/tests/coagulation_integration_test.py<span class="w"> </span>-q<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span>
+<span class="w">  </span>-m<span class="w"> </span><span class="s2">"warp and cuda"</span>
 </code></pre></div>
 <p>Acceptance classes remain separate: deterministic comparisons use their owning
 explicit <code>rtol</code>/<code>atol</code>; closed concentration-weighted inventory and ledger
@@ -17567,7 +17567,7 @@ saturation ratio belong to <code>EnvironmentData</code>.</p>
 <span class="p">)</span>
 
 <span class="n">gas_data</span> <span class="o">=</span> <span class="n">GasData</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Water&quot;</span><span class="p">,</span> <span class="s2">&quot;H2SO4&quot;</span><span class="p">],</span>
+    <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s2">"Water"</span><span class="p">,</span> <span class="s2">"H2SO4"</span><span class="p">],</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.098</span><span class="p">]),</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">2e-10</span><span class="p">]]),</span>
     <span class="n">partitioning</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]),</span>
@@ -17635,7 +17635,7 @@ re-exported by <code>particula.gpu.kernels</code> or <code>particula.gpu</code>:
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.wall_loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeutralWallLossConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">NeutralWallLossConfig</span><span class="p">(</span>
-    <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="s2">"spherical"</span><span class="p">,</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
     <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># m</span>
 <span class="p">)</span>
@@ -17747,7 +17747,7 @@ helper boundary when particle-resident arrays must move between CPU-owned
 containers and Warp-owned storage:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_warp_particle_data</span><span class="p">,</span> <span class="n">to_warp_particle_data</span>
 
-<span class="n">gpu_particle</span> <span class="o">=</span> <span class="n">to_warp_particle_data</span><span class="p">(</span><span class="n">particle_data</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="n">gpu_particle</span> <span class="o">=</span> <span class="n">to_warp_particle_data</span><span class="p">(</span><span class="n">particle_data</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
 <span class="n">restored_particle</span> <span class="o">=</span> <span class="n">from_warp_particle_data</span><span class="p">(</span><span class="n">gpu_particle</span><span class="p">)</span>
 </code></pre></div>
 <p>Across this boundary, the shipped particle schema stays aligned:</p>
@@ -18005,7 +18005,7 @@ boundary:</p>
     <span class="n">to_warp_environment_data</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">gpu_environment</span> <span class="o">=</span> <span class="n">to_warp_environment_data</span><span class="p">(</span><span class="n">environment</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="n">gpu_environment</span> <span class="o">=</span> <span class="n">to_warp_environment_data</span><span class="p">(</span><span class="n">environment</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
 <span class="n">restored_environment</span> <span class="o">=</span> <span class="n">from_warp_environment_data</span><span class="p">(</span><span class="n">gpu_environment</span><span class="p">)</span>
 </code></pre></div>
 <p>Across this boundary, shapes stay fixed:</p>
@@ -18073,7 +18073,7 @@ field or a source of hidden CPU↔Warp synchronization.</p>
 <span class="n">vapor_pressure</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">2330.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">]])</span>
 <span class="n">gpu_gas</span> <span class="o">=</span> <span class="n">to_warp_gas_data</span><span class="p">(</span>
     <span class="n">gas_data</span><span class="p">,</span>
-    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">,</span>
     <span class="n">vapor_pressure</span><span class="o">=</span><span class="n">vapor_pressure</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">restored_gas</span> <span class="o">=</span> <span class="n">from_warp_gas_data</span><span class="p">(</span><span class="n">gpu_gas</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">gas_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -18258,7 +18258,7 @@ the baseline whenever Warp is installed; CUDA is optional, availability-guarded,
 and separately marked. Warp-dependent test imports are lazy, so marker-
 deselected collection does not require Warp. Focused direct-kernel and CPU
 integration smoke commands are:</p>
-<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>--collect-only<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not warp&quot;</span>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>--collect-only<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"not warp"</span>
 pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/integration_tests/condensation_particle_resolved_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 </code></pre></div>
@@ -18522,8 +18522,8 @@ the other evidence classes.</p>
 parity matrix, inventory conservation checks, and latent-heat energy/bookkeeping
 checks are separate: no one class proves either of the others.</p>
 <p><strong>Optional/local CUDA evidence:</strong></p>
-<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
-pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"warp and cuda"</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"warp and cuda"</span><span class="w"> </span>-Werror
 </code></pre></div>
 <p>This is additive to the required Warp <code>device="cpu"</code> baseline and skips
 cleanly when CUDA is unavailable.</p>

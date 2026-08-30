@@ -16166,7 +16166,7 @@ problems.</p>
 <span class="normal">111</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_reduced_self_broadcast</span><span class="p">(</span>
     <span class="n">alpha_array</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a square matrix of pairwise reduced values using a single array.</span>
+<span class="w">    </span><span class="sd">"""Return a square matrix of pairwise reduced values using a single array.</span>
 
 <span class="sd">    Each element is calculated by broadcasting the array with its transpose:</span>
 <span class="sd">    - r_ij = (α_i × α_j) / (α_i + α_j),</span>
@@ -16179,7 +16179,7 @@ problems.</p>
 <span class="sd">        - A 2D square matrix of pairwise reduced values.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        from particula.util.reduced_quantity import get_reduced_self_broadcast</span>
 <span class="sd">        import numpy as np</span>
 
@@ -16192,13 +16192,13 @@ problems.</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - [Reduced Mass, Wikipedia](https://en.wikipedia.org/wiki/Reduced_mass)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Use broadcasting to create matrix and its transpose</span>
     <span class="n">alpha_matrix</span> <span class="o">=</span> <span class="n">alpha_array</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
     <span class="n">alpha_matrix_transpose</span> <span class="o">=</span> <span class="n">alpha_array</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
     <span class="n">denominator</span> <span class="o">=</span> <span class="n">alpha_matrix</span> <span class="o">+</span> <span class="n">alpha_matrix_transpose</span>
     <span class="c1"># Perform element-wise multiplication and division with np.errstate</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
             <span class="n">denominator</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">alpha_matrix</span> <span class="o">*</span> <span class="n">alpha_matrix_transpose</span> <span class="o">/</span> <span class="n">denominator</span><span class="p">,</span>
@@ -16355,7 +16355,7 @@ problems.</p>
     <span class="n">alpha</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the reduced value of two parameters.</span>
+<span class="w">    </span><span class="sd">"""Return the reduced value of two parameters.</span>
 
 <span class="sd">    The reduced value is computed using:</span>
 <span class="sd">    - r = (α × β) / (α + β),</span>
@@ -16373,7 +16373,7 @@ problems.</p>
 <span class="sd">        - ValueError : If arrays have incompatible shapes.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        from particula.util.reduced_quantity import get_reduced_value</span>
 <span class="sd">        import numpy as np</span>
 
@@ -16388,20 +16388,20 @@ problems.</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - [Reduced Mass, Wikipedia](https://en.wikipedia.org/wiki/Reduced_mass)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Ensure input compatibility, especially when both are arrays</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="nb">isinstance</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="ow">and</span> <span class="p">(</span><span class="n">alpha</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">beta</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;The shapes of alpha and beta must be identical.&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The shapes of alpha and beta must be identical.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"The shapes of alpha and beta must be identical."</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"The shapes of alpha and beta must be identical."</span><span class="p">)</span>
 
     <span class="c1"># Calculation of the reduced value, with safety against division by zero</span>
     <span class="n">denominator</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">+</span> <span class="n">beta</span>
     <span class="c1"># Using np.errstate to suppress divide by zero warnings</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">denominator</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">/</span> <span class="n">denominator</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>

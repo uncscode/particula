@@ -16158,15 +16158,15 @@ fluid flow. Mathematically:</p>
 <span class="normal">52</span>
 <span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_inertia_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kolmogorov_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_inertia_time"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"kolmogorov_time"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_stokes_number</span><span class="p">(</span>
     <span class="n">particle_inertia_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">kolmogorov_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the Stokes number (St) to measure particle inertia relative to</span>
+<span class="w">    </span><span class="sd">"""Compute the Stokes number (St) to measure particle inertia relative to</span>
 <span class="sd">    fluid flow.</span>
 
 <span class="sd">    The Stokes number is a dimensionless parameter reflecting how much a</span>
@@ -16187,7 +16187,7 @@ fluid flow. Mathematically:</p>
 <span class="sd">        - Dimensionless Stokes number (float or NDArray[np.float64]).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_stokes_number(1e-3, 2e-3)</span>
 <span class="sd">        # Output: 0.5</span>
@@ -16197,7 +16197,7 @@ fluid flow. Mathematically:</p>
 <span class="sd">        - [Stokes number, Wikipedia](https://en.wikipedia.org/wiki/Stokes_number)</span>
 <span class="sd">        - Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric Chemistry and</span>
 <span class="sd">          Physics, 3rd ed., Wiley-Interscience.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">particle_inertia_time</span> <span class="o">/</span> <span class="n">kolmogorov_time</span>
 </code></pre></div></td></tr></table></div>
             </details>

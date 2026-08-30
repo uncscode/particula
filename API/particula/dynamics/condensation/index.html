@@ -17006,15 +17006,15 @@
         <span class="n">CondensationIsothermalStaggeredBuilder</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the mapping of strategy types to builder instances.</span>
+<span class="w">    </span><span class="sd">"""Return the mapping of strategy types to builder instances.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dictionary mapping condensation strategy names to builders.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;isothermal&quot;</span><span class="p">:</span> <span class="n">CondensationIsothermalBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;isothermal_staggered&quot;</span><span class="p">:</span> <span class="n">CondensationIsothermalStaggeredBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;latent_heat&quot;</span><span class="p">:</span> <span class="n">CondensationLatentHeatBuilder</span><span class="p">(),</span>
+        <span class="s2">"isothermal"</span><span class="p">:</span> <span class="n">CondensationIsothermalBuilder</span><span class="p">(),</span>
+        <span class="s2">"isothermal_staggered"</span><span class="p">:</span> <span class="n">CondensationIsothermalStaggeredBuilder</span><span class="p">(),</span>
+        <span class="s2">"latent_heat"</span><span class="p">:</span> <span class="n">CondensationLatentHeatBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17259,7 +17259,7 @@ inputs.</p>
     <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VaporPressureStrategy</span><span class="p">]</span>
     <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the CondensationIsothermal strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the CondensationIsothermal strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        molar_mass: Molar mass of the species [kg/mol].</span>
@@ -17272,7 +17272,7 @@ inputs.</p>
 <span class="sd">        surface_strategy: Surface strategy used for ParticleData inputs.</span>
 <span class="sd">        vapor_pressure_strategy: Vapor pressure strategy used for GasData</span>
 <span class="sd">            inputs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
         <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="n">diffusion_coefficient</span><span class="p">,</span>
@@ -17485,7 +17485,7 @@ order transport calculation.</p>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
     <span class="c1"># pylint: disable=too-many-positional-arguments, too-many-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the isothermal mass transfer rate per particle.</span>
+<span class="w">    </span><span class="sd">"""Compute the isothermal mass transfer rate per particle.</span>
 
 <span class="sd">    Particle radii are filled for zeros, clipped to the minimum valid</span>
 <span class="sd">    radius, and the resulting pressure delta is converted to a mass transfer</span>
@@ -17505,17 +17505,17 @@ order transport calculation.</p>
 <span class="sd">        Mass transfer rate per particle and per species in kg/s.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example – Mass-transfer rate&quot;</span>
+<span class="sd">        ```py title="Example – Mass-transfer rate"</span>
 <span class="sd">        m_rate = iso_cond.mass_transfer_rate(</span>
 <span class="sd">            particle, gas_species, 298.15, 101325</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle_data</span><span class="p">,</span> <span class="n">particle_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">gas_data</span><span class="p">,</span> <span class="n">gas_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_gas</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
     <span class="n">_require_matching_types</span><span class="p">(</span><span class="n">particle_is_legacy</span><span class="p">,</span> <span class="n">gas_is_legacy</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;GasData&quot;</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"ParticleData"</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"GasData"</span><span class="p">)</span>
 
     <span class="n">radius_with_fill</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill_zero_radius</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
@@ -17716,7 +17716,7 @@ matching the particle inventory shape.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the condensation rate per particle or bin.</span>
+<span class="w">    </span><span class="sd">"""Compute the condensation rate per particle or bin.</span>
 
 <span class="sd">    Mass transfer rates are multiplied by particle concentration, optional</span>
 <span class="sd">    skip-partitioning is applied, and the result is returned as an array</span>
@@ -17732,16 +17732,16 @@ matching the particle inventory shape.</p>
 <span class="sd">        Condensation rate in kg/s per particle or bin.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example – Condensation rate array&quot;</span>
+<span class="sd">        ```py title="Example – Condensation rate array"</span>
 <span class="sd">        rates = iso_cond.rate(particle, gas_species, 298.15, 101325)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Calculate the mass transfer rate due to condensation</span>
     <span class="n">particle_data</span><span class="p">,</span> <span class="n">particle_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">gas_data</span><span class="p">,</span> <span class="n">gas_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_gas</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
     <span class="n">_require_matching_types</span><span class="p">(</span><span class="n">particle_is_legacy</span><span class="p">,</span> <span class="n">gas_is_legacy</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;GasData&quot;</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"ParticleData"</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"GasData"</span><span class="p">)</span>
 
     <span class="n">mass_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_transfer_rate</span><span class="p">(</span>
         <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
@@ -18020,7 +18020,7 @@ inventory limits.</p>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Advance the simulation one timestep using isothermal condensation.</span>
+<span class="w">    </span><span class="sd">"""Advance the simulation one timestep using isothermal condensation.</span>
 
 <span class="sd">    The mass transfer rate is computed, optional skip-partitioning applied,</span>
 <span class="sd">    and both the particle and gas states are updated while respecting</span>
@@ -18042,15 +18042,15 @@ inventory limits.</p>
 <span class="sd">            particle, gas_species, 298.15, 101325, 1.0</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span>
 
     <span class="c1"># Calculate the mass transfer rate</span>
     <span class="n">particle_data</span><span class="p">,</span> <span class="n">particle_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">gas_data</span><span class="p">,</span> <span class="n">gas_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_gas</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
     <span class="n">_require_matching_types</span><span class="p">(</span><span class="n">particle_is_legacy</span><span class="p">,</span> <span class="n">gas_is_legacy</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;GasData&quot;</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"ParticleData"</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"GasData"</span><span class="p">)</span>
 
     <span class="n">mass_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_transfer_rate</span><span class="p">(</span>
         <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
@@ -18199,16 +18199,16 @@ diffusion coefficient, and accommodation coefficient.</p>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Condensation Isothermal builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Condensation Isothermal builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    CondensationIsothermal strategy, including molar mass,</span>
 <span class="sd">    diffusion coefficient, and accommodation coefficient.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderMolarMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -18266,14 +18266,14 @@ diffusion coefficient, and accommodation coefficient.</p>
 <span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CondensationStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and create a condensation strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and create a condensation strategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
 
     <span class="c1"># Type guards: pre_build_check ensures these are not None</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_coefficient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;diffusion_coefficient must be set&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"diffusion_coefficient must be set"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">accommodation_coefficient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;accommodation_coefficient must be set&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"accommodation_coefficient must be set"</span><span class="p">)</span>
     <span class="n">molar_mass</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">CondensationIsothermal</span><span class="p">(</span>
@@ -18305,7 +18305,7 @@ diffusion coefficient, and accommodation coefficient.</p>
 
 
 <a href="#particula.dynamics.condensation.CondensationIsothermalStaggered" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">CondensationIsothermalStaggered</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">theta_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;half&#39;</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">shuffle_each_step</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">RandomState</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">2e-05</span><span class="p">,</span> <span class="n">accommodation_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">update_gases</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">skip_partitioning_indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">activity_strategy</span><span class="p">:</span> <span class="n">ActivityStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">surface_strategy</span><span class="p">:</span> <span class="n">SurfaceStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">vapor_pressure_strategy</span><span class="p">:</span> <span class="n">VaporPressureStrategy</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VaporPressureStrategy</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">CondensationIsothermalStaggered</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">theta_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'half'</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">shuffle_each_step</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">RandomState</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">2e-05</span><span class="p">,</span> <span class="n">accommodation_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">update_gases</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">skip_partitioning_indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">activity_strategy</span><span class="p">:</span> <span class="n">ActivityStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">surface_strategy</span><span class="p">:</span> <span class="n">SurfaceStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">vapor_pressure_strategy</span><span class="p">:</span> <span class="n">VaporPressureStrategy</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VaporPressureStrategy</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -18621,7 +18621,7 @@ less than 1.</p>
 <span class="normal">1287</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">theta_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;half&quot;</span><span class="p">,</span>
+    <span class="n">theta_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"half"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">shuffle_each_step</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
@@ -18637,7 +18637,7 @@ less than 1.</p>
     <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VaporPressureStrategy</span><span class="p">]</span>
     <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the staggered condensation strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the staggered condensation strategy.</span>
 
 <span class="sd">    This constructor configures theta mode, batching, and RNG options while</span>
 <span class="sd">    reusing diffusion and accommodation settings from the base strategy. The</span>
@@ -18646,8 +18646,8 @@ less than 1.</p>
 
 <span class="sd">    Args:</span>
 <span class="sd">        molar_mass: Molar mass of the condensing species [kg/mol].</span>
-<span class="sd">        theta_mode: Staggered stepping mode; one of ``(&quot;half&quot;, &quot;random&quot;,</span>
-<span class="sd">            &quot;batch&quot;)``.</span>
+<span class="sd">        theta_mode: Staggered stepping mode; one of ``("half", "random",</span>
+<span class="sd">            "batch")``.</span>
 <span class="sd">        num_batches: Requested Gauss-Seidel batch count (&gt;= 1).</span>
 <span class="sd">        shuffle_each_step: When True, shuffle particle order each step;</span>
 <span class="sd">            set False for deterministic sequencing.</span>
@@ -18665,7 +18665,7 @@ less than 1.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``theta_mode`` is unsupported or ``num_batches`` is</span>
 <span class="sd">            less than 1.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
         <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="n">diffusion_coefficient</span><span class="p">,</span>
@@ -18679,11 +18679,11 @@ less than 1.</p>
 
     <span class="k">if</span> <span class="n">theta_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">VALID_THETA_MODES</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;theta_mode must be one of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">VALID_THETA_MODES</span><span class="si">}</span><span class="s2">, got &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">theta_mode</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="sa">f</span><span class="s2">"theta_mode must be one of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">VALID_THETA_MODES</span><span class="si">}</span><span class="s2">, got "</span>
+            <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">theta_mode</span><span class="si">}</span><span class="s2">'"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">num_batches</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;num_batches must be &gt;= 1.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"num_batches must be &gt;= 1."</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">theta_mode</span> <span class="o">=</span> <span class="n">theta_mode</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">num_batches</span> <span class="o">=</span> <span class="n">num_batches</span>
@@ -18866,7 +18866,7 @@ non-finite deltas are zeroed to avoid propagating NaNs or infinities.</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute mass transfer rate for staggered condensation.</span>
+<span class="w">    </span><span class="sd">"""Compute mass transfer rate for staggered condensation.</span>
 
 <span class="sd">    Mirrors the isothermal flow while leaving skip-partitioning to callers.</span>
 <span class="sd">    Radii are filled and clipped to ``MIN_PARTICLE_RADIUS_M`` before</span>
@@ -18884,12 +18884,12 @@ non-finite deltas are zeroed to avoid propagating NaNs or infinities.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        Mass transfer rate per particle per species (kg/s), shaped like</span>
 <span class="sd">        ``particle.get_species_mass()``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle_data</span><span class="p">,</span> <span class="n">particle_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">gas_data</span><span class="p">,</span> <span class="n">gas_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_gas</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
     <span class="n">_require_matching_types</span><span class="p">(</span><span class="n">particle_is_legacy</span><span class="p">,</span> <span class="n">gas_is_legacy</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;GasData&quot;</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"ParticleData"</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"GasData"</span><span class="p">)</span>
 
     <span class="n">radius_with_fill</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fill_zero_radius</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
@@ -19057,7 +19057,7 @@ non-finite deltas are zeroed to avoid propagating NaNs or infinities.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute staggered condensation rate per particle.</span>
+<span class="w">    </span><span class="sd">"""Compute staggered condensation rate per particle.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        particle: Particle representation supplying concentrations.</span>
@@ -19068,12 +19068,12 @@ non-finite deltas are zeroed to avoid propagating NaNs or infinities.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        Condensation/evaporation rate (kg/s) scaled by particle</span>
 <span class="sd">        concentration with skip-partitioning applied.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle_data</span><span class="p">,</span> <span class="n">particle_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">gas_data</span><span class="p">,</span> <span class="n">gas_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_gas</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
     <span class="n">_require_matching_types</span><span class="p">(</span><span class="n">particle_is_legacy</span><span class="p">,</span> <span class="n">gas_is_legacy</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;GasData&quot;</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"ParticleData"</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"GasData"</span><span class="p">)</span>
 
     <span class="n">mass_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_transfer_rate</span><span class="p">(</span>
         <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
@@ -19466,7 +19466,7 @@ True.</p>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform two-pass staggered condensation update.</span>
+<span class="w">    </span><span class="sd">"""Perform two-pass staggered condensation update.</span>
 
 <span class="sd">    The timestep is split into theta and 1 - theta passes. Each pass loops</span>
 <span class="sd">    over Gauss-Seidel batches, updates a working gas concentration after</span>
@@ -19492,14 +19492,14 @@ True.</p>
 <span class="sd">        behavior. Mass changes are applied after both passes with optional</span>
 <span class="sd">        skip-partitioning, and gas updates run only when ``update_gases`` is</span>
 <span class="sd">        True.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span>
 
     <span class="n">particle_data</span><span class="p">,</span> <span class="n">particle_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">gas_data</span><span class="p">,</span> <span class="n">gas_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_gas</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
     <span class="n">_require_matching_types</span><span class="p">(</span><span class="n">particle_is_legacy</span><span class="p">,</span> <span class="n">gas_is_legacy</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;GasData&quot;</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"ParticleData"</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"GasData"</span><span class="p">)</span>
 
     <span class="n">n_particles</span> <span class="o">=</span> <span class="n">particle_data</span><span class="o">.</span><span class="n">concentration</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">time_step</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">n_particles</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -19551,7 +19551,7 @@ True.</p>
         <span class="n">batch_indices</span> <span class="o">=</span> <span class="n">batch_indices</span><span class="p">[</span><span class="n">active_mask</span><span class="p">]</span>
         <span class="n">dt_local</span> <span class="o">=</span> <span class="n">dt_local</span><span class="p">[</span><span class="n">active_mask</span><span class="p">]</span>
         <span class="n">use_vectorized</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_single_particle_transfer</span><span class="p">,</span> <span class="s2">&quot;__func__&quot;</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_single_particle_transfer</span><span class="p">,</span> <span class="s2">"__func__"</span><span class="p">,</span> <span class="kc">None</span>
         <span class="p">)</span> <span class="ow">is</span> <span class="p">(</span>
             <span class="n">CondensationIsothermalStaggered</span><span class="o">.</span><span class="n">_calculate_single_particle_transfer</span>
         <span class="p">)</span>
@@ -19607,7 +19607,7 @@ True.</p>
         <span class="n">batch_indices</span> <span class="o">=</span> <span class="n">batch_indices</span><span class="p">[</span><span class="n">active_mask</span><span class="p">]</span>
         <span class="n">dt_local</span> <span class="o">=</span> <span class="n">dt_local</span><span class="p">[</span><span class="n">active_mask</span><span class="p">]</span>
         <span class="n">use_vectorized</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_single_particle_transfer</span><span class="p">,</span> <span class="s2">&quot;__func__&quot;</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_single_particle_transfer</span><span class="p">,</span> <span class="s2">"__func__"</span><span class="p">,</span> <span class="kc">None</span>
         <span class="p">)</span> <span class="ow">is</span> <span class="p">(</span>
             <span class="n">CondensationIsothermalStaggered</span><span class="o">.</span><span class="n">_calculate_single_particle_transfer</span>
         <span class="p">)</span>
@@ -19754,11 +19754,11 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the builder with required parameters and defaults.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the builder with required parameters and defaults."""</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderMolarMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -19766,7 +19766,7 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
     <span class="n">BuilderAccommodationCoefficientMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderUpdateGasesMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">theta_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;half&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">theta_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"half"</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">num_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_each_step</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
@@ -19826,7 +19826,7 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">224</span>
 <span class="normal">225</span>
 <span class="normal">226</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CondensationStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and create a condensation strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and create a condensation strategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
 
     <span class="c1"># pre_build_check ensures these are not None</span>
@@ -19925,8 +19925,8 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">173</span>
 <span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_num_batches</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationIsothermalStaggeredBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the number of batches for staggered updates.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationIsothermalStaggeredBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the number of batches for staggered updates.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_batches: Number of batches; must be at least 1.</span>
@@ -19936,9 +19936,9 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``num_batches`` is less than 1.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">num_batches</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;num_batches must be &gt;= 1.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"num_batches must be &gt;= 1."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">num_batches</span> <span class="o">=</span> <span class="n">num_batches</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -20020,56 +20020,56 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">132</span>
 <span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationIsothermalStaggeredBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set required and optional parameters from a dictionary.&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationIsothermalStaggeredBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set required and optional parameters from a dictionary."""</span>
     <span class="n">required</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span>
     <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Missing required parameter(s): </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Missing required parameter(s): </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
 
     <span class="n">valid_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
         <span class="n">required</span>
-        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">]</span>
         <span class="o">+</span> <span class="p">[</span>
-            <span class="s2">&quot;theta_mode&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;num_batches&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;shuffle_each_step&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;random_state&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;update_gases&quot;</span><span class="p">,</span>
+            <span class="s2">"theta_mode"</span><span class="p">,</span>
+            <span class="s2">"num_batches"</span><span class="p">,</span>
+            <span class="s2">"shuffle_each_step"</span><span class="p">,</span>
+            <span class="s2">"random_state"</span><span class="p">,</span>
+            <span class="s2">"update_gases"</span><span class="p">,</span>
         <span class="p">]</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">invalid_keys</span> <span class="o">:=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_keys</span><span class="p">]:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Trying to set an invalid parameter(s) &#39;</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;The valid parameter(s) &#39;</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Trying to set an invalid parameter(s) '</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">'. "</span>
+            <span class="sa">f</span><span class="s2">"The valid parameter(s) '</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">'."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">:</span>
-        <span class="n">unit_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span>
+        <span class="n">unit_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span>
         <span class="k">if</span> <span class="n">unit_key</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)(</span>
                 <span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">unit_key</span><span class="p">]</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using default units for parameter: &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Using default units for parameter: '</span><span class="si">%s</span><span class="s2">'."</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
-    <span class="k">if</span> <span class="s2">&quot;theta_mode&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_theta_mode</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;theta_mode&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;num_batches&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_num_batches</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;num_batches&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;shuffle_each_step&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_shuffle_each_step</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;shuffle_each_step&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;random_state&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_random_state</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;random_state&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;update_gases&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;update_gases&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"theta_mode"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_theta_mode</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"theta_mode"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"num_batches"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_num_batches</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"num_batches"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"shuffle_each_step"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_shuffle_each_step</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"shuffle_each_step"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"random_state"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_random_state</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"random_state"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"update_gases"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"update_gases"</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -20141,15 +20141,15 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
     <span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
         <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">]</span>
     <span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationIsothermalStaggeredBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the random state for reproducibility.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationIsothermalStaggeredBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the random state for reproducibility.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        random_state: Seed or RNG controlling random theta generation.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The builder instance for chaining.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -20215,15 +20215,15 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">187</span>
 <span class="normal">188</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_shuffle_each_step</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">:</span> <span class="nb">bool</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationIsothermalStaggeredBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enable or disable shuffling at each step.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationIsothermalStaggeredBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Enable or disable shuffling at each step.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        shuffle: Whether to shuffle particle order every step.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The builder instance for chaining.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_each_step</span> <span class="o">=</span> <span class="n">shuffle</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -20309,22 +20309,22 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">154</span>
 <span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_theta_mode</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">theta_mode</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationIsothermalStaggeredBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the staggered stepping mode.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationIsothermalStaggeredBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the staggered stepping mode.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        theta_mode: One of ``(&quot;half&quot;, &quot;random&quot;, &quot;batch&quot;)``.</span>
+<span class="sd">        theta_mode: One of ``("half", "random", "batch")``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The builder instance for chaining.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``theta_mode`` is not supported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">valid_modes</span> <span class="o">=</span> <span class="n">CondensationIsothermalStaggered</span><span class="o">.</span><span class="n">VALID_THETA_MODES</span>
     <span class="k">if</span> <span class="n">theta_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_modes</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;theta_mode must be one of </span><span class="si">{</span><span class="n">valid_modes</span><span class="si">}</span><span class="s2">, got &#39;</span><span class="si">{</span><span class="n">theta_mode</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="sa">f</span><span class="s2">"theta_mode must be one of </span><span class="si">{</span><span class="n">valid_modes</span><span class="si">}</span><span class="s2">, got '</span><span class="si">{</span><span class="n">theta_mode</span><span class="si">}</span><span class="s2">'"</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">theta_mode</span> <span class="o">=</span> <span class="n">theta_mode</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -20576,7 +20576,7 @@ inputs.</p>
     <span class="n">latent_heat_strategy</span><span class="p">:</span> <span class="n">LatentHeatStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">latent_heat</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the CondensationLatentHeat strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the CondensationLatentHeat strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        molar_mass: Molar mass of the species [kg/mol].</span>
@@ -20591,7 +20591,7 @@ inputs.</p>
 <span class="sd">            inputs.</span>
 <span class="sd">        latent_heat_strategy: Optional latent heat strategy to use.</span>
 <span class="sd">        latent_heat: Scalar latent heat fallback [J/kg].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
         <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="n">diffusion_coefficient</span><span class="p">,</span>
@@ -20815,7 +20815,7 @@ Non-finite inputs raise errors to avoid masked outputs.</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the non-isothermal mass transfer rate per particle.</span>
+<span class="w">    </span><span class="sd">"""Compute the non-isothermal mass transfer rate per particle.</span>
 
 <span class="sd">    This mirrors the isothermal workflow and optionally applies the</span>
 <span class="sd">    latent-heat correction when a latent heat strategy is configured.</span>
@@ -20833,12 +20833,12 @@ Non-finite inputs raise errors to avoid masked outputs.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If pressure deltas or latent-heat inputs are non-finite.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle_data</span><span class="p">,</span> <span class="n">particle_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">gas_data</span><span class="p">,</span> <span class="n">gas_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_gas</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
     <span class="n">_require_matching_types</span><span class="p">(</span><span class="n">particle_is_legacy</span><span class="p">,</span> <span class="n">gas_is_legacy</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;GasData&quot;</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"ParticleData"</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"GasData"</span><span class="p">)</span>
 
     <span class="n">radius_with_fill</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill_zero_radius</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">radius_with_fill</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">radius_with_fill</span><span class="p">,</span> <span class="n">MIN_PARTICLE_RADIUS_M</span><span class="p">)</span>
@@ -20871,10 +20871,10 @@ Non-finite inputs raise errors to avoid masked outputs.</p>
 
     <span class="n">latent_heat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_latent_heat_strategy</span><span class="o">.</span><span class="n">latent_heat</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">latent_heat</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;latent_heat must be finite.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"latent_heat must be finite."</span><span class="p">)</span>
     <span class="n">thermal_conductivity</span> <span class="o">=</span> <span class="n">get_thermal_conductivity</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">thermal_conductivity</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;thermal_conductivity must be finite.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"thermal_conductivity must be finite."</span><span class="p">)</span>
     <span class="n">vapor_pressure_surface</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_vapor_pressure_surface</span><span class="p">(</span>
         <span class="n">particle</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">radius_with_fill</span>
     <span class="p">)</span>
@@ -21028,7 +21028,7 @@ the configured skip-partitioning indices are applied.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the condensation rate per particle or bin.</span>
+<span class="w">    </span><span class="sd">"""Compute the condensation rate per particle or bin.</span>
 
 <span class="sd">    Mass transfer rates are scaled by the raw particle concentration and</span>
 <span class="sd">    the configured skip-partitioning indices are applied.</span>
@@ -21041,12 +21041,12 @@ the configured skip-partitioning indices are applied.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Condensation rate in kg/s per particle or bin.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle_data</span><span class="p">,</span> <span class="n">particle_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">gas_data</span><span class="p">,</span> <span class="n">gas_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_gas</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
     <span class="n">_require_matching_types</span><span class="p">(</span><span class="n">particle_is_legacy</span><span class="p">,</span> <span class="n">gas_is_legacy</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;GasData&quot;</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"ParticleData"</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"GasData"</span><span class="p">)</span>
 
     <span class="n">mass_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_transfer_rate</span><span class="p">(</span>
         <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
@@ -21294,7 +21294,7 @@ mass-transfer calculation.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
     <span class="n">Tuple</span><span class="p">[</span><span class="n">ParticleRepresentation</span><span class="p">,</span> <span class="n">GasSpecies</span><span class="p">]</span> <span class="o">|</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ParticleData</span><span class="p">,</span> <span class="n">GasData</span><span class="p">]</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Advance one condensation step with latent-heat diagnostics.</span>
+<span class="w">    </span><span class="sd">"""Advance one condensation step with latent-heat diagnostics.</span>
 
 <span class="sd">    The mass transfer rate is computed, optional skip-partitioning applied,</span>
 <span class="sd">    and both the particle and gas states are updated while respecting</span>
@@ -21313,14 +21313,14 @@ mass-transfer calculation.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple containing updated particle and gas species objects.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span>
 
     <span class="n">particle_data</span><span class="p">,</span> <span class="n">particle_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">gas_data</span><span class="p">,</span> <span class="n">gas_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_gas</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
     <span class="n">_require_matching_types</span><span class="p">(</span><span class="n">particle_is_legacy</span><span class="p">,</span> <span class="n">gas_is_legacy</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;GasData&quot;</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"ParticleData"</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"GasData"</span><span class="p">)</span>
 
     <span class="n">mass_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_transfer_rate</span><span class="p">(</span>
         <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
@@ -21467,16 +21467,16 @@ heat configuration when it was explicitly provided.</p>
 <span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the builder with required shared parameters.</span>
+<span class="w">    </span><span class="sd">"""Initialize the builder with required shared parameters.</span>
 
 <span class="sd">    The builder starts with the common condensation transport inputs and</span>
 <span class="sd">    no latent heat override so :meth:`build` only forwards optional latent</span>
 <span class="sd">    heat configuration when it was explicitly provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderMolarMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -21570,7 +21570,7 @@ scalar <code>latent_heat</code> is only passed when
 <span class="normal">241</span>
 <span class="normal">242</span>
 <span class="normal">243</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CondensationLatentHeat</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and create a latent-heat strategy.</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and create a latent-heat strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A configured :class:`CondensationLatentHeat` instance.</span>
@@ -21579,24 +21579,24 @@ scalar <code>latent_heat</code> is only passed when
 <span class="sd">        An explicit ``latent_heat_strategy`` is forwarded unchanged. A</span>
 <span class="sd">        scalar ``latent_heat`` is only passed when</span>
 <span class="sd">        :meth:`set_latent_heat` was called successfully.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
 
     <span class="n">build_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span>
             <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_coefficient</span>
         <span class="p">),</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span>
             <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">accommodation_coefficient</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="s2">&quot;update_gases&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_gases</span><span class="p">,</span>
+        <span class="s2">"update_gases"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_gases</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_strategy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">build_kwargs</span><span class="p">[</span><span class="s2">&quot;latent_heat_strategy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_strategy</span>
+        <span class="n">build_kwargs</span><span class="p">[</span><span class="s2">"latent_heat_strategy"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_strategy</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_latent_heat_explicitly_set</span><span class="p">:</span>
-        <span class="n">build_kwargs</span><span class="p">[</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span><span class="p">)</span>
+        <span class="n">build_kwargs</span><span class="p">[</span><span class="s2">"latent_heat"</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">CondensationLatentHeat</span><span class="p">(</span><span class="o">**</span><span class="n">build_kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -21704,8 +21704,8 @@ zero, or negative.</p>
 <span class="normal">211</span>
 <span class="normal">212</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_latent_heat</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">latent_heat</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set a positive finite scalar latent heat fallback.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set a positive finite scalar latent heat fallback.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        latent_heat: Scalar latent heat value in J/kg.</span>
@@ -21716,29 +21716,29 @@ zero, or negative.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``latent_heat`` is None, array-like, non-finite,</span>
 <span class="sd">            zero, or negative.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">latent_heat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;latent_heat must be a positive finite scalar, got None&quot;</span>
+            <span class="s2">"latent_heat must be a positive finite scalar, got None"</span>
         <span class="p">)</span>
 
     <span class="n">latent_heat_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">latent_heat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">latent_heat_array</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">():</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;latent_heat must be a positive finite scalar, got &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;array-like value </span><span class="si">{</span><span class="n">latent_heat</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="s2">"latent_heat must be a positive finite scalar, got "</span>
+            <span class="sa">f</span><span class="s2">"array-like value </span><span class="si">{</span><span class="n">latent_heat</span><span class="si">!r}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="n">latent_heat_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">latent_heat_array</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">latent_heat_value</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;latent_heat must be a positive finite scalar, got &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;non-finite value </span><span class="si">{</span><span class="n">latent_heat_value</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="s2">"latent_heat must be a positive finite scalar, got "</span>
+            <span class="sa">f</span><span class="s2">"non-finite value </span><span class="si">{</span><span class="n">latent_heat_value</span><span class="si">!r}</span><span class="s2">"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">latent_heat_value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;latent_heat must be a positive finite scalar, got &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;non-positive value </span><span class="si">{</span><span class="n">latent_heat_value</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="s2">"latent_heat must be a positive finite scalar, got "</span>
+            <span class="sa">f</span><span class="s2">"non-positive value </span><span class="si">{</span><span class="n">latent_heat_value</span><span class="si">!r}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span> <span class="o">=</span> <span class="n">latent_heat_value</span>
@@ -21841,8 +21841,8 @@ implement :class:<code>LatentHeatStrategy</code>.</p>
 <span class="normal">168</span>
 <span class="normal">169</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_latent_heat_strategy</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">latent_heat_strategy</span><span class="p">:</span> <span class="n">LatentHeatStrategy</span> <span class="o">|</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Store a latent heat strategy for direct passthrough.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Store a latent heat strategy for direct passthrough.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        latent_heat_strategy: Strategy object used by</span>
@@ -21857,13 +21857,13 @@ implement :class:<code>LatentHeatStrategy</code>.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``latent_heat_strategy`` is not ``None`` and does not</span>
 <span class="sd">            implement :class:`LatentHeatStrategy`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">latent_heat_strategy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="n">latent_heat_strategy</span><span class="p">,</span> <span class="n">LatentHeatStrategy</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;latent_heat_strategy must be a LatentHeatStrategy or None, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">latent_heat_strategy</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">"latent_heat_strategy must be a LatentHeatStrategy or None, "</span>
+            <span class="sa">f</span><span class="s2">"got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">latent_heat_strategy</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_strategy</span> <span class="o">=</span> <span class="n">latent_heat_strategy</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -21998,8 +21998,8 @@ implement :class:<code>LatentHeatStrategy</code>.</p>
 <span class="normal">139</span>
 <span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set required and optional parameters from a dictionary.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set required and optional parameters from a dictionary.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        parameters: Required shared builder parameters plus optional</span>
@@ -22011,29 +22011,29 @@ implement :class:<code>LatentHeatStrategy</code>.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required keys are missing or any key is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span>
     <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Missing required parameter(s): </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Missing required parameter(s): </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
 
     <span class="n">valid_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
         <span class="n">required</span>
-        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">]</span>
         <span class="o">+</span> <span class="p">[</span>
-            <span class="s2">&quot;update_gases&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;latent_heat_strategy&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;latent_heat&quot;</span><span class="p">,</span>
+            <span class="s2">"update_gases"</span><span class="p">,</span>
+            <span class="s2">"latent_heat_strategy"</span><span class="p">,</span>
+            <span class="s2">"latent_heat"</span><span class="p">,</span>
         <span class="p">]</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">invalid_keys</span> <span class="o">:=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_keys</span><span class="p">]:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Trying to set an invalid parameter(s) &#39;</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;The valid parameter(s) &#39;</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Trying to set an invalid parameter(s) '</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">'. "</span>
+            <span class="sa">f</span><span class="s2">"The valid parameter(s) '</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">'."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
@@ -22041,26 +22041,26 @@ implement :class:<code>LatentHeatStrategy</code>.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">_reset_optional_latent_heat_state</span><span class="p">()</span>
 
     <span class="n">default_units</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;m^2/s&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"kg/mol"</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="s2">"m^2/s"</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">:</span>
-        <span class="n">unit_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span>
+        <span class="n">unit_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span>
         <span class="n">units</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">unit_key</span><span class="p">,</span> <span class="n">default_units</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">unit_key</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">units</span><span class="p">)</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">units</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using default units for parameter: &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">units</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Using default units for parameter: '</span><span class="si">%s</span><span class="s2">'."</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">units</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">&quot;update_gases&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;update_gases&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;latent_heat_strategy&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_latent_heat_strategy</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;latent_heat_strategy&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;latent_heat&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_latent_heat</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"update_gases"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"update_gases"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"latent_heat_strategy"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_latent_heat_strategy</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"latent_heat_strategy"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"latent_heat"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_latent_heat</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"latent_heat"</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -22315,10 +22315,10 @@ strategies used when GasData inputs are provided.</p>
 <span class="normal">324</span>
 <span class="normal">325</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;skip_partitioning_indices&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"skip_partitioning_indices"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -22334,7 +22334,7 @@ strategies used when GasData inputs are provided.</p>
     <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VaporPressureStrategy</span><span class="p">]</span>
     <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the CondensationStrategy instance.</span>
+<span class="w">    </span><span class="sd">"""Initialize the CondensationStrategy instance.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        molar_mass: Molar mass of the species [kg/mol].</span>
@@ -22351,7 +22351,7 @@ strategies used when GasData inputs are provided.</p>
 <span class="sd">            are provided (required for data-only usage).</span>
 <span class="sd">        vapor_pressure_strategy: Vapor pressure strategy or per-species</span>
 <span class="sd">            strategies used when GasData inputs are provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span> <span class="o">=</span> <span class="n">molar_mass</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_coefficient</span> <span class="o">=</span> <span class="n">diffusion_coefficient</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">accommodation_coefficient</span> <span class="o">=</span> <span class="n">accommodation_coefficient</span>
@@ -22537,7 +22537,7 @@ between the gas and particle phases.</li>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the difference in partial pressure between the gas and</span>
+<span class="w">    </span><span class="sd">"""Calculate the difference in partial pressure between the gas and</span>
 <span class="sd">    particle phases.</span>
 
 <span class="sd">    Arguments:</span>
@@ -22554,7 +22554,7 @@ between the gas and particle phases.</li>
 <span class="sd">            between the gas and particle phases.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example – Δp calculation&quot;</span>
+<span class="sd">        ```py title="Example – Δp calculation"</span>
 <span class="sd">        delta_p = cond.calculate_pressure_delta(</span>
 <span class="sd">            particle=particle,</span>
 <span class="sd">            gas_species=gas_species,</span>
@@ -22562,12 +22562,12 @@ between the gas and particle phases.</li>
 <span class="sd">            radius=particle.get_radius(),</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle_data</span><span class="p">,</span> <span class="n">particle_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">gas_data</span><span class="p">,</span> <span class="n">gas_is_legacy</span> <span class="o">=</span> <span class="n">_unwrap_gas</span><span class="p">(</span><span class="n">gas_species</span><span class="p">)</span>
     <span class="n">_require_matching_types</span><span class="p">(</span><span class="n">particle_is_legacy</span><span class="p">,</span> <span class="n">gas_is_legacy</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">)</span>
-    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;GasData&quot;</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"ParticleData"</span><span class="p">)</span>
+    <span class="n">_require_single_box</span><span class="p">(</span><span class="n">gas_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"GasData"</span><span class="p">)</span>
 
     <span class="n">activity_strategy</span><span class="p">,</span> <span class="n">surface_strategy</span><span class="p">,</span> <span class="n">vapor_pressure_strategy</span> <span class="o">=</span> <span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_strategies</span><span class="p">(</span>
@@ -22754,7 +22754,7 @@ not provided, it will be calculated based on the temperature</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;First-order mass transport coefficient per particle.</span>
+<span class="w">    </span><span class="sd">"""First-order mass transport coefficient per particle.</span>
 
 <span class="sd">    Calculate the first-order mass transport coefficient, K, for a given</span>
 <span class="sd">    particle based on the diffusion coefficient, radius, and vapor</span>
@@ -22778,7 +22778,7 @@ not provided, it will be calculated based on the temperature</p>
 <span class="sd">        [DOI](https://doi.org/10.1002/9781119625728)</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example – First-order mass-transport&quot;</span>
+<span class="sd">        ```py title="Example – First-order mass-transport"</span>
 <span class="sd">        cond = CondensationIsothermal(molar_mass=0.018)</span>
 <span class="sd">        k = cond.first_order_mass_transport(</span>
 <span class="sd">            particle_radius=1e-7,</span>
@@ -22786,7 +22786,7 @@ not provided, it will be calculated based on the temperature</p>
 <span class="sd">            pressure=101325,</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">vapor_transition</span> <span class="o">=</span> <span class="n">get_vapor_transition_correction</span><span class="p">(</span>
         <span class="n">knudsen_number</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">knudsen_number</span><span class="p">(</span>
             <span class="n">radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
@@ -22937,7 +22937,7 @@ the particle radius.</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Knudsen number for a particle.</span>
+<span class="w">    </span><span class="sd">"""The Knudsen number for a particle.</span>
 
 <span class="sd">    Calculate the Knudsen number based on the mean free path of the gas</span>
 <span class="sd">    molecules and the radius of the particle.</span>
@@ -22957,13 +22957,13 @@ the particle radius.</p>
 <span class="sd">        - [Knudsen Number](https://en.wikipedia.org/wiki/Knudsen_number)</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example – Knudsen number&quot;</span>
+<span class="sd">        ```py title="Example – Knudsen number"</span>
 <span class="sd">        cond = CondensationIsothermal(molar_mass=0.018)</span>
 <span class="sd">        kn = cond.knudsen_number(</span>
 <span class="sd">            radius=1e-7, temperature=298.15, pressure=101325</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_knudsen_number</span><span class="p">(</span>
         <span class="n">mean_free_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_free_path</span><span class="p">(</span>
             <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
@@ -23120,7 +23120,7 @@ concentration, etc.</p>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
     <span class="c1"># pylint: disable=too-many-positional-arguments, too-many-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the isothermal mass transfer rate for a particle.</span>
+<span class="w">    </span><span class="sd">"""Compute the isothermal mass transfer rate for a particle.</span>
 
 <span class="sd">    Implements dm/dt = 4π × r × Dᵢ × Mᵢ × f(Kn, α) × Δpᵢ / (R × T),</span>
 <span class="sd">    where:</span>
@@ -23144,12 +23144,12 @@ concentration, etc.</p>
 <span class="sd">        - Mass transfer rate [kg/s] for each particle.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example Usage of mass_transfer_rate&quot;</span>
+<span class="sd">        ```py title="Example Usage of mass_transfer_rate"</span>
 <span class="sd">        m_rate = iso_cond.mass_transfer_rate(</span>
 <span class="sd">            particle, gas_species, 298.15, 101325</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23218,7 +23218,7 @@ not provided, it will be calculated based on the temperature</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example – Mean-free-path</span><pre><span></span><code><span class="n">cond</span> <span class="o">=</span> <span class="n">CondensationIsothermal</span><span class="p">(</span><span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">)</span>  <span class="c1"># water vapour</span>
 <span class="n">lam</span> <span class="o">=</span> <span class="n">cond</span><span class="o">.</span><span class="n">mean_free_path</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mi">101325</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lam</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> m&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">lam</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -23264,7 +23264,7 @@ not provided, it will be calculated based on the temperature</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the mean free path of the gas molecules based on the</span>
+<span class="w">    </span><span class="sd">"""Calculate the mean free path of the gas molecules based on the</span>
 <span class="sd">    temperature, pressure, and dynamic viscosity of the gas.</span>
 
 <span class="sd">    Arguments:</span>
@@ -23281,12 +23281,12 @@ not provided, it will be calculated based on the temperature</p>
 <span class="sd">        [Wikipedia](https://en.wikipedia.org/wiki/Mean_free_path)</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example – Mean-free-path&quot;</span>
+<span class="sd">        ```py title="Example – Mean-free-path"</span>
 <span class="sd">        cond = CondensationIsothermal(molar_mass=0.018)  # water vapour</span>
 <span class="sd">        lam = cond.mean_free_path(temperature=298.15, pressure=101325)</span>
-<span class="sd">        print(f&quot;{lam:.2e} m&quot;)</span>
+<span class="sd">        print(f"{lam:.2e} m")</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_molecule_mean_free_path</span><span class="p">(</span>
         <span class="n">molar_mass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>
         <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
@@ -23415,7 +23415,7 @@ concentration.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the net condensation rate per particle, scaled by</span>
+<span class="w">    </span><span class="sd">"""Compute the net condensation rate per particle, scaled by</span>
 <span class="sd">    concentration.</span>
 
 <span class="sd">    Calculates the mass transfer rate and multiplies it by particle</span>
@@ -23432,11 +23432,11 @@ concentration.</p>
 <span class="sd">        - Condensation rate per particle or bin, in kg/s.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example Usage of rate&quot;</span>
+<span class="sd">        ```py title="Example Usage of rate"</span>
 <span class="sd">        rates = iso_cond.rate(particle, gas_species, 298.15, 101325)</span>
 <span class="sd">        # returns array([...]) with condensation rates</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23591,7 +23591,7 @@ both the particle mass and the gas concentration
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform one timestep of isothermal condensation on the particle.</span>
+<span class="w">    </span><span class="sd">"""Perform one timestep of isothermal condensation on the particle.</span>
 
 <span class="sd">    Calculates the mass transfer for the specified time_step and updates</span>
 <span class="sd">    both the particle mass and the gas concentration</span>
@@ -23614,7 +23614,7 @@ both the particle mass and the gas concentration
 <span class="sd">            particle, gas_species, 298.15, 101325, 1.0</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

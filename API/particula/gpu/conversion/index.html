@@ -16427,7 +16427,7 @@ representation.</p>
 
 
 <a href="#particula.gpu.conversion.from_warp_environment_data" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_warp_environment_data</span><span class="p">(</span><span class="n">gpu_data</span><span class="p">:</span> <span class="s1">&#39;WarpEnvironmentData&#39;</span><span class="p">,</span> <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;EnvironmentData&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_warp_environment_data</span><span class="p">(</span><span class="n">gpu_data</span><span class="p">:</span> <span class="s1">'WarpEnvironmentData'</span><span class="p">,</span> <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'EnvironmentData'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16548,10 +16548,10 @@ result = from_warp_environment_data(gpu_environment, sync=False)</p>
 <span class="normal">630</span>
 <span class="normal">631</span>
 <span class="normal">632</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">from_warp_environment_data</span><span class="p">(</span>
-    <span class="n">gpu_data</span><span class="p">:</span> <span class="s2">&quot;WarpEnvironmentData&quot;</span><span class="p">,</span>
+    <span class="n">gpu_data</span><span class="p">:</span> <span class="s2">"WarpEnvironmentData"</span><span class="p">,</span>
     <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;EnvironmentData&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transfer WarpEnvironmentData back to CPU.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"EnvironmentData"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Transfer WarpEnvironmentData back to CPU.</span>
 
 <span class="sd">    Use this to transfer GPU-resident environment data back to CPU after</span>
 <span class="sd">    GPU simulation steps. The returned EnvironmentData can be used for</span>
@@ -16561,7 +16561,7 @@ result = from_warp_environment_data(gpu_environment, sync=False)</p>
 <span class="sd">        gpu_data: GPU-resident WarpEnvironmentData container.</span>
 <span class="sd">        sync: If True (default), synchronize device before transfer</span>
 <span class="sd">            to ensure all GPU operations have completed. Set False</span>
-<span class="sd">            only if you&#39;ve already synchronized manually (e.g., for</span>
+<span class="sd">            only if you've already synchronized manually (e.g., for</span>
 <span class="sd">            batched transfers).</span>
 
 <span class="sd">    Returns:</span>
@@ -16577,7 +16577,7 @@ result = from_warp_environment_data(gpu_environment, sync=False)</p>
 <span class="sd">        &gt;&gt;&gt; import warp as wp</span>
 <span class="sd">        &gt;&gt;&gt; wp.synchronize()</span>
 <span class="sd">        &gt;&gt;&gt; result = from_warp_environment_data(gpu_environment, sync=False)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">wp</span> <span class="o">=</span> <span class="n">_ensure_warp_available</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">sync</span><span class="p">:</span>
@@ -16604,7 +16604,7 @@ result = from_warp_environment_data(gpu_environment, sync=False)</p>
 
 
 <a href="#particula.gpu.conversion.from_warp_gas_data" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_warp_gas_data</span><span class="p">(</span><span class="n">gpu_data</span><span class="p">:</span> <span class="s1">&#39;WarpGasData&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">allow_per_box_partitioning</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;GasData&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_warp_gas_data</span><span class="p">(</span><span class="n">gpu_data</span><span class="p">:</span> <span class="s1">'WarpGasData'</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">allow_per_box_partitioning</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'GasData'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16861,13 +16861,13 @@ print(result.name)  # ["species_0", "species_1"]</p>
 <span class="normal">585</span>
 <span class="normal">586</span>
 <span class="normal">587</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">from_warp_gas_data</span><span class="p">(</span>
-    <span class="n">gpu_data</span><span class="p">:</span> <span class="s2">&quot;WarpGasData&quot;</span><span class="p">,</span>
+    <span class="n">gpu_data</span><span class="p">:</span> <span class="s2">"WarpGasData"</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">allow_per_box_partitioning</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasData&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transfer WarpGasData back to CPU with an intentionally lossy restore.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"GasData"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Transfer WarpGasData back to CPU with an intentionally lossy restore.</span>
 
 <span class="sd">    Use this to transfer GPU-resident gas data back to CPU after</span>
 <span class="sd">    GPU simulation steps. The returned GasData can be used for</span>
@@ -16898,11 +16898,11 @@ print(result.name)  # ["species_0", "species_1"]</p>
 <span class="sd">        gpu_data: GPU-resident WarpGasData container.</span>
 <span class="sd">        name: Optional ordered species names supplied by the caller.</span>
 <span class="sd">            If omitted or ``None``, generates placeholder names such as</span>
-<span class="sd">            ``[&quot;species_0&quot;, &quot;species_1&quot;, ...]``. If provided, the list</span>
+<span class="sd">            ``["species_0", "species_1", ...]``. If provided, the list</span>
 <span class="sd">            length must match ``gpu_data.molar_mass.shape[0]``.</span>
 <span class="sd">        sync: If True (default), synchronize device before transfer</span>
 <span class="sd">            to ensure all GPU operations have completed. Set False</span>
-<span class="sd">            only if you&#39;ve already synchronized manually.</span>
+<span class="sd">            only if you've already synchronized manually.</span>
 <span class="sd">        allow_per_box_partitioning: Internal checkpoint-only escape hatch for</span>
 <span class="sd">            building a lossy CPU inspection carrier from a nonuniform GPU mask.</span>
 
@@ -16917,12 +16917,12 @@ print(result.name)  # ["species_0", "species_1"]</p>
 
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # With caller-supplied ordered names</span>
-<span class="sd">        &gt;&gt;&gt; result = from_warp_gas_data(gpu_data, name=[&quot;Water&quot;, &quot;H2SO4&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; result = from_warp_gas_data(gpu_data, name=["Water", "H2SO4"])</span>
 <span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">        &gt;&gt;&gt; # With placeholder names because GPU data stores no names</span>
 <span class="sd">        &gt;&gt;&gt; result = from_warp_gas_data(gpu_data)</span>
-<span class="sd">        &gt;&gt;&gt; print(result.name)  # [&quot;species_0&quot;, &quot;species_1&quot;]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; print(result.name)  # ["species_0", "species_1"]</span>
+<span class="sd">    """</span>
     <span class="n">wp</span> <span class="o">=</span> <span class="n">_ensure_warp_available</span><span class="p">()</span>
 
     <span class="c1"># Determine n_species from molar_mass shape</span>
@@ -16930,44 +16930,44 @@ print(result.name)  # ["species_0", "species_1"]</p>
 
     <span class="c1"># Handle name parameter</span>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">restored_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;species_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_species</span><span class="p">)]</span>
+        <span class="n">restored_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"species_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_species</span><span class="p">)]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name must be a list of strings or None&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"name must be a list of strings or None"</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">species_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">species_name</span> <span class="ow">in</span> <span class="n">name</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name must contain only string entries&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"name must contain only string entries"</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_species</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;name length mismatch when restoring GasData: expected &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_species</span><span class="si">}</span><span class="s2"> names, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="s2">"name length mismatch when restoring GasData: expected "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n_species</span><span class="si">}</span><span class="s2"> names, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="n">restored_names</span> <span class="o">=</span> <span class="n">name</span>
 
     <span class="k">if</span> <span class="n">sync</span><span class="p">:</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
 
-    <span class="c1"># Validate the GPU&#39;s per-box mask before collapsing it to CPU&#39;s shared</span>
+    <span class="c1"># Validate the GPU's per-box mask before collapsing it to CPU's shared</span>
     <span class="c1"># species mask. Exact shape matching prevents broadcasting and indexing</span>
     <span class="c1"># failures for malformed device-side data.</span>
     <span class="n">partitioning_values</span> <span class="o">=</span> <span class="n">gpu_data</span><span class="o">.</span><span class="n">partitioning</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">concentration_shape</span> <span class="o">=</span> <span class="n">gpu_data</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">shape</span>
     <span class="k">if</span> <span class="n">partitioning_values</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">concentration_shape</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;GPU partitioning must have the same (n_boxes, n_species) shape &quot;</span>
-            <span class="s2">&quot;as concentration to restore CPU GasData.&quot;</span>
+            <span class="s2">"GPU partitioning must have the same (n_boxes, n_species) shape "</span>
+            <span class="s2">"as concentration to restore CPU GasData."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">concentration_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;cannot restore zero-box WarpGasData to GasData because its shared &quot;</span>
-            <span class="s2">&quot;partitioning mask has no authoritative box&quot;</span>
+            <span class="s2">"cannot restore zero-box WarpGasData to GasData because its shared "</span>
+            <span class="s2">"partitioning mask has no authoritative box"</span>
         <span class="p">)</span>
     <span class="n">partitioning_bool_by_box</span> <span class="o">=</span> <span class="n">_restore_partitioning_bool</span><span class="p">(</span><span class="n">partitioning_values</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_per_box_partitioning</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span>
         <span class="n">partitioning_bool_by_box</span> <span class="o">==</span> <span class="n">partitioning_bool_by_box</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;GPU partitioning must be an identical binary (n_boxes, n_species) &quot;</span>
-            <span class="s2">&quot;mask to restore CPU GasData.&quot;</span>
+            <span class="s2">"GPU partitioning must be an identical binary (n_boxes, n_species) "</span>
+            <span class="s2">"mask to restore CPU GasData."</span>
         <span class="p">)</span>
     <span class="n">partitioning_bool</span> <span class="o">=</span> <span class="n">partitioning_bool_by_box</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -16994,7 +16994,7 @@ print(result.name)  # ["species_0", "species_1"]</p>
 
 
 <a href="#particula.gpu.conversion.from_warp_particle_data" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_warp_particle_data</span><span class="p">(</span><span class="n">gpu_data</span><span class="p">:</span> <span class="s1">&#39;WarpParticleData&#39;</span><span class="p">,</span> <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ParticleData&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_warp_particle_data</span><span class="p">(</span><span class="n">gpu_data</span><span class="p">:</span> <span class="s1">'WarpParticleData'</span><span class="p">,</span> <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'ParticleData'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17106,10 +17106,10 @@ data2 = from_warp_particle_data(gpu_data2, sync=False)</p>
 <span class="normal">463</span>
 <span class="normal">464</span>
 <span class="normal">465</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">from_warp_particle_data</span><span class="p">(</span>
-    <span class="n">gpu_data</span><span class="p">:</span> <span class="s2">&quot;WarpParticleData&quot;</span><span class="p">,</span>
+    <span class="n">gpu_data</span><span class="p">:</span> <span class="s2">"WarpParticleData"</span><span class="p">,</span>
     <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transfer WarpParticleData back to CPU.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ParticleData"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Transfer WarpParticleData back to CPU.</span>
 
 <span class="sd">    Use this to transfer GPU-resident particle data back to CPU after</span>
 <span class="sd">    GPU simulation steps. The returned ParticleData can be used for</span>
@@ -17119,7 +17119,7 @@ data2 = from_warp_particle_data(gpu_data2, sync=False)</p>
 <span class="sd">        gpu_data: GPU-resident WarpParticleData container.</span>
 <span class="sd">        sync: If True (default), synchronize device before transfer</span>
 <span class="sd">            to ensure all GPU operations have completed. Set False</span>
-<span class="sd">            only if you&#39;ve already synchronized manually (e.g., for</span>
+<span class="sd">            only if you've already synchronized manually (e.g., for</span>
 <span class="sd">            batched transfers).</span>
 
 <span class="sd">    Returns:</span>
@@ -17134,7 +17134,7 @@ data2 = from_warp_particle_data(gpu_data2, sync=False)</p>
 <span class="sd">        &gt;&gt;&gt; wp.synchronize()</span>
 <span class="sd">        &gt;&gt;&gt; data1 = from_warp_particle_data(gpu_data1, sync=False)</span>
 <span class="sd">        &gt;&gt;&gt; data2 = from_warp_particle_data(gpu_data2, sync=False)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">wp</span> <span class="o">=</span> <span class="n">_ensure_warp_available</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">sync</span><span class="p">:</span>
@@ -17163,7 +17163,7 @@ data2 = from_warp_particle_data(gpu_data2, sync=False)</p>
 
 
 <a href="#particula.gpu.conversion.gpu_context" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">gpu_context</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="s1">&#39;ParticleData&#39;</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="s1">&#39;WarpParticleData&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">gpu_context</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="s1">'ParticleData'</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'cuda'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="s1">'WarpParticleData'</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17274,10 +17274,10 @@ result = from_warp_particle_data(gpu_data)</p>
 <span class="normal">671</span>
 <span class="normal">672</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@contextmanager</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">gpu_context</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">,</span>
-    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="s2">&quot;WarpParticleData&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context manager for scoped GPU-resident simulation.</span>
+    <span class="n">data</span><span class="p">:</span> <span class="s2">"ParticleData"</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cuda"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="s2">"WarpParticleData"</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Context manager for scoped GPU-resident simulation.</span>
 
 <span class="sd">    Transfers ParticleData to GPU on entry. User is responsible for</span>
 <span class="sd">    calling from_warp_particle_data() when ready to transfer back</span>
@@ -17290,7 +17290,7 @@ result = from_warp_particle_data(gpu_data)</p>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data: CPU-side ParticleData to transfer to GPU.</span>
-<span class="sd">        device: Target GPU device (&quot;cuda&quot;, &quot;cuda:0&quot;, &quot;cpu&quot;).</span>
+<span class="sd">        device: Target GPU device ("cuda", "cuda:0", "cpu").</span>
 
 <span class="sd">    Yields:</span>
 <span class="sd">        WarpParticleData on the specified device.</span>
@@ -17307,7 +17307,7 @@ result = from_warp_particle_data(gpu_data)</p>
 <span class="sd">        ...     for _ in range(1000):</span>
 <span class="sd">        ...         gpu_data = physics_step(gpu_data, dt)</span>
 <span class="sd">        &gt;&gt;&gt; result = from_warp_particle_data(gpu_data)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">gpu_data</span> <span class="o">=</span> <span class="n">to_warp_particle_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="k">yield</span> <span class="n">gpu_data</span>
 </code></pre></div></td></tr></table></div>
@@ -17324,7 +17324,7 @@ result = from_warp_particle_data(gpu_data)</p>
 
 
 <a href="#particula.gpu.conversion.to_per_box_partitioning" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_per_box_partitioning</span><span class="p">(</span><span class="n">partitioning</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_per_box_partitioning</span><span class="p">(</span><span class="n">partitioning</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'cpu'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17437,9 +17437,9 @@ for callers that previously kept a one-dimensional shared mask.</p>
     <span class="n">partitioning</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cpu"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Migrate a legacy shared mask to the Warp per-box mask schema.</span>
+<span class="w">    </span><span class="sd">"""Migrate a legacy shared mask to the Warp per-box mask schema.</span>
 
 <span class="sd">    ``WarpGasData.partitioning`` is version-2 public state: its active-device</span>
 <span class="sd">    representation is always binary ``int32`` with shape</span>
@@ -17457,17 +17457,17 @@ for callers that previously kept a one-dimensional shared mask.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If shape or binary values are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">wp</span> <span class="o">=</span> <span class="n">_ensure_warp_available</span><span class="p">()</span>
     <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">partitioning</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
     <span class="k">elif</span> <span class="n">values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_boxes</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;partitioning must have shape (n_species,) or (n_boxes, n_species)&quot;</span>
+            <span class="s2">"partitioning must have shape (n_species,) or (n_boxes, n_species)"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">((</span><span class="n">values</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">values</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;partitioning must contain only binary 0/1 values&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"partitioning must contain only binary 0/1 values"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
         <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
@@ -17487,7 +17487,7 @@ for callers that previously kept a one-dimensional shared mask.</p>
 
 
 <a href="#particula.gpu.conversion.to_warp_environment_data" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_warp_environment_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="s1">&#39;EnvironmentData&#39;</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;WarpEnvironmentData&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_warp_environment_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="s1">'EnvironmentData'</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'cuda'</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'WarpEnvironmentData'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17636,11 +17636,11 @@ gpu_environment.temperature.shape
 <span class="normal">247</span>
 <span class="normal">248</span>
 <span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_warp_environment_data</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;EnvironmentData&quot;</span><span class="p">,</span>
-    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="s2">"EnvironmentData"</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cuda"</span><span class="p">,</span>
     <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;WarpEnvironmentData&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transfer EnvironmentData to GPU with explicit control.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"WarpEnvironmentData"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Transfer EnvironmentData to GPU with explicit control.</span>
 
 <span class="sd">    Use this helper when environment state should remain on the selected</span>
 <span class="sd">    Warp device alongside particle or gas data during GPU-resident</span>
@@ -17648,7 +17648,7 @@ gpu_environment.temperature.shape
 
 <span class="sd">    Args:</span>
 <span class="sd">        data: CPU-side EnvironmentData container.</span>
-<span class="sd">        device: Target device (&quot;cuda&quot;, &quot;cuda:0&quot;, &quot;cuda:1&quot;, &quot;cpu&quot;).</span>
+<span class="sd">        device: Target device ("cuda", "cuda:0", "cuda:1", "cpu").</span>
 <span class="sd">        copy: If True (default), always copy data to device.</span>
 <span class="sd">            If False, attempt zero-copy via wp.from_numpy() when</span>
 <span class="sd">            arrays are already on a compatible device.</span>
@@ -17662,11 +17662,11 @@ gpu_environment.temperature.shape
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; from particula.gpu import to_warp_environment_data</span>
 <span class="sd">        &gt;&gt;&gt; gpu_environment = to_warp_environment_data(</span>
-<span class="sd">        ...     environment_data, device=&quot;cpu&quot;</span>
+<span class="sd">        ...     environment_data, device="cpu"</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; gpu_environment.temperature.shape</span>
 <span class="sd">        (1,)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">wp</span> <span class="o">=</span> <span class="n">_ensure_warp_available</span><span class="p">()</span>
     <span class="n">_validate_device</span><span class="p">(</span><span class="n">wp</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 
@@ -17710,7 +17710,7 @@ gpu_environment.temperature.shape
 
 
 <a href="#particula.gpu.conversion.to_warp_gas_data" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_warp_gas_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="s1">&#39;GasData&#39;</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">vapor_pressure</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;WarpGasData&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_warp_gas_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="s1">'GasData'</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'cuda'</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">vapor_pressure</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'WarpGasData'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17976,12 +17976,12 @@ gpu_gas = to_warp_gas_data(gas_data, vapor_pressure=vp)</p>
 <span class="normal">375</span>
 <span class="normal">376</span>
 <span class="normal">377</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_warp_gas_data</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;GasData&quot;</span><span class="p">,</span>
-    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="s2">"GasData"</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cuda"</span><span class="p">,</span>
     <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">vapor_pressure</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;WarpGasData&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transfer GasData to GPU with caller-owned vapor-pressure state.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"WarpGasData"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Transfer GasData to GPU with caller-owned vapor-pressure state.</span>
 
 <span class="sd">    Use this for long GPU-resident simulations where you want to:</span>
 <span class="sd">    1. Transfer data to GPU once at simulation start</span>
@@ -17989,7 +17989,7 @@ gpu_gas = to_warp_gas_data(gas_data, vapor_pressure=vp)</p>
 <span class="sd">    3. Transfer back only when needed (checkpoints, final result)</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        The &#39;name&#39; field from GasData is excluded (strings are not</span>
+<span class="sd">        The 'name' field from GasData is excluded (strings are not</span>
 <span class="sd">        GPU-compatible). Use index mapping for species identification.</span>
 
 <span class="sd">        The shared species-level CPU ``partitioning`` field is expanded to an</span>
@@ -18001,7 +18001,7 @@ gpu_gas = to_warp_gas_data(gas_data, vapor_pressure=vp)</p>
 <span class="sd">        ``(n_boxes, n_species)`` vapor-pressure array for kernels that consume</span>
 <span class="sd">        it directly. ``condensation_step_gpu()`` instead refreshes this buffer</span>
 <span class="sd">        from its thermodynamic configuration on every substep. That step also</span>
-<span class="sd">        updates this mirror&#39;s ``concentration`` from each P2-finalized particle</span>
+<span class="sd">        updates this mirror's ``concentration`` from each P2-finalized particle</span>
 <span class="sd">        transfer. The updated concentration informs the next mass-transfer</span>
 <span class="sd">        proposal, not vapor-pressure refresh.</span>
 
@@ -18015,7 +18015,7 @@ gpu_gas = to_warp_gas_data(gas_data, vapor_pressure=vp)</p>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data: CPU-side GasData container.</span>
-<span class="sd">        device: Target device (&quot;cuda&quot;, &quot;cuda:0&quot;, &quot;cuda:1&quot;, &quot;cpu&quot;).</span>
+<span class="sd">        device: Target device ("cuda", "cuda:0", "cuda:1", "cpu").</span>
 <span class="sd">        copy: If True (default), always copy data to device.</span>
 <span class="sd">              If False, attempt zero-copy via wp.from_numpy() when</span>
 <span class="sd">              arrays are already on a compatible device.</span>
@@ -18028,18 +18028,18 @@ gpu_gas = to_warp_gas_data(gas_data, vapor_pressure=vp)</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: If Warp is not available or device not found.</span>
-<span class="sd">        ValueError: If vapor_pressure shape doesn&#39;t match expected</span>
+<span class="sd">        ValueError: If vapor_pressure shape doesn't match expected</span>
 <span class="sd">            (n_boxes, n_species).</span>
 <span class="sd">        ValueError: If vapor_pressure contains NaN, inf, or negative values.</span>
 
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; from particula.gpu import to_warp_gas_data</span>
 <span class="sd">        &gt;&gt;&gt; # Omitted vapor pressure allocates zeros for schema parity only.</span>
-<span class="sd">        &gt;&gt;&gt; gpu_gas = to_warp_gas_data(gas_data, device=&quot;cuda&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; gpu_gas = to_warp_gas_data(gas_data, device="cuda")</span>
 <span class="sd">        &gt;&gt;&gt; # Supply initial vapor pressure for kernels that do not refresh it:</span>
 <span class="sd">        &gt;&gt;&gt; vp = np.array([[1000.0, 500.0, 200.0], [1000.0, 500.0, 200.0]])</span>
 <span class="sd">        &gt;&gt;&gt; gpu_gas = to_warp_gas_data(gas_data, vapor_pressure=vp)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">wp</span> <span class="o">=</span> <span class="n">_ensure_warp_available</span><span class="p">()</span>
     <span class="n">_validate_device</span><span class="p">(</span><span class="n">wp</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 
@@ -18051,14 +18051,14 @@ gpu_gas = to_warp_gas_data(gas_data, vapor_pressure=vp)</p>
         <span class="n">vp_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">vp_array</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">expected_shape</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;vapor_pressure shape </span><span class="si">{</span><span class="n">vp_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> does not match &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="n">expected_shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"vapor_pressure shape </span><span class="si">{</span><span class="n">vp_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> does not match "</span>
+                <span class="sa">f</span><span class="s2">"expected </span><span class="si">{</span><span class="n">expected_shape</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">vp_array</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;vapor_pressure must contain only finite values&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"vapor_pressure must contain only finite values"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">vp_array</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;vapor_pressure must contain only nonnegative values&quot;</span>
+                <span class="s2">"vapor_pressure must contain only nonnegative values"</span>
             <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># GPU kernels always receive a valid (n_boxes, n_species) buffer.</span>
@@ -18115,7 +18115,7 @@ gpu_gas = to_warp_gas_data(gas_data, vapor_pressure=vp)</p>
 
 
 <a href="#particula.gpu.conversion.to_warp_particle_data" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_warp_particle_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="s1">&#39;ParticleData&#39;</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;WarpParticleData&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_warp_particle_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="s1">'ParticleData'</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'cuda'</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'WarpParticleData'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -18269,11 +18269,11 @@ len(gpu_data.masses.shape)
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_warp_particle_data</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">,</span>
-    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="s2">"ParticleData"</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cuda"</span><span class="p">,</span>
     <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;WarpParticleData&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transfer ParticleData to GPU with explicit control.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"WarpParticleData"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Transfer ParticleData to GPU with explicit control.</span>
 
 <span class="sd">    Use this for long GPU-resident simulations where you want to:</span>
 <span class="sd">    1. Transfer data to GPU once at simulation start</span>
@@ -18282,7 +18282,7 @@ len(gpu_data.masses.shape)
 
 <span class="sd">    Args:</span>
 <span class="sd">        data: CPU-side ParticleData container.</span>
-<span class="sd">        device: Target device (&quot;cuda&quot;, &quot;cuda:0&quot;, &quot;cuda:1&quot;, &quot;cpu&quot;).</span>
+<span class="sd">        device: Target device ("cuda", "cuda:0", "cuda:1", "cpu").</span>
 <span class="sd">        copy: If True (default), always copy data to device.</span>
 <span class="sd">              If False, attempt zero-copy via wp.from_numpy() when</span>
 <span class="sd">              arrays are already on a compatible device.</span>
@@ -18295,10 +18295,10 @@ len(gpu_data.masses.shape)
 
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; from particula.gpu import to_warp_particle_data</span>
-<span class="sd">        &gt;&gt;&gt; gpu_data = to_warp_particle_data(particles, device=&quot;cuda&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; gpu_data = to_warp_particle_data(particles, device="cuda")</span>
 <span class="sd">        &gt;&gt;&gt; len(gpu_data.masses.shape)</span>
 <span class="sd">        3</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">wp</span> <span class="o">=</span> <span class="n">_ensure_warp_available</span><span class="p">()</span>
     <span class="n">_validate_device</span><span class="p">(</span><span class="n">wp</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 

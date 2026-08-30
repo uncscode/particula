@@ -13449,6 +13449,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#e7-roadmap-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E7 roadmap inventory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#high-level-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -16852,6 +16863,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#e7-roadmap-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E7 roadmap inventory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#high-level-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -17094,13 +17116,13 @@ documentation conventions.</p>
 <tr>
 <td>7</td>
 <td><a href="#epic-g-backend-selection-and-gpu-resident-simulation">Epic G: Backend Selection and GPU-Resident Simulation</a></td>
-<td>Active</td>
-<td>not scheduled</td>
+<td>Shipped</td>
+<td>E7</td>
 </tr>
 <tr>
 <td>8</td>
 <td><a href="#epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance</a></td>
-<td>Pending</td>
+<td>Active</td>
 <td>not scheduled</td>
 </tr>
 <tr>
@@ -18402,9 +18424,9 @@ them.</p>
 <div class="highlight"><pre><span></span><code>- missing Warp means the quick-start stays in its CPU-only documentation
   path behind `WARP_AVAILABLE`, with deferred `particula.gpu.kernels`
   imports and no pretend kernel execution; guarded test suites may also skip
-  through `pytest.importorskip(&quot;warp&quot;)`, which is expected and should not
+  through `pytest.importorskip("warp")`, which is expected and should not
   be treated as a validation failure
-- CUDA is optional/local/manual, Warp `device=&quot;cpu&quot;` is the default
+- CUDA is optional/local/manual, Warp `device="cpu"` is the default
   runnable validation path, and CPU-only or CI environments should skip
   CUDA-targeted coverage cleanly with the shared `Warp/CUDA not available`
   contract rather than fail
@@ -18420,7 +18442,7 @@ them.</p>
 - focused local validation can use
   `pytest particula/gpu/tests/cuda_availability_test.py -q` for the shared
   skip contract and `pytest particula/gpu/kernels/tests/environment_test.py
-  -q -m &quot;warp and cuda&quot;` for optional CUDA-if-available coverage
+  -q -m "warp and cuda"` for optional CUDA-if-available coverage
 </code></pre></div>
 <ol>
 <li>The paired
@@ -18515,7 +18537,7 @@ explicitly accepted with evidence and remain bounded follow-up concerns.</p>
   acceptance collapse is solved for every mixed-scale distribution.</p>
 <p>Reproduce the seeded checks with:</p>
 <div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_test.py<span class="w"> </span>-q<span class="w"> </span>-k<span class="w"> </span>mixed_scale
-pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_test.py<span class="w"> </span>-q<span class="w"> </span>-k<span class="w"> </span><span class="s2">&quot;mixed_scale or sparse or degenerate or conservation&quot;</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_test.py<span class="w"> </span>-q<span class="w"> </span>-k<span class="w"> </span><span class="s2">"mixed_scale or sparse or degenerate or conservation"</span><span class="w"> </span>-Werror
 </code></pre></div>
 <p>Documentation validation for this note is limited to markdown/path readback
   plus those focused <code>pytest</code> checks; no separate repo-specific docs formatter
@@ -18585,8 +18607,8 @@ it does not change production capability. The caller-owned, write-only
 (<code>kg * J/kg = J</code>).</p>
 <h2 id="epic-e-gpu-coagulation-physics-coverage">Epic E: GPU Coagulation Physics Coverage<a class="headerlink" href="#epic-e-gpu-coagulation-physics-coverage" title="Permanent link">&para;</a></h2>
 <p>Status: shipped. E5-F9 P3 completed no later than its P4 closeout, and Epic E
-completed its bounded direct-kernel coagulation scope. Epic F subsequently
-shipped, and Epic G is active.</p>
+completed its bounded direct-kernel coagulation scope. Epics F and G subsequently
+shipped, and Epic H is active.</p>
 <h3 id="e5-roadmap-inventory">E5 roadmap inventory<a class="headerlink" href="#e5-roadmap-inventory" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -18792,7 +18814,8 @@ establish CPU-strategy parity. E5-F6 ships the additive contract and
 documentation; no additional planned work remains for the shipped approved
 additive combinations. E5-F7 is shipped with the cross-mechanism validation
 record. E5-F9 is shipped: its completed P3/P4 publish the consolidated direct
-example and closeout gate. Epic F subsequently shipped, and Epic G is active.</p>
+example and closeout gate. Epics F and G subsequently shipped, and Epic H is
+active.</p>
 <p>Planned features:</p>
 <ol>
 <li>Sedimentation variants beyond the exact unit-efficiency SP2016 direct-kernel
@@ -18918,7 +18941,7 @@ keeps explicit transfers visible.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.wall_loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeutralWallLossConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">NeutralWallLossConfig</span><span class="p">(</span>
-    <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="s2">"spherical"</span><span class="p">,</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
     <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># m</span>
 <span class="p">)</span>
@@ -19093,14 +19116,78 @@ policy.</p>
   contract.</li>
 </ul>
 <p><strong>Exit bar:</strong> E6-F1--E6-F8 and E6-F9 P1–P4 are shipped with dated completion
-evidence, so E6 is shipped and Epic G is active. Warp CPU remains the baseline
-and CUDA optional. Backend selection, high-level GPU runnables, deterministic
-scheduling, resident loops, and transport remain Epic G work.</p>
+evidence, so E6 is shipped. Epic G subsequently shipped, and Epic H is active.
+Warp CPU remains the baseline and CUDA optional. Graph capture, performance
+validation, profiling, and memory-budget work remain Epic H scope.</p>
 <h2 id="epic-g-backend-selection-and-gpu-resident-simulation">Epic G: Backend Selection and GPU-Resident Simulation<a class="headerlink" href="#epic-g-backend-selection-and-gpu-resident-simulation" title="Permanent link">&para;</a></h2>
 <p>Status: shipped. E7-F9 P7 validation passed on 2026-08-11 after the required
 focused, export, resident-fast, full-package-coverage, changed-module-coverage,
 strict MkDocs, and optional-CUDA gates passed. Epic G is shipped. Epics H and I
-remain deferred.</p>
+remain deferred.
+Status: shipped as ADW plan E7 on 2026-08-30. All nine child plans E7-F1
+through E7-F9 are shipped, and Epic H is active next.</p>
+<h3 id="e7-roadmap-inventory">E7 roadmap inventory<a class="headerlink" href="#e7-roadmap-inventory" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Status text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>E7</code></td>
+<td>Backend Selection and GPU-Resident Simulation</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F1</code></td>
+<td>Backend-Selection and Execution-Context API</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F2</code></td>
+<td>Backend-Selected Condensation</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F3</code></td>
+<td>Backend-Selected Brownian Coagulation</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F4</code></td>
+<td>GPU-Resident Session State and Checkpoints</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F5</code></td>
+<td>Deterministic Full-Process Scheduling</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F6</code></td>
+<td>Fallback, Capability Errors, and API Stability</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F7</code></td>
+<td>Multi-Box Communication and Volume Evolution</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F8</code></td>
+<td>Persistent Per-Box RNG Streams and Restart Semantics</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E7-F9</code></td>
+<td>Diagnostics, Full-Loop Regressions, Documentation, and Closeout</td>
+<td>Shipped</td>
+</tr>
+</tbody>
+</table>
 <p>E7-F1 is shipped (P1--P6 complete). It provides a separate public,
 dependency-neutral, explicit-selection context with a limited CPU/reference
 registration use case.
@@ -19178,10 +19265,12 @@ amount; <code>-1 -&gt; destination</code> sources use the destination's pre-step
 record it in the source ledger, while <code>source -&gt; -1</code> sinks use and record the
 source amount in the sink ledger. The operation performs one gas-concentration
 commit after preflight.
-The remaining transport and mixing/advection work remain deferred.
+Broader transport and mixing/advection work remain deferred.
 E7-F8 is shipped: it owns the bounded scheduled persistent-stream identity,
 reset, and checkpoint/restart policy. E7-F9 owns final diagnostics products,
 complete examples, and closeout; its P7 validation gate is shipped.
+reset, and checkpoint/restart policy. E7-F9 shipped the final diagnostics,
+full-loop regression, documentation, and closeout scope.
 High-level GPU adapters and user-facing CPU/GPU orchestration remain later
 contracts after E7-F6 establishes policy. They must not imply availability
 probing, fallback, retry, graph capture, performance claims, distributed or
@@ -19205,7 +19294,7 @@ guide for the amount equations, capacity gating, and checkpoint boundary.</p>
 <p>CFD, pressure/velocity solvers, adaptive meshes, distributed or multi-GPU
 transport, broad mixing/advection claims, graph capture, performance work, and
 autodiff remain deferred. Independent boxes remain the default; E7-F8 supplies
-the shipped scheduled RNG policy while E7-F9 owns complete-loop publication.</p>
+the shipped scheduled RNG policy and E7-F9 closes complete-loop publication.</p>
 <p>Fixed-capacity slot management for these loops is defined in
 <a href="#fixed-capacity-slot-boundary">Fixed-Capacity Slot Boundary</a> under Epic F.</p>
 <h3 id="random-number-strategy">Random Number Strategy<a class="headerlink" href="#random-number-strategy" title="Permanent link">&para;</a></h3>
@@ -19244,8 +19333,16 @@ P7 is shipped as of 2026-08-11. See the
 for the dated evidence. Epic G is shipped. Epics H and I remain deferred. Any
 public, availability-policy, fallback/retry, graph-capture, performance, or
 distributed integration must establish its own contract. The direct GPU path
-remains explicit and unchanged.</p>
+remains explicit and unchanged.
+<strong>Exit bar:</strong> Satisfied on 2026-08-30. E7-F1 remains a bounded selection seam,
+E7-F5 remains a bounded concrete-only resident scheduler, and E7-F7--E7-F9
+close the communication, RNG/restart, diagnostics, validation, documentation,
+and epic publication scope. The direct GPU path remains explicit and unchanged.
+Graph capture, performance profiling and targets, memory-budget evidence,
+distributed execution, and autodiff remain deferred to Epics H and I.</p>
 <h2 id="epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance<a class="headerlink" href="#epic-h-graph-capture-and-performance" title="Permanent link">&para;</a></h2>
+<p>Status: active. This is the next roadmap step after E7; its ADW plan and child
+feature decomposition are not yet scheduled.</p>
 <p>Reduce launch overhead with graph capture and establish performance and memory
 targets aligned with the multi-box scaling goal.</p>
 <p>Planned features:</p>

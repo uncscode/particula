@@ -16143,9 +16143,9 @@ as temperature, pressure, and particle radius.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example Usage of BrownianCoagulationStrategy</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">brownian_strat</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span>
 <span class="p">)</span>
-<span class="c1"># Suppose we have a ParticleRepresentation object called &#39;particle_rep&#39;</span>
+<span class="c1"># Suppose we have a ParticleRepresentation object called 'particle_rep'</span>
 <span class="c1"># kernel_values = brownian_strat.kernel(</span>
 <span class="c1">#   particle_rep, temperature=298, pressure=101325</span>
 <span class="c1"># )</span>
@@ -16193,12 +16193,12 @@ as temperature, pressure, and particle radius.</p>
 <span class="normal">70</span>
 <span class="normal">71</span>
 <span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the BrownianCoagulationStrategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the BrownianCoagulationStrategy.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - distribution_type : String specifying the distribution type</span>
-<span class="sd">          (e.g., &quot;discrete&quot;, &quot;continuous_pdf&quot;, &quot;particle_resolved&quot;).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">          (e.g., "discrete", "continuous_pdf", "particle_resolved").</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16295,7 +16295,7 @@ Brownian kernels are not defined here.</p>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Not implemented for BrownianCoagulationStrategy.</span>
+<span class="w">    </span><span class="sd">"""Not implemented for BrownianCoagulationStrategy.</span>
 
 <span class="sd">    This method raises NotImplementedError since dimensionless</span>
 <span class="sd">    Brownian kernels are not defined here.</span>
@@ -16307,10 +16307,10 @@ Brownian kernels are not defined here.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        - NotImplementedError : Always, as no dimensionless kernel is</span>
 <span class="sd">        provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;Dimensionless kernel not implemented in simple &quot;</span>
-        <span class="o">+</span> <span class="s2">&quot;coagulation strategy.&quot;</span>
+        <span class="s2">"Dimensionless kernel not implemented in simple "</span>
+        <span class="o">+</span> <span class="s2">"coagulation strategy."</span>
     <span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -16426,7 +16426,7 @@ underlying distribution.</li>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the dimensioned Brownian coagulation kernel.</span>
+<span class="w">    </span><span class="sd">"""Calculate the dimensioned Brownian coagulation kernel.</span>
 
 <span class="sd">    Leverages the `get_brownian_kernel_via_system_state` function to</span>
 <span class="sd">    compute the kernel, which accounts for particle size, temperature,</span>
@@ -16446,7 +16446,7 @@ underlying distribution.</li>
 <span class="sd">        ```py</span>
 <span class="sd">        kernel_matrix = brownian_strat.kernel(particle_rep, 300, 101325)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_brownian_kernel_via_system_state</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">_get_radius</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
         <span class="n">particle_mass</span><span class="o">=</span><span class="n">_get_mass</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>

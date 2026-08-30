@@ -16316,7 +16316,7 @@ resolved graph, schedule, and thermodynamic configuration.</p>
 <span class="normal">245</span>
 <span class="normal">246</span>
 <span class="normal">247</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ResidentThermodynamicUpdateRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retain a request and initialize both derived fields as stale.</span>
+<span class="w">    </span><span class="sd">"""Retain a request and initialize both derived fields as stale.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        request: Exact concrete binding to the resident session, registry,</span>
@@ -16325,10 +16325,10 @@ resolved graph, schedule, and thermodynamic configuration.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``request`` is not an exact</span>
 <span class="sd">            ``ResidentThermodynamicUpdateRequest``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentThermodynamicUpdateRequest</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;request must be an exact ResidentThermodynamicUpdateRequest.&quot;</span>
+            <span class="s2">"request must be an exact ResidentThermodynamicUpdateRequest."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_request</span> <span class="o">=</span> <span class="n">request</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span> <span class="o">=</span> <span class="mi">0</span>
@@ -16584,7 +16584,7 @@ consuming the consumer node.</p>
 <span class="normal">466</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute_consumer</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">ProcessNode</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">object</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Refresh stale fields and call the next scheduled consumer once.</span>
+<span class="w">    </span><span class="sd">"""Refresh stale fields and call the next scheduled consumer once.</span>
 
 <span class="sd">    Only condensation and diagnostics consumers are supported. The method</span>
 <span class="sd">    consumes immediately preceding virtual refresh nodes when present,</span>
@@ -16608,32 +16608,32 @@ consuming the consumer node.</p>
 <span class="sd">            ordering, or the requested consumer is invalid.</span>
 <span class="sd">        Exception: Propagates a refresh-writer or callback failure without</span>
 <span class="sd">            consuming the consumer node.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ProcessNode</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;node must be an exact ProcessNode.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"node must be an exact ProcessNode."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">callback</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;callback must be callable.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"callback must be callable."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_binding</span><span class="p">()</span>
     <span class="n">virtual_nodes</span><span class="p">,</span> <span class="n">expected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_consumer_window</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">expected</span><span class="o">.</span><span class="n">node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_CONSUMER_IDS</span> <span class="ow">or</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">expected</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;node must be the next scheduled thermodynamic consumer.&quot;</span>
+            <span class="s2">"node must be the next scheduled thermodynamic consumer."</span>
         <span class="p">)</span>
     <span class="n">virtual_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">item</span><span class="o">.</span><span class="n">node_id</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">virtual_nodes</span><span class="p">}</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">InvalidatedState</span><span class="o">.</span><span class="n">VAPOR_PRESSURE</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stale</span>
-        <span class="ow">and</span> <span class="s2">&quot;vapor_pressure_refresh&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">virtual_ids</span>
+        <span class="ow">and</span> <span class="s2">"vapor_pressure_refresh"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">virtual_ids</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;stale vapor pressure requires a virtual refresh node.&quot;</span>
+            <span class="s2">"stale vapor pressure requires a virtual refresh node."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">InvalidatedState</span><span class="o">.</span><span class="n">SATURATION_RATIO</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stale</span>
-        <span class="ow">and</span> <span class="s2">&quot;saturation_refresh&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">virtual_ids</span>
+        <span class="ow">and</span> <span class="s2">"saturation_refresh"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">virtual_ids</span>
         <span class="ow">and</span> <span class="n">virtual_nodes</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;stale saturation ratio requires a virtual refresh node.&quot;</span>
+            <span class="s2">"stale saturation ratio requires a virtual refresh node."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_refresh_stale_fields</span><span class="p">()</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">callback</span><span class="p">()</span>
@@ -16739,7 +16739,7 @@ if <code>node</code> is out of order, virtual, or a consumer.</p>
 <span class="normal">374</span>
 <span class="normal">375</span>
 <span class="normal">376</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">record_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">ProcessNode</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Record one successfully completed ordinary schedule node.</span>
+<span class="w">    </span><span class="sd">"""Record one successfully completed ordinary schedule node.</span>
 
 <span class="sd">    The node must be the next scheduled graph member and must not be a</span>
 <span class="sd">    virtual refresh or supported consumer. Its declared invalidations are</span>
@@ -16756,15 +16756,15 @@ if <code>node</code> is out of order, virtual, or a consumer.</p>
 <span class="sd">        TypeError: If ``node`` is not an exact ``ProcessNode``.</span>
 <span class="sd">        ValueError: If resident binding or schedule metadata is invalid, or</span>
 <span class="sd">            if ``node`` is out of order, virtual, or a consumer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ProcessNode</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;node must be an exact ProcessNode.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"node must be an exact ProcessNode."</span><span class="p">)</span>
     <span class="n">expected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_node</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">expected</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;node must be the next scheduled graph node.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"node must be the next scheduled graph node."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">node_id</span> <span class="ow">in</span> <span class="n">_VIRTUAL_IDS</span> <span class="ow">or</span> <span class="n">node</span><span class="o">.</span><span class="n">node_id</span> <span class="ow">in</span> <span class="n">_CONSUMER_IDS</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;record_completed accepts only non-consumer non-virtual nodes.&quot;</span>
+            <span class="s2">"record_completed accepts only non-consumer non-virtual nodes."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_stale</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">invalidates</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -16947,25 +16947,25 @@ concrete type.</p>
 <span class="normal">118</span>
 <span class="normal">119</span>
 <span class="normal">120</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact retained carrier types without inspecting payloads.</span>
+<span class="w">    </span><span class="sd">"""Validate exact retained carrier types without inspecting payloads.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If any retained object is not its required exact</span>
 <span class="sd">            concrete type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentSession</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;session must be an exact ResidentSession.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"session must be an exact ResidentSession."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_registry_type</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;registry must be an exact GPUResourceRegistry.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"registry must be an exact GPUResourceRegistry."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResolvedProcessGraph</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;graph must be an exact ResolvedProcessGraph.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"graph must be an exact ResolvedProcessGraph."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResolvedTimestepSchedule</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;schedule must be an exact ResolvedTimestepSchedule.&quot;</span>
+            <span class="s2">"schedule must be an exact ResolvedTimestepSchedule."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thermodynamics</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ThermodynamicsConfig</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;thermodynamics must be an exact ThermodynamicsConfig.&quot;</span>
+            <span class="s2">"thermodynamics must be an exact ThermodynamicsConfig."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

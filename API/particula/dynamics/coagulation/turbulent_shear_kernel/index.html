@@ -16227,7 +16227,7 @@ how rapidly eddies drive particle collisions.</p>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the turbulent shear kernel (Equation 13A.2, Saffman &amp; Turner,</span>
+<span class="w">    </span><span class="sd">"""Calculate the turbulent shear kernel (Equation 13A.2, Saffman &amp; Turner,</span>
 <span class="sd">    1956).</span>
 
 <span class="sd">    This function implements the formula for collisions induced by turbulent</span>
@@ -16249,7 +16249,7 @@ how rapidly eddies drive particle collisions.</p>
 <span class="sd">        - Turbulent shear kernel matrix [m³/s], shape (n, n).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 
 <span class="sd">        r = np.array([1e-7, 2e-7])</span>
@@ -16266,7 +16266,7 @@ how rapidly eddies drive particle collisions.</p>
 <span class="sd">          in turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.</span>
 <span class="sd">        - Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry and</span>
 <span class="sd">          physics (3rd ed.). John Wiley &amp; Sons. Chapter 13, Equation 13A.2.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">diameter_sum_matrix</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">particle_radius</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">particle_radius</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
     <span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>  <span class="c1"># Convert from radius to diameter sum</span>
@@ -16442,7 +16442,7 @@ Saffman &amp; Turner (1956) formula:</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the turbulent shear kernel using system state data.</span>
+<span class="w">    </span><span class="sd">"""Calculate the turbulent shear kernel using system state data.</span>
 
 <span class="sd">    This version derives the kinematic viscosity from the temperature and</span>
 <span class="sd">    fluid density, then uses get_turbulent_shear_kernel_st1956 for the</span>
@@ -16464,7 +16464,7 @@ Saffman &amp; Turner (1956) formula:</p>
 <span class="sd">        - Turbulent shear kernel matrix [m³/s], shape (n, n).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 
 <span class="sd">        r = np.array([1e-7, 2e-7])</span>
@@ -16482,7 +16482,7 @@ Saffman &amp; Turner (1956) formula:</p>
 <span class="sd">          in turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.</span>
 <span class="sd">        - Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry and</span>
 <span class="sd">          physics (3rd ed.). John Wiley &amp; Sons. Chapter 13, Equation 13A.2.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">kinematic_viscosity</span> <span class="o">=</span> <span class="n">get_kinematic_viscosity_via_system_state</span><span class="p">(</span>
         <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span> <span class="n">fluid_density</span><span class="o">=</span><span class="n">fluid_density</span>
     <span class="p">)</span>

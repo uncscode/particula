@@ -16294,7 +16294,7 @@ and then cleared.</p>
     <span class="n">collision_pairs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">n_collisions</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply representable coagulation merges to caller-owned state in place.</span>
+<span class="w">    </span><span class="sd">"""Apply representable coagulation merges to caller-owned state in place.</span>
 
 <span class="sd">    A pair is applied only when the summed charge and every summed species mass</span>
 <span class="sd">    are finite and nonnegative. Applied merges add donor mass and charge to the</span>
@@ -16311,7 +16311,7 @@ and then cleared.</p>
 <span class="sd">        collision_pairs: Collision index buffer</span>
 <span class="sd">            ``(n_boxes, max_collisions, 2)``.</span>
 <span class="sd">        n_collisions: Collision counts ``(n_boxes,)``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># type: ignore</span>
+<span class="sd">    """</span>  <span class="c1"># type: ignore</span>
     <span class="n">box_idx</span><span class="p">,</span> <span class="n">collision_idx</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>  <span class="c1"># type: ignore[misc]</span>
     <span class="k">if</span> <span class="n">collision_idx</span> <span class="o">&gt;=</span> <span class="n">n_collisions</span><span class="p">[</span><span class="n">box_idx</span><span class="p">]:</span>
         <span class="k">return</span>
@@ -17095,7 +17095,7 @@ two-way, and four-way approved masks are executable.</p>
     <span class="n">mechanism_mask</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">collision_capacity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Select stochastic coagulation pairs for each box.</span>
+<span class="w">    </span><span class="sd">"""Select stochastic coagulation pairs for each box.</span>
 
 <span class="sd">    Candidate pairs are drawn by rank within the current active set so each</span>
 <span class="sd">    scheduled trial proposes two distinct active particles without retrying on</span>
@@ -17154,7 +17154,7 @@ two-way, and four-way approved masks are executable.</p>
 <span class="sd">        mechanism_mask: Fixed internal sampler mask. Public singleton,</span>
 <span class="sd">            two-way, and four-way approved masks are executable.</span>
 <span class="sd">        collision_capacity: Maximum accepted collisions per box for this call.</span>
-<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># type: ignore</span>
+<span class="sd">    """</span>  <span class="c1"># type: ignore</span>
     <span class="n">box_idx</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>  <span class="c1"># type: ignore[misc]</span>
     <span class="n">n_particles</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
@@ -18455,10 +18455,10 @@ retrying.</p>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute one direct, particle-resolved Warp coagulation timestep.</span>
+<span class="w">    </span><span class="sd">"""Execute one direct, particle-resolved Warp coagulation timestep.</span>
 
 <span class="sd">    This low-level API is not a CPU strategy-composition or ``Runnable`` API.</span>
-<span class="sd">    It supports only ``&quot;particle_resolved&quot;`` execution: omission selects</span>
+<span class="sd">    It supports only ``"particle_resolved"`` execution: omission selects</span>
 <span class="sd">    Brownian; the executable singleton masks are ``1``, ``2``, ``4``, and ``8``;</span>
 <span class="sd">    unordered two-way masks are ``3``, ``5``, ``6``, ``9``, ``10``, and ``12``;</span>
 <span class="sd">    and the four-way mask is ``15``. Supported mechanism tuples normalize to</span>
@@ -18547,7 +18547,7 @@ retrying.</p>
 <span class="sd">            raises exactly</span>
 <span class="sd">            ``ValueError``</span>
 <span class="sd">            with the message</span>
-<span class="sd">            ``&quot;mechanism_config must be a CoagulationMechanismConfig.&quot;``;</span>
+<span class="sd">            ``"mechanism_config must be a CoagulationMechanismConfig."``;</span>
 <span class="sd">            other errors are delegated to the resolver and capability gate.</span>
 <span class="sd">        initialize_rng: Explicit reset flag for caller-provided</span>
 <span class="sd">            ``rng_states``. The default ``False`` path validates the buffer and</span>
@@ -18668,7 +18668,7 @@ retrying.</p>
 <span class="sd">        Sedimentation-enabled masks allocate a separate zero-initialized</span>
 <span class="sd">        settling-velocity array; non-sedimentation paths alias that storage to</span>
 <span class="sd">        radii. The selector clears its own scratch slots and sums each active</span>
-<span class="sd">        particle&#39;s species masses once for charged pair rates and their</span>
+<span class="sd">        particle's species masses once for charged pair rates and their</span>
 <span class="sd">        compact-active majorant. It derives radii for ST1956 turbulent-shear</span>
 <span class="sd">        rates and populates settling velocities for valid active slots whenever</span>
 <span class="sd">        sedimentation is enabled, including mixed masks.</span>
@@ -18697,12 +18697,12 @@ retrying.</p>
 <span class="sd">        particles, collision outputs, or RNG state. Callers must synchronize and</span>
 <span class="sd">        check Warp errors, then restore or discard their own snapshots before</span>
 <span class="sd">        retrying.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">mechanism_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mechanism_config</span> <span class="o">=</span> <span class="n">CoagulationMechanismConfig</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mechanism_config</span><span class="p">,</span> <span class="n">CoagulationMechanismConfig</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;mechanism_config must be a CoagulationMechanismConfig.&quot;</span>
+            <span class="s2">"mechanism_config must be a CoagulationMechanismConfig."</span>
         <span class="p">)</span>
     <span class="n">resolved_mechanism_config</span> <span class="o">=</span> <span class="n">resolve_coagulation_mechanism_config</span><span class="p">(</span>
         <span class="n">mechanism_config</span>
@@ -18764,7 +18764,7 @@ retrying.</p>
         <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
         <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
         <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-        <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;coagulation_step_gpu&quot;</span><span class="p">,</span>
+        <span class="n">caller_name</span><span class="o">=</span><span class="s2">"coagulation_step_gpu"</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">volume</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -18774,16 +18774,16 @@ retrying.</p>
     <span class="n">expected_pairs_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">max_collisions_value</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">collision_pairs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">collision_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_boxes</span> <span class="ow">or</span> <span class="n">collision_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;collision_pairs shape must match (n_boxes, *, 2)&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"collision_pairs shape must match (n_boxes, *, 2)"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">collision_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">max_collisions_value</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;collision_pairs capacity is smaller than the effective &quot;</span>
-                <span class="s2">&quot;max_collisions bound&quot;</span>
+                <span class="s2">"collision_pairs capacity is smaller than the effective "</span>
+                <span class="s2">"max_collisions bound"</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">collision_pairs</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;collision_pairs buffer must use dtype int32&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"collision_pairs buffer must use dtype int32"</span><span class="p">)</span>
         <span class="n">_validate_device_match</span><span class="p">(</span>
-            <span class="s2">&quot;collision_pairs buffer&quot;</span><span class="p">,</span> <span class="n">collision_pairs</span><span class="p">,</span> <span class="n">device</span>
+            <span class="s2">"collision_pairs buffer"</span><span class="p">,</span> <span class="n">collision_pairs</span><span class="p">,</span> <span class="n">device</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">n_collisions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -19041,7 +19041,7 @@ buffer or if the provided device mismatches the buffer device.</p>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize a caller-owned coagulation RNG state buffer from a seed.</span>
+<span class="w">    </span><span class="sd">"""Initialize a caller-owned coagulation RNG state buffer from a seed.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        rng_seed: Seed used to initialize the per-box Warp RNG state.</span>
@@ -19055,18 +19055,18 @@ buffer or if the provided device mismatches the buffer device.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``rng_states`` is not a one-dimensional ``wp.uint32``</span>
 <span class="sd">            buffer or if the provided device mismatches the buffer device.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rng_states</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;rng_states must have shape (n_boxes,)&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"rng_states must have shape (n_boxes,)"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">rng_states</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">wp</span><span class="o">.</span><span class="n">uint32</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;rng_states buffer must use dtype uint32&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"rng_states buffer must use dtype uint32"</span><span class="p">)</span>
 
-    <span class="n">resolved_device</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">rng_states</span><span class="p">,</span> <span class="s2">&quot;device&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">resolved_device</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">rng_states</span><span class="p">,</span> <span class="s2">"device"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">resolved_device</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">get_device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">_validate_device_match</span><span class="p">(</span><span class="s2">&quot;rng_states buffer&quot;</span><span class="p">,</span> <span class="n">rng_states</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="n">_validate_device_match</span><span class="p">(</span><span class="s2">"rng_states buffer"</span><span class="p">,</span> <span class="n">rng_states</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 
     <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
         <span class="n">_initialize_rng_states</span><span class="p">,</span>

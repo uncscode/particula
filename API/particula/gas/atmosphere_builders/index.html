@@ -16187,14 +16187,14 @@ species (or None if not set).</p>
   <div class="highlight"><span class="filename">Create an atmosphere using the builder</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">builder</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
 <span class="n">o2</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpecies</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;O2&quot;</span><span class="p">,</span> <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.032</span><span class="p">,</span> <span class="n">partitioning</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"O2"</span><span class="p">,</span> <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.032</span><span class="p">,</span> <span class="n">partitioning</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 <span class="n">n2</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpecies</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;N2&quot;</span><span class="p">,</span> <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.028</span><span class="p">,</span> <span class="n">partitioning</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"N2"</span><span class="p">,</span> <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.028</span><span class="p">,</span> <span class="n">partitioning</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">)</span>
 <span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">builder</span><span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">101325</span><span class="p">,</span> <span class="s2">&quot;Pa&quot;</span><span class="p">)</span>
+    <span class="n">builder</span><span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="s2">"K"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">101325</span><span class="p">,</span> <span class="s2">"Pa"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_more_partitioning_species</span><span class="p">(</span><span class="n">o2</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_more_gas_only_species</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -16229,14 +16229,14 @@ Atmosphere object, including temperature and pressure.</p>
 <span class="normal">82</span>
 <span class="normal">83</span>
 <span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Atmosphere builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Atmosphere builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating an</span>
 <span class="sd">    Atmosphere object, including temperature and pressure.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;pressure&quot;</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">,</span>
+        <span class="s2">"pressure"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderPressureMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16333,7 +16333,7 @@ added to the mixture.</p>
 <span class="normal">151</span>
 <span class="normal">152</span>
 <span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Atmosphere</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the configuration and construct the Atmosphere object.</span>
+<span class="w">    </span><span class="sd">"""Validate the configuration and construct the Atmosphere object.</span>
 
 <span class="sd">    This method checks that all necessary conditions are met for a valid</span>
 <span class="sd">    Atmosphere instance (e.g., at least one partitioning and one gas-only</span>
@@ -16345,7 +16345,7 @@ added to the mixture.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If no partitioning or gas-only species have been</span>
 <span class="sd">          added to the mixture.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">Atmosphere</span><span class="p">(</span>
         <span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
@@ -16439,8 +16439,8 @@ added to the mixture.</p>
 <span class="normal">130</span>
 <span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_more_gas_only_species</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">species</span><span class="p">:</span> <span class="n">GasSpecies</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AtmosphereBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a non-partitioning GasSpecies object to the mixture.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AtmosphereBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Add a non-partitioning GasSpecies object to the mixture.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - species : The GasSpecies instance to add (must have</span>
@@ -16451,9 +16451,9 @@ added to the mixture.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If ``species.partitioning`` is False.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">species</span><span class="o">.</span><span class="n">get_partitioning</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provided species has partitioning=True&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Provided species has partitioning=True"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas_only_species</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gas_only_species</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">species</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -16546,8 +16546,8 @@ added to the mixture.</p>
 <span class="normal">107</span>
 <span class="normal">108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_more_partitioning_species</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">species</span><span class="p">:</span> <span class="n">GasSpecies</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AtmosphereBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a partitioning GasSpecies object to the mixture.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AtmosphereBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Add a partitioning GasSpecies object to the mixture.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - species : The GasSpecies instance to add (must have</span>
@@ -16558,9 +16558,9 @@ added to the mixture.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If ``species.partitioning`` is False.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">species</span><span class="o">.</span><span class="n">get_partitioning</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provided species has partitioning=False&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Provided species has partitioning=False"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">partitioning_species</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># store a copy to avoid external mutation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">partitioning_species</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">species</span><span class="p">)</span>

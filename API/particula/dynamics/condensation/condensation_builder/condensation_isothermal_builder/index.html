@@ -16120,16 +16120,16 @@ diffusion coefficient, and accommodation coefficient.</p>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Condensation Isothermal builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Condensation Isothermal builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    CondensationIsothermal strategy, including molar mass,</span>
 <span class="sd">    diffusion coefficient, and accommodation coefficient.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderMolarMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16187,14 +16187,14 @@ diffusion coefficient, and accommodation coefficient.</p>
 <span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CondensationStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and create a condensation strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and create a condensation strategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
 
     <span class="c1"># Type guards: pre_build_check ensures these are not None</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_coefficient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;diffusion_coefficient must be set&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"diffusion_coefficient must be set"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">accommodation_coefficient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;accommodation_coefficient must be set&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"accommodation_coefficient must be set"</span><span class="p">)</span>
     <span class="n">molar_mass</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">CondensationIsothermal</span><span class="p">(</span>

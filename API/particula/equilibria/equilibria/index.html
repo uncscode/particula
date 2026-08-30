@@ -16180,11 +16180,11 @@ TODO is richer aerosol data mapping once broader data flow is finalized.</p>
 <span class="normal">59</span>
 <span class="normal">60</span>
 <span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">EquilibriaStrategy</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize with the provided equilibria strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize with the provided equilibria strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        strategy: Concrete ``EquilibriaStrategy`` used during execution.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">strategy</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16327,7 +16327,7 @@ TODO is richer aerosol data mapping once broader data flow is finalized.</p>
 <span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run equilibria over the provided time step.</span>
+<span class="w">    </span><span class="sd">"""Run equilibria over the provided time step.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        aerosol: Aerosol state passed to the strategy and updated in place.</span>
@@ -16341,9 +16341,9 @@ TODO is richer aerosol data mapping once broader data flow is finalized.</p>
 <span class="sd">        ValueError: If ``sub_steps`` is not positive.</span>
 <span class="sd">        AttributeError: When required partitioning inputs are missing.</span>
 <span class="sd">        TypeError: If the strategy returns ``None``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">sub_steps</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sub_steps must be positive&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"sub_steps must be positive"</span><span class="p">)</span>
 
     <span class="n">partitioning_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_partitioning_inputs</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
     <span class="n">dt</span> <span class="o">=</span> <span class="n">time_step</span> <span class="o">/</span> <span class="n">sub_steps</span>
@@ -16352,10 +16352,10 @@ TODO is richer aerosol data mapping once broader data flow is finalized.</p>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sub_steps</span><span class="p">):</span>
         <span class="n">solve_kwargs</span> <span class="o">=</span> <span class="p">{</span>
             <span class="o">**</span><span class="n">partitioning_inputs</span><span class="p">,</span>
-            <span class="s2">&quot;partition_coefficient_guess&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">"partition_coefficient_guess"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="k">if</span> <span class="s2">&quot;time_step&quot;</span> <span class="ow">in</span> <span class="n">solve_params</span><span class="p">:</span>
-            <span class="n">solve_kwargs</span><span class="p">[</span><span class="s2">&quot;time_step&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="k">if</span> <span class="s2">"time_step"</span> <span class="ow">in</span> <span class="n">solve_params</span><span class="p">:</span>
+            <span class="n">solve_kwargs</span><span class="p">[</span><span class="s2">"time_step"</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="o">**</span><span class="n">solve_kwargs</span><span class="p">)</span>
         <span class="n">aerosol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_equilibrium_result</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
 
@@ -16387,7 +16387,7 @@ TODO is richer aerosol data mapping once broader data flow is finalized.</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># noqa: ARG002</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the strategy identifier for non-rate processes.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return the strategy identifier for non-rate processes."""</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>

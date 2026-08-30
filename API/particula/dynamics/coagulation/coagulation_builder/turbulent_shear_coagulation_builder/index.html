@@ -16160,11 +16160,11 @@ TurbulentShearCoagulationStrategy.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Turbulent Shear Coagulation Builder Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">builder</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">TurbulentShearCoagulationBuilder</span><span class="p">()</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
 <span class="n">builder</span><span class="o">.</span><span class="n">set_turbulent_dissipation</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">)</span>
 <span class="n">builder</span><span class="o">.</span><span class="n">set_fluid_density</span><span class="p">(</span><span class="mf">1000.</span><span class="p">)</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="c1"># Now &#39;strategy&#39; can be used to compute turbulent shear coagulation</span>
+<span class="c1"># Now 'strategy' can be used to compute turbulent shear coagulation</span>
 <span class="c1"># rates.</span>
 </code></pre></div>
 
@@ -16226,7 +16226,7 @@ toward valid operation.</p>
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the TurbulentShearCoagulationBuilder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the TurbulentShearCoagulationBuilder.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - None</span>
@@ -16234,11 +16234,11 @@ toward valid operation.</p>
 <span class="sd">    Note:</span>
 <span class="sd">        Some default values may be set by the mixins to guide the user</span>
 <span class="sd">        toward valid operation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;distribution_type&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;fluid_density&quot;</span><span class="p">,</span>
+        <span class="s2">"distribution_type"</span><span class="p">,</span>
+        <span class="s2">"turbulent_dissipation"</span><span class="p">,</span>
+        <span class="s2">"fluid_density"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">coagulation_builder_mixin</span><span class="o">.</span><span class="n">BuilderDistributionTypeMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16312,7 +16312,7 @@ TurbulentShearCoagulationStrategy.</p>
 <span class="normal">93</span>
 <span class="normal">94</span>
 <span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoagulationStrategyABC</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct a TurbulentShearCoagulationStrategy.</span>
+<span class="w">    </span><span class="sd">"""Construct a TurbulentShearCoagulationStrategy.</span>
 
 <span class="sd">    This method performs a final check to ensure all required parameters</span>
 <span class="sd">    have been set. It then creates and returns an instance of</span>
@@ -16320,7 +16320,7 @@ TurbulentShearCoagulationStrategy.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - The resulting turbulent shear coagulation strategy object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">TurbulentShearCoagulationStrategy</span><span class="p">(</span>
         <span class="n">distribution_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span><span class="p">,</span>

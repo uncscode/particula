@@ -16262,7 +16262,7 @@ the Chahl and Gopalakrishnan (2019) approximation.</p>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chahl and Gopalakrishnan (2019) dimensionless coagulation kernel.</span>
+<span class="w">    </span><span class="sd">"""Chahl and Gopalakrishnan (2019) dimensionless coagulation kernel.</span>
 
 <span class="sd">    This function accounts for the Coulomb potential between particles using</span>
 <span class="sd">    the Chahl and Gopalakrishnan (2019) approximation.</span>
@@ -16281,7 +16281,7 @@ the Chahl and Gopalakrishnan (2019) approximation.</p>
 <span class="sd">          molecular regime Coulombic collisions in aerosols and dusty plasmas.</span>
 <span class="sd">          Aerosol Science and Technology, 53(8), 933-957.</span>
 <span class="sd">          https://doi.org/10.1080/02786826.2019.1614522</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">bool_mask</span> <span class="o">=</span> <span class="n">coulomb_potential_ratio</span> <span class="o">&gt;</span> <span class="mi">0</span>
     <span class="c1"># Ensure no division by zero</span>
     <span class="n">coulomb_potential_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">)</span>
@@ -16431,7 +16431,7 @@ the Dyachkov et al. (2007) approximation.</p>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dyachkov et al. (2007) approximation for the dimensionless kernel.</span>
+<span class="w">    </span><span class="sd">"""Dyachkov et al. (2007) approximation for the dimensionless kernel.</span>
 
 <span class="sd">    This function accounts for the Coulomb potential between particles using</span>
 <span class="sd">    the Dyachkov et al. (2007) approximation.</span>
@@ -16450,7 +16450,7 @@ the Dyachkov et al. (2007) approximation.</p>
 <span class="sd">      particles in the transition regime: The effect of the Coulomb potential.</span>
 <span class="sd">      Journal of Chemical Physics, 126(12).</span>
 <span class="sd">      https://doi.org/10.1063/1.2713719</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">coulomb_potential_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
         <span class="n">coulomb_potential_ratio</span><span class="p">,</span> <span class="mf">1e-16</span>
     <span class="p">)</span>  <span class="c1"># Avoid division by zero</span>
@@ -16616,7 +16616,7 @@ the Gatti et al. (2008) approximation.</p>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gatti et al. (2008) approximation for the dimensionless kernel.</span>
+<span class="w">    </span><span class="sd">"""Gatti et al. (2008) approximation for the dimensionless kernel.</span>
 
 <span class="sd">    This function accounts for the Coulomb potential between particles using</span>
 <span class="sd">    the Gatti et al. (2008) approximation.</span>
@@ -16635,7 +16635,7 @@ the Gatti et al. (2008) approximation.</p>
 <span class="sd">      charging in plasmas over a wide range of collisionality. Physical Review</span>
 <span class="sd">      E - Statistical, Nonlinear, and Soft Matter Physics, 78(4).</span>
 <span class="sd">      https://doi.org/10.1103/PhysRevE.78.046402</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">bool_mask</span> <span class="o">=</span> <span class="n">coulomb_potential_ratio</span> <span class="o">&gt;=</span> <span class="mi">0</span>
     <span class="c1"># Ensure no division by zero</span>
     <span class="n">coulomb_potential_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span> <span class="mf">1e-16</span><span class="p">)</span>
@@ -16791,7 +16791,7 @@ the Gopalakrishnan and Hogan (2012) approximation.</p>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gopalakrishnan and Hogan (2012) dimensionless coagulation kernel.</span>
+<span class="w">    </span><span class="sd">"""Gopalakrishnan and Hogan (2012) dimensionless coagulation kernel.</span>
 
 <span class="sd">    This function accounts for the Coulomb potential between particles using</span>
 <span class="sd">    the Gopalakrishnan and Hogan (2012) approximation.</span>
@@ -16810,7 +16810,7 @@ the Gopalakrishnan and Hogan (2012) approximation.</p>
 <span class="sd">      in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear</span>
 <span class="sd">      and Soft Matter Physics, 85(2).</span>
 <span class="sd">      https://doi.org/10.1103/PhysRevE.85.026410</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Condition for the transition regime</span>
     <span class="n">bool_mask</span> <span class="o">=</span> <span class="n">coulomb_potential_ratio</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
     <span class="c1"># Ensure no division by zero</span>
@@ -16976,7 +16976,7 @@ particle-particle interactions [m³/s].</li>
     <span class="n">reduced_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">reduced_friction_factor</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the dimensioned coagulation kernel for each particle pair.</span>
+<span class="w">    </span><span class="sd">"""Calculate the dimensioned coagulation kernel for each particle pair.</span>
 
 <span class="sd">    This function computes the dimensioned coagulation kernel from the</span>
 <span class="sd">    dimensionless coagulation kernel and the reduced quantities. All inputs</span>
@@ -17000,7 +17000,7 @@ particle-particle interactions [m³/s].</li>
 <span class="sd">          molecular regime Coulombic collisions in aerosols and dusty plasmas.</span>
 <span class="sd">          Aerosol Science and Technology, 53(8), 933-957.</span>
 <span class="sd">          https://doi.org/10.1080/02786826.2019.1614522</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">coulomb_kinetic_limit</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">get_coulomb_kinetic_limit</span><span class="p">(</span>
         <span class="n">coulomb_potential_ratio</span>
     <span class="p">)</span>
@@ -17135,7 +17135,7 @@ infinity.</p>
 <span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_hard_sphere_kernel</span><span class="p">(</span>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hard sphere approximation for the dimensionless coagulation kernel.</span>
+<span class="w">    </span><span class="sd">"""Hard sphere approximation for the dimensionless coagulation kernel.</span>
 
 <span class="sd">    This function provides a hard sphere approximation for the dimensionless</span>
 <span class="sd">    coagulation kernel based on the diffusive Knudsen number.</span>
@@ -17156,13 +17156,13 @@ infinity.</p>
 <span class="sd">      particles in the transition regime: The effect of the Coulomb potential.</span>
 <span class="sd">      Journal of Chemical Physics, 126(12).</span>
 <span class="sd">      https://doi.org/10.1063/1.2713719</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">diffusive_knudsen</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Particle sizes must be non-negative&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Particle sizes must be non-negative"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">diffusive_knudsen</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid particle sizes&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid particle sizes"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">diffusive_knudsen</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid particle sizes&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid particle sizes"</span><span class="p">)</span>
 
     <span class="n">continuum_limit</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">diffusive_knudsen</span><span class="o">**</span><span class="mi">2</span>
 

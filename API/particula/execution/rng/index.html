@@ -16647,15 +16647,15 @@ non-boolean integral value.</p>
 <span class="normal">95</span>
 <span class="normal">96</span>
 <span class="normal">97</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate descriptor carrier types without registry context.</span>
+<span class="w">    </span><span class="sd">"""Validate descriptor carrier types without registry context.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``key`` is not a StreamKey or ``lane`` is not a</span>
 <span class="sd">            non-boolean integral value.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">StreamKey</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;StreamDescriptor.key must be a StreamKey.&quot;</span><span class="p">)</span>
-    <span class="n">_validate_integral</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lane</span><span class="p">,</span> <span class="s2">&quot;StreamDescriptor.lane&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"StreamDescriptor.key must be a StreamKey."</span><span class="p">)</span>
+    <span class="n">_validate_integral</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lane</span><span class="p">,</span> <span class="s2">"StreamDescriptor.lane"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16800,22 +16800,22 @@ invalid.</p>
 <span class="normal">70</span>
 <span class="normal">71</span>
 <span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate immutable stream identity metadata.</span>
+<span class="w">    </span><span class="sd">"""Validate immutable stream identity metadata.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a field has an unsupported type.</span>
 <span class="sd">        ValueError: If the schema version, process, or logical ID is</span>
 <span class="sd">            invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_validate_integral</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema_version</span><span class="p">,</span> <span class="s2">&quot;StreamKey.schema_version&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_validate_integral</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema_version</span><span class="p">,</span> <span class="s2">"StreamKey.schema_version"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_version</span> <span class="o">!=</span> <span class="n">STREAM_SCHEMA_VERSION</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;StreamKey.schema_version must be 1.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"StreamKey.schema_version must be 1."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;StreamKey.process_id must be a str.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"StreamKey.process_id must be a str."</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PROCESS_IDS</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;StreamKey.process_id is unsupported.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"StreamKey.process_id is unsupported."</span><span class="p">)</span>
     <span class="n">_validate_logical_box_id</span><span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logical_box_id</span><span class="p">,</span> <span class="s2">&quot;StreamKey.logical_box_id&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logical_box_id</span><span class="p">,</span> <span class="s2">"StreamKey.logical_box_id"</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17144,7 +17144,7 @@ or produces a same-process derived-word collision.</p>
     <span class="n">lanes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
     <span class="n">state_arrays</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and retain an immutable host-only stream manifest.</span>
+<span class="w">    </span><span class="sd">"""Validate and retain an immutable host-only stream manifest.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        root_seed: Non-boolean unsigned 32-bit root seed.</span>
@@ -17157,29 +17157,29 @@ or produces a same-process derived-word collision.</p>
 <span class="sd">        TypeError: If manifest metadata does not have the required types.</span>
 <span class="sd">        ValueError: If metadata is out of range, malformed, noncanonical,</span>
 <span class="sd">            or produces a same-process derived-word collision.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_validate_integral</span><span class="p">(</span><span class="n">root_seed</span><span class="p">,</span> <span class="s2">&quot;root_seed&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_validate_integral</span><span class="p">(</span><span class="n">root_seed</span><span class="p">,</span> <span class="s2">"root_seed"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">root_seed</span> <span class="o">&lt;=</span> <span class="n">MAX_ROOT_SEED</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;root_seed must be in [0, </span><span class="si">{</span><span class="n">MAX_ROOT_SEED</span><span class="si">}</span><span class="s2">].&quot;</span><span class="p">)</span>
-    <span class="n">_validate_integral</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;n_boxes&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"root_seed must be in [0, </span><span class="si">{</span><span class="n">MAX_ROOT_SEED</span><span class="si">}</span><span class="s2">]."</span><span class="p">)</span>
+    <span class="n">_validate_integral</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"n_boxes"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">n_boxes</span> <span class="o">&lt;=</span> <span class="n">MAX_ROOT_SEED</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n_boxes must be in [0, </span><span class="si">{</span><span class="n">MAX_ROOT_SEED</span><span class="si">}</span><span class="s2">].&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"n_boxes must be in [0, </span><span class="si">{</span><span class="n">MAX_ROOT_SEED</span><span class="si">}</span><span class="s2">]."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">logical_box_ids</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;logical_box_ids must be an exact tuple.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"logical_box_ids must be an exact tuple."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">lanes</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;lanes must be an exact tuple.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"lanes must be an exact tuple."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">logical_box_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_boxes</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">lanes</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_boxes</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;logical_box_ids and lanes must have n_boxes entries.&quot;</span>
+            <span class="s2">"logical_box_ids and lanes must have n_boxes entries."</span>
         <span class="p">)</span>
     <span class="k">for</span> <span class="n">logical_box_id</span> <span class="ow">in</span> <span class="n">logical_box_ids</span><span class="p">:</span>
-        <span class="n">_validate_logical_box_id</span><span class="p">(</span><span class="n">logical_box_id</span><span class="p">,</span> <span class="s2">&quot;logical_box_ids entries&quot;</span><span class="p">)</span>
+        <span class="n">_validate_logical_box_id</span><span class="p">(</span><span class="n">logical_box_id</span><span class="p">,</span> <span class="s2">"logical_box_ids entries"</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">logical_box_ids</span><span class="p">))</span> <span class="o">!=</span> <span class="n">n_boxes</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;logical_box_ids must be unique.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"logical_box_ids must be unique."</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">lane</span> <span class="ow">in</span> <span class="n">lanes</span><span class="p">:</span>
-        <span class="n">_validate_integral</span><span class="p">(</span><span class="n">lane</span><span class="p">,</span> <span class="s2">&quot;lanes entries&quot;</span><span class="p">)</span>
+        <span class="n">_validate_integral</span><span class="p">(</span><span class="n">lane</span><span class="p">,</span> <span class="s2">"lanes entries"</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">lanes</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;lanes must be a permutation of range(n_boxes).&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"lanes must be a permutation of range(n_boxes)."</span><span class="p">)</span>
     <span class="n">_validate_state_manifest</span><span class="p">(</span><span class="n">state_arrays</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_root_seed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">root_seed</span><span class="p">)</span>
@@ -17545,7 +17545,7 @@ or produces a same-process derived-word collision.</p>
 <span class="normal">358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">descriptor_for</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">process_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">logical_box_id</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StreamDescriptor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the descriptor for an exact registered process and ID.</span>
+<span class="w">    </span><span class="sd">"""Return the descriptor for an exact registered process and ID.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        process_id: Supported process namespace.</span>
@@ -17558,13 +17558,13 @@ or produces a same-process derived-word collision.</p>
 <span class="sd">        TypeError: If either identity component has an invalid type.</span>
 <span class="sd">        ValueError: If the process or logical ID is invalid.</span>
 <span class="sd">        LookupError: If the valid stream identity is not registered.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">key</span> <span class="o">=</span> <span class="n">StreamKey</span><span class="p">(</span><span class="n">STREAM_SCHEMA_VERSION</span><span class="p">,</span> <span class="n">process_id</span><span class="p">,</span> <span class="n">logical_box_id</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor_by_key</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span>
-            <span class="s2">&quot;No stream is registered for process and logical ID.&quot;</span>
+            <span class="s2">"No stream is registered for process and logical ID."</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17657,7 +17657,7 @@ validation.</p>
 <span class="normal">588</span>
 <span class="normal">589</span>
 <span class="normal">590</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Overwrite retained arrays with deterministic initial words.</span>
+<span class="w">    </span><span class="sd">"""Overwrite retained arrays with deterministic initial words.</span>
 
 <span class="sd">    NumPy and Warp are imported only after host manifest preflight. The</span>
 <span class="sd">    temporary host and Warp copy sources do not change state-array</span>
@@ -17666,7 +17666,7 @@ validation.</p>
 <span class="sd">    failures write neither buffer. It copies lane-indexed words for</span>
 <span class="sd">    coagulation first and wall loss second. A device or copy failure after</span>
 <span class="sd">    the first successful copy has no rollback guarantee; callers may correct</span>
-<span class="sd">    the failure and retry without replacing this registry&#39;s arrays.</span>
+<span class="sd">    the failure and retry without replacing this registry's arrays.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ImportError: If NumPy or Warp is unavailable.</span>
@@ -17675,7 +17675,7 @@ validation.</p>
 <span class="sd">            aliasing relationships.</span>
 <span class="sd">        RuntimeError: If Warp reports a device-copy failure after</span>
 <span class="sd">            validation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_state_arrays</span><span class="p">()</span>
 
     <span class="k">for</span> <span class="n">process_id</span> <span class="ow">in</span> <span class="n">PROCESS_IDS</span><span class="p">:</span>
@@ -17775,7 +17775,7 @@ aliasing metadata.</p>
 <span class="normal">617</span>
 <span class="normal">618</span>
 <span class="normal">619</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize exactly one validated process state array.</span>
+<span class="w">    </span><span class="sd">"""Initialize exactly one validated process state array.</span>
 
 <span class="sd">    This narrow internal primitive lets a resident resource publish a new</span>
 <span class="sd">    process sidecar without reseeding an already-published sibling stream,</span>
@@ -17789,7 +17789,7 @@ aliasing metadata.</p>
 <span class="sd">        ValueError: If either retained array has invalid schema, device, or</span>
 <span class="sd">            aliasing metadata.</span>
 <span class="sd">        RuntimeError: If Warp reports a device-copy failure.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_process_id</span><span class="p">(</span><span class="n">process_id</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_state_arrays</span><span class="p">()</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -17800,7 +17800,7 @@ aliasing metadata.</p>
     <span class="p">)</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state_array_for</span><span class="p">(</span><span class="n">process_id</span><span class="p">),</span>
-        <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">host_source</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+        <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">host_source</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">),</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17883,11 +17883,11 @@ writer, including for an explicitly empty selection.</p>
     <span class="n">process_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">logical_box_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reinitialize only selected process and logical-box stream lanes.</span>
+<span class="w">    </span><span class="sd">"""Reinitialize only selected process and logical-box stream lanes.</span>
 
 <span class="sd">    Full retained-array schema and nonaliasing preflight always precedes a</span>
 <span class="sd">    writer, including for an explicitly empty selection.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">selected_processes</span><span class="p">,</span> <span class="n">selected_ids</span> <span class="o">=</span> <span class="n">_resolve_stream_selection</span><span class="p">(</span>
         <span class="n">process_ids</span><span class="p">,</span>
         <span class="n">logical_box_ids</span><span class="p">,</span>
@@ -17907,7 +17907,7 @@ writer, including for an explicitly empty selection.</p>
         <span class="p">],</span>
         <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">lane_source</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lanes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="n">lane_source</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lanes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">process_id</span> <span class="ow">in</span> <span class="n">selected_processes</span><span class="p">:</span>
         <span class="n">words</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
             <span class="p">[</span>
@@ -17916,7 +17916,7 @@ writer, including for an explicitly empty selection.</p>
             <span class="p">],</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">word_source</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+        <span class="n">word_source</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
         <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_array_for</span><span class="p">(</span><span class="n">process_id</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
@@ -17959,7 +17959,7 @@ writer, including for an explicitly empty selection.</p>
 <span class="normal">445</span>
 <span class="normal">446</span>
 <span class="normal">447</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">inspect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StreamManifest</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return this registry&#39;s immutable host-only stream manifest.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return this registry's immutable host-only stream manifest."""</span>
     <span class="k">return</span> <span class="n">StreamManifest</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_root_seed</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logical_box_ids</span><span class="p">,</span>
@@ -18062,7 +18062,7 @@ writer, including for an explicitly empty selection.</p>
 <span class="normal">380</span>
 <span class="normal">381</span>
 <span class="normal">382</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">lane_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logical_box_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the physical lane for an exact registered logical ID.</span>
+<span class="w">    </span><span class="sd">"""Return the physical lane for an exact registered logical ID.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        logical_box_id: Exact registered logical-box identifier.</span>
@@ -18074,13 +18074,13 @@ writer, including for an explicitly empty selection.</p>
 <span class="sd">        TypeError: If ``logical_box_id`` is not a string.</span>
 <span class="sd">        ValueError: If the logical ID is malformed.</span>
 <span class="sd">        LookupError: If the valid logical ID is not registered.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_validate_logical_box_id</span><span class="p">(</span><span class="n">logical_box_id</span><span class="p">,</span> <span class="s2">&quot;logical_box_id&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_validate_logical_box_id</span><span class="p">(</span><span class="n">logical_box_id</span><span class="p">,</span> <span class="s2">"logical_box_id"</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lane_by_id</span><span class="p">[</span><span class="n">logical_box_id</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span>
-            <span class="s2">&quot;No lane is registered for logical_box_id.&quot;</span>
+            <span class="s2">"No lane is registered for logical_box_id."</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18124,7 +18124,7 @@ writer, including for an explicitly empty selection.</p>
     <span class="n">process_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">logical_box_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate a selected reset without allocating or launching writers.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate a selected reset without allocating or launching writers."""</span>
     <span class="n">_resolve_stream_selection</span><span class="p">(</span>
         <span class="n">process_ids</span><span class="p">,</span>
         <span class="n">logical_box_ids</span><span class="p">,</span>
@@ -18214,7 +18214,7 @@ writer, including for an explicitly empty selection.</p>
 <span class="normal">434</span>
 <span class="normal">435</span>
 <span class="normal">436</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">state_array_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the retained caller-owned process state array by identity.</span>
+<span class="w">    </span><span class="sd">"""Return the retained caller-owned process state array by identity.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        process_id: Supported process namespace.</span>
@@ -18225,7 +18225,7 @@ writer, including for an explicitly empty selection.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``process_id`` is not a string.</span>
 <span class="sd">        ValueError: If ``process_id`` is unsupported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_process_id</span><span class="p">(</span><span class="n">process_id</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_arrays</span><span class="p">[</span><span class="n">PROCESS_IDS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">process_id</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
@@ -18328,7 +18328,7 @@ writer, including for an explicitly empty selection.</p>
 <span class="normal">400</span>
 <span class="normal">401</span>
 <span class="normal">402</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">word_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">logical_box_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the derived word for an exact registered stream.</span>
+<span class="w">    </span><span class="sd">"""Return the derived word for an exact registered stream.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        process_id: Supported process namespace.</span>
@@ -18341,7 +18341,7 @@ writer, including for an explicitly empty selection.</p>
 <span class="sd">        TypeError: If either identity component has an invalid type.</span>
 <span class="sd">        ValueError: If the process or logical ID is invalid.</span>
 <span class="sd">        LookupError: If the valid stream identity is not registered.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">descriptor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">descriptor_for</span><span class="p">(</span><span class="n">process_id</span><span class="p">,</span> <span class="n">logical_box_id</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_words_by_process</span><span class="p">[</span><span class="n">process_id</span><span class="p">][</span><span class="n">descriptor</span><span class="o">.</span><span class="n">lane</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
@@ -18427,7 +18427,7 @@ writer, including for an explicitly empty selection.</p>
 <span class="normal">418</span>
 <span class="normal">419</span>
 <span class="normal">420</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">words_by_lane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return immutable derived words indexed by physical lane.</span>
+<span class="w">    </span><span class="sd">"""Return immutable derived words indexed by physical lane.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        process_id: Supported process namespace.</span>
@@ -18438,7 +18438,7 @@ writer, including for an explicitly empty selection.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``process_id`` is not a string.</span>
 <span class="sd">        ValueError: If ``process_id`` is unsupported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_process_id</span><span class="p">(</span><span class="n">process_id</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_words_by_process</span><span class="p">[</span><span class="n">process_id</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>

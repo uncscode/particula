@@ -16961,7 +16961,7 @@ state in an underlying :class:<code>ParticleData</code> container.</p>
     <span class="n">charge</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">):</span>  <span class="c1"># pylint: disable=too-many-positional-arguments, too-many-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the legacy particle representation facade.</span>
+<span class="w">    </span><span class="sd">"""Initialize the legacy particle representation facade.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        strategy: Distribution strategy for the representation.</span>
@@ -16976,7 +16976,7 @@ state in an underlying :class:<code>ParticleData</code> container.</p>
 <span class="sd">    Notes:</span>
 <span class="sd">        This legacy facade emits a deprecation log message and stores its</span>
 <span class="sd">        state in an underlying :class:`ParticleData` container.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_warn_deprecated</span><span class="p">(</span><span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">strategy</span>
@@ -17235,21 +17235,21 @@ state in an underlying :class:<code>ParticleData</code> container.</p>
 <span class="normal">209</span>
 <span class="normal">210</span>
 <span class="normal">211</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a human-readable summary of the representation.</span>
+<span class="w">    </span><span class="sd">"""Return a human-readable summary of the representation.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Multi-line string describing the configured strategies and bulk</span>
 <span class="sd">        concentrations.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;Particle Representation:</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Strategy: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_strategy_name</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Activity: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_activity_name</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Surface: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_surface_name</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Mass Concentration: &quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2"> [kg/m^3]</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Number Concentration: &quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2"> [#/m^3]&quot;</span>
+        <span class="sa">f</span><span class="s2">"Particle Representation:</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">Strategy: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_strategy_name</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">Activity: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_activity_name</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">Surface: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_surface_name</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">Mass Concentration: "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2"> [kg/m^3]</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">Number Concentration: "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2"> [#/m^3]"</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17387,7 +17387,7 @@ charge data is returned.</p>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">added_charge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add concentration to the particle distribution.</span>
+<span class="w">    </span><span class="sd">"""Add concentration to the particle distribution.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        added_concentration: Concentration increment per distribution bin.</span>
@@ -17400,11 +17400,11 @@ charge data is returned.</p>
 <span class="sd">        ValueError: If charge tracking is disabled but the strategy returns</span>
 <span class="sd">            charge data, or if charge tracking is enabled but no updated</span>
 <span class="sd">            charge data is returned.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_warn_deprecated</span><span class="p">(</span><span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="c1"># if added_distribution is None, then it will be calculated</span>
     <span class="k">if</span> <span class="n">added_distribution</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Added distribution is value None.&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">"Added distribution is value None."</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="n">added_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_distribution</span><span class="p">()</span>
     <span class="p">(</span>
@@ -17422,12 +17422,12 @@ charge data is returned.</p>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_charge_is_none</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">updated_charge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;updated_charge must be None when charge is disabled&quot;</span>
+                <span class="s2">"updated_charge must be None when charge is disabled"</span>
             <span class="p">)</span>
         <span class="n">charge_array</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">elif</span> <span class="n">updated_charge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;updated_charge must not be None when charge is set&quot;</span>
+            <span class="s2">"updated_charge must not be None when charge is set"</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">charge_array</span> <span class="o">=</span> <span class="n">updated_charge</span>
@@ -17493,11 +17493,11 @@ charge data is returned.</p>
 <span class="normal">703</span>
 <span class="normal">704</span>
 <span class="normal">705</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">added_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add mass to the particle distribution and update parameters.</span>
+<span class="w">    </span><span class="sd">"""Add mass to the particle distribution and update parameters.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        added_mass: Mass increment per distribution bin in ``kg``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_warn_deprecated</span><span class="p">(</span><span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">distribution</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">add_mass</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_distribution</span><span class="p">(),</span>
@@ -17595,10 +17595,10 @@ each row is <code>[small_index, large_index]</code>.</p>
 <span class="normal">800</span>
 <span class="normal">801</span>
 <span class="normal">802</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collide particle pairs for particle-resolved strategies.</span>
+<span class="w">    </span><span class="sd">"""Collide particle pairs for particle-resolved strategies.</span>
 
 <span class="sd">    Performs coagulation between particle pairs by delegating to the</span>
-<span class="sd">    distribution strategy&#39;s collide_pairs method. The smaller particle</span>
+<span class="sd">    distribution strategy's collide_pairs method. The smaller particle</span>
 <span class="sd">    (first index in each pair) is merged into the larger particle (second</span>
 <span class="sd">    index). Mass, concentration, and charge are all updated accordingly.</span>
 
@@ -17610,7 +17610,7 @@ each row is <code>[small_index, large_index]</code>.</p>
 <span class="sd">    Args:</span>
 <span class="sd">        indices: Array of particle pair indices with shape ``(K, 2)`` where</span>
 <span class="sd">            each row is ``[small_index, large_index]``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_warn_deprecated</span><span class="p">(</span><span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">updated_distribution</span><span class="p">,</span> <span class="n">updated_concentration</span><span class="p">,</span> <span class="n">updated_charge</span> <span class="o">=</span> <span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">collide_pairs</span><span class="p">(</span>
@@ -17772,15 +17772,15 @@ each row is <code>[small_index, large_index]</code>.</p>
 <span class="normal">271</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">from_data</span><span class="p">(</span>
     <span class="bp">cls</span><span class="p">,</span>
-    <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="s2">"ParticleData"</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">strategy</span><span class="p">:</span> <span class="n">DistributionStrategy</span><span class="p">,</span>
     <span class="n">activity</span><span class="p">:</span> <span class="n">ActivityStrategy</span><span class="p">,</span>
     <span class="n">surface</span><span class="p">:</span> <span class="n">SurfaceStrategy</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">charge</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ParticleRepresentation&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a facade without emitting a deprecation warning.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ParticleRepresentation"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Create a facade without emitting a deprecation warning.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data: ParticleData instance to wrap.</span>
@@ -17792,7 +17792,7 @@ each row is <code>[small_index, large_index]</code>.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ParticleRepresentation instance wrapping ``data``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
     <span class="n">instance</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">strategy</span>
     <span class="n">instance</span><span class="o">.</span><span class="n">activity</span> <span class="o">=</span> <span class="n">activity</span>
@@ -17870,14 +17870,14 @@ each row is <code>[small_index, large_index]</code>.</p>
 <span class="normal">481</span>
 <span class="normal">482</span>
 <span class="normal">483</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_activity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActivityStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the activity strategy used for partial pressure calculations.</span>
+<span class="w">    </span><span class="sd">"""Return the activity strategy used for partial pressure calculations.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, return a deep copy of the activity strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The activity strategy used for particle-phase calculations.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">clone</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activity</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activity</span>
@@ -17926,12 +17926,12 @@ calculations.</p>
 <span class="normal">490</span>
 <span class="normal">491</span>
 <span class="normal">492</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_activity_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the name of the activity strategy used for partial pressure</span>
+<span class="w">    </span><span class="sd">"""Return the name of the activity strategy used for partial pressure</span>
 <span class="sd">    calculations.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The activity strategy name.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activity</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18005,14 +18005,14 @@ calculations.</p>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the charge per particle.</span>
+<span class="w">    </span><span class="sd">"""Return the charge per particle.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, return a copy of the charge array.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Particle charge array, or ``None`` when charge tracking is disabled.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span>
     <span class="k">if</span> <span class="n">charge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -18088,17 +18088,17 @@ particles per self.volume. Otherwise, it's per 1/m^3.</p>
 <span class="normal">579</span>
 <span class="normal">580</span>
 <span class="normal">581</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the volume concentration of the particles.</span>
+<span class="w">    </span><span class="sd">"""Return the volume concentration of the particles.</span>
 
 <span class="sd">    For ParticleResolved Strategies, this is the number of</span>
-<span class="sd">    particles per self.volume. Otherwise, it&#39;s per 1/m^3.</span>
+<span class="sd">    particles per self.volume. Otherwise, it's per 1/m^3.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, return a copy of the concentration array.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Particle concentration in ``1/m^3``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">concentration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">concentration</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">volume</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">clone</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">concentration</span><span class="p">)</span>
@@ -18166,14 +18166,14 @@ particles per self.volume. Otherwise, it's per 1/m^3.</p>
 <span class="normal">538</span>
 <span class="normal">539</span>
 <span class="normal">540</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the density of the particles.</span>
+<span class="w">    </span><span class="sd">"""Return the density of the particles.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, return a copy of the density array.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The particle density array.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">clone</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span>
@@ -18240,14 +18240,14 @@ particles per self.volume. Otherwise, it's per 1/m^3.</p>
 <span class="normal">525</span>
 <span class="normal">526</span>
 <span class="normal">527</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the distribution of the particles.</span>
+<span class="w">    </span><span class="sd">"""Return the distribution of the particles.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, return a copy of the distribution array.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The particle distribution array.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">clone</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span>
@@ -18297,11 +18297,11 @@ particles per self.volume. Otherwise, it's per 1/m^3.</p>
 <span class="normal">549</span>
 <span class="normal">550</span>
 <span class="normal">551</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_effective_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the effective density of the particles, weighted by the mass.</span>
+<span class="w">    </span><span class="sd">"""Return the effective density of the particles, weighted by the mass.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Effective particle densities derived from species masses.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">densities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_density</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">densities</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_species_mass</span><span class="p">())</span> <span class="o">*</span> <span class="n">densities</span>
@@ -18370,14 +18370,14 @@ particles per self.volume. Otherwise, it's per 1/m^3.</p>
 <span class="normal">652</span>
 <span class="normal">653</span>
 <span class="normal">654</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the mass of the particles as calculated by the strategy.</span>
+<span class="w">    </span><span class="sd">"""Return the mass of the particles as calculated by the strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, return a copy of the mass array.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Total particle masses in ``kg``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">total_mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">clone</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">mass</span><span class="p">)</span>
@@ -18451,7 +18451,7 @@ and concentration arrays.</p>
 <span class="normal">669</span>
 <span class="normal">670</span>
 <span class="normal">671</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_mass_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the total mass per volume of the simulated particles.</span>
+<span class="w">    </span><span class="sd">"""Return the total mass per volume of the simulated particles.</span>
 
 <span class="sd">    The mass concentration is calculated from the distribution</span>
 <span class="sd">    and concentration arrays.</span>
@@ -18461,7 +18461,7 @@ and concentration arrays.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Total particle mass concentration in ``kg/m^3``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">mass_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_mass</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">clone</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">mass_concentration</span><span class="p">)</span>
@@ -18514,11 +18514,11 @@ and concentration arrays.</p>
 <span class="normal">562</span>
 <span class="normal">563</span>
 <span class="normal">564</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_mean_effective_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the mean effective density of the particles.</span>
+<span class="w">    </span><span class="sd">"""Return the mean effective density of the particles.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Mean effective density across nonzero-density particles.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># filter out zero densities for no mass in bin/particle</span>
     <span class="n">effective_density</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_effective_density</span><span class="p">()</span>
     <span class="n">effective_density</span> <span class="o">=</span> <span class="n">effective_density</span><span class="p">[</span><span class="n">effective_density</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
@@ -18589,14 +18589,14 @@ and concentration arrays.</p>
 <span class="normal">683</span>
 <span class="normal">684</span>
 <span class="normal">685</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the radius of the particles as calculated by the strategy.</span>
+<span class="w">    </span><span class="sd">"""Return the radius of the particles as calculated by the strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, return a copy of the radius array.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Particle radii in meters.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">clone</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
@@ -18667,14 +18667,14 @@ and concentration arrays.</p>
 <span class="normal">638</span>
 <span class="normal">639</span>
 <span class="normal">640</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_species_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the masses per species in the particles.</span>
+<span class="w">    </span><span class="sd">"""Return the masses per species in the particles.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, return a copy of the computed mass array.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Per-species particle masses in ``kg``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">masses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">masses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species_mass_is_1d</span><span class="p">:</span>
         <span class="n">masses</span> <span class="o">=</span> <span class="n">masses</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
@@ -18744,14 +18744,14 @@ and concentration arrays.</p>
 <span class="normal">460</span>
 <span class="normal">461</span>
 <span class="normal">462</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DistributionStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the strategy used for particle representation.</span>
+<span class="w">    </span><span class="sd">"""Return the strategy used for particle representation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, return a deep copy of the strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The distribution strategy used by this representation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">clone</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span>
@@ -18798,11 +18798,11 @@ and concentration arrays.</p>
 <span class="normal">468</span>
 <span class="normal">469</span>
 <span class="normal">470</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_strategy_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the name of the strategy used for particle representation.</span>
+<span class="w">    </span><span class="sd">"""Return the name of the strategy used for particle representation.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The distribution strategy name.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18867,14 +18867,14 @@ and concentration arrays.</p>
 <span class="normal">503</span>
 <span class="normal">504</span>
 <span class="normal">505</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_surface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SurfaceStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return surface strategy for surface tension and Kelvin effect.</span>
+<span class="w">    </span><span class="sd">"""Return surface strategy for surface tension and Kelvin effect.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, return a deep copy of the surface strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The surface strategy used for Kelvin and surface-tension effects.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">clone</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span>
@@ -18923,12 +18923,12 @@ Kelvin effect.</p>
 <span class="normal">512</span>
 <span class="normal">513</span>
 <span class="normal">514</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_surface_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the name of the surface strategy used for surface tension and</span>
+<span class="w">    </span><span class="sd">"""Return the name of the surface strategy used for surface tension and</span>
 <span class="sd">    Kelvin effect.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The surface strategy name.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18991,14 +18991,14 @@ Kelvin effect.</p>
 <span class="normal">590</span>
 <span class="normal">591</span>
 <span class="normal">592</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_total_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the total concentration of the particles.</span>
+<span class="w">    </span><span class="sd">"""Return the total concentration of the particles.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, operate on a copied concentration array.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Total number concentration in ``1/m^3``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="n">clone</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -19063,14 +19063,14 @@ Kelvin effect.</p>
 <span class="normal">622</span>
 <span class="normal">623</span>
 <span class="normal">624</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the volume used for the particle representation.</span>
+<span class="w">    </span><span class="sd">"""Return the volume used for the particle representation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        clone: If ``True``, return a copy of the volume value.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Representation volume in ``m^3``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">clone</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume</span>

@@ -16170,7 +16170,7 @@ NDArray[np.float64].</li>
     <span class="n">partial_pressure_particle</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">kelvin_term</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the difference in partial pressure between gas and particle</span>
+<span class="w">    </span><span class="sd">"""Calculate the difference in partial pressure between gas and particle</span>
 <span class="sd">    phase, considering the Kelvin effect.</span>
 
 <span class="sd">    - Δp = p_gas − (p_particle × K)</span>
@@ -16191,7 +16191,7 @@ NDArray[np.float64].</li>
 <span class="sd">            NDArray[np.float64].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_partial_pressure_delta(</span>
 <span class="sd">            partial_pressure_gas=1000.0,</span>
@@ -16204,7 +16204,7 @@ NDArray[np.float64].</li>
 <span class="sd">    References:</span>
 <span class="sd">        - [Kelvin effect, Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)</span>
 <span class="sd">        - [Partial pressure, Wikipedia](https://en.wikipedia.org/wiki/Partial_pressure)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">partial_pressure_gas</span> <span class="o">-</span> <span class="n">partial_pressure_particle</span> <span class="o">*</span> <span class="n">kelvin_term</span>
 </code></pre></div></td></tr></table></div>
             </details>

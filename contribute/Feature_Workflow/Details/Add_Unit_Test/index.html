@@ -16058,39 +16058,39 @@
 <h2 id="location">Location<a class="headerlink" href="#location" title="Permanent link">&para;</a></h2>
 <p>particula/<area>/tests/test_<symbol>.py  (mirror the package directory)</p>
 <h2 id="template-for-functions">Template for Functions<a class="headerlink" href="#template-for-functions" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="sd">&quot;&quot;&quot;Docstring for the test module.&quot;&quot;&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Docstring for the test module."""</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>  <span class="c1"># if needed</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.</span><span class="o">&lt;</span><span class="n">area</span><span class="o">&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test_</span><span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span><span class="n">_accuracy</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Docstring for the test.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Docstring for the test."""</span>
     <span class="n">result</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&lt;</span><span class="n">valid_args</span><span class="o">&gt;</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">expected</span><span class="o">&gt;</span><span class="p">)</span>
 
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;bad_input&quot;</span><span class="p">,</span> <span class="p">[</span><span class="o">...</span><span class="p">])</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"bad_input"</span><span class="p">,</span> <span class="p">[</span><span class="o">...</span><span class="p">])</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test_</span><span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span><span class="n">_bad_inputs</span><span class="p">(</span><span class="n">bad_input</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Docstring for the test.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Docstring for the test."""</span>
     <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
         <span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span><span class="p">(</span><span class="n">bad_input</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="template-for-classes">Template for Classes<a class="headerlink" href="#template-for-classes" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="sd">&quot;&quot;&quot;Docstring for the test module.&quot;&quot;&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="sd">"""Docstring for the test module."""</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>  <span class="c1"># if needed</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.</span><span class="o">&lt;</span><span class="n">area</span><span class="o">&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="o">&lt;</span><span class="n">ClassName</span><span class="o">&gt;</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test_</span><span class="o">&lt;</span><span class="n">ClassName</span><span class="o">&gt;</span><span class="n">_accuracy</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Docstring for the test.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Docstring for the test."""</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">ClassName</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&lt;</span><span class="n">valid_args</span><span class="o">&gt;</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.&lt;</span><span class="n">method_name</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&lt;</span><span class="n">valid_args</span><span class="o">&gt;</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">expected</span><span class="o">&gt;</span><span class="p">)</span>
 
 
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;bad_input&quot;</span><span class="p">,</span> <span class="p">[</span><span class="o">...</span><span class="p">])</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"bad_input"</span><span class="p">,</span> <span class="p">[</span><span class="o">...</span><span class="p">])</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">test_</span><span class="o">&lt;</span><span class="n">ClassName</span><span class="o">&gt;</span><span class="n">_bad_inputs</span><span class="p">(</span><span class="n">bad_input</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Docstring for the test.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Docstring for the test."""</span>
     <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
         <span class="o">&lt;</span><span class="n">ClassName</span><span class="o">&gt;</span><span class="p">(</span><span class="n">bad_input</span><span class="p">)</span>
 </code></pre></div>

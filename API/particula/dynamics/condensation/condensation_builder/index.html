@@ -16406,16 +16406,16 @@ diffusion coefficient, and accommodation coefficient.</p>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Condensation Isothermal builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Condensation Isothermal builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    CondensationIsothermal strategy, including molar mass,</span>
 <span class="sd">    diffusion coefficient, and accommodation coefficient.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderMolarMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16473,14 +16473,14 @@ diffusion coefficient, and accommodation coefficient.</p>
 <span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CondensationStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and create a condensation strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and create a condensation strategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
 
     <span class="c1"># Type guards: pre_build_check ensures these are not None</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_coefficient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;diffusion_coefficient must be set&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"diffusion_coefficient must be set"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">accommodation_coefficient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;accommodation_coefficient must be set&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"accommodation_coefficient must be set"</span><span class="p">)</span>
     <span class="n">molar_mass</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">CondensationIsothermal</span><span class="p">(</span>
@@ -16556,11 +16556,11 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the builder with required parameters and defaults.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the builder with required parameters and defaults."""</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderMolarMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16568,7 +16568,7 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
     <span class="n">BuilderAccommodationCoefficientMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderUpdateGasesMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">theta_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;half&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">theta_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"half"</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">num_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_each_step</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
@@ -16628,7 +16628,7 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">224</span>
 <span class="normal">225</span>
 <span class="normal">226</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CondensationStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and create a condensation strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and create a condensation strategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
 
     <span class="c1"># pre_build_check ensures these are not None</span>
@@ -16727,8 +16727,8 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">173</span>
 <span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_num_batches</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationIsothermalStaggeredBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the number of batches for staggered updates.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationIsothermalStaggeredBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the number of batches for staggered updates.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_batches: Number of batches; must be at least 1.</span>
@@ -16738,9 +16738,9 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``num_batches`` is less than 1.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">num_batches</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;num_batches must be &gt;= 1.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"num_batches must be &gt;= 1."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">num_batches</span> <span class="o">=</span> <span class="n">num_batches</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16822,56 +16822,56 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">132</span>
 <span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationIsothermalStaggeredBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set required and optional parameters from a dictionary.&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationIsothermalStaggeredBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set required and optional parameters from a dictionary."""</span>
     <span class="n">required</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span>
     <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Missing required parameter(s): </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Missing required parameter(s): </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
 
     <span class="n">valid_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
         <span class="n">required</span>
-        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">]</span>
         <span class="o">+</span> <span class="p">[</span>
-            <span class="s2">&quot;theta_mode&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;num_batches&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;shuffle_each_step&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;random_state&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;update_gases&quot;</span><span class="p">,</span>
+            <span class="s2">"theta_mode"</span><span class="p">,</span>
+            <span class="s2">"num_batches"</span><span class="p">,</span>
+            <span class="s2">"shuffle_each_step"</span><span class="p">,</span>
+            <span class="s2">"random_state"</span><span class="p">,</span>
+            <span class="s2">"update_gases"</span><span class="p">,</span>
         <span class="p">]</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">invalid_keys</span> <span class="o">:=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_keys</span><span class="p">]:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Trying to set an invalid parameter(s) &#39;</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;The valid parameter(s) &#39;</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Trying to set an invalid parameter(s) '</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">'. "</span>
+            <span class="sa">f</span><span class="s2">"The valid parameter(s) '</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">'."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">:</span>
-        <span class="n">unit_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span>
+        <span class="n">unit_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span>
         <span class="k">if</span> <span class="n">unit_key</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)(</span>
                 <span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">unit_key</span><span class="p">]</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using default units for parameter: &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Using default units for parameter: '</span><span class="si">%s</span><span class="s2">'."</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
-    <span class="k">if</span> <span class="s2">&quot;theta_mode&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_theta_mode</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;theta_mode&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;num_batches&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_num_batches</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;num_batches&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;shuffle_each_step&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_shuffle_each_step</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;shuffle_each_step&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;random_state&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_random_state</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;random_state&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;update_gases&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;update_gases&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"theta_mode"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_theta_mode</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"theta_mode"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"num_batches"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_num_batches</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"num_batches"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"shuffle_each_step"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_shuffle_each_step</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"shuffle_each_step"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"random_state"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_random_state</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"random_state"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"update_gases"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"update_gases"</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16943,15 +16943,15 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
     <span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
         <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">]</span>
     <span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationIsothermalStaggeredBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the random state for reproducibility.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationIsothermalStaggeredBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the random state for reproducibility.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        random_state: Seed or RNG controlling random theta generation.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The builder instance for chaining.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17017,15 +17017,15 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">187</span>
 <span class="normal">188</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_shuffle_each_step</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">:</span> <span class="nb">bool</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationIsothermalStaggeredBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enable or disable shuffling at each step.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationIsothermalStaggeredBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Enable or disable shuffling at each step.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        shuffle: Whether to shuffle particle order every step.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The builder instance for chaining.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_each_step</span> <span class="o">=</span> <span class="n">shuffle</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17111,22 +17111,22 @@ parameters <code>theta_mode</code>, <code>num_batches</code>, <code>shuffle_each
 <span class="normal">154</span>
 <span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_theta_mode</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">theta_mode</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationIsothermalStaggeredBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the staggered stepping mode.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationIsothermalStaggeredBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the staggered stepping mode.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        theta_mode: One of ``(&quot;half&quot;, &quot;random&quot;, &quot;batch&quot;)``.</span>
+<span class="sd">        theta_mode: One of ``("half", "random", "batch")``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The builder instance for chaining.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``theta_mode`` is not supported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">valid_modes</span> <span class="o">=</span> <span class="n">CondensationIsothermalStaggered</span><span class="o">.</span><span class="n">VALID_THETA_MODES</span>
     <span class="k">if</span> <span class="n">theta_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_modes</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;theta_mode must be one of </span><span class="si">{</span><span class="n">valid_modes</span><span class="si">}</span><span class="s2">, got &#39;</span><span class="si">{</span><span class="n">theta_mode</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="sa">f</span><span class="s2">"theta_mode must be one of </span><span class="si">{</span><span class="n">valid_modes</span><span class="si">}</span><span class="s2">, got '</span><span class="si">{</span><span class="n">theta_mode</span><span class="si">}</span><span class="s2">'"</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">theta_mode</span> <span class="o">=</span> <span class="n">theta_mode</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -17221,16 +17221,16 @@ heat configuration when it was explicitly provided.</p>
 <span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the builder with required shared parameters.</span>
+<span class="w">    </span><span class="sd">"""Initialize the builder with required shared parameters.</span>
 
 <span class="sd">    The builder starts with the common condensation transport inputs and</span>
 <span class="sd">    no latent heat override so :meth:`build` only forwards optional latent</span>
 <span class="sd">    heat configuration when it was explicitly provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderMolarMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -17324,7 +17324,7 @@ scalar <code>latent_heat</code> is only passed when
 <span class="normal">241</span>
 <span class="normal">242</span>
 <span class="normal">243</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CondensationLatentHeat</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and create a latent-heat strategy.</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and create a latent-heat strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A configured :class:`CondensationLatentHeat` instance.</span>
@@ -17333,24 +17333,24 @@ scalar <code>latent_heat</code> is only passed when
 <span class="sd">        An explicit ``latent_heat_strategy`` is forwarded unchanged. A</span>
 <span class="sd">        scalar ``latent_heat`` is only passed when</span>
 <span class="sd">        :meth:`set_latent_heat` was called successfully.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
 
     <span class="n">build_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span>
             <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_coefficient</span>
         <span class="p">),</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span>
             <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">accommodation_coefficient</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="s2">&quot;update_gases&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_gases</span><span class="p">,</span>
+        <span class="s2">"update_gases"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_gases</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_strategy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">build_kwargs</span><span class="p">[</span><span class="s2">&quot;latent_heat_strategy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_strategy</span>
+        <span class="n">build_kwargs</span><span class="p">[</span><span class="s2">"latent_heat_strategy"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_strategy</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_latent_heat_explicitly_set</span><span class="p">:</span>
-        <span class="n">build_kwargs</span><span class="p">[</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span><span class="p">)</span>
+        <span class="n">build_kwargs</span><span class="p">[</span><span class="s2">"latent_heat"</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">CondensationLatentHeat</span><span class="p">(</span><span class="o">**</span><span class="n">build_kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -17458,8 +17458,8 @@ zero, or negative.</p>
 <span class="normal">211</span>
 <span class="normal">212</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_latent_heat</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">latent_heat</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set a positive finite scalar latent heat fallback.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set a positive finite scalar latent heat fallback.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        latent_heat: Scalar latent heat value in J/kg.</span>
@@ -17470,29 +17470,29 @@ zero, or negative.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``latent_heat`` is None, array-like, non-finite,</span>
 <span class="sd">            zero, or negative.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">latent_heat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;latent_heat must be a positive finite scalar, got None&quot;</span>
+            <span class="s2">"latent_heat must be a positive finite scalar, got None"</span>
         <span class="p">)</span>
 
     <span class="n">latent_heat_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">latent_heat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">latent_heat_array</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">():</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;latent_heat must be a positive finite scalar, got &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;array-like value </span><span class="si">{</span><span class="n">latent_heat</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="s2">"latent_heat must be a positive finite scalar, got "</span>
+            <span class="sa">f</span><span class="s2">"array-like value </span><span class="si">{</span><span class="n">latent_heat</span><span class="si">!r}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="n">latent_heat_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">latent_heat_array</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">latent_heat_value</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;latent_heat must be a positive finite scalar, got &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;non-finite value </span><span class="si">{</span><span class="n">latent_heat_value</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="s2">"latent_heat must be a positive finite scalar, got "</span>
+            <span class="sa">f</span><span class="s2">"non-finite value </span><span class="si">{</span><span class="n">latent_heat_value</span><span class="si">!r}</span><span class="s2">"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">latent_heat_value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;latent_heat must be a positive finite scalar, got &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;non-positive value </span><span class="si">{</span><span class="n">latent_heat_value</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="s2">"latent_heat must be a positive finite scalar, got "</span>
+            <span class="sa">f</span><span class="s2">"non-positive value </span><span class="si">{</span><span class="n">latent_heat_value</span><span class="si">!r}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span> <span class="o">=</span> <span class="n">latent_heat_value</span>
@@ -17595,8 +17595,8 @@ implement :class:<code>LatentHeatStrategy</code>.</p>
 <span class="normal">168</span>
 <span class="normal">169</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_latent_heat_strategy</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">latent_heat_strategy</span><span class="p">:</span> <span class="n">LatentHeatStrategy</span> <span class="o">|</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Store a latent heat strategy for direct passthrough.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Store a latent heat strategy for direct passthrough.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        latent_heat_strategy: Strategy object used by</span>
@@ -17611,13 +17611,13 @@ implement :class:<code>LatentHeatStrategy</code>.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``latent_heat_strategy`` is not ``None`` and does not</span>
 <span class="sd">            implement :class:`LatentHeatStrategy`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">latent_heat_strategy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="n">latent_heat_strategy</span><span class="p">,</span> <span class="n">LatentHeatStrategy</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;latent_heat_strategy must be a LatentHeatStrategy or None, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">latent_heat_strategy</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">"latent_heat_strategy must be a LatentHeatStrategy or None, "</span>
+            <span class="sa">f</span><span class="s2">"got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">latent_heat_strategy</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_strategy</span> <span class="o">=</span> <span class="n">latent_heat_strategy</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -17752,8 +17752,8 @@ implement :class:<code>LatentHeatStrategy</code>.</p>
 <span class="normal">139</span>
 <span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondensationLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set required and optional parameters from a dictionary.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"CondensationLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set required and optional parameters from a dictionary.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        parameters: Required shared builder parameters plus optional</span>
@@ -17765,29 +17765,29 @@ implement :class:<code>LatentHeatStrategy</code>.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required keys are missing or any key is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span>
     <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Missing required parameter(s): </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Missing required parameter(s): </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
 
     <span class="n">valid_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
         <span class="n">required</span>
-        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">]</span>
         <span class="o">+</span> <span class="p">[</span>
-            <span class="s2">&quot;update_gases&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;latent_heat_strategy&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;latent_heat&quot;</span><span class="p">,</span>
+            <span class="s2">"update_gases"</span><span class="p">,</span>
+            <span class="s2">"latent_heat_strategy"</span><span class="p">,</span>
+            <span class="s2">"latent_heat"</span><span class="p">,</span>
         <span class="p">]</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">invalid_keys</span> <span class="o">:=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_keys</span><span class="p">]:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Trying to set an invalid parameter(s) &#39;</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;The valid parameter(s) &#39;</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Trying to set an invalid parameter(s) '</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">'. "</span>
+            <span class="sa">f</span><span class="s2">"The valid parameter(s) '</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">'."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
@@ -17795,26 +17795,26 @@ implement :class:<code>LatentHeatStrategy</code>.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">_reset_optional_latent_heat_state</span><span class="p">()</span>
 
     <span class="n">default_units</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;m^2/s&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"kg/mol"</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="s2">"m^2/s"</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">:</span>
-        <span class="n">unit_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span>
+        <span class="n">unit_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span>
         <span class="n">units</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">unit_key</span><span class="p">,</span> <span class="n">default_units</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">unit_key</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">units</span><span class="p">)</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">units</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using default units for parameter: &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">units</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Using default units for parameter: '</span><span class="si">%s</span><span class="s2">'."</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"set_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)(</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">units</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">&quot;update_gases&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;update_gases&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;latent_heat_strategy&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_latent_heat_strategy</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;latent_heat_strategy&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;latent_heat&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_latent_heat</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"update_gases"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"update_gases"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"latent_heat_strategy"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_latent_heat_strategy</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"latent_heat_strategy"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"latent_heat"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_latent_heat</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"latent_heat"</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>

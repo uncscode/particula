@@ -16201,7 +16201,7 @@ compound, if applicable.</p>
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">functional_group</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the biphasic to single phase water activity (RH*100).</span>
+<span class="w">    </span><span class="sd">"""Computes the biphasic to single phase water activity (RH*100).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        - oxygen2carbon : The oxygen to carbon ratio.</span>
@@ -16213,7 +16213,7 @@ compound, if applicable.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - The RH cross point array.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">oxygen2carbon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">hydrogen2carbon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hydrogen2carbon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -16245,7 +16245,7 @@ compound, if applicable.</p>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">activities</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;water activity is NaN, check inputs&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"water activity is NaN, check inputs"</span><span class="p">)</span>
 
         <span class="n">activities_water_seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">activities</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="n">activities_organic_seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">activities</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -16254,8 +16254,8 @@ compound, if applicable.</p>
             <span class="n">activities_water_seq</span><span class="p">,</span> <span class="n">activities_organic_seq</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;phase_sep_check&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">water_activity_cross_point</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;upper_seperation&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">phase_check</span><span class="p">[</span><span class="s2">"phase_sep_check"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">water_activity_cross_point</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">phase_check</span><span class="p">[</span><span class="s2">"upper_seperation"</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">water_activity_cross_point</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -16495,7 +16495,7 @@ If no phase separation occurs, the beta phase values are None.</li>
     <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]],</span>
     <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Activity coefficients in organic-water mixtures.</span>
+<span class="w">    </span><span class="sd">"""Activity coefficients in organic-water mixtures.</span>
 
 <span class="sd">    This function assumes a fixed water activity value (e.g., RH = 75%</span>
 <span class="sd">    corresponds to 0.75 water activity in equilibrium).</span>
@@ -16512,7 +16512,7 @@ If no phase separation occurs, the beta phase values are None.</li>
 <span class="sd">        - A tuple containing the activity coefficients for alpha and beta</span>
 <span class="sd">          phases, and the q_alpha (phase separation) value.</span>
 <span class="sd">          If no phase separation occurs, the beta phase values are None.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># pylint: disable=too-many-locals</span>
 
     <span class="c1"># check types</span>
@@ -16548,7 +16548,7 @@ If no phase separation occurs, the beta phase values are None.</li>
     <span class="p">)</span>
     <span class="c1"># ensure water activity type is float</span>
     <span class="n">activities_water</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">activities</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;phase_sep_check&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">phase_check</span><span class="p">[</span><span class="s2">"phase_sep_check"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">alpha_organic_mole_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
             <span class="n">xp</span><span class="o">=</span><span class="n">activities_water</span><span class="p">,</span>
             <span class="n">fp</span><span class="o">=</span><span class="n">organic_mole_fraction_array</span><span class="p">,</span>
@@ -16574,8 +16574,8 @@ If no phase separation occurs, the beta phase values are None.</li>
     <span class="c1"># else phase separation occurs</span>
     <span class="c1"># split the activities into alpha and beta phases</span>
 
-    <span class="n">upper_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;upper_seperation_index&quot;</span><span class="p">])</span>
-    <span class="n">matching_upper_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;matching_upper_seperation_index&quot;</span><span class="p">])</span>
+    <span class="n">upper_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">phase_check</span><span class="p">[</span><span class="s2">"upper_seperation_index"</span><span class="p">])</span>
+    <span class="n">matching_upper_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">phase_check</span><span class="p">[</span><span class="s2">"matching_upper_seperation_index"</span><span class="p">])</span>
 
     <span class="c1"># alpha water rich phase</span>
     <span class="n">alpha_water_activity</span> <span class="o">=</span> <span class="n">activities_water</span><span class="p">[</span><span class="n">upper_index</span><span class="p">:]</span>
@@ -16617,7 +16617,7 @@ If no phase separation occurs, the beta phase values are None.</li>
         <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">q_alpha</span> <span class="o">=</span> <span class="n">phase_separation</span><span class="o">.</span><span class="n">q_alpha</span><span class="p">(</span>
-        <span class="n">seperation_activity</span><span class="o">=</span><span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;upper_seperation&quot;</span><span class="p">],</span>
+        <span class="n">seperation_activity</span><span class="o">=</span><span class="n">phase_check</span><span class="p">[</span><span class="s2">"upper_seperation"</span><span class="p">],</span>
         <span class="n">activities</span><span class="o">=</span><span class="n">water_activity</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="c1"># change back to original order</span>

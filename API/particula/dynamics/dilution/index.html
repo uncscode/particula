@@ -16263,14 +16263,14 @@ nonnegative.</p>
 <span class="normal">609</span>
 <span class="normal">610</span>
 <span class="normal">611</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the strategy with a validated dilution coefficient.</span>
+<span class="w">    </span><span class="sd">"""Initialize the strategy with a validated dilution coefficient.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        coefficient: Scalar chamber dilution coefficient [s⁻¹], finite and</span>
 <span class="sd">            nonnegative.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span> <span class="o">=</span> <span class="n">_validate_nonnegative_scalar</span><span class="p">(</span>
-        <span class="n">coefficient</span><span class="p">,</span> <span class="s2">&quot;coefficient&quot;</span>
+        <span class="n">coefficient</span><span class="p">,</span> <span class="s2">"coefficient"</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16349,8 +16349,8 @@ nonnegative.</p>
 <span class="normal">621</span>
 <span class="normal">622</span>
 <span class="normal">623</span>
-<span class="normal">624</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="s2">&quot;Aerosol&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the particle-number dilution rate.</span>
+<span class="normal">624</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="s2">"Aerosol"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Calculate the particle-number dilution rate.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        aerosol: Aerosol providing physical particle-number concentration.</span>
@@ -16358,7 +16358,7 @@ nonnegative.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        Particle-number concentration rate [1/(m³ s)] with the scalar or</span>
 <span class="sd">        array shape of the physical particle-number concentration.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">concentration</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">get_dilution_rate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">,</span> <span class="n">concentration</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16466,10 +16466,10 @@ or supported aerosol state cannot be safely committed.</p>
 <span class="normal">662</span>
 <span class="normal">663</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="n">aerosol</span><span class="p">:</span> <span class="s2">&quot;Aerosol&quot;</span><span class="p">,</span>
+    <span class="n">aerosol</span><span class="p">:</span> <span class="s2">"Aerosol"</span><span class="p">,</span>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Aerosol&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply one validated, atomic in-place aerosol dilution step.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Aerosol"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Apply one validated, atomic in-place aerosol dilution step.</span>
 
 <span class="sd">    Validates the concrete aerosol state and every candidate before its</span>
 <span class="sd">    first write. A preflight failure leaves the aerosol unchanged; a later</span>
@@ -16486,7 +16486,7 @@ or supported aerosol state cannot be safely committed.</p>
 <span class="sd">        TypeError: If ``time_step`` is not numeric.</span>
 <span class="sd">        ValueError: If ``time_step`` is nonfinite, negative, or nonscalar,</span>
 <span class="sd">            or supported aerosol state cannot be safely committed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">dilute_aerosol</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16675,14 +16675,14 @@ safely committed.</p>
 <span class="normal">583</span>
 <span class="normal">584</span>
 <span class="normal">585</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dilute_aerosol</span><span class="p">(</span>
-    <span class="n">aerosol</span><span class="p">:</span> <span class="s2">&quot;Aerosol&quot;</span><span class="p">,</span>
+    <span class="n">aerosol</span><span class="p">:</span> <span class="s2">"Aerosol"</span><span class="p">,</span>
     <span class="n">coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">,</span>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Aerosol&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dilute an aerosol&#39;s particle and gas concentrations in place.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Aerosol"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Dilute an aerosol's particle and gas concentrations in place.</span>
 
 <span class="sd">    Applies ``c_new = c * exp(-coefficient * time_step)`` to physical</span>
-<span class="sd">    particle-number concentration and, in order, the atmosphere&#39;s partitioning</span>
+<span class="sd">    particle-number concentration and, in order, the atmosphere's partitioning</span>
 <span class="sd">    and gas-only concentrations. Before writing, it validates every supported</span>
 <span class="sd">    source, particle-storage representation, volume, and candidate. Thus,</span>
 <span class="sd">    preflight failures are atomic; an unexpected later setter failure restores</span>
@@ -16705,12 +16705,12 @@ safely committed.</p>
 <span class="sd">        ValueError: If either scalar is nonfinite, negative, or nonscalar, or</span>
 <span class="sd">            supported aerosol state or a concentration candidate cannot be</span>
 <span class="sd">            safely committed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">coefficient_scalar</span> <span class="o">=</span> <span class="n">_validate_nonnegative_scalar</span><span class="p">(</span>
         <span class="n">coefficient</span><span class="p">,</span>
-        <span class="s2">&quot;coefficient&quot;</span><span class="p">,</span>
+        <span class="s2">"coefficient"</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">time_step_scalar</span> <span class="o">=</span> <span class="n">_validate_nonnegative_scalar</span><span class="p">(</span><span class="n">time_step</span><span class="p">,</span> <span class="s2">&quot;time_step&quot;</span><span class="p">)</span>
+    <span class="n">time_step_scalar</span> <span class="o">=</span> <span class="n">_validate_nonnegative_scalar</span><span class="p">(</span><span class="n">time_step</span><span class="p">,</span> <span class="s2">"time_step"</span><span class="p">)</span>
 
     <span class="n">preflight</span> <span class="o">=</span> <span class="n">_preflight_dilution_aerosol</span><span class="p">(</span>
         <span class="n">aerosol</span><span class="p">,</span>
@@ -16719,12 +16719,12 @@ safely committed.</p>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">coefficient_scalar</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">time_step_scalar</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">aerosol</span>
-    <span class="n">particle</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">&quot;particle&quot;</span><span class="p">]</span>
-    <span class="n">gas_containers</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">&quot;gas_containers&quot;</span><span class="p">]</span>
-    <span class="n">stored_particle_candidate</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">&quot;particle_candidate&quot;</span><span class="p">]</span>
-    <span class="n">gas_candidates</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">&quot;gas_candidates&quot;</span><span class="p">]</span>
-    <span class="n">particle_snapshot</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">&quot;particle_snapshot&quot;</span><span class="p">]</span>
-    <span class="n">gas_snapshots</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">&quot;gas_snapshots&quot;</span><span class="p">]</span>
+    <span class="n">particle</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">"particle"</span><span class="p">]</span>
+    <span class="n">gas_containers</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">"gas_containers"</span><span class="p">]</span>
+    <span class="n">stored_particle_candidate</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">"particle_candidate"</span><span class="p">]</span>
+    <span class="n">gas_candidates</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">"gas_candidates"</span><span class="p">]</span>
+    <span class="n">particle_snapshot</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">"particle_snapshot"</span><span class="p">]</span>
+    <span class="n">gas_snapshots</span> <span class="o">=</span> <span class="n">preflight</span><span class="p">[</span><span class="s2">"gas_snapshots"</span><span class="p">]</span>
     <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
@@ -16886,12 +16886,12 @@ operand shapes cannot be broadcast.</p>
 <span class="normal">156</span>
 <span class="normal">157</span>
 <span class="normal">158</span>
-<span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"coefficient"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_dilution_rate</span><span class="p">(</span>
     <span class="n">coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the instantaneous dilution rate ``dc/dt = -alpha * c``.</span>
+<span class="w">    </span><span class="sd">"""Calculate the instantaneous dilution rate ``dc/dt = -alpha * c``.</span>
 
 <span class="sd">    Finite inputs are validated and broadcast with NumPy before multiplication.</span>
 <span class="sd">    The function does not mutate inputs; all-scalar inputs return a scalar, and</span>
@@ -16911,22 +16911,22 @@ operand shapes cannot be broadcast.</p>
 <span class="sd">        TypeError: If an operand is ``None`` or is not numeric.</span>
 <span class="sd">        ValueError: If an operand is outside its finite physical domain or the</span>
 <span class="sd">            operand shapes cannot be broadcast.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">coefficient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;coefficient&#39; must not be None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Argument 'coefficient' must not be None."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">concentration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;concentration&#39; must not be None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Argument 'concentration' must not be None."</span><span class="p">)</span>
 
     <span class="n">coefficient_array</span><span class="p">,</span> <span class="n">concentration_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_arrays</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">coefficient</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
         <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">concentration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">):</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="o">-</span><span class="n">coefficient_array</span> <span class="o">*</span> <span class="n">concentration_array</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">FloatingPointError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Computed dilution rate must be finite.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">_require_finite_result</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">&quot;dilution rate&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Computed dilution rate must be finite."</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">_require_finite_result</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">"dilution rate"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_return_scalar_if_appropriate</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">coefficient</span><span class="p">,</span> <span class="n">concentration</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17093,9 +17093,9 @@ operand shapes cannot be broadcast.</p>
 <span class="normal">224</span>
 <span class="normal">225</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"coefficient"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"time_step"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_dilution_step</span><span class="p">(</span>
@@ -17103,7 +17103,7 @@ operand shapes cannot be broadcast.</p>
     <span class="n">concentration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the exact finite-step concentration, rather than a delta.</span>
+<span class="w">    </span><span class="sd">"""Calculate the exact finite-step concentration, rather than a delta.</span>
 
 <span class="sd">    This evaluates ``c_new = c * exp(-alpha * time_step)``, not an Euler</span>
 <span class="sd">    approximation, so zero coefficient, concentration, or elapsed time is an</span>
@@ -17127,13 +17127,13 @@ operand shapes cannot be broadcast.</p>
 <span class="sd">        TypeError: If an operand is ``None`` or is not numeric.</span>
 <span class="sd">        ValueError: If an operand is outside its finite physical domain or the</span>
 <span class="sd">            operand shapes cannot be broadcast.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">coefficient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;coefficient&#39; must not be None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Argument 'coefficient' must not be None."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">concentration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;concentration&#39; must not be None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Argument 'concentration' must not be None."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">time_step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;time_step&#39; must not be None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Argument 'time_step' must not be None."</span><span class="p">)</span>
 
     <span class="p">(</span>
         <span class="n">coefficient_array</span><span class="p">,</span>
@@ -17144,11 +17144,11 @@ operand shapes cannot be broadcast.</p>
         <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">concentration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
         <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">time_step</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
     <span class="p">)</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">under</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">under</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
             <span class="n">concentration_array</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">coefficient_array</span> <span class="o">*</span> <span class="n">time_step_array</span><span class="p">)</span>
         <span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">_require_finite_result</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">&quot;dilution step&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">_require_finite_result</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">"dilution step"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_return_scalar_if_appropriate</span><span class="p">(</span>
         <span class="n">result</span><span class="p">,</span>
         <span class="n">coefficient</span><span class="p">,</span>
@@ -17283,12 +17283,12 @@ operand shapes cannot be broadcast.</p>
 <span class="normal">112</span>
 <span class="normal">113</span>
 <span class="normal">114</span>
-<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;input_flow_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"volume"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"input_flow_rate"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_volume_dilution_coefficient</span><span class="p">(</span>
     <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">input_flow_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the volume dilution coefficient ``alpha = Q / V``.</span>
+<span class="w">    </span><span class="sd">"""Calculate the volume dilution coefficient ``alpha = Q / V``.</span>
 
 <span class="sd">    Finite inputs are validated and broadcast with NumPy before division. The</span>
 <span class="sd">    function does not mutate inputs; all-scalar inputs return a scalar, and any</span>
@@ -17306,24 +17306,24 @@ operand shapes cannot be broadcast.</p>
 <span class="sd">        TypeError: If an operand is ``None`` or is not numeric.</span>
 <span class="sd">        ValueError: If an operand is outside its finite physical domain or the</span>
 <span class="sd">            operand shapes cannot be broadcast.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">volume</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;volume&#39; must not be None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Argument 'volume' must not be None."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">input_flow_rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;input_flow_rate&#39; must not be None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Argument 'input_flow_rate' must not be None."</span><span class="p">)</span>
 
     <span class="n">volume_array</span><span class="p">,</span> <span class="n">input_flow_rate_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_arrays</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
         <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">input_flow_rate</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">):</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">input_flow_rate_array</span> <span class="o">/</span> <span class="n">volume_array</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">FloatingPointError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Computed dilution coefficient must be finite.&quot;</span>
+            <span class="s2">"Computed dilution coefficient must be finite."</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">_require_finite_result</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">&quot;dilution coefficient&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">_require_finite_result</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">"dilution coefficient"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_return_scalar_if_appropriate</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">input_flow_rate</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

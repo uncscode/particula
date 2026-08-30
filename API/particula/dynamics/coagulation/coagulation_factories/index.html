@@ -16167,17 +16167,17 @@ based on a given type string. Supported types include:
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the mapping of strategy types to builder instances.</span>
+<span class="w">    </span><span class="sd">"""Return the mapping of strategy types to builder instances.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dictionary mapping strategy names to their corresponding builders.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;brownian&quot;</span><span class="p">:</span> <span class="n">BrownianCoagulationBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;charged&quot;</span><span class="p">:</span> <span class="n">ChargedCoagulationBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;turbulent_shear&quot;</span><span class="p">:</span> <span class="n">TurbulentShearCoagulationBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;turbulent_dns&quot;</span><span class="p">:</span> <span class="n">TurbulentDNSCoagulationBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;combine&quot;</span><span class="p">:</span> <span class="n">CombineCoagulationStrategyBuilder</span><span class="p">(),</span>
+        <span class="s2">"brownian"</span><span class="p">:</span> <span class="n">BrownianCoagulationBuilder</span><span class="p">(),</span>
+        <span class="s2">"charged"</span><span class="p">:</span> <span class="n">ChargedCoagulationBuilder</span><span class="p">(),</span>
+        <span class="s2">"turbulent_shear"</span><span class="p">:</span> <span class="n">TurbulentShearCoagulationBuilder</span><span class="p">(),</span>
+        <span class="s2">"turbulent_dns"</span><span class="p">:</span> <span class="n">TurbulentDNSCoagulationBuilder</span><span class="p">(),</span>
+        <span class="s2">"combine"</span><span class="p">:</span> <span class="n">CombineCoagulationStrategyBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>

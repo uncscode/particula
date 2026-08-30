@@ -16203,15 +16203,15 @@ acceleration. The conceptual form is:</p>
 <span class="normal">131</span>
 <span class="normal">132</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;velocity_dispersion&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_inertia_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"velocity_dispersion"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"particle_inertia_time"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_radial_relative_velocity_ao2008</span><span class="p">(</span>
     <span class="n">velocity_dispersion</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">particle_inertia_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the radial relative velocity based on Ayala et al. (2008).</span>
+<span class="w">    </span><span class="sd">"""Compute the radial relative velocity based on Ayala et al. (2008).</span>
 
 <span class="sd">    This function estimates the radial relative velocity between pairs of</span>
 <span class="sd">    particles considering both turbulent velocity dispersion and gravitational</span>
@@ -16248,17 +16248,17 @@ acceleration. The conceptual form is:</p>
 <span class="sd">        - Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on</span>
 <span class="sd">          the geometric collision rate of sedimenting droplets. Part 2. Theory</span>
 <span class="sd">          and parameterization. New Journal of Physics, 10.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># tau_delta = (</span>
     <span class="c1">#     particle_inertia_time[:, np.newaxis]</span>
     <span class="c1">#     - particle_inertia_time[np.newaxis, :]</span>
     <span class="c1"># )</span>
-    <span class="c1"># print(f&quot;tau_delta: {tau_delta}&quot;)</span>
+    <span class="c1"># print(f"tau_delta: {tau_delta}")</span>
 
     <span class="c1"># gravity_term = (np.pi / 8) * tau_delta**2 * STANDARD_GRAVITY**2</span>
 
     <span class="c1"># return np.sqrt(2 / np.pi) * np.sqrt(velocity_dispersion + gravity_term)</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This function is not yet right.&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"This function is not yet right."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16408,15 +16408,15 @@ inertia timescales. The equation is:</p>
 <span class="normal">71</span>
 <span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;velocity_dispersion&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_inertia_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"velocity_dispersion"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"particle_inertia_time"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_radial_relative_velocity_dz2002</span><span class="p">(</span>
     <span class="n">velocity_dispersion</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">particle_inertia_time</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the radial relative velocity based on Dodin and Elperin (2002).</span>
+<span class="w">    </span><span class="sd">"""Compute the radial relative velocity based on Dodin and Elperin (2002).</span>
 
 <span class="sd">    This function calculates the radial relative velocity between pairs of</span>
 <span class="sd">    particles under turbulent conditions, capturing the effects of different</span>
@@ -16449,7 +16449,7 @@ inertia timescales. The equation is:</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Dodin, Z., &amp; Elperin, T. (2002). Phys. Fluids, 14, 2921–2924.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">tau_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
         <span class="n">particle_inertia_time</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
         <span class="o">-</span> <span class="n">particle_inertia_time</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>

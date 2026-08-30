@@ -16777,7 +16777,7 @@ can privately restore fresh bindings from captured current words.</p>
   </span>
 
 <a href="#particula.execution.gpu_resources.CommunicationResources" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">CommunicationResources</span><span class="p">(</span><span class="n">configuration</span><span class="p">:</span> <span class="n">CommunicationConfiguration</span><span class="p">,</span> <span class="n">buffers</span><span class="p">:</span> <span class="n">GasCommunicationBuffers</span> <span class="o">|</span> <span class="n">ParticleCommunicationBuffers</span><span class="p">,</span> <span class="n">final_volumes</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">execution_state</span><span class="p">:</span> <span class="s1">&#39;ResidentCommunicationState&#39;</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">CommunicationResources</span><span class="p">(</span><span class="n">configuration</span><span class="p">:</span> <span class="n">CommunicationConfiguration</span><span class="p">,</span> <span class="n">buffers</span><span class="p">:</span> <span class="n">GasCommunicationBuffers</span> <span class="o">|</span> <span class="n">ParticleCommunicationBuffers</span><span class="p">,</span> <span class="n">final_volumes</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">execution_state</span><span class="p">:</span> <span class="s1">'ResidentCommunicationState'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17024,7 +17024,7 @@ validation.</p>
 <span class="normal">538</span>
 <span class="normal">539</span>
 <span class="normal">540</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a sidecar registry pinned to one active resident session.</span>
+<span class="w">    </span><span class="sd">"""Create a sidecar registry pinned to one active resident session.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        session: Exact active resident session that supplies the fixed</span>
@@ -17035,9 +17035,9 @@ validation.</p>
 <span class="sd">            resident-session types.</span>
 <span class="sd">        ValueError: If the session is not active or fails its metadata</span>
 <span class="sd">            validation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">session</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentSession</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;session must be an exact ResidentSession.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"session must be an exact ResidentSession."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">session</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_session_state</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_signature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_signature</span><span class="p">()</span>
@@ -17334,7 +17334,7 @@ replacement request is incompatible with the established state.</p>
     <span class="n">n_collisions</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">rng_states</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoagulationResources</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Acquire fixed-capacity coagulation outputs and one RNG sidecar.</span>
+<span class="w">    </span><span class="sd">"""Acquire fixed-capacity coagulation outputs and one RNG sidecar.</span>
 
 <span class="sd">    The first successful acquisition validates supplied sidecars and</span>
 <span class="sd">    nonaliasing before allocating omitted arrays. It then initializes the</span>
@@ -17360,12 +17360,12 @@ replacement request is incompatible with the established state.</p>
 <span class="sd">            sidecar is not a Warp array.</span>
 <span class="sd">        ValueError: If capacity, schema, aliasing, session signature, or a</span>
 <span class="sd">            replacement request is incompatible with the established state.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">collision_capacity</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="n">collision_capacity</span><span class="p">,</span> <span class="n">Integral</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;collision_capacity must be a non-boolean integral.&quot;</span>
+            <span class="s2">"collision_capacity must be a non-boolean integral."</span>
         <span class="p">)</span>
     <span class="n">maximum_capacity</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
         <span class="mi">1</span><span class="p">,</span>
@@ -17377,16 +17377,16 @@ replacement request is incompatible with the established state.</p>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">collision_capacity</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">collision_capacity</span> <span class="o">&gt;</span> <span class="n">maximum_capacity</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;collision_capacity must be positive and within resident &quot;</span>
-            <span class="s2">&quot;fixed-capacity bounds.&quot;</span>
+            <span class="s2">"collision_capacity must be positive and within resident "</span>
+            <span class="s2">"fixed-capacity bounds."</span>
         <span class="p">)</span>
-    <span class="n">already_published</span> <span class="o">=</span> <span class="s2">&quot;coagulation&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span>
+    <span class="n">already_published</span> <span class="o">=</span> <span class="s2">"coagulation"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span>
     <span class="n">bindings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire</span><span class="p">(</span>
         <span class="n">_COAGULATION</span><span class="p">,</span>
         <span class="p">{</span>
-            <span class="s2">&quot;collision_pairs&quot;</span><span class="p">:</span> <span class="n">collision_pairs</span><span class="p">,</span>
-            <span class="s2">&quot;n_collisions&quot;</span><span class="p">:</span> <span class="n">n_collisions</span><span class="p">,</span>
-            <span class="s2">&quot;rng_states&quot;</span><span class="p">:</span> <span class="n">rng_states</span><span class="p">,</span>
+            <span class="s2">"collision_pairs"</span><span class="p">:</span> <span class="n">collision_pairs</span><span class="p">,</span>
+            <span class="s2">"n_collisions"</span><span class="p">:</span> <span class="n">n_collisions</span><span class="p">,</span>
+            <span class="s2">"rng_states"</span><span class="p">:</span> <span class="n">rng_states</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="nb">int</span><span class="p">(</span><span class="n">collision_capacity</span><span class="p">),</span>
         <span class="n">publish</span><span class="o">=</span><span class="n">already_published</span><span class="p">,</span>
@@ -17419,17 +17419,17 @@ replacement request is incompatible with the established state.</p>
             <span class="n">logical_box_ids</span><span class="p">,</span>
             <span class="n">lanes</span><span class="p">,</span>
             <span class="p">(</span>
-                <span class="p">(</span><span class="s2">&quot;coagulation&quot;</span><span class="p">,</span> <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;rng_states&quot;</span><span class="p">]),</span>
-                <span class="p">(</span><span class="s2">&quot;wall_loss&quot;</span><span class="p">,</span> <span class="n">temporary_wall_loss</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"coagulation"</span><span class="p">,</span> <span class="n">bindings</span><span class="p">[</span><span class="s2">"rng_states"</span><span class="p">]),</span>
+                <span class="p">(</span><span class="s2">"wall_loss"</span><span class="p">,</span> <span class="n">temporary_wall_loss</span><span class="p">),</span>
             <span class="p">),</span>
         <span class="p">)</span>
         <span class="n">registry</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
         <span class="n">view</span> <span class="o">=</span> <span class="n">CoagulationResources</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">collision_capacity</span><span class="p">),</span> <span class="o">**</span><span class="n">bindings</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">&quot;coagulation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bindings</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_capacities</span><span class="p">[</span><span class="s2">&quot;coagulation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">collision_capacity</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">"coagulation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">bindings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_capacities</span><span class="p">[</span><span class="s2">"coagulation"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">collision_capacity</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_coagulation_stream_registry</span> <span class="o">=</span> <span class="n">registry</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">&quot;coagulation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">view</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">&quot;coagulation&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">"coagulation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">view</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">"coagulation"</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17706,7 +17706,7 @@ capacity, or nonaliasing checks fail, or a binding is replaced.</p>
     <span class="o">|</span> <span class="n">ParticleCommunicationBuffers</span>
     <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CommunicationResources</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pin one closed resident communication map and native work record.</span>
+<span class="w">    </span><span class="sd">"""Pin one closed resident communication map and native work record.</span>
 
 <span class="sd">    This is the sole P1 validation and optional-allocation boundary for this</span>
 <span class="sd">    family. It accepts only GAS or PARTICLES closed maps, validates the</span>
@@ -17730,22 +17730,22 @@ capacity, or nonaliasing checks fail, or a binding is replaced.</p>
 <span class="sd">            inexact or mode-incompatible type.</span>
 <span class="sd">        ValueError: If P1 validation, session identity, resource schema,</span>
 <span class="sd">            capacity, or nonaliasing checks fail, or a binding is replaced.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_session_signature</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CommunicationConfiguration</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;configuration must be an exact CommunicationConfiguration.&quot;</span>
+            <span class="s2">"configuration must be an exact CommunicationConfiguration."</span>
         <span class="p">)</span>
     <span class="n">validated</span> <span class="o">=</span> <span class="n">validate_communication_configuration</span><span class="p">(</span>
         <span class="n">configuration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">dimensions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signature</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">validated</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">configuration</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;configuration validation must retain identity.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"configuration validation must retain identity."</span><span class="p">)</span>
     <span class="n">map_data</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span>
     <span class="n">final_volumes</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">prescribed_volume</span><span class="o">.</span><span class="n">final_volumes</span>
     <span class="k">if</span> <span class="n">final_volumes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">volume_entry</span> <span class="o">=</span> <span class="n">ManifestEntry</span><span class="p">(</span>
-            <span class="s2">&quot;final_volumes&quot;</span><span class="p">,</span> <span class="s2">&quot;communication&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span>
+            <span class="s2">"final_volumes"</span><span class="p">,</span> <span class="s2">"communication"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">"b"</span>
         <span class="p">)</span>
         <span class="n">volume_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span>
             <span class="n">volume_entry</span><span class="p">,</span> <span class="n">final_volumes</span><span class="p">,</span> <span class="n">capacity</span><span class="o">=</span><span class="kc">None</span>
@@ -17761,7 +17761,7 @@ capacity, or nonaliasing checks fail, or a binding is replaced.</p>
             <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">registered</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;final_volumes must not alias resident resources.&quot;</span>
+                <span class="s2">"final_volumes must not alias resident resources."</span>
             <span class="p">)</span>
     <span class="n">mode</span> <span class="o">=</span> <span class="n">map_data</span><span class="o">.</span><span class="n">transport_mode</span>
     <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span>
@@ -17769,21 +17769,21 @@ capacity, or nonaliasing checks fail, or a binding is replaced.</p>
         <span class="n">CommunicationTransportMode</span><span class="o">.</span><span class="n">PARTICLES</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;resident communication supports GAS or PARTICLES only.&quot;</span>
+            <span class="s2">"resident communication supports GAS or PARTICLES only."</span>
         <span class="p">)</span>
     <span class="n">opposite_family</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;communication_particles&quot;</span>
+        <span class="s2">"communication_particles"</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">CommunicationTransportMode</span><span class="o">.</span><span class="n">GAS</span>
-        <span class="k">else</span> <span class="s2">&quot;communication_gas&quot;</span>
+        <span class="k">else</span> <span class="s2">"communication_gas"</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">opposite_family</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Only one resident communication family may be bound.&quot;</span>
+            <span class="s2">"Only one resident communication family may be bound."</span>
         <span class="p">)</span>
     <span class="n">family</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;communication_gas&quot;</span>
+        <span class="s2">"communication_gas"</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">CommunicationTransportMode</span><span class="o">.</span><span class="n">GAS</span>
-        <span class="k">else</span> <span class="s2">&quot;communication_particles&quot;</span>
+        <span class="k">else</span> <span class="s2">"communication_particles"</span>
     <span class="p">)</span>
     <span class="n">manifest</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">_GAS_COMMUNICATION</span>
@@ -17797,13 +17797,13 @@ capacity, or nonaliasing checks fail, or a binding is replaced.</p>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">buffers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">buffers</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">expected</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;buffers must match the communication transport mode.&quot;</span>
+            <span class="s2">"buffers must match the communication transport mode."</span>
         <span class="p">)</span>
     <span class="n">supplied</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;source_boxes&quot;</span><span class="p">:</span> <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
-        <span class="s2">&quot;destination_boxes&quot;</span><span class="p">:</span> <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
-        <span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
-        <span class="s2">&quot;rates&quot;</span><span class="p">:</span> <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span>
+        <span class="s2">"source_boxes"</span><span class="p">:</span> <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
+        <span class="s2">"destination_boxes"</span><span class="p">:</span> <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
+        <span class="s2">"enabled"</span><span class="p">:</span> <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
+        <span class="s2">"rates"</span><span class="p">:</span> <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">manifest</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="mi">4</span><span class="p">:]:</span>
         <span class="n">supplied</span><span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -17818,7 +17818,7 @@ capacity, or nonaliasing checks fail, or a binding is replaced.</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">_record_bindings</span><span class="p">(</span><span class="n">buffers</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;communication buffers must be complete.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"communication buffers must be complete."</span><span class="p">)</span>
     <span class="n">bindings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire</span><span class="p">(</span>
         <span class="n">manifest</span><span class="p">,</span> <span class="n">supplied</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">)</span>
     <span class="p">)</span>
@@ -17826,25 +17826,25 @@ capacity, or nonaliasing checks fail, or a binding is replaced.</p>
         <span class="n">native</span><span class="p">:</span> <span class="n">GasCommunicationBuffers</span> <span class="o">|</span> <span class="n">ParticleCommunicationBuffers</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">CommunicationTransportMode</span><span class="o">.</span><span class="n">GAS</span><span class="p">:</span>
             <span class="n">native</span> <span class="o">=</span> <span class="n">GasCommunicationBuffers</span><span class="p">(</span>
-                <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;amounts&quot;</span><span class="p">],</span>
-                <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;amount_deltas&quot;</span><span class="p">],</span>
-                <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;outbound_amounts&quot;</span><span class="p">],</span>
+                <span class="n">bindings</span><span class="p">[</span><span class="s2">"amounts"</span><span class="p">],</span>
+                <span class="n">bindings</span><span class="p">[</span><span class="s2">"amount_deltas"</span><span class="p">],</span>
+                <span class="n">bindings</span><span class="p">[</span><span class="s2">"outbound_amounts"</span><span class="p">],</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">native</span> <span class="o">=</span> <span class="n">ParticleCommunicationBuffers</span><span class="p">(</span>
-                <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;source_debits&quot;</span><span class="p">],</span>
-                <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;destination_credits&quot;</span><span class="p">],</span>
-                <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;assignments&quot;</span><span class="p">],</span>
-                <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;request_concentrations&quot;</span><span class="p">],</span>
+                <span class="n">bindings</span><span class="p">[</span><span class="s2">"source_debits"</span><span class="p">],</span>
+                <span class="n">bindings</span><span class="p">[</span><span class="s2">"destination_credits"</span><span class="p">],</span>
+                <span class="n">bindings</span><span class="p">[</span><span class="s2">"assignments"</span><span class="p">],</span>
+                <span class="n">bindings</span><span class="p">[</span><span class="s2">"request_concentrations"</span><span class="p">],</span>
             <span class="p">)</span>
         <span class="n">execution_state</span> <span class="o">=</span> <span class="n">ResidentCommunicationState</span><span class="p">(</span>
-            <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;invalid&quot;</span><span class="p">],</span>
-            <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;active_or_demand&quot;</span><span class="p">],</span>
-            <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;volume_invalid&quot;</span><span class="p">],</span>
-            <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;volume_changed&quot;</span><span class="p">],</span>
-            <span class="n">bindings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_masses&quot;</span><span class="p">),</span>
-            <span class="n">bindings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_concentration&quot;</span><span class="p">),</span>
-            <span class="n">bindings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_charge&quot;</span><span class="p">),</span>
+            <span class="n">bindings</span><span class="p">[</span><span class="s2">"invalid"</span><span class="p">],</span>
+            <span class="n">bindings</span><span class="p">[</span><span class="s2">"active_or_demand"</span><span class="p">],</span>
+            <span class="n">bindings</span><span class="p">[</span><span class="s2">"volume_invalid"</span><span class="p">],</span>
+            <span class="n">bindings</span><span class="p">[</span><span class="s2">"volume_changed"</span><span class="p">],</span>
+            <span class="n">bindings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_masses"</span><span class="p">),</span>
+            <span class="n">bindings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_concentration"</span><span class="p">),</span>
+            <span class="n">bindings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_charge"</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="n">family</span><span class="p">]</span> <span class="o">=</span> <span class="n">CommunicationResources</span><span class="p">(</span>
             <span class="n">configuration</span><span class="p">,</span>
@@ -17855,7 +17855,7 @@ capacity, or nonaliasing checks fail, or a binding is replaced.</p>
     <span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="n">family</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">configuration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">configuration</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Established communication configuration cannot change.&quot;</span>
+            <span class="s2">"Established communication configuration cannot change."</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">view</span>
 </code></pre></div></td></tr></table></div>
@@ -17982,7 +17982,7 @@ storage, or the pinned session has drifted.</p>
 <span class="normal">1603</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">acquire_condensation</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">buffers</span><span class="p">:</span> <span class="n">CondensationScratchBuffers</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CondensationResources</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Acquire one complete pinned condensation scratch record.</span>
+<span class="w">    </span><span class="sd">"""Acquire one complete pinned condensation scratch record.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        buffers: Optional complete exact native scratch record. Missing</span>
@@ -17995,13 +17995,13 @@ storage, or the pinned session has drifted.</p>
 <span class="sd">        TypeError: If ``buffers`` is not an exact native record.</span>
 <span class="sd">        ValueError: If it is incomplete, incompatible, aliases protected</span>
 <span class="sd">            storage, or the pinned session has drifted.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">buffers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">buffers</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CondensationScratchBuffers</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;buffers must be an exact CondensationScratchBuffers.&quot;</span>
+            <span class="s2">"buffers must be an exact CondensationScratchBuffers."</span>
         <span class="p">)</span>
     <span class="n">supplied</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">:</span> <span class="kc">None</span>
@@ -18012,13 +18012,13 @@ storage, or the pinned session has drifted.</p>
     <span class="k">if</span> <span class="n">buffers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
         <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">supplied</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;buffers must be complete.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"buffers must be complete."</span><span class="p">)</span>
     <span class="n">bindings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire</span><span class="p">(</span><span class="n">_CONDENSATION</span><span class="p">,</span> <span class="n">supplied</span><span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;condensation&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">&quot;condensation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CondensationResources</span><span class="p">(</span>
+    <span class="k">if</span> <span class="s2">"condensation"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">"condensation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">CondensationResources</span><span class="p">(</span>
             <span class="n">CondensationScratchBuffers</span><span class="p">(</span><span class="o">**</span><span class="n">bindings</span><span class="p">)</span>
         <span class="p">)</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">&quot;condensation&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">"condensation"</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18209,7 +18209,7 @@ incompatible or aliasing, or the session signature drifted.</p>
     <span class="n">diagnostics</span><span class="p">:</span> <span class="n">NucleationDiagnosticBuffers</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">exhaustion</span><span class="p">:</span> <span class="n">NucleationExhaustionBuffers</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NucleationResources</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Acquire complete pinned native nucleation records and scratch.</span>
+<span class="w">    </span><span class="sd">"""Acquire complete pinned native nucleation records and scratch.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        scratch: Optional complete exact nucleation scratch record.</span>
@@ -18226,7 +18226,7 @@ incompatible or aliasing, or the session signature drifted.</p>
 <span class="sd">        TypeError: If supplied records are not exact native record types.</span>
 <span class="sd">        ValueError: If records are incomplete, their sidecars are</span>
 <span class="sd">            incompatible or aliasing, or the session signature drifted.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">supplied</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nucleation_supplied_bindings</span><span class="p">(</span>
         <span class="n">scratch</span><span class="p">,</span>
         <span class="n">finalized_demand</span><span class="p">,</span>
@@ -18234,9 +18234,9 @@ incompatible or aliasing, or the session signature drifted.</p>
         <span class="n">exhaustion</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">bindings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire</span><span class="p">(</span><span class="n">_NUCLEATION</span><span class="p">,</span> <span class="n">supplied</span><span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;nucleation&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">&quot;nucleation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nucleation_view</span><span class="p">(</span><span class="n">bindings</span><span class="p">)</span>
-        <span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">&quot;nucleation&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">"nucleation"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">"nucleation"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nucleation_view</span><span class="p">(</span><span class="n">bindings</span><span class="p">)</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">"nucleation"</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nucleation_records</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">view</span><span class="o">.</span><span class="n">scratch</span><span class="p">,</span>
             <span class="n">view</span><span class="o">.</span><span class="n">finalized_demand</span><span class="p">,</span>
@@ -18244,7 +18244,7 @@ incompatible or aliasing, or the session signature drifted.</p>
             <span class="n">view</span><span class="o">.</span><span class="n">exhaustion</span><span class="p">,</span>
             <span class="n">view</span><span class="o">.</span><span class="n">exhaustion</span><span class="o">.</span><span class="n">resampling_buffers</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">&quot;nucleation&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">"nucleation"</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18404,7 +18404,7 @@ an established binding is incompatible.</p>
 <span class="normal">1783</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">acquire_wall_loss</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rng_states</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WallLossResources</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Acquire one initialized persistent wall-loss RNG sidecar.</span>
+<span class="w">    </span><span class="sd">"""Acquire one initialized persistent wall-loss RNG sidecar.</span>
 
 <span class="sd">    The first successful acquisition validates or allocates the single</span>
 <span class="sd">    ``(n_boxes,)`` ``wp.uint32`` sidecar, initializes it from the wall-loss</span>
@@ -18424,11 +18424,11 @@ an established binding is incompatible.</p>
 <span class="sd">        TypeError: If a supplied sidecar is not a Warp array.</span>
 <span class="sd">        ValueError: If the sidecar schema, aliasing, session signature, or</span>
 <span class="sd">            an established binding is incompatible.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">already_published</span> <span class="o">=</span> <span class="s2">&quot;wall_loss&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span>
+<span class="sd">    """</span>
+    <span class="n">already_published</span> <span class="o">=</span> <span class="s2">"wall_loss"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span>
     <span class="n">bindings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire</span><span class="p">(</span>
         <span class="n">_WALL_LOSS</span><span class="p">,</span>
-        <span class="p">{</span><span class="s2">&quot;rng_states&quot;</span><span class="p">:</span> <span class="n">rng_states</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"rng_states"</span><span class="p">:</span> <span class="n">rng_states</span><span class="p">},</span>
         <span class="n">publish</span><span class="o">=</span><span class="n">already_published</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">already_published</span><span class="p">:</span>
@@ -18444,8 +18444,8 @@ an established binding is incompatible.</p>
             <span class="n">logical_box_ids</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">logical_box_ids</span>
             <span class="n">lanes</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">lanes</span>
             <span class="n">root_seed</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">root_seed</span>
-        <span class="n">coagulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;coagulation&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="s2">&quot;rng_states&quot;</span>
+        <span class="n">coagulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"coagulation"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">"rng_states"</span>
         <span class="p">)</span>
         <span class="n">has_published_coagulation</span> <span class="o">=</span> <span class="n">coagulation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">coagulation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -18460,21 +18460,21 @@ an established binding is incompatible.</p>
             <span class="n">logical_box_ids</span><span class="p">,</span>
             <span class="n">lanes</span><span class="p">,</span>
             <span class="p">(</span>
-                <span class="p">(</span><span class="s2">&quot;coagulation&quot;</span><span class="p">,</span> <span class="n">coagulation</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;wall_loss&quot;</span><span class="p">,</span> <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;rng_states&quot;</span><span class="p">]),</span>
+                <span class="p">(</span><span class="s2">"coagulation"</span><span class="p">,</span> <span class="n">coagulation</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"wall_loss"</span><span class="p">,</span> <span class="n">bindings</span><span class="p">[</span><span class="s2">"rng_states"</span><span class="p">]),</span>
             <span class="p">),</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">has_published_coagulation</span><span class="p">:</span>
             <span class="c1"># Do not reseed the existing resident coagulation stream while</span>
             <span class="c1"># initializing this newly acquired independent namespace.</span>
-            <span class="n">registry</span><span class="o">.</span><span class="n">initialize_process</span><span class="p">(</span><span class="s2">&quot;wall_loss&quot;</span><span class="p">)</span>
+            <span class="n">registry</span><span class="o">.</span><span class="n">initialize_process</span><span class="p">(</span><span class="s2">"wall_loss"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">registry</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
         <span class="n">view</span> <span class="o">=</span> <span class="n">WallLossResources</span><span class="p">(</span><span class="o">**</span><span class="n">bindings</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">&quot;wall_loss&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bindings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">"wall_loss"</span><span class="p">]</span> <span class="o">=</span> <span class="n">bindings</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wall_loss_stream_registry</span> <span class="o">=</span> <span class="n">registry</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">&quot;wall_loss&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">view</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">&quot;wall_loss&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">"wall_loss"</span><span class="p">]</span> <span class="o">=</span> <span class="n">view</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">[</span><span class="s2">"wall_loss"</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18524,16 +18524,16 @@ than only the guard passed to a lifecycle boundary.</p>
 <span class="normal">1207</span>
 <span class="normal">1208</span>
 <span class="normal">1209</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">assert_step_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reject lifecycle work while this registry has an open timestep.</span>
+<span class="w">    </span><span class="sd">"""Reject lifecycle work while this registry has an open timestep.</span>
 
 <span class="sd">    This binding-wide check covers every guard sharing the registry rather</span>
 <span class="sd">    than only the guard passed to a lifecycle boundary.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: If a resident timestep remains open.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_step_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;A resident timestep is open.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"A resident timestep is open."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18576,18 +18576,18 @@ restored configuration without accessing registry internals.</p>
 <span class="normal">1958</span>
 <span class="normal">1959</span>
 <span class="normal">1960</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_communication_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CommunicationResources</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the established concrete communication view, if any.</span>
+<span class="w">    </span><span class="sd">"""Return the established concrete communication view, if any.</span>
 
 <span class="sd">    This metadata-only accessor exposes the single identity-pinned resident</span>
 <span class="sd">    communication family so an explicit checkpoint restart can reuse its</span>
 <span class="sd">    restored configuration without accessing registry internals.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_session_signature</span><span class="p">()</span>
-    <span class="n">gas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;communication_gas&quot;</span><span class="p">)</span>
-    <span class="n">particles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;communication_particles&quot;</span><span class="p">)</span>
+    <span class="n">gas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"communication_gas"</span><span class="p">)</span>
+    <span class="n">particles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"communication_particles"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">gas</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">particles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Only one resident communication family may be bound.&quot;</span>
+            <span class="s2">"Only one resident communication family may be bound."</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">gas</span> <span class="k">if</span> <span class="n">gas</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">particles</span>
 </code></pre></div></td></tr></table></div>
@@ -18664,13 +18664,13 @@ restored configuration without accessing registry internals.</p>
     <span class="n">process_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">logical_box_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Explicitly reinitialize selected currently published stream lanes.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Explicitly reinitialize selected currently published stream lanes."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">assert_step_closed</span><span class="p">()</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">registered_ids</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_metadata</span><span class="p">()</span>
     <span class="n">published</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
         <span class="n">process_id</span>
-        <span class="k">for</span> <span class="n">process_id</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;coagulation&quot;</span><span class="p">,</span> <span class="s2">&quot;wall_loss&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">process_id</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"coagulation"</span><span class="p">,</span> <span class="s2">"wall_loss"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_published_stream_registry</span><span class="p">(</span><span class="n">process_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="p">)</span>
     <span class="n">requested</span> <span class="o">=</span> <span class="n">published</span> <span class="k">if</span> <span class="n">process_ids</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">process_ids</span>
@@ -18681,12 +18681,12 @@ restored configuration without accessing registry internals.</p>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">process_id</span> <span class="ow">in</span> <span class="n">selected_processes</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">process_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">published</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Requested RNG stream has not been acquired.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Requested RNG stream has not been acquired."</span><span class="p">)</span>
     <span class="n">selected_registries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_PublishedStreamRegistry</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">process_id</span> <span class="ow">in</span> <span class="n">selected_processes</span><span class="p">:</span>
         <span class="n">registry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_published_stream_registry</span><span class="p">(</span><span class="n">process_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">registry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;published stream registry is unavailable&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">"published stream registry is unavailable"</span><span class="p">)</span>
         <span class="n">registry</span><span class="o">.</span><span class="n">preflight_selected</span><span class="p">(</span>
             <span class="n">process_ids</span><span class="o">=</span><span class="p">(</span><span class="n">process_id</span><span class="p">,),</span> <span class="n">logical_box_ids</span><span class="o">=</span><span class="n">selected_ids</span>
         <span class="p">)</span>
@@ -18754,25 +18754,25 @@ restored configuration without accessing registry internals.</p>
 <span class="normal">652</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">inspect_published_streams</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PublishedStreamManifest</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return frozen metadata for currently published resident streams.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return frozen metadata for currently published resident streams."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
     <span class="n">root_seed</span><span class="p">,</span> <span class="n">logical_box_ids</span><span class="p">,</span> <span class="n">lanes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_metadata</span><span class="p">()</span>
     <span class="n">published</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
         <span class="n">process_id</span>
-        <span class="k">for</span> <span class="n">process_id</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;coagulation&quot;</span><span class="p">,</span> <span class="s2">&quot;wall_loss&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">process_id</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"coagulation"</span><span class="p">,</span> <span class="s2">"wall_loss"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_published_stream_registry</span><span class="p">(</span><span class="n">process_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="p">)</span>
     <span class="n">descriptors</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
     <span class="k">for</span> <span class="n">process_id</span> <span class="ow">in</span> <span class="n">published</span><span class="p">:</span>
         <span class="n">registry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_published_stream_registry</span><span class="p">(</span><span class="n">process_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">registry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;published stream registry is unavailable&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">"published stream registry is unavailable"</span><span class="p">)</span>
         <span class="n">descriptors</span> <span class="o">+=</span> <span class="nb">tuple</span><span class="p">(</span>
             <span class="n">descriptor</span>
             <span class="k">for</span> <span class="n">descriptor</span> <span class="ow">in</span> <span class="n">registry</span><span class="o">.</span><span class="n">inspect</span><span class="p">()</span><span class="o">.</span><span class="n">descriptors</span>
             <span class="k">if</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">key</span><span class="o">.</span><span class="n">process_id</span> <span class="o">==</span> <span class="n">process_id</span>
         <span class="p">)</span>
-    <span class="n">roles</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="n">process_id</span><span class="p">,</span> <span class="s2">&quot;rng_states&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">process_id</span> <span class="ow">in</span> <span class="n">published</span><span class="p">)</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="n">process_id</span><span class="p">,</span> <span class="s2">"rng_states"</span><span class="p">)</span> <span class="k">for</span> <span class="n">process_id</span> <span class="ow">in</span> <span class="n">published</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">PublishedStreamManifest</span><span class="p">(</span>
         <span class="n">StreamManifest</span><span class="p">(</span><span class="n">root_seed</span><span class="p">,</span> <span class="n">logical_box_ids</span><span class="p">,</span> <span class="n">lanes</span><span class="p">,</span> <span class="n">descriptors</span><span class="p">),</span>
         <span class="n">published</span><span class="p">,</span>
@@ -18839,16 +18839,16 @@ restored configuration without accessing registry internals.</p>
 <span class="normal">1195</span>
 <span class="normal">1196</span>
 <span class="normal">1197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">release_open_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Release the exact outstanding binding-level timestep token.</span>
+<span class="w">    </span><span class="sd">"""Release the exact outstanding binding-level timestep token.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        token: The exact token previously reserved for this binding.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``token`` is not the outstanding token by identity.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_step_token</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;token does not match the open resident timestep.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"token does not match the open resident timestep."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_open_step_token</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18918,7 +18918,7 @@ performs runtime work.</p>
 <span class="normal">1182</span>
 <span class="normal">1183</span>
 <span class="normal">1184</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reserve_open_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reserve the binding&#39;s sole open timestep token by identity.</span>
+<span class="w">    </span><span class="sd">"""Reserve the binding's sole open timestep token by identity.</span>
 
 <span class="sd">    The resident step guard calls this only after validating the pinned</span>
 <span class="sd">    session. This bookkeeping-only seam neither acquires resources nor</span>
@@ -18929,9 +18929,9 @@ performs runtime work.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: If this exact registry binding already has a token.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_step_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;A resident timestep is already open.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"A resident timestep is already open."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_open_step_token</span> <span class="o">=</span> <span class="n">token</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18983,23 +18983,23 @@ performs runtime work.</p>
 <span class="normal">962</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_coagulation_resources</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="n">CoagulationResources</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Require the exact established coagulation view.</span>
+<span class="w">    </span><span class="sd">"""Require the exact established coagulation view.</span>
 
 <span class="sd">    This does not acquire a new resource binding.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CoagulationResources</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;resources must be an exact CoagulationResources.&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;coagulation&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resources must be an exact CoagulationResources."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"coagulation"</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;resources must be the published coagulation view.&quot;</span>
+            <span class="s2">"resources must be the published coagulation view."</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="n">resources</span><span class="o">.</span><span class="n">collision_capacity</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capacities</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;coagulation&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;coagulation resource capacity changed.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">resources</span><span class="o">.</span><span class="n">collision_capacity</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capacities</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"coagulation"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"coagulation resource capacity changed."</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">_COAGULATION</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">&quot;coagulation&quot;</span><span class="p">][</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;coagulation resource bindings changed.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">"coagulation"</span><span class="p">][</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"coagulation resource bindings changed."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span>
             <span class="n">entry</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">capacity</span><span class="o">=</span><span class="n">resources</span><span class="o">.</span><span class="n">collision_capacity</span>
         <span class="p">)</span>
@@ -19183,7 +19183,7 @@ no longer matches the pinned binding.</p>
 <span class="normal">2058</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_communication_resources</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="n">CommunicationResources</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Metadata-validate an established communication resource view.</span>
+<span class="w">    </span><span class="sd">"""Metadata-validate an established communication resource view.</span>
 
 <span class="sd">    This execution-time seam requires the exact active pinned session and</span>
 <span class="sd">    published view, then rechecks mode, identities, shapes, device,</span>
@@ -19200,22 +19200,22 @@ no longer matches the pinned binding.</p>
 <span class="sd">            concrete type.</span>
 <span class="sd">        ValueError: If the session, mode, view, sidecar identity, or schema</span>
 <span class="sd">            no longer matches the pinned binding.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CommunicationResources</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;resources must be an exact CommunicationResources.&quot;</span>
+            <span class="s2">"resources must be an exact CommunicationResources."</span>
         <span class="p">)</span>
     <span class="n">configuration</span> <span class="o">=</span> <span class="n">resources</span><span class="o">.</span><span class="n">configuration</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CommunicationConfiguration</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;configuration must be an exact CommunicationConfiguration.&quot;</span>
+            <span class="s2">"configuration must be an exact CommunicationConfiguration."</span>
         <span class="p">)</span>
     <span class="n">mode</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span><span class="o">.</span><span class="n">transport_mode</span>
     <span class="n">family</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;communication_gas&quot;</span>
+        <span class="s2">"communication_gas"</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">CommunicationTransportMode</span><span class="o">.</span><span class="n">GAS</span>
-        <span class="k">else</span> <span class="s2">&quot;communication_particles&quot;</span>
+        <span class="k">else</span> <span class="s2">"communication_particles"</span>
     <span class="p">)</span>
     <span class="n">manifest</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">_GAS_COMMUNICATION</span>
@@ -19227,51 +19227,51 @@ no longer matches the pinned binding.</p>
         <span class="n">CommunicationTransportMode</span><span class="o">.</span><span class="n">PARTICLES</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;resident communication supports GAS or PARTICLES only.&quot;</span>
+            <span class="s2">"resident communication supports GAS or PARTICLES only."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">family</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;resources must be the published communication view.&quot;</span>
+            <span class="s2">"resources must be the published communication view."</span>
         <span class="p">)</span>
     <span class="n">bindings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="n">family</span><span class="p">]</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">resources</span><span class="o">.</span><span class="n">final_volumes</span>
         <span class="ow">is</span> <span class="ow">not</span> <span class="n">configuration</span><span class="o">.</span><span class="n">prescribed_volume</span><span class="o">.</span><span class="n">final_volumes</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;communication final volumes binding changed.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"communication final volumes binding changed."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">resources</span><span class="o">.</span><span class="n">final_volumes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span>
             <span class="n">ManifestEntry</span><span class="p">(</span>
-                <span class="s2">&quot;final_volumes&quot;</span><span class="p">,</span> <span class="s2">&quot;communication&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span>
+                <span class="s2">"final_volumes"</span><span class="p">,</span> <span class="s2">"communication"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">"b"</span>
             <span class="p">),</span>
             <span class="n">resources</span><span class="o">.</span><span class="n">final_volumes</span><span class="p">,</span>
             <span class="n">capacity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="n">values</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;source_boxes&quot;</span><span class="p">:</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
-        <span class="s2">&quot;destination_boxes&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">"source_boxes"</span><span class="p">:</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
+        <span class="s2">"destination_boxes"</span><span class="p">:</span> <span class="p">(</span>
             <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span><span class="o">.</span><span class="n">destination_boxes</span>
         <span class="p">),</span>
-        <span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
-        <span class="s2">&quot;rates&quot;</span><span class="p">:</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span>
+        <span class="s2">"enabled"</span><span class="p">:</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
+        <span class="s2">"rates"</span><span class="p">:</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_record_bindings</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">buffers</span><span class="p">))</span>
     <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
         <span class="p">{</span>
-            <span class="s2">&quot;invalid&quot;</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">invalid</span><span class="p">,</span>
-            <span class="s2">&quot;active_or_demand&quot;</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">active_or_demand</span><span class="p">,</span>
-            <span class="s2">&quot;volume_invalid&quot;</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">volume_invalid</span><span class="p">,</span>
-            <span class="s2">&quot;volume_changed&quot;</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">volume_changed</span><span class="p">,</span>
-            <span class="s2">&quot;initial_masses&quot;</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">initial_masses</span><span class="p">,</span>
-            <span class="s2">&quot;initial_concentration&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">"invalid"</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">invalid</span><span class="p">,</span>
+            <span class="s2">"active_or_demand"</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">active_or_demand</span><span class="p">,</span>
+            <span class="s2">"volume_invalid"</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">volume_invalid</span><span class="p">,</span>
+            <span class="s2">"volume_changed"</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">volume_changed</span><span class="p">,</span>
+            <span class="s2">"initial_masses"</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">initial_masses</span><span class="p">,</span>
+            <span class="s2">"initial_concentration"</span><span class="p">:</span> <span class="p">(</span>
                 <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">initial_concentration</span>
             <span class="p">),</span>
-            <span class="s2">&quot;initial_charge&quot;</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">initial_charge</span><span class="p">,</span>
+            <span class="s2">"initial_charge"</span><span class="p">:</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span><span class="o">.</span><span class="n">initial_charge</span><span class="p">,</span>
         <span class="p">}</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">manifest</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">bindings</span><span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;communication resource bindings changed.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"communication resource bindings changed."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span>
             <span class="n">entry</span><span class="p">,</span>
             <span class="n">bindings</span><span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">],</span>
@@ -19323,21 +19323,21 @@ no longer matches the pinned binding.</p>
 <span class="normal">938</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_condensation_resources</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="n">CondensationResources</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Require the exact established condensation view.</span>
+<span class="w">    </span><span class="sd">"""Require the exact established condensation view.</span>
 
 <span class="sd">    This does not acquire a new resource binding.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CondensationResources</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;resources must be an exact CondensationResources.&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;condensation&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resources must be an exact CondensationResources."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"condensation"</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;resources must be the published condensation view.&quot;</span>
+            <span class="s2">"resources must be the published condensation view."</span>
         <span class="p">)</span>
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">_CONDENSATION</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">scratch_buffers</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">&quot;condensation&quot;</span><span class="p">][</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;condensation resource bindings changed.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">"condensation"</span><span class="p">][</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"condensation resource bindings changed."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">capacity</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -19484,7 +19484,7 @@ contiguity, or byte-range nonaliasing validation fails.</p>
 <span class="normal">764</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_diagnostic_outputs</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate caller-owned diagnostic outputs without publishing them.</span>
+<span class="w">    </span><span class="sd">"""Validate caller-owned diagnostic outputs without publishing them.</span>
 
 <span class="sd">    The diagnostics boundary owns neither these arrays nor their lifetime.</span>
 <span class="sd">    This metadata-only check rejects aliasing with resident primaries and</span>
@@ -19502,20 +19502,20 @@ contiguity, or byte-range nonaliasing validation fails.</p>
 <span class="sd">            a Warp array.</span>
 <span class="sd">        ValueError: If session ownership, output schema, device, pointer,</span>
 <span class="sd">            contiguity, or byte-range nonaliasing validation fails.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;outputs must be an exact tuple.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"outputs must be an exact tuple."</span><span class="p">)</span>
     <span class="n">ranges</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="n">ManifestEntry</span><span class="p">(</span>
-            <span class="s2">&quot;diagnostic output&quot;</span><span class="p">,</span> <span class="s2">&quot;diagnostics&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">&quot;bs&quot;</span>
+            <span class="s2">"diagnostic output"</span><span class="p">,</span> <span class="s2">"diagnostics"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">"bs"</span>
         <span class="p">)</span>
         <span class="n">byte_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">capacity</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">byte_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">byte_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Nonempty diagnostic outputs must have a valid pointer.&quot;</span>
+                <span class="s2">"Nonempty diagnostic outputs must have a valid pointer."</span>
             <span class="p">)</span>
         <span class="n">ranges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">byte_range</span><span class="p">)</span>
     <span class="n">protected</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_primary_arrays</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span>
@@ -19529,14 +19529,14 @@ contiguity, or byte-range nonaliasing validation fails.</p>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">output</span> <span class="ow">is</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">protected</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Diagnostic outputs must not alias resident resources.&quot;</span>
+                <span class="s2">"Diagnostic outputs must not alias resident resources."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_ranges_overlap</span><span class="p">(</span><span class="n">byte_range</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">protected_ranges</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Diagnostic output byte ranges must not overlap.&quot;</span>
+                <span class="s2">"Diagnostic output byte ranges must not overlap."</span>
             <span class="p">)</span>
         <span class="k">for</span> <span class="n">other</span><span class="p">,</span> <span class="n">other_range</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
             <span class="n">values</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:],</span> <span class="n">ranges</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:],</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
@@ -19545,7 +19545,7 @@ contiguity, or byte-range nonaliasing validation fails.</p>
                 <span class="n">byte_range</span><span class="p">,</span> <span class="n">other_range</span>
             <span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Diagnostic outputs must not overlap each other.&quot;</span>
+                    <span class="s2">"Diagnostic outputs must not overlap each other."</span>
                 <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -19618,16 +19618,16 @@ may not overlap any diagnostic binding.</p>
 <span class="normal">806</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_diagnostic_registrations</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">registrations</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate closed diagnostic bindings without acquiring resources.</span>
+<span class="w">    </span><span class="sd">"""Validate closed diagnostic bindings without acquiring resources.</span>
 
 <span class="sd">    Outputs and accounting inputs are caller-owned, same-device contiguous</span>
 <span class="sd">    arrays. Inputs may alias other inputs because they are read-only, but</span>
 <span class="sd">    no input or output may overlap resident or acquired storage, and outputs</span>
 <span class="sd">    may not overlap any diagnostic binding.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">registrations</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;registrations must be an exact tuple.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"registrations must be an exact tuple."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">registrations</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validated_diagnostic_registrations</span><span class="p">:</span>
         <span class="k">return</span>
     <span class="n">outputs</span><span class="p">,</span> <span class="n">output_entries</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">input_entries</span> <span class="o">=</span> <span class="p">(</span>
@@ -19803,7 +19803,7 @@ published view, or a pinned sidecar binding changed.</p>
 <span class="normal">1028</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_nucleation_resources</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="n">NucleationResources</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate one established nucleation view without acquiring sidecars.</span>
+<span class="w">    </span><span class="sd">"""Validate one established nucleation view without acquiring sidecars.</span>
 
 <span class="sd">    This concrete-only adapter seam verifies exact active-session ownership,</span>
 <span class="sd">    the exact published view identity, and every pinned record binding. It</span>
@@ -19819,18 +19819,18 @@ published view, or a pinned sidecar binding changed.</p>
 <span class="sd">        TypeError: If ``resources`` is not an exact nucleation view.</span>
 <span class="sd">        ValueError: If the family is unavailable, the view differs from the</span>
 <span class="sd">            published view, or a pinned sidecar binding changed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NucleationResources</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;resources must be an exact NucleationResources.&quot;</span><span class="p">)</span>
-    <span class="n">published</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nucleation&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resources must be an exact NucleationResources."</span><span class="p">)</span>
+    <span class="n">published</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"nucleation"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">published</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;nucleation resources have not been acquired.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"nucleation resources have not been acquired."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">published</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resources must be the published nucleation view.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resources must be the published nucleation view."</span><span class="p">)</span>
     <span class="n">published_records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nucleation_records</span>
     <span class="k">if</span> <span class="n">published_records</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;nucleation resource records are unavailable.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"nucleation resource records are unavailable."</span><span class="p">)</span>
     <span class="n">resource_records</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">resources</span><span class="o">.</span><span class="n">scratch</span><span class="p">,</span>
         <span class="n">resources</span><span class="o">.</span><span class="n">finalized_demand</span><span class="p">,</span>
@@ -19851,7 +19851,7 @@ published view, or a pinned sidecar binding changed.</p>
             <span class="n">resource_records</span><span class="p">,</span> <span class="n">published_records</span><span class="p">,</span> <span class="n">record_types</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;nucleation resource record bindings changed.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"nucleation resource record bindings changed."</span><span class="p">)</span>
     <span class="n">bindings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_bindings</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">scratch</span><span class="p">)</span>
     <span class="n">bindings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_record_bindings</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">finalized_demand</span><span class="p">))</span>
     <span class="n">bindings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_record_bindings</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">))</span>
@@ -19860,10 +19860,10 @@ published view, or a pinned sidecar binding changed.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">_record_bindings</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">exhaustion</span><span class="o">.</span><span class="n">resampling_buffers</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">_NUCLEATION</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">bindings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">&quot;nucleation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="k">if</span> <span class="n">bindings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">"nucleation"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="n">entry</span><span class="o">.</span><span class="n">role</span>
         <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;nucleation resource bindings changed.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"nucleation resource bindings changed."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">bindings</span><span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span><span class="p">],</span> <span class="n">capacity</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -19946,10 +19946,10 @@ array identity signature changed.</p>
 <span class="normal">602</span>
 <span class="normal">603</span>
 <span class="normal">604</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_pinned_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the exact active pinned session without acquiring resources.</span>
+<span class="w">    </span><span class="sd">"""Validate the exact active pinned session without acquiring resources.</span>
 
 <span class="sd">    This direct-module-only guard seam first requires ``session is`` the</span>
-<span class="sd">    registry&#39;s retained session. It then performs the existing metadata-only</span>
+<span class="sd">    registry's retained session. It then performs the existing metadata-only</span>
 <span class="sd">    active-lifecycle, container identity, primary-array identity, and schema</span>
 <span class="sd">    validation. It does not inspect payloads, acquire sidecars, allocate,</span>
 <span class="sd">    transfer, synchronize, execute, or mutate registry bindings or views.</span>
@@ -19961,9 +19961,9 @@ array identity signature changed.</p>
 <span class="sd">        ValueError: If ``session`` is not the retained object or its active</span>
 <span class="sd">            lifecycle, schema, protected container identity, or primary</span>
 <span class="sd">            array identity signature changed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;session must be the pinned ResidentSession.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"session must be the pinned ResidentSession."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_session_signature</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -20081,7 +20081,7 @@ published view, or its pinned sidecar binding changed.</p>
 <span class="normal">918</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_wall_loss_resources</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="n">WallLossResources</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate one established wall-loss view without acquiring sidecars.</span>
+<span class="w">    </span><span class="sd">"""Validate one established wall-loss view without acquiring sidecars.</span>
 
 <span class="sd">    This concrete-only adapter seam verifies the exact active session before</span>
 <span class="sd">    checking that ``resources`` is the already-published wall-loss view. It</span>
@@ -20097,18 +20097,18 @@ published view, or its pinned sidecar binding changed.</p>
 <span class="sd">        TypeError: If ``resources`` is not an exact wall-loss view.</span>
 <span class="sd">        ValueError: If the family is unavailable, the view differs from the</span>
 <span class="sd">            published view, or its pinned sidecar binding changed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">WallLossResources</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;resources must be an exact WallLossResources.&quot;</span><span class="p">)</span>
-    <span class="n">published</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wall_loss&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resources must be an exact WallLossResources."</span><span class="p">)</span>
+    <span class="n">published</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wall_loss"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">published</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wall_loss resources have not been acquired.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"wall_loss resources have not been acquired."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">published</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resources must be the published wall_loss view.&quot;</span><span class="p">)</span>
-    <span class="n">bindings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">&quot;wall_loss&quot;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">resources</span><span class="o">.</span><span class="n">rng_states</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;rng_states&quot;</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wall_loss resource bindings changed.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resources must be the published wall_loss view."</span><span class="p">)</span>
+    <span class="n">bindings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bindings</span><span class="p">[</span><span class="s2">"wall_loss"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">resources</span><span class="o">.</span><span class="n">rng_states</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">bindings</span><span class="p">[</span><span class="s2">"rng_states"</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"wall_loss resource bindings changed."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span>
         <span class="n">_WALL_LOSS</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">resources</span><span class="o">.</span><span class="n">rng_states</span><span class="p">,</span> <span class="n">capacity</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span>

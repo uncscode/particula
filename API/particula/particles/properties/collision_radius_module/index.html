@@ -16291,13 +16291,13 @@ https://doi.org/10.1016/j.jaerosci.2021.10586</p>
 <span class="normal">49</span>
 <span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;gyration_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"gyration_radius"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_collision_radius_mg1988</span><span class="p">(</span>
     <span class="n">gyration_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the collision radius using the mg1988 model.</span>
+<span class="w">    </span><span class="sd">"""Calculate the collision radius using the mg1988 model.</span>
 
 <span class="sd">    The collision radius (R_c) is set equal to the radius of gyration (R_g):</span>
 
@@ -16310,7 +16310,7 @@ https://doi.org/10.1016/j.jaerosci.2021.10586</p>
 <span class="sd">        - Collision radius of the particle (m).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_collision_radius_mg1988(1.5)</span>
 <span class="sd">        # 1.5</span>
@@ -16318,9 +16318,9 @@ https://doi.org/10.1016/j.jaerosci.2021.10586</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Mulholland, G. W., Mountain, R. D., Samson, R. J., &amp; Ernst, M. H.</span>
-<span class="sd">        (1988). &quot;Cluster Size Distribution for Free Molecular Agglomeration.&quot;</span>
+<span class="sd">        (1988). "Cluster Size Distribution for Free Molecular Agglomeration."</span>
 <span class="sd">          Energy and Fuels, 2(4). https://doi.org/10.1021/ef00010a014</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">gyration_radius</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16448,15 +16448,15 @@ https://doi.org/10.1016/j.jaerosci.2021.10586</p>
 <span class="normal">136</span>
 <span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;gyration_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;fractal_prefactor&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"gyration_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"fractal_prefactor"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_collision_radius_mzg2002</span><span class="p">(</span>
     <span class="n">gyration_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">fractal_prefactor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the collision radius using the mzg2002 model.</span>
+<span class="w">    </span><span class="sd">"""Calculate the collision radius using the mzg2002 model.</span>
 
 <span class="sd">    The collision radius (R_c) is given by the empirical relation:</span>
 
@@ -16473,19 +16473,19 @@ https://doi.org/10.1016/j.jaerosci.2021.10586</p>
 <span class="sd">        - Collision radius of the particle (m).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_collision_radius_mzg2002(1.5, 1.2)</span>
 <span class="sd">        # 1.577...</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Zurita-Gotor, M., &amp; Rosner, D. E. (2002). &quot;Effective diameters for</span>
+<span class="sd">        - Zurita-Gotor, M., &amp; Rosner, D. E. (2002). "Effective diameters for</span>
 <span class="sd">          collisions of fractal-like aggregates: Recommendations for improved</span>
-<span class="sd">          aerosol coagulation frequency predictions.&quot; Journal of Colloid and</span>
+<span class="sd">          aerosol coagulation frequency predictions." Journal of Colloid and</span>
 <span class="sd">          Interface Science, 255(1).</span>
 <span class="sd">          https://doi.org/10.1006/jcis.2002.8634</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="mf">1.037</span> <span class="o">*</span> <span class="p">(</span><span class="n">fractal_prefactor</span><span class="o">**</span><span class="mf">0.077</span><span class="p">)</span> <span class="o">*</span> <span class="n">gyration_radius</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16615,15 +16615,15 @@ https://doi.org/10.1016/j.jaerosci.2021.10586</p>
 <span class="normal">93</span>
 <span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;gyration_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;fractal_dimension&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"gyration_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"fractal_dimension"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_collision_radius_sr1992</span><span class="p">(</span>
     <span class="n">gyration_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">fractal_dimension</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the collision radius using the sr1992 model.</span>
+<span class="w">    </span><span class="sd">"""Calculate the collision radius using the sr1992 model.</span>
 
 <span class="sd">    This model includes the fractal dimension (d_f). The collision radius</span>
 <span class="sd">    (R_c) is:</span>
@@ -16642,18 +16642,18 @@ https://doi.org/10.1016/j.jaerosci.2021.10586</p>
 <span class="sd">        - Collision radius of the particle (m).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_collision_radius_sr1992(1.5, 1.2)</span>
 <span class="sd">        # 1.8371173...</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Rogak, S. N., &amp; Flagan, R. C. (1992). &quot;Coagulation of aerosol</span>
-<span class="sd">          agglomerates in the transition regime.&quot; Journal of Colloid and</span>
+<span class="sd">        - Rogak, S. N., &amp; Flagan, R. C. (1992). "Coagulation of aerosol</span>
+<span class="sd">          agglomerates in the transition regime." Journal of Colloid and</span>
 <span class="sd">          Interface Science, 151(1), 203-224.</span>
 <span class="sd">          https://doi.org/10.1016/0021-9797(92)90252-H</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">fractal_dimension</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">gyration_radius</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16804,10 +16804,10 @@ dimension (d_f) and number of monomers (N). The collision radius
 <span class="normal">192</span>
 <span class="normal">193</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;fractal_dimension&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;number_of_particles&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gyration_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;radius_monomer&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"fractal_dimension"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"number_of_particles"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"gyration_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"radius_monomer"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_collision_radius_tt2012</span><span class="p">(</span>
@@ -16816,7 +16816,7 @@ dimension (d_f) and number of monomers (N). The collision radius
     <span class="n">gyration_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">radius_monomer</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the collision radius using the tt2012 model.</span>
+<span class="w">    </span><span class="sd">"""Calculate the collision radius using the tt2012 model.</span>
 
 <span class="sd">    This function uses fitting parameters α₁, α₂ based on the fractal</span>
 <span class="sd">    dimension (d_f) and number of monomers (N). The collision radius</span>
@@ -16834,18 +16834,18 @@ dimension (d_f) and number of monomers (N). The collision radius
 <span class="sd">        - Collision radius of the particle (m).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_collision_radius_tt2012(2.5, 100, 1.5, 0.1)</span>
 <span class="sd">        # 2.034...</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Thajudeen, T., Gopalakrishnan, R., &amp; Hogan, C. J. (2012). &quot;The</span>
+<span class="sd">        - Thajudeen, T., Gopalakrishnan, R., &amp; Hogan, C. J. (2012). "The</span>
 <span class="sd">          collision rate of nonspherical particles and aggregates for all</span>
-<span class="sd">          diffusive knudsen numbers.&quot; Aerosol Science and Technology, 46(11).</span>
+<span class="sd">          diffusive knudsen numbers." Aerosol Science and Technology, 46(11).</span>
 <span class="sd">          https://doi.org/10.1080/02786826.2012.701353</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">alpha1</span> <span class="o">=</span> <span class="mf">0.253</span> <span class="o">*</span> <span class="n">fractal_dimension</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">1.209</span> <span class="o">*</span> <span class="n">fractal_dimension</span> <span class="o">+</span> <span class="mf">1.433</span>
     <span class="n">alpha2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.218</span> <span class="o">*</span> <span class="n">fractal_dimension</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mf">0.964</span> <span class="o">*</span> <span class="n">fractal_dimension</span> <span class="o">-</span> <span class="mf">0.180</span>
     <span class="n">phi</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">alpha1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">number_of_particles</span><span class="p">)</span> <span class="o">+</span> <span class="n">alpha2</span><span class="p">)</span>
@@ -16987,15 +16987,15 @@ The collision radius (R_c) is:</p>
 <span class="normal">239</span>
 <span class="normal">240</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;gyration_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;radius_monomer&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"gyration_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"radius_monomer"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_collision_radius_wq2022_rg</span><span class="p">(</span>
     <span class="n">gyration_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">radius_monomer</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the collision radius using the wq2022_rg model.</span>
+<span class="w">    </span><span class="sd">"""Calculate the collision radius using the wq2022_rg model.</span>
 
 <span class="sd">    This function uses a fitted model based on the ratio (R_g / rₘ).</span>
 <span class="sd">    The collision radius (R_c) is:</span>
@@ -17014,7 +17014,7 @@ The collision radius (R_c) is:</p>
 <span class="sd">        - Collision radius of the particle (m).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_collision_radius_wq2022_rg(1.5, 0.1)</span>
 <span class="sd">        # 1.50...</span>
@@ -17022,10 +17022,10 @@ The collision radius (R_c) is:</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Qian, W., Kronenburg, A., Hui, X., Lin, Y., &amp; Karsch, M. (2022).</span>
-<span class="sd">          &quot;Effects of agglomerate characteristics on their collision kernels in</span>
-<span class="sd">          the free molecular regime.&quot; Journal of Aerosol Science, 159.</span>
+<span class="sd">          "Effects of agglomerate characteristics on their collision kernels in</span>
+<span class="sd">          the free molecular regime." Journal of Aerosol Science, 159.</span>
 <span class="sd">          https://doi.org/10.1016/j.jaerosci.2021.105868</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">coefficient</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.973</span><span class="p">,</span> <span class="mf">0.441</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">coefficient</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">gyration_radius</span> <span class="o">/</span> <span class="n">radius_monomer</span><span class="p">)</span> <span class="o">+</span> <span class="n">coefficient</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -17176,9 +17176,9 @@ The collision radius (R_c) is:</p>
 <span class="normal">293</span>
 <span class="normal">294</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;fractal_dimension&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gyration_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;radius_monomer&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"fractal_dimension"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"gyration_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"radius_monomer"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_collision_radius_wq2022_rg_df</span><span class="p">(</span>
@@ -17186,7 +17186,7 @@ The collision radius (R_c) is:</p>
     <span class="n">gyration_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">radius_monomer</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the collision radius using the wq2022_rg_df model.</span>
+<span class="w">    </span><span class="sd">"""Calculate the collision radius using the wq2022_rg_df model.</span>
 
 <span class="sd">    This function uses a fitted model based on fractal dimension (d_f), ratio</span>
 <span class="sd">    (R_g / rₘ), and empirical coefficients. The collision radius (R_c) is:</span>
@@ -17207,7 +17207,7 @@ The collision radius (R_c) is:</p>
 <span class="sd">        - Collision radius of the particle (m).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_collision_radius_wq2022_rg_df(2.5, 1.5, 0.1)</span>
 <span class="sd">        # 1.66...</span>
@@ -17215,10 +17215,10 @@ The collision radius (R_c) is:</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Qian, W., Kronenburg, A., Hui, X., Lin, Y., &amp; Karsch, M. (2022).</span>
-<span class="sd">          &quot;Effects of agglomerate characteristics on their collision kernels in</span>
-<span class="sd">          the free molecular regime.&quot; Journal of Aerosol Science, 159.</span>
+<span class="sd">          "Effects of agglomerate characteristics on their collision kernels in</span>
+<span class="sd">          the free molecular regime." Journal of Aerosol Science, 159.</span>
 <span class="sd">          https://doi.org/10.1016/j.jaerosci.2021.105868</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">coefficient</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.882</span><span class="p">,</span> <span class="mf">0.223</span><span class="p">,</span> <span class="mf">0.387</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">coefficient</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -17388,10 +17388,10 @@ radius (R_c) is:</p>
 <span class="normal">354</span>
 <span class="normal">355</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;fractal_dimension&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;fractal_prefactor&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gyration_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;radius_monomer&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"fractal_dimension"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"fractal_prefactor"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"gyration_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"radius_monomer"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_collision_radius_wq2022_rg_df_k0</span><span class="p">(</span>
@@ -17400,7 +17400,7 @@ radius (R_c) is:</p>
     <span class="n">gyration_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">radius_monomer</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the collision radius using the wq2022_rg_df_k0 model.</span>
+<span class="w">    </span><span class="sd">"""Calculate the collision radius using the wq2022_rg_df_k0 model.</span>
 
 <span class="sd">    This function uses a fitted expression depending on fractal dimension</span>
 <span class="sd">    (d_f), fractal prefactor (k₀), and ratio (R_g / rₘ). The collision</span>
@@ -17424,7 +17424,7 @@ radius (R_c) is:</p>
 <span class="sd">        - Collision radius of the particle (m).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_collision_radius_wq2022_rg_df_k0(2.5, 1.2, 1.5, 0.1)</span>
 <span class="sd">        # 1.83...</span>
@@ -17432,10 +17432,10 @@ radius (R_c) is:</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Qian, W., Kronenburg, A., Hui, X., Lin, Y., &amp; Karsch, M. (2022).</span>
-<span class="sd">          &quot;Effects of agglomerate characteristics on their collision kernels in</span>
-<span class="sd">          the free molecular regime.&quot; Journal of Aerosol Science, 159.</span>
+<span class="sd">          "Effects of agglomerate characteristics on their collision kernels in</span>
+<span class="sd">          the free molecular regime." Journal of Aerosol Science, 159.</span>
 <span class="sd">          https://doi.org/10.1016/j.jaerosci.2021.105868</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">coefficient</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.777</span><span class="p">,</span> <span class="mf">0.479</span><span class="p">,</span> <span class="mf">0.000970</span><span class="p">,</span> <span class="mf">0.267</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0790</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">coefficient</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -17624,11 +17624,11 @@ radius (R_c) is:</p>
 <span class="normal">422</span>
 <span class="normal">423</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;fractal_dimension&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;fractal_prefactor&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;shape_anisotropy&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gyration_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;radius_monomer&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"fractal_dimension"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"fractal_prefactor"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"shape_anisotropy"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"gyration_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"radius_monomer"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_collision_radius_wq2022_rg_df_k0_a13</span><span class="p">(</span>
@@ -17638,7 +17638,7 @@ radius (R_c) is:</p>
     <span class="n">gyration_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">radius_monomer</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the collision radius using the wq2022_rg_df_k0_a13 model.</span>
+<span class="w">    </span><span class="sd">"""Calculate the collision radius using the wq2022_rg_df_k0_a13 model.</span>
 
 <span class="sd">    This function uses a fitted expression depending on fractal dimension</span>
 <span class="sd">    (d_f), fractal prefactor (k₀), shape anisotropy (A₁₃), and ratio</span>
@@ -17664,7 +17664,7 @@ radius (R_c) is:</p>
 <span class="sd">        - Collision radius of the particle (m).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_collision_radius_wq2022_rg_df_k0_a13(</span>
 <span class="sd">            2.5, 1.2, 1.82, 1.5, 0.1</span>
@@ -17674,10 +17674,10 @@ radius (R_c) is:</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Qian, W., Kronenburg, A., Hui, X., Lin, Y., &amp; Karsch, M. (2022).</span>
-<span class="sd">          &quot;Effects of agglomerate characteristics on their collision kernels in</span>
-<span class="sd">          the free molecular regime.&quot; Journal of Aerosol Science, 159.</span>
+<span class="sd">          "Effects of agglomerate characteristics on their collision kernels in</span>
+<span class="sd">          the free molecular regime." Journal of Aerosol Science, 159.</span>
 <span class="sd">          https://doi.org/10.1016/j.jaerosci.2021.105868</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">coefficient</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.876</span><span class="p">,</span> <span class="mf">0.363</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.105</span><span class="p">,</span> <span class="mf">0.421</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0360</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.227</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">coefficient</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

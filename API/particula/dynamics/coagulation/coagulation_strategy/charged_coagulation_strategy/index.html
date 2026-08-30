@@ -16146,7 +16146,7 @@ handling of Coulomb interactions under various regimes.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">kernel_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">HardSphereKernelStrategy</span><span class="p">()</span>
 <span class="n">charged_coag</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span> <span class="n">kernel_strategy</span><span class="o">=</span><span class="n">kernel_strategy</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span> <span class="n">kernel_strategy</span><span class="o">=</span><span class="n">kernel_strategy</span>
 <span class="p">)</span>
 <span class="c1"># Now the charged_coag object can compute dimensionless and</span>
 <span class="c1"># dimensioned kernels given a ParticleRepresentation object.</span>
@@ -16245,12 +16245,12 @@ particle-resolved coagulation instead of using interpolation.</p>
     <span class="n">kernel_strategy</span><span class="p">:</span> <span class="n">ChargedKernelStrategyABC</span><span class="p">,</span>
     <span class="n">use_direct_kernel</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the ChargedCoagulationStrategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the ChargedCoagulationStrategy.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        distribution_type : The distribution type representing how</span>
-<span class="sd">        particles are tracked (e.g., &quot;discrete&quot;, &quot;continuous_pdf&quot;,</span>
-<span class="sd">        or &quot;particle_resolved&quot;).</span>
+<span class="sd">        particles are tracked (e.g., "discrete", "continuous_pdf",</span>
+<span class="sd">        or "particle_resolved").</span>
 <span class="sd">        kernel_strategy : A ChargedKernelStrategyABC instance used to</span>
 <span class="sd">            calculate dimensionless/dimensioned kernels for charged</span>
 <span class="sd">            coagulation.</span>
@@ -16259,7 +16259,7 @@ particle-resolved coagulation instead of using interpolation.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">,</span>
         <span class="n">use_direct_kernel</span><span class="o">=</span><span class="n">use_direct_kernel</span><span class="p">,</span>
@@ -16381,7 +16381,7 @@ electrostatic interactions.</p>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the dimensionless kernel for charged coagulation.</span>
+<span class="w">    </span><span class="sd">"""Compute the dimensionless kernel for charged coagulation.</span>
 
 <span class="sd">    This method delegates computation to the provided kernel strategy. It</span>
 <span class="sd">    returns the dimensionless kernel (H) as a function of the diffusive</span>
@@ -16397,13 +16397,13 @@ electrostatic interactions.</p>
 <span class="sd">        - NDArray[np.float64] : Array of dimensionless kernel values.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Dimensionless Kernel Example&quot;</span>
+<span class="sd">        ```py title="Dimensionless Kernel Example"</span>
 <span class="sd">        kn = np.array([0.1, 0.2])</span>
 <span class="sd">        phi = np.array([1.0, 2.0])</span>
 <span class="sd">        dim_kernel = charged_coag.dimensionless_kernel(kn, phi)</span>
 <span class="sd">        # dim_kernel -&gt; array of dimensionless kernel values</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_strategy</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">(</span>
         <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen</span><span class="p">,</span>
         <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
@@ -16557,7 +16557,7 @@ kernel value(s).</li>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the dimensioned coagulation kernel for charged particles.</span>
+<span class="w">    </span><span class="sd">"""Compute the dimensioned coagulation kernel for charged particles.</span>
 
 <span class="sd">    This method converts the dimensionless kernel into a dimensioned</span>
 <span class="sd">    coagulation kernel by combining Coulomb parameters, the pairwise</span>
@@ -16574,7 +16574,7 @@ kernel value(s).</li>
 <span class="sd">          kernel value(s).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Dimensioned Kernel Example&quot;</span>
+<span class="sd">        ```py title="Dimensioned Kernel Example"</span>
 <span class="sd">        kernel_matrix = charged_coag.kernel(</span>
 <span class="sd">            particle=my_particle, temperature=300, pressure=101325</span>
 <span class="sd">        )</span>
@@ -16582,10 +16582,10 @@ kernel value(s).</li>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">    - Gopalakrishnan, R. &amp; Hogan, C. J. &quot;Determination of the Transition</span>
-<span class="sd">      Regime Collision Kernel from Mean First Passage Times.&quot; Aerosol</span>
+<span class="sd">    - Gopalakrishnan, R. &amp; Hogan, C. J. "Determination of the Transition</span>
+<span class="sd">      Regime Collision Kernel from Mean First Passage Times." Aerosol</span>
 <span class="sd">      Science and Technology, 46: 887-899, 2012.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">diffusive_knudsen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffusive_knudsen</span><span class="p">(</span>
         <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span>
     <span class="p">)</span>

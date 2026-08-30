@@ -16327,14 +16327,14 @@ after the resolver has accepted the request declaration and capabilities.</p>
 <span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">device_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">Device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return whether a recognized device is available at runtime.</span>
+<span class="w">    </span><span class="sd">"""Return whether a recognized device is available at runtime.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        device: Structurally recognized device declaration to check.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ``True`` when the runtime can resolve the declared device.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16398,14 +16398,14 @@ after the resolver has accepted the request declaration and capabilities.</p>
 <span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">recognizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">Device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return whether a declared device is structurally recognized.</span>
+<span class="w">    </span><span class="sd">"""Return whether a declared device is structurally recognized.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        device: Validated device declaration to recognize without probing.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ``True`` when the provider recognizes the declaration.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16448,11 +16448,11 @@ after the resolver has accepted the request declaration and capabilities.</p>
 <span class="normal">56</span>
 <span class="normal">57</span>
 <span class="normal">58</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">runtime_available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return whether the optional backend runtime is available.</span>
+<span class="w">    </span><span class="sd">"""Return whether the optional backend runtime is available.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ``True`` when the backend runtime is available for device checking.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16720,7 +16720,7 @@ state validation is substantive only when a validator is supplied.</p>
     <span class="n">providers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Backend</span><span class="p">,</span> <span class="n">AvailabilityProvider</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">state_validator</span><span class="p">:</span> <span class="n">StateValidator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AvailabilityDecision</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve availability in declaration, runtime, device, and state order.</span>
+<span class="w">    </span><span class="sd">"""Resolve availability in declaration, runtime, device, and state order.</span>
 
 <span class="sd">    The resolver is pre-execution only. It validates a provider registry before</span>
 <span class="sd">    provider calls, then short-circuits through recognition, capability</span>
@@ -16745,9 +16745,9 @@ state validation is substantive only when a validator is supplied.</p>
 <span class="sd">        UnavailableRuntimeError: If a registry or runtime is unavailable.</span>
 <span class="sd">        UnavailableDeviceError: If the runtime cannot resolve the device.</span>
 <span class="sd">        InvalidExecutionStateError: If request-associated state is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">validate_execution_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;request&quot;</span><span class="p">)</span>
-    <span class="n">validate_capability_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="s2">&quot;matrix&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">validate_execution_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">"request"</span><span class="p">)</span>
+    <span class="n">validate_capability_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="s2">"matrix"</span><span class="p">)</span>
 
     <span class="n">recognizes</span><span class="p">,</span> <span class="n">runtime_available</span><span class="p">,</span> <span class="n">device_available</span> <span class="o">=</span> <span class="n">_validate_providers</span><span class="p">(</span>
         <span class="n">_DEFAULT_PROVIDERS</span> <span class="k">if</span> <span class="n">providers</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">providers</span><span class="p">,</span>
@@ -16809,10 +16809,10 @@ state validation is substantive only when a validator is supplied.</p>
         <span class="n">state_valid</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">InvalidExecutionStateError</span><span class="p">(</span>
-            <span class="s2">&quot;validation_failed&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">context</span>
+            <span class="s2">"validation_failed"</span><span class="p">,</span> <span class="o">**</span><span class="n">context</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">state_valid</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">bool</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">state_valid</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">InvalidExecutionStateError</span><span class="p">(</span><span class="s2">&quot;validation_failed&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">InvalidExecutionStateError</span><span class="p">(</span><span class="s2">"validation_failed"</span><span class="p">,</span> <span class="o">**</span><span class="n">context</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">AvailabilityDecision</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

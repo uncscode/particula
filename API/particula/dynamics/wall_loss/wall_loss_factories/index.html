@@ -16185,15 +16185,15 @@ name using registered builders.</p>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BuilderType</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return available wall loss builders keyed by strategy name.</span>
+<span class="w">    </span><span class="sd">"""Return available wall loss builders keyed by strategy name.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dict[str, BuilderType]: Mapping of strategy type to builder.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;spherical&quot;</span><span class="p">:</span> <span class="n">SphericalWallLossBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;rectangular&quot;</span><span class="p">:</span> <span class="n">RectangularWallLossBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;charged&quot;</span><span class="p">:</span> <span class="n">ChargedWallLossBuilder</span><span class="p">(),</span>
+        <span class="s2">"spherical"</span><span class="p">:</span> <span class="n">SphericalWallLossBuilder</span><span class="p">(),</span>
+        <span class="s2">"rectangular"</span><span class="p">:</span> <span class="n">RectangularWallLossBuilder</span><span class="p">(),</span>
+        <span class="s2">"charged"</span><span class="p">:</span> <span class="n">ChargedWallLossBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16306,11 +16306,11 @@ invalid.</p>
 <span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_strategy</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">strategy_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a wall loss strategy using its corresponding builder.</span>
+<span class="w">    </span><span class="sd">"""Create a wall loss strategy using its corresponding builder.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        strategy_type: Strategy name (&quot;spherical&quot;, &quot;rectangular&quot;, or</span>
-<span class="sd">            &quot;charged&quot;).</span>
+<span class="sd">        strategy_type: Strategy name ("spherical", "rectangular", or</span>
+<span class="sd">            "charged").</span>
 <span class="sd">        parameters: Optional parameter mapping for the builder. Include</span>
 <span class="sd">            geometry keys (``chamber_radius`` or ``chamber_dimensions``)</span>
 <span class="sd">            plus optional ``wall_potential`` and ``wall_electric_field``</span>
@@ -16322,14 +16322,14 @@ invalid.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``strategy_type`` is unknown or parameters are</span>
 <span class="sd">            invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">builder_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
     <span class="n">builder</span> <span class="o">=</span> <span class="n">builder_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">strategy_type</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">builder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown strategy type: </span><span class="si">{</span><span class="n">strategy_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown strategy type: </span><span class="si">{</span><span class="n">strategy_type</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="n">parameter_copy</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="k">if</span> <span class="n">parameters</span> <span class="k">else</span> <span class="p">{}</span>
-    <span class="n">distribution_type</span> <span class="o">=</span> <span class="n">parameter_copy</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;distribution_type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">distribution_type</span> <span class="o">=</span> <span class="n">parameter_copy</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"distribution_type"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">parameter_copy</span><span class="p">:</span>
         <span class="n">builder</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">(</span><span class="n">parameter_copy</span><span class="p">)</span>

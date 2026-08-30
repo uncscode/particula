@@ -16222,10 +16222,10 @@ temperature for a pure substance.</p>
 <span class="normal">60</span>
 <span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"a"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"b"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"c"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_antoine_vapor_pressure</span><span class="p">(</span>
@@ -16234,7 +16234,7 @@ temperature for a pure substance.</p>
     <span class="n">c</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate vapor pressure using the Antoine equation.</span>
+<span class="w">    </span><span class="sd">"""Calculate vapor pressure using the Antoine equation.</span>
 
 <span class="sd">    The Antoine equation relates the logarithm of vapor pressure to</span>
 <span class="sd">    temperature for a pure substance.</span>
@@ -16254,7 +16254,7 @@ temperature for a pure substance.</p>
 <span class="sd">        - Vapor pressure in Pascals [Pa].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example usage&quot;</span>
+<span class="sd">        ```py title="Example usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_antoine_vapor_pressure(</span>
 <span class="sd">            8.07131, 1730.63, 233.426, 373.15</span>
@@ -16266,7 +16266,7 @@ temperature for a pure substance.</p>
 <span class="sd">        - https://en.wikipedia.org/wiki/Antoine_equation</span>
 <span class="sd">        - Kelvin conversion details:</span>
 <span class="sd">          https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781118135341.app1</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">vapor_pressure_log</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="p">(</span><span class="n">b</span> <span class="o">/</span> <span class="p">(</span><span class="n">temperature</span> <span class="o">-</span> <span class="n">c</span><span class="p">))</span>
     <span class="n">vapor_pressure</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">vapor_pressure_log</span>
     <span class="k">return</span> <span class="n">vapor_pressure</span> <span class="o">*</span> <span class="mf">133.32238741499998</span>  <span class="c1"># Convert mmHg to Pa</span>
@@ -16400,13 +16400,13 @@ water vapor pressure.</p>
 <span class="normal">171</span>
 <span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_buck_vapor_pressure</span><span class="p">(</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate vapor pressure using the Buck equation for water vapor.</span>
+<span class="w">    </span><span class="sd">"""Calculate vapor pressure using the Buck equation for water vapor.</span>
 
 <span class="sd">    Uses separate empirical formulas below 0 °C and above 0 °C to compute</span>
 <span class="sd">    water vapor pressure.</span>
@@ -16425,7 +16425,7 @@ water vapor pressure.</p>
 <span class="sd">        - Vapor pressure in Pascals [Pa].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example usage&quot;</span>
+<span class="sd">        ```py title="Example usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_buck_vapor_pressure(273.15)</span>
 <span class="sd">        # Output: ~611 Pa (around ice point)</span>
@@ -16434,7 +16434,7 @@ water vapor pressure.</p>
 <span class="sd">    References:</span>
 <span class="sd">        - Buck, A. L., (1981)</span>
 <span class="sd">        - https://en.wikipedia.org/wiki/Arden_Buck_equation</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span> <span class="o">-</span> <span class="mf">273.15</span>  <span class="c1"># Convert to Celsius</span>
     <span class="n">temp_below_freezing</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">&lt;</span> <span class="mf">0.0</span>
     <span class="n">temp_above_freezing</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">&gt;=</span> <span class="mf">0.0</span>
@@ -16614,10 +16614,10 @@ assuming ideal gas behavior.</p>
 <span class="normal">117</span>
 <span class="normal">118</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;latent_heat&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature_initial&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;pressure_initial&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"latent_heat"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"temperature_initial"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"pressure_initial"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_clausius_clapeyron_vapor_pressure</span><span class="p">(</span>
@@ -16627,7 +16627,7 @@ assuming ideal gas behavior.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">gas_constant</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">GAS_CONSTANT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate vapor pressure using Clausius-Clapeyron equation.</span>
+<span class="w">    </span><span class="sd">"""Calculate vapor pressure using Clausius-Clapeyron equation.</span>
 
 <span class="sd">    This function calculates the final vapor pressure based on an initial</span>
 <span class="sd">    temperature/pressure pair and the latent heat of vaporization,</span>
@@ -16652,7 +16652,7 @@ assuming ideal gas behavior.</p>
 <span class="sd">        - Pure vapor pressure [Pa].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example usage&quot;</span>
+<span class="sd">        ```py title="Example usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_clausius_clapeyron_vapor_pressure(</span>
 <span class="sd">            40660, 373.15, 101325, 300</span>
@@ -16662,7 +16662,7 @@ assuming ideal gas behavior.</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">pressure_initial</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
         <span class="p">(</span><span class="n">latent_heat</span> <span class="o">/</span> <span class="n">gas_constant</span><span class="p">)</span>
         <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">temperature_initial</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">temperature</span><span class="p">)</span>

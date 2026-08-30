@@ -16193,8 +16193,8 @@ and aerodynamic mobility.</p>
 <span class="normal">68</span>
 <span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;aerodynamic_mobility&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"aerodynamic_mobility"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_diffusion_coefficient</span><span class="p">(</span>
@@ -16202,7 +16202,7 @@ and aerodynamic mobility.</p>
     <span class="n">aerodynamic_mobility</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">boltzmann_constant</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">BOLTZMANN_CONSTANT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the diffusion coefficient of a particle based on temperature</span>
+<span class="w">    </span><span class="sd">"""Calculate the diffusion coefficient of a particle based on temperature</span>
 <span class="sd">    and aerodynamic mobility.</span>
 
 <span class="sd">    The diffusion coefficient (D) can be computed using:</span>
@@ -16222,7 +16222,7 @@ and aerodynamic mobility.</p>
 <span class="sd">        - The diffusion coefficient of the particle in m²/s.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_diffusion_coefficient(</span>
 <span class="sd">            temperature=300.0, aerodynamic_mobility=1.0e-8</span>
@@ -16231,12 +16231,12 @@ and aerodynamic mobility.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Einstein, A. (1905). &quot;On the movement of small particles suspended</span>
+<span class="sd">        - Einstein, A. (1905). "On the movement of small particles suspended</span>
 <span class="sd">          in stationary liquids required by the molecular-kinetic theory of</span>
-<span class="sd">          heat.&quot; Annalen der Physik, 17(8), 549–560.</span>
-<span class="sd">        - &quot;Stokes-Einstein equation,&quot; Wikipedia,</span>
+<span class="sd">          heat." Annalen der Physik, 17(8), 549–560.</span>
+<span class="sd">        - "Stokes-Einstein equation," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Stokes%E2%80%93Einstein_equation</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">boltzmann_constant</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">aerodynamic_mobility</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16394,7 +16394,7 @@ and aerodynamic mobility.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the diffusion coefficient from system state parameters.</span>
+<span class="w">    </span><span class="sd">"""Calculate the diffusion coefficient from system state parameters.</span>
 
 <span class="sd">    This function determines the diffusion coefficient (D) of a particle by:</span>
 <span class="sd">    1. Computing gas properties (dynamic viscosity, mean free path),</span>
@@ -16410,7 +16410,7 @@ and aerodynamic mobility.</p>
 <span class="sd">        - The diffusion coefficient of the particle in m²/s.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_diffusion_coefficient_via_system_state(</span>
 <span class="sd">            particle_radius=1.0e-7,</span>
@@ -16421,11 +16421,11 @@ and aerodynamic mobility.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Millikan, R. A. (1923). &quot;On the elementary electrical charge and the</span>
-<span class="sd">          Avogadro constant.&quot; Physical Review, 2(2), 109–143. [check]</span>
-<span class="sd">        - &quot;Mass Diffusion,&quot; Wikipedia,</span>
+<span class="sd">        - Millikan, R. A. (1923). "On the elementary electrical charge and the</span>
+<span class="sd">          Avogadro constant." Physical Review, 2(2), 109–143. [check]</span>
+<span class="sd">        - "Mass Diffusion," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Diffusion#Mass_diffusion</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Calculate gas properties</span>
     <span class="n">_dynamic_viscosity</span> <span class="o">=</span> <span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
     <span class="n">_mean_free_path</span> <span class="o">=</span> <span class="n">get_molecule_mean_free_path</span><span class="p">(</span>

@@ -16624,7 +16624,7 @@
     <span class="n">densities</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
     <span class="n">masses</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute particle mass from diameter and density.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute particle mass from diameter and density."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="c1"># Volume of sphere: (4/3) * pi * r^3</span>
@@ -16655,12 +16655,12 @@
 <p>Functions decorated with <code>@wp.func</code> can be called from kernels and are automatically inlined during compilation for optimal performance.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">knudsen_number</span><span class="p">(</span><span class="n">diameter</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mean_free_path</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate Knudsen number for a particle.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Calculate Knudsen number for a particle."""</span>
     <span class="k">return</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">mean_free_path</span> <span class="o">/</span> <span class="n">diameter</span>
 
 <span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">cunningham_correction</span><span class="p">(</span><span class="n">knudsen</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cunningham slip correction factor.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Cunningham slip correction factor."""</span>
     <span class="c1"># Cc = 1 + Kn * (A1 + A2 * exp(-A3/Kn))</span>
     <span class="n">A1</span> <span class="o">=</span> <span class="mf">1.257</span>
     <span class="n">A2</span> <span class="o">=</span> <span class="mf">0.400</span>
@@ -16673,7 +16673,7 @@
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">corrections</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute Cunningham slip correction for each particle.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute Cunningham slip correction for each particle."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">kn</span> <span class="o">=</span> <span class="n">knudsen_number</span><span class="p">(</span><span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">],</span> <span class="n">mean_free_path</span><span class="p">)</span>
     <span class="n">corrections</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span> <span class="o">=</span> <span class="n">cunningham_correction</span><span class="p">(</span><span class="n">kn</span><span class="p">)</span>
@@ -16696,7 +16696,7 @@
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">k_boltzmann</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.BOLTZMANN_CONSTANT</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute coagulation kernel K(i,j) for all particle pairs.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute coagulation kernel K(i,j) for all particle pairs."""</span>
     <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">d_i</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -16721,7 +16721,7 @@
     <span class="n">diameters</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
     <span class="n">classifications</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Classify particles by size regime.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Classify particles by size regime."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
 
@@ -16741,7 +16741,7 @@
     <span class="n">concentrations</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
     <span class="n">total_mass</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute total aerosol mass concentration.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute total aerosol mass concentration."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">mass_conc</span> <span class="o">=</span> <span class="n">masses</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span> <span class="o">*</span> <span class="n">concentrations</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">atomic_add</span><span class="p">(</span><span class="n">total_mass</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mass_conc</span><span class="p">)</span>
@@ -16767,10 +16767,10 @@ truth for all constants.</p>
     <span class="n">ref_temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># passed from Python side</span>
     <span class="n">ref_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>     <span class="c1"># passed from Python side</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clausius-Clapeyron equation for water vapor.</span>
+<span class="w">    </span><span class="sd">"""Clausius-Clapeyron equation for water vapor.</span>
 
 <span class="sd">    Must match the Python equivalent exactly — no approximations.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">ref_pressure</span> <span class="o">*</span> <span class="n">wp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
         <span class="p">(</span><span class="n">latent_heat</span> <span class="o">/</span> <span class="n">gas_constant_vapor</span><span class="p">)</span>
         <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">ref_temperature</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">temperature</span><span class="p">)</span>
@@ -16785,7 +16785,7 @@ truth for all constants.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">gas_constant</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.GAS_CONSTANT</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Kelvin effect correction for small droplets.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Kelvin effect correction for small droplets."""</span>
     <span class="n">exponent</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">*</span> <span class="n">surface_tension</span> <span class="o">*</span> <span class="n">molar_mass</span><span class="p">)</span> <span class="o">/</span> \
                <span class="p">(</span><span class="n">gas_constant</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">density</span> <span class="o">*</span> <span class="n">diameter</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">exponent</span><span class="p">)</span>
@@ -16806,10 +16806,10 @@ truth for all constants.</p>
     <span class="n">ref_temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">ref_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute condensation growth rate for each particle.</span>
+<span class="w">    </span><span class="sd">"""Compute condensation growth rate for each particle.</span>
 
 <span class="sd">    All physical constants passed as parameters — see launch call below.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="c1"># Load particle properties once</span>
@@ -16853,7 +16853,7 @@ truth for all constants.</p>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">tid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Print only from first thread</span>
-        <span class="n">wp</span><span class="o">.</span><span class="n">printf</span><span class="p">(</span><span class="s2">&quot;First particle: d=</span><span class="si">%e</span><span class="s2"> m, m=</span><span class="si">%e</span><span class="s2"> kg</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> 
+        <span class="n">wp</span><span class="o">.</span><span class="n">printf</span><span class="p">(</span><span class="s2">"First particle: d=</span><span class="si">%e</span><span class="s2"> m, m=</span><span class="si">%e</span><span class="s2"> kg</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> 
                   <span class="n">diameters</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">masses</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </code></pre></div>
 <h3 id="bounds-checking">Bounds Checking<a class="headerlink" href="#bounds-checking" title="Permanent link">&para;</a></h3>
@@ -16868,7 +16868,7 @@ truth for all constants.</p>
     <span class="n">concentrations</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
     <span class="n">moments</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>  <span class="c1"># [M0, M1, M2, M3]</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute size distribution moments.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute size distribution moments."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">d</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16891,10 +16891,10 @@ truth for all constants.</p>
     <span class="n">slip_correction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">k_boltzmann</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.BOLTZMANN_CONSTANT</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stokes-Einstein diffusion coefficient with slip correction.</span>
+<span class="w">    </span><span class="sd">"""Stokes-Einstein diffusion coefficient with slip correction.</span>
 
 <span class="sd">    Must match the Python equivalent exactly — no approximations.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">k_boltzmann</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">slip_correction</span><span class="p">)</span> <span class="o">/</span> \
            <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">*</span> <span class="n">viscosity</span> <span class="o">*</span> <span class="n">diameter</span><span class="p">)</span>
 
@@ -16907,7 +16907,7 @@ truth for all constants.</p>
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">k_boltzmann</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.BOLTZMANN_CONSTANT</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute diffusion coefficient for each particle.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute diffusion coefficient for each particle."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">diffusion_coeffs</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span> <span class="o">=</span> <span class="n">stokes_einstein_diffusion</span><span class="p">(</span>
         <span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">],</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">viscosity</span><span class="p">,</span> <span class="n">slip_corrections</span><span class="p">[</span><span class="n">tid</span><span class="p">],</span>
@@ -16935,7 +16935,7 @@ calls the function and writes results to an output array:</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy.testing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
 
-<span class="n">wp</span> <span class="o">=</span> <span class="n">pytest</span><span class="o">.</span><span class="n">importorskip</span><span class="p">(</span><span class="s2">&quot;warp&quot;</span><span class="p">)</span>
+<span class="n">wp</span> <span class="o">=</span> <span class="n">pytest</span><span class="o">.</span><span class="n">importorskip</span><span class="p">(</span><span class="s2">"warp"</span><span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">BOLTZMANN_CONSTANT</span>
 
@@ -16949,7 +16949,7 @@ calls the function and writes results to an output array:</p>
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">k_boltzmann</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lightweight test wrapper for stokes_einstein_diffusion.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Lightweight test wrapper for stokes_einstein_diffusion."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">results</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span> <span class="o">=</span> <span class="n">stokes_einstein_diffusion</span><span class="p">(</span>
         <span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">],</span> <span class="n">slip_corrections</span><span class="p">[</span><span class="n">tid</span><span class="p">],</span>
@@ -16958,7 +16958,7 @@ calls the function and writes results to an output array:</p>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test_diffusion_gpu_matches_numpy</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;GPU diffusion matches Python/NumPy implementation exactly.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""GPU diffusion matches Python/NumPy implementation exactly."""</span>
     <span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-7</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">slips</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.15</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">,</span> <span class="mf">1.001</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">temp</span><span class="p">,</span> <span class="n">visc</span> <span class="o">=</span> <span class="mf">298.15</span><span class="p">,</span> <span class="mf">1.81e-5</span>

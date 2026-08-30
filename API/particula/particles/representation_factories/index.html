@@ -16093,7 +16093,7 @@ based on various distribution, activity, and surface strategies.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Factory Usage Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleRepresentationFactory</span><span class="p">()</span>
-<span class="n">rep</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">&quot;mass&quot;</span><span class="p">)</span>
+<span class="n">rep</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"mass"</span><span class="p">)</span>
 <span class="c1"># rep -&gt; ParticleRepresentation with mass-based distribution</span>
 </code></pre></div>
 
@@ -16161,7 +16161,7 @@ corresponding builder instance.</li>
     <div class="highlight"><span class="filename">get_builders usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleRepresentationFactory</span><span class="p">()</span>
 <span class="n">builders</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
-<span class="n">mass_builder</span> <span class="o">=</span> <span class="n">builders</span><span class="p">[</span><span class="s2">&quot;mass&quot;</span><span class="p">]</span>
+<span class="n">mass_builder</span> <span class="o">=</span> <span class="n">builders</span><span class="p">[</span><span class="s2">"mass"</span><span class="p">]</span>
 <span class="c1"># mass_builder -&gt; ParticleMassRepresentationBuilder()</span>
 </code></pre></div>
 
@@ -16192,28 +16192,28 @@ corresponding builder instance.</li>
 <span class="normal">73</span>
 <span class="normal">74</span>
 <span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a mapping of strategy types to builder instances.</span>
+<span class="w">    </span><span class="sd">"""Return a mapping of strategy types to builder instances.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - A dictionary where each key is a strategy type</span>
-<span class="sd">          (&quot;mass&quot;, &quot;radius&quot;, etc.) and each value is the</span>
+<span class="sd">          ("mass", "radius", etc.) and each value is the</span>
 <span class="sd">          corresponding builder instance.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;get_builders usage&quot;</span>
+<span class="sd">        ```py title="get_builders usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        factory = par.particles.ParticleRepresentationFactory()</span>
 <span class="sd">        builders = factory.get_builders()</span>
-<span class="sd">        mass_builder = builders[&quot;mass&quot;]</span>
+<span class="sd">        mass_builder = builders["mass"]</span>
 <span class="sd">        # mass_builder -&gt; ParticleMassRepresentationBuilder()</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;mass&quot;</span><span class="p">:</span> <span class="n">ParticleMassRepresentationBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="n">ParticleRadiusRepresentationBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;preset_radius&quot;</span><span class="p">:</span> <span class="n">PresetParticleRadiusBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;resolved_mass&quot;</span><span class="p">:</span> <span class="n">ResolvedParticleMassRepresentationBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;preset_resolved_mass&quot;</span><span class="p">:</span> <span class="n">PresetResolvedParticleMassBuilder</span><span class="p">(),</span>
+        <span class="s2">"mass"</span><span class="p">:</span> <span class="n">ParticleMassRepresentationBuilder</span><span class="p">(),</span>
+        <span class="s2">"radius"</span><span class="p">:</span> <span class="n">ParticleRadiusRepresentationBuilder</span><span class="p">(),</span>
+        <span class="s2">"preset_radius"</span><span class="p">:</span> <span class="n">PresetParticleRadiusBuilder</span><span class="p">(),</span>
+        <span class="s2">"resolved_mass"</span><span class="p">:</span> <span class="n">ResolvedParticleMassRepresentationBuilder</span><span class="p">(),</span>
+        <span class="s2">"preset_resolved_mass"</span><span class="p">:</span> <span class="n">PresetResolvedParticleMassBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>

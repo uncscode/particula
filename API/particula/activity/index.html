@@ -16586,9 +16586,9 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="normal">125</span>
 <span class="normal">126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;molar_mass_ratio&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;organic_mole_fraction&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass_ratio"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"organic_mole_fraction"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">bat_activity_coefficients</span><span class="p">(</span>
@@ -16605,7 +16605,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
     <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the activity coefficients for water-organic mixtures.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Calculate the activity coefficients for water-organic mixtures.</span>
 
 <span class="sd">    Uses the BAT (Binary Activity Thermodynamics) model to compute activity</span>
 <span class="sd">    coefficients for binary organic-water mixtures based on AIOMFAC-derived</span>
@@ -16620,7 +16620,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">        oxygen2carbon: Oxygen-to-carbon ratio in the organic compound.</span>
 <span class="sd">        density: Density of the mixture, in kg/m^3.</span>
 <span class="sd">        functional_group: Optional functional group(s) of the organic compound</span>
-<span class="sd">            (e.g., &quot;alcohol&quot;, &quot;carboxylic_acid&quot;, &quot;ether&quot;).</span>
+<span class="sd">            (e.g., "alcohol", "carboxylic_acid", "ether").</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple of six values:</span>
@@ -16646,7 +16646,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">    References:</span>
 <span class="sd">        Gorkowski et al. (2019), Equations 1-6 and SI S1-S2.</span>
 <span class="sd">        https://doi.org/10.5194/acp-19-13383-2019</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">convert_to_oh_equivalent</span><span class="p">(</span>
         <span class="n">oxygen2carbon</span><span class="o">=</span><span class="n">oxygen2carbon</span><span class="p">,</span>
         <span class="n">molar_mass_ratio</span><span class="o">=</span><span class="n">molar_mass_ratio</span><span class="p">,</span>
@@ -16793,15 +16793,15 @@ return (n, 3) where n is the length of <code>oxygen2carbon</code>.</p>
 <span class="normal">61</span>
 <span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;molar_mass_ratio&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;oxygen2carbon&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass_ratio"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"oxygen2carbon"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">bat_blending_weights</span><span class="p">(</span>
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate BAT blending weights for oxygen-rich regimes.</span>
+<span class="w">    </span><span class="sd">"""Estimate BAT blending weights for oxygen-rich regimes.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        molar_mass_ratio: Ratio of water to organic matter. Must be positive.</span>
@@ -16816,7 +16816,7 @@ return (n, 3) where n is the length of <code>oxygen2carbon</code>.</p>
 <span class="sd">        &gt;&gt;&gt; from particula.activity.bat_blending import bat_blending_weights</span>
 <span class="sd">        &gt;&gt;&gt; bat_blending_weights(molar_mass_ratio=0.5, oxygen2carbon=0.35)</span>
 <span class="sd">        array([0.00000000e+00, 9.11531178e-05, 9.99908847e-01])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">oxygen2carbon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
@@ -16963,7 +16963,7 @@ return (n, 3) where n is the length of <code>oxygen2carbon</code>.</p>
     <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">fit_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute fitted BAT coefficients from published parameters.</span>
+<span class="w">    </span><span class="sd">"""Compute fitted BAT coefficients from published parameters.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        molar_mass_ratio: Water-to-organic molar mass ratio.</span>
@@ -16985,7 +16985,7 @@ return (n, 3) where n is the length of <code>oxygen2carbon</code>.</p>
 <span class="sd">        ...     fit_values=G19_FIT_MID.a1,</span>
 <span class="sd">        ... )</span>
 <span class="sd">        0.025427174197017652</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># force to array</span>
     <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">oxygen2carbon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -17089,7 +17089,7 @@ Supported values are <code>None</code>, <code>"alcohol"</code>, <code>"ether"</c
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convert_to_oh_equivalent</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">oxygen2carbon</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">molar_mass_ratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">functional_group</span><span class="o">=</span><span class="s2">&quot;carboxylic_acid&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">functional_group</span><span class="o">=</span><span class="s2">"carboxylic_acid"</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="go">(2.3, 45.1)</span>
 </code></pre></div>
@@ -17149,14 +17149,14 @@ Supported values are <code>None</code>, <code>"alcohol"</code>, <code>"ether"</c
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">functional_group</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert oxygen and molar mass ratios for BAT functional groups.</span>
+<span class="w">    </span><span class="sd">"""Convert oxygen and molar mass ratios for BAT functional groups.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        oxygen2carbon: The oxygen to carbon ratio.</span>
 <span class="sd">        molar_mass_ratio: The molar mass ratio of water to organic matter.</span>
 <span class="sd">        functional_group: Optional functional group requiring adjustments.</span>
-<span class="sd">            Supported values are ``None``, ``&quot;alcohol&quot;``, ``&quot;ether&quot;``, and</span>
-<span class="sd">            ``&quot;carboxylic_acid&quot;``.</span>
+<span class="sd">            Supported values are ``None``, ``"alcohol"``, ``"ether"``, and</span>
+<span class="sd">            ``"carboxylic_acid"``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple containing the converted oxygen2carbon and molar_mass_ratio.</span>
@@ -17172,22 +17172,22 @@ Supported values are <code>None</code>, <code>"alcohol"</code>, <code>"ether"</c
 <span class="sd">        &gt;&gt;&gt; convert_to_oh_equivalent(</span>
 <span class="sd">        ...     oxygen2carbon=0.3,</span>
 <span class="sd">        ...     molar_mass_ratio=0.1,</span>
-<span class="sd">        ...     functional_group=&quot;carboxylic_acid&quot;,</span>
+<span class="sd">        ...     functional_group="carboxylic_acid",</span>
 <span class="sd">        ... )</span>
 <span class="sd">        (2.3, 45.1)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">normalized_group</span> <span class="o">=</span> <span class="n">_normalize_functional_group</span><span class="p">(</span><span class="n">functional_group</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">normalized_group</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">molar_mass_ratio</span>
 
     <span class="n">adjustments</span> <span class="o">=</span> <span class="n">_FUNCTIONAL_GROUP_ADJUSTMENTS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">normalized_group</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">adjustments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">supported_values</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="s2">&quot;None&quot;</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+        <span class="n">supported_values</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s2">"None"</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">'"</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">"'</span>
             <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">SUPPORTED_FUNCTIONAL_GROUPS</span>
         <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;BAT functional group must be one of: </span><span class="si">{</span><span class="n">supported_values</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">"BAT functional group must be one of: </span><span class="si">{</span><span class="n">supported_values</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
 
     <span class="n">delta_oxygen</span><span class="p">,</span> <span class="n">delta_mass</span> <span class="o">=</span> <span class="n">adjustments</span>
@@ -17343,7 +17343,7 @@ index_phase_sep_end: Index where separation ends.</p>
 <span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">find_phase_sep_index</span><span class="p">(</span>
     <span class="n">activity_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detect phase separation using activity monotonicity and limits.</span>
+<span class="w">    </span><span class="sd">"""Detect phase separation using activity monotonicity and limits.</span>
 
 <span class="sd">    Identifies potential phase separation by checking for activities above one</span>
 <span class="sd">    and curvature inflections in the activity curve. Physical systems should</span>
@@ -17359,7 +17359,7 @@ index_phase_sep_end: Index where separation ends.</p>
 <span class="sd">            phase_sep_curve: 1 if curvature changes sign, else 0.</span>
 <span class="sd">            index_phase_sep_starts: Index where separation starts.</span>
 <span class="sd">            index_phase_sep_end: Index where separation ends.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">activity_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">activity_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
     <span class="c1"># Compute difference between consecutive elements in the array</span>
@@ -17427,10 +17427,10 @@ index_phase_sep_end: Index where separation ends.</p>
     <span class="c1"># Assign phase separation via activity based on data being greater than 1</span>
     <span class="n">phase_sep_activity</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">activity_data</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;phase_sep_activity&quot;</span><span class="p">:</span> <span class="n">phase_sep_activity</span><span class="p">,</span>
-        <span class="s2">&quot;phase_sep_curve&quot;</span><span class="p">:</span> <span class="n">phase_sep_curve</span><span class="p">,</span>
-        <span class="s2">&quot;index_phase_sep_starts&quot;</span><span class="p">:</span> <span class="n">index_phase_sep_starts</span><span class="p">,</span>
-        <span class="s2">&quot;index_phase_sep_end&quot;</span><span class="p">:</span> <span class="n">index_phase_sep_end</span><span class="p">,</span>
+        <span class="s2">"phase_sep_activity"</span><span class="p">:</span> <span class="n">phase_sep_activity</span><span class="p">,</span>
+        <span class="s2">"phase_sep_curve"</span><span class="p">:</span> <span class="n">phase_sep_curve</span><span class="p">,</span>
+        <span class="s2">"index_phase_sep_starts"</span><span class="p">:</span> <span class="n">index_phase_sep_starts</span><span class="p">,</span>
+        <span class="s2">"index_phase_sep_end"</span><span class="p">:</span> <span class="n">index_phase_sep_end</span><span class="p">,</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17596,7 +17596,7 @@ matching_upper_seperation: Water activity at the matched index.</p>
     <span class="n">activity_water</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">activity_org</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check for phase separation across water and organic activity curves.</span>
+<span class="w">    </span><span class="sd">"""Check for phase separation across water and organic activity curves.</span>
 
 <span class="sd">    Applies :func:`find_phase_sep_index` to both water and organic activities,</span>
 <span class="sd">    then combines the detected indices into a consolidated separation report.</span>
@@ -17617,7 +17617,7 @@ matching_upper_seperation: Water activity at the matched index.</p>
 <span class="sd">            lower_seperation: Water activity at lower separation index.</span>
 <span class="sd">            upper_seperation: Water activity at upper separation index.</span>
 <span class="sd">            matching_upper_seperation: Water activity at the matched index.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">activity_water_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">activity_water</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">activity_org_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">activity_org</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
@@ -17626,10 +17626,10 @@ matching_upper_seperation: Water activity at the matched index.</p>
 
     <span class="c1"># gather all the indexes into a list for easier access</span>
     <span class="n">indexes</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">water_sep</span><span class="p">[</span><span class="s2">&quot;index_phase_sep_starts&quot;</span><span class="p">],</span>
-        <span class="n">water_sep</span><span class="p">[</span><span class="s2">&quot;index_phase_sep_end&quot;</span><span class="p">],</span>
-        <span class="n">organic_sep</span><span class="p">[</span><span class="s2">&quot;index_phase_sep_starts&quot;</span><span class="p">],</span>
-        <span class="n">organic_sep</span><span class="p">[</span><span class="s2">&quot;index_phase_sep_end&quot;</span><span class="p">],</span>
+        <span class="n">water_sep</span><span class="p">[</span><span class="s2">"index_phase_sep_starts"</span><span class="p">],</span>
+        <span class="n">water_sep</span><span class="p">[</span><span class="s2">"index_phase_sep_end"</span><span class="p">],</span>
+        <span class="n">organic_sep</span><span class="p">[</span><span class="s2">"index_phase_sep_starts"</span><span class="p">],</span>
+        <span class="n">organic_sep</span><span class="p">[</span><span class="s2">"index_phase_sep_end"</span><span class="p">],</span>
     <span class="p">]</span>
 
     <span class="n">lower_seperation_index</span> <span class="o">=</span> <span class="mi">2</span>
@@ -17637,7 +17637,7 @@ matching_upper_seperation: Water activity at the matched index.</p>
     <span class="n">match_index_prime</span> <span class="o">=</span> <span class="mi">2</span>
 
     <span class="c1"># If there is a phase separation curve in the water activity data</span>
-    <span class="k">if</span> <span class="n">water_sep</span><span class="p">[</span><span class="s2">&quot;phase_sep_curve&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">water_sep</span><span class="p">[</span><span class="s2">"phase_sep_curve"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">phase_sep_check</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">activity_water_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">activity_water_arr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># increasing order</span>
@@ -17676,13 +17676,13 @@ matching_upper_seperation: Water activity at the matched index.</p>
     <span class="n">matching_upper_activity</span> <span class="o">=</span> <span class="n">activity_water_arr</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">match_index_prime</span><span class="p">)]</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;phase_sep_check&quot;</span><span class="p">:</span> <span class="n">phase_sep_check</span><span class="p">,</span>
-        <span class="s2">&quot;lower_seperation_index&quot;</span><span class="p">:</span> <span class="n">lower_seperation_index</span><span class="p">,</span>
-        <span class="s2">&quot;upper_seperation_index&quot;</span><span class="p">:</span> <span class="n">upper_seperation_index</span><span class="p">,</span>
-        <span class="s2">&quot;matching_upper_seperation_index&quot;</span><span class="p">:</span> <span class="n">match_index_prime</span><span class="p">,</span>
-        <span class="s2">&quot;lower_seperation&quot;</span><span class="p">:</span> <span class="n">lower_seperation_activity</span><span class="p">,</span>
-        <span class="s2">&quot;upper_seperation&quot;</span><span class="p">:</span> <span class="n">upper_seperation_activity</span><span class="p">,</span>
-        <span class="s2">&quot;matching_upper_seperation&quot;</span><span class="p">:</span> <span class="n">matching_upper_activity</span><span class="p">,</span>
+        <span class="s2">"phase_sep_check"</span><span class="p">:</span> <span class="n">phase_sep_check</span><span class="p">,</span>
+        <span class="s2">"lower_seperation_index"</span><span class="p">:</span> <span class="n">lower_seperation_index</span><span class="p">,</span>
+        <span class="s2">"upper_seperation_index"</span><span class="p">:</span> <span class="n">upper_seperation_index</span><span class="p">,</span>
+        <span class="s2">"matching_upper_seperation_index"</span><span class="p">:</span> <span class="n">match_index_prime</span><span class="p">,</span>
+        <span class="s2">"lower_seperation"</span><span class="p">:</span> <span class="n">lower_seperation_activity</span><span class="p">,</span>
+        <span class="s2">"upper_seperation"</span><span class="p">:</span> <span class="n">upper_seperation_activity</span><span class="p">,</span>
+        <span class="s2">"matching_upper_seperation"</span><span class="p">:</span> <span class="n">matching_upper_activity</span><span class="p">,</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17815,15 +17815,15 @@ Must be positive.</p>
 <span class="normal">84</span>
 <span class="normal">85</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;molar_mass_ratio&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;other_molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass_ratio"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"other_molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">from_molar_mass_ratio</span><span class="p">(</span>
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">other_molar_mass</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">18.01528</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert molar mass ratio to organic molar mass.</span>
+<span class="w">    </span><span class="sd">"""Convert molar mass ratio to organic molar mass.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        molar_mass_ratio: Molar mass ratio (MW water / MW organic).</span>
@@ -17845,7 +17845,7 @@ Must be positive.</p>
 <span class="sd">        array([ 9.00764, 18.01528])</span>
 <span class="sd">        &gt;&gt;&gt; from_molar_mass_ratio(np.array([0.25]))</span>
 <span class="sd">        array([4.50382])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">molar_mass_ratio_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">molar_mass</span> <span class="o">=</span> <span class="n">other_molar_mass</span> <span class="o">*</span> <span class="n">molar_mass_ratio_array</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
@@ -17957,7 +17957,7 @@ gibbs_real: Real Gibbs free energy of mixing (ideal + mix).</p>
     <span class="n">organic_mole_fraction</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">gibbs_mix</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute ideal and real Gibbs free energy of mixing.</span>
+<span class="w">    </span><span class="sd">"""Compute ideal and real Gibbs free energy of mixing.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        organic_mole_fraction: Mole fraction of the organic component.</span>
@@ -17977,7 +17977,7 @@ gibbs_real: Real Gibbs free energy of mixing (ideal + mix).</p>
 <span class="sd">        &gt;&gt;&gt; g_ideal, g_real = gibbs_free_energy(x_org, g_mix)</span>
 <span class="sd">        &gt;&gt;&gt; g_ideal.shape, g_real.shape</span>
 <span class="sd">        ((3,), (3,))</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">gibbs_ideal</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="n">get_safe_log</span><span class="p">(</span>
         <span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span>
     <span class="p">)</span> <span class="o">+</span> <span class="n">organic_mole_fraction</span> <span class="o">*</span> <span class="n">get_safe_log</span><span class="p">(</span><span class="n">organic_mole_fraction</span><span class="p">)</span>
@@ -18193,7 +18193,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
     <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Blend Gibbs mixing energies across O:C regimes for BAT activity.</span>
+<span class="w">    </span><span class="sd">"""Blend Gibbs mixing energies across O:C regimes for BAT activity.</span>
 
 <span class="sd">    The BAT model interpolates between Gorkowski et al. (2019) fits for low,</span>
 <span class="sd">    mid, and high oxygen-to-carbon ratios via :func:`bat_blending_weights`. The</span>
@@ -18209,7 +18209,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">        oxygen2carbon: Oxygen-to-carbon atomic ratio of the organic compound.</span>
 <span class="sd">        density: Density of the organic compound in kg/m^3.</span>
 <span class="sd">        functional_group: Optional functional group for OH-equivalent</span>
-<span class="sd">            conversion (e.g., &quot;alcohol&quot;, &quot;carboxylic_acid&quot;, &quot;ether&quot;).</span>
+<span class="sd">            conversion (e.g., "alcohol", "carboxylic_acid", "ether").</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple containing:</span>
@@ -18230,7 +18230,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">    References:</span>
 <span class="sd">        Gorkowski et al. (2019), Section 2.2 and SI S2.</span>
 <span class="sd">        https://doi.org/10.5194/acp-19-13383-2019</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
     <span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">convert_to_oh_equivalent</span><span class="p">(</span>
@@ -18484,10 +18484,10 @@ Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="normal">116</span>
 <span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;molar_mass_ratio&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;organic_mole_fraction&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;oxygen2carbon&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass_ratio"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"organic_mole_fraction"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"oxygen2carbon"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">gibbs_of_mixing</span><span class="p">(</span>
@@ -18499,7 +18499,7 @@ Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
     <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the Gibbs free energy of mixing for a single fit region.</span>
+<span class="w">    </span><span class="sd">"""Compute the Gibbs free energy of mixing for a single fit region.</span>
 
 <span class="sd">    This helper evaluates the Gibbs energy and its derivative for the low,</span>
 <span class="sd">    mid, or high O:C fit indicated by ``fit_dict``. The calculation follows</span>
@@ -18534,7 +18534,7 @@ Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">    References:</span>
 <span class="sd">        Gorkowski, K., Preston, T. C., &amp; Zuend, A. (2019), Equations 1-6 and</span>
 <span class="sd">        Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">organic_mole_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">organic_mole_fraction</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">oxygen2carbon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -18666,7 +18666,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="normal">63</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">organic_water_single_phase</span><span class="p">(</span>
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute single-phase O:C limit for organic–water mixtures.</span>
+<span class="w">    </span><span class="sd">"""Compute single-phase O:C limit for organic–water mixtures.</span>
 
 <span class="sd">    Converts the molar mass ratio (:math:`MW_{water} / MW_{organic}`) to the</span>
 <span class="sd">    oxygen-to-carbon threshold above which mixtures remain single phase.</span>
@@ -18685,7 +18685,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">    References:</span>
 <span class="sd">        Gorkowski et al. (2019).</span>
 <span class="sd">        https://doi.org/10.5194/acp-19-13383-2019</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">(</span>
@@ -18823,7 +18823,7 @@ arrays before computing the logistic curve.</p>
     <span class="n">seperation_activity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">activities</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute :math:`q_\alpha` transition using a squeezed logistic curve.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Compute :math:`q_\alpha` transition using a squeezed logistic curve.</span>
 
 <span class="sd">    Maps activity values to a smooth transition between phase-separated and</span>
 <span class="sd">    single-phase regimes. The sigmoid is calibrated so that</span>
@@ -18843,7 +18843,7 @@ arrays before computing the logistic curve.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; q_alpha(0.8, np.array([0.7, 0.8, 0.9]))</span>
 <span class="sd">        array(...)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">separation_activity_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
         <span class="n">seperation_activity</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
     <span class="p">)</span>
@@ -18983,12 +18983,12 @@ Must be positive.</p>
 <span class="normal">40</span>
 <span class="normal">41</span>
 <span class="normal">42</span>
-<span class="normal">43</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;other_molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">43</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"other_molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">to_molar_mass_ratio</span><span class="p">(</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">other_molar_mass</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">18.01528</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert to molar mass ratio (MW water / MW organic).</span>
+<span class="w">    </span><span class="sd">"""Convert to molar mass ratio (MW water / MW organic).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        molar_mass: Molar mass of the organic compound. Must be positive.</span>
@@ -19008,7 +19008,7 @@ Must be positive.</p>
 <span class="sd">        array([0.5, 1. ])</span>
 <span class="sd">        &gt;&gt;&gt; to_molar_mass_ratio(np.array([72.06]))</span>
 <span class="sd">        array([0.25])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">molar_mass_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">ratio</span> <span class="o">=</span> <span class="n">other_molar_mass</span> <span class="o">/</span> <span class="n">molar_mass_array</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>

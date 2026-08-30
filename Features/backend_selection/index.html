@@ -16096,11 +16096,11 @@ invokes the adapter nor resolves availability or fallback.</p>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">calls</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Selection must not invoke this adapter.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Selection must not invoke this adapter."</span><span class="p">)</span>
 
 
-<span class="n">device</span> <span class="o">=</span> <span class="n">Device</span><span class="p">(</span><span class="n">Backend</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-<span class="n">process</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="s2">&quot;condensation&quot;</span><span class="p">)</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">Device</span><span class="p">(</span><span class="n">Backend</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">process</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="s2">"condensation"</span><span class="p">)</span>
 <span class="n">requirements</span> <span class="o">=</span> <span class="n">CapabilityRequirements</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">())</span>
 <span class="n">matrix</span> <span class="o">=</span> <span class="n">CapabilityMatrix</span><span class="p">(</span>
     <span class="nb">frozenset</span><span class="p">({</span><span class="n">CapabilityDeclaration</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">requirements</span><span class="p">)})</span>
@@ -16185,8 +16185,8 @@ component restores, transfers, synchronizes, migrates, or retries silently.</p>
     <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">resident_session</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">guard</span><span class="p">)</span>
     <span class="n">finalized</span> <span class="o">=</span> <span class="n">resident_session</span><span class="o">.</span><span class="n">finalize</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">guard</span><span class="p">)</span>
     <span class="n">cpu_state</span> <span class="o">=</span> <span class="n">caller_restore_to_cpu_authoritative_state</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">)</span>
-    <span class="n">cpu_authority</span> <span class="o">=</span> <span class="s2">&quot;caller declares CPU_AUTHORITATIVE after explicit restore&quot;</span>
-    <span class="n">cpu_request</span> <span class="o">=</span> <span class="s2">&quot;a distinct canonical CPU request&quot;</span>
+    <span class="n">cpu_authority</span> <span class="o">=</span> <span class="s2">"caller declares CPU_AUTHORITATIVE after explicit restore"</span>
+    <span class="n">cpu_request</span> <span class="o">=</span> <span class="s2">"a distinct canonical CPU request"</span>
 </code></pre></div>
 
 

@@ -16093,10 +16093,10 @@ by delegating to the corresponding builder class.</p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">LatentHeatFactory</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">factory</span> <span class="o">=</span> <span class="n">LatentHeatFactory</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"constant"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="p">{</span>
-<span class="gp">... </span>        <span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">:</span> <span class="mf">2.26e6</span><span class="p">,</span>
-<span class="gp">... </span>        <span class="s2">&quot;latent_heat_ref_units&quot;</span><span class="p">:</span> <span class="s2">&quot;J/kg&quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s2">"latent_heat_ref"</span><span class="p">:</span> <span class="mf">2.26e6</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s2">"latent_heat_ref_units"</span><span class="p">:</span> <span class="s2">"J/kg"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">latent_heat</span><span class="p">(</span><span class="mf">300.0</span><span class="p">)</span>
 <span class="go">2260000.0</span>
@@ -16154,7 +16154,7 @@ by delegating to the corresponding builder class.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">LatentHeatFactory</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">builders</span> <span class="o">=</span> <span class="n">LatentHeatFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">builders</span><span class="p">[</span><span class="s2">&quot;constant&quot;</span><span class="p">],</span> <span class="n">ConstantLatentHeatBuilder</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">builders</span><span class="p">[</span><span class="s2">"constant"</span><span class="p">],</span> <span class="n">ConstantLatentHeatBuilder</span><span class="p">)</span>
 <span class="go">True</span>
 </code></pre></div>
 
@@ -16178,7 +16178,7 @@ by delegating to the corresponding builder class.</p>
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LatentHeatBuilderType</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return latent heat builders keyed by strategy name.</span>
+<span class="w">    </span><span class="sd">"""Return latent heat builders keyed by strategy name.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Builder instances keyed by strategy type.</span>
@@ -16186,13 +16186,13 @@ by delegating to the corresponding builder class.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from particula.gas import LatentHeatFactory</span>
 <span class="sd">        &gt;&gt;&gt; builders = LatentHeatFactory().get_builders()</span>
-<span class="sd">        &gt;&gt;&gt; isinstance(builders[&quot;constant&quot;], ConstantLatentHeatBuilder)</span>
+<span class="sd">        &gt;&gt;&gt; isinstance(builders["constant"], ConstantLatentHeatBuilder)</span>
 <span class="sd">        True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;constant&quot;</span><span class="p">:</span> <span class="n">ConstantLatentHeatBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;linear&quot;</span><span class="p">:</span> <span class="n">LinearLatentHeatBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;power_law&quot;</span><span class="p">:</span> <span class="n">PowerLawLatentHeatBuilder</span><span class="p">(),</span>
+        <span class="s2">"constant"</span><span class="p">:</span> <span class="n">ConstantLatentHeatBuilder</span><span class="p">(),</span>
+        <span class="s2">"linear"</span><span class="p">:</span> <span class="n">LinearLatentHeatBuilder</span><span class="p">(),</span>
+        <span class="s2">"power_law"</span><span class="p">:</span> <span class="n">PowerLawLatentHeatBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>

@@ -16194,9 +16194,9 @@
 <span class="normal">65</span>
 <span class="normal">66</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"particle_velocity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"kinematic_viscosity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_particle_reynolds_number</span><span class="p">(</span>
@@ -16204,7 +16204,7 @@
     <span class="n">particle_velocity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Reynolds number (Reₚ) of a particle in a fluid.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Reynolds number (Reₚ) of a particle in a fluid.</span>
 
 <span class="sd">    This dimensionless quantity characterizes the flow regime:</span>
 
@@ -16222,7 +16222,7 @@
 <span class="sd">        - Dimensionless Reynolds number (float or NDArray[np.float64]).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_particle_reynolds_number(</span>
 <span class="sd">            particle_radius=1e-6,</span>
@@ -16246,7 +16246,7 @@
 <span class="sd">                wake formation.</span>
 <span class="sd">            - Applies to **large, fast-moving particles**</span>
 <span class="sd">                (e.g., raindrops, large sediment).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">particle_radius</span> <span class="o">*</span> <span class="n">particle_velocity</span><span class="p">)</span> <span class="o">/</span> <span class="n">kinematic_viscosity</span>
 </code></pre></div></td></tr></table></div>
             </details>

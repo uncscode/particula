@@ -16734,15 +16734,15 @@ coagulation-only initialization.</p>
 <span class="normal">202</span>
 <span class="normal">203</span>
 <span class="normal">204</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the immutable resident dimensions.</span>
+<span class="w">    </span><span class="sd">"""Validate the immutable resident dimensions.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a dimension is not an integral value or is boolean.</span>
 <span class="sd">        ValueError: If a dimension violates its required lower bound.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_validate_dimension</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;n_boxes&quot;</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">_validate_dimension</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_particles</span><span class="p">,</span> <span class="s2">&quot;n_particles&quot;</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">_validate_dimension</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_species</span><span class="p">,</span> <span class="s2">&quot;n_species&quot;</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_validate_dimension</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"n_boxes"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">_validate_dimension</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_particles</span><span class="p">,</span> <span class="s2">"n_particles"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">_validate_dimension</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_species</span><span class="p">,</span> <span class="s2">"n_species"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16945,19 +16945,19 @@ or normalized at this boundary.</p>
 <span class="normal">334</span>
 <span class="normal">335</span>
 <span class="normal">336</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate fixed-cost metadata declarations without normalizing names.</span>
+<span class="w">    </span><span class="sd">"""Validate fixed-cost metadata declarations without normalizing names.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If the device or name tuple has the wrong type.</span>
 <span class="sd">        ValueError: If the device does not declare the Warp backend.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Device</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;device must be an exact Device.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"device must be an exact Device."</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Backend</span><span class="o">.</span><span class="n">WARP</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;device.backend must be Backend.WARP.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"device.backend must be Backend.WARP."</span><span class="p">)</span>
     <span class="n">_validate_gas_names</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gas_names</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentStreamMetadata</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;stream must be an exact ResidentStreamMetadata.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"stream must be an exact ResidentStreamMetadata."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">__post_init__</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17169,7 +17169,7 @@ runtime.</p>
 <span class="normal">755</span>
 <span class="normal">756</span>
 <span class="normal">757</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform ordered O(1) metadata-only resident-session preflight.</span>
+<span class="w">    </span><span class="sd">"""Perform ordered O(1) metadata-only resident-session preflight.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If carrier, lifecycle, or generated container types are</span>
@@ -17177,7 +17177,7 @@ runtime.</p>
 <span class="sd">        ValueError: If declared metadata, schema, or device values disagree.</span>
 <span class="sd">        RuntimeError: If resident validation requires an unavailable Warp</span>
 <span class="sd">            runtime.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="p">(</span>
         <span class="n">dimensions</span><span class="p">,</span>
         <span class="n">metadata</span><span class="p">,</span>
@@ -17186,11 +17186,11 @@ runtime.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lifecycle</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;particles and gas must not be identical.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"particles and gas must not be identical."</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;particles and environment must not be identical.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"particles and environment must not be identical."</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gas and environment must not be identical.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"gas and environment must not be identical."</span><span class="p">)</span>
     <span class="n">wp</span> <span class="o">=</span> <span class="n">_validate_resident_imports</span><span class="p">()</span>
     <span class="n">_validate_generated_containers</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span>
@@ -17282,11 +17282,11 @@ and all resident identities remain active and caller-owned.</p>
 <span class="normal">799</span>
 <span class="normal">800</span>
 <span class="normal">801</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">checkpoint</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">&quot;GPUResourceRegistry&quot;</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="s2">&quot;ResidentStepGuard&quot;</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">"GPUResourceRegistry"</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="s2">"ResidentStepGuard"</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a nonterminal immutable in-memory resident checkpoint.</span>
+<span class="w">    </span><span class="sd">"""Create a nonterminal immutable in-memory resident checkpoint.</span>
 
-<span class="sd">    The session, registry, and closed guard must be the controller&#39;s exact</span>
+<span class="sd">    The session, registry, and closed guard must be the controller's exact</span>
 <span class="sd">    active binding. The returned concrete-only record owns detached host</span>
 <span class="sd">    inspection carriers and canonical primary/sidecar bytes; this session</span>
 <span class="sd">    and all resident identities remain active and caller-owned.</span>
@@ -17297,7 +17297,7 @@ and all resident identities remain active and caller-owned.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A fresh immutable checkpoint record.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkpoint_controller</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">guard</span><span class="p">)</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17413,9 +17413,9 @@ checkpoint.</p>
 <span class="normal">907</span>
 <span class="normal">908</span>
 <span class="normal">909</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">&quot;GPUResourceRegistry&quot;</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="s2">&quot;ResidentStepGuard&quot;</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">"GPUResourceRegistry"</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="s2">"ResidentStepGuard"</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Terminally discard this binding without touching resident payloads.</span>
+<span class="w">    </span><span class="sd">"""Terminally discard this binding without touching resident payloads.</span>
 
 <span class="sd">    An active session validates its exact pinned binding once and requires a</span>
 <span class="sd">    closed guard before becoming CLOSED. A faulted session uses only exact</span>
@@ -17432,7 +17432,7 @@ checkpoint.</p>
 <span class="sd">        TypeError: If the registry or guard is not an exact concrete type.</span>
 <span class="sd">        ValueError: If the binding is wrong or the lifecycle is invalid.</span>
 <span class="sd">        RuntimeError: If a resident timestep remains open.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lifecycle</span> <span class="ow">in</span> <span class="p">{</span>
         <span class="n">ResidentLifecycle</span><span class="o">.</span><span class="n">CLOSED</span><span class="p">,</span>
         <span class="n">ResidentLifecycle</span><span class="o">.</span><span class="n">FINALIZED</span><span class="p">,</span>
@@ -17442,13 +17442,13 @@ checkpoint.</p>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lifecycle</span> <span class="ow">is</span> <span class="n">ResidentLifecycle</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">:</span>
         <span class="n">registry</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">registry</span><span class="o">.</span><span class="n">assert_step_closed</span><span class="p">()</span>
-        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;lifecycle&quot;</span><span class="p">,</span> <span class="n">ResidentLifecycle</span><span class="o">.</span><span class="n">CLOSED</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"lifecycle"</span><span class="p">,</span> <span class="n">ResidentLifecycle</span><span class="o">.</span><span class="n">CLOSED</span><span class="p">)</span>
         <span class="k">return</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lifecycle</span> <span class="ow">is</span> <span class="n">ResidentLifecycle</span><span class="o">.</span><span class="n">FAULTED</span><span class="p">:</span>
         <span class="n">registry</span><span class="o">.</span><span class="n">assert_step_closed</span><span class="p">()</span>
-        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;lifecycle&quot;</span><span class="p">,</span> <span class="n">ResidentLifecycle</span><span class="o">.</span><span class="n">CLOSED</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"lifecycle"</span><span class="p">,</span> <span class="n">ResidentLifecycle</span><span class="o">.</span><span class="n">CLOSED</span><span class="p">)</span>
         <span class="k">return</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;session.lifecycle must be ACTIVE or FAULTED.&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"session.lifecycle must be ACTIVE or FAULTED."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17540,9 +17540,9 @@ does not restore, synchronize, allocate, or mutate resident payloads.</p>
 <span class="normal">926</span>
 <span class="normal">927</span>
 <span class="normal">928</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">discard</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">&quot;GPUResourceRegistry&quot;</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="s2">&quot;ResidentStepGuard&quot;</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">"GPUResourceRegistry"</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="s2">"ResidentStepGuard"</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Discard this binding using the same terminal semantics as ``close``.</span>
+<span class="w">    </span><span class="sd">"""Discard this binding using the same terminal semantics as ``close``.</span>
 
 <span class="sd">    This alias only changes lifecycle state when ``close`` permits it. It</span>
 <span class="sd">    does not restore, synchronize, allocate, or mutate resident payloads.</span>
@@ -17555,7 +17555,7 @@ does not restore, synchronize, allocate, or mutate resident payloads.</p>
 <span class="sd">        TypeError: If the registry or guard is not an exact concrete type.</span>
 <span class="sd">        ValueError: If the binding is wrong or the lifecycle is invalid.</span>
 <span class="sd">        RuntimeError: If a resident timestep remains open.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">guard</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17638,9 +17638,9 @@ guaranteed after an already-launched device operation.</p>
 <span class="normal">819</span>
 <span class="normal">820</span>
 <span class="normal">821</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">finalize</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">&quot;GPUResourceRegistry&quot;</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="s2">&quot;ResidentStepGuard&quot;</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">"GPUResourceRegistry"</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="s2">"ResidentStepGuard"</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create or return the terminal cached resident checkpoint.</span>
+<span class="w">    </span><span class="sd">"""Create or return the terminal cached resident checkpoint.</span>
 
 <span class="sd">    The first successful call snapshots the exact active binding, caches the</span>
 <span class="sd">    resulting record, and transitions this session to FINALIZED. Later calls</span>
@@ -17654,7 +17654,7 @@ guaranteed after an already-launched device operation.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The immutable cached terminal checkpoint.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkpoint_controller</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">guard</span><span class="p">)</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17696,13 +17696,13 @@ guaranteed after an already-launched device operation.</p>
 <span class="normal">843</span>
 <span class="normal">844</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize_streams</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="n">registry</span><span class="p">:</span> <span class="s2">&quot;GPUResourceRegistry&quot;</span><span class="p">,</span>
-    <span class="n">guard</span><span class="p">:</span> <span class="s2">&quot;ResidentStepGuard&quot;</span><span class="p">,</span>
+    <span class="n">registry</span><span class="p">:</span> <span class="s2">"GPUResourceRegistry"</span><span class="p">,</span>
+    <span class="n">guard</span><span class="p">:</span> <span class="s2">"ResidentStepGuard"</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">process_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">logical_box_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Explicitly reinitialize selected published resident RNG streams.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Explicitly reinitialize selected published resident RNG streams."""</span>
     <span class="n">_validate_active_stream_binding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">,</span> <span class="n">guard</span><span class="p">)</span>
     <span class="n">registry</span><span class="o">.</span><span class="n">initialize_published_streams</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -17739,9 +17739,9 @@ guaranteed after an already-launched device operation.</p>
 <span class="normal">826</span>
 <span class="normal">827</span>
 <span class="normal">828</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">inspect_streams</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">&quot;GPUResourceRegistry&quot;</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="s2">&quot;ResidentStepGuard&quot;</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">"GPUResourceRegistry"</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="s2">"ResidentStepGuard"</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return immutable metadata for published binding RNG streams.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return immutable metadata for published binding RNG streams."""</span>
     <span class="n">_validate_active_stream_binding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">,</span> <span class="n">guard</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">registry</span><span class="o">.</span><span class="n">inspect_published_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -17784,13 +17784,13 @@ guaranteed after an already-launched device operation.</p>
 <span class="normal">859</span>
 <span class="normal">860</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reset_streams</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="n">registry</span><span class="p">:</span> <span class="s2">&quot;GPUResourceRegistry&quot;</span><span class="p">,</span>
-    <span class="n">guard</span><span class="p">:</span> <span class="s2">&quot;ResidentStepGuard&quot;</span><span class="p">,</span>
+    <span class="n">registry</span><span class="p">:</span> <span class="s2">"GPUResourceRegistry"</span><span class="p">,</span>
+    <span class="n">guard</span><span class="p">:</span> <span class="s2">"ResidentStepGuard"</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">process_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">logical_box_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias :meth:`initialize_streams` for deliberate stream resets.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Alias :meth:`initialize_streams` for deliberate stream resets."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">initialize_streams</span><span class="p">(</span>
         <span class="n">registry</span><span class="p">,</span>
         <span class="n">guard</span><span class="p">,</span>
@@ -17933,9 +17933,9 @@ active metadata-only signature is invalid.</p>
 <span class="normal"> 999</span>
 <span class="normal">1000</span>
 <span class="normal">1001</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">&quot;GPUResourceRegistry&quot;</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s2">"GPUResourceRegistry"</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a closed guard for one exact active session-registry binding.</span>
+<span class="w">    </span><span class="sd">"""Create a closed guard for one exact active session-registry binding.</span>
 
 <span class="sd">    Construction validates the pinned binding without acquiring sidecars or</span>
 <span class="sd">    executing, transferring, synchronizing, or mutating resident state.</span>
@@ -17948,13 +17948,13 @@ active metadata-only signature is invalid.</p>
 <span class="sd">        TypeError: If either argument is not its exact concrete type.</span>
 <span class="sd">        ValueError: If the registry does not retain ``session`` or its</span>
 <span class="sd">            active metadata-only signature is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.gpu_resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPUResourceRegistry</span>
 
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">session</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentSession</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;session must be an exact ResidentSession.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"session must be an exact ResidentSession."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">registry</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">GPUResourceRegistry</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;registry must be an exact GPUResourceRegistry.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"registry must be an exact GPUResourceRegistry."</span><span class="p">)</span>
     <span class="n">registry</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">session</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span> <span class="o">=</span> <span class="n">registry</span>
@@ -18106,7 +18106,7 @@ globally intercept direct raw helper calls.</p>
 <span class="normal">1137</span>
 <span class="normal">1138</span>
 <span class="normal">1139</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">assert_step_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reject a lifecycle boundary while a guarded timestep remains open.</span>
+<span class="w">    </span><span class="sd">"""Reject a lifecycle boundary while a guarded timestep remains open.</span>
 
 <span class="sd">    Future checkpoint, finalize, close, conversion, resize, rebind, and</span>
 <span class="sd">    fault boundaries must call this side-effect-free gate before their own</span>
@@ -18115,9 +18115,9 @@ globally intercept direct raw helper calls.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: If this guard has an outstanding timestep token.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;A resident timestep is open.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"A resident timestep is open."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18231,7 +18231,7 @@ is no longer valid and active.</p>
 <span class="normal">1067</span>
 <span class="normal">1068</span>
 <span class="normal">1069</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">begin_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResidentStepToken</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open and return the sole token for a validated timestep duration.</span>
+<span class="w">    </span><span class="sd">"""Open and return the sole token for a validated timestep duration.</span>
 
 <span class="sd">    The guard validates duration before its pinned active session-registry</span>
 <span class="sd">    binding. It performs bookkeeping only; callers execute any process work</span>
@@ -18249,11 +18249,11 @@ is no longer valid and active.</p>
 <span class="sd">        ValueError: If ``duration`` is invalid or the pinned session binding</span>
 <span class="sd">            is no longer valid and active.</span>
 <span class="sd">        RuntimeError: If another timestep is already open.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">validated_duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_duration</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;A resident timestep is already open.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"A resident timestep is already open."</span><span class="p">)</span>
     <span class="n">token</span> <span class="o">=</span> <span class="n">ResidentStepToken</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validated_duration</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">reserve_open_step</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_open_token</span> <span class="o">=</span> <span class="n">token</span>
@@ -18354,7 +18354,7 @@ does not match the open token by identity.</p>
 <span class="normal">1098</span>
 <span class="normal">1099</span>
 <span class="normal">1100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">complete_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="n">ResidentStepToken</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete the exact outstanding token and advance bookkeeping.</span>
+<span class="w">    </span><span class="sd">"""Complete the exact outstanding token and advance bookkeeping.</span>
 
 <span class="sd">    Completed-step count and simulated time change only after the current</span>
 <span class="sd">    pinned binding validates and ``token`` is the exact open token. This</span>
@@ -18362,23 +18362,23 @@ does not match the open token by identity.</p>
 <span class="sd">    for external process work.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        token: Exact opaque token returned by this guard&#39;s open step.</span>
+<span class="sd">        token: Exact opaque token returned by this guard's open step.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the pinned session binding is invalid or ``token``</span>
 <span class="sd">            does not match the open token by identity.</span>
 <span class="sd">        RuntimeError: If no timestep is open.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No resident timestep is open.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"No resident timestep is open."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_token</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;token does not match the open resident timestep.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"token does not match the open resident timestep."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">_open_step_token</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;token does not match the open resident timestep.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"token does not match the open resident timestep."</span><span class="p">)</span>
     <span class="n">simulated_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulated_time</span> <span class="o">+</span> <span class="n">token</span><span class="o">.</span><span class="n">_duration</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_isfinite_real</span><span class="p">(</span><span class="n">simulated_time</span><span class="p">)</span> <span class="ow">or</span> <span class="n">simulated_time</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;completed simulated time must be finite.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"completed simulated time must be finite."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_completed_steps</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_simulated_time</span> <span class="o">=</span> <span class="n">simulated_time</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_open_token</span> <span class="o">=</span> <span class="kc">None</span>
@@ -18612,17 +18612,17 @@ violates the P1 contract.</p>
 <span class="normal">239</span>
 <span class="normal">240</span>
 <span class="normal">241</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the host-only P1 stream manifest metadata.</span>
+<span class="w">    </span><span class="sd">"""Validate the host-only P1 stream manifest metadata.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If metadata fields have invalid exact container or scalar</span>
 <span class="sd">            types.</span>
 <span class="sd">        ValueError: If the seed, ID uniqueness, lengths, or lane permutation</span>
 <span class="sd">            violates the P1 contract.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.rng</span><span class="w"> </span><span class="kn">import</span> <span class="n">MAX_ROOT_SEED</span>
 
-    <span class="n">_validate_dimension</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">&quot;n_boxes&quot;</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">_validate_dimension</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="s2">"n_boxes"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_root_seed</span><span class="p">(</span><span class="n">MAX_ROOT_SEED</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_stream_arrays</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
@@ -18886,18 +18886,18 @@ an unavailable runtime.</p>
 <span class="normal">1398</span>
 <span class="normal">1399</span>
 <span class="normal">1400</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">setup_resident_session</span><span class="p">(</span>
-    <span class="n">particles</span><span class="p">:</span> <span class="s2">&quot;ParticleData&quot;</span><span class="p">,</span>
-    <span class="n">gas</span><span class="p">:</span> <span class="s2">&quot;GasData&quot;</span><span class="p">,</span>
-    <span class="n">environment</span><span class="p">:</span> <span class="s2">&quot;EnvironmentData&quot;</span><span class="p">,</span>
+    <span class="n">particles</span><span class="p">:</span> <span class="s2">"ParticleData"</span><span class="p">,</span>
+    <span class="n">gas</span><span class="p">:</span> <span class="s2">"GasData"</span><span class="p">,</span>
+    <span class="n">environment</span><span class="p">:</span> <span class="s2">"EnvironmentData"</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">Device</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">root_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">logical_box_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">lanes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResidentSession</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Upload CPU carriers once and publish one active resident session.</span>
+<span class="w">    </span><span class="sd">"""Upload CPU carriers once and publish one active resident session.</span>
 
-<span class="sd">    This concrete-only, unexported factory is P2&#39;s only CPU-to-Warp upload</span>
+<span class="sd">    This concrete-only, unexported factory is P2's only CPU-to-Warp upload</span>
 <span class="sd">    point. Local CPU preflight completes before conversion helpers are imported.</span>
 <span class="sd">    It then converts particles, gas, and environment once in that order,</span>
 <span class="sd">    snapshots ordered gas names into immutable CPU-owned tuple metadata, and</span>
@@ -18927,7 +18927,7 @@ an unavailable runtime.</p>
 <span class="sd">            invalid.</span>
 <span class="sd">        RuntimeError: If optional Warp conversion or session validation requires</span>
 <span class="sd">            an unavailable runtime.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="p">(</span>
         <span class="n">validated_particles</span><span class="p">,</span>
         <span class="n">validated_gas</span><span class="p">,</span>

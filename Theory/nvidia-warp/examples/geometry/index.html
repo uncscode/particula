@@ -16389,7 +16389,7 @@
     <span class="n">sphere_center</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span>
     <span class="n">sphere_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Distance from particle to spherical chamber wall.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Distance from particle to spherical chamber wall."""</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">position</span> <span class="o">-</span> <span class="n">sphere_center</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sphere_radius</span> <span class="o">-</span> <span class="n">r</span>
 
@@ -16401,7 +16401,7 @@
     <span class="n">sphere_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">restitution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reflect particles off spherical chamber walls.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Reflect particles off spherical chamber walls."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">pos</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16436,7 +16436,7 @@
     <span class="n">box_max</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span>
     <span class="n">restitution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reflect particles off rectangular chamber walls.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Reflect particles off rectangular chamber walls."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">pos</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16486,10 +16486,10 @@
     <span class="n">cylinder_height</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">restitution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reflect particles off cylindrical chamber walls.</span>
+<span class="w">    </span><span class="sd">"""Reflect particles off cylindrical chamber walls.</span>
 
 <span class="sd">    Cylinder axis is along z-direction.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">pos</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16551,11 +16551,11 @@
     <span class="n">diffusion_coeff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Diffusion-limited wall loss rate for spherical chamber.</span>
+<span class="w">    </span><span class="sd">"""Diffusion-limited wall loss rate for spherical chamber.</span>
 
 <span class="sd">    Based on Crump &amp; Seinfeld (1981).</span>
 <span class="sd">    Returns loss rate coefficient (1/s).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># First-order loss rate: beta = D * pi^2 / R^2</span>
     <span class="k">return</span> <span class="n">diffusion_coeff</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">/</span> <span class="p">(</span><span class="n">chamber_radius</span> <span class="o">*</span> <span class="n">chamber_radius</span><span class="p">)</span>
 
@@ -16567,7 +16567,7 @@
     <span class="n">width</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Diffusion-limited wall loss rate for rectangular chamber.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Diffusion-limited wall loss rate for rectangular chamber."""</span>
     <span class="c1"># Sum of contributions from each dimension</span>
     <span class="n">L2</span> <span class="o">=</span> <span class="n">length</span> <span class="o">*</span> <span class="n">length</span>
     <span class="n">W2</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="n">width</span>
@@ -16582,7 +16582,7 @@
     <span class="n">wall_loss_rates</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
     <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute diffusion wall loss rate for each particle.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute diffusion wall loss rate for each particle."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">D</span> <span class="o">=</span> <span class="n">diffusion_coeffs</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16599,7 +16599,7 @@
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">slip_correction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Terminal settling velocity (Stokes regime with slip correction).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Terminal settling velocity (Stokes regime with slip correction)."""</span>
     <span class="n">g</span> <span class="o">=</span> <span class="mf">9.81</span>  <span class="c1"># m/s²</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">particle_density</span> <span class="o">-</span> <span class="n">air_density</span><span class="p">)</span> <span class="o">*</span> <span class="n">g</span> <span class="o">*</span> <span class="n">diameter</span> <span class="o">*</span> <span class="n">diameter</span> <span class="o">*</span> \
            <span class="n">slip_correction</span> <span class="o">/</span> <span class="p">(</span><span class="mf">18.0</span> <span class="o">*</span> <span class="n">viscosity</span><span class="p">)</span>
@@ -16614,10 +16614,10 @@
     <span class="n">air_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute gravitational settling wall loss rate.</span>
+<span class="w">    </span><span class="sd">"""Compute gravitational settling wall loss rate.</span>
 
 <span class="sd">    Assumes particles settle to bottom of chamber.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">v_s</span> <span class="o">=</span> <span class="n">settling_velocity</span><span class="p">(</span>
@@ -16642,10 +16642,10 @@
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute total wall loss rate including all mechanisms.</span>
+<span class="w">    </span><span class="sd">"""Compute total wall loss rate including all mechanisms.</span>
 
 <span class="sd">    Combines diffusion, settling, and turbulent deposition.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">d</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16674,10 +16674,10 @@
     <span class="n">loss_rates</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
     <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply wall loss to particle concentrations.</span>
+<span class="w">    </span><span class="sd">"""Apply wall loss to particle concentrations.</span>
 
 <span class="sd">    Uses first-order decay: n(t+dt) = n(t) * exp(-beta * dt)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">beta</span> <span class="o">=</span> <span class="n">loss_rates</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16692,10 +16692,10 @@
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">slip_correction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Electrical mobility of charged particle.</span>
+<span class="w">    </span><span class="sd">"""Electrical mobility of charged particle.</span>
 
 <span class="sd">    Z = n * e * Cc / (3 * pi * mu * d)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">e</span> <span class="o">=</span> <span class="mf">1.602e-19</span>  <span class="c1"># Elementary charge (C)</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_charges</span><span class="p">)</span> <span class="o">*</span> <span class="n">e</span> <span class="o">*</span> <span class="n">slip_correction</span> <span class="o">/</span> \
            <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">*</span> <span class="n">viscosity</span> <span class="o">*</span> <span class="n">diameter</span><span class="p">)</span>
@@ -16709,10 +16709,10 @@
     <span class="n">slip_correction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">dielectric_constant</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Velocity toward wall due to image charge attraction.</span>
+<span class="w">    </span><span class="sd">"""Velocity toward wall due to image charge attraction.</span>
 
 <span class="sd">    Important for charged particles near conducting walls.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">e</span> <span class="o">=</span> <span class="mf">1.602e-19</span>
     <span class="n">epsilon_0</span> <span class="o">=</span> <span class="mf">8.854e-12</span>  <span class="c1"># Vacuum permittivity</span>
 
@@ -16740,7 +16740,7 @@
     <span class="n">wall_potential</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">dielectric_constant</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute electrostatic enhancement to wall loss.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute electrostatic enhancement to wall loss."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">pos</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16784,7 +16784,7 @@
     <span class="n">pos_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">vel_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">mass_j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">radius_j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">restitution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute velocity change from hard sphere collision.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute velocity change from hard sphere collision."""</span>
     <span class="n">r_vec</span> <span class="o">=</span> <span class="n">pos_j</span> <span class="o">-</span> <span class="n">pos_i</span>
     <span class="n">dist</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">r_vec</span><span class="p">)</span>
     <span class="n">collision_dist</span> <span class="o">=</span> <span class="n">radius_i</span> <span class="o">+</span> <span class="n">radius_j</span>
@@ -16820,7 +16820,7 @@
     <span class="n">search_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">restitution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detect and resolve particle-particle collisions.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Detect and resolve particle-particle collisions."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">pos_i</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16850,13 +16850,13 @@
     <span class="n">n_particles</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
     <span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
     <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
-    <span class="n">chamber_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sphere&quot;</span><span class="p">,</span>
+    <span class="n">chamber_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"sphere"</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete chamber simulation with wall loss.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Complete chamber simulation with wall loss."""</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
     <span class="c1"># Chamber geometry</span>
-    <span class="k">if</span> <span class="n">chamber_type</span> <span class="o">==</span> <span class="s2">&quot;sphere&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">chamber_type</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
         <span class="n">chamber_radius</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># 0.5 m radius</span>
         <span class="n">chamber_volume</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">3.14159</span> <span class="o">*</span> <span class="n">chamber_radius</span><span class="o">**</span><span class="mi">3</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># box</span>
@@ -16873,26 +16873,26 @@
     <span class="c1"># Initialize particles</span>
     <span class="n">positions</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span>
     <span class="p">)</span>
-    <span class="n">velocities</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="n">velocities</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">)</span>
     <span class="n">diameters</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">100e-9</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span>
     <span class="p">)</span>
     <span class="n">densities</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_particles</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1500.0</span><span class="p">,</span>  <span class="c1"># kg/m³</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span>
     <span class="p">)</span>
     <span class="n">concentrations</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_particles</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">,</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span>
     <span class="p">)</span>
 
     <span class="c1"># Derived properties</span>
-    <span class="n">diffusion_coeffs</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
-    <span class="n">slip_corrections</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
-    <span class="n">wall_loss_rates</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="n">diffusion_coeffs</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">)</span>
+    <span class="n">slip_corrections</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">)</span>
+    <span class="n">wall_loss_rates</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">)</span>
 
     <span class="c1"># Pre-compute slip corrections and diffusion coefficients</span>
     <span class="c1"># (would use kernels from previous examples)</span>
@@ -16921,7 +16921,7 @@
         <span class="p">)</span>
 
         <span class="c1"># 4. Apply boundary conditions</span>
-        <span class="k">if</span> <span class="n">chamber_type</span> <span class="o">==</span> <span class="s2">&quot;sphere&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">chamber_type</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
                 <span class="n">apply_sphere_boundary</span><span class="p">,</span>
                 <span class="n">dim</span><span class="o">=</span><span class="n">n_particles</span><span class="p">,</span>
@@ -16935,12 +16935,12 @@
 
         <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">total_conc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">concentrations</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">: total concentration = </span><span class="si">{</span><span class="n">total_conc</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> #/m³&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Step </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">: total concentration = </span><span class="si">{</span><span class="n">total_conc</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> #/m³"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;positions&quot;</span><span class="p">:</span> <span class="n">positions</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-        <span class="s2">&quot;concentrations&quot;</span><span class="p">:</span> <span class="n">concentrations</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-        <span class="s2">&quot;diameters&quot;</span><span class="p">:</span> <span class="n">diameters</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+        <span class="s2">"positions"</span><span class="p">:</span> <span class="n">positions</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+        <span class="s2">"concentrations"</span><span class="p">:</span> <span class="n">concentrations</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+        <span class="s2">"diameters"</span><span class="p">:</span> <span class="n">diameters</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div>
 <h2 id="performance-tips">Performance Tips<a class="headerlink" href="#performance-tips" title="Permanent link">&para;</a></h2>
@@ -16955,7 +16955,7 @@
     <span class="n">chamber_center</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span>
     <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Vectorized wall distance computation.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Vectorized wall distance computation."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">pos</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">pos</span> <span class="o">-</span> <span class="n">chamber_center</span><span class="p">)</span>

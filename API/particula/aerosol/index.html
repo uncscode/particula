@@ -16216,12 +16216,12 @@ ParticleRepresentation object.</p>
     <span class="n">atmosphere</span><span class="p">:</span> <span class="n">Atmosphere</span><span class="p">,</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Aerosol object with an Atmosphere and Particles.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Aerosol object with an Atmosphere and Particles.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        atmosphere: Atmosphere containing one or more gas species.</span>
 <span class="sd">        particles: A single ParticleRepresentation object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span> <span class="o">=</span> <span class="n">atmosphere</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particles</span>
 </code></pre></div></td></tr></table></div>
@@ -16313,7 +16313,7 @@ ParticleRepresentation object.</p>
 <span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide a string representation of the aerosol.</span>
+<span class="w">    </span><span class="sd">"""Provide a string representation of the aerosol.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - str : A string summarizing the atmosphere and each particle.</span>
@@ -16322,8 +16322,8 @@ ParticleRepresentation object.</p>
 <span class="sd">        aerosol_instance = Aerosol(atmosphere, particles)</span>
 <span class="sd">        print(aerosol_instance)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">message</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16388,18 +16388,18 @@ ParticleRepresentation object.</p>
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">replace_atmosphere</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmosphere</span><span class="p">:</span> <span class="n">Atmosphere</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Replace the current atmosphere with a new Atmosphere instance.</span>
+<span class="w">    </span><span class="sd">"""Replace the current atmosphere with a new Atmosphere instance.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        atmosphere: The new Atmosphere to assign.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Replacing the Atmosphere in the Aerosol&quot;</span>
+<span class="sd">        ```py title="Replacing the Atmosphere in the Aerosol"</span>
 <span class="sd">        aerosol_instance = Aerosol(atmosphere, particles)</span>
 <span class="sd">        new_atmosphere = Atmosphere()</span>
 <span class="sd">        aerosol_instance.replace_atmosphere(new_atmosphere)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span> <span class="o">=</span> <span class="n">atmosphere</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16465,18 +16465,18 @@ ParticleRepresentation object.</p>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Replace a particles in the aerosol with a new ParticleRepresentation.</span>
+<span class="w">    </span><span class="sd">"""Replace a particles in the aerosol with a new ParticleRepresentation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        particles: The new ParticleRepresentation to assign.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Replacing a Particle in the Aerosol&quot;</span>
+<span class="sd">        ```py title="Replacing a Particle in the Aerosol"</span>
 <span class="sd">        aerosol_instance = Aerosol(atmosphere, particles)</span>
 <span class="sd">        new_particle = ParticleRepresentation()</span>
 <span class="sd">        aerosol_instance.replace_particles(new_particle)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particles</span>
 </code></pre></div></td></tr></table></div>
             </details>

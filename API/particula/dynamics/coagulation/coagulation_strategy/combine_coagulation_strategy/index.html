@@ -16252,7 +16252,7 @@ mismatched distribution types.</p>
 <span class="normal">86</span>
 <span class="normal">87</span>
 <span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategies</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CoagulationStrategyABC</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the combined coagulation strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the combined coagulation strategy.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - strategies : A list of CoagulationStrategyABC instances to</span>
@@ -16264,15 +16264,15 @@ mismatched distribution types.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If no strategies are provided or if they have</span>
 <span class="sd">          mismatched distribution types.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">strategies</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one strategy must be provided.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"At least one strategy must be provided."</span><span class="p">)</span>
 
     <span class="n">distribution_type</span> <span class="o">=</span> <span class="n">strategies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">distribution_type</span>
     <span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="n">strategies</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">strategy</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">!=</span> <span class="n">distribution_type</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;All strategies must have the same distribution type.&quot;</span>
+                <span class="s2">"All strategies must have the same distribution type."</span>
             <span class="p">)</span>
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">)</span>
@@ -16379,7 +16379,7 @@ combined strategy.</p>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise NotImplementedError for dimensionless kernel in combined</span>
+<span class="w">    </span><span class="sd">"""Raise NotImplementedError for dimensionless kernel in combined</span>
 <span class="sd">    strategy.</span>
 
 <span class="sd">    Dimensionless kernels must be handled individually by the underlying</span>
@@ -16394,10 +16394,10 @@ combined strategy.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        - NotImplementedError : This method is not supported in the</span>
 <span class="sd">          combined strategy.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;Dimensionless kernel not implemented in combined &quot;</span>
-        <span class="o">+</span> <span class="s2">&quot;coagulation strategy.&quot;</span>
+        <span class="s2">"Dimensionless kernel not implemented in combined "</span>
+        <span class="o">+</span> <span class="s2">"coagulation strategy."</span>
     <span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -16521,7 +16521,7 @@ equal to the sum of each strategy's kernel.</li>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the total coagulation kernel by summing the kernels from all</span>
+<span class="w">    </span><span class="sd">"""Compute the total coagulation kernel by summing the kernels from all</span>
 <span class="sd">    underlying strategies.</span>
 
 <span class="sd">    Arguments:</span>
@@ -16532,7 +16532,7 @@ equal to the sum of each strategy's kernel.</li>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - float or NDArray[np.float64] : The combined coagulation kernel,</span>
-<span class="sd">          equal to the sum of each strategy&#39;s kernel.</span>
+<span class="sd">          equal to the sum of each strategy's kernel.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        ```py</span>
@@ -16544,7 +16544,7 @@ equal to the sum of each strategy's kernel.</li>
 <span class="sd">        # k_combined is the sum of kernels from each strategy in</span>
 <span class="sd">        # combined_strategy</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Type narrowing: initialize as Union type to match return signature</span>
     <span class="n">combined_kernel</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategies</span><span class="p">:</span>

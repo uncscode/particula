@@ -16146,7 +16146,7 @@ and temperature using the ideal gas equation:</p>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the concentration of a gas using the ideal gas law.</span>
+<span class="w">    </span><span class="sd">"""Calculate the concentration of a gas using the ideal gas law.</span>
 
 <span class="sd">    The concentration is determined from the partial pressure, molar mass,</span>
 <span class="sd">    and temperature using the ideal gas equation:</span>
@@ -16164,7 +16164,7 @@ and temperature using the ideal gas equation:</p>
 <span class="sd">        temperature : Temperature in Kelvin.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Floating-point Example Usage&quot;</span>
+<span class="sd">        ```py title="Floating-point Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_concentration_from_pressure(101325, 0.02897, 298.15)</span>
 <span class="sd">        # Output: 1.184587604735883</span>
@@ -16172,7 +16172,7 @@ and temperature using the ideal gas equation:</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Concentration of the gas in kg/m³.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">partial_pressure</span> <span class="o">*</span> <span class="n">molar_mass</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">GAS_CONSTANT</span><span class="p">)</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

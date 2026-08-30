@@ -16292,7 +16292,7 @@ otherwise selects static mode.</p>
     <span class="n">requested_species_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">composition_weighted</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return static or composition-weighted surface tension for one particle.</span>
+<span class="w">    </span><span class="sd">"""Return static or composition-weighted surface tension for one particle.</span>
 
 <span class="sd">    In static mode, immediately return the requested species tension [N/m]</span>
 <span class="sd">    without reading ``masses`` or ``densities``. In composition-weighted mode,</span>
@@ -16315,7 +16315,7 @@ otherwise selects static mode.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Effective surface tension [N/m].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">composition_weighted</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">surface_tensions</span><span class="p">[</span><span class="n">requested_species_idx</span><span class="p">]</span>
 
@@ -16435,7 +16435,7 @@ otherwise selects static mode.</p>
     <span class="n">vapor_transition</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the first-order mass transport coefficient.</span>
+<span class="w">    </span><span class="sd">"""Calculate the first-order mass transport coefficient.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.dynamics.condensation.mass_transfer.get_first_order_mass_transport_k``.</span>
@@ -16447,7 +16447,7 @@ otherwise selects static mode.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        First-order mass transport coefficient [m³/s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">pi_value</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">3.141592653589793</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)</span>
@@ -16575,7 +16575,7 @@ otherwise selects static mode.</p>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">gas_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the condensation mass transfer rate.</span>
+<span class="w">    </span><span class="sd">"""Calculate the condensation mass transfer rate.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.dynamics.condensation.mass_transfer.get_mass_transfer_rate``.</span>
@@ -16589,7 +16589,7 @@ otherwise selects static mode.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Mass transfer rate [kg/s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">first_order_mass_transport</span>
         <span class="o">*</span> <span class="n">pressure_delta</span>
@@ -16728,7 +16728,7 @@ It returns zero when the selected particle has zero total moles.</p>
     <span class="n">particle_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">water_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate ideal water activity for one particle from its mole fraction.</span>
+<span class="w">    </span><span class="sd">"""Calculate ideal water activity for one particle from its mole fraction.</span>
 
 <span class="sd">    This Warp helper mirrors</span>
 <span class="sd">    ``particula.particles.properties.activity_module.get_ideal_activity_molar``.</span>
@@ -16744,7 +16744,7 @@ It returns zero when the selected particle has zero total moles.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dimensionless water mole fraction, or zero for zero total moles.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">total_moles</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">species_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>  <span class="c1"># type: ignore[attr-defined]</span>
         <span class="n">total_moles</span> <span class="o">+=</span> <span class="p">(</span>
@@ -16925,7 +16925,7 @@ https://doi.org/10.5194/acp-7-1961-2007</p>
     <span class="n">particle_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">water_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate κ-model water activity for one particle.</span>
+<span class="w">    </span><span class="sd">"""Calculate κ-model water activity for one particle.</span>
 
 <span class="sd">    This Warp helper mirrors</span>
 <span class="sd">    ``particula.particles.properties.activity_module.get_kappa_activity``.</span>
@@ -16949,7 +16949,7 @@ https://doi.org/10.5194/acp-7-1961-2007</p>
 <span class="sd">        representation of hygroscopic growth and cloud condensation nucleus</span>
 <span class="sd">        activity. Atmospheric Chemistry and Physics, 7(8), 1961-1971.</span>
 <span class="sd">        https://doi.org/10.5194/acp-7-1961-2007</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">water_volume</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="n">solute_volume</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="n">kappa_times_solute_volume</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>

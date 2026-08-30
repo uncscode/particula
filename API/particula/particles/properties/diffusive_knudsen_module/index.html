@@ -16282,9 +16282,9 @@ zero if no charge.</p>
 <span class="normal">136</span>
 <span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;friction_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"particle_mass"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"friction_factor"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_diffusive_knudsen_number</span><span class="p">(</span>
@@ -16294,7 +16294,7 @@ zero if no charge.</p>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">298.15</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the diffusive Knudsen number for particle-particle interactions.</span>
+<span class="w">    </span><span class="sd">"""Compute the diffusive Knudsen number for particle-particle interactions.</span>
 
 <span class="sd">    The *diffusive* Knudsen number (Kn_d) differs from the standard Knudsen</span>
 <span class="sd">    number. It represents the ratio of the mean particle persistence</span>
@@ -16321,7 +16321,7 @@ zero if no charge.</p>
 <span class="sd">        - The diffusive Knudsen number, either a float or NDArray[np.float64].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Single Particle Example&quot;</span>
+<span class="sd">        ```py title="Single Particle Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_diffusive_knudsen_number(</span>
@@ -16333,7 +16333,7 @@ zero if no charge.</p>
 <span class="sd">        )</span>
 <span class="sd">        # Output: 0.12...</span>
 <span class="sd">        ```</span>
-<span class="sd">        ```py title=&quot;Multiple Particles Example&quot;</span>
+<span class="sd">        ```py title="Multiple Particles Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        # Multiple particles example</span>
@@ -16348,14 +16348,14 @@ zero if no charge.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Chahl, H. S., &amp; Gopalakrishnan, R. (2019). &quot;High potential, near free</span>
-<span class="sd">          molecular regime Coulombic collisions in aerosols and dusty plasmas.&quot;</span>
+<span class="sd">        - Chahl, H. S., &amp; Gopalakrishnan, R. (2019). "High potential, near free</span>
+<span class="sd">          molecular regime Coulombic collisions in aerosols and dusty plasmas."</span>
 <span class="sd">          Aerosol Science and Technology, 53(8), 933-957.</span>
 <span class="sd">          https://doi.org/10.1080/02786826.2019.1614522</span>
-<span class="sd">        - Gopalakrishnan, R., &amp; Hogan, C. J. (2012). &quot;Coulomb-influenced</span>
-<span class="sd">          collisions in aerosols and dusty plasmas.&quot; Physical Review E, 85(2).</span>
+<span class="sd">        - Gopalakrishnan, R., &amp; Hogan, C. J. (2012). "Coulomb-influenced</span>
+<span class="sd">          collisions in aerosols and dusty plasmas." Physical Review E, 85(2).</span>
 <span class="sd">          https://doi.org/10.1103/PhysRevE.85.026410</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Calculate the pairwise sum of radii</span>
     <span class="n">sum_of_radii</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>

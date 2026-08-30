@@ -16172,7 +16172,7 @@ reconstruction.</p>
 import numpy as np
 
 data = GasData(
-    name=[&quot;Water&quot;, &quot;Ammonia&quot;, &quot;H2SO4&quot;],
+    name=["Water", "Ammonia", "H2SO4"],
     molar_mass=np.array([0.018, 0.017, 0.098]),
     concentration=np.array([[1e-6, 5e-9, 2e-10]]),  # (1, 3)
     partitioning=np.array([True, True, True]),
@@ -16180,7 +16180,7 @@ data = GasData(
 </code></pre></div>
 <p>Multi-box CFD simulation (100 boxes)::</p>
 <div class="highlight"><pre><span></span><code>cfd_data = GasData(
-    name=[&quot;Water&quot;, &quot;Ammonia&quot;, &quot;H2SO4&quot;],
+    name=["Water", "Ammonia", "H2SO4"],
     molar_mass=np.array([0.018, 0.017, 0.098]),
     concentration=np.zeros((100, 3)),  # kg/m^3, (100, 3)
     partitioning=np.array([True, True, True]),
@@ -16425,10 +16425,10 @@ Shape: (n_species,) - shared across boxes</p>
 <span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate array shapes are consistent and enforce boolean mask.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate array shapes are consistent and enforce boolean mask."""</span>
     <span class="c1"># Reject empty species set to avoid ambiguous shapes</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name must contain at least one species&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"name must contain at least one species"</span><span class="p">)</span>
 
     <span class="c1"># Normalize arrays to expected dtypes</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -16439,7 +16439,7 @@ Shape: (n_species,) - shared across boxes</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">partitioning</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partitioning</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;partitioning must be boolean convertible&quot;</span>
+            <span class="s2">"partitioning must be boolean convertible"</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
     <span class="n">n_species</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -16447,29 +16447,29 @@ Shape: (n_species,) - shared across boxes</p>
     <span class="c1"># concentration must be 2D (n_boxes, n_species)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;concentration must be 2D (n_boxes, n_species), &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;got ndim=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">"concentration must be 2D (n_boxes, n_species), "</span>
+            <span class="sa">f</span><span class="s2">"got ndim=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="c1"># concentration width must match number of species</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_species</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;concentration n_species dimension does not match name list: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, expected </span><span class="si">{</span><span class="n">n_species</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">"concentration n_species dimension does not match name list: "</span>
+            <span class="sa">f</span><span class="s2">"got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, expected </span><span class="si">{</span><span class="n">n_species</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="c1"># molar_mass shape must align with n_species</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_species</span><span class="p">,):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;molar_mass shape does not match n_species: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, expected (</span><span class="si">{</span><span class="n">n_species</span><span class="si">}</span><span class="s2">,)&quot;</span>
+            <span class="s2">"molar_mass shape does not match n_species: "</span>
+            <span class="sa">f</span><span class="s2">"got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, expected (</span><span class="si">{</span><span class="n">n_species</span><span class="si">}</span><span class="s2">,)"</span>
         <span class="p">)</span>
 
     <span class="c1"># partitioning must be 1D boolean with n_species elements</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">partitioning</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_species</span><span class="p">,):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;partitioning shape does not match n_species: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">partitioning</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, expected (</span><span class="si">{</span><span class="n">n_species</span><span class="si">}</span><span class="s2">,)&quot;</span>
+            <span class="s2">"partitioning shape does not match n_species: "</span>
+            <span class="sa">f</span><span class="s2">"got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">partitioning</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, expected (</span><span class="si">{</span><span class="n">n_species</span><span class="si">}</span><span class="s2">,)"</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16502,8 +16502,8 @@ Shape: (n_species,) - shared across boxes</p>
 <span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
-<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasData&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a deep copy of this GasData.&quot;&quot;&quot;</span>
+<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"GasData"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Create a deep copy of this GasData."""</span>
     <span class="k">return</span> <span class="n">GasData</span><span class="p">(</span>
         <span class="n">name</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
         <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">),</span>
@@ -16673,8 +16673,8 @@ gas_data.n_boxes
 <span class="normal">212</span>
 <span class="normal">213</span>
 <span class="normal">214</span>
-<span class="normal">215</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">from_species</span><span class="p">(</span><span class="n">species</span><span class="p">:</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GasData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert existing GasSpecies to GasData.</span>
+<span class="normal">215</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">from_species</span><span class="p">(</span><span class="n">species</span><span class="p">:</span> <span class="s2">"GasSpecies"</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GasData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Convert existing GasSpecies to GasData.</span>
 
 <span class="sd">    Extracts data fields from a GasSpecies instance and creates a GasData</span>
 <span class="sd">    container with the specified number of boxes. Concentration is copied</span>
@@ -16692,7 +16692,7 @@ gas_data.n_boxes
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">        &gt;&gt;&gt; vapor_pressure = par.gas.ConstantVaporPressureStrategy(2330)</span>
 <span class="sd">        &gt;&gt;&gt; species = par.gas.GasSpecies(</span>
-<span class="sd">        ...     name=&quot;Water&quot;,</span>
+<span class="sd">        ...     name="Water",</span>
 <span class="sd">        ...     molar_mass=0.018,</span>
 <span class="sd">        ...     vapor_pressure_strategy=vapor_pressure,</span>
 <span class="sd">        ...     concentration=1e-6,  # kg/m^3</span>
@@ -16700,7 +16700,7 @@ gas_data.n_boxes
 <span class="sd">        &gt;&gt;&gt; gas_data = from_species(species)</span>
 <span class="sd">        &gt;&gt;&gt; gas_data.n_boxes</span>
 <span class="sd">        1</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Handle single vs multi-species names</span>
     <span class="n">raw_names</span> <span class="o">=</span> <span class="n">species</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -16937,10 +16937,10 @@ species = to_species(gas_data, [strategy])</p>
 <span class="normal">297</span>
 <span class="normal">298</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_species</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">GasData</span><span class="p">,</span>
-    <span class="n">vapor_pressure_strategies</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;VaporPressureStrategy&quot;</span><span class="p">],</span>
+    <span class="n">vapor_pressure_strategies</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">"VaporPressureStrategy"</span><span class="p">],</span>
     <span class="n">box_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert GasData back to GasSpecies.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"GasSpecies"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Convert GasData back to GasSpecies.</span>
 
 <span class="sd">    Creates a GasSpecies instance from GasData for a single box. Requires</span>
 <span class="sd">    vapor pressure strategies to be provided since GasData does not store</span>
@@ -16956,7 +16956,7 @@ species = to_species(gas_data, [strategy])</p>
 <span class="sd">        GasSpecies for single box.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If vapor_pressure_strategies length doesn&#39;t match n_species,</span>
+<span class="sd">        ValueError: If vapor_pressure_strategies length doesn't match n_species,</span>
 <span class="sd">            or if GasData has mixed partitioning values.</span>
 <span class="sd">        IndexError: If box_index is out of range.</span>
 
@@ -16964,27 +16964,27 @@ species = to_species(gas_data, [strategy])</p>
 <span class="sd">        &gt;&gt;&gt; import particula as par</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">        &gt;&gt;&gt; gas_data = GasData(</span>
-<span class="sd">        ...     name=[&quot;Water&quot;],</span>
+<span class="sd">        ...     name=["Water"],</span>
 <span class="sd">        ...     molar_mass=np.array([0.018]),</span>
 <span class="sd">        ...     concentration=np.array([[1e-6]]),  # kg/m^3</span>
 <span class="sd">        ...     partitioning=np.array([True]),</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; strategy = par.gas.ConstantVaporPressureStrategy(2330)</span>
 <span class="sd">        &gt;&gt;&gt; species = to_species(gas_data, [strategy])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Import here to avoid circular import at module level</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.species</span><span class="w"> </span><span class="kn">import</span> <span class="n">GasSpecies</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vapor_pressure_strategies</span><span class="p">)</span> <span class="o">!=</span> <span class="n">data</span><span class="o">.</span><span class="n">n_species</span><span class="p">:</span>
         <span class="n">n_strategies</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vapor_pressure_strategies</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;vapor_pressure_strategies length </span><span class="si">{</span><span class="n">n_strategies</span><span class="si">}</span><span class="s2"> &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;doesn&#39;t match n_species </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">n_species</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"vapor_pressure_strategies length </span><span class="si">{</span><span class="n">n_strategies</span><span class="si">}</span><span class="s2"> "</span>
+            <span class="sa">f</span><span class="s2">"doesn't match n_species </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">n_species</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">box_index</span> <span class="o">&gt;=</span> <span class="n">data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;box_index </span><span class="si">{</span><span class="n">box_index</span><span class="si">}</span><span class="s2"> out of range for n_boxes </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">n_boxes</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"box_index </span><span class="si">{</span><span class="n">box_index</span><span class="si">}</span><span class="s2"> out of range for n_boxes </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">n_boxes</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="c1"># Validate uniform partitioning (GasSpecies requires single bool for all)</span>
@@ -16992,8 +16992,8 @@ species = to_species(gas_data, [strategy])</p>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_partitioning</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">part_list</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">partitioning</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;GasData has mixed partitioning values </span><span class="si">{</span><span class="n">part_list</span><span class="si">}</span><span class="s2">, &quot;</span>
-            <span class="s2">&quot;but GasSpecies requires uniform partitioning for all species&quot;</span>
+            <span class="sa">f</span><span class="s2">"GasData has mixed partitioning values </span><span class="si">{</span><span class="n">part_list</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="s2">"but GasSpecies requires uniform partitioning for all species"</span>
         <span class="p">)</span>
     <span class="n">partitioning_value</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">unique_partitioning</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
@@ -17008,7 +17008,7 @@ species = to_species(gas_data, [strategy])</p>
     <span class="p">)</span>
 
     <span class="n">vapor_pressure_strategy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="s2">&quot;VaporPressureStrategy&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;VaporPressureStrategy&quot;</span><span class="p">]</span>
+        <span class="s2">"VaporPressureStrategy"</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="s2">"VaporPressureStrategy"</span><span class="p">]</span>
     <span class="p">]</span>
     <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">n_species</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">vapor_pressure_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure_strategies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

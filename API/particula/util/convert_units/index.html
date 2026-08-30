@@ -16018,7 +16018,7 @@ units. The Pint library must be installed to use all features.</p>
     <div class="highlight"><span class="filename">Basic Usage</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.convert_units</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_unit_conversion</span>
 
 <span class="c1"># Convert 10 degrees Celsius to degrees Fahrenheit:</span>
-<span class="n">converted_value</span> <span class="o">=</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="s2">&quot;degC&quot;</span><span class="p">,</span> <span class="s2">&quot;degF&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">converted_value</span> <span class="o">=</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="s2">"degC"</span><span class="p">,</span> <span class="s2">"degF"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">converted_value</span><span class="p">)</span>
 <span class="c1"># ~50.0</span>
 </code></pre></div>
@@ -16128,12 +16128,12 @@ factor or the fully converted value in the target unit.</li>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example Multi-Unit Conversion</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="n">factor</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_unit_conversion</span><span class="p">(</span><span class="s2">&quot;ug/m^3&quot;</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+<span class="n">factor</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_unit_conversion</span><span class="p">(</span><span class="s2">"ug/m^3"</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span>
 <span class="c1"># 1e-9</span>
 </code></pre></div>
 <div class="highlight"><span class="filename">Example Temperature Conversion</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="n">degF</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_unit_conversion</span><span class="p">(</span><span class="s2">&quot;degC&quot;</span><span class="p">,</span> <span class="s2">&quot;degF&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">degF</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">get_unit_conversion</span><span class="p">(</span><span class="s2">"degC"</span><span class="p">,</span> <span class="s2">"degF"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">degF</span><span class="p">)</span>
 <span class="c1"># ~77.0</span>
 </code></pre></div>
@@ -16219,7 +16219,7 @@ factor or the fully converted value in the target unit.</li>
     <span class="n">new</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReturnType</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a numeric value or unit expression from one unit to another using</span>
+<span class="w">    </span><span class="sd">"""Convert a numeric value or unit expression from one unit to another using</span>
 <span class="sd">    Pint.</span>
 
 <span class="sd">    For simple multiplicative units, if no value is provided, this function</span>
@@ -16228,7 +16228,7 @@ factor or the fully converted value in the target unit.</li>
 <span class="sd">    numeric value is returned instead.</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        - old : A string representing the current unit (e.g., &quot;m&quot;, &quot;degC&quot;).</span>
+<span class="sd">        - old : A string representing the current unit (e.g., "m", "degC").</span>
 <span class="sd">        - new : A string representing the target unit.</span>
 <span class="sd">        - value : An optional numeric value to convert. If omitted, returns the</span>
 <span class="sd">            conversion factor between old and new.</span>
@@ -16242,29 +16242,29 @@ factor or the fully converted value in the target unit.</li>
 <span class="sd">          factor or the fully converted value in the target unit.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Multi-Unit Conversion&quot;</span>
+<span class="sd">        ``` py title="Example Multi-Unit Conversion"</span>
 <span class="sd">        import particula as par</span>
-<span class="sd">        factor = par.get_unit_conversion(&quot;ug/m^3&quot;, &quot;kg/m^3&quot;)</span>
+<span class="sd">        factor = par.get_unit_conversion("ug/m^3", "kg/m^3")</span>
 <span class="sd">        print(factor)</span>
 <span class="sd">        # 1e-9</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Example Temperature Conversion&quot;</span>
+<span class="sd">        ``` py title="Example Temperature Conversion"</span>
 <span class="sd">        import particula as par</span>
-<span class="sd">        degF = par.get_unit_conversion(&quot;degC&quot;, &quot;degF&quot;, value=25)</span>
+<span class="sd">        degF = par.get_unit_conversion("degC", "degF", value=25)</span>
 <span class="sd">        print(degF)</span>
 <span class="sd">        # ~77.0</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Pint documentation: https://pint.readthedocs.io/</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">unit_registry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;Install pint to use unit conversion features: pip install pint&quot;</span>
+            <span class="s2">"Install pint to use unit conversion features: pip install pint"</span>
         <span class="p">)</span>
 
-    <span class="n">offset_units</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;degC&quot;</span><span class="p">,</span> <span class="s2">&quot;degF&quot;</span><span class="p">,</span> <span class="s2">&quot;degR&quot;</span><span class="p">,</span> <span class="s2">&quot;degK&quot;</span><span class="p">]</span>
+    <span class="n">offset_units</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"degC"</span><span class="p">,</span> <span class="s2">"degF"</span><span class="p">,</span> <span class="s2">"degR"</span><span class="p">,</span> <span class="s2">"degK"</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">old</span> <span class="ow">in</span> <span class="n">offset_units</span> <span class="ow">or</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
         <span class="n">old_quantity</span> <span class="o">=</span> <span class="n">unit_registry</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">old</span><span class="p">)</span>

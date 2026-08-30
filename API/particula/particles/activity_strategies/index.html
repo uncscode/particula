@@ -16527,14 +16527,14 @@ parameterizations.</p>
 <span class="normal">178</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">activity</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the activity of a species based on mass concentration.</span>
+<span class="w">    </span><span class="sd">"""Calculate the activity of a species based on mass concentration.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - mass_concentration : Concentration of the species in kg/m^3.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Activity of the species, unitless.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_ideal_activity_mass</span><span class="p">(</span><span class="n">mass_concentration</span><span class="o">=</span><span class="n">mass_concentration</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16643,11 +16643,11 @@ and molar mass.</p>
 <span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the ActivityIdealMolar strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the ActivityIdealMolar strategy.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - molar_mass : Molar mass in kg/mol.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span> <span class="o">=</span> <span class="n">molar_mass</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16725,14 +16725,14 @@ and molar mass.</p>
 <span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">activity</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the activity of a species based on mass concentration.</span>
+<span class="w">    </span><span class="sd">"""Calculate the activity of a species based on mass concentration.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - mass_concentration : Concentration of the species in kg/m^3.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Activity of the species, unitless.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_ideal_activity_molar</span><span class="p">(</span>
         <span class="n">mass_concentration</span><span class="o">=</span><span class="n">mass_concentration</span><span class="p">,</span> <span class="n">molar_mass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span>
     <span class="p">)</span>
@@ -16826,11 +16826,11 @@ derive volume fractions from mass concentrations.</p>
 <span class="normal">207</span>
 <span class="normal">208</span>
 <span class="normal">209</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the ActivityIdealVolume strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the ActivityIdealVolume strategy.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - density : Density of the species in kg/m^3.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">density</span> <span class="o">=</span> <span class="n">density</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16916,7 +16916,7 @@ derive volume fractions from mass concentrations.</p>
 <span class="normal">225</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">activity</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the activity of a species based on mass concentration.</span>
+<span class="w">    </span><span class="sd">"""Calculate the activity of a species based on mass concentration.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - mass_concentration : Concentration of the species in kg/m^3.</span>
@@ -16924,7 +16924,7 @@ derive volume fractions from mass concentrations.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Activity of the species, unitless.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_ideal_activity_volume</span><span class="p">(</span>
         <span class="n">mass_concentration</span><span class="o">=</span><span class="n">mass_concentration</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">density</span>
     <span class="p">)</span>
@@ -17106,14 +17106,14 @@ derive volume fractions from mass concentrations.</p>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">water_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the ActivityKappaParameter strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the ActivityKappaParameter strategy.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - kappa : Kappa hygroscopic parameters (array or scalar).</span>
 <span class="sd">        - density : Densities in kg/m^3 (array or scalar).</span>
 <span class="sd">        - molar_mass : Molar masses in kg/mol (array or scalar).</span>
 <span class="sd">        - water_index : Index of the water species.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">kappa</span> <span class="k">if</span> <span class="n">kappa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="p">)</span>
@@ -17224,7 +17224,7 @@ derive volume fractions from mass concentrations.</p>
 <span class="normal">425</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">activity</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the activity of a species based on mass concentration.</span>
+<span class="w">    </span><span class="sd">"""Calculate the activity of a species based on mass concentration.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - mass_concentration : Concentration of the species in kg/m^3.</span>
@@ -17237,7 +17237,7 @@ derive volume fractions from mass concentrations.</p>
 <span class="sd">          representation of hygroscopic growth and cloud condensation</span>
 <span class="sd">          nucleus activity. Atmospheric Chemistry and Physics, 7(8),</span>
 <span class="sd">          1961-1971. [DOI](https://doi.org/10.5194/acp-7-1961-2007).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_kappa_activity</span><span class="p">(</span>
         <span class="n">mass_concentration</span><span class="o">=</span><span class="n">mass_concentration</span><span class="p">,</span>
         <span class="n">kappa</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kappa</span><span class="p">,</span>
@@ -17333,7 +17333,7 @@ equivalent conversion in the BAT helper.</p>
 <span class="gp">... </span>    <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">oxygen2carbon</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">density</span><span class="o">=</span><span class="mf">1400.0</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">functional_group</span><span class="o">=</span><span class="s2">&quot;carboxylic_acid&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">functional_group</span><span class="o">=</span><span class="s2">"carboxylic_acid"</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mass_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">activity</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">activity</span><span class="p">(</span><span class="n">mass_concentration</span><span class="p">)</span>
@@ -17379,7 +17379,7 @@ Physics, 19(19), 13383-13410. https://doi.org/10.5194/acp-19-13383-2019</p>
     <span class="n">density</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">functional_group</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the binary non-ideal activity strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the binary non-ideal activity strategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass_kg</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass_g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass_kg</span> <span class="o">*</span> <span class="mf">1000.0</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">oxygen2carbon</span> <span class="o">=</span> <span class="n">oxygen2carbon</span>
@@ -17517,7 +17517,7 @@ dimension size 2 ordered as [water, organic], in kg/m^3.</p>
 <span class="normal">331</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">activity</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate organic activity using the BAT model.</span>
+<span class="w">    </span><span class="sd">"""Calculate organic activity using the BAT model.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        mass_concentration: Binary mass concentrations with last</span>
@@ -17529,12 +17529,12 @@ dimension size 2 ordered as [water, organic], in kg/m^3.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the input is scalar or last dimension is not 2.</span>
 <span class="sd">        ValueError: If any total moles are non-positive.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">mass_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mass_concentration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">mass_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">mass_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;ActivityNonIdealBinary expects mass_concentration with last &quot;</span>
-            <span class="s2">&quot;dimension of size 2.&quot;</span>
+            <span class="s2">"ActivityNonIdealBinary expects mass_concentration with last "</span>
+            <span class="s2">"dimension of size 2."</span>
         <span class="p">)</span>
 
     <span class="n">water_moles</span> <span class="o">=</span> <span class="n">mass_array</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mf">0.01801528</span>
@@ -17543,7 +17543,7 @@ dimension size 2 ordered as [water, organic], in kg/m^3.</p>
 
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">total_moles</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Total moles must be positive for activity calculation.&quot;</span>
+            <span class="s2">"Total moles must be positive for activity calculation."</span>
         <span class="p">)</span>
 
     <span class="n">organic_mole_fraction</span> <span class="o">=</span> <span class="n">organic_moles</span> <span class="o">/</span> <span class="n">total_moles</span>
@@ -17592,8 +17592,8 @@ dimension size 2 ordered as [water, organic], in kg/m^3.</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">333</span>
 <span class="normal">334</span>
 <span class="normal">335</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the strategy identifier.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="s2">&quot;ActivityNonIdealBinary&quot;</span>
+<span class="w">    </span><span class="sd">"""Return the strategy identifier."""</span>
+    <span class="k">return</span> <span class="s2">"ActivityNonIdealBinary"</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17733,14 +17733,14 @@ partial_pressure().</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">activity</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the activity of a species based on its mass concentration.</span>
+<span class="w">    </span><span class="sd">"""Calculate the activity of a species based on its mass concentration.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - mass_concentration : Concentration of the species in kg/m^3.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Activity of the species, unitless.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17768,7 +17768,7 @@ partial_pressure().</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the type of the activity strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return the type of the activity strategy."""</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17849,7 +17849,7 @@ partial_pressure().</p>
     <span class="n">pure_vapor_pressure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the vapor pressure of species in the particle phase.</span>
+<span class="w">    </span><span class="sd">"""Calculate the vapor pressure of species in the particle phase.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - pure_vapor_pressure : Pure vapor pressure of the species in Pa.</span>
@@ -17857,7 +17857,7 @@ partial_pressure().</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Vapor pressure of the particle in Pa.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_surface_partial_pressure</span><span class="p">(</span>
         <span class="n">pure_vapor_pressure</span><span class="o">=</span><span class="n">pure_vapor_pressure</span><span class="p">,</span>
         <span class="n">activity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">activity</span><span class="p">(</span><span class="n">mass_concentration</span><span class="p">),</span>

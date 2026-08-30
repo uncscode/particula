@@ -16143,7 +16143,7 @@ gravitational settling.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Sedimentation Coagulation Strategy Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">SedimentationCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span>
 <span class="p">)</span>
 <span class="c1"># Use strategy.kernel(aerosol_particle, 298.15, 101325) to get the</span>
 <span class="c1"># sedimentation kernel.</span>
@@ -16190,12 +16190,12 @@ gravitational settling.</p>
 <span class="normal">69</span>
 <span class="normal">70</span>
 <span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the sedimentation coagulation strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the sedimentation coagulation strategy.</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        distribution_type: Type of particle distribution (&quot;discrete&quot;,</span>
-<span class="sd">            &quot;continuous_pdf&quot;, or &quot;particle_resolved&quot;).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        distribution_type: Type of particle distribution ("discrete",</span>
+<span class="sd">            "continuous_pdf", or "particle_resolved").</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16293,7 +16293,7 @@ strategy.</p>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise NotImplementedError for dimensionless kernel in sedimentation</span>
+<span class="w">    </span><span class="sd">"""Raise NotImplementedError for dimensionless kernel in sedimentation</span>
 <span class="sd">    strategy.</span>
 
 <span class="sd">    This method is not applicable to sedimentation-based collisions.</span>
@@ -16305,10 +16305,10 @@ strategy.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - NotImplementedError : Always raised for this strategy.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;Dimensionless kernel not implemented in sedimentation &quot;</span>
-        <span class="o">+</span> <span class="s2">&quot;coagulation strategy.&quot;</span>
+        <span class="s2">"Dimensionless kernel not implemented in sedimentation "</span>
+        <span class="o">+</span> <span class="s2">"coagulation strategy."</span>
     <span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -16429,7 +16429,7 @@ and density.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the sedimentation coagulation kernel [m^3/s].</span>
+<span class="w">    </span><span class="sd">"""Compute the sedimentation coagulation kernel [m^3/s].</span>
 
 <span class="sd">    Uses the Seinfeld &amp; Pandis (2016) sedimentation kernel via</span>
 <span class="sd">    `get_sedimentation_kernel_sp2016_via_system_state`.</span>
@@ -16450,7 +16450,7 @@ and density.</p>
 <span class="sd">        )</span>
 <span class="sd">        # k_values may be a single float or an array</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_kernel_sp2016</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">_get_radius</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
         <span class="n">particle_density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>

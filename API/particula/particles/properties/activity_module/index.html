@@ -16228,13 +16228,13 @@ In an ideal mixture, the activity (aᵢ) can be expressed as:</p>
 <span class="normal">146</span>
 <span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_ideal_activity_mass</span><span class="p">(</span>
     <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the ideal activity based on mass fractions.</span>
+<span class="w">    </span><span class="sd">"""Compute the ideal activity based on mass fractions.</span>
 
 <span class="sd">    This function calculates the activity of a species using its mass fraction.</span>
 <span class="sd">    In an ideal mixture, the activity (aᵢ) can be expressed as:</span>
@@ -16249,16 +16249,16 @@ In an ideal mixture, the activity (aᵢ) can be expressed as:</p>
 <span class="sd">        - Ideal activity of the species as a dimensionless value.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_ideal_activity_mass(np.array([1.0, 2.0]))</span>
 <span class="sd">        # Output: array([...])</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Raoult&#39;s Law, &quot;Raoult&#39;s law,&quot; Wikipedia,</span>
+<span class="sd">        - Raoult's Law, "Raoult's law," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Raoult%27s_law.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mass_concentration</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">1.0</span>
     <span class="k">return</span> <span class="n">get_mass_fraction_from_mass</span><span class="p">(</span>
@@ -16393,18 +16393,18 @@ which follows Raoult's Law. The ideal activity (aᵢ) is determined using:</p>
 <span class="normal">59</span>
 <span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_ideal_activity_molar</span><span class="p">(</span>
     <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the ideal activity based on mole fractions.</span>
+<span class="w">    </span><span class="sd">"""Compute the ideal activity based on mole fractions.</span>
 
 <span class="sd">    This function calculates the activity of a species using its mole fraction,</span>
-<span class="sd">    which follows Raoult&#39;s Law. The ideal activity (aᵢ) is determined using:</span>
+<span class="sd">    which follows Raoult's Law. The ideal activity (aᵢ) is determined using:</span>
 
 <span class="sd">    - aᵢ = Xᵢ</span>
 <span class="sd">        - Xᵢ is the mole fraction of species i.</span>
@@ -16417,7 +16417,7 @@ which follows Raoult's Law. The ideal activity (aᵢ) is determined using:</p>
 <span class="sd">        - Ideal activity of the species as a dimensionless value.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_ideal_activity_molar(</span>
 <span class="sd">            mass_concentration=np.array([1.0, 2.0]),</span>
@@ -16427,9 +16427,9 @@ which follows Raoult's Law. The ideal activity (aᵢ) is determined using:</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Raoult&#39;s Law, &quot;Raoult&#39;s law,&quot; Wikipedia,</span>
+<span class="sd">        - Raoult's Law, "Raoult's law," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Raoult%27s_law.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mass_concentration</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">1.0</span>
     <span class="k">return</span> <span class="n">get_mole_fraction_from_mass</span><span class="p">(</span>
@@ -16565,15 +16565,15 @@ fraction. In an ideal mixture, the activity (aᵢ) can be expressed as:</p>
 <span class="normal">106</span>
 <span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_ideal_activity_volume</span><span class="p">(</span>
     <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the ideal activity based on volume fractions.</span>
+<span class="w">    </span><span class="sd">"""Compute the ideal activity based on volume fractions.</span>
 
 <span class="sd">    This function calculates the activity of a species using its volume</span>
 <span class="sd">    fraction. In an ideal mixture, the activity (aᵢ) can be expressed as:</span>
@@ -16589,7 +16589,7 @@ fraction. In an ideal mixture, the activity (aᵢ) can be expressed as:</p>
 <span class="sd">        - Ideal activity of the species as a dimensionless value.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_ideal_activity_volume(</span>
 <span class="sd">            mass_concentration=np.array([1.0, 2.0]),</span>
@@ -16599,9 +16599,9 @@ fraction. In an ideal mixture, the activity (aᵢ) can be expressed as:</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Raoult&#39;s Law, &quot;Raoult&#39;s law,&quot; Wikipedia,</span>
+<span class="sd">        - Raoult's Law, "Raoult's law," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Raoult%27s_law.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mass_concentration</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">1.0</span>
     <span class="k">return</span> <span class="n">get_volume_fraction_from_mass</span><span class="p">(</span>
@@ -16830,10 +16830,10 @@ determined by:</p>
 <span class="normal">257</span>
 <span class="normal">258</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mass_concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kappa&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"mass_concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"kappa"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kappa_activity</span><span class="p">(</span>
@@ -16844,7 +16844,7 @@ determined by:</p>
     <span class="n">water_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
     <span class="c1"># pylint: disable=too-many-locals</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute species activity using κ hygroscopic growth parameter.</span>
+<span class="w">    </span><span class="sd">"""Compute species activity using κ hygroscopic growth parameter.</span>
 
 <span class="sd">    This function calculates the activity of a mixture by combining</span>
 <span class="sd">    volume-fraction weighted κ-values. The water activity (aₘ) is</span>
@@ -16866,7 +16866,7 @@ determined by:</p>
 <span class="sd">        - Array of species activities, dimensionless.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_kappa_activity(</span>
 <span class="sd">            mass_concentration=np.array([[1.0, 2.0], [3.0, 4.0]]),</span>
@@ -16879,11 +16879,11 @@ determined by:</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Petters, M. D., &amp; Kreidenweis, S. M. (2007). &quot;A single parameter</span>
+<span class="sd">        - Petters, M. D., &amp; Kreidenweis, S. M. (2007). "A single parameter</span>
 <span class="sd">          representation of hygroscopic growth and cloud condensation nucleus</span>
-<span class="sd">          activity,&quot; Atmospheric Chemistry and Physics, 7(8), 1961-1971.</span>
+<span class="sd">          activity," Atmospheric Chemistry and Physics, 7(8), 1961-1971.</span>
 <span class="sd">          DOI: https://doi.org/10.5194/acp-7-1961-2007.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">volume_fractions</span> <span class="o">=</span> <span class="n">get_volume_fraction_from_mass</span><span class="p">(</span>
         <span class="n">mass_concentrations</span><span class="o">=</span><span class="n">mass_concentration</span><span class="p">,</span> <span class="n">densities</span><span class="o">=</span><span class="n">density</span>
     <span class="p">)</span>
@@ -17039,15 +17039,15 @@ activity (aᵢ) and pure vapor pressure (pᵢ*). It follows:</p>
 <span class="normal">291</span>
 <span class="normal">292</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;pure_vapor_pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;activity&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"pure_vapor_pressure"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"activity"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_surface_partial_pressure</span><span class="p">(</span>
     <span class="n">pure_vapor_pressure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">activity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the partial pressure from activity and pure vapor pressure.</span>
+<span class="w">    </span><span class="sd">"""Compute the partial pressure from activity and pure vapor pressure.</span>
 
 <span class="sd">    This function calculates the partial pressure (pᵢ) of a species, given its</span>
 <span class="sd">    activity (aᵢ) and pure vapor pressure (pᵢ*). It follows:</span>
@@ -17062,12 +17062,12 @@ activity (aᵢ) and pure vapor pressure (pᵢ*). It follows:</p>
 <span class="sd">        - Partial pressure of the species in Pa.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_surface_partial_pressure(1000.0, 0.95)</span>
 <span class="sd">        # Output: 950.0</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">pure_vapor_pressure</span> <span class="o">*</span> <span class="n">activity</span>
 </code></pre></div></td></tr></table></div>
             </details>

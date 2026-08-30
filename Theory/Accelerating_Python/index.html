@@ -16038,7 +16038,7 @@
 <p>Our vision is to have a simple enable statement for <code>particula</code> that allows users to choose the acceleration method. For example, a user could run the following command in their notebook:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
-<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;taichi&quot;</span><span class="p">)</span>  <span class="c1"># or &quot;warp&quot;, &quot;cpp&quot;, etc.</span>
+<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">"taichi"</span><span class="p">)</span>  <span class="c1"># or "warp", "cpp", etc.</span>
 </code></pre></div>
 <p>The rest of the builder and other function calls would remain unchanged, and the user would be able to run their code as usual. The only difference would be that the kernels would be compiled to the selected backend (e.g., Taichi, Warp, etc.) and run there instead of in Python.</p>
 <p>See one option for how this could be done in the <a href="Details/One-Line_Vision/">One-Line Vision</a> document.</p>

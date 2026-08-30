@@ -16655,7 +16655,7 @@ only operation that may subsequently derive new words from this metadata.</p>
   </span>
 
 <a href="#particula.execution.checkpoint.ResidentCheckpoint" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ResidentCheckpoint</span><span class="p">(</span><span class="n">schema_version</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">carrier_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">ResidentDimensions</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">Device</span><span class="p">,</span> <span class="n">gas_names</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">completed_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">simulated_time</span><span class="p">:</span> <span class="n">Real</span><span class="p">,</span> <span class="n">lifecycle</span><span class="p">:</span> <span class="n">ResidentLifecycle</span><span class="p">,</span> <span class="n">particles</span><span class="p">:</span> <span class="s1">&#39;ParticleData&#39;</span><span class="p">,</span> <span class="n">gas</span><span class="p">:</span> <span class="s1">&#39;GasData&#39;</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="s1">&#39;EnvironmentData&#39;</span><span class="p">,</span> <span class="n">payloads</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CheckpointPayload</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">communication</span><span class="p">:</span> <span class="s1">&#39;CommunicationCheckpointMetadata | None&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng_continuation</span><span class="p">:</span> <span class="s1">&#39;RNGContinuationCheckpoint | None&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng_resource_processes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">())</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ResidentCheckpoint</span><span class="p">(</span><span class="n">schema_version</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">carrier_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="n">ResidentDimensions</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">Device</span><span class="p">,</span> <span class="n">gas_names</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">completed_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">simulated_time</span><span class="p">:</span> <span class="n">Real</span><span class="p">,</span> <span class="n">lifecycle</span><span class="p">:</span> <span class="n">ResidentLifecycle</span><span class="p">,</span> <span class="n">particles</span><span class="p">:</span> <span class="s1">'ParticleData'</span><span class="p">,</span> <span class="n">gas</span><span class="p">:</span> <span class="s1">'GasData'</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="s1">'EnvironmentData'</span><span class="p">,</span> <span class="n">payloads</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CheckpointPayload</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">communication</span><span class="p">:</span> <span class="s1">'CommunicationCheckpointMetadata | None'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng_continuation</span><span class="p">:</span> <span class="s1">'RNGContinuationCheckpoint | None'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng_resource_processes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">())</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16858,7 +16858,7 @@ intentionally excluded from ordinary payloads.</p>
 
 
 <a href="#particula.execution.checkpoint.ResidentCheckpointController" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ResidentCheckpointController</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s1">&#39;GPUResourceRegistry&#39;</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="n">ResidentStepGuard</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ResidentCheckpointController</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s1">'GPUResourceRegistry'</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="n">ResidentStepGuard</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16956,27 +16956,27 @@ initializes streams absent from a checkpoint.</p>
 <span class="normal">370</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span>
-    <span class="n">registry</span><span class="p">:</span> <span class="s2">&quot;GPUResourceRegistry&quot;</span><span class="p">,</span>
+    <span class="n">registry</span><span class="p">:</span> <span class="s2">"GPUResourceRegistry"</span><span class="p">,</span>
     <span class="n">guard</span><span class="p">:</span> <span class="n">ResidentStepGuard</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bind exact active session, registry, and guard identities.</span>
+<span class="w">    </span><span class="sd">"""Bind exact active session, registry, and guard identities.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        session: Active resident session to checkpoint.</span>
 <span class="sd">        registry: Registry pinned to ``session``.</span>
 <span class="sd">        guard: Closed-step guard bound to the same registry and session.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.gpu_resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPUResourceRegistry</span>
 
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">session</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentSession</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;session must be an exact ResidentSession.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"session must be an exact ResidentSession."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">registry</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">GPUResourceRegistry</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;registry must be an exact GPUResourceRegistry.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"registry must be an exact GPUResourceRegistry."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">guard</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentStepGuard</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;guard must be an exact ResidentStepGuard.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"guard must be an exact ResidentStepGuard."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">guard</span><span class="o">.</span><span class="n">_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">session</span> <span class="ow">or</span> <span class="n">guard</span><span class="o">.</span><span class="n">_registry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">registry</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;guard must match the resident session and registry.&quot;</span>
+            <span class="s2">"guard must match the resident session and registry."</span>
         <span class="p">)</span>
     <span class="n">registry</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">session</span>
@@ -17171,7 +17171,7 @@ is invalid.</p>
 <span class="normal">502</span>
 <span class="normal">503</span>
 <span class="normal">504</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResidentCheckpoint</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a fresh immutable snapshot while leaving the session active.</span>
+<span class="w">    </span><span class="sd">"""Return a fresh immutable snapshot while leaving the session active.</span>
 
 <span class="sd">    Validation occurs before synchronization, transfer, payload access, or</span>
 <span class="sd">    mutation. On success, this operation synchronizes once, reads the three</span>
@@ -17185,7 +17185,7 @@ is invalid.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the lifecycle binding or published stream metadata</span>
 <span class="sd">            is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">()</span>
     <span class="n">rng_streams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">_enumerate_published_rng_streams</span><span class="p">()</span>
     <span class="n">rng_manifest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">inspect_published_streams</span><span class="p">(</span>
@@ -17223,20 +17223,20 @@ is invalid.</p>
         <span class="c1"># collapses partitioning to shared species state, so only those two</span>
         <span class="c1"># canonical GPU fields need their own readback.</span>
         <span class="n">primary_values</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="p">(</span><span class="s2">&quot;particles&quot;</span><span class="p">,</span> <span class="s2">&quot;masses&quot;</span><span class="p">):</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;particles&quot;</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">):</span> <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;particles&quot;</span><span class="p">,</span> <span class="s2">&quot;charge&quot;</span><span class="p">):</span> <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;particles&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">):</span> <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;particles&quot;</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">):</span> <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;gas&quot;</span><span class="p">,</span> <span class="s2">&quot;molar_mass&quot;</span><span class="p">):</span> <span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;gas&quot;</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">):</span> <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;gas&quot;</span><span class="p">,</span> <span class="s2">&quot;vapor_pressure&quot;</span><span class="p">):</span> <span class="n">resident_gas</span><span class="o">.</span><span class="n">vapor_pressure</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;gas&quot;</span><span class="p">,</span> <span class="s2">&quot;partitioning&quot;</span><span class="p">):</span> <span class="n">resident_gas</span><span class="o">.</span><span class="n">partitioning</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;environment&quot;</span><span class="p">,</span> <span class="s2">&quot;temperature&quot;</span><span class="p">):</span> <span class="n">environment</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;environment&quot;</span><span class="p">,</span> <span class="s2">&quot;pressure&quot;</span><span class="p">):</span> <span class="n">environment</span><span class="o">.</span><span class="n">pressure</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"masses"</span><span class="p">):</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">):</span> <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"charge"</span><span class="p">):</span> <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">):</span> <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"volume"</span><span class="p">):</span> <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"gas"</span><span class="p">,</span> <span class="s2">"molar_mass"</span><span class="p">):</span> <span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"gas"</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">):</span> <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"gas"</span><span class="p">,</span> <span class="s2">"vapor_pressure"</span><span class="p">):</span> <span class="n">resident_gas</span><span class="o">.</span><span class="n">vapor_pressure</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"gas"</span><span class="p">,</span> <span class="s2">"partitioning"</span><span class="p">):</span> <span class="n">resident_gas</span><span class="o">.</span><span class="n">partitioning</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"environment"</span><span class="p">,</span> <span class="s2">"temperature"</span><span class="p">):</span> <span class="n">environment</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"environment"</span><span class="p">,</span> <span class="s2">"pressure"</span><span class="p">):</span> <span class="n">environment</span><span class="o">.</span><span class="n">pressure</span><span class="p">,</span>
             <span class="p">(</span>
-                <span class="s2">&quot;environment&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;saturation_ratio&quot;</span><span class="p">,</span>
+                <span class="s2">"environment"</span><span class="p">,</span>
+                <span class="s2">"saturation_ratio"</span><span class="p">,</span>
             <span class="p">):</span> <span class="n">environment</span><span class="o">.</span><span class="n">saturation_ratio</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="n">payloads</span> <span class="o">=</span> <span class="p">[</span>
@@ -17249,22 +17249,22 @@ is invalid.</p>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">_enumerate_resources</span><span class="p">()</span>
             <span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">resources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;communication_gas&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;communication_particles&quot;</span><span class="p">)</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"communication_gas"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">_views</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"communication_particles"</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">resources</span><span class="o">.</span><span class="n">final_volumes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">family</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">&quot;communication_gas&quot;</span>
+                <span class="s2">"communication_gas"</span>
                 <span class="k">if</span> <span class="p">(</span>
                     <span class="n">resources</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span><span class="o">.</span><span class="n">transport_mode</span><span class="o">.</span><span class="n">value</span>
-                    <span class="o">==</span> <span class="s2">&quot;gas&quot;</span>
+                    <span class="o">==</span> <span class="s2">"gas"</span>
                 <span class="p">)</span>
-                <span class="k">else</span> <span class="s2">&quot;communication_particles&quot;</span>
+                <span class="k">else</span> <span class="s2">"communication_particles"</span>
             <span class="p">)</span>
             <span class="n">payloads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">_payload</span><span class="p">(</span>
                     <span class="n">family</span><span class="p">,</span>
-                    <span class="s2">&quot;final_volumes&quot;</span><span class="p">,</span>
+                    <span class="s2">"final_volumes"</span><span class="p">,</span>
                     <span class="n">resources</span><span class="o">.</span><span class="n">final_volumes</span><span class="p">,</span>
                     <span class="n">resources</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">,</span>
                 <span class="p">)</span>
@@ -17272,7 +17272,7 @@ is invalid.</p>
         <span class="n">communication</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_communication_metadata</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">ResidentCheckpoint</span><span class="p">(</span>
             <span class="n">_SCHEMA_VERSION</span><span class="p">,</span>
-            <span class="s2">&quot;ResidentSession&quot;</span><span class="p">,</span>
+            <span class="s2">"ResidentSession"</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">dimensions</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">gas_names</span><span class="p">,</span>
@@ -17366,7 +17366,7 @@ stream binding. The session remains ACTIVE.</p>
 <span class="normal">545</span>
 <span class="normal">546</span>
 <span class="normal">547</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResidentCheckpoint</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create once, cache, and terminally finalize this resident session.</span>
+<span class="w">    </span><span class="sd">"""Create once, cache, and terminally finalize this resident session.</span>
 
 <span class="sd">    The first successful call has checkpoint semantics and then transitions</span>
 <span class="sd">    the bound session from ACTIVE to FINALIZED. Repeated calls return the</span>
@@ -17378,7 +17378,7 @@ stream binding. The session remains ACTIVE.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If a first finalization has an invalid lifecycle or</span>
 <span class="sd">            stream binding. The session remains ACTIVE.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finalized</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finalized</span>
     <span class="n">checkpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">()</span>
@@ -17408,7 +17408,7 @@ stream binding. The session remains ACTIVE.</p>
 
 
 <a href="#particula.execution.checkpoint.restart_resident_session" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">restart_resident_session</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">:</span> <span class="n">ResidentCheckpoint</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">Device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ResidentSession</span><span class="p">,</span> <span class="s1">&#39;GPUResourceRegistry&#39;</span><span class="p">,</span> <span class="n">ResidentStepGuard</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">restart_resident_session</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">:</span> <span class="n">ResidentCheckpoint</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">Device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ResidentSession</span><span class="p">,</span> <span class="s1">'GPUResourceRegistry'</span><span class="p">,</span> <span class="n">ResidentStepGuard</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17687,8 +17687,8 @@ are invalid, or the device does not exactly match.</p>
 <span class="normal">743</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">restart_resident_session</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">checkpoint</span><span class="p">:</span> <span class="n">ResidentCheckpoint</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">Device</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ResidentSession</span><span class="p">,</span> <span class="s2">&quot;GPUResourceRegistry&quot;</span><span class="p">,</span> <span class="n">ResidentStepGuard</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Restart a fresh compatible resident session from canonical bytes.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ResidentSession</span><span class="p">,</span> <span class="s2">"GPUResourceRegistry"</span><span class="p">,</span> <span class="n">ResidentStepGuard</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Restart a fresh compatible resident session from canonical bytes.</span>
 
 <span class="sd">    This concrete-only operation requires a nonterminal checkpoint and an exact</span>
 <span class="sd">    matching target device. It never reuses source containers, primary arrays,</span>
@@ -17707,7 +17707,7 @@ are invalid, or the device does not exactly match.</p>
 <span class="sd">        TypeError: If the checkpoint carrier or required metadata is invalid.</span>
 <span class="sd">        ValueError: If compatibility, lifecycle, counters, or payload schemas</span>
 <span class="sd">            are invalid, or the device does not exactly match.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">plan</span> <span class="o">=</span> <span class="n">_preflight_restart</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
     <span class="n">primary</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">primary</span>
     <span class="n">target_device</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
@@ -17721,32 +17721,32 @@ are invalid, or the device does not exactly match.</p>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParticleData</span>
 
     <span class="n">particles</span> <span class="o">=</span> <span class="n">ParticleData</span><span class="p">(</span>
-        <span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;particles&quot;</span><span class="p">,</span> <span class="s2">&quot;masses&quot;</span><span class="p">),</span>
-        <span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;particles&quot;</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">),</span>
-        <span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;particles&quot;</span><span class="p">,</span> <span class="s2">&quot;charge&quot;</span><span class="p">),</span>
-        <span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;particles&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">),</span>
-        <span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;particles&quot;</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">),</span>
+        <span class="n">unpack</span><span class="p">(</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"masses"</span><span class="p">),</span>
+        <span class="n">unpack</span><span class="p">(</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">),</span>
+        <span class="n">unpack</span><span class="p">(</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"charge"</span><span class="p">),</span>
+        <span class="n">unpack</span><span class="p">(</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">),</span>
+        <span class="n">unpack</span><span class="p">(</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"volume"</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">gas</span> <span class="o">=</span> <span class="n">GasData</span><span class="p">(</span>
         <span class="nb">list</span><span class="p">(</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">gas_names</span><span class="p">),</span>
-        <span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;gas&quot;</span><span class="p">,</span> <span class="s2">&quot;molar_mass&quot;</span><span class="p">),</span>
-        <span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;gas&quot;</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">),</span>
+        <span class="n">unpack</span><span class="p">(</span><span class="s2">"gas"</span><span class="p">,</span> <span class="s2">"molar_mass"</span><span class="p">),</span>
+        <span class="n">unpack</span><span class="p">(</span><span class="s2">"gas"</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">),</span>
         <span class="c1"># GasData carries shared CPU partitioning only. The exact per-box</span>
         <span class="c1"># canonical payload is copied into the resident carrier after setup.</span>
-        <span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;gas&quot;</span><span class="p">,</span> <span class="s2">&quot;partitioning&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">),</span>
+        <span class="n">unpack</span><span class="p">(</span><span class="s2">"gas"</span><span class="p">,</span> <span class="s2">"partitioning"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">environment</span> <span class="o">=</span> <span class="n">EnvironmentData</span><span class="p">(</span>
-        <span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;environment&quot;</span><span class="p">,</span> <span class="s2">&quot;temperature&quot;</span><span class="p">),</span>
-        <span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;environment&quot;</span><span class="p">,</span> <span class="s2">&quot;pressure&quot;</span><span class="p">),</span>
-        <span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;environment&quot;</span><span class="p">,</span> <span class="s2">&quot;saturation_ratio&quot;</span><span class="p">),</span>
+        <span class="n">unpack</span><span class="p">(</span><span class="s2">"environment"</span><span class="p">,</span> <span class="s2">"temperature"</span><span class="p">),</span>
+        <span class="n">unpack</span><span class="p">(</span><span class="s2">"environment"</span><span class="p">,</span> <span class="s2">"pressure"</span><span class="p">),</span>
+        <span class="n">unpack</span><span class="p">(</span><span class="s2">"environment"</span><span class="p">,</span> <span class="s2">"saturation_ratio"</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">continuation</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">continuation</span>
     <span class="n">setup_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">continuation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">setup_kwargs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;root_seed&quot;</span><span class="p">:</span> <span class="n">continuation</span><span class="o">.</span><span class="n">root_seed</span><span class="p">,</span>
-            <span class="s2">&quot;logical_box_ids&quot;</span><span class="p">:</span> <span class="n">continuation</span><span class="o">.</span><span class="n">logical_box_ids</span><span class="p">,</span>
-            <span class="s2">&quot;lanes&quot;</span><span class="p">:</span> <span class="n">continuation</span><span class="o">.</span><span class="n">lanes</span><span class="p">,</span>
+            <span class="s2">"root_seed"</span><span class="p">:</span> <span class="n">continuation</span><span class="o">.</span><span class="n">root_seed</span><span class="p">,</span>
+            <span class="s2">"logical_box_ids"</span><span class="p">:</span> <span class="n">continuation</span><span class="o">.</span><span class="n">logical_box_ids</span><span class="p">,</span>
+            <span class="s2">"lanes"</span><span class="p">:</span> <span class="n">continuation</span><span class="o">.</span><span class="n">lanes</span><span class="p">,</span>
         <span class="p">}</span>
     <span class="n">session</span> <span class="o">=</span> <span class="n">setup_resident_session</span><span class="p">(</span>
         <span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="p">,</span> <span class="n">environment</span><span class="p">,</span> <span class="n">target_device</span><span class="p">,</span> <span class="o">**</span><span class="n">setup_kwargs</span>
@@ -17754,8 +17754,8 @@ are invalid, or the device does not exactly match.</p>
     <span class="kn">import</span><span class="w"> </span><span class="nn">warp</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">wp</span>
 
     <span class="n">restored_gas</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">session</span><span class="o">.</span><span class="n">gas</span><span class="p">)</span>
-    <span class="n">restored_gas</span><span class="o">.</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;gas&quot;</span><span class="p">,</span> <span class="s2">&quot;vapor_pressure&quot;</span><span class="p">))</span>
-    <span class="n">restored_gas</span><span class="o">.</span><span class="n">partitioning</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;gas&quot;</span><span class="p">,</span> <span class="s2">&quot;partitioning&quot;</span><span class="p">))</span>
+    <span class="n">restored_gas</span><span class="o">.</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"gas"</span><span class="p">,</span> <span class="s2">"vapor_pressure"</span><span class="p">))</span>
+    <span class="n">restored_gas</span><span class="o">.</span><span class="n">partitioning</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">unpack</span><span class="p">(</span><span class="s2">"gas"</span><span class="p">,</span> <span class="s2">"partitioning"</span><span class="p">))</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution</span><span class="w"> </span><span class="kn">import</span> <span class="n">gpu_resources</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.gpu_resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPUResourceRegistry</span>
 
@@ -17783,8 +17783,8 @@ are invalid, or the device does not exactly match.</p>
         <span class="p">}</span>
         <span class="n">manifests</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
             <span class="p">{</span>
-                <span class="s2">&quot;communication_gas&quot;</span><span class="p">:</span> <span class="n">gpu_resources</span><span class="o">.</span><span class="n">_GAS_COMMUNICATION</span><span class="p">,</span>
-                <span class="s2">&quot;communication_particles&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">"communication_gas"</span><span class="p">:</span> <span class="n">gpu_resources</span><span class="o">.</span><span class="n">_GAS_COMMUNICATION</span><span class="p">,</span>
+                <span class="s2">"communication_particles"</span><span class="p">:</span> <span class="p">(</span>
                     <span class="n">gpu_resources</span><span class="o">.</span><span class="n">_PARTICLE_COMMUNICATION</span>
                 <span class="p">),</span>
             <span class="p">}</span>
@@ -17793,7 +17793,7 @@ are invalid, or the device does not exactly match.</p>
         <span class="n">final_volumes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">capacities</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">resource_payloads</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;final_volumes&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">"final_volumes"</span><span class="p">:</span>
                 <span class="n">final_volumes</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">family</span><span class="p">]</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
                     <span class="n">unpack</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">family</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">role</span><span class="p">),</span>
                     <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -17802,42 +17802,42 @@ are invalid, or the device does not exactly match.</p>
                 <span class="n">capacities</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">family</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">capacity</span>
                 <span class="k">continue</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">family</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">role</span><span class="p">)</span>
-            <span class="n">dtype</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;&lt;f8&quot;</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">&quot;&lt;i4&quot;</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="s2">&quot;&lt;u4&quot;</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">uint32</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"&lt;f8"</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">"&lt;i4"</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="s2">"&lt;u4"</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">uint32</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">str</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;checkpoint resource dtype is invalid.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"checkpoint resource dtype is invalid."</span><span class="p">)</span>
             <span class="n">grouped</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">family</span><span class="p">,</span> <span class="p">{})[</span><span class="n">item</span><span class="o">.</span><span class="n">role</span><span class="p">]</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
                 <span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">target_device</span><span class="o">.</span><span class="n">native</span>
             <span class="p">)</span>
             <span class="n">capacities</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">family</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">capacity</span>
-        <span class="k">if</span> <span class="s2">&quot;coagulation&quot;</span> <span class="ow">in</span> <span class="n">rng_values</span><span class="p">:</span>
-            <span class="n">grouped</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;coagulation&quot;</span><span class="p">,</span> <span class="p">{})[</span><span class="s2">&quot;rng_states&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng_values</span><span class="p">[</span>
-                <span class="s2">&quot;coagulation&quot;</span>
+        <span class="k">if</span> <span class="s2">"coagulation"</span> <span class="ow">in</span> <span class="n">rng_values</span><span class="p">:</span>
+            <span class="n">grouped</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"coagulation"</span><span class="p">,</span> <span class="p">{})[</span><span class="s2">"rng_states"</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng_values</span><span class="p">[</span>
+                <span class="s2">"coagulation"</span>
             <span class="p">]</span>
-        <span class="k">if</span> <span class="s2">&quot;wall_loss&quot;</span> <span class="ow">in</span> <span class="n">rng_values</span><span class="p">:</span>
-            <span class="n">grouped</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;wall_loss&quot;</span><span class="p">,</span> <span class="p">{})[</span><span class="s2">&quot;rng_states&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng_values</span><span class="p">[</span>
-                <span class="s2">&quot;wall_loss&quot;</span>
+        <span class="k">if</span> <span class="s2">"wall_loss"</span> <span class="ow">in</span> <span class="n">rng_values</span><span class="p">:</span>
+            <span class="n">grouped</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"wall_loss"</span><span class="p">,</span> <span class="p">{})[</span><span class="s2">"rng_states"</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng_values</span><span class="p">[</span>
+                <span class="s2">"wall_loss"</span>
             <span class="p">]</span>
         <span class="k">for</span> <span class="n">family</span><span class="p">,</span> <span class="n">bindings</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">manifest</span> <span class="o">=</span> <span class="n">manifests</span><span class="p">[</span><span class="n">family</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">bindings</span><span class="p">)</span> <span class="o">!=</span> <span class="p">{</span><span class="n">entry</span><span class="o">.</span><span class="n">role</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">manifest</span><span class="o">.</span><span class="n">entries</span><span class="p">}:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;checkpoint resource payloads are incomplete.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"checkpoint resource payloads are incomplete."</span><span class="p">)</span>
             <span class="n">registry</span><span class="o">.</span><span class="n">_acquire</span><span class="p">(</span><span class="n">manifest</span><span class="p">,</span> <span class="n">bindings</span><span class="p">,</span> <span class="n">capacities</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">family</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">&quot;condensation&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"condensation"</span><span class="p">:</span>
                 <span class="n">registry</span><span class="o">.</span><span class="n">acquire_condensation</span><span class="p">()</span>
-            <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">&quot;coagulation&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"coagulation"</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">capacities</span><span class="p">[</span><span class="n">family</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;coagulation checkpoint lacks capacity.&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"coagulation checkpoint lacks capacity."</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">family</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">restored_processes</span><span class="p">:</span>
                     <span class="n">registry</span><span class="o">.</span><span class="n">acquire_coagulation</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">capacities</span><span class="p">[</span><span class="n">family</span><span class="p">]))</span>
-            <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">&quot;wall_loss&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"wall_loss"</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">family</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">restored_processes</span><span class="p">:</span>
                     <span class="n">registry</span><span class="o">.</span><span class="n">acquire_wall_loss</span><span class="p">()</span>
-            <span class="k">elif</span> <span class="n">family</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;communication_gas&quot;</span><span class="p">,</span> <span class="s2">&quot;communication_particles&quot;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="n">family</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"communication_gas"</span><span class="p">,</span> <span class="s2">"communication_particles"</span><span class="p">):</span>
                 <span class="n">metadata</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="o">.</span><span class="n">communication</span>
                 <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;communication checkpoint lacks metadata.&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"communication checkpoint lacks metadata."</span><span class="p">)</span>
                 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.communication</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
                     <span class="n">CommunicationConfiguration</span><span class="p">,</span>
                     <span class="n">CommunicationMap</span><span class="p">,</span>
@@ -17847,20 +17847,20 @@ are invalid, or the device does not exactly match.</p>
                 <span class="p">)</span>
 
                 <span class="n">mode</span> <span class="o">=</span> <span class="n">CommunicationTransportMode</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">family</span> <span class="o">==</span> <span class="s2">&quot;communication_gas&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">family</span> <span class="o">==</span> <span class="s2">"communication_gas"</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span>
                     <span class="n">mode</span> <span class="ow">is</span> <span class="n">CommunicationTransportMode</span><span class="o">.</span><span class="n">GAS</span>
                 <span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;communication checkpoint mode is invalid.&quot;</span>
+                        <span class="s2">"communication checkpoint mode is invalid."</span>
                     <span class="p">)</span>
                 <span class="n">map_data</span> <span class="o">=</span> <span class="n">CommunicationMap</span><span class="p">(</span>
                     <span class="n">CommunicationMapForm</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">form</span><span class="p">),</span>
                     <span class="n">mode</span><span class="p">,</span>
                     <span class="n">metadata</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">,</span>
-                    <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;source_boxes&quot;</span><span class="p">],</span>
-                    <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;destination_boxes&quot;</span><span class="p">],</span>
-                    <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">],</span>
-                    <span class="n">bindings</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">],</span>
+                    <span class="n">bindings</span><span class="p">[</span><span class="s2">"source_boxes"</span><span class="p">],</span>
+                    <span class="n">bindings</span><span class="p">[</span><span class="s2">"destination_boxes"</span><span class="p">],</span>
+                    <span class="n">bindings</span><span class="p">[</span><span class="s2">"enabled"</span><span class="p">],</span>
+                    <span class="n">bindings</span><span class="p">[</span><span class="s2">"rates"</span><span class="p">],</span>
                 <span class="p">)</span>
                 <span class="n">registry</span><span class="o">.</span><span class="n">acquire_communication</span><span class="p">(</span>
                     <span class="n">CommunicationConfiguration</span><span class="p">(</span>

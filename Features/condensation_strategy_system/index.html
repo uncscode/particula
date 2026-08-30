@@ -17022,7 +17022,7 @@ It operates on an <code>Aerosol</code>, delegates to the configured strategy, sp
     <span class="n">wall_loss_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
         <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">workflow</span> <span class="o">=</span> <span class="n">condensation</span> <span class="o">|</span> <span class="n">wall_loss</span>
@@ -17110,7 +17110,7 @@ reduce lag. Radii are clamped and Δp is sanitized before computing dm/dt.</p>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span>
+    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
     <span class="n">shuffle_each_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">random_state</span><span class="o">=</span><span class="mi">1234</span><span class="p">,</span>
@@ -17131,20 +17131,20 @@ reduce lag. Radii are clamped and Δp is sanitized before computing dm/dt.</p>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="n">half</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
-    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">&quot;half&quot;</span><span class="p">,</span>
+    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">"half"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">batch</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
-    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span>
+    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">"batch"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
     <span class="n">shuffle_each_step</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># deterministic ordering</span>
 <span class="p">)</span>
 
 <span class="n">rand</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
-    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span>
+    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
     <span class="n">random_state</span><span class="o">=</span><span class="mi">2024</span><span class="p">,</span>
 <span class="p">)</span>
@@ -17165,8 +17165,8 @@ factory entry points are available from both import surfaces:</p>
 
 <span class="n">iso</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.018</span><span class="p">,</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">2.1e-5</span><span class="p">,</span> <span class="s2">&quot;m^2/s&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.018</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">2.1e-5</span><span class="p">,</span> <span class="s2">"m^2/s"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_accommodation_coefficient</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -17174,10 +17174,10 @@ factory entry points are available from both import surfaces:</p>
 
 <span class="n">staggered</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggeredBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.018</span><span class="p">,</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">2e-5</span><span class="p">,</span> <span class="s2">&quot;m^2/s&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.018</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">2e-5</span><span class="p">,</span> <span class="s2">"m^2/s"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_accommodation_coefficient</span><span class="p">(</span><span class="mf">0.95</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_theta_mode</span><span class="p">(</span><span class="s2">&quot;batch&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_theta_mode</span><span class="p">(</span><span class="s2">"batch"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_num_batches</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_shuffle_each_step</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_random_state</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
@@ -17189,8 +17189,8 @@ factory entry points are available from both import surfaces:</p>
 
 <span class="n">latent</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationLatentHeatBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.018</span><span class="p">,</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">2e-5</span><span class="p">,</span> <span class="s2">&quot;m^2/s&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.018</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">2e-5</span><span class="p">,</span> <span class="s2">"m^2/s"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_accommodation_coefficient</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_latent_heat_strategy</span><span class="p">(</span><span class="n">latent_strategy</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
@@ -17199,33 +17199,33 @@ factory entry points are available from both import surfaces:</p>
 
 <span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationFactory</span><span class="p">()</span>
 <span class="n">latent_factory_with_strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">,</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"latent_heat"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="mf">0.018</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="mf">2e-5</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-        <span class="s2">&quot;latent_heat_strategy&quot;</span><span class="p">:</span> <span class="n">latent_strategy</span><span class="p">,</span>
-        <span class="s2">&quot;update_gases&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="mf">0.018</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="mf">2e-5</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">"latent_heat_strategy"</span><span class="p">:</span> <span class="n">latent_strategy</span><span class="p">,</span>
+        <span class="s2">"update_gases"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 
 <span class="n">iso_factory</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;isothermal&quot;</span><span class="p">,</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"isothermal"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="mf">0.018</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="mf">2e-5</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-        <span class="s2">&quot;update_gases&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="mf">0.018</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="mf">2e-5</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">"update_gases"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 <span class="n">latent_factory</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">,</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"latent_heat"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="mf">0.018</span><span class="p">,</span>
-        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="mf">2e-5</span><span class="p">,</span>
-        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-        <span class="s2">&quot;latent_heat&quot;</span><span class="p">:</span> <span class="mf">2.4e6</span><span class="p">,</span>
-        <span class="s2">&quot;update_gases&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="mf">0.018</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="mf">2e-5</span><span class="p">,</span>
+        <span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">"latent_heat"</span><span class="p">:</span> <span class="mf">2.4e6</span><span class="p">,</span>
+        <span class="s2">"update_gases"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -17258,7 +17258,7 @@ without touching others; combine with <code>update_gases</code> to control deple
     <span class="n">molar_mass</span><span class="o">=</span><span class="p">[</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.046</span><span class="p">],</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="p">[</span><span class="mf">2e-5</span><span class="p">,</span> <span class="mf">1.2e-5</span><span class="p">],</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span>
-    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span>
+    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">"batch"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
     <span class="n">shuffle_each_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
@@ -17277,7 +17277,7 @@ with other processes.</p>
 <div class="highlight"><pre><span></span><code><span class="n">cond</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span><span class="n">condensation_strategy</span><span class="o">=</span><span class="n">iso</span><span class="p">)</span>
 <span class="n">coag</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
     <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">workflow</span> <span class="o">=</span> <span class="n">cond</span> <span class="o">|</span> <span class="n">coag</span> <span class="o">|</span> <span class="n">wall_loss</span>
@@ -17325,7 +17325,7 @@ with other processes.</p>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">&quot;half&quot;</span><span class="p">,</span>
+    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">"half"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">staggered</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
@@ -17347,8 +17347,8 @@ with other processes.</p>
 <h3 id="1-configure-via-builder">1. Configure via builder<a class="headerlink" href="#1-configure-via-builder" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="n">condensation</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">1.5e-5</span><span class="p">,</span> <span class="s2">&quot;m^2/s&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">1.5e-5</span><span class="p">,</span> <span class="s2">"m^2/s"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_accommodation_coefficient</span><span class="p">(</span><span class="mf">0.85</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -17360,7 +17360,7 @@ with other processes.</p>
     <span class="n">wall_loss_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
         <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">workflow</span> <span class="o">=</span> <span class="n">cond</span> <span class="o">|</span> <span class="n">wall</span>
@@ -17372,7 +17372,7 @@ with other processes.</p>
     <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.018</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">2e-5</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_accommodation_coefficient</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_theta_mode</span><span class="p">(</span><span class="s2">&quot;batch&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_theta_mode</span><span class="p">(</span><span class="s2">"batch"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_num_batches</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_shuffle_each_step</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -17407,7 +17407,7 @@ dominate.</p>
 <code>"batch"</code> and multiple batches to spread updates and reduce lag.</p>
 <div class="highlight"><pre><span></span><code><span class="n">stable</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
-    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span>
+    <span class="n">theta_mode</span><span class="o">=</span><span class="s2">"batch"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
     <span class="n">shuffle_each_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
@@ -17638,9 +17638,9 @@ pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_graph_cap
 pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_autodiff_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 
 <span class="c1"># Optional CUDA selections; unavailable CUDA must skip cleanly.</span>
-pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
-pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_graph_capture_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
-pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_autodiff_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"warp and cuda"</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_graph_capture_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"warp and cuda"</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_autodiff_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"warp and cuda"</span><span class="w"> </span>-Werror
 </code></pre></div>
 <p>Warp-backed tests may skip when Warp is missing. CUDA evidence is optional when
 CUDA is unavailable; a skip is not GPU execution. P3's CPU skip and narrowly

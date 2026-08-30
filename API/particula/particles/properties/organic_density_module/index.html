@@ -16230,7 +16230,7 @@ the input arrays.</li>
     <span class="n">nitrogen2carbon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">mass_ratio_convert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Vectorised wrapper around ``get_organic_density_estimate``.</span>
+<span class="w">    </span><span class="sd">"""Vectorised wrapper around ``get_organic_density_estimate``.</span>
 
 <span class="sd">    Applies the Girolami density estimate element-wise to one-dimensional NumPy</span>
 <span class="sd">    arrays or lists of molecular properties.</span>
@@ -16249,7 +16249,7 @@ the input arrays.</li>
 <span class="sd">          the input arrays.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Batch calculation&quot;</span>
+<span class="sd">        ```py title="Batch calculation"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        from particula.particles import (</span>
 <span class="sd">            get_organic_density_array,</span>
@@ -16267,7 +16267,7 @@ the input arrays.</li>
 <span class="sd">    - G. S. Girolami, “A Simple ‘Back of the Envelope’ Method for Estimating</span>
 <span class="sd">        the Densities and Molecular Volumes of Liquids and Solids,” *J. Chem.</span>
 <span class="sd">        Educ.*, 71 (11), 962 (1994).  DOI:10.1021/ed071p962</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">mm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">oc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">hc</span> <span class="o">=</span> <span class="p">(</span>
@@ -16501,7 +16501,7 @@ ratio to molar mass using
     <span class="n">nitrogen2carbon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">mass_ratio_convert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate the density of an organic molecule via the Girolami method.</span>
+<span class="w">    </span><span class="sd">"""Estimate the density of an organic molecule via the Girolami method.</span>
 
 <span class="sd">    The original paper proposes an empirical two-step approach:</span>
 
@@ -16531,7 +16531,7 @@ ratio to molar mass using
 <span class="sd">        - Estimated density of the compound in kg m⁻³.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Single compound&quot;</span>
+<span class="sd">        ```py title="Single compound"</span>
 <span class="sd">        from particula.particles import (</span>
 <span class="sd">            get_organic_density_estimate,</span>
 <span class="sd">        )</span>
@@ -16546,7 +16546,7 @@ ratio to molar mass using
 <span class="sd">    - G. S. Girolami, “A Simple ‘Back of the Envelope’ Method for Estimating</span>
 <span class="sd">        the Densities and Molecular Volumes of Liquids and Solids,” *J. Chem.</span>
 <span class="sd">        Educ.*, 71 (11), 962 (1994).  DOI:10.1021/ed071p962</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">nitrogen2carbon</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">nitrogen2carbon</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">hydrogen2carbon</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

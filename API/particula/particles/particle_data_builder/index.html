@@ -16233,9 +16233,9 @@ from particula.particles import ParticleDataBuilder
 
 data = (
     ParticleDataBuilder()
-    .set_masses(np.array([[1e-18, 2e-18]]), units=&quot;kg&quot;)
-    .set_density(np.array([1000.0, 1200.0]), units=&quot;kg/m^3&quot;)
-    .set_concentration(np.array([1.0]), units=&quot;1/m^3&quot;)
+    .set_masses(np.array([[1e-18, 2e-18]]), units="kg")
+    .set_density(np.array([1000.0, 1200.0]), units="kg/m^3")
+    .set_concentration(np.array([1.0]), units="1/m^3")
     .set_charge(np.array([0.0]))
     .build()
 )
@@ -16246,7 +16246,7 @@ data = (
     .set_n_boxes(2)
     .set_n_particles(3)
     .set_n_species(1)
-    .set_density(np.array([1500.0]), units=&quot;kg/m^3&quot;)
+    .set_density(np.array([1500.0]), units="kg/m^3")
     .build()
 )
 </code></pre></div>
@@ -16313,7 +16313,7 @@ available when counts are supplied instead of masses.</p>
 <span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize empty builder state.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize empty builder state."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_masses</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_concentration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_charge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -16452,14 +16452,14 @@ available when counts are supplied instead of masses.</p>
 <span class="normal">332</span>
 <span class="normal">333</span>
 <span class="normal">334</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct a ``ParticleData`` instance with validation.</span>
+<span class="w">    </span><span class="sd">"""Construct a ``ParticleData`` instance with validation.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A validated ``ParticleData`` object.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: When required fields are missing or shapes mismatch.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_masses</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_counts</span><span class="p">()</span>
         <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_counts</span><span class="p">()</span>
@@ -16473,15 +16473,15 @@ available when counts are supplied instead of masses.</p>
         <span class="n">masses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_masses</span>
         <span class="k">if</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;masses shape mismatch for provided counts and batches&quot;</span>
+                <span class="s2">"masses shape mismatch for provided counts and batches"</span>
             <span class="p">)</span>
 
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_density</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;density is required&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"density is required"</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_density</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_species</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;density length must match number of species from masses&quot;</span>
+            <span class="s2">"density length must match number of species from masses"</span>
         <span class="p">)</span>
     <span class="n">density</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_density</span>
 
@@ -16492,7 +16492,7 @@ available when counts are supplied instead of masses.</p>
         <span class="n">conc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_broadcast_if_needed</span><span class="p">(</span>
             <span class="n">conc</span><span class="p">,</span>
             <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span>
-            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;concentration&quot;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">"concentration"</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="n">charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_charge</span>
@@ -16500,7 +16500,7 @@ available when counts are supplied instead of masses.</p>
         <span class="n">charge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_broadcast_if_needed</span><span class="p">(</span>
-            <span class="n">charge</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;charge&quot;</span>
+            <span class="n">charge</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"charge"</span>
         <span class="p">)</span>
 
     <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_volume</span>
@@ -16508,7 +16508,7 @@ available when counts are supplied instead of masses.</p>
         <span class="n">volume</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_broadcast_if_needed</span><span class="p">(</span>
-            <span class="n">volume</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;volume&quot;</span>
+            <span class="n">volume</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"volume"</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ParticleData</span><span class="p">(</span>
@@ -16532,7 +16532,7 @@ available when counts are supplied instead of masses.</p>
 
 
 <a href="#particula.particles.particle_data_builder.ParticleDataBuilder.set_charge" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_charge</span><span class="p">(</span><span class="n">charge</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;ParticleDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_charge</span><span class="p">(</span><span class="n">charge</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">'ParticleDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16600,8 +16600,8 @@ available when counts are supplied instead of masses.</p>
 <span class="normal">141</span>
 <span class="normal">142</span>
 <span class="normal">143</span>
-<span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">charge</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;ParticleDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set particle charge (unitless) with batch handling.</span>
+<span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">charge</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"ParticleDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set particle charge (unitless) with batch handling.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        charge: Charge array shaped (n_boxes, n_particles) or</span>
@@ -16612,12 +16612,12 @@ available when counts are supplied instead of masses.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: When charge is not 1D or 2D.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">charge_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">charge_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">charge_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">charge_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">charge_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;charge must be 1D or 2D&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"charge must be 1D or 2D"</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_charge</span> <span class="o">=</span> <span class="n">charge_array</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -16635,7 +16635,7 @@ available when counts are supplied instead of masses.</p>
 
 
 <a href="#particula.particles.particle_data_builder.ParticleDataBuilder.set_concentration" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_concentration</span><span class="p">(</span><span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;1/m^3&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ParticleDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_concentration</span><span class="p">(</span><span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'1/m^3'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'ParticleDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16724,9 +16724,9 @@ or (n_particles,).</p>
 <span class="normal">120</span>
 <span class="normal">121</span>
 <span class="normal">122</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_concentration</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1/m^3&quot;</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ParticleDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set number concentration with optional unit conversion.</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"1/m^3"</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ParticleDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set number concentration with optional unit conversion.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        concentration: Concentration array shaped (n_boxes, n_particles)</span>
@@ -16739,16 +16739,16 @@ or (n_particles,).</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: When concentration is not 1D or 2D.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">concentration_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">concentration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">concentration_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">concentration_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">concentration_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">concentration_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;concentration must be 1D or 2D&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"concentration must be 1D or 2D"</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">&quot;1/m^3&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">"1/m^3"</span><span class="p">:</span>
         <span class="n">concentration_array</span> <span class="o">=</span> <span class="n">concentration_array</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
-            <span class="n">units</span><span class="p">,</span> <span class="s2">&quot;1/m^3&quot;</span>
+            <span class="n">units</span><span class="p">,</span> <span class="s2">"1/m^3"</span>
         <span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_concentration</span> <span class="o">=</span> <span class="n">concentration_array</span>
@@ -16767,7 +16767,7 @@ or (n_particles,).</p>
 
 
 <a href="#particula.particles.particle_data_builder.ParticleDataBuilder.set_density" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_density</span><span class="p">(</span><span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;kg/m^3&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ParticleDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_density</span><span class="p">(</span><span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'kg/m^3'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'ParticleDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16848,9 +16848,9 @@ or (n_particles,).</p>
 <span class="normal">167</span>
 <span class="normal">168</span>
 <span class="normal">169</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_density</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;kg/m^3&quot;</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ParticleDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set species densities with optional unit conversion.</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"kg/m^3"</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ParticleDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set species densities with optional unit conversion.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        density: Density array shaped (n_species,).</span>
@@ -16861,13 +16861,13 @@ or (n_particles,).</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: When density is not 1D.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">density_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">density_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;density must be 1D&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"density must be 1D"</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">:</span>
-        <span class="n">density_array</span> <span class="o">=</span> <span class="n">density_array</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">"kg/m^3"</span><span class="p">:</span>
+        <span class="n">density_array</span> <span class="o">=</span> <span class="n">density_array</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_density</span> <span class="o">=</span> <span class="n">density_array</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -16885,7 +16885,7 @@ or (n_particles,).</p>
 
 
 <a href="#particula.particles.particle_data_builder.ParticleDataBuilder.set_masses" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_masses</span><span class="p">(</span><span class="n">masses</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;kg&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ParticleDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_masses</span><span class="p">(</span><span class="n">masses</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'kg'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'ParticleDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16970,9 +16970,9 @@ or (n_particles,).</p>
 <span class="normal">89</span>
 <span class="normal">90</span>
 <span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_masses</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">masses</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;kg&quot;</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ParticleDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set per-species masses with optional unit conversion.</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">masses</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"kg"</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ParticleDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set per-species masses with optional unit conversion.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        masses: Mass array shaped (n_boxes, n_particles, n_species) or</span>
@@ -16984,15 +16984,15 @@ or (n_particles,).</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: When masses are not 2D or 3D.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">masses_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">masses</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">masses_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">masses_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">masses_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">masses_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;masses must be 2D or 3D&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"masses must be 2D or 3D"</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">&quot;kg&quot;</span><span class="p">:</span>
-        <span class="n">masses_array</span> <span class="o">=</span> <span class="n">masses_array</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="s2">&quot;kg&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">"kg"</span><span class="p">:</span>
+        <span class="n">masses_array</span> <span class="o">=</span> <span class="n">masses_array</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="s2">"kg"</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_masses</span> <span class="o">=</span> <span class="n">masses_array</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -17010,7 +17010,7 @@ or (n_particles,).</p>
 
 
 <a href="#particula.particles.particle_data_builder.ParticleDataBuilder.set_n_boxes" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_n_boxes</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ParticleDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_n_boxes</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'ParticleDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17023,8 +17023,8 @@ or (n_particles,).</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">198</span>
 <span class="normal">199</span>
 <span class="normal">200</span>
-<span class="normal">201</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_n_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ParticleDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set number of boxes for zero-init or shape validation.&quot;&quot;&quot;</span>
+<span class="normal">201</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_n_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ParticleDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set number of boxes for zero-init or shape validation."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_n_boxes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17041,7 +17041,7 @@ or (n_particles,).</p>
 
 
 <a href="#particula.particles.particle_data_builder.ParticleDataBuilder.set_n_particles" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_n_particles</span><span class="p">(</span><span class="n">n_particles</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ParticleDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_n_particles</span><span class="p">(</span><span class="n">n_particles</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'ParticleDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17054,8 +17054,8 @@ or (n_particles,).</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">203</span>
 <span class="normal">204</span>
 <span class="normal">205</span>
-<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_n_particles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ParticleDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set number of particles for zero-init or shape validation.&quot;&quot;&quot;</span>
+<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_n_particles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ParticleDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set number of particles for zero-init or shape validation."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_n_particles</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_particles</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17072,7 +17072,7 @@ or (n_particles,).</p>
 
 
 <a href="#particula.particles.particle_data_builder.ParticleDataBuilder.set_n_species" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_n_species</span><span class="p">(</span><span class="n">n_species</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ParticleDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_n_species</span><span class="p">(</span><span class="n">n_species</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'ParticleDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17085,8 +17085,8 @@ or (n_particles,).</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">208</span>
 <span class="normal">209</span>
 <span class="normal">210</span>
-<span class="normal">211</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_n_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_species</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ParticleDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set number of species for zero-init or shape validation.&quot;&quot;&quot;</span>
+<span class="normal">211</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_n_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_species</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ParticleDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set number of species for zero-init or shape validation."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_n_species</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_species</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17103,7 +17103,7 @@ or (n_particles,).</p>
 
 
 <a href="#particula.particles.particle_data_builder.ParticleDataBuilder.set_volume" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_volume</span><span class="p">(</span><span class="n">volume</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;m^3&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ParticleDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_volume</span><span class="p">(</span><span class="n">volume</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'m^3'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'ParticleDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17186,9 +17186,9 @@ or (n_particles,).</p>
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_volume</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">volume</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;m^3&quot;</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ParticleDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set per-box volume with optional unit conversion.</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">volume</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"m^3"</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ParticleDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set per-box volume with optional unit conversion.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        volume: Volume scalar or array shaped (n_boxes,).</span>
@@ -17199,15 +17199,15 @@ or (n_particles,).</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: When volume is neither scalar nor 1D.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">volume_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">volume_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">volume_array</span> <span class="o">=</span> <span class="n">volume_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">volume_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;volume must be scalar or 1D&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"volume must be scalar or 1D"</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">&quot;m^3&quot;</span><span class="p">:</span>
-        <span class="n">volume_array</span> <span class="o">=</span> <span class="n">volume_array</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="s2">&quot;m^3&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">"m^3"</span><span class="p">:</span>
+        <span class="n">volume_array</span> <span class="o">=</span> <span class="n">volume_array</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="s2">"m^3"</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_volume</span> <span class="o">=</span> <span class="n">volume_array</span>
     <span class="k">return</span> <span class="bp">self</span>

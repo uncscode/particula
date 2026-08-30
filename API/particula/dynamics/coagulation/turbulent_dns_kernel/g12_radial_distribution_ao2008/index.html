@@ -16276,13 +16276,13 @@ The equation is:</p>
 <span class="normal">116</span>
 <span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;stokes_number&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kolmogorov_length_scale&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;reynolds_lambda&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;normalized_accel_variance&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kolmogorov_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kolmogorov_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"stokes_number"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"kolmogorov_length_scale"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"reynolds_lambda"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"normalized_accel_variance"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"kolmogorov_velocity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"kolmogorov_time"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_g12_radial_distribution_ao2008</span><span class="p">(</span>
@@ -16295,7 +16295,7 @@ The equation is:</p>
     <span class="n">kolmogorov_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
     <span class="c1"># pylint: disable=too-many-arguments, too-many-positional-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the radial distribution function g₁₂ for particles in a</span>
+<span class="w">    </span><span class="sd">"""Compute the radial distribution function g₁₂ for particles in a</span>
 <span class="sd">    turbulent flow.</span>
 
 <span class="sd">    This function describes the clustering of particles in a turbulent flow.</span>
@@ -16323,7 +16323,7 @@ The equation is:</p>
 <span class="sd">        - The radial distribution function g₁₂ (dimensionless).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ```py title="Example Usage"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        from particula.dynamics.coagulation.turbulent_dns_kernel</span>
 <span class="sd">            .g12_radial_distribution_ao2008 import (</span>
@@ -16349,7 +16349,7 @@ The equation is:</p>
 <span class="sd">          the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">          Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">          https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">collision_radius</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">particle_radius</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">particle_radius</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
     <span class="p">)</span>

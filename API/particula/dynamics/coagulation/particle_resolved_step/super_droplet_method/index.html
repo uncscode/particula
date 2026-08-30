@@ -16438,7 +16438,7 @@ r_new, c_new = get_super_droplet_coagulation_step(
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">random_generator</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Carry out one time-step of super-droplet-based coagulation.</span>
+<span class="w">    </span><span class="sd">"""Carry out one time-step of super-droplet-based coagulation.</span>
 
 <span class="sd">    This function sorts particles by radius, bins them, and then stochastically</span>
 <span class="sd">    computes collision events according to the coagulation kernel. It updates</span>
@@ -16474,11 +16474,11 @@ r_new, c_new = get_super_droplet_coagulation_step(
 <span class="sd">        # coagulation step.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - E. W. Tedford and L. A. Perugini, &quot;Superdroplet method</span>
-<span class="sd">          in cloud microphysics simulations,&quot; J. Atmos. Sci., 2020.</span>
+<span class="sd">        - E. W. Tedford and L. A. Perugini, "Superdroplet method</span>
+<span class="sd">          in cloud microphysics simulations," J. Atmos. Sci., 2020.</span>
 <span class="sd">        - Seinfeld, J. H., &amp; Pandis, S. N. *Atmospheric Chemistry and Physics*,</span>
 <span class="sd">          Wiley, 2016.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Sort particles by size and obtain indices to revert sorting later</span>
     <span class="n">unsort_indices</span><span class="p">,</span> <span class="n">sorted_radius</span><span class="p">,</span> <span class="n">sorted_concentration</span> <span class="o">=</span> <span class="n">_sort_particles</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
@@ -16513,7 +16513,7 @@ r_new, c_new = get_super_droplet_coagulation_step(
     <span class="c1"># coagulation events</span>
     <span class="k">for</span> <span class="n">lower_bin</span><span class="p">,</span> <span class="n">upper_bin</span> <span class="ow">in</span> <span class="n">pair_indices</span><span class="p">:</span>
         <span class="c1"># Step 7.1: Retrieve the maximum kernel value for the current bin pair</span>
-        <span class="c1"># Note: The &#39;+1&#39; indexing assumes that &#39;kernel&#39; has dimensions</span>
+        <span class="c1"># Note: The '+1' indexing assumes that 'kernel' has dimensions</span>
         <span class="c1"># accommodating this offset due to bin edges</span>
         <span class="n">kernel_max</span> <span class="o">=</span> <span class="n">kernel</span><span class="p">[</span><span class="n">lower_bin</span><span class="p">,</span> <span class="n">upper_bin</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
 
@@ -16790,7 +16790,7 @@ are considered valid.</p>
     <span class="n">bin_indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
     <span class="n">generator</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Select valid particle indices in two bins for coagulation events.</span>
+<span class="w">    </span><span class="sd">"""Select valid particle indices in two bins for coagulation events.</span>
 
 <span class="sd">    This function tries to choose `events` valid indices from</span>
 <span class="sd">    `lower_bin` and `upper_bin`, discarding any particles with radius ≤ 0.</span>
@@ -16820,7 +16820,7 @@ are considered valid.</p>
 <span class="sd">        # lw_bin -&gt; array of valid picks from bin 0</span>
 <span class="sd">        # up_bin -&gt; array of valid picks from bin 1</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># Directly find the indices where the condition is True</span>
         <span class="n">lower_indices</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>

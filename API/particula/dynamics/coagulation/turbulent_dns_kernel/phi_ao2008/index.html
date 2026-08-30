@@ -16318,10 +16318,10 @@ velocities (vₚ₁, vₚ₂) and inertia times (τₚ₁, τₚ₂). The equati
 <span class="normal">127</span>
 <span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;phi&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_inertia_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"alpha"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"phi"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"particle_inertia_time"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"particle_velocity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_phi_ao2008</span><span class="p">(</span>
@@ -16330,7 +16330,7 @@ velocities (vₚ₁, vₚ₂) and inertia times (τₚ₁, τₚ₂). The equati
     <span class="n">particle_inertia_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">particle_velocity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the function Φ(α, φ) for the given particle properties using</span>
+<span class="w">    </span><span class="sd">"""Compute the function Φ(α, φ) for the given particle properties using</span>
 <span class="sd">    Ayala et al. (2008).</span>
 
 <span class="sd">    This function calculates Φ(α, φ) when vₚ₁ &gt; vₚ₂ by considering the</span>
@@ -16386,7 +16386,7 @@ velocities (vₚ₁, vₚ₂) and inertia times (τₚ₁, τₚ₂). The equati
 <span class="sd">          the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">          Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">          https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># valid for v1 &gt; v2, in pairwise comparison</span>
     <span class="c1"># Type narrowing: ensure arrays for indexing operations</span>
     <span class="n">velocity_array</span> <span class="o">=</span> <span class="p">(</span>

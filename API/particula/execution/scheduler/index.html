@@ -16341,21 +16341,21 @@ complete P1 plan validation.</p>
 <span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate selection container and identifier syntax.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate selection container and identifier syntax."""</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enabled_node_ids</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">frozenset</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;EnabledNodeSelection.enabled_node_ids must be a frozenset.&quot;</span>
+            <span class="s2">"EnabledNodeSelection.enabled_node_ids must be a frozenset."</span>
         <span class="p">)</span>
     <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled_node_ids</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;EnabledNodeSelection.enabled_node_ids must contain only &quot;</span>
-                <span class="s2">&quot;str instances.&quot;</span>
+                <span class="s2">"EnabledNodeSelection.enabled_node_ids must contain only "</span>
+                <span class="s2">"str instances."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_NAME_PATTERN</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;EnabledNodeSelection.enabled_node_ids must contain valid &quot;</span>
-                <span class="s2">&quot;node IDs.&quot;</span>
+                <span class="s2">"EnabledNodeSelection.enabled_node_ids must contain valid "</span>
+                <span class="s2">"node IDs."</span>
             <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16526,7 +16526,7 @@ launch.</p>
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate canonical immutable schedule fields.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate canonical immutable schedule fields."""</span>
     <span class="n">_validate_schedule_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">_validate_schedule_content</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16629,14 +16629,14 @@ it cannot encode both directions or no direction.</p>
 <span class="normal">107</span>
 <span class="normal">108</span>
 <span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the single direction declaration.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate the single direction declaration."""</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nucleation_condensation_direction</span><span class="p">,</span>
         <span class="n">NucleationCondensationDirection</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;SchedulerProfile.nucleation_condensation_direction must be a &quot;</span>
-            <span class="s2">&quot;NucleationCondensationDirection.&quot;</span>
+            <span class="s2">"SchedulerProfile.nucleation_condensation_direction must be a "</span>
+            <span class="s2">"NucleationCondensationDirection."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16686,11 +16686,11 @@ schedule from entering the resident execution boundary.</p>
 <span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_resolver_produced_schedule</span><span class="p">(</span>
     <span class="n">schedule</span><span class="p">:</span> <span class="n">ResolvedTimestepSchedule</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">ResolvedProcessGraph</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return whether a schedule retains its exact resolver-produced graph.</span>
+<span class="w">    </span><span class="sd">"""Return whether a schedule retains its exact resolver-produced graph.</span>
 
 <span class="sd">    This internal provenance check prevents a structurally similar hand-built</span>
 <span class="sd">    schedule from entering the resident execution boundary.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">schedule</span><span class="o">.</span><span class="n">source_graph</span> <span class="ow">is</span> <span class="n">graph</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
         <span class="n">schedule</span> <span class="ow">is</span> <span class="n">registered</span> <span class="k">for</span> <span class="n">registered</span> <span class="ow">in</span> <span class="n">_RESOLVER_SCHEDULES</span>
     <span class="p">)</span>
@@ -16858,7 +16858,7 @@ required because resolution has no side effects.</p>
     <span class="n">selection</span><span class="p">:</span> <span class="n">EnabledNodeSelection</span><span class="p">,</span>
     <span class="n">profile</span><span class="p">:</span> <span class="n">SchedulerProfile</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedTimestepSchedule</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an immutable effective schedule without running any process.</span>
+<span class="w">    </span><span class="sd">"""Resolve an immutable effective schedule without running any process.</span>
 
 <span class="sd">    After exact carrier-type checks, complete P1 graph validation happens before</span>
 <span class="sd">    selection or profile inspection. This function then applies selected IDs,</span>
@@ -16879,7 +16879,7 @@ required because resolution has no side effects.</p>
 <span class="sd">        ValueError: If selection, direction, closure, or effective topology is</span>
 <span class="sd">            invalid. No input is mutated when resolution fails; no rollback is</span>
 <span class="sd">            required because resolution has no side effects.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_resolution_inputs</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">selection</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span>
     <span class="n">resolved</span> <span class="o">=</span> <span class="n">resolve_timestep_plan</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
     <span class="n">_validate_selected_ids</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">resolved</span><span class="p">)</span>

@@ -16182,9 +16182,9 @@
 <span class="normal">52</span>
 <span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_partial_pressure</span><span class="p">(</span>
@@ -16192,7 +16192,7 @@
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate partial pressure from concentration, molar mass, T.</span>
+<span class="w">    </span><span class="sd">"""Calculate partial pressure from concentration, molar mass, T.</span>
 
 <span class="sd">    - p = (c × R × T) / M</span>
 <span class="sd">        - p is Partial pressure [Pa].</span>
@@ -16210,16 +16210,16 @@
 <span class="sd">        - Partial pressure of the gas [Pa].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example usage&quot;</span>
+<span class="sd">        ```py title="Example usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_partial_pressure(1.2, 0.02897, 298)</span>
 <span class="sd">        # Output: ~986.4 Pa</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Wikipedia contributors, &quot;Ideal gas law,&quot; Wikipedia,</span>
+<span class="sd">        - Wikipedia contributors, "Ideal gas law," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Ideal_gas_law</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Calculate the partial pressure</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">concentration</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">GAS_CONSTANT</span><span class="p">)</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">)</span> <span class="o">/</span> <span class="n">molar_mass</span>
 </code></pre></div></td></tr></table></div>
@@ -16346,15 +16346,15 @@ pure vapor pressure.</p>
 <span class="normal">94</span>
 <span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;partial_pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;pure_vapor_pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"partial_pressure"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"pure_vapor_pressure"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_saturation_ratio_from_pressure</span><span class="p">(</span>
     <span class="n">partial_pressure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">pure_vapor_pressure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the saturation ratio of the gas at a given partial pressure and</span>
+<span class="w">    </span><span class="sd">"""Calculate the saturation ratio of the gas at a given partial pressure and</span>
 <span class="sd">    pure vapor pressure.</span>
 
 <span class="sd">    The saturation ratio is defined as the ratio of partial pressure to the</span>
@@ -16373,16 +16373,16 @@ pure vapor pressure.</p>
 <span class="sd">        - Saturation ratio of the gas (dimensionless).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example usage&quot;</span>
+<span class="sd">        ```py title="Example usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_saturation_ratio_from_pressure(800.0, 1000.0)</span>
 <span class="sd">        # Output: 0.8</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Wikipedia contributors, &quot;Relative humidity,&quot; Wikipedia,</span>
+<span class="sd">        - Wikipedia contributors, "Relative humidity," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Relative_humidity</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">partial_pressure</span> <span class="o">/</span> <span class="n">pure_vapor_pressure</span>
 </code></pre></div></td></tr></table></div>
             </details>

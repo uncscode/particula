@@ -16265,7 +16265,7 @@ index_phase_sep_end: Index where separation ends.</p>
 <span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">find_phase_sep_index</span><span class="p">(</span>
     <span class="n">activity_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detect phase separation using activity monotonicity and limits.</span>
+<span class="w">    </span><span class="sd">"""Detect phase separation using activity monotonicity and limits.</span>
 
 <span class="sd">    Identifies potential phase separation by checking for activities above one</span>
 <span class="sd">    and curvature inflections in the activity curve. Physical systems should</span>
@@ -16281,7 +16281,7 @@ index_phase_sep_end: Index where separation ends.</p>
 <span class="sd">            phase_sep_curve: 1 if curvature changes sign, else 0.</span>
 <span class="sd">            index_phase_sep_starts: Index where separation starts.</span>
 <span class="sd">            index_phase_sep_end: Index where separation ends.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">activity_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">activity_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
     <span class="c1"># Compute difference between consecutive elements in the array</span>
@@ -16349,10 +16349,10 @@ index_phase_sep_end: Index where separation ends.</p>
     <span class="c1"># Assign phase separation via activity based on data being greater than 1</span>
     <span class="n">phase_sep_activity</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">activity_data</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;phase_sep_activity&quot;</span><span class="p">:</span> <span class="n">phase_sep_activity</span><span class="p">,</span>
-        <span class="s2">&quot;phase_sep_curve&quot;</span><span class="p">:</span> <span class="n">phase_sep_curve</span><span class="p">,</span>
-        <span class="s2">&quot;index_phase_sep_starts&quot;</span><span class="p">:</span> <span class="n">index_phase_sep_starts</span><span class="p">,</span>
-        <span class="s2">&quot;index_phase_sep_end&quot;</span><span class="p">:</span> <span class="n">index_phase_sep_end</span><span class="p">,</span>
+        <span class="s2">"phase_sep_activity"</span><span class="p">:</span> <span class="n">phase_sep_activity</span><span class="p">,</span>
+        <span class="s2">"phase_sep_curve"</span><span class="p">:</span> <span class="n">phase_sep_curve</span><span class="p">,</span>
+        <span class="s2">"index_phase_sep_starts"</span><span class="p">:</span> <span class="n">index_phase_sep_starts</span><span class="p">,</span>
+        <span class="s2">"index_phase_sep_end"</span><span class="p">:</span> <span class="n">index_phase_sep_end</span><span class="p">,</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16518,7 +16518,7 @@ matching_upper_seperation: Water activity at the matched index.</p>
     <span class="n">activity_water</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">activity_org</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check for phase separation across water and organic activity curves.</span>
+<span class="w">    </span><span class="sd">"""Check for phase separation across water and organic activity curves.</span>
 
 <span class="sd">    Applies :func:`find_phase_sep_index` to both water and organic activities,</span>
 <span class="sd">    then combines the detected indices into a consolidated separation report.</span>
@@ -16539,7 +16539,7 @@ matching_upper_seperation: Water activity at the matched index.</p>
 <span class="sd">            lower_seperation: Water activity at lower separation index.</span>
 <span class="sd">            upper_seperation: Water activity at upper separation index.</span>
 <span class="sd">            matching_upper_seperation: Water activity at the matched index.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">activity_water_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">activity_water</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">activity_org_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">activity_org</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
@@ -16548,10 +16548,10 @@ matching_upper_seperation: Water activity at the matched index.</p>
 
     <span class="c1"># gather all the indexes into a list for easier access</span>
     <span class="n">indexes</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">water_sep</span><span class="p">[</span><span class="s2">&quot;index_phase_sep_starts&quot;</span><span class="p">],</span>
-        <span class="n">water_sep</span><span class="p">[</span><span class="s2">&quot;index_phase_sep_end&quot;</span><span class="p">],</span>
-        <span class="n">organic_sep</span><span class="p">[</span><span class="s2">&quot;index_phase_sep_starts&quot;</span><span class="p">],</span>
-        <span class="n">organic_sep</span><span class="p">[</span><span class="s2">&quot;index_phase_sep_end&quot;</span><span class="p">],</span>
+        <span class="n">water_sep</span><span class="p">[</span><span class="s2">"index_phase_sep_starts"</span><span class="p">],</span>
+        <span class="n">water_sep</span><span class="p">[</span><span class="s2">"index_phase_sep_end"</span><span class="p">],</span>
+        <span class="n">organic_sep</span><span class="p">[</span><span class="s2">"index_phase_sep_starts"</span><span class="p">],</span>
+        <span class="n">organic_sep</span><span class="p">[</span><span class="s2">"index_phase_sep_end"</span><span class="p">],</span>
     <span class="p">]</span>
 
     <span class="n">lower_seperation_index</span> <span class="o">=</span> <span class="mi">2</span>
@@ -16559,7 +16559,7 @@ matching_upper_seperation: Water activity at the matched index.</p>
     <span class="n">match_index_prime</span> <span class="o">=</span> <span class="mi">2</span>
 
     <span class="c1"># If there is a phase separation curve in the water activity data</span>
-    <span class="k">if</span> <span class="n">water_sep</span><span class="p">[</span><span class="s2">&quot;phase_sep_curve&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">water_sep</span><span class="p">[</span><span class="s2">"phase_sep_curve"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">phase_sep_check</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">activity_water_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">activity_water_arr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># increasing order</span>
@@ -16598,13 +16598,13 @@ matching_upper_seperation: Water activity at the matched index.</p>
     <span class="n">matching_upper_activity</span> <span class="o">=</span> <span class="n">activity_water_arr</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">match_index_prime</span><span class="p">)]</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;phase_sep_check&quot;</span><span class="p">:</span> <span class="n">phase_sep_check</span><span class="p">,</span>
-        <span class="s2">&quot;lower_seperation_index&quot;</span><span class="p">:</span> <span class="n">lower_seperation_index</span><span class="p">,</span>
-        <span class="s2">&quot;upper_seperation_index&quot;</span><span class="p">:</span> <span class="n">upper_seperation_index</span><span class="p">,</span>
-        <span class="s2">&quot;matching_upper_seperation_index&quot;</span><span class="p">:</span> <span class="n">match_index_prime</span><span class="p">,</span>
-        <span class="s2">&quot;lower_seperation&quot;</span><span class="p">:</span> <span class="n">lower_seperation_activity</span><span class="p">,</span>
-        <span class="s2">&quot;upper_seperation&quot;</span><span class="p">:</span> <span class="n">upper_seperation_activity</span><span class="p">,</span>
-        <span class="s2">&quot;matching_upper_seperation&quot;</span><span class="p">:</span> <span class="n">matching_upper_activity</span><span class="p">,</span>
+        <span class="s2">"phase_sep_check"</span><span class="p">:</span> <span class="n">phase_sep_check</span><span class="p">,</span>
+        <span class="s2">"lower_seperation_index"</span><span class="p">:</span> <span class="n">lower_seperation_index</span><span class="p">,</span>
+        <span class="s2">"upper_seperation_index"</span><span class="p">:</span> <span class="n">upper_seperation_index</span><span class="p">,</span>
+        <span class="s2">"matching_upper_seperation_index"</span><span class="p">:</span> <span class="n">match_index_prime</span><span class="p">,</span>
+        <span class="s2">"lower_seperation"</span><span class="p">:</span> <span class="n">lower_seperation_activity</span><span class="p">,</span>
+        <span class="s2">"upper_seperation"</span><span class="p">:</span> <span class="n">upper_seperation_activity</span><span class="p">,</span>
+        <span class="s2">"matching_upper_seperation"</span><span class="p">:</span> <span class="n">matching_upper_activity</span><span class="p">,</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16701,7 +16701,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="normal">63</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">organic_water_single_phase</span><span class="p">(</span>
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute single-phase O:C limit for organic–water mixtures.</span>
+<span class="w">    </span><span class="sd">"""Compute single-phase O:C limit for organic–water mixtures.</span>
 
 <span class="sd">    Converts the molar mass ratio (:math:`MW_{water} / MW_{organic}`) to the</span>
 <span class="sd">    oxygen-to-carbon threshold above which mixtures remain single phase.</span>
@@ -16720,7 +16720,7 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 <span class="sd">    References:</span>
 <span class="sd">        Gorkowski et al. (2019).</span>
 <span class="sd">        https://doi.org/10.5194/acp-19-13383-2019</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">(</span>
@@ -16858,7 +16858,7 @@ arrays before computing the logistic curve.</p>
     <span class="n">seperation_activity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">activities</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute :math:`q_\alpha` transition using a squeezed logistic curve.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Compute :math:`q_\alpha` transition using a squeezed logistic curve.</span>
 
 <span class="sd">    Maps activity values to a smooth transition between phase-separated and</span>
 <span class="sd">    single-phase regimes. The sigmoid is calibrated so that</span>
@@ -16878,7 +16878,7 @@ arrays before computing the logistic curve.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; q_alpha(0.8, np.array([0.7, 0.8, 0.9]))</span>
 <span class="sd">        array(...)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">separation_activity_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
         <span class="n">seperation_activity</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
     <span class="p">)</span>

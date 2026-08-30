@@ -16572,34 +16572,34 @@ residual, shape <code>(n_boxes, n_species)</code>.</p>
 <span class="normal">580</span>
 <span class="normal">581</span>
 <span class="normal">582</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defensively own all finalized diagnostic arrays.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Defensively own all finalized diagnostic arrays."""</span>
     <span class="n">vectors</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;potential_event_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gas_admitted_event_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;represented_event_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gas_limited_event_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;representation_reduction_event_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;residual_event_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;limiting_species_index&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;requested_slot_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;activated_slot_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;released_slot_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;exhaustion_policy_code&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;representative_volume_scale&quot;</span><span class="p">,</span>
+        <span class="s2">"potential_event_count"</span><span class="p">,</span>
+        <span class="s2">"gas_admitted_event_count"</span><span class="p">,</span>
+        <span class="s2">"represented_event_count"</span><span class="p">,</span>
+        <span class="s2">"gas_limited_event_count"</span><span class="p">,</span>
+        <span class="s2">"representation_reduction_event_count"</span><span class="p">,</span>
+        <span class="s2">"residual_event_count"</span><span class="p">,</span>
+        <span class="s2">"limiting_species_index"</span><span class="p">,</span>
+        <span class="s2">"requested_slot_count"</span><span class="p">,</span>
+        <span class="s2">"activated_slot_count"</span><span class="p">,</span>
+        <span class="s2">"released_slot_count"</span><span class="p">,</span>
+        <span class="s2">"exhaustion_policy_code"</span><span class="p">,</span>
+        <span class="s2">"representative_volume_scale"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">int_names</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;limiting_species_index&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;requested_slot_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;activated_slot_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;released_slot_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;exhaustion_policy_code&quot;</span><span class="p">,</span>
+        <span class="s2">"limiting_species_index"</span><span class="p">,</span>
+        <span class="s2">"requested_slot_count"</span><span class="p">,</span>
+        <span class="s2">"activated_slot_count"</span><span class="p">,</span>
+        <span class="s2">"released_slot_count"</span><span class="p">,</span>
+        <span class="s2">"exhaustion_policy_code"</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">vectors</span><span class="p">:</span>
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">int_names</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
         <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">_readonly_vector</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="p">)</span>
-    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;gas_mass_removed&quot;</span><span class="p">,</span> <span class="s2">&quot;conservation_residual&quot;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"gas_mass_removed"</span><span class="p">,</span> <span class="s2">"conservation_residual"</span><span class="p">):</span>
         <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
@@ -16815,33 +16815,33 @@ area.</p>
 <span class="normal">490</span>
 <span class="normal">491</span>
 <span class="normal">492</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate scalar controls and defensively own P4 inputs.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate scalar controls and defensively own P4 inputs."""</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">positive</span> <span class="ow">in</span> <span class="p">(</span>
-        <span class="p">(</span><span class="s2">&quot;maximum_slot_weight&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;source_charge&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"maximum_slot_weight"</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"source_charge"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
     <span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_real_scalar</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a real scalar&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a real scalar"</span><span class="p">)</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">positive</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
-            <span class="n">qualifier</span> <span class="o">=</span> <span class="s2">&quot;positive&quot;</span> <span class="k">if</span> <span class="n">positive</span> <span class="k">else</span> <span class="s2">&quot;finite&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be finite and </span><span class="si">{</span><span class="n">qualifier</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">qualifier</span> <span class="o">=</span> <span class="s2">"positive"</span> <span class="k">if</span> <span class="n">positive</span> <span class="k">else</span> <span class="s2">"finite"</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be finite and </span><span class="si">{</span><span class="n">qualifier</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exhaustion_controls</span><span class="p">,</span> <span class="n">ExhaustionControls</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;exhaustion_controls must be ExhaustionControls&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"exhaustion_controls must be ExhaustionControls"</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span>
-        <span class="s2">&quot;radius_cubed_relative_error&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mean_radius_relative_error&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;surface_relative_error&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;diversity_absolute_error&quot;</span><span class="p">,</span>
+        <span class="s2">"radius_cubed_relative_error"</span><span class="p">,</span>
+        <span class="s2">"mean_radius_relative_error"</span><span class="p">,</span>
+        <span class="s2">"surface_relative_error"</span><span class="p">,</span>
+        <span class="s2">"diversity_absolute_error"</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">float</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an exact Python float&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an exact Python float"</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be finite and nonnegative&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;requested_scale&quot;</span><span class="p">,</span> <span class="s2">&quot;minimum_scale&quot;</span><span class="p">,</span> <span class="s2">&quot;minimum_volume&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be finite and nonnegative"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"requested_scale"</span><span class="p">,</span> <span class="s2">"minimum_scale"</span><span class="p">,</span> <span class="s2">"minimum_volume"</span><span class="p">):</span>
         <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
@@ -16971,32 +16971,32 @@ area.</p>
 <span class="normal">150</span>
 <span class="normal">151</span>
 <span class="normal">152</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and defensively own the potential-source inputs.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate and defensively own the potential-source inputs."""</span>
     <span class="n">rate</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
         <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">_readonly_copy</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">potential_rate</span><span class="p">,</span>
             <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-            <span class="s2">&quot;potential_rate&quot;</span><span class="p">,</span>
+            <span class="s2">"potential_rate"</span><span class="p">,</span>
             <span class="n">ndim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">rate</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;potential_rate must be finite&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"potential_rate must be finite"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">rate</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;potential_rate must be nonnegative&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"potential_rate must be nonnegative"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_real_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;duration must be a real scalar&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"duration must be a real scalar"</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">duration</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">OverflowError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;duration must be finite&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"duration must be finite"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">duration</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;duration must be finite&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"duration must be finite"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">duration</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;duration must be nonnegative&quot;</span><span class="p">)</span>
-    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;potential_rate&quot;</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span>
-    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;duration&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"duration must be nonnegative"</span><span class="p">)</span>
+    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"potential_rate"</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span>
+    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"duration"</span><span class="p">,</span> <span class="n">duration</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17113,19 +17113,19 @@ float64 copy. P2 does not apply this demand to gas.</p>
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defensively own immutable float64 output payloads.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Defensively own immutable float64 output payloads."""</span>
     <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="s2">&quot;per_event_mass&quot;</span><span class="p">,</span>
-        <span class="n">_readonly_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">per_event_mass</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">&quot;per_event_mass&quot;</span><span class="p">),</span>
+        <span class="s2">"per_event_mass"</span><span class="p">,</span>
+        <span class="n">_readonly_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">per_event_mass</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">"per_event_mass"</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="s2">&quot;gas_mass_removed&quot;</span><span class="p">,</span>
+        <span class="s2">"gas_mass_removed"</span><span class="p">,</span>
         <span class="n">_readonly_copy</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gas_mass_removed</span><span class="p">,</span>
             <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-            <span class="s2">&quot;gas_mass_removed&quot;</span><span class="p">,</span>
+            <span class="s2">"gas_mass_removed"</span><span class="p">,</span>
             <span class="n">ndim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="p">),</span>
     <span class="p">)</span>
@@ -17261,12 +17261,12 @@ with shape <code>(n_boxes,)</code> and <code>-1</code> as the no-limiting sentin
 <span class="normal">223</span>
 <span class="normal">224</span>
 <span class="normal">225</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defensively own immutable output payloads.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Defensively own immutable output payloads."""</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">(</span>
-        <span class="p">(</span><span class="s2">&quot;potential_event_count&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;gas_admitted_event_count&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;gas_limited_event_count&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;limiting_species_index&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"potential_event_count"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"gas_admitted_event_count"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"gas_limited_event_count"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"limiting_species_index"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
     <span class="p">):</span>
         <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -17631,7 +17631,7 @@ scaling, activation, gas inventory, or conservation are invalid.</p>
     <span class="n">gas</span><span class="p">:</span> <span class="n">GasData</span><span class="p">,</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">ParticleSourceCommitConfig</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FinalizedSourceDiagnostics</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Commit a gas-admitted source into staged fixed-capacity particle storage.</span>
+<span class="w">    </span><span class="sd">"""Commit a gas-admitted source into staged fixed-capacity particle storage.</span>
 
 <span class="sd">    P2 event counts and represented event counts are [#/m³]. P2 demand and</span>
 <span class="sd">    final gas removal are mass concentrations [kg/m³], while per-event particle</span>
@@ -17658,7 +17658,7 @@ scaling, activation, gas inventory, or conservation are invalid.</p>
 <span class="sd">        TypeError: If a boundary object has the wrong type.</span>
 <span class="sd">        ValueError: If schemas, physical values, P2 records, capacity policy,</span>
 <span class="sd">            scaling, activation, gas inventory, or conservation are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">demand</span><span class="p">,</span> <span class="n">diagnostics</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">_validate_commit_inputs</span><span class="p">(</span>
         <span class="n">demand</span><span class="p">,</span> <span class="n">diagnostics</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="p">,</span> <span class="n">config</span>
     <span class="p">)</span>
@@ -17742,7 +17742,7 @@ scaling, activation, gas inventory, or conservation are invalid.</p>
         <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">reduction</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">)</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;represented source demand must be finite and nonnegative&quot;</span>
+            <span class="s2">"represented source demand must be finite and nonnegative"</span>
         <span class="p">)</span>
     <span class="n">requested_counts</span> <span class="o">=</span> <span class="n">_request_counts</span><span class="p">(</span>
         <span class="n">represented_events</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">maximum_slot_weight</span><span class="p">,</span> <span class="n">capacity</span>
@@ -17780,7 +17780,7 @@ scaling, activation, gas inventory, or conservation are invalid.</p>
         <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">gas_mass_removed</span><span class="p">))</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;final gas concentration must be finite and nonnegative&quot;</span>
+            <span class="s2">"final gas concentration must be finite and nonnegative"</span>
         <span class="p">)</span>
     <span class="n">particle_post</span> <span class="o">=</span> <span class="n">_weighted_particle_mass</span><span class="p">(</span><span class="n">staged_particles</span><span class="p">)</span>
     <span class="n">expected_total</span> <span class="o">=</span> <span class="n">resolved_scale</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">particle_pre</span> <span class="o">+</span> <span class="n">gas_pre</span><span class="p">)</span>
@@ -17790,7 +17790,7 @@ scaling, activation, gas inventory, or conservation are invalid.</p>
         <span class="n">post_total</span><span class="p">,</span> <span class="n">expected_total</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-30</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;particle and gas source transaction must conserve mass&quot;</span>
+            <span class="s2">"particle and gas source transaction must conserve mass"</span>
         <span class="p">)</span>
     <span class="n">residual_events</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">finalized</span> <span class="o">=</span> <span class="n">FinalizedSourceDiagnostics</span><span class="p">(</span>
@@ -18075,7 +18075,7 @@ invalid or cannot be made inventory-safe after four ULP corrections.</p>
     <span class="n">composition</span><span class="p">:</span> <span class="n">InjectionComposition</span><span class="p">,</span>
     <span class="n">gas</span><span class="p">:</span> <span class="n">GasData</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">SourceDemandData</span><span class="p">,</span> <span class="n">SourceDiagnostics</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Finalize immutable, inventory-limited source demand records.</span>
+<span class="w">    </span><span class="sd">"""Finalize immutable, inventory-limited source demand records.</span>
 
 <span class="sd">    Every box receives one common admitted event count constrained by its</span>
 <span class="sd">    tightest participating gas inventory. The returned records own fresh,</span>
@@ -18098,50 +18098,50 @@ invalid or cannot be made inventory-safe after four ULP corrections.</p>
 <span class="sd">        TypeError: If a top-level input has an invalid type.</span>
 <span class="sd">        ValueError: If schemas, physical values, or derived quantities are</span>
 <span class="sd">            invalid or cannot be made inventory-safe after four ULP corrections.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">potential_events</span><span class="p">,</span> <span class="n">PotentialEventData</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;potential_events must be PotentialEventData&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"potential_events must be PotentialEventData"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">composition</span><span class="p">,</span> <span class="n">InjectionComposition</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;composition must be InjectionComposition&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"composition must be InjectionComposition"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="n">GasData</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;gas must be GasData&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"gas must be GasData"</span><span class="p">)</span>
 
     <span class="n">potential_rate</span> <span class="o">=</span> <span class="n">potential_events</span><span class="o">.</span><span class="n">potential_rate</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">potential_count</span> <span class="o">=</span> <span class="n">potential_rate</span> <span class="o">*</span> <span class="n">potential_events</span><span class="o">.</span><span class="n">duration</span>
         <span class="k">except</span> <span class="ne">FloatingPointError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;potential_event_count must be finite&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"potential_event_count must be finite"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">potential_count</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;potential_event_count must be finite&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"potential_event_count must be finite"</span><span class="p">)</span>
 
     <span class="n">n_boxes</span> <span class="o">=</span> <span class="n">potential_count</span><span class="o">.</span><span class="n">size</span>
     <span class="n">n_species</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">composition</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">)</span>
     <span class="n">molar_mass</span><span class="p">,</span> <span class="n">concentration</span> <span class="o">=</span> <span class="n">_validate_gas</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">53</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">composition</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must be representable as float64&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molecule_counts must be representable as float64"</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">composition</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OverflowError</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;molecule_counts must be representable as float64&quot;</span>
+            <span class="s2">"molecule_counts must be representable as float64"</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">counts</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must be representable as float64&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molecule_counts must be representable as float64"</span><span class="p">)</span>
     <span class="n">participating</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">counts</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">[</span><span class="n">participating</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;participating gas molar_mass must be positive&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"participating gas molar_mass must be positive"</span><span class="p">)</span>
 
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="n">under</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">,</span> <span class="n">under</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">per_event_mass</span> <span class="o">=</span> <span class="p">(</span><span class="n">counts</span> <span class="o">/</span> <span class="n">AVOGADRO_NUMBER</span><span class="p">)</span> <span class="o">*</span> <span class="n">molar_mass</span>
         <span class="k">except</span> <span class="ne">FloatingPointError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;per_event_mass must be finite&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"per_event_mass must be finite"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">per_event_mass</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;per_event_mass must be finite&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"per_event_mass must be finite"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">per_event_mass</span><span class="p">[</span><span class="n">participating</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;per_event_mass must be positive for participating gas&quot;</span>
+            <span class="s2">"per_event_mass must be positive for participating gas"</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">n_boxes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -18151,7 +18151,7 @@ invalid or cannot be made inventory-safe after four ULP corrections.</p>
         <span class="n">admitted</span> <span class="o">=</span> <span class="n">potential_count</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">limiting_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">ratios</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">concentration</span><span class="p">[:,</span> <span class="n">participating</span><span class="p">]</span>
@@ -18159,37 +18159,37 @@ invalid or cannot be made inventory-safe after four ULP corrections.</p>
                 <span class="p">)</span>
             <span class="k">except</span> <span class="ne">FloatingPointError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;gas inventory ratio must be finite&quot;</span>
+                    <span class="s2">"gas inventory ratio must be finite"</span>
                 <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ratios</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">ratios</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gas inventory ratio must be nonnegative&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"gas inventory ratio must be nonnegative"</span><span class="p">)</span>
         <span class="n">minimum_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ratios</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">limiting_indices</span> <span class="o">=</span> <span class="n">participating</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">ratios</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
         <span class="n">admitted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">potential_count</span><span class="p">,</span> <span class="n">minimum_ratio</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">admitted</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gas_admitted_event_count must be finite&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"gas_admitted_event_count must be finite"</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">demand</span> <span class="o">=</span> <span class="n">admitted</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">per_event_mass</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
             <span class="k">except</span> <span class="ne">FloatingPointError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gas_mass_removed must be finite&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"gas_mass_removed must be finite"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
         <span class="n">overshot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span>
             <span class="n">demand</span><span class="p">[:,</span> <span class="n">participating</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">concentration</span><span class="p">[:,</span> <span class="n">participating</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">overshot</span><span class="p">):</span>
             <span class="k">break</span>
         <span class="n">admitted</span><span class="p">[</span><span class="n">overshot</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="n">admitted</span><span class="p">[</span><span class="n">overshot</span><span class="p">],</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">demand</span> <span class="o">=</span> <span class="n">admitted</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">per_event_mass</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
         <span class="k">except</span> <span class="ne">FloatingPointError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gas_mass_removed must be finite&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"gas_mass_removed must be finite"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">demand</span><span class="p">[:,</span> <span class="n">participating</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">concentration</span><span class="p">[:,</span> <span class="n">participating</span><span class="p">]):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gas demand remains out of inventory after correction&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"gas demand remains out of inventory after correction"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">demand</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">demand</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gas_mass_removed must be finite and nonnegative&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"gas_mass_removed must be finite and nonnegative"</span><span class="p">)</span>
 
     <span class="n">gas_limited</span> <span class="o">=</span> <span class="n">potential_count</span> <span class="o">-</span> <span class="n">admitted</span>
     <span class="n">reduced</span> <span class="o">=</span> <span class="n">potential_count</span> <span class="o">&gt;</span> <span class="n">admitted</span>

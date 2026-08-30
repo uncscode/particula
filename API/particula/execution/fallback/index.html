@@ -16364,24 +16364,24 @@ validation fails.</p>
 <span class="normal">174</span>
 <span class="normal">175</span>
 <span class="normal">176</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact fallback metadata without changing native metadata.</span>
+<span class="w">    </span><span class="sd">"""Validate exact fallback metadata without changing native metadata.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a carrier, native result, or metadata tuple is</span>
 <span class="sd">            invalid.</span>
 <span class="sd">        ValueError: If native result validation or fallback metadata</span>
 <span class="sd">            validation fails.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">FallbackResolution</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;resolution must be a FallbackResolution.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resolution must be a FallbackResolution."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ExecutionResult</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;result must be an ExecutionResult.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"result must be an ExecutionResult."</span><span class="p">)</span>
     <span class="n">validate_execution_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="o">.</span><span class="n">cpu_state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;metadata must be a tuple.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"metadata must be a tuple."</span><span class="p">)</span>
     <span class="n">expected</span> <span class="o">=</span> <span class="n">_fallback_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">!=</span> <span class="n">expected</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;metadata must contain exact fallback provenance.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"metadata must contain exact fallback provenance."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16570,24 +16570,24 @@ or select an adapter.</p>
 <span class="normal">82</span>
 <span class="normal">83</span>
 <span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate carrier types without selecting or reading payloads.</span>
+<span class="w">    </span><span class="sd">"""Validate carrier types without selecting or reading payloads.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a carrier field or fallback enum has an invalid type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_request</span><span class="p">,</span> <span class="n">ExecutionRequest</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;original_request must be an ExecutionRequest.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"original_request must be an ExecutionRequest."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_error</span><span class="p">,</span> <span class="n">ExecutionCapabilityError</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;original_error must be an ExecutionCapabilityError.&quot;</span>
+            <span class="s2">"original_error must be an ExecutionCapabilityError."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">ExecutionContext</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;context must be an ExecutionContext.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"context must be an ExecutionContext."</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cpu_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpu_state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CPUExecutionState</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;cpu_state must be a CPUExecutionState or None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"cpu_state must be a CPUExecutionState or None."</span><span class="p">)</span>
     <span class="n">_validate_fallback_enums</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_authority</span>
     <span class="p">)</span>
@@ -16813,31 +16813,31 @@ type.</p>
 <span class="normal">139</span>
 <span class="normal">140</span>
 <span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate resolution metadata without reselecting an adapter.</span>
+<span class="w">    </span><span class="sd">"""Validate resolution metadata without reselecting an adapter.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a retained carrier or metadata field has an invalid</span>
 <span class="sd">            type.</span>
 <span class="sd">        ValueError: If CPU request or error provenance is inconsistent.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_request</span><span class="p">,</span> <span class="n">ExecutionRequest</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;original_request must be an ExecutionRequest.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"original_request must be an ExecutionRequest."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpu_request</span><span class="p">,</span> <span class="n">ExecutionRequest</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;cpu_request must be an ExecutionRequest.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"cpu_request must be an ExecutionRequest."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_error</span><span class="p">,</span> <span class="n">ExecutionCapabilityError</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;original_error must be an ExecutionCapabilityError.&quot;</span>
+            <span class="s2">"original_error must be an ExecutionCapabilityError."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpu_state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CPUExecutionState</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;cpu_state must be a CPUExecutionState.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"cpu_state must be a CPUExecutionState."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_static_execution_adapter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adapter</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;adapter must have a callable execute attribute.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"adapter must have a callable execute attribute."</span><span class="p">)</span>
     <span class="n">_validate_resolution_request</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">_validate_fallback_enums</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">,</span> <span class="n">CPUStateAuthority</span><span class="o">.</span><span class="n">CPU_AUTHORITATIVE</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">FallbackPolicy</span><span class="o">.</span><span class="n">CPU</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;policy must be FallbackPolicy.CPU.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"policy must be FallbackPolicy.CPU."</span><span class="p">)</span>
     <span class="n">_validate_resolution_reason</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16994,9 +16994,9 @@ policy.</p>
 <span class="normal">524</span>
 <span class="normal">525</span>
 <span class="normal">526</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dispatch_cpu_fallback</span><span class="p">(</span><span class="n">fallback</span><span class="p">:</span> <span class="n">FallbackRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FallbackDispatchResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and execute one CPU adapter without recovery or retry.</span>
+<span class="w">    </span><span class="sd">"""Resolve and execute one CPU adapter without recovery or retry.</span>
 
-<span class="sd">    The adapter&#39;s native result and metadata remain unchanged. Provenance is</span>
+<span class="sd">    The adapter's native result and metadata remain unchanged. Provenance is</span>
 <span class="sd">    available only on the returned fallback dispatch carrier.</span>
 
 <span class="sd">    Args:</span>
@@ -17007,7 +17007,7 @@ policy.</p>
 <span class="sd">        provenance by identity.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        TypeError: If fallback or the adapter&#39;s result violates a carrier type.</span>
+<span class="sd">        TypeError: If fallback or the adapter's result violates a carrier type.</span>
 <span class="sd">        ValueError: If selection, result validation, or metadata validation</span>
 <span class="sd">            fails.</span>
 <span class="sd">        LookupError: If no canonical CPU adapter is registered.</span>
@@ -17016,7 +17016,7 @@ policy.</p>
 <span class="sd">        FallbackDisallowedError: If fallback fails closed before selection.</span>
 
 <span class="sd">    Adapter exceptions propagate unchanged after the single adapter invocation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">resolution</span> <span class="o">=</span> <span class="n">resolve_cpu_fallback</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span>
     <span class="n">native_result</span> <span class="o">=</span> <span class="n">resolution</span><span class="o">.</span><span class="n">adapter</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">resolution</span><span class="o">.</span><span class="n">cpu_state</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">validate_execution_result</span><span class="p">(</span><span class="n">resolution</span><span class="o">.</span><span class="n">cpu_state</span><span class="p">,</span> <span class="n">native_result</span><span class="p">)</span>
@@ -17202,7 +17202,7 @@ policy.</p>
 <span class="normal">492</span>
 <span class="normal">493</span>
 <span class="normal">494</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resolve_cpu_fallback</span><span class="p">(</span><span class="n">fallback</span><span class="p">:</span> <span class="n">FallbackRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FallbackResolution</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Select the registered CPU adapter once for an eligible explicit request.</span>
+<span class="w">    </span><span class="sd">"""Select the registered CPU adapter once for an eligible explicit request.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fallback: Exact explicit fallback carrier.</span>
@@ -17217,9 +17217,9 @@ policy.</p>
 <span class="sd">        ExecutionCapabilityError: The identical original error for default-deny</span>
 <span class="sd">            policy.</span>
 <span class="sd">        FallbackDisallowedError: If fallback fails closed before selection.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">FallbackRequest</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;fallback must be a FallbackRequest.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"fallback must be a FallbackRequest."</span><span class="p">)</span>
     <span class="n">_validate_request_and_error</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">_validate_fallback_enums</span><span class="p">(</span>
@@ -17230,19 +17230,19 @@ policy.</p>
     <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">_disallow</span><span class="p">(</span>
             <span class="n">fallback</span><span class="p">,</span>
-            <span class="n">state</span><span class="o">=</span><span class="s2">&quot;invalid_fallback_carrier&quot;</span><span class="p">,</span>
-            <span class="n">boundary</span><span class="o">=</span><span class="s2">&quot;invalid_fallback_carrier&quot;</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">=</span><span class="s2">"invalid_fallback_carrier"</span><span class="p">,</span>
+            <span class="n">boundary</span><span class="o">=</span><span class="s2">"invalid_fallback_carrier"</span><span class="p">,</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">fallback.original_error</span>
 
     <span class="n">request</span> <span class="o">=</span> <span class="n">fallback</span><span class="o">.</span><span class="n">original_request</span>
     <span class="n">error</span> <span class="o">=</span> <span class="n">fallback</span><span class="o">.</span><span class="n">original_error</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">backend</span> <span class="ow">is</span> <span class="n">Backend</span><span class="o">.</span><span class="n">CPU</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">_disallow</span><span class="p">(</span>
-            <span class="n">fallback</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s2">&quot;cpu_request&quot;</span><span class="p">,</span> <span class="n">boundary</span><span class="o">=</span><span class="s2">&quot;cpu_request&quot;</span>
+            <span class="n">fallback</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s2">"cpu_request"</span><span class="p">,</span> <span class="n">boundary</span><span class="o">=</span><span class="s2">"cpu_request"</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
     <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">reason</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_ELIGIBLE_REASONS</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">_disallow</span><span class="p">(</span>
-            <span class="n">fallback</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s2">&quot;ineligible_reason&quot;</span><span class="p">,</span> <span class="n">boundary</span><span class="o">=</span><span class="s2">&quot;ineligible_reason&quot;</span>
+            <span class="n">fallback</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s2">"ineligible_reason"</span><span class="p">,</span> <span class="n">boundary</span><span class="o">=</span><span class="s2">"ineligible_reason"</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
     <span class="n">_validate_error_context</span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">fallback</span><span class="o">.</span><span class="n">policy</span> <span class="ow">is</span> <span class="n">FallbackPolicy</span><span class="o">.</span><span class="n">RAISE</span><span class="p">:</span>
@@ -17250,7 +17250,7 @@ policy.</p>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">fallback</span><span class="o">.</span><span class="n">cpu_state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CPUExecutionState</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">_disallow</span><span class="p">(</span>
             <span class="n">fallback</span><span class="p">,</span>
-            <span class="n">state</span><span class="o">=</span><span class="s2">&quot;missing_cpu_state&quot;</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">=</span><span class="s2">"missing_cpu_state"</span><span class="p">,</span>
             <span class="n">boundary</span><span class="o">=</span><span class="n">fallback</span><span class="o">.</span><span class="n">boundary</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
     <span class="k">if</span> <span class="n">fallback</span><span class="o">.</span><span class="n">state_authority</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CPUStateAuthority</span><span class="o">.</span><span class="n">CPU_AUTHORITATIVE</span><span class="p">:</span>
@@ -17263,7 +17263,7 @@ policy.</p>
 
     <span class="n">cpu_request</span> <span class="o">=</span> <span class="n">ExecutionRequest</span><span class="p">(</span>
         <span class="n">Backend</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span>
-        <span class="n">Device</span><span class="p">(</span><span class="n">Backend</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+        <span class="n">Device</span><span class="p">(</span><span class="n">Backend</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="s2">"cpu"</span><span class="p">),</span>
         <span class="n">request</span><span class="o">.</span><span class="n">process</span><span class="p">,</span>
         <span class="n">request</span><span class="o">.</span><span class="n">requirements</span><span class="p">,</span>
     <span class="p">)</span>

@@ -16885,7 +16885,7 @@ values are normalized to SI units before construction.</p>
 <span class="normal">81</span>
 <span class="normal">82</span>
 <span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unconfigured strategy builder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize an unconfigured strategy builder."""</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">_REQUIRED</span><span class="p">))</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">coefficient_provenance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -16995,7 +16995,7 @@ are missing or invalid.</p>
 <span class="normal">494</span>
 <span class="normal">495</span>
 <span class="normal">496</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActivationNucleationStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a fully validated immutable activation strategy.</span>
+<span class="w">    </span><span class="sd">"""Build a fully validated immutable activation strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Activation strategy with normalized metadata and a survival default</span>
@@ -17004,7 +17004,7 @@ are missing or invalid.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required builder fields or paired saturation bounds</span>
 <span class="sd">            are missing or invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">domain</span><span class="p">,</span> <span class="n">composition</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">survival</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">ActivationNucleationStrategy</span><span class="p">(</span>
         <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">),</span>
@@ -17197,12 +17197,12 @@ factor returns exactly <code>0.0</code> after basic input validation and convers
 <span class="normal">550</span>
 <span class="normal">551</span>
 <span class="normal">552</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate immutable activation-strategy configuration.</span>
+<span class="w">    </span><span class="sd">"""Validate immutable activation-strategy configuration.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a scalar configuration value is not a scalar real.</span>
 <span class="sd">        ValueError: If configuration values or metadata records are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_strategy_configuration</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validity_domain</span><span class="p">,</span>
@@ -17372,7 +17372,7 @@ yield a nonfinite conversion or rate.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">saturation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the activation potential event rate [#/m³/s].</span>
+<span class="w">    </span><span class="sd">"""Calculate the activation potential event rate [#/m³/s].</span>
 
 <span class="sd">    Basic inputs and number-concentration conversion are validated before</span>
 <span class="sd">    exact zero paths. Nonzero inputs must lie in the configured inclusive</span>
@@ -17392,7 +17392,7 @@ yield a nonfinite conversion or rate.</p>
 <span class="sd">        TypeError: If required inputs are not accepted scalar real values.</span>
 <span class="sd">        ValueError: If inputs are physically invalid, out of domain, or</span>
 <span class="sd">            yield a nonfinite conversion or rate.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">concentration</span><span class="p">,</span> <span class="n">normalized_temperature</span><span class="p">,</span> <span class="n">normalized_saturation</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">_preflight_rate_inputs</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">validity_domain</span><span class="p">,</span>
@@ -17547,16 +17547,16 @@ yield a nonfinite conversion or rate.</p>
 <span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate finite ordered interval endpoints.</span>
+<span class="w">    </span><span class="sd">"""Validate finite ordered interval endpoints.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If an endpoint is not a scalar real value.</span>
 <span class="sd">        ValueError: If an endpoint is nonfinite or ``lower &gt; upper``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">lower</span> <span class="o">=</span> <span class="n">_finite_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">)</span>
-    <span class="n">upper</span> <span class="o">=</span> <span class="n">_finite_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">_finite_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="s2">"lower"</span><span class="p">)</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">_finite_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="s2">"upper"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">lower</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;lower must be less than or equal to upper&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"lower must be less than or equal to upper"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17616,14 +17616,14 @@ yield a nonfinite conversion or rate.</p>
 <span class="normal">142</span>
 <span class="normal">143</span>
 <span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test inclusive membership for an already validated value.</span>
+<span class="w">    </span><span class="sd">"""Test inclusive membership for an already validated value.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value: Normalized scalar value to test.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ``True`` if ``lower &lt;= value &lt;= upper``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17652,7 +17652,7 @@ yield a nonfinite conversion or rate.</p>
   </span>
 
 <a href="#particula.dynamics.nucleation.FormationMetadata" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">FormationMetadata</span><span class="p">(</span><span class="n">formation_diameter</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">diameter_convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mobility_diameter&#39;</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">FormationMetadata</span><span class="p">(</span><span class="n">formation_diameter</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">diameter_convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'mobility_diameter'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17750,15 +17750,15 @@ yield a nonfinite conversion or rate.</p>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the potential-rate size representation.</span>
+<span class="w">    </span><span class="sd">"""Validate the potential-rate size representation.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If the diameter is not a scalar real value.</span>
 <span class="sd">        ValueError: If the diameter is invalid or its convention differs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_positive_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formation_diameter</span><span class="p">,</span> <span class="s2">&quot;formation_diameter&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diameter_convention</span> <span class="o">!=</span> <span class="s2">&quot;mobility_diameter&quot;</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;diameter_convention must be mobility_diameter&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_positive_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formation_diameter</span><span class="p">,</span> <span class="s2">"formation_diameter"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diameter_convention</span> <span class="o">!=</span> <span class="s2">"mobility_diameter"</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"diameter_convention must be mobility_diameter"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17889,26 +17889,26 @@ this potential-rate-only implementation.</p>
 <span class="normal">211</span>
 <span class="normal">212</span>
 <span class="normal">213</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the nonempty, nonnegative injection composition.</span>
+<span class="w">    </span><span class="sd">"""Validate the nonempty, nonnegative injection composition.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If counts are not a tuple of non-Boolean integers.</span>
 <span class="sd">        ValueError: If no count is positive or any count is negative.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must be a tuple&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"molecule_counts must be a tuple"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must be nonempty&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molecule_counts must be nonempty"</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
         <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">))</span>
         <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must contain integers&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"molecule_counts must contain integers"</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">count</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must be nonnegative&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molecule_counts must be nonnegative"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must include a positive count&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molecule_counts must include a positive count"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17969,7 +17969,7 @@ normalized to m³/s before construction.</p>
 <span class="normal">81</span>
 <span class="normal">82</span>
 <span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unconfigured strategy builder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize an unconfigured strategy builder."""</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">_REQUIRED</span><span class="p">))</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">coefficient_provenance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -18079,7 +18079,7 @@ are missing or invalid.</p>
 <span class="normal">525</span>
 <span class="normal">526</span>
 <span class="normal">527</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KineticNucleationStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a fully validated immutable kinetic strategy.</span>
+<span class="w">    </span><span class="sd">"""Build a fully validated immutable kinetic strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Kinetic strategy with normalized metadata and a survival default of</span>
@@ -18088,7 +18088,7 @@ are missing or invalid.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required builder fields or paired saturation bounds</span>
 <span class="sd">            are missing or invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">domain</span><span class="p">,</span> <span class="n">composition</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">survival</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">KineticNucleationStrategy</span><span class="p">(</span>
         <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">),</span>
@@ -18281,12 +18281,12 @@ factor returns exactly <code>0.0</code> after basic input validation and convers
 <span class="normal">649</span>
 <span class="normal">650</span>
 <span class="normal">651</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate immutable kinetic-strategy configuration.</span>
+<span class="w">    </span><span class="sd">"""Validate immutable kinetic-strategy configuration.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a scalar configuration value is not a scalar real.</span>
 <span class="sd">        ValueError: If configuration values or metadata records are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_strategy_configuration</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validity_domain</span><span class="p">,</span>
@@ -18456,7 +18456,7 @@ yield a nonfinite conversion or rate.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">saturation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the kinetic potential event rate [#/m³/s].</span>
+<span class="w">    </span><span class="sd">"""Calculate the kinetic potential event rate [#/m³/s].</span>
 
 <span class="sd">    Basic inputs and number-concentration conversion are validated before</span>
 <span class="sd">    exact zero paths. Nonzero inputs must lie in the configured inclusive</span>
@@ -18476,7 +18476,7 @@ yield a nonfinite conversion or rate.</p>
 <span class="sd">        TypeError: If required inputs are not accepted scalar real values.</span>
 <span class="sd">        ValueError: If inputs are physically invalid, out of domain, or</span>
 <span class="sd">            yield a nonfinite conversion or rate.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">concentration</span><span class="p">,</span> <span class="n">normalized_temperature</span><span class="p">,</span> <span class="n">normalized_saturation</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">_preflight_rate_inputs</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">validity_domain</span><span class="p">,</span>
@@ -18624,15 +18624,15 @@ but are limited to <code>"activation"</code> and <code>"kinetic"</code>.</p>
 <span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ActivationNucleationBuilder</span> <span class="o">|</span> <span class="n">KineticNucleationBuilder</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return fresh builders for the two supported identifiers.</span>
+<span class="w">    </span><span class="sd">"""Return fresh builders for the two supported identifiers.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        New activation and kinetic builders under their canonical lowercase</span>
 <span class="sd">        identifiers.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;activation&quot;</span><span class="p">:</span> <span class="n">ActivationNucleationBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;kinetic&quot;</span><span class="p">:</span> <span class="n">KineticNucleationBuilder</span><span class="p">(),</span>
+        <span class="s2">"activation"</span><span class="p">:</span> <span class="n">ActivationNucleationBuilder</span><span class="p">(),</span>
+        <span class="s2">"kinetic"</span><span class="p">:</span> <span class="n">KineticNucleationBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18749,10 +18749,10 @@ fails the selected builder's schema validation.</p>
     <span class="n">strategy_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActivationNucleationStrategy</span> <span class="o">|</span> <span class="n">KineticNucleationStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a validated strategy from a copied strict-schema payload.</span>
+<span class="w">    </span><span class="sd">"""Build a validated strategy from a copied strict-schema payload.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        strategy_type: Case-insensitive ``&quot;activation&quot;`` or ``&quot;kinetic&quot;``</span>
+<span class="sd">        strategy_type: Case-insensitive ``"activation"`` or ``"kinetic"``</span>
 <span class="sd">            identifier.</span>
 <span class="sd">        parameters: Required dictionary accepted by the selected builder.</span>
 
@@ -18761,15 +18761,15 @@ fails the selected builder's schema validation.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the identifier or payload is invalid, unsupported, or</span>
-<span class="sd">            fails the selected builder&#39;s schema validation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">            fails the selected builder's schema validation.</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strategy_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;strategy_type must be a string&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"strategy_type must be a string"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;parameters must be a dict&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"parameters must be a dict"</span><span class="p">)</span>
     <span class="n">builder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">strategy_type</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">builder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown strategy type: </span><span class="si">{</span><span class="n">strategy_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown strategy type: </span><span class="si">{</span><span class="n">strategy_type</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="n">builder</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
@@ -18911,26 +18911,26 @@ a later concrete source operation.</p>
 <span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the supported strategy types and nonnegative index.</span>
+<span class="w">    </span><span class="sd">"""Validate the supported strategy types and nonnegative index.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``precursor_index`` is not a non-Boolean integer.</span>
 <span class="sd">        ValueError: If the strategy is unsupported or the index is negative.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="p">,</span>
         <span class="p">(</span><span class="n">ActivationNucleationStrategy</span><span class="p">,</span> <span class="n">KineticNucleationStrategy</span><span class="p">),</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;strategy must be ActivationNucleationStrategy or &quot;</span>
-            <span class="s2">&quot;KineticNucleationStrategy&quot;</span>
+            <span class="s2">"strategy must be ActivationNucleationStrategy or "</span>
+            <span class="s2">"KineticNucleationStrategy"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
     <span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;precursor_index must be an integer&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"precursor_index must be an integer"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;precursor_index must be nonnegative&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"precursor_index must be nonnegative"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18984,8 +18984,8 @@ mutation behavior.</p>
 <span class="normal">540</span>
 <span class="normal">541</span>
 <span class="normal">542</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unconfigured P4 source-selection builder.&quot;&quot;&quot;</span>
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">,</span> <span class="s2">&quot;precursor_index&quot;</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">"""Initialize an unconfigured P4 source-selection builder."""</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">"strategy"</span><span class="p">,</span> <span class="s2">"precursor_index"</span><span class="p">])</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="p">:</span> <span class="n">NucleationStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
@@ -19073,7 +19073,7 @@ mutation behavior.</p>
 <span class="normal">608</span>
 <span class="normal">609</span>
 <span class="normal">610</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NucleationSourceConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build validated immutable P4 source-selection metadata.</span>
+<span class="w">    </span><span class="sd">"""Build validated immutable P4 source-selection metadata.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Metadata selecting a supported strategy and precursor index.</span>
@@ -19081,7 +19081,7 @@ mutation behavior.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required builder fields are missing or invalid.</span>
 <span class="sd">        TypeError: If the precursor index is not an accepted integer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">NucleationSourceConfig</span><span class="p">(</span>
         <span class="n">cast</span><span class="p">(</span><span class="n">NucleationStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="p">),</span>
@@ -19183,7 +19183,7 @@ mutation behavior.</p>
 <span class="normal">592</span>
 <span class="normal">593</span>
 <span class="normal">594</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Atomically configure the exact two-key source metadata schema.</span>
+<span class="w">    </span><span class="sd">"""Atomically configure the exact two-key source metadata schema.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        parameters: Dictionary containing only ``strategy`` and</span>
@@ -19195,16 +19195,16 @@ mutation behavior.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``parameters`` is not a dictionary.</span>
 <span class="sd">        ValueError: If keys or source-selection values are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;parameters must be a dict&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">!=</span> <span class="p">{</span><span class="s2">&quot;strategy&quot;</span><span class="p">,</span> <span class="s2">&quot;precursor_index&quot;</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"parameters must be a dict"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">!=</span> <span class="p">{</span><span class="s2">"strategy"</span><span class="p">,</span> <span class="s2">"precursor_index"</span><span class="p">}:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;parameters must contain only strategy and precursor_index&quot;</span>
+            <span class="s2">"parameters must contain only strategy and precursor_index"</span>
         <span class="p">)</span>
     <span class="n">staged</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)()</span>
-    <span class="n">staged</span><span class="o">.</span><span class="n">set_strategy</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">])</span>
-    <span class="n">staged</span><span class="o">.</span><span class="n">set_precursor_index</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;precursor_index&quot;</span><span class="p">])</span>
+    <span class="n">staged</span><span class="o">.</span><span class="n">set_strategy</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"strategy"</span><span class="p">])</span>
+    <span class="n">staged</span><span class="o">.</span><span class="n">set_precursor_index</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"precursor_index"</span><span class="p">])</span>
     <span class="n">staged</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">staged</span><span class="o">.</span><span class="n">strategy</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span> <span class="o">=</span> <span class="n">staged</span><span class="o">.</span><span class="n">precursor_index</span>
@@ -19269,14 +19269,14 @@ mutation behavior.</p>
 <span class="normal">564</span>
 <span class="normal">565</span>
 <span class="normal">566</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_precursor_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursor_index</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the candidate nonnegative precursor species index.</span>
+<span class="w">    </span><span class="sd">"""Set the candidate nonnegative precursor species index.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        precursor_index: Index validated when the configuration is built.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        This builder for fluent configuration.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span> <span class="o">=</span> <span class="n">precursor_index</span>  <span class="c1"># type: ignore[assignment]</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -19339,14 +19339,14 @@ mutation behavior.</p>
 <span class="normal">552</span>
 <span class="normal">553</span>
 <span class="normal">554</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the candidate supported nucleation strategy.</span>
+<span class="w">    </span><span class="sd">"""Set the candidate supported nucleation strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        strategy: Activation or kinetic strategy to select.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        This builder for fluent configuration.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">strategy</span>  <span class="c1"># type: ignore[assignment]</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -19504,7 +19504,7 @@ particle sources, survival inference, or state mutation.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">saturation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate a potential formation-event rate [#/m³/s].</span>
+<span class="w">    </span><span class="sd">"""Calculate a potential formation-event rate [#/m³/s].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        precursor_mass_concentration: Precursor mass concentration [kg/m³].</span>
@@ -19514,7 +19514,7 @@ particle sources, survival inference, or state mutation.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Potential formation-event rate [#/m³/s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -19664,22 +19664,22 @@ optional saturation field is neither one nor <code>None</code>.</p>
 <span class="normal">175</span>
 <span class="normal">176</span>
 <span class="normal">177</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the nested interval records.</span>
+<span class="w">    </span><span class="sd">"""Validate the nested interval records.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If a required field is not a ``ClosedInterval`` or an</span>
 <span class="sd">            optional saturation field is neither one nor ``None``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precursor_number_concentration</span><span class="p">,</span> <span class="n">ClosedInterval</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;precursor_number_concentration must be ClosedInterval&quot;</span>
+            <span class="s2">"precursor_number_concentration must be ClosedInterval"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span> <span class="n">ClosedInterval</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;temperature must be ClosedInterval&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"temperature must be ClosedInterval"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">saturation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">saturation</span><span class="p">,</span> <span class="n">ClosedInterval</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;saturation must be ClosedInterval or None&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"saturation must be ClosedInterval or None"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

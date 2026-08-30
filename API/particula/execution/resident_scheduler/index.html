@@ -16445,53 +16445,53 @@ inexact concrete type.</p>
 <span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact request components and optional update types.</span>
+<span class="w">    </span><span class="sd">"""Validate exact request components and optional update types.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a required component or optional update has an</span>
 <span class="sd">            inexact concrete type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coagulation</span><span class="p">)</span>
         <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentBrownianCoagulationExecutionState</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;coagulation must be an exact resident execution state.&quot;</span>
+            <span class="s2">"coagulation must be an exact resident execution state."</span>
         <span class="p">)</span>
     <span class="n">exact</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="s2">&quot;session&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span> <span class="n">_registry_type</span><span class="p">(),</span> <span class="s2">&quot;registry&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guard</span><span class="p">,</span> <span class="n">ResidentStepGuard</span><span class="p">,</span> <span class="s2">&quot;guard&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">ResolvedProcessGraph</span><span class="p">,</span> <span class="s2">&quot;graph&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="p">,</span> <span class="n">ResolvedTimestepSchedule</span><span class="p">,</span> <span class="s2">&quot;schedule&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thermodynamics</span><span class="p">,</span> <span class="n">ThermodynamicsConfig</span><span class="p">,</span> <span class="s2">&quot;thermodynamics&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condensation</span><span class="p">,</span> <span class="n">WarpCondensationExecutionState</span><span class="p">,</span> <span class="s2">&quot;condensation&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dilution</span><span class="p">,</span> <span class="n">ResidentDilutionRequest</span><span class="p">,</span> <span class="s2">&quot;dilution&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_loss</span><span class="p">,</span> <span class="n">ResidentWallLossRequest</span><span class="p">,</span> <span class="s2">&quot;wall_loss&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nucleation</span><span class="p">,</span> <span class="n">ResidentNucleationRequest</span><span class="p">,</span> <span class="s2">&quot;nucleation&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">,</span> <span class="n">ResidentDiagnosticsPlan</span><span class="p">,</span> <span class="s2">&quot;diagnostics&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="s2">"session"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span> <span class="n">_registry_type</span><span class="p">(),</span> <span class="s2">"registry"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guard</span><span class="p">,</span> <span class="n">ResidentStepGuard</span><span class="p">,</span> <span class="s2">"guard"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">ResolvedProcessGraph</span><span class="p">,</span> <span class="s2">"graph"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="p">,</span> <span class="n">ResolvedTimestepSchedule</span><span class="p">,</span> <span class="s2">"schedule"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thermodynamics</span><span class="p">,</span> <span class="n">ThermodynamicsConfig</span><span class="p">,</span> <span class="s2">"thermodynamics"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condensation</span><span class="p">,</span> <span class="n">WarpCondensationExecutionState</span><span class="p">,</span> <span class="s2">"condensation"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dilution</span><span class="p">,</span> <span class="n">ResidentDilutionRequest</span><span class="p">,</span> <span class="s2">"dilution"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_loss</span><span class="p">,</span> <span class="n">ResidentWallLossRequest</span><span class="p">,</span> <span class="s2">"wall_loss"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nucleation</span><span class="p">,</span> <span class="n">ResidentNucleationRequest</span><span class="p">,</span> <span class="s2">"nucleation"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">,</span> <span class="n">ResidentDiagnosticsPlan</span><span class="p">,</span> <span class="s2">"diagnostics"</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">exact</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">expected</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an exact </span><span class="si">{</span><span class="n">expected</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an exact </span><span class="si">{</span><span class="n">expected</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">environment_update</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">environment_update</span><span class="p">)</span>
         <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentEnvironmentUpdateRequest</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;environment_update must be an exact request or None.&quot;</span>
+            <span class="s2">"environment_update must be an exact request or None."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gas_update</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gas_update</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentGasUpdateRequest</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;gas_update must be an exact request or None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"gas_update must be an exact request or None."</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">communication</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">communication</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentCommunicationRequest</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;communication must be an exact request or None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"communication must be an exact request or None."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16592,17 +16592,17 @@ stream.</p>
 <span class="normal">225</span>
 <span class="normal">226</span>
 <span class="normal">227</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ResidentSimulationRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retain one exact resident simulation request.</span>
+<span class="w">    </span><span class="sd">"""Retain one exact resident simulation request.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        request: Complete identity-bound resident simulation request.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``request`` is not an exact request instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentSimulationRequest</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;request must be an exact ResidentSimulationRequest.&quot;</span>
+            <span class="s2">"request must be an exact ResidentSimulationRequest."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_request</span> <span class="o">=</span> <span class="n">request</span>
 </code></pre></div></td></tr></table></div>
@@ -16787,7 +16787,7 @@ operation reject execution.</p>
 <span class="normal">566</span>
 <span class="normal">567</span>
 <span class="normal">568</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Preflight then run one complete ordered timestep.</span>
+<span class="w">    </span><span class="sd">"""Preflight then run one complete ordered timestep.</span>
 
 <span class="sd">    Failures before a writer-capable invocation leave the session active.</span>
 <span class="sd">    Once dispatch begins, the token is closed and the session faults without</span>
@@ -16802,7 +16802,7 @@ operation reject execution.</p>
 <span class="sd">        ValueError: If resolved bindings, duration agreement, or an invoked</span>
 <span class="sd">            operation reject execution.</span>
 <span class="sd">        RuntimeError: If lifecycle token handling rejects the timestep.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span>
     <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span>
     <span class="n">updates</span> <span class="o">=</span> <span class="n">ResidentStateUpdateExecutor</span><span class="p">()</span>
@@ -16835,39 +16835,39 @@ operation reject execution.</p>
             <span class="k">if</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="n">_VIRTUAL_IDS</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">writer_called</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">&quot;communication&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">"communication"</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">communication</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;communication request is required.&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"communication request is required."</span><span class="p">)</span>
                 <span class="n">communication</span><span class="o">.</span><span class="n">execute_communication</span><span class="p">()</span>
                 <span class="n">thermal</span><span class="o">.</span><span class="n">record_completed</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">&quot;volume_evolution&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">"volume_evolution"</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">communication</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;communication request is required.&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"communication request is required."</span><span class="p">)</span>
                 <span class="n">communication</span><span class="o">.</span><span class="n">execute_volume_evolution</span><span class="p">()</span>
                 <span class="n">thermal</span><span class="o">.</span><span class="n">record_completed</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">&quot;environment_update&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">"environment_update"</span><span class="p">:</span>
                 <span class="n">updates</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">environment_update</span><span class="p">)</span>
                 <span class="n">thermal</span><span class="o">.</span><span class="n">record_completed</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">&quot;gas_update&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">"gas_update"</span><span class="p">:</span>
                 <span class="n">updates</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">gas_update</span><span class="p">)</span>
                 <span class="n">thermal</span><span class="o">.</span><span class="n">record_completed</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">&quot;condensation&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">"condensation"</span><span class="p">:</span>
                 <span class="n">thermal</span><span class="o">.</span><span class="n">execute_consumer</span><span class="p">(</span>
                     <span class="n">node</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">condensation</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">condensation</span><span class="p">)</span>
                 <span class="p">)</span>
-            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">&quot;brownian_coagulation&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">"brownian_coagulation"</span><span class="p">:</span>
                 <span class="n">coagulation</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">coagulation</span><span class="p">))</span>
                 <span class="n">thermal</span><span class="o">.</span><span class="n">record_completed</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">&quot;dilution&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">"dilution"</span><span class="p">:</span>
                 <span class="n">dilution</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">dilution</span><span class="p">)</span>
                 <span class="n">thermal</span><span class="o">.</span><span class="n">record_completed</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">&quot;wall_loss&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">"wall_loss"</span><span class="p">:</span>
                 <span class="n">wall_loss</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">wall_loss</span><span class="p">)</span>
                 <span class="n">thermal</span><span class="o">.</span><span class="n">record_completed</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">&quot;nucleation&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">"nucleation"</span><span class="p">:</span>
                 <span class="n">nucleation</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">nucleation</span><span class="p">)</span>
                 <span class="n">thermal</span><span class="o">.</span><span class="n">record_completed</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">&quot;diagnostics&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s2">"diagnostics"</span><span class="p">:</span>
                 <span class="n">thermal</span><span class="o">.</span><span class="n">execute_consumer</span><span class="p">(</span>
                     <span class="n">node</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">diagnostics</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">)</span>
                 <span class="p">)</span>

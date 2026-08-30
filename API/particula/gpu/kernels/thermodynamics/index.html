@@ -16415,7 +16415,7 @@ configuration is invalid. <code>gas.vapor_pressure</code> is unchanged.</p>
     <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Refresh caller-owned GPU vapor pressure from thermodynamic models.</span>
+<span class="w">    </span><span class="sd">"""Refresh caller-owned GPU vapor pressure from thermodynamic models.</span>
 
 <span class="sd">    Import this concrete-module API from</span>
 <span class="sd">    ``particula.gpu.kernels.thermodynamics``; it is intentionally not exported</span>
@@ -16439,19 +16439,19 @@ configuration is invalid. <code>gas.vapor_pressure</code> is unchanged.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If an input violates the device-array contract or the</span>
 <span class="sd">            configuration is invalid. ``gas.vapor_pressure`` is unchanged.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">caller_name</span> <span class="o">=</span> <span class="s2">&quot;refresh_vapor_pressure_gpu&quot;</span>
+<span class="sd">    """</span>
+    <span class="n">caller_name</span> <span class="o">=</span> <span class="s2">"refresh_vapor_pressure_gpu"</span>
     <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_species</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="n">_validate_refresh_gas</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="n">caller_name</span><span class="p">)</span>
     <span class="n">_validate_array_metadata</span><span class="p">(</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">,</span>
         <span class="n">temperature</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_boxes</span><span class="p">,),</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
         <span class="n">caller_name</span><span class="p">,</span>
-        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">_validate_positive_finite_array</span><span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">caller_name</span><span class="p">)</span>
+    <span class="n">_validate_positive_finite_array</span><span class="p">(</span><span class="s2">"temperature"</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">caller_name</span><span class="p">)</span>
     <span class="n">validate_thermodynamics_config</span><span class="p">(</span>
         <span class="n">thermodynamics</span><span class="p">,</span>
         <span class="n">n_species</span><span class="p">,</span>
@@ -16691,7 +16691,7 @@ ordered molar-mass fingerprint is invalid.</p>
     <span class="n">gas_molar_mass</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">caller_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ThermodynamicsConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate a thermodynamic sidecar and return its identical object.</span>
+<span class="w">    </span><span class="sd">"""Validate a thermodynamic sidecar and return its identical object.</span>
 
 <span class="sd">    Structural metadata is validated before any device-to-host readback. Valid</span>
 <span class="sd">    caller buffers are never allocated, replaced, or mutated. This</span>
@@ -16712,13 +16712,13 @@ ordered molar-mass fingerprint is invalid.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the configuration schema, device locality, values, or</span>
 <span class="sd">            ordered molar-mass fingerprint is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thermodynamics</span><span class="p">,</span> <span class="n">ThermodynamicsConfig</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;thermodynamics must be a ThermodynamicsConfig in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">"thermodynamics must be a ThermodynamicsConfig in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
     <span class="n">_validate_array_metadata</span><span class="p">(</span>
-        <span class="s2">&quot;modes&quot;</span><span class="p">,</span>
+        <span class="s2">"modes"</span><span class="p">,</span>
         <span class="n">thermodynamics</span><span class="o">.</span><span class="n">modes</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_species</span><span class="p">,),</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
@@ -16726,7 +16726,7 @@ ordered molar-mass fingerprint is invalid.</p>
         <span class="n">caller_name</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">_validate_array_metadata</span><span class="p">(</span>
-        <span class="s2">&quot;parameters&quot;</span><span class="p">,</span>
+        <span class="s2">"parameters"</span><span class="p">,</span>
         <span class="n">thermodynamics</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_species</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -16734,7 +16734,7 @@ ordered molar-mass fingerprint is invalid.</p>
         <span class="n">caller_name</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">_validate_array_metadata</span><span class="p">(</span>
-        <span class="s2">&quot;molar_mass_reference&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass_reference"</span><span class="p">,</span>
         <span class="n">thermodynamics</span><span class="o">.</span><span class="n">molar_mass_reference</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_species</span><span class="p">,),</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -16742,7 +16742,7 @@ ordered molar-mass fingerprint is invalid.</p>
         <span class="n">caller_name</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">_validate_array_metadata</span><span class="p">(</span>
-        <span class="s2">&quot;gas.molar_mass&quot;</span><span class="p">,</span>
+        <span class="s2">"gas.molar_mass"</span><span class="p">,</span>
         <span class="n">gas_molar_mass</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_species</span><span class="p">,),</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -16761,33 +16761,33 @@ ordered molar-mass fingerprint is invalid.</p>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">modes</span><span class="p">,</span> <span class="n">supported_modes</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;thermodynamics.modes contains an unsupported mode in &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">"thermodynamics.modes contains an unsupported mode in "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">parameters</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;thermodynamics.parameters must be finite and non-negative in &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">"thermodynamics.parameters must be finite and non-negative in "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">references</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">references</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;thermodynamics.molar_mass_reference must be finite and &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;positive in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">"thermodynamics.molar_mass_reference must be finite and "</span>
+            <span class="sa">f</span><span class="s2">"positive in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">gas_masses</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">gas_masses</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;gas.molar_mass must be finite and positive in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">"gas.molar_mass must be finite and positive in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
     <span class="n">constant</span> <span class="o">=</span> <span class="n">modes</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">THERMODYNAMICS_MODE_CONSTANT</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="n">constant</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;constant vapor-pressure parameters must be positive in &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">"constant vapor-pressure parameters must be positive in "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">references</span><span class="p">,</span> <span class="n">gas_masses</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;thermodynamics.molar_mass_reference must exactly match &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;gas.molar_mass in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">"thermodynamics.molar_mass_reference must exactly match "</span>
+            <span class="sa">f</span><span class="s2">"gas.molar_mass in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">thermodynamics</span>
 </code></pre></div></td></tr></table></div>

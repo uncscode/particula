@@ -16422,7 +16422,7 @@ concentration. If None, charge is ignored and returned None.</p>
     <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add concentration to the distribution of particles.</span>
+<span class="w">    </span><span class="sd">"""Add concentration to the distribution of particles.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - distribution : The distribution of particle sizes or masses.</span>
@@ -16438,7 +16438,7 @@ concentration. If None, charge is ignored and returned None.</p>
 <span class="sd">        - The updated distribution array.</span>
 <span class="sd">        - The updated concentration array.</span>
 <span class="sd">        - The updated charge array, or None if charge input was None.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16552,7 +16552,7 @@ size or mass.</p>
     <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">added_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add mass to the distribution of particles.</span>
+<span class="w">    </span><span class="sd">"""Add mass to the distribution of particles.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - distribution : The distribution of particle sizes or masses.</span>
@@ -16564,7 +16564,7 @@ size or mass.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        - The updated distribution array.</span>
 <span class="sd">        - The updated concentration array.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16699,7 +16699,7 @@ collisions. If None, charge handling is skipped.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
     <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collide index pairs in the distribution.</span>
+<span class="w">    </span><span class="sd">"""Collide index pairs in the distribution.</span>
 
 <span class="sd">    Performs collision between particle pairs specified by indices. The</span>
 <span class="sd">    smaller particle (first index in each pair) is merged into the larger</span>
@@ -16721,7 +16721,7 @@ collisions. If None, charge handling is skipped.</p>
 <span class="sd">            - Updated distribution array with merged masses.</span>
 <span class="sd">            - Updated concentration array with zeroed small particles.</span>
 <span class="sd">            - Updated charge array (None if input was None).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16796,7 +16796,7 @@ collisions. If None, charge handling is skipped.</p>
 <span class="normal">63</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_mass</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the mass of the particles or bin.</span>
+<span class="w">    </span><span class="sd">"""Calculate the mass of the particles or bin.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - distribution : The distribution of particle sizes or masses.</span>
@@ -16804,7 +16804,7 @@ collisions. If None, charge handling is skipped.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - The mass of the particles.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">distribution</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_species_mass</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_species_mass</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">density</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -16835,7 +16835,7 @@ collisions. If None, charge handling is skipped.</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the type of the distribution strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return the type of the distribution strategy."""</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16914,7 +16914,7 @@ collisions. If None, charge handling is skipped.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_radius</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the radius of the particles.</span>
+<span class="w">    </span><span class="sd">"""Calculate the radius of the particles.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - distribution : The distribution of particle sizes or masses.</span>
@@ -16922,7 +16922,7 @@ collisions. If None, charge handling is skipped.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - The radius of the particles in meters.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17000,7 +17000,7 @@ collisions. If None, charge handling is skipped.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_species_mass</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the mass per species in the distribution.</span>
+<span class="w">    </span><span class="sd">"""Return the mass per species in the distribution.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - distribution : The distribution of particle sizes or masses.</span>
@@ -17008,7 +17008,7 @@ collisions. If None, charge handling is skipped.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - The mass of the particles (per species).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17098,7 +17098,7 @@ size or mass in the distribution.</p>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the total mass of all particles (or bin).</span>
+<span class="w">    </span><span class="sd">"""Calculate the total mass of all particles (or bin).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - distribution : The distribution of particle sizes or masses.</span>
@@ -17108,7 +17108,7 @@ size or mass in the distribution.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - The total mass of the particles.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">masses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mass</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">masses</span> <span class="o">*</span> <span class="n">concentration</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>

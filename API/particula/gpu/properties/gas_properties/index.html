@@ -16182,7 +16182,7 @@
     <span class="n">ref_temperature</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">sutherland_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate dynamic viscosity with Sutherland&#39;s formula.</span>
+<span class="w">    </span><span class="sd">"""Calculate dynamic viscosity with Sutherland's formula.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.gas.properties.dynamic_viscosity.get_dynamic_viscosity``.</span>
@@ -16195,7 +16195,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dynamic viscosity [Pa·s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">ref_viscosity</span>
         <span class="o">*</span> <span class="n">wp</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">temperature</span> <span class="o">/</span> <span class="n">ref_temperature</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.5</span><span class="p">))</span>
@@ -16319,7 +16319,7 @@
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">gas_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate mean free path for a gas molecule.</span>
+<span class="w">    </span><span class="sd">"""Calculate mean free path for a gas molecule.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.gas.properties.mean_free_path.get_molecule_mean_free_path``.</span>
@@ -16333,7 +16333,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Mean free path of a gas molecule [m].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">pi_value</span> <span class="o">=</span> <span class="n">_PI</span>
     <span class="n">numerator</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">8.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">molar_mass</span>
     <span class="n">denominator</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">numerator</span> <span class="o">/</span> <span class="p">(</span><span class="n">pi_value</span> <span class="o">*</span> <span class="n">gas_constant</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">))</span>
@@ -16439,7 +16439,7 @@
     <span class="n">temperature</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">gas_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate partial pressure from concentration and temperature.</span>
+<span class="w">    </span><span class="sd">"""Calculate partial pressure from concentration and temperature.</span>
 
 <span class="sd">    Port of ``particula.gas.properties.pressure_function.get_partial_pressure``.</span>
 
@@ -16451,7 +16451,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Partial pressure [Pa].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">concentration</span> <span class="o">*</span> <span class="n">gas_constant</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">)</span> <span class="o">/</span> <span class="n">molar_mass</span>
 </code></pre></div></td></tr></table></div>
             </details>

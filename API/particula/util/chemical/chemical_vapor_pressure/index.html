@@ -16097,13 +16097,13 @@ temperature, a 0-d NumPy array is returned for consistency.</li>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example Usage – scalar input</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.materials.vapor_pressure</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_vapor_pressure</span>
-<span class="n">p_sat</span> <span class="o">=</span> <span class="n">get_vapor_pressure</span><span class="p">(</span><span class="s2">&quot;water&quot;</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span>
+<span class="n">p_sat</span> <span class="o">=</span> <span class="n">get_vapor_pressure</span><span class="p">(</span><span class="s2">"water"</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span>
 <span class="c1"># p_sat ≈ 3169.0  # Pa</span>
 </code></pre></div>
 <div class="highlight"><span class="filename">Example Usage – vectorised input</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.materials.vapor_pressure</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_vapor_pressure</span>
 <span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">280.0</span><span class="p">,</span> <span class="mf">290.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">])</span>
-<span class="n">p_sat</span> <span class="o">=</span> <span class="n">get_vapor_pressure</span><span class="p">(</span><span class="s2">&quot;water&quot;</span><span class="p">,</span> <span class="n">temps</span><span class="p">)</span>
+<span class="n">p_sat</span> <span class="o">=</span> <span class="n">get_vapor_pressure</span><span class="p">(</span><span class="s2">"water"</span><span class="p">,</span> <span class="n">temps</span><span class="p">)</span>
 <span class="c1"># p_sat → array([...])  # Pa</span>
 </code></pre></div>
 
@@ -16178,7 +16178,7 @@ temperature, a 0-d NumPy array is returned for consistency.</li>
 <span class="normal">66</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_chemical_vapor_pressure</span><span class="p">(</span>
     <span class="n">chemical_identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve the saturation-vapor pressure of a chemical at temperature.</span>
+<span class="w">    </span><span class="sd">"""Retrieve the saturation-vapor pressure of a chemical at temperature.</span>
 
 <span class="sd">    The saturation-vapor pressure (Pₛₐₜ) is obtained by calling the correlation</span>
 <span class="sd">    implemented in ``thermo.chemical.Chemical``:</span>
@@ -16198,30 +16198,30 @@ temperature, a 0-d NumPy array is returned for consistency.</li>
 <span class="sd">          temperature, a 0-d NumPy array is returned for consistency.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage – scalar input&quot;</span>
+<span class="sd">        ``` py title="Example Usage – scalar input"</span>
 <span class="sd">        from particula.util.materials.vapor_pressure import get_vapor_pressure</span>
-<span class="sd">        p_sat = get_vapor_pressure(&quot;water&quot;, 298.15)</span>
+<span class="sd">        p_sat = get_vapor_pressure("water", 298.15)</span>
 <span class="sd">        # p_sat ≈ 3169.0  # Pa</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Example Usage – vectorised input&quot;</span>
+<span class="sd">        ``` py title="Example Usage – vectorised input"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        from particula.util.materials.vapor_pressure import get_vapor_pressure</span>
 <span class="sd">        temps = np.array([280.0, 290.0, 300.0])</span>
-<span class="sd">        p_sat = get_vapor_pressure(&quot;water&quot;, temps)</span>
+<span class="sd">        p_sat = get_vapor_pressure("water", temps)</span>
 <span class="sd">        # p_sat → array([...])  # Pa</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Vapour pressure,&quot;</span>
+<span class="sd">        - "Vapour pressure,"</span>
 <span class="sd">          [Wikipedia](https://en.wikipedia.org/wiki/Vapour_pressure)</span>
-<span class="sd">        - R. H. Perry &amp; D. W. Green, *Perry&#39;s Chemical Engineers&#39; Handbook*,</span>
+<span class="sd">        - R. H. Perry &amp; D. W. Green, *Perry's Chemical Engineers' Handbook*,</span>
 <span class="sd">          8th ed., McGraw-Hill, 2007.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">Chemical</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;The &#39;thermo&#39; package is required for vapor pressure calculations.&quot;</span>
-            <span class="s2">&quot; Please install it using &#39;pip install thermo&#39;.&quot;</span>
+            <span class="s2">"The 'thermo' package is required for vapor pressure calculations."</span>
+            <span class="s2">" Please install it using 'pip install thermo'."</span>
         <span class="p">)</span>
 
     <span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>

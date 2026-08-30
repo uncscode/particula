@@ -16090,7 +16090,7 @@
   </span>
 
 <a href="#particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">CoagulationMechanismConfig</span><span class="p">(</span><span class="n">mechanisms</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;particle_resolved&#39;</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">CoagulationMechanismConfig</span><span class="p">(</span><span class="n">mechanisms</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'particle_resolved'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16269,7 +16269,7 @@ a non-empty tuple of strings, a mechanism is duplicated or unknown.</p>
 <span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resolve_coagulation_mechanism_config</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">CoagulationMechanismConfig</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ResolvedCoagulationMechanismConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a configuration through host-side structural validation.</span>
+<span class="w">    </span><span class="sd">"""Resolve a configuration through host-side structural validation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        config: Configuration whose distribution type and mechanism identifiers</span>
@@ -16281,22 +16281,22 @@ a non-empty tuple of strings, a mechanism is duplicated or unknown.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the distribution type is unsupported, mechanisms are not</span>
 <span class="sd">            a non-empty tuple of strings, a mechanism is duplicated or unknown.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">!=</span> <span class="s2">&quot;particle_resolved&quot;</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">!=</span> <span class="s2">"particle_resolved"</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;distribution_type must be exactly &#39;particle_resolved&#39;.&quot;</span>
+            <span class="s2">"distribution_type must be exactly 'particle_resolved'."</span>
         <span class="p">)</span>
     <span class="n">mechanisms</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">mechanisms</span>
     <span class="k">if</span> <span class="n">mechanisms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mechanisms</span> <span class="o">=</span> <span class="p">(</span><span class="n">BROWNIAN_MECHANISM</span><span class="p">,)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mechanisms</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">mechanisms</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mechanisms must be a non-empty tuple of strings.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"mechanisms must be a non-empty tuple of strings."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">mechanism</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">mechanism</span> <span class="ow">in</span> <span class="n">mechanisms</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mechanisms must contain only string identifiers.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"mechanisms must contain only string identifiers."</span><span class="p">)</span>
     <span class="n">seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">mechanism</span> <span class="ow">in</span> <span class="n">mechanisms</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">mechanism</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate coagulation mechanism &#39;</span><span class="si">{</span><span class="n">mechanism</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Duplicate coagulation mechanism '</span><span class="si">{</span><span class="n">mechanism</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
         <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mechanism</span><span class="p">)</span>
     <span class="n">unknown</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
         <span class="p">(</span>
@@ -16307,7 +16307,7 @@ a non-empty tuple of strings, a mechanism is duplicated or unknown.</p>
         <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">unknown</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown coagulation mechanism &#39;</span><span class="si">{</span><span class="n">unknown</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown coagulation mechanism '</span><span class="si">{</span><span class="n">unknown</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
     <span class="n">normalized_mechanisms</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
         <span class="n">mechanism</span>
         <span class="k">for</span> <span class="n">mechanism</span> <span class="ow">in</span> <span class="n">CANONICAL_COAGULATION_MECHANISMS</span>
@@ -16400,7 +16400,7 @@ a non-empty tuple of strings, a mechanism is duplicated or unknown.</p>
 <span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_coagulation_mechanism_capabilities</span><span class="p">(</span>
     <span class="n">resolved</span><span class="p">:</span> <span class="n">_ResolvedCoagulationMechanismConfig</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enforce the executable and deferred mechanism-mask boundary.</span>
+<span class="w">    </span><span class="sd">"""Enforce the executable and deferred mechanism-mask boundary.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        resolved: Structurally valid, normalized configuration to check.</span>
@@ -16410,10 +16410,10 @@ a non-empty tuple of strings, a mechanism is duplicated or unknown.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the mechanism mask is a deferred three-way combination.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">resolved</span><span class="o">.</span><span class="n">mask</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">):</span>
         <span class="k">return</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Additive coagulation execution is deferred.&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Additive coagulation execution is deferred."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

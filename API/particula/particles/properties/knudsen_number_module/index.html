@@ -16187,15 +16187,15 @@ particle radius.</li>
 <span class="normal">87</span>
 <span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;mean_free_path&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"mean_free_path"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_knudsen_number</span><span class="p">(</span>
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate Knudsen number (Kn) from mean free path and radius.</span>
+<span class="w">    </span><span class="sd">"""Calculate Knudsen number (Kn) from mean free path and radius.</span>
 
 <span class="sd">    The Knudsen number (Kn) indicates whether a flow is in the continuum</span>
 <span class="sd">    regime or the free molecular regime. It is computed by:</span>
@@ -16214,7 +16214,7 @@ particle radius.</li>
 <span class="sd">            particle radius.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_knudsen_number(6.5e-8, 1.0e-7)</span>
 <span class="sd">        # Output: 0.65</span>
@@ -16223,11 +16223,11 @@ particle radius.</li>
 <span class="sd">    References:</span>
 <span class="sd">        - Knudsen number, Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Knudsen_number</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mean_free_path</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
     <span class="p">):</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;The input must be a float or a numpy array&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">"The input must be a float or a numpy array"</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mean_free_path</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
@@ -16255,8 +16255,8 @@ particle radius.</li>
         <span class="k">return</span> <span class="n">mean_free_path</span> <span class="o">/</span> <span class="n">particle_radius</span>
 
     <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The input arrays must have the same size&quot;</span>
-        <span class="o">+</span> <span class="s2">&quot; or one of them must have size 1&quot;</span>
+        <span class="s2">"The input arrays must have the same size"</span>
+        <span class="o">+</span> <span class="s2">" or one of them must have size 1"</span>
     <span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>

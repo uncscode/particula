@@ -16625,7 +16625,7 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">diameters</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>  <span class="c1"># float32</span>
 
 <span class="c1"># Device (CPU or GPU)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">diameters</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># &quot;cpu&quot; or &quot;cuda&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">diameters</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># "cpu" or "cuda"</span>
 
 <span class="c1"># Size (number of particles)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">diameters</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>  <span class="c1"># 3</span>
@@ -16633,8 +16633,8 @@
 <h3 id="array-operations">Array Operations<a class="headerlink" href="#array-operations" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Create arrays on GPU for large particle populations</span>
 <span class="n">n_particles</span> <span class="o">=</span> <span class="mi">100000</span>
-<span class="n">gpu_positions</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
-<span class="n">gpu_diameters</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<span class="n">gpu_positions</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">)</span>
+<span class="n">gpu_diameters</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">)</span>
 
 <span class="c1"># Copy between CPU and GPU</span>
 <span class="n">cpu_data</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_particles</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -16690,13 +16690,13 @@
 <h3 id="distance-calculations">Distance Calculations<a class="headerlink" href="#distance-calculations" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">particle_separation</span><span class="p">(</span><span class="n">pos_i</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">pos_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate distance between two particles.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Calculate distance between two particles."""</span>
     <span class="n">diff</span> <span class="o">=</span> <span class="n">pos_j</span> <span class="o">-</span> <span class="n">pos_i</span>
     <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
 
 <span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">unit_direction</span><span class="p">(</span><span class="n">pos_i</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span> <span class="n">pos_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unit vector from particle i to particle j.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Unit vector from particle i to particle j."""</span>
     <span class="n">diff</span> <span class="o">=</span> <span class="n">pos_j</span> <span class="o">-</span> <span class="n">pos_i</span>
     <span class="n">dist</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">dist</span> <span class="o">&gt;</span> <span class="mf">1e-12</span><span class="p">:</span>
@@ -16713,7 +16713,7 @@
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">k_boltzmann</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.BOLTZMANN_CONSTANT</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build pairwise coagulation kernel matrix K[i,j].&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Build pairwise coagulation kernel matrix K[i,j]."""</span>
     <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
 
     <span class="n">d_i</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -16729,7 +16729,7 @@
 <p>For rotating reference frames or coordinate transformations:</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">rotation_matrix_z</span><span class="p">(</span><span class="n">angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">mat33</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotation matrix about z-axis.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Rotation matrix about z-axis."""</span>
     <span class="n">c</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">mat33</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="o">-</span><span class="n">s</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -16741,7 +16741,7 @@
     <span class="n">velocities</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">),</span>
     <span class="n">angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotate all particle velocities.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Rotate all particle velocities."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">R</span> <span class="o">=</span> <span class="n">rotation_matrix_z</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
     <span class="n">velocities</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span> <span class="o">=</span> <span class="n">R</span> <span class="o">*</span> <span class="n">velocities</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16751,7 +16751,7 @@
 <p>Define custom data structures for aerosol particles:</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Particle</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Single aerosol particle properties.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Single aerosol particle properties."""</span>
     <span class="n">position</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span>      <span class="c1"># Position (m)</span>
     <span class="n">velocity</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span>      <span class="c1"># Velocity (m/s)</span>
     <span class="n">diameter</span><span class="p">:</span> <span class="nb">float</span>        <span class="c1"># Diameter (m)</span>
@@ -16761,7 +16761,7 @@
 
 <span class="nd">@wp</span><span class="o">.</span><span class="n">struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ParticleSpecies</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Properties of a particle species/component.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Properties of a particle species/component."""</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="nb">float</span>      <span class="c1"># Molar mass (kg/mol)</span>
     <span class="n">density</span><span class="p">:</span> <span class="nb">float</span>         <span class="c1"># Bulk density (kg/m³)</span>
     <span class="n">surface_tension</span><span class="p">:</span> <span class="nb">float</span> <span class="c1"># Surface tension (N/m)</span>
@@ -16774,7 +16774,7 @@
     <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">gravity</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update particle positions and velocities.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Update particle positions and velocities."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">particles</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
 
@@ -16788,14 +16788,14 @@
 <h3 id="aerosol-distribution-structure">Aerosol Distribution Structure<a class="headerlink" href="#aerosol-distribution-structure" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SizeDistribution</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log-normal size distribution parameters.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Log-normal size distribution parameters."""</span>
     <span class="n">geometric_mean</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># Geometric mean diameter (m)</span>
     <span class="n">geometric_std</span><span class="p">:</span> <span class="nb">float</span>   <span class="c1"># Geometric standard deviation</span>
     <span class="n">total_number</span><span class="p">:</span> <span class="nb">float</span>    <span class="c1"># Total number concentration (#/m³)</span>
 
 <span class="nd">@wp</span><span class="o">.</span><span class="n">struct</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AerosolState</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete aerosol system state.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Complete aerosol system state."""</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span>     <span class="c1"># Temperature (K)</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span>        <span class="c1"># Pressure (Pa)</span>
     <span class="n">relative_humidity</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># Relative humidity (0-1)</span>
@@ -16812,7 +16812,7 @@
     <span class="n">positions</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">),</span>
     <span class="n">grid</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build spatial hash grid from particle positions.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Build spatial hash grid from particle positions."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">hash_grid_point_id</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">tid</span><span class="p">,</span> <span class="n">positions</span><span class="p">[</span><span class="n">tid</span><span class="p">])</span>
 
@@ -16825,7 +16825,7 @@
     <span class="n">n_collisions</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
     <span class="n">search_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find particle pairs within collision distance.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Find particle pairs within collision distance."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">pos_i</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
     <span class="n">d_i</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
@@ -16864,7 +16864,7 @@
     <span class="n">mesh</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
     <span class="n">wall_distances</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute distance from each particle to nearest wall.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute distance from each particle to nearest wall."""</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
     <span class="n">pos</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span>
 
@@ -16946,7 +16946,7 @@ transfer:</p>
 
 <span class="n">gpu_environment</span><span class="p">:</span> <span class="n">WarpEnvironmentData</span> <span class="o">=</span> <span class="n">to_warp_environment_data</span><span class="p">(</span>
     <span class="n">environment</span><span class="p">,</span>
-    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">restored</span> <span class="o">=</span> <span class="n">from_warp_environment_data</span><span class="p">(</span><span class="n">gpu_environment</span><span class="p">)</span>
 

@@ -16101,7 +16101,7 @@ place only for eligible slots, and resets only when explicitly requested.</p>
   </span>
 
 <a href="#particula.gpu.kernels.wall_loss.NeutralWallLossConfig" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">NeutralWallLossConfig</span><span class="p">(</span><span class="n">geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;particle_resolved&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;neutral&#39;</span><span class="p">,</span> <span class="n">wall_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">wall_electric_field</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">NeutralWallLossConfig</span><span class="p">(</span><span class="n">geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'particle_resolved'</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'neutral'</span><span class="p">,</span> <span class="n">wall_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">wall_electric_field</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16400,12 +16400,12 @@ logical box, avoiding repeated direct-boundary preflight and launches.</p>
     <span class="n">selected_boxes</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Privately dispatch one validated wall-loss writer over selected boxes.</span>
+<span class="w">    </span><span class="sd">"""Privately dispatch one validated wall-loss writer over selected boxes.</span>
 
 <span class="sd">    This resident-only seam is deliberately not re-exported.  Its index buffer</span>
 <span class="sd">    is prevalidated by the caller and maps one writer thread to each selected</span>
 <span class="sd">    logical box, avoiding repeated direct-boundary preflight and launches.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">validated_config</span> <span class="o">=</span> <span class="n">_validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
     <span class="n">n_boxes</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="n">_validate_particle_schema</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
@@ -16416,7 +16416,7 @@ logical box, avoiding repeated direct-boundary preflight and launches.</p>
         <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">selected_boxes</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;selected_boxes must be a nonempty same-device int32 array.&quot;</span>
+            <span class="s2">"selected_boxes must be a nonempty same-device int32 array."</span>
         <span class="p">)</span>
     <span class="c1"># The resident adapter validates selected logical indices before allocating</span>
     <span class="c1"># this private same-device view. Avoid host inspection here so selected</span>
@@ -16430,7 +16430,7 @@ logical box, avoiding repeated direct-boundary preflight and launches.</p>
         <span class="n">environment</span><span class="p">,</span>
         <span class="n">n_boxes</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
-        <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;wall_loss_selected_boxes_step_gpu&quot;</span><span class="p">,</span>
+        <span class="n">caller_name</span><span class="o">=</span><span class="s2">"wall_loss_selected_boxes_step_gpu"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">_validate_rng</span><span class="p">(</span><span class="n">rng_seed</span><span class="p">,</span> <span class="n">rng_states</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">validated_time_step</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
@@ -16441,7 +16441,7 @@ logical box, avoiding repeated direct-boundary preflight and launches.</p>
         <span class="n">environment</span><span class="p">,</span>
         <span class="n">n_boxes</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
-        <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;wall_loss_selected_boxes_step_gpu&quot;</span><span class="p">,</span>
+        <span class="n">caller_name</span><span class="o">=</span><span class="s2">"wall_loss_selected_boxes_step_gpu"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">temperature_array</span> <span class="o">=</span> <span class="n">_normalize_execution_environment_array</span><span class="p">(</span>
         <span class="n">temperature_array</span><span class="p">,</span> <span class="n">n_boxes</span>
@@ -16452,7 +16452,7 @@ logical box, avoiding repeated direct-boundary preflight and launches.</p>
     <span class="n">n_particles</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">n_species</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">dimensions</span> <span class="o">=</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">chamber_dimensions</span> <span class="ow">or</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;neutral&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">"neutral"</span><span class="p">:</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
             <span class="n">_wall_loss_remove_selected</span><span class="p">,</span>
             <span class="n">dim</span><span class="o">=</span><span class="n">selected_boxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
@@ -16469,7 +16469,7 @@ logical box, avoiding repeated direct-boundary preflight and launches.</p>
                 <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
                 <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
                 <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
-                <span class="mi">0</span> <span class="k">if</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">&quot;spherical&quot;</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="mi">0</span> <span class="k">if</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">"spherical"</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span>
                 <span class="n">n_particles</span><span class="p">,</span>
                 <span class="n">n_species</span><span class="p">,</span>
                 <span class="n">rng_states</span><span class="p">,</span>
@@ -16479,7 +16479,7 @@ logical box, avoiding repeated direct-boundary preflight and launches.</p>
             <span class="p">],</span>
             <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">&quot;spherical&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">"spherical"</span><span class="p">:</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
             <span class="n">_charged_spherical_wall_loss_remove_selected</span><span class="p">,</span>
             <span class="n">dim</span><span class="o">=</span><span class="n">selected_boxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
@@ -16903,7 +16903,7 @@ with direct environment inputs.</p>
     <span class="n">initialize_rng</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply direct neutral or charged wall loss to eligible fixed slots.</span>
+<span class="w">    </span><span class="sd">"""Apply direct neutral or charged wall loss to eligible fixed slots.</span>
 
 <span class="sd">    The configuration supports particle-resolved neutral and charged wall loss.</span>
 <span class="sd">    Charged nonzero slots compose private P2 image enhancement and P3 signed</span>
@@ -16956,7 +16956,7 @@ with direct environment inputs.</p>
 <span class="sd">            values, shapes, dtypes, or devices violate the direct contract,</span>
 <span class="sd">            including an invalid charged field or combining ``environment``</span>
 <span class="sd">            with direct environment inputs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">validated_config</span> <span class="o">=</span> <span class="n">_validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
     <span class="n">n_boxes</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="n">_validate_particle_schema</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
     <span class="n">_validate_charged_rectangular_field</span><span class="p">(</span><span class="n">validated_config</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
@@ -16968,7 +16968,7 @@ with direct environment inputs.</p>
         <span class="n">environment</span><span class="p">,</span>
         <span class="n">n_boxes</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
-        <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;wall_loss_step_gpu&quot;</span><span class="p">,</span>
+        <span class="n">caller_name</span><span class="o">=</span><span class="s2">"wall_loss_step_gpu"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">_validate_rng</span><span class="p">(</span><span class="n">rng_seed</span><span class="p">,</span> <span class="n">rng_states</span><span class="p">,</span> <span class="n">initialize_rng</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">validated_time_step</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
@@ -16980,7 +16980,7 @@ with direct environment inputs.</p>
         <span class="n">environment</span><span class="p">,</span>
         <span class="n">n_boxes</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
-        <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;wall_loss_step_gpu&quot;</span><span class="p">,</span>
+        <span class="n">caller_name</span><span class="o">=</span><span class="s2">"wall_loss_step_gpu"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">temperature_array</span> <span class="o">=</span> <span class="n">_normalize_execution_environment_array</span><span class="p">(</span>
         <span class="n">temperature_array</span><span class="p">,</span> <span class="n">n_boxes</span>
@@ -16994,10 +16994,10 @@ with direct environment inputs.</p>
     <span class="k">if</span> <span class="n">execution_rng_states</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">execution_rng_states</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
         <span class="n">initialize_rng</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">geometry_mode</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">&quot;spherical&quot;</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="n">geometry_mode</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">"spherical"</span> <span class="k">else</span> <span class="mi">1</span>
     <span class="n">chamber_radius</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">validated_config</span><span class="o">.</span><span class="n">chamber_radius</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">)</span>
     <span class="n">dimensions</span> <span class="o">=</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">chamber_dimensions</span> <span class="ow">or</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;neutral&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">"neutral"</span><span class="p">:</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
             <span class="n">_wall_loss_remove</span><span class="p">,</span>
             <span class="n">dim</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
@@ -17023,7 +17023,7 @@ with direct environment inputs.</p>
             <span class="p">],</span>
             <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">&quot;spherical&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">"spherical"</span><span class="p">:</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
             <span class="n">_charged_spherical_wall_loss_remove</span><span class="p">,</span>
             <span class="n">dim</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>

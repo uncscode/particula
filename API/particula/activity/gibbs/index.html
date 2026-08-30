@@ -16152,7 +16152,7 @@ gibbs_real: Real Gibbs free energy of mixing (ideal + mix).</p>
     <span class="n">organic_mole_fraction</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">gibbs_mix</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute ideal and real Gibbs free energy of mixing.</span>
+<span class="w">    </span><span class="sd">"""Compute ideal and real Gibbs free energy of mixing.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        organic_mole_fraction: Mole fraction of the organic component.</span>
@@ -16172,7 +16172,7 @@ gibbs_real: Real Gibbs free energy of mixing (ideal + mix).</p>
 <span class="sd">        &gt;&gt;&gt; g_ideal, g_real = gibbs_free_energy(x_org, g_mix)</span>
 <span class="sd">        &gt;&gt;&gt; g_ideal.shape, g_real.shape</span>
 <span class="sd">        ((3,), (3,))</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">gibbs_ideal</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="n">get_safe_log</span><span class="p">(</span>
         <span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span>
     <span class="p">)</span> <span class="o">+</span> <span class="n">organic_mole_fraction</span> <span class="o">*</span> <span class="n">get_safe_log</span><span class="p">(</span><span class="n">organic_mole_fraction</span><span class="p">)</span>
@@ -16225,15 +16225,15 @@ gibbs_real: Real Gibbs free energy of mixing (ideal + mix).</p>
     <span class="n">organic_mole_fraction</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">gibbs_mix</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deprecated alias for gibbs_free_energy.</span>
+<span class="w">    </span><span class="sd">"""Deprecated alias for gibbs_free_energy.</span>
 
 <span class="sd">    .. deprecated:: 0.3.0</span>
 <span class="sd">        Use :func:`gibbs_free_energy` instead. This alias will be removed</span>
 <span class="sd">        in a future version.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-        <span class="s2">&quot;gibbs_free_engery is deprecated and will be removed in a future &quot;</span>
-        <span class="s2">&quot;version. Use gibbs_free_energy instead.&quot;</span><span class="p">,</span>
+        <span class="s2">"gibbs_free_engery is deprecated and will be removed in a future "</span>
+        <span class="s2">"version. Use gibbs_free_energy instead."</span><span class="p">,</span>
         <span class="ne">DeprecationWarning</span><span class="p">,</span>
         <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="p">)</span>

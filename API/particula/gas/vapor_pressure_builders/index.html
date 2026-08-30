@@ -16636,8 +16636,8 @@ Follows the general form of the Antoine equation in</p>
 <div class="highlight"><span class="filename">AntoineVaporPressureBuilder with units</span><pre><span></span><code><span class="n">strategy</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AntoineVaporPressureBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_a</span><span class="p">(</span><span class="mf">8.07131</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_b</span><span class="p">(</span><span class="mf">1730.63</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_c</span><span class="p">(</span><span class="mf">233.426</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_b</span><span class="p">(</span><span class="mf">1730.63</span><span class="p">,</span> <span class="s2">"K"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_c</span><span class="p">(</span><span class="mf">233.426</span><span class="p">,</span> <span class="s2">"K"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -16679,13 +16679,13 @@ creating an AntoineVaporPressureStrategy.</p>
 <span class="normal">105</span>
 <span class="normal">106</span>
 <span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Antoine vapor pressure builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Antoine vapor pressure builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters (a, b, c) for</span>
 <span class="sd">    creating an AntoineVaporPressureStrategy.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">]</span>
-    <span class="c1"># Call the base class&#39;s __init__ method</span>
+<span class="sd">    """</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">]</span>
+    <span class="c1"># Call the base class's __init__ method</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="kc">None</span>
@@ -16748,12 +16748,12 @@ coefficients.</p>
 <span class="normal">147</span>
 <span class="normal">148</span>
 <span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AntoineVaporPressureStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and return an AntoineVaporPressureStrategy using the set</span>
+<span class="w">    </span><span class="sd">"""Validate and return an AntoineVaporPressureStrategy using the set</span>
 <span class="sd">    coefficients.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Configured with coefficients a, b, and c.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">AntoineVaporPressureStrategy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16792,13 +16792,13 @@ coefficients.</p>
 <span class="normal">118</span>
 <span class="normal">119</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_a</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AntoineVaporPressureBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the coefficient &#39;a&#39; of the Antoine equation.&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AntoineVaporPressureBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the coefficient 'a' of the Antoine equation."""</span>
     <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Coefficient &#39;a&#39; must be a positive value.&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Coefficient &#39;a&#39; must be a positive value.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Coefficient 'a' must be a positive value."</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Coefficient 'a' must be a positive value."</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">a_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring units for coefficient &#39;a&#39;.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for coefficient 'a'."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16815,7 +16815,7 @@ coefficients.</p>
 
 
 <a href="#particula.gas.vapor_pressure_builders.AntoineVaporPressureBuilder.set_b" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_b</span><span class="p">(</span><span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;K&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AntoineVaporPressureBuilder</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_b</span><span class="p">(</span><span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'K'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AntoineVaporPressureBuilder</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16833,15 +16833,15 @@ coefficients.</p>
 <span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
-<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"b"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_b</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;K&quot;</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AntoineVaporPressureBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the coefficient &#39;b&#39; of the Antoine equation.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">b_units</span> <span class="o">==</span> <span class="s2">&quot;K&quot;</span><span class="p">:</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"K"</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AntoineVaporPressureBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the coefficient 'b' of the Antoine equation."""</span>
+    <span class="k">if</span> <span class="n">b_units</span> <span class="o">==</span> <span class="s2">"K"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
         <span class="k">return</span> <span class="bp">self</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only K units are supported for coefficient &#39;b&#39;.&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Only K units are supported for coefficient 'b'."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16856,7 +16856,7 @@ coefficients.</p>
 
 
 <a href="#particula.gas.vapor_pressure_builders.AntoineVaporPressureBuilder.set_c" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_c</span><span class="p">(</span><span class="n">c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;K&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AntoineVaporPressureBuilder</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_c</span><span class="p">(</span><span class="n">c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'K'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AntoineVaporPressureBuilder</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16874,15 +16874,15 @@ coefficients.</p>
 <span class="normal">136</span>
 <span class="normal">137</span>
 <span class="normal">138</span>
-<span class="normal">139</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">139</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"c"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_c</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;K&quot;</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AntoineVaporPressureBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the coefficient &#39;c&#39; of the Antoine equation.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">c_units</span> <span class="o">==</span> <span class="s2">&quot;K&quot;</span><span class="p">:</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"K"</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AntoineVaporPressureBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the coefficient 'c' of the Antoine equation."""</span>
+    <span class="k">if</span> <span class="n">c_units</span> <span class="o">==</span> <span class="s2">"K"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">c</span>
         <span class="k">return</span> <span class="bp">self</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only K units are supported for coefficient &#39;c&#39;.&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Only K units are supported for coefficient 'c'."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16943,9 +16943,9 @@ pressure with unit handling and then builds the strategy object.</p>
 </code></pre></div>
 <div class="highlight"><span class="filename">ClausiusClapeyronVaporPressureBuilder with units</span><pre><span></span><code><span class="n">strategy</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">ClausiusClapeyronVaporPressureBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_latent_heat</span><span class="p">(</span><span class="mi">2260</span><span class="p">,</span> <span class="s2">&quot;J/mol&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_temperature_initial</span><span class="p">(</span><span class="mf">373.15</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_pressure_initial</span><span class="p">(</span><span class="mi">101325</span><span class="p">,</span> <span class="s2">&quot;Pa&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_latent_heat</span><span class="p">(</span><span class="mi">2260</span><span class="p">,</span> <span class="s2">"J/mol"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_temperature_initial</span><span class="p">(</span><span class="mf">373.15</span><span class="p">,</span> <span class="s2">"K"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_pressure_initial</span><span class="p">(</span><span class="mi">101325</span><span class="p">,</span> <span class="s2">"Pa"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -16988,16 +16988,16 @@ temperature, and initial pressure.</p>
 <span class="normal">210</span>
 <span class="normal">211</span>
 <span class="normal">212</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Clausius-Clapeyron vapor pressure builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Clausius-Clapeyron vapor pressure builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    ClausiusClapeyronStrategy, including latent heat, initial</span>
 <span class="sd">    temperature, and initial pressure.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_keys</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;latent_heat&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature_initial&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;pressure_initial&quot;</span><span class="p">,</span>
+        <span class="s2">"latent_heat"</span><span class="p">,</span>
+        <span class="s2">"temperature_initial"</span><span class="p">,</span>
+        <span class="s2">"pressure_initial"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_keys</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span> <span class="o">=</span> <span class="kc">None</span>
@@ -17063,11 +17063,11 @@ temperature, and initial pressure.</p>
 <span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ClausiusClapeyronStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and return a ClausiusClapeyronStrategy object.</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and return a ClausiusClapeyronStrategy object.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Configured with latent heat, initial Temperature, and Pressure.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">ClausiusClapeyronStrategy</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
@@ -17109,16 +17109,16 @@ temperature, and initial pressure.</p>
 <span class="normal">222</span>
 <span class="normal">223</span>
 <span class="normal">224</span>
-<span class="normal">225</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">225</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"latent_heat"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_latent_heat</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">latent_heat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">latent_heat_units</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ClausiusClapeyronVaporPressureBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the latent heat of vaporization: Default units J/mol.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">latent_heat_units</span> <span class="o">==</span> <span class="s2">&quot;J/mol&quot;</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ClausiusClapeyronVaporPressureBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the latent heat of vaporization: Default units J/mol."""</span>
+    <span class="k">if</span> <span class="n">latent_heat_units</span> <span class="o">==</span> <span class="s2">"J/mol"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span> <span class="o">=</span> <span class="n">latent_heat</span>
         <span class="k">return</span> <span class="bp">self</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat</span> <span class="o">=</span> <span class="n">latent_heat</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
-        <span class="n">latent_heat_units</span><span class="p">,</span> <span class="s2">&quot;J/mol&quot;</span>
+        <span class="n">latent_heat_units</span><span class="p">,</span> <span class="s2">"J/mol"</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17156,16 +17156,16 @@ temperature, and initial pressure.</p>
 <span class="normal">248</span>
 <span class="normal">249</span>
 <span class="normal">250</span>
-<span class="normal">251</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;pressure_initial&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">251</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"pressure_initial"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_pressure_initial</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">pressure_initial</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pressure_initial_units</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ClausiusClapeyronVaporPressureBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the initial pressure. Default units: Pa.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">pressure_initial_units</span> <span class="o">==</span> <span class="s2">&quot;Pa&quot;</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ClausiusClapeyronVaporPressureBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the initial pressure. Default units: Pa."""</span>
+    <span class="k">if</span> <span class="n">pressure_initial_units</span> <span class="o">==</span> <span class="s2">"Pa"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pressure_initial</span> <span class="o">=</span> <span class="n">pressure_initial</span>
         <span class="k">return</span> <span class="bp">self</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pressure_initial</span> <span class="o">=</span> <span class="n">pressure_initial</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
-        <span class="n">pressure_initial_units</span><span class="p">,</span> <span class="s2">&quot;Pa&quot;</span>
+        <span class="n">pressure_initial_units</span><span class="p">,</span> <span class="s2">"Pa"</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17203,16 +17203,16 @@ temperature, and initial pressure.</p>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
-<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature_initial&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"temperature_initial"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_temperature_initial</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature_initial</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">temperature_initial_units</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ClausiusClapeyronVaporPressureBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the initial temperature. Default units: K.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">temperature_initial_units</span> <span class="o">==</span> <span class="s2">&quot;K&quot;</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ClausiusClapeyronVaporPressureBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the initial temperature. Default units: K."""</span>
+    <span class="k">if</span> <span class="n">temperature_initial_units</span> <span class="o">==</span> <span class="s2">"K"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temperature_initial</span> <span class="o">=</span> <span class="n">temperature_initial</span>
         <span class="k">return</span> <span class="bp">self</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">temperature_initial</span> <span class="o">=</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
-        <span class="n">temperature_initial_units</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="n">temperature_initial</span>
+        <span class="n">temperature_initial_units</span><span class="p">,</span> <span class="s2">"K"</span><span class="p">,</span> <span class="n">temperature_initial</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17279,7 +17279,7 @@ setting the constant vapor pressure and then building the strategy object.</p>
 </code></pre></div>
 <div class="highlight"><span class="filename">ConstantVaporPressureBuilder with units</span><pre><span></span><code><span class="n">strategy</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">ConstantVaporPressureBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_vapor_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;atm&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_vapor_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"atm"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -17312,11 +17312,11 @@ setting the constant vapor pressure and then building the strategy object.</p>
 <span class="normal">306</span>
 <span class="normal">307</span>
 <span class="normal">308</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Constant vapor pressure builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Constant vapor pressure builder.</span>
 
 <span class="sd">    Sets up the builder with the required vapor_pressure parameter.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;vapor_pressure&quot;</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">required_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"vapor_pressure"</span><span class="p">]</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_keys</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">vapor_pressure</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
@@ -17375,11 +17375,11 @@ setting the constant vapor pressure and then building the strategy object.</p>
 <span class="normal">328</span>
 <span class="normal">329</span>
 <span class="normal">330</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstantVaporPressureStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and return ConstantVaporPressureStrategy.</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and return ConstantVaporPressureStrategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Configured with vapor_pressure in Pa.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vapor_pressure</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -17417,16 +17417,16 @@ setting the constant vapor pressure and then building the strategy object.</p>
 <span class="normal">318</span>
 <span class="normal">319</span>
 <span class="normal">320</span>
-<span class="normal">321</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;vapor_pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">321</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"vapor_pressure"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_vapor_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">vapor_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">vapor_pressure_units</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ConstantVaporPressureBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the constant vapor pressure.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">vapor_pressure_units</span> <span class="o">==</span> <span class="s2">&quot;Pa&quot;</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ConstantVaporPressureBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the constant vapor pressure."""</span>
+    <span class="k">if</span> <span class="n">vapor_pressure_units</span> <span class="o">==</span> <span class="s2">"Pa"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vapor_pressure</span> <span class="o">=</span> <span class="n">vapor_pressure</span>
         <span class="k">return</span> <span class="bp">self</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">vapor_pressure</span> <span class="o">=</span> <span class="n">vapor_pressure</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
-        <span class="n">vapor_pressure_units</span><span class="p">,</span> <span class="s2">&quot;Pa&quot;</span>
+        <span class="n">vapor_pressure_units</span><span class="p">,</span> <span class="s2">"Pa"</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17479,9 +17479,9 @@ commonly called C^sat (or C* when in a mixture) in aerosol sciences.</p>
   <div class="highlight"><span class="filename">SaturationConcentrationVaporPressureBuilder</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">SaturationConcentrationVaporPressureBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_saturation_concentration</span><span class="p">(</span><span class="mf">10e-6</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.200</span><span class="p">,</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mf">298.15</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_saturation_concentration</span><span class="p">(</span><span class="mf">10e-6</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.200</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mf">298.15</span><span class="p">,</span> <span class="s2">"K"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -17523,16 +17523,16 @@ molar mass, and temperature.</p>
 <span class="normal">385</span>
 <span class="normal">386</span>
 <span class="normal">387</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Saturation Concentration vapor pressure builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Saturation Concentration vapor pressure builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    ConstantVaporPressureStrategy from saturation concentration,</span>
 <span class="sd">    molar mass, and temperature.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;saturation_concentration&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">,</span>
+        <span class="s2">"saturation_concentration"</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderMolarMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -17612,14 +17612,14 @@ ideal-gas relationship between concentration and partial pressure.</p>
 <span class="normal">437</span>
 <span class="normal">438</span>
 <span class="normal">439</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstantVaporPressureStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate all parameters and construct a</span>
+<span class="w">    </span><span class="sd">"""Validate all parameters and construct a</span>
 <span class="sd">    ConstantVaporPressureStrategy whose value is obtained from the</span>
 <span class="sd">    ideal-gas relationship between concentration and partial pressure.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ConstantVaporPressureStrategy containing the calculated vapor</span>
 <span class="sd">        pressure.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
 
     <span class="n">vapor_pressure</span> <span class="o">=</span> <span class="n">get_partial_pressure</span><span class="p">(</span>
@@ -17689,7 +17689,7 @@ ideal-gas relationship between concentration and partial pressure.</p>
   <div class="highlight"><span class="filename">SaturationConcentrationVaporPressureBuilder</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">SaturationConcentrationVaporPressureBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_saturation_concentration</span><span class="p">(</span><span class="mf">10e-6</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_saturation_concentration</span><span class="p">(</span><span class="mf">10e-6</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
 <span class="p">)</span>
 </code></pre></div>
 </details>
@@ -17728,37 +17728,37 @@ ideal-gas relationship between concentration and partial pressure.</p>
 <span class="normal">418</span>
 <span class="normal">419</span>
 <span class="normal">420</span>
-<span class="normal">421</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;saturation_concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="normal">421</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"saturation_concentration"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_saturation_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">saturation_concentration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">saturation_concentration_units</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SaturationConcentrationVaporPressureBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the saturation concentration (C*, C^sat).</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"SaturationConcentrationVaporPressureBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the saturation concentration (C*, C^sat).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - saturation_concentration : Value of the saturation concentration.</span>
 <span class="sd">        - saturation_concentration_units : Any units convertible to</span>
-<span class="sd">            ``&quot;kg/m^3&quot;`` via ``get_unit_conversion`` are accepted.</span>
+<span class="sd">            ``"kg/m^3"`` via ``get_unit_conversion`` are accepted.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">       - The builder itself for fluent chaining.</span>
 
 <span class="sd">    Example:</span>
-<span class="sd">        ```py title=&quot;SaturationConcentrationVaporPressureBuilder&quot;</span>
+<span class="sd">        ```py title="SaturationConcentrationVaporPressureBuilder"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        strategy = (</span>
 <span class="sd">            par.gas.SaturationConcentrationVaporPressureBuilder()</span>
-<span class="sd">            .set_saturation_concentration(10e-6, &quot;kg/m^3&quot;)</span>
+<span class="sd">            .set_saturation_concentration(10e-6, "kg/m^3")</span>
 <span class="sd">        )</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">saturation_concentration_units</span> <span class="o">==</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">saturation_concentration_units</span> <span class="o">==</span> <span class="s2">"kg/m^3"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">saturation_concentration</span> <span class="o">=</span> <span class="n">saturation_concentration</span>
         <span class="k">return</span> <span class="bp">self</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">saturation_concentration</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">saturation_concentration</span>
-        <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="n">saturation_concentration_units</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+        <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="n">saturation_concentration_units</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17822,13 +17822,13 @@ and temperature.</p>
 <span class="normal">490</span>
 <span class="normal">491</span>
 <span class="normal">492</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Table vapor pressure builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Table vapor pressure builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    TableVaporPressureStrategy from lookup tables of vapor pressure</span>
 <span class="sd">    and temperature.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;vapor_pressure_table&quot;</span><span class="p">,</span> <span class="s2">&quot;temperature_table&quot;</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"vapor_pressure_table"</span><span class="p">,</span> <span class="s2">"temperature_table"</span><span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderTemperatureTableMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">vapor_pressure_table</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -17874,7 +17874,7 @@ and temperature.</p>
 <span class="normal">515</span>
 <span class="normal">516</span>
 <span class="normal">517</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TableVaporPressureStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and construct a TableVaporPressureStrategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate and construct a TableVaporPressureStrategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="n">temperature_table</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature_table</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">TableVaporPressureStrategy</span><span class="p">(</span>
@@ -17895,7 +17895,7 @@ and temperature.</p>
 
 
 <a href="#particula.gas.vapor_pressure_builders.TableVaporPressureBuilder.set_vapor_pressure_table" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_vapor_pressure_table</span><span class="p">(</span><span class="n">vapor_pressure_table</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">vapor_pressure_table_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Pa&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TableVaporPressureBuilder</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_vapor_pressure_table</span><span class="p">(</span><span class="n">vapor_pressure_table</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">vapor_pressure_table_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'Pa'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TableVaporPressureBuilder</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17919,18 +17919,18 @@ and temperature.</p>
 <span class="normal">505</span>
 <span class="normal">506</span>
 <span class="normal">507</span>
-<span class="normal">508</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;vapor_pressure_table&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">508</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"vapor_pressure_table"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_vapor_pressure_table</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">vapor_pressure_table</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">vapor_pressure_table_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Pa&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;TableVaporPressureBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the vapor pressure lookup table.&quot;&quot;&quot;</span>
+    <span class="n">vapor_pressure_table_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Pa"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"TableVaporPressureBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the vapor pressure lookup table."""</span>
     <span class="n">table</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vapor_pressure_table</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">vapor_pressure_table_units</span> <span class="o">!=</span> <span class="s2">&quot;Pa&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">vapor_pressure_table_units</span> <span class="o">!=</span> <span class="s2">"Pa"</span><span class="p">:</span>
         <span class="n">table</span> <span class="o">=</span> <span class="n">table</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
             <span class="n">vapor_pressure_table_units</span><span class="p">,</span>
-            <span class="s2">&quot;Pa&quot;</span><span class="p">,</span>
+            <span class="s2">"Pa"</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">vapor_pressure_table</span> <span class="o">=</span> <span class="n">table</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -17996,10 +17996,10 @@ extended in the future (e.g., ice-only calculations).</p>
 <span class="normal">459</span>
 <span class="normal">460</span>
 <span class="normal">461</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Water Buck vapor pressure builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the Water Buck vapor pressure builder.</span>
 
 <span class="sd">    Sets up the builder for creating a WaterBuckStrategy.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -18056,11 +18056,11 @@ extended in the future (e.g., ice-only calculations).</p>
 <span class="normal">467</span>
 <span class="normal">468</span>
 <span class="normal">469</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WaterBuckStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return a WaterBuckStrategy object.</span>
+<span class="w">    </span><span class="sd">"""Build and return a WaterBuckStrategy object.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - Configured for water-specific Buck vapor pressure.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">WaterBuckStrategy</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>

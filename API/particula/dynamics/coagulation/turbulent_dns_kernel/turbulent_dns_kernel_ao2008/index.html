@@ -16259,9 +16259,9 @@ DNS simulations.</p>
 <span class="normal"> 99</span>
 <span class="normal">100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;velocity_dispersion&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_inertia_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"velocity_dispersion"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"particle_inertia_time"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_turbulent_dns_kernel_ao2008</span><span class="p">(</span>
@@ -16276,7 +16276,7 @@ DNS simulations.</p>
     <span class="n">kolmogorov_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
     <span class="c1"># pylint: disable=too-many-arguments, too-many-positional-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the geometric collision kernel Γ₁₂ from DNS simulations.</span>
+<span class="w">    </span><span class="sd">"""Compute the geometric collision kernel Γ₁₂ from DNS simulations.</span>
 
 <span class="sd">    Where the equation is</span>
 
@@ -16307,7 +16307,7 @@ DNS simulations.</p>
 <span class="sd">        the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">        Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">        https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Type narrowing: ensure array for indexing operations</span>
     <span class="n">radius_array</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">particle_radius</span>
@@ -16642,7 +16642,7 @@ dimensionality as <code>particle_radius</code>.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
     <span class="c1"># pylint: disable=too-many-arguments, too-many-positional-arguments</span>
     <span class="c1"># pylint: disable=too-many-locals</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the geometric collision kernel Γ₁₂ using AO2008 for system.</span>
+<span class="w">    </span><span class="sd">"""Compute the geometric collision kernel Γ₁₂ using AO2008 for system.</span>
 
 <span class="sd">    This function orchestrates the calculation of the geometric collision</span>
 <span class="sd">    kernel by deriving necessary fluid, turbulence, and particle parameters</span>
@@ -16686,7 +16686,7 @@ dimensionality as <code>particle_radius</code>.</p>
 <span class="sd">          the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">          Theory and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">          https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># 1. Basic fluid properties</span>
     <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
     <span class="n">kinematic_viscosity</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">get_kinematic_viscosity</span><span class="p">(</span>

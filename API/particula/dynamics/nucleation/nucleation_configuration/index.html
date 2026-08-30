@@ -16195,26 +16195,26 @@ a later concrete source operation.</p>
 <span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the supported strategy types and nonnegative index.</span>
+<span class="w">    </span><span class="sd">"""Validate the supported strategy types and nonnegative index.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``precursor_index`` is not a non-Boolean integer.</span>
 <span class="sd">        ValueError: If the strategy is unsupported or the index is negative.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="p">,</span>
         <span class="p">(</span><span class="n">ActivationNucleationStrategy</span><span class="p">,</span> <span class="n">KineticNucleationStrategy</span><span class="p">),</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;strategy must be ActivationNucleationStrategy or &quot;</span>
-            <span class="s2">&quot;KineticNucleationStrategy&quot;</span>
+            <span class="s2">"strategy must be ActivationNucleationStrategy or "</span>
+            <span class="s2">"KineticNucleationStrategy"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
     <span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;precursor_index must be an integer&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"precursor_index must be an integer"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;precursor_index must be nonnegative&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"precursor_index must be nonnegative"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

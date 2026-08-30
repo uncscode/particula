@@ -16134,7 +16134,7 @@
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_capability_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deeply validate a capability matrix and every declaration it retains.</span>
+<span class="w">    </span><span class="sd">"""Deeply validate a capability matrix and every declaration it retains.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        matrix: Candidate capability matrix carrier.</span>
@@ -16142,25 +16142,25 @@
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a carrier or nested declaration has an invalid type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">CapabilityMatrix</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2"> must be a CapabilityMatrix.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2"> must be a CapabilityMatrix."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">declarations</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">frozenset</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.declarations must be a frozenset.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.declarations must be a frozenset."</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">declaration</span> <span class="ow">in</span> <span class="n">matrix</span><span class="o">.</span><span class="n">declarations</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">declaration</span><span class="p">,</span> <span class="n">CapabilityDeclaration</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.declarations must contain only &quot;</span>
-                <span class="s2">&quot;CapabilityDeclaration instances.&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.declarations must contain only "</span>
+                <span class="s2">"CapabilityDeclaration instances."</span>
             <span class="p">)</span>
-        <span class="n">_validate_device</span><span class="p">(</span><span class="n">declaration</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.declaration.device&quot;</span><span class="p">)</span>
+        <span class="n">_validate_device</span><span class="p">(</span><span class="n">declaration</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.declaration.device"</span><span class="p">)</span>
         <span class="n">_validate_process</span><span class="p">(</span>
             <span class="n">declaration</span><span class="o">.</span><span class="n">process</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.declaration.process&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.declaration.process"</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">_validate_requirements</span><span class="p">(</span>
             <span class="n">declaration</span><span class="o">.</span><span class="n">requirements</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.declaration.requirements&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.declaration.requirements"</span><span class="p">,</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16246,7 +16246,7 @@
 <span class="normal">36</span>
 <span class="normal">37</span>
 <span class="normal">38</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_execution_request</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deeply validate an execution request and its nested declarations.</span>
+<span class="w">    </span><span class="sd">"""Deeply validate an execution request and its nested declarations.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        request: Candidate execution request carrier.</span>
@@ -16255,16 +16255,16 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a carrier or nested declaration has an invalid type.</span>
 <span class="sd">        ValueError: If a nested value violates its closed declaration contract.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">ExecutionRequest</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2"> must be an ExecutionRequest.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2"> must be an ExecutionRequest."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="n">Backend</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.backend must be a Backend.&quot;</span><span class="p">)</span>
-    <span class="n">_validate_device</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.device&quot;</span><span class="p">)</span>
-    <span class="n">_validate_process</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.process&quot;</span><span class="p">)</span>
-    <span class="n">_validate_requirements</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">requirements</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.requirements&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.backend must be a Backend."</span><span class="p">)</span>
+    <span class="n">_validate_device</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.device"</span><span class="p">)</span>
+    <span class="n">_validate_process</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.process"</span><span class="p">)</span>
+    <span class="n">_validate_requirements</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">requirements</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">.requirements"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2"> backend must match device.backend.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2"> backend must match device.backend."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

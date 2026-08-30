@@ -16437,11 +16437,11 @@ optional backends.</p>
 <span class="normal">89</span>
 <span class="normal">90</span>
 <span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate canonical, distinct dependency endpoints.&quot;&quot;&quot;</span>
-    <span class="n">_validate_node_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">before_id</span><span class="p">,</span> <span class="s2">&quot;DependencyEdge.before_id&quot;</span><span class="p">)</span>
-    <span class="n">_validate_node_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">after_id</span><span class="p">,</span> <span class="s2">&quot;DependencyEdge.after_id&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""Validate canonical, distinct dependency endpoints."""</span>
+    <span class="n">_validate_node_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">before_id</span><span class="p">,</span> <span class="s2">"DependencyEdge.before_id"</span><span class="p">)</span>
+    <span class="n">_validate_node_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">after_id</span><span class="p">,</span> <span class="s2">"DependencyEdge.after_id"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">before_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">after_id</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DependencyEdge endpoints must differ.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"DependencyEdge endpoints must differ."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16709,32 +16709,32 @@ ordered resident barrier declarations, not process or backend APIs.</p>
 <span class="normal">139</span>
 <span class="normal">140</span>
 <span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the node&#39;s typed immutable declaration fields.&quot;&quot;&quot;</span>
-    <span class="n">_validate_node_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span> <span class="s2">&quot;ProcessNode.node_id&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""Validate the node's typed immutable declaration fields."""</span>
+    <span class="n">_validate_node_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span> <span class="s2">"ProcessNode.node_id"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span> <span class="n">NodeKind</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;ProcessNode.kind must be a NodeKind.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"ProcessNode.kind must be a NodeKind."</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="n">Process</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;ProcessNode.process must be a Process or None.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"ProcessNode.process must be a Process or None."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requirements</span><span class="p">,</span> <span class="n">CapabilityRequirements</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;ProcessNode.requirements must be a CapabilityRequirements.&quot;</span>
+            <span class="s2">"ProcessNode.requirements must be a CapabilityRequirements."</span>
         <span class="p">)</span>
     <span class="n">_validate_frozenset_members</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">,</span>
         <span class="n">ResourceRequirement</span><span class="p">,</span>
-        <span class="s2">&quot;ProcessNode.resources&quot;</span><span class="p">,</span>
+        <span class="s2">"ProcessNode.resources"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">_validate_frozenset_members</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">invalidates</span><span class="p">,</span>
         <span class="n">InvalidatedState</span><span class="p">,</span>
-        <span class="s2">&quot;ProcessNode.invalidates&quot;</span><span class="p">,</span>
+        <span class="s2">"ProcessNode.invalidates"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="n">NodeKind</span><span class="o">.</span><span class="n">PROCESS</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Process nodes must declare a Process.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Process nodes must declare a Process."</span><span class="p">)</span>
     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">requirements</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Non-process nodes must have no Process and empty requirements.&quot;</span>
+            <span class="s2">"Non-process nodes must have no Process and empty requirements."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16852,11 +16852,11 @@ and cycles, then canonicalize declaration order.</p>
 <span class="normal">181</span>
 <span class="normal">182</span>
 <span class="normal">183</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact resolved-graph container and member types.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate exact resolved-graph container and member types."""</span>
     <span class="n">_validate_plan_members</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">,</span>
-        <span class="s2">&quot;ResolvedProcessGraph&quot;</span><span class="p">,</span>
+        <span class="s2">"ResolvedProcessGraph"</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17017,8 +17017,8 @@ resource or selecting a backend.</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">156</span>
 <span class="normal">157</span>
 <span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact graph-plan container and member types.&quot;&quot;&quot;</span>
-    <span class="n">_validate_plan_members</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">,</span> <span class="s2">&quot;TimestepPlan&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""Validate exact graph-plan container and member types."""</span>
+    <span class="n">_validate_plan_members</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">,</span> <span class="s2">"TimestepPlan"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17182,7 +17182,7 @@ effective dependencies contain a cycle.</p>
     <span class="n">nodes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ProcessNode</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
     <span class="n">dependencies</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DependencyEdge</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a deterministic canonical dependency order for graph records.</span>
+<span class="w">    </span><span class="sd">"""Return a deterministic canonical dependency order for graph records.</span>
 
 <span class="sd">    Ready nodes and successor traversal use lexical node identifiers, so the</span>
 <span class="sd">    result never depends on declaration order. This read-only helper validates</span>
@@ -17201,11 +17201,11 @@ effective dependencies contain a cycle.</p>
 <span class="sd">        TypeError: If containers or members do not have the declared types.</span>
 <span class="sd">        ValueError: If node identifiers repeat, an endpoint is absent, or the</span>
 <span class="sd">            effective dependencies contain a cycle.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_topology_members</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">dependencies</span><span class="p">)</span>
     <span class="n">node_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">node_id</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">node_ids</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Topology node IDs must be unique.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Topology node IDs must be unique."</span><span class="p">)</span>
     <span class="n">declared_ids</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">node_ids</span><span class="p">)</span>
     <span class="n">adjacent</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">node_id</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="n">declared_ids</span><span class="p">}</span>
     <span class="n">indegree</span> <span class="o">=</span> <span class="p">{</span><span class="n">node_id</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="n">declared_ids</span><span class="p">}</span>
@@ -17214,7 +17214,7 @@ effective dependencies contain a cycle.</p>
             <span class="n">edge</span><span class="o">.</span><span class="n">before_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">declared_ids</span>
             <span class="ow">or</span> <span class="n">edge</span><span class="o">.</span><span class="n">after_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">declared_ids</span>
         <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dependency endpoints must be declared node IDs.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Dependency endpoints must be declared node IDs."</span><span class="p">)</span>
         <span class="n">adjacent</span><span class="p">[</span><span class="n">edge</span><span class="o">.</span><span class="n">before_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">after_id</span><span class="p">)</span>
         <span class="n">indegree</span><span class="p">[</span><span class="n">edge</span><span class="o">.</span><span class="n">after_id</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -17235,7 +17235,7 @@ effective dependencies contain a cycle.</p>
         <span class="n">remaining</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="n">node_id</span> <span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">degree</span> <span class="ow">in</span> <span class="n">indegree</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">degree</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cycle detected: &quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">remaining</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Cycle detected: "</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">remaining</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"."</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ordered</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17355,7 +17355,7 @@ schema, or acyclic graph constraints.</p>
 <span class="normal">401</span>
 <span class="normal">402</span>
 <span class="normal">403</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resolve_timestep_plan</span><span class="p">(</span><span class="n">plan</span><span class="p">:</span> <span class="n">TimestepPlan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedProcessGraph</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and deterministically normalize a declaration-only plan.</span>
+<span class="w">    </span><span class="sd">"""Validate and deterministically normalize a declaration-only plan.</span>
 
 <span class="sd">    This pure boundary neither schedules nor executes the declared graph,</span>
 <span class="sd">    accesses resources, or selects an execution backend. For complete resident</span>
@@ -17373,9 +17373,9 @@ schema, or acyclic graph constraints.</p>
 <span class="sd">        TypeError: If the plan is not a ``TimestepPlan``.</span>
 <span class="sd">        ValueError: If declarations violate the closed catalogue, dependency</span>
 <span class="sd">            schema, or acyclic graph constraints.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">TimestepPlan</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;plan must be a TimestepPlan.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"plan must be a TimestepPlan."</span><span class="p">)</span>
     <span class="n">node_ids</span> <span class="o">=</span> <span class="n">_validate_nodes</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
     <span class="n">_validate_dependencies</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">dependencies</span><span class="p">,</span> <span class="n">node_ids</span><span class="p">)</span>
     <span class="n">normalized_nodes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">node</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">node_id</span><span class="p">))</span>

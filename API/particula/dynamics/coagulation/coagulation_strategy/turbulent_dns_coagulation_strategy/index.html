@@ -16249,7 +16249,7 @@ collisions.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example usage of TurbulentDNSCoagulationStrategy</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">TurbulentDNSCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="o">=</span><span class="mf">1.225</span><span class="p">,</span>
     <span class="n">reynolds_lambda</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span>
@@ -16367,11 +16367,11 @@ number.</p>
     <span class="n">relative_velocity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="c1"># pylint: disable=too-many-arguments, too-many-positional-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the TurbulentDNSCoagulationStrategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the TurbulentDNSCoagulationStrategy.</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        - distribution_type : The distribution type (&quot;discrete&quot;,</span>
-<span class="sd">          &quot;continuous_pdf&quot;, or &quot;particle_resolved&quot;).</span>
+<span class="sd">        - distribution_type : The distribution type ("discrete",</span>
+<span class="sd">          "continuous_pdf", or "particle_resolved").</span>
 <span class="sd">        - turbulent_dissipation : Turbulent kinetic energy dissipation</span>
 <span class="sd">          [m^2/s^3].</span>
 <span class="sd">        - fluid_density : The fluid density [kg/m^3].</span>
@@ -16381,7 +16381,7 @@ number.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - None</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">turbulent_dissipation</span> <span class="o">=</span> <span class="n">turbulent_dissipation</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">fluid_density</span> <span class="o">=</span> <span class="n">fluid_density</span>
@@ -16503,7 +16503,7 @@ NotImplementedError.</p>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute or return the dimensionless kernel (H).</span>
+<span class="w">    </span><span class="sd">"""Compute or return the dimensionless kernel (H).</span>
 
 <span class="sd">    Not implemented for DNS-based approaches, so raises</span>
 <span class="sd">    NotImplementedError.</span>
@@ -16520,10 +16520,10 @@ NotImplementedError.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        - NotImplementedError : This strategy does not support</span>
 <span class="sd">        dimensionless kernels.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The dimensionless kernel is not implemented for &quot;</span>
-        <span class="s2">&quot;TurbulentDNSCoagulationStrategy.&quot;</span>
+        <span class="s2">"The dimensionless kernel is not implemented for "</span>
+        <span class="s2">"TurbulentDNSCoagulationStrategy."</span>
     <span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -16667,7 +16667,7 @@ for interface consistency).</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the DNS-based coagulation kernel [m^3/s].</span>
+<span class="w">    </span><span class="sd">"""Compute the DNS-based coagulation kernel [m^3/s].</span>
 
 <span class="sd">    Uses the `get_turbulent_dns_kernel_ao2008_via_system_state` function to</span>
 <span class="sd">    calculate collision rates following Ayala et al. (2008). This approach</span>
@@ -16700,7 +16700,7 @@ for interface consistency).</p>
 <span class="sd">      on the geometric collision rate of sedimenting droplets. Part 2.</span>
 <span class="sd">      New Journal of Physics, 10.</span>
 <span class="sd">      [DOI](https://doi.org/10.1088/1367-2630/10/7/075016)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_turbulent_dns_kernel_ao2008_via_system_state</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">_get_radius</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
         <span class="n">particle_density</span><span class="o">=</span><span class="n">_get_mean_effective_density</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
@@ -16780,7 +16780,7 @@ for interface consistency).</p>
 <span class="normal">156</span>
 <span class="normal">157</span>
 <span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_relative_velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_velocity</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the relative velocity of the flow [m/s].</span>
+<span class="w">    </span><span class="sd">"""Set the relative velocity of the flow [m/s].</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - relative_velocity : Relative velocity in [m/s].</span>
@@ -16792,7 +16792,7 @@ for interface consistency).</p>
 <span class="sd">        ```py</span>
 <span class="sd">        strategy.set_relative_velocity(0.8)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">relative_velocity</span> <span class="o">=</span> <span class="n">relative_velocity</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16865,7 +16865,7 @@ for interface consistency).</p>
 <span class="normal">139</span>
 <span class="normal">140</span>
 <span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_reynolds_lambda</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reynolds_lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the Reynolds lambda value.</span>
+<span class="w">    </span><span class="sd">"""Set the Reynolds lambda value.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - reynolds_lambda : Reynolds lambda [dimensionless].</span>
@@ -16877,7 +16877,7 @@ for interface consistency).</p>
 <span class="sd">        ```py</span>
 <span class="sd">        strategy.set_reynolds_lambda(74)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">reynolds_lambda</span> <span class="o">=</span> <span class="n">reynolds_lambda</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16950,7 +16950,7 @@ for interface consistency).</p>
 <span class="normal">122</span>
 <span class="normal">123</span>
 <span class="normal">124</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_turbulent_dissipation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the turbulent kinetic energy dissipation rate.</span>
+<span class="w">    </span><span class="sd">"""Set the turbulent kinetic energy dissipation rate.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - turbulent_dissipation : Turbulent dissipation [m^2/s^3].</span>
@@ -16962,7 +16962,7 @@ for interface consistency).</p>
 <span class="sd">        ```py</span>
 <span class="sd">        strategy.set_turbulent_dissipation(0.02)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">turbulent_dissipation</span> <span class="o">=</span> <span class="n">turbulent_dissipation</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>

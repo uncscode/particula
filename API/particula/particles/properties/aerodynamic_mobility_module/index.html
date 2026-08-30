@@ -16169,9 +16169,9 @@ https://en.wikipedia.org/wiki/Stokes%27_law.</li>
 <span class="normal">59</span>
 <span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;slip_correction_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dynamic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"slip_correction_factor"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"dynamic_viscosity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_aerodynamic_mobility</span><span class="p">(</span>
@@ -16179,7 +16179,7 @@ https://en.wikipedia.org/wiki/Stokes%27_law.</li>
     <span class="n">slip_correction_factor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the aerodynamic mobility of a particle using classical fluid</span>
+<span class="w">    </span><span class="sd">"""Calculate the aerodynamic mobility of a particle using classical fluid</span>
 <span class="sd">    mechanics.</span>
 
 <span class="sd">    The aerodynamic mobility (B) can be determined by:</span>
@@ -16199,7 +16199,7 @@ https://en.wikipedia.org/wiki/Stokes%27_law.</li>
 <span class="sd">        - The particle aerodynamic mobility in m²/s.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_particle_aerodynamic_mobility(</span>
 <span class="sd">            particle_radius=0.00005,</span>
@@ -16208,9 +16208,9 @@ https://en.wikipedia.org/wiki/Stokes%27_law.</li>
 <span class="sd">        )</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Wikipedia contributors, &quot;Stokes&#39; Law,&quot; Wikipedia,</span>
+<span class="sd">        - Wikipedia contributors, "Stokes' Law," Wikipedia,</span>
 <span class="sd">        https://en.wikipedia.org/wiki/Stokes%27_law.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">slip_correction_factor</span> <span class="o">/</span> <span class="p">(</span>
         <span class="mi">6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">dynamic_viscosity</span> <span class="o">*</span> <span class="n">particle_radius</span>
     <span class="p">)</span>

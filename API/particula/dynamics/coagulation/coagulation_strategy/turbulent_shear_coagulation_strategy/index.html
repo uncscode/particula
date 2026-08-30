@@ -16201,7 +16201,7 @@ rate [m<sup>2/s</sup>3].</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Example usage of TurbulentShearCoagulationStrategy</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">TurbulentShearCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="o">=</span><span class="mf">1.225</span><span class="p">,</span>
 <span class="p">)</span>
@@ -16295,18 +16295,18 @@ rate [m<sup>2/s</sup>3].</p>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the turbulent shear coagulation strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the turbulent shear coagulation strategy.</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        - distribution_type : The distribution type (&quot;discrete&quot;,</span>
-<span class="sd">          &quot;continuous_pdf&quot;, or &quot;particle_resolved&quot;).</span>
+<span class="sd">        - distribution_type : The distribution type ("discrete",</span>
+<span class="sd">          "continuous_pdf", or "particle_resolved").</span>
 <span class="sd">        - turbulent_dissipation : Turbulent kinetic energy dissipation</span>
 <span class="sd">          rate [m^2/s^3].</span>
 <span class="sd">        - fluid_density : The fluid density [kg/m^3].</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - None</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">turbulent_dissipation</span> <span class="o">=</span> <span class="n">turbulent_dissipation</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">fluid_density</span> <span class="o">=</span> <span class="n">fluid_density</span>
@@ -16382,7 +16382,7 @@ rate [m<sup>2/s</sup>3].</p>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">dimensionless_kernel</span><span class="p">(</span><span class="n">diff_kn</span><span class="p">,</span> <span class="n">phi_ratio</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Not implemented for turbulent shear strategy.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Not implemented for turbulent shear strategy."</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -16436,7 +16436,7 @@ rate [m<sup>2/s</sup>3].</p>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a dimensionless kernel (H).</span>
+<span class="w">    </span><span class="sd">"""Compute a dimensionless kernel (H).</span>
 
 <span class="sd">    Not implemented for turbulent shear; raises NotImplementedError.</span>
 
@@ -16454,16 +16454,16 @@ rate [m<sup>2/s</sup>3].</p>
 <span class="sd">        try:</span>
 <span class="sd">            result = strategy.dimensionless_kernel(diff_kn, phi_ratio)</span>
 <span class="sd">        except NotImplementedError:</span>
-<span class="sd">            print(&quot;Not implemented for turbulent shear strategy.&quot;)</span>
+<span class="sd">            print("Not implemented for turbulent shear strategy.")</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Saffman &amp; Turner (1956) used dimensional forms; dimensionless</span>
 <span class="sd">          form is not covered.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;Dimensionless kernel not implemented in turbulent shear &quot;</span>
-        <span class="o">+</span> <span class="s2">&quot;coagulation strategy.&quot;</span>
+        <span class="s2">"Dimensionless kernel not implemented in turbulent shear "</span>
+        <span class="o">+</span> <span class="s2">"coagulation strategy."</span>
     <span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -16603,7 +16603,7 @@ particle radii.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the dimensioned turbulent shear coagulation kernel [m^3/s].</span>
+<span class="w">    </span><span class="sd">"""Compute the dimensioned turbulent shear coagulation kernel [m^3/s].</span>
 
 <span class="sd">    Uses the system state to calculate the Saffman-Turner (1956) kernel,</span>
 <span class="sd">    which depends on the dissipation rate of turbulent kinetic energy,</span>
@@ -16619,7 +16619,7 @@ particle radii.</p>
 <span class="sd">        - float or NDArray[np.float64] : The coagulation kernel(s) [m^3/s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example usage of kernel method&quot;</span>
+<span class="sd">        ```py title="Example usage of kernel method"</span>
 <span class="sd">        kernel_value = strategy.kernel(</span>
 <span class="sd">            particle=ParticleRepresentation(...),</span>
 <span class="sd">            temperature=298.15,</span>
@@ -16633,7 +16633,7 @@ particle radii.</p>
 <span class="sd">        - Saffman, P. G., &amp; Turner, J. S. (1956). On the collision of drops</span>
 <span class="sd">          in turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.</span>
 <span class="sd">          https://doi.org/10.1017/S0022112056000020</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_turbulent_shear_kernel_st1956_via_system_state</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">_get_radius</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
         <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">turbulent_dissipation</span><span class="p">,</span>
@@ -16712,7 +16712,7 @@ rate [m<sup>2/s</sup>3].</p>
 <span class="normal">112</span>
 <span class="normal">113</span>
 <span class="normal">114</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_turbulent_dissipation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the turbulent kinetic energy dissipation rate.</span>
+<span class="w">    </span><span class="sd">"""Set the turbulent kinetic energy dissipation rate.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - turbulent_dissipation : Turbulent kinetic energy dissipation</span>
@@ -16725,7 +16725,7 @@ rate [m<sup>2/s</sup>3].</p>
 <span class="sd">        ```py</span>
 <span class="sd">        strategy.set_turbulent_dissipation(0.02)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">turbulent_dissipation</span> <span class="o">=</span> <span class="n">turbulent_dissipation</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>

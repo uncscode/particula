@@ -16158,7 +16158,7 @@
 <span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_chemical_stp_properties</span><span class="p">(</span><span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return selected thermodynamic properties of *identifier* at STP.</span>
+<span class="w">    </span><span class="sd">"""Return selected thermodynamic properties of *identifier* at STP.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -16169,16 +16169,16 @@
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
 <span class="sd">        {</span>
-<span class="sd">            &quot;molar_mass&quot;: kg mol⁻¹,</span>
-<span class="sd">            &quot;density&quot;: kg m⁻³,</span>
-<span class="sd">            &quot;surface_tension&quot;: N m⁻¹,</span>
-<span class="sd">            &quot;pure_vapor_pressure&quot;: Pa,</span>
+<span class="sd">            "molar_mass": kg mol⁻¹,</span>
+<span class="sd">            "density": kg m⁻³,</span>
+<span class="sd">            "surface_tension": N m⁻¹,</span>
+<span class="sd">            "pure_vapor_pressure": Pa,</span>
 <span class="sd">        }</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">Chemical</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;The &#39;thermo&#39; package is required. &quot;</span>
-            <span class="s2">&quot;Please install it using &#39;pip install thermo&#39;.&quot;</span>
+            <span class="s2">"The 'thermo' package is required. "</span>
+            <span class="s2">"Please install it using 'pip install thermo'."</span>
         <span class="p">)</span>
 
     <span class="n">chem</span> <span class="o">=</span> <span class="n">Chemical</span><span class="p">(</span>
@@ -16186,15 +16186,15 @@
     <span class="p">)</span>  <span class="c1"># Explicitly set STP: T=298.15 K, P=101325 Pa</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">MW</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span>  <span class="c1"># kg/mol</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">rho</span><span class="p">,</span>  <span class="c1"># kg/m³</span>
-        <span class="s2">&quot;surface_tension&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span>  <span class="c1"># N/m</span>
-        <span class="s2">&quot;pure_vapor_pressure&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">Psat</span><span class="p">,</span>  <span class="c1"># Pa</span>
-        <span class="s2">&quot;cas_number&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">CAS</span><span class="p">,</span>  <span class="c1"># CAS number</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>  <span class="c1"># Chemical name</span>
-        <span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">smiles</span><span class="p">,</span>  <span class="c1"># SMILES representation</span>
-        <span class="s2">&quot;formula&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">formula</span><span class="p">,</span>  <span class="c1"># Chemical formula</span>
-        <span class="s2">&quot;pubchem_id&quot;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">PubChem</span><span class="p">,</span>  <span class="c1"># PubChem ID</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">MW</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span>  <span class="c1"># kg/mol</span>
+        <span class="s2">"density"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">rho</span><span class="p">,</span>  <span class="c1"># kg/m³</span>
+        <span class="s2">"surface_tension"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span>  <span class="c1"># N/m</span>
+        <span class="s2">"pure_vapor_pressure"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">Psat</span><span class="p">,</span>  <span class="c1"># Pa</span>
+        <span class="s2">"cas_number"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">CAS</span><span class="p">,</span>  <span class="c1"># CAS number</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>  <span class="c1"># Chemical name</span>
+        <span class="s2">"smiles"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">smiles</span><span class="p">,</span>  <span class="c1"># SMILES representation</span>
+        <span class="s2">"formula"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">formula</span><span class="p">,</span>  <span class="c1"># Chemical formula</span>
+        <span class="s2">"pubchem_id"</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">PubChem</span><span class="p">,</span>  <span class="c1"># PubChem ID</span>
     <span class="p">}</span>  <span class="c1"># type: ignore</span>
 </code></pre></div></td></tr></table></div>
             </details>

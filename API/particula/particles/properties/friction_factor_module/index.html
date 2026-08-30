@@ -16184,9 +16184,9 @@ The formula used is:</p>
 <span class="normal">68</span>
 <span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dynamic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;slip_correction&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"dynamic_viscosity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"slip_correction"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_friction_factor</span><span class="p">(</span>
@@ -16194,7 +16194,7 @@ The formula used is:</p>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">slip_correction</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the friction factor for a particle in a fluid.</span>
+<span class="w">    </span><span class="sd">"""Calculate the friction factor for a particle in a fluid.</span>
 
 <span class="sd">    This friction factor (f) is the proportionality constant between</span>
 <span class="sd">    the fluid velocity and the resulting drag force on the particle.</span>
@@ -16215,7 +16215,7 @@ The formula used is:</p>
 <span class="sd">        - The friction factor of the particle in N·s/m.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_friction_factor(</span>
 <span class="sd">            particle_radius=1e-7,</span>
@@ -16227,12 +16227,12 @@ The formula used is:</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - Zhang, C., Thajudeen, T., Larriba, C., Schwartzentruber, T. E.,</span>
-<span class="sd">          &amp; Hogan, C. J. (2012). &quot;Determination of the Scalar Friction Factor</span>
+<span class="sd">          &amp; Hogan, C. J. (2012). "Determination of the Scalar Friction Factor</span>
 <span class="sd">          for Nonspherical Particles and Aggregates Across the Entire Knudsen</span>
-<span class="sd">          Number Range by Direct Simulation Monte Carlo (DSMC).&quot;</span>
+<span class="sd">          Number Range by Direct Simulation Monte Carlo (DSMC)."</span>
 <span class="sd">          Aerosol Science and Technology, 46(10), 1065-1078.</span>
 <span class="sd">          https://doi.org/10.1080/02786826.2012.690543</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">dynamic_viscosity</span> <span class="o">*</span> <span class="n">particle_radius</span> <span class="o">/</span> <span class="n">slip_correction</span>
 </code></pre></div></td></tr></table></div>
             </details>

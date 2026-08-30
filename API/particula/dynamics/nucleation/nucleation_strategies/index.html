@@ -16651,12 +16651,12 @@ factor returns exactly <code>0.0</code> after basic input validation and convers
 <span class="normal">550</span>
 <span class="normal">551</span>
 <span class="normal">552</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate immutable activation-strategy configuration.</span>
+<span class="w">    </span><span class="sd">"""Validate immutable activation-strategy configuration.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a scalar configuration value is not a scalar real.</span>
 <span class="sd">        ValueError: If configuration values or metadata records are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_strategy_configuration</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validity_domain</span><span class="p">,</span>
@@ -16826,7 +16826,7 @@ yield a nonfinite conversion or rate.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">saturation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the activation potential event rate [#/m³/s].</span>
+<span class="w">    </span><span class="sd">"""Calculate the activation potential event rate [#/m³/s].</span>
 
 <span class="sd">    Basic inputs and number-concentration conversion are validated before</span>
 <span class="sd">    exact zero paths. Nonzero inputs must lie in the configured inclusive</span>
@@ -16846,7 +16846,7 @@ yield a nonfinite conversion or rate.</p>
 <span class="sd">        TypeError: If required inputs are not accepted scalar real values.</span>
 <span class="sd">        ValueError: If inputs are physically invalid, out of domain, or</span>
 <span class="sd">            yield a nonfinite conversion or rate.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">concentration</span><span class="p">,</span> <span class="n">normalized_temperature</span><span class="p">,</span> <span class="n">normalized_saturation</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">_preflight_rate_inputs</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">validity_domain</span><span class="p">,</span>
@@ -17001,16 +17001,16 @@ yield a nonfinite conversion or rate.</p>
 <span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate finite ordered interval endpoints.</span>
+<span class="w">    </span><span class="sd">"""Validate finite ordered interval endpoints.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If an endpoint is not a scalar real value.</span>
 <span class="sd">        ValueError: If an endpoint is nonfinite or ``lower &gt; upper``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">lower</span> <span class="o">=</span> <span class="n">_finite_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">)</span>
-    <span class="n">upper</span> <span class="o">=</span> <span class="n">_finite_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">_finite_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="s2">"lower"</span><span class="p">)</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">_finite_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="s2">"upper"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">lower</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;lower must be less than or equal to upper&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"lower must be less than or equal to upper"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17070,14 +17070,14 @@ yield a nonfinite conversion or rate.</p>
 <span class="normal">142</span>
 <span class="normal">143</span>
 <span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test inclusive membership for an already validated value.</span>
+<span class="w">    </span><span class="sd">"""Test inclusive membership for an already validated value.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value: Normalized scalar value to test.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ``True`` if ``lower &lt;= value &lt;= upper``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17106,7 +17106,7 @@ yield a nonfinite conversion or rate.</p>
   </span>
 
 <a href="#particula.dynamics.nucleation.nucleation_strategies.FormationMetadata" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">FormationMetadata</span><span class="p">(</span><span class="n">formation_diameter</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">diameter_convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mobility_diameter&#39;</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">FormationMetadata</span><span class="p">(</span><span class="n">formation_diameter</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">diameter_convention</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'mobility_diameter'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17204,15 +17204,15 @@ yield a nonfinite conversion or rate.</p>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the potential-rate size representation.</span>
+<span class="w">    </span><span class="sd">"""Validate the potential-rate size representation.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If the diameter is not a scalar real value.</span>
 <span class="sd">        ValueError: If the diameter is invalid or its convention differs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_positive_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formation_diameter</span><span class="p">,</span> <span class="s2">&quot;formation_diameter&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diameter_convention</span> <span class="o">!=</span> <span class="s2">&quot;mobility_diameter&quot;</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;diameter_convention must be mobility_diameter&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_positive_scalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formation_diameter</span><span class="p">,</span> <span class="s2">"formation_diameter"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diameter_convention</span> <span class="o">!=</span> <span class="s2">"mobility_diameter"</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"diameter_convention must be mobility_diameter"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17343,26 +17343,26 @@ this potential-rate-only implementation.</p>
 <span class="normal">211</span>
 <span class="normal">212</span>
 <span class="normal">213</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the nonempty, nonnegative injection composition.</span>
+<span class="w">    </span><span class="sd">"""Validate the nonempty, nonnegative injection composition.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If counts are not a tuple of non-Boolean integers.</span>
 <span class="sd">        ValueError: If no count is positive or any count is negative.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must be a tuple&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"molecule_counts must be a tuple"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must be nonempty&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molecule_counts must be nonempty"</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
         <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">))</span>
         <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must contain integers&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"molecule_counts must contain integers"</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">count</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must be nonnegative&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molecule_counts must be nonnegative"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule_counts</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molecule_counts must include a positive count&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molecule_counts must include a positive count"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17546,12 +17546,12 @@ factor returns exactly <code>0.0</code> after basic input validation and convers
 <span class="normal">649</span>
 <span class="normal">650</span>
 <span class="normal">651</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate immutable kinetic-strategy configuration.</span>
+<span class="w">    </span><span class="sd">"""Validate immutable kinetic-strategy configuration.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If a scalar configuration value is not a scalar real.</span>
 <span class="sd">        ValueError: If configuration values or metadata records are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_validate_strategy_configuration</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validity_domain</span><span class="p">,</span>
@@ -17721,7 +17721,7 @@ yield a nonfinite conversion or rate.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">saturation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the kinetic potential event rate [#/m³/s].</span>
+<span class="w">    </span><span class="sd">"""Calculate the kinetic potential event rate [#/m³/s].</span>
 
 <span class="sd">    Basic inputs and number-concentration conversion are validated before</span>
 <span class="sd">    exact zero paths. Nonzero inputs must lie in the configured inclusive</span>
@@ -17741,7 +17741,7 @@ yield a nonfinite conversion or rate.</p>
 <span class="sd">        TypeError: If required inputs are not accepted scalar real values.</span>
 <span class="sd">        ValueError: If inputs are physically invalid, out of domain, or</span>
 <span class="sd">            yield a nonfinite conversion or rate.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">concentration</span><span class="p">,</span> <span class="n">normalized_temperature</span><span class="p">,</span> <span class="n">normalized_saturation</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">_preflight_rate_inputs</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">validity_domain</span><span class="p">,</span>
@@ -17925,7 +17925,7 @@ particle sources, survival inference, or state mutation.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">saturation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate a potential formation-event rate [#/m³/s].</span>
+<span class="w">    </span><span class="sd">"""Calculate a potential formation-event rate [#/m³/s].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        precursor_mass_concentration: Precursor mass concentration [kg/m³].</span>
@@ -17935,7 +17935,7 @@ particle sources, survival inference, or state mutation.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Potential formation-event rate [#/m³/s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18085,22 +18085,22 @@ optional saturation field is neither one nor <code>None</code>.</p>
 <span class="normal">175</span>
 <span class="normal">176</span>
 <span class="normal">177</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the nested interval records.</span>
+<span class="w">    </span><span class="sd">"""Validate the nested interval records.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If a required field is not a ``ClosedInterval`` or an</span>
 <span class="sd">            optional saturation field is neither one nor ``None``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precursor_number_concentration</span><span class="p">,</span> <span class="n">ClosedInterval</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;precursor_number_concentration must be ClosedInterval&quot;</span>
+            <span class="s2">"precursor_number_concentration must be ClosedInterval"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span> <span class="n">ClosedInterval</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;temperature must be ClosedInterval&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"temperature must be ClosedInterval"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">saturation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">saturation</span><span class="p">,</span> <span class="n">ClosedInterval</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;saturation must be ClosedInterval or None&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"saturation must be ClosedInterval or None"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

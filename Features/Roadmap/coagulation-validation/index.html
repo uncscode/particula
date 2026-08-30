@@ -16160,9 +16160,9 @@ local/manual additive evidence and skips cleanly when unavailable. The <code>war
 does not select a device. P2 enumerates available Warp devices, so it includes
 available CUDA even when P2 tests are not <code>cuda</code>-marked.</p>
 <h2 id="warning-clean-reproduction-commands">Warning-Clean Reproduction Commands<a class="headerlink" href="#warning-clean-reproduction-commands" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and gpu_parity&quot;</span><span class="w"> </span>-Werror
-pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and stochastic and not cuda&quot;</span><span class="w"> </span>-Werror
-pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"warp and gpu_parity"</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"warp and stochastic and not cuda"</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">"warp and cuda"</span><span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/tests/gpu_coagulation_docs_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 </code></pre></div>

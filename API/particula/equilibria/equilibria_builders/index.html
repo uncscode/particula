@@ -16163,7 +16163,7 @@ deterministic parameter handling for factory usage.</p>
 <span class="go">0.8</span>
 </code></pre></div>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">builder</span> <span class="o">=</span> <span class="n">LiquidVaporPartitioningBuilder</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">({</span><span class="s2">&quot;water_activity&quot;</span><span class="p">:</span> <span class="mf">0.65</span><span class="p">})</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">({</span><span class="s2">"water_activity"</span><span class="p">:</span> <span class="mf">0.65</span><span class="p">})</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span><span class="o">.</span><span class="n">water_activity</span>
 <span class="go">0.65</span>
 </code></pre></div>
@@ -16183,7 +16183,7 @@ deterministic parameter handling for factory usage.</p>
 <span class="normal">36</span>
 <span class="normal">37</span>
 <span class="normal">38</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize builder with default water activity.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize builder with default water activity."""</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="o">=</span><span class="p">[])</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_water_activity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.5</span>
 </code></pre></div></td></tr></table></div>
@@ -16228,10 +16228,10 @@ deterministic parameter handling for factory usage.</p>
 <span class="normal"> 98</span>
 <span class="normal"> 99</span>
 <span class="normal">100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LiquidVaporPartitioningStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the configured :class:`LiquidVaporPartitioningStrategy`.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Build the configured :class:`LiquidVaporPartitioningStrategy`."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_water_activity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;water_activity must be set before build&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"water_activity must be set before build"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">LiquidVaporPartitioningStrategy</span><span class="p">(</span>
         <span class="n">water_activity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_water_activity</span>
     <span class="p">)</span>
@@ -16264,10 +16264,10 @@ deterministic parameter handling for factory usage.</p>
 <span class="normal">89</span>
 <span class="normal">90</span>
 <span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pre_build_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure builder is ready to build a strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Ensure builder is ready to build a strategy."""</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_water_activity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;water_activity must be set before build&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"water_activity must be set before build"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16360,9 +16360,9 @@ deterministic for factories.</p>
 <span class="normal">83</span>
 <span class="normal">84</span>
 <span class="normal">85</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set parameters from a dictionary with strict key validation.</span>
+<span class="w">    </span><span class="sd">"""Set parameters from a dictionary with strict key validation.</span>
 
-<span class="sd">    Only ``{&quot;water_activity&quot;}`` is accepted. Unknown keys, including</span>
+<span class="sd">    Only ``{"water_activity"}`` is accepted. Unknown keys, including</span>
 <span class="sd">    unit-suffixed variants, raise ``ValueError`` to keep behavior</span>
 <span class="sd">    deterministic for factories.</span>
 
@@ -16374,17 +16374,17 @@ deterministic for factories.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If an unknown key is provided or value is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">allowed_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;water_activity&quot;</span><span class="p">}</span>
+<span class="sd">    """</span>
+    <span class="n">allowed_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"water_activity"</span><span class="p">}</span>
     <span class="n">invalid_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">-</span> <span class="n">allowed_keys</span>
     <span class="k">if</span> <span class="n">invalid_keys</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Invalid parameter(s): </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">invalid_keys</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
-            <span class="s2">&quot;Allowed keys: water_activity.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Invalid parameter(s): </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">invalid_keys</span><span class="p">)</span><span class="si">}</span><span class="s2">. "</span>
+            <span class="s2">"Allowed keys: water_activity."</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">&quot;water_activity&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_water_activity</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;water_activity&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"water_activity"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_water_activity</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"water_activity"</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16465,7 +16465,7 @@ deterministic for factories.</p>
 <span class="normal">54</span>
 <span class="normal">55</span>
 <span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_water_activity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the target water activity.</span>
+<span class="w">    </span><span class="sd">"""Set the target water activity.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value: Water activity in range [0, 1].</span>
@@ -16475,10 +16475,10 @@ deterministic for factories.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``value`` is outside the inclusive [0, 1] range.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">water_activity</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">water_activity</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;water_activity must be in [0, 1], got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"water_activity must be in [0, 1], got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_water_activity</span> <span class="o">=</span> <span class="n">water_activity</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>

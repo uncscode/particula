@@ -16386,8 +16386,8 @@ before calling :meth:<code>build</code>.</p>
 <span class="normal">60</span>
 <span class="normal">61</span>
 <span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the constant latent heat builder.&quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Initialize the constant latent heat builder."""</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"latent_heat_ref"</span><span class="p">]</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
@@ -16461,14 +16461,14 @@ before calling :meth:<code>build</code>.</p>
 <span class="normal">106</span>
 <span class="normal">107</span>
 <span class="normal">108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstantLatentHeat</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and build the ConstantLatentHeat strategy.</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and build the ConstantLatentHeat strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The configured ConstantLatentHeat strategy.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required parameters are missing.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">ConstantLatentHeat</span><span class="p">(</span>
         <span class="n">latent_heat_ref</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">)</span>
@@ -16583,13 +16583,13 @@ invalid and pint is available.</p>
 <span class="normal">91</span>
 <span class="normal">92</span>
 <span class="normal">93</span>
-<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"latent_heat_ref"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_latent_heat_ref</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">latent_heat_ref_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ConstantLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the reference latent heat value.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ConstantLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the reference latent heat value.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        latent_heat_ref: Reference latent heat value.</span>
@@ -16603,7 +16603,7 @@ invalid and pint is available.</p>
 <span class="sd">        ValueError: If ``latent_heat_ref`` is not positive.</span>
 <span class="sd">        pint.errors.UndefinedUnitError: If ``latent_heat_ref_units`` is</span>
 <span class="sd">            invalid and pint is available.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">latent_heat_ref_units</span> <span class="ow">is</span> <span class="kc">None</span>
         <span class="ow">or</span> <span class="n">latent_heat_ref_units</span> <span class="o">==</span> <span class="n">LATENT_HEAT_UNIT</span>
@@ -16696,8 +16696,8 @@ invalid and pint is available.</p>
 <span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the linear latent heat builder.&quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">,</span> <span class="s2">&quot;slope&quot;</span><span class="p">,</span> <span class="s2">&quot;temperature_ref&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Initialize the linear latent heat builder."""</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"latent_heat_ref"</span><span class="p">,</span> <span class="s2">"slope"</span><span class="p">,</span> <span class="s2">"temperature_ref"</span><span class="p">]</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">slope</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -16775,14 +16775,14 @@ invalid and pint is available.</p>
 <span class="normal">233</span>
 <span class="normal">234</span>
 <span class="normal">235</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearLatentHeat</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and build the LinearLatentHeat strategy.</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and build the LinearLatentHeat strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The configured LinearLatentHeat strategy.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required parameters are missing.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">LinearLatentHeat</span><span class="p">(</span>
         <span class="n">latent_heat_ref</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">),</span>
@@ -16899,13 +16899,13 @@ invalid and pint is available.</p>
 <span class="normal">157</span>
 <span class="normal">158</span>
 <span class="normal">159</span>
-<span class="normal">160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"latent_heat_ref"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_latent_heat_ref</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">latent_heat_ref_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LinearLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the reference latent heat value.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"LinearLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the reference latent heat value.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        latent_heat_ref: Reference latent heat value.</span>
@@ -16919,7 +16919,7 @@ invalid and pint is available.</p>
 <span class="sd">        ValueError: If ``latent_heat_ref`` is not positive.</span>
 <span class="sd">        pint.errors.UndefinedUnitError: If ``latent_heat_ref_units`` is</span>
 <span class="sd">            invalid and pint is available.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">latent_heat_ref_units</span> <span class="ow">is</span> <span class="kc">None</span>
         <span class="ow">or</span> <span class="n">latent_heat_ref_units</span> <span class="o">==</span> <span class="n">LATENT_HEAT_UNIT</span>
@@ -17033,13 +17033,13 @@ pint is available.</p>
 <span class="normal">183</span>
 <span class="normal">184</span>
 <span class="normal">185</span>
-<span class="normal">186</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;slope&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">})</span>
+<span class="normal">186</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"slope"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_slope</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">slope</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">slope_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LinearLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the linear slope value.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"LinearLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the linear slope value.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        slope: Linear slope value.</span>
@@ -17052,7 +17052,7 @@ pint is available.</p>
 <span class="sd">        ValueError: If ``slope`` is not finite.</span>
 <span class="sd">        pint.errors.UndefinedUnitError: If ``slope_units`` is invalid and</span>
 <span class="sd">            pint is available.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">slope_units</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">slope_units</span> <span class="o">==</span> <span class="n">SLOPE_UNIT</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">slope</span> <span class="o">=</span> <span class="n">slope</span>
         <span class="k">return</span> <span class="bp">self</span>
@@ -17168,13 +17168,13 @@ invalid and pint is available.</p>
 <span class="normal">216</span>
 <span class="normal">217</span>
 <span class="normal">218</span>
-<span class="normal">219</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature_ref&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">})</span>
+<span class="normal">219</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"temperature_ref"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_temperature_ref</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">temperature_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">temperature_ref_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LinearLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the reference temperature.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"LinearLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the reference temperature.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        temperature_ref: Reference temperature value.</span>
@@ -17187,7 +17187,7 @@ invalid and pint is available.</p>
 <span class="sd">        ValueError: If ``temperature_ref`` is not positive.</span>
 <span class="sd">        pint.errors.UndefinedUnitError: If ``temperature_ref_units`` is</span>
 <span class="sd">            invalid and pint is available.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">temperature_ref_units</span> <span class="ow">is</span> <span class="kc">None</span>
         <span class="ow">or</span> <span class="n">temperature_ref_units</span> <span class="o">==</span> <span class="n">TEMPERATURE_UNIT</span>
@@ -17197,7 +17197,7 @@ invalid and pint is available.</p>
         <span class="n">temperature_ref_converted</span> <span class="o">=</span> <span class="n">_to_kelvin</span><span class="p">(</span>
             <span class="n">temperature_ref</span><span class="p">,</span> <span class="n">temperature_ref_units</span>
         <span class="p">)</span>
-    <span class="n">_validate_temperature</span><span class="p">(</span><span class="s2">&quot;temperature_ref&quot;</span><span class="p">,</span> <span class="n">temperature_ref_converted</span><span class="p">)</span>
+    <span class="n">_validate_temperature</span><span class="p">(</span><span class="s2">"temperature_ref"</span><span class="p">,</span> <span class="n">temperature_ref_converted</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">temperature_ref</span> <span class="o">=</span> <span class="n">temperature_ref_converted</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17286,11 +17286,11 @@ invalid and pint is available.</p>
 <span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the power-law latent heat builder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the power-law latent heat builder."""</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;critical_temperature&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;beta&quot;</span><span class="p">,</span>
+        <span class="s2">"latent_heat_ref"</span><span class="p">,</span>
+        <span class="s2">"critical_temperature"</span><span class="p">,</span>
+        <span class="s2">"beta"</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -17369,14 +17369,14 @@ invalid and pint is available.</p>
 <span class="normal">364</span>
 <span class="normal">365</span>
 <span class="normal">366</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PowerLawLatentHeat</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and build the PowerLawLatentHeat strategy.</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and build the PowerLawLatentHeat strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The configured PowerLawLatentHeat strategy.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required parameters are missing.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">PowerLawLatentHeat</span><span class="p">(</span>
         <span class="n">latent_heat_ref</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">),</span>
@@ -17475,13 +17475,13 @@ invalid and pint is available.</p>
 <span class="normal">347</span>
 <span class="normal">348</span>
 <span class="normal">349</span>
-<span class="normal">350</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="normal">350</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"beta"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_beta</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">beta_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PowerLawLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the power-law exponent.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"PowerLawLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the power-law exponent.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        beta: Power-law exponent (dimensionless).</span>
@@ -17492,9 +17492,9 @@ invalid and pint is available.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``beta`` is negative.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">beta_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring units for beta: &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">,</span> <span class="n">beta_units</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for beta: '</span><span class="si">%s</span><span class="s2">'."</span><span class="p">,</span> <span class="n">beta_units</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17611,13 +17611,13 @@ is invalid and pint is available.</p>
 <span class="normal">324</span>
 <span class="normal">325</span>
 <span class="normal">326</span>
-<span class="normal">327</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;critical_temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">})</span>
+<span class="normal">327</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"critical_temperature"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_critical_temperature</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">critical_temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">critical_temperature_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PowerLawLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the critical temperature value.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"PowerLawLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the critical temperature value.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        critical_temperature: Critical temperature value.</span>
@@ -17631,7 +17631,7 @@ is invalid and pint is available.</p>
 <span class="sd">        ValueError: If ``critical_temperature`` is not positive.</span>
 <span class="sd">        pint.errors.UndefinedUnitError: If ``critical_temperature_units``</span>
 <span class="sd">            is invalid and pint is available.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">critical_temperature_units</span> <span class="ow">is</span> <span class="kc">None</span>
         <span class="ow">or</span> <span class="n">critical_temperature_units</span> <span class="o">==</span> <span class="n">TEMPERATURE_UNIT</span>
@@ -17642,7 +17642,7 @@ is invalid and pint is available.</p>
             <span class="n">critical_temperature</span><span class="p">,</span> <span class="n">critical_temperature_units</span>
         <span class="p">)</span>
     <span class="n">_validate_temperature</span><span class="p">(</span>
-        <span class="s2">&quot;critical_temperature&quot;</span><span class="p">,</span> <span class="n">critical_temperature_converted</span>
+        <span class="s2">"critical_temperature"</span><span class="p">,</span> <span class="n">critical_temperature_converted</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">critical_temperature</span> <span class="o">=</span> <span class="n">critical_temperature_converted</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -17756,13 +17756,13 @@ invalid and pint is available.</p>
 <span class="normal">288</span>
 <span class="normal">289</span>
 <span class="normal">290</span>
-<span class="normal">291</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">291</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"latent_heat_ref"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_latent_heat_ref</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">latent_heat_ref_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PowerLawLatentHeatBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the reference latent heat value.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"PowerLawLatentHeatBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the reference latent heat value.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        latent_heat_ref: Reference latent heat value.</span>
@@ -17776,7 +17776,7 @@ invalid and pint is available.</p>
 <span class="sd">        ValueError: If ``latent_heat_ref`` is not positive.</span>
 <span class="sd">        pint.errors.UndefinedUnitError: If ``latent_heat_ref_units`` is</span>
 <span class="sd">            invalid and pint is available.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">latent_heat_ref_units</span> <span class="ow">is</span> <span class="kc">None</span>
         <span class="ow">or</span> <span class="n">latent_heat_ref_units</span> <span class="o">==</span> <span class="n">LATENT_HEAT_UNIT</span>

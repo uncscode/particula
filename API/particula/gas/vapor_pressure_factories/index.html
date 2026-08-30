@@ -16103,7 +16103,7 @@ a flexible way to switch or extend vapor pressure calculation methods.</p>
 <span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">VaporPressureFactory</span><span class="p">()</span>
 <span class="c1"># Create a constant vapor pressure strategy:</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;constant_vapor_pressure&quot;</span><span class="p">:</span> <span class="mf">101325.0</span><span class="p">}</span>
+    <span class="s2">"constant"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"constant_vapor_pressure"</span><span class="p">:</span> <span class="mf">101325.0</span><span class="p">}</span>
 <span class="p">)</span>
 <span class="c1"># strategy is an instance of ConstantVaporPressureStrategy</span>
 </code></pre></div>
@@ -16174,7 +16174,7 @@ a flexible way to switch or extend vapor pressure calculation methods.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">builders_dict</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
-<span class="n">builder</span> <span class="o">=</span> <span class="n">builders_dict</span><span class="p">[</span><span class="s2">&quot;constant&quot;</span><span class="p">]</span>
+<span class="n">builder</span> <span class="o">=</span> <span class="n">builders_dict</span><span class="p">[</span><span class="s2">"constant"</span><span class="p">]</span>
 <span class="c1"># builder is an instance of ConstantBuilder</span>
 </code></pre></div>
 
@@ -16211,34 +16211,34 @@ a flexible way to switch or extend vapor pressure calculation methods.</p>
 <span class="normal">105</span>
 <span class="normal">106</span>
 <span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a dictionary mapping strategy types to builder instances.</span>
+<span class="w">    </span><span class="sd">"""Return a dictionary mapping strategy types to builder instances.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict:</span>
-<span class="sd">            - &quot;constant&quot;: ConstantVaporPressureBuilder</span>
-<span class="sd">            - &quot;antoine&quot;: AntoineVaporPressureBuilder</span>
-<span class="sd">            - &quot;clausius_clapeyron&quot;: ClausiusClapeyronVaporPressureBuilder</span>
-<span class="sd">            - &quot;saturation_concentration&quot;: SaturationConcentration</span>
+<span class="sd">            - "constant": ConstantVaporPressureBuilder</span>
+<span class="sd">            - "antoine": AntoineVaporPressureBuilder</span>
+<span class="sd">            - "clausius_clapeyron": ClausiusClapeyronVaporPressureBuilder</span>
+<span class="sd">            - "saturation_concentration": SaturationConcentration</span>
 <span class="sd">              VaporPressureBuilder</span>
-<span class="sd">            - &quot;water_buck&quot;: WaterBuckVaporPressureBuilder</span>
+<span class="sd">            - "water_buck": WaterBuckVaporPressureBuilder</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        ```py</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        builders_dict = par.gas.VaporPressureFactory().get_builders()</span>
-<span class="sd">        builder = builders_dict[&quot;constant&quot;]</span>
+<span class="sd">        builder = builders_dict["constant"]</span>
 <span class="sd">        # builder is an instance of ConstantBuilder</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;constant&quot;</span><span class="p">:</span> <span class="n">ConstantVaporPressureBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;antoine&quot;</span><span class="p">:</span> <span class="n">AntoineVaporPressureBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;clausius_clapeyron&quot;</span><span class="p">:</span> <span class="n">ClausiusClapeyronVaporPressureBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;saturation_concentration&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">"constant"</span><span class="p">:</span> <span class="n">ConstantVaporPressureBuilder</span><span class="p">(),</span>
+        <span class="s2">"antoine"</span><span class="p">:</span> <span class="n">AntoineVaporPressureBuilder</span><span class="p">(),</span>
+        <span class="s2">"clausius_clapeyron"</span><span class="p">:</span> <span class="n">ClausiusClapeyronVaporPressureBuilder</span><span class="p">(),</span>
+        <span class="s2">"saturation_concentration"</span><span class="p">:</span> <span class="p">(</span>
             <span class="n">SaturationConcentrationVaporPressureBuilder</span><span class="p">()</span>
         <span class="p">),</span>
-        <span class="s2">&quot;water_buck&quot;</span><span class="p">:</span> <span class="n">WaterBuckVaporPressureBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;table&quot;</span><span class="p">:</span> <span class="n">TableVaporPressureBuilder</span><span class="p">(),</span>
+        <span class="s2">"water_buck"</span><span class="p">:</span> <span class="n">WaterBuckVaporPressureBuilder</span><span class="p">(),</span>
+        <span class="s2">"table"</span><span class="p">:</span> <span class="n">TableVaporPressureBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>

@@ -16340,7 +16340,7 @@ to avoid divide-by-zero.</p>
     <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add concentration to the distribution with optional charge.</span>
+<span class="w">    </span><span class="sd">"""Add concentration to the distribution with optional charge.</span>
 
 <span class="sd">    Charge is updated using concentration-weighted averaging when both</span>
 <span class="sd">    ``charge`` and ``added_charge`` are supplied. If ``charge`` is ``None``</span>
@@ -16350,20 +16350,20 @@ to avoid divide-by-zero.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Updated distribution, concentration, and charge arrays.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">distribution</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">added_distribution</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
         <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">added_distribution</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
     <span class="p">):</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;When adding concentration to RadiiBasedMovingBin, &quot;</span>
-            <span class="s2">&quot;distribution and added distribution should match.&quot;</span>
+            <span class="s2">"When adding concentration to RadiiBasedMovingBin, "</span>
+            <span class="s2">"distribution and added distribution should match."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">concentration</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">added_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;When adding concentration to RadiiBasedMovingBin, the arrays &quot;</span>
-            <span class="s2">&quot;should have the same shape.&quot;</span>
+            <span class="s2">"When adding concentration to RadiiBasedMovingBin, the arrays "</span>
+            <span class="s2">"should have the same shape."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -16382,8 +16382,8 @@ to avoid divide-by-zero.</p>
 
     <span class="k">if</span> <span class="n">charge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">original_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;When adding concentration with charge, charge must match &quot;</span>
-            <span class="s2">&quot;concentration shape.&quot;</span>
+            <span class="s2">"When adding concentration with charge, charge must match "</span>
+            <span class="s2">"concentration shape."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -16393,8 +16393,8 @@ to avoid divide-by-zero.</p>
 
     <span class="k">if</span> <span class="n">added_charge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">added_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;When adding concentration with charge, added_charge must &quot;</span>
-            <span class="s2">&quot;match added_concentration shape.&quot;</span>
+            <span class="s2">"When adding concentration with charge, added_charge must "</span>
+            <span class="s2">"match added_concentration shape."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -16481,11 +16481,11 @@ to avoid divide-by-zero.</p>
     <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">added_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add mass to the particle distribution and update radii.</span>
+<span class="w">    </span><span class="sd">"""Add mass to the particle distribution and update radii.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Updated distribution (radii) and concentration arrays.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">mass_per_particle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
         <span class="n">concentration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">added_mass</span> <span class="o">/</span> <span class="n">concentration</span><span class="p">,</span> <span class="mi">0</span>
     <span class="p">)</span>
@@ -16618,7 +16618,7 @@ concentrations.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
     <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collide particle pairs (not implemented for this strategy).</span>
+<span class="w">    </span><span class="sd">"""Collide particle pairs (not implemented for this strategy).</span>
 
 <span class="sd">    This method is not implemented for RadiiBasedMovingBin because particle</span>
 <span class="sd">    pair collisions are not physically valid for bin-based strategies</span>
@@ -16634,8 +16634,8 @@ concentrations.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        NotImplementedError: Always raised as method is not applicable.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Colliding pairs in RadiiBasedMovingBin not physically valid&quot;</span>
+<span class="sd">    """</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">"Colliding pairs in RadiiBasedMovingBin not physically valid"</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16685,11 +16685,11 @@ concentrations.</p>
 <span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_radius</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return particle radius from the distribution.</span>
+<span class="w">    </span><span class="sd">"""Return particle radius from the distribution.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Particle radius in meters.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">distribution</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16739,11 +16739,11 @@ concentrations.</p>
 <span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_species_mass</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the mass per species from radius and density.</span>
+<span class="w">    </span><span class="sd">"""Calculate the mass per species from radius and density.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Mass per species array.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">volumes</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">distribution</span><span class="o">**</span><span class="mi">3</span>
     <span class="k">return</span> <span class="n">volumes</span> <span class="o">*</span> <span class="n">density</span>
 </code></pre></div></td></tr></table></div>

@@ -16212,10 +16212,10 @@ pressure.</p>
 <span class="normal">72</span>
 <span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;effective_surface_tension&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;effective_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"effective_surface_tension"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"effective_density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kelvin_radius</span><span class="p">(</span>
@@ -16224,7 +16224,7 @@ pressure.</p>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the Kelvin radius (rₖ) to account for curvature effects on vapor</span>
+<span class="w">    </span><span class="sd">"""Compute the Kelvin radius (rₖ) to account for curvature effects on vapor</span>
 <span class="sd">    pressure.</span>
 
 <span class="sd">    The Kelvin radius is defined by:</span>
@@ -16247,7 +16247,7 @@ pressure.</p>
 <span class="sd">        - Kelvin radius in meters (float or NDArray[np.float64]).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_kelvin_radius(</span>
@@ -16260,9 +16260,9 @@ pressure.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Kelvin equation,&quot; Wikipedia,</span>
+<span class="sd">        - "Kelvin equation," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Kelvin_equation</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">effective_surface_tension</span> <span class="o">*</span> <span class="n">molar_mass</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
         <span class="n">GAS_CONSTANT</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">effective_density</span>
     <span class="p">)</span>
@@ -16438,15 +16438,15 @@ For extreme cases, the value is clipped to prevent overflow.</li>
 <span class="normal">152</span>
 <span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kelvin_radius_value&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"kelvin_radius_value"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kelvin_term</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">kelvin_radius_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the Kelvin exponential term to account for curvature effects.</span>
+<span class="w">    </span><span class="sd">"""Compute the Kelvin exponential term to account for curvature effects.</span>
 
 <span class="sd">    The Kelvin term (K) is given by:</span>
 
@@ -16471,7 +16471,7 @@ For extreme cases, the value is clipped to prevent overflow.</li>
 <span class="sd">          For extreme cases, the value is clipped to prevent overflow.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_kelvin_term(</span>
 <span class="sd">            particle_radius=1e-7,</span>
@@ -16482,10 +16482,10 @@ For extreme cases, the value is clipped to prevent overflow.</li>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Donahue, N. M., et al. (2013). &quot;How do organic vapors contribute to</span>
-<span class="sd">          new-particle formation?&quot; Faraday Discussions, 165, 91–104.</span>
+<span class="sd">        - Donahue, N. M., et al. (2013). "How do organic vapors contribute to</span>
+<span class="sd">          new-particle formation?" Faraday Discussions, 165, 91–104.</span>
 <span class="sd">          https://doi.org/10.1039/C3FD00046J. [check]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">kelvin_expand</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="c1"># Broadcast the arrays if necessary np.isscalar(kelvin_radius_value)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kelvin_radius_value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
@@ -16495,7 +16495,7 @@ For extreme cases, the value is clipped to prevent overflow.</li>
         <span class="n">kelvin_radius_value</span> <span class="o">=</span> <span class="n">kelvin_radius_value</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
 
     <span class="c1"># Suppress divide-by-zero warnings - zero radius is handled by clipping</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kelvin_expand</span><span class="p">:</span>
             <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">kelvin_radius_value</span> <span class="o">/</span> <span class="n">particle_radius</span>
             <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">MAX_KELVIN_RATIO</span><span class="p">)</span>

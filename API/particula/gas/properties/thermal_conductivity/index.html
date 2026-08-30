@@ -16129,16 +16129,16 @@ Earth's surface.</p>
 <span class="normal">42</span>
 <span class="normal">43</span>
 <span class="normal">44</span>
-<span class="normal">45</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="normal">45</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_thermal_conductivity</span><span class="p">(</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Thermal conductivity of air as a function of temperature.</span>
+<span class="w">    </span><span class="sd">"""Thermal conductivity of air as a function of temperature.</span>
 
 <span class="sd">    Calculate the thermal conductivity of air as a function of temperature.</span>
 <span class="sd">    Based on a simplified linear relation from atmospheric science literature.</span>
 <span class="sd">    Only valid for temperatures within the range typically found on</span>
-<span class="sd">    Earth&#39;s surface.</span>
+<span class="sd">    Earth's surface.</span>
 
 <span class="sd">    - k(T) = 1e-3 × (4.39 + 0.071 × T)</span>
 <span class="sd">        - k(T) is Thermal conductivity [W/(m·K)].</span>
@@ -16151,15 +16151,15 @@ Earth's surface.</p>
 <span class="sd">        - The thermal conductivity [W/(m·K)] or [J/(m·s·K)].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_thermal_conductivity(300)</span>
 <span class="sd">        # ~0.449 W/(m·K)</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">    - Seinfeld and Pandis, &quot;Atmospheric Chemistry and Physics&quot;, Equation 17.54.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    - Seinfeld and Pandis, "Atmospheric Chemistry and Physics", Equation 17.54.</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="mf">1e-3</span> <span class="o">*</span> <span class="p">(</span><span class="mf">4.39</span> <span class="o">+</span> <span class="mf">0.071</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

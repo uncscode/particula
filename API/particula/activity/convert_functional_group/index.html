@@ -16124,7 +16124,7 @@ Supported values are <code>None</code>, <code>"alcohol"</code>, <code>"ether"</c
 <span class="gp">&gt;&gt;&gt; </span><span class="n">convert_to_oh_equivalent</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">oxygen2carbon</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">molar_mass_ratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">functional_group</span><span class="o">=</span><span class="s2">&quot;carboxylic_acid&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">functional_group</span><span class="o">=</span><span class="s2">"carboxylic_acid"</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="go">(2.3, 45.1)</span>
 </code></pre></div>
@@ -16184,14 +16184,14 @@ Supported values are <code>None</code>, <code>"alcohol"</code>, <code>"ether"</c
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">functional_group</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert oxygen and molar mass ratios for BAT functional groups.</span>
+<span class="w">    </span><span class="sd">"""Convert oxygen and molar mass ratios for BAT functional groups.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        oxygen2carbon: The oxygen to carbon ratio.</span>
 <span class="sd">        molar_mass_ratio: The molar mass ratio of water to organic matter.</span>
 <span class="sd">        functional_group: Optional functional group requiring adjustments.</span>
-<span class="sd">            Supported values are ``None``, ``&quot;alcohol&quot;``, ``&quot;ether&quot;``, and</span>
-<span class="sd">            ``&quot;carboxylic_acid&quot;``.</span>
+<span class="sd">            Supported values are ``None``, ``"alcohol"``, ``"ether"``, and</span>
+<span class="sd">            ``"carboxylic_acid"``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple containing the converted oxygen2carbon and molar_mass_ratio.</span>
@@ -16207,22 +16207,22 @@ Supported values are <code>None</code>, <code>"alcohol"</code>, <code>"ether"</c
 <span class="sd">        &gt;&gt;&gt; convert_to_oh_equivalent(</span>
 <span class="sd">        ...     oxygen2carbon=0.3,</span>
 <span class="sd">        ...     molar_mass_ratio=0.1,</span>
-<span class="sd">        ...     functional_group=&quot;carboxylic_acid&quot;,</span>
+<span class="sd">        ...     functional_group="carboxylic_acid",</span>
 <span class="sd">        ... )</span>
 <span class="sd">        (2.3, 45.1)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">normalized_group</span> <span class="o">=</span> <span class="n">_normalize_functional_group</span><span class="p">(</span><span class="n">functional_group</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">normalized_group</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">molar_mass_ratio</span>
 
     <span class="n">adjustments</span> <span class="o">=</span> <span class="n">_FUNCTIONAL_GROUP_ADJUSTMENTS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">normalized_group</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">adjustments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">supported_values</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="s2">&quot;None&quot;</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+        <span class="n">supported_values</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s2">"None"</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">'"</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">"'</span>
             <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">SUPPORTED_FUNCTIONAL_GROUPS</span>
         <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;BAT functional group must be one of: </span><span class="si">{</span><span class="n">supported_values</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">"BAT functional group must be one of: </span><span class="si">{</span><span class="n">supported_values</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
 
     <span class="n">delta_oxygen</span><span class="p">,</span> <span class="n">delta_mass</span> <span class="o">=</span> <span class="n">adjustments</span>

@@ -16184,7 +16184,7 @@ volume-weighted molar refraction.</p>
     <span class="n">volume_zero</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">volume_one</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the effective refractive index of a two-solute mixture.</span>
+<span class="w">    </span><span class="sd">"""Calculate the effective refractive index of a two-solute mixture.</span>
 
 <span class="sd">    The calculation uses volume-weighted molar refraction, described by:</span>
 <span class="sd">    - r_eff = (v0 / (v0 + v1)) * ((m0 - 1) / (m0 + 2)) +</span>
@@ -16206,7 +16206,7 @@ volume-weighted molar refraction.</p>
 <span class="sd">        - Effective refractive index of the mixture (float or complex).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        n_mix = par.get_effective_refractive_index(1.33, 1.50, 2.0, 1.0)</span>
 <span class="sd">        print(n_mix)</span>
@@ -16214,13 +16214,13 @@ volume-weighted molar refraction.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - Y. Liu &amp; P. H. Daum, &quot;Relationship of refractive index to mass</span>
+<span class="sd">        - Y. Liu &amp; P. H. Daum, "Relationship of refractive index to mass</span>
 <span class="sd">          density and self-consistency mixing rules for multicomponent</span>
-<span class="sd">          mixtures like ambient aerosols,&quot; Journal of Aerosol Science,</span>
+<span class="sd">          mixtures like ambient aerosols," Journal of Aerosol Science,</span>
 <span class="sd">          vol. 39(11), pp. 974–986, 2008.</span>
 <span class="sd">          DOI: 10.1016/j.jaerosci.2008.06.006</span>
-<span class="sd">        - Wikipedia contributors, &quot;Refractive index,&quot; Wikipedia.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - Wikipedia contributors, "Refractive index," Wikipedia.</span>
+<span class="sd">    """</span>
     <span class="n">volume_total</span> <span class="o">=</span> <span class="n">volume_zero</span> <span class="o">+</span> <span class="n">volume_one</span>
     <span class="n">r_effective</span> <span class="o">=</span> <span class="n">volume_zero</span> <span class="o">/</span> <span class="n">volume_total</span> <span class="o">*</span> <span class="p">(</span><span class="n">m_zero</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
         <span class="n">m_zero</span> <span class="o">+</span> <span class="mi">2</span>

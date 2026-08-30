@@ -16202,10 +16202,10 @@ used only if total_bins is None.</p>
     <span class="n">total_bins</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">bins_per_radius_decade</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine binned radii for kernel calculations.</span>
+<span class="w">    </span><span class="sd">"""Determine binned radii for kernel calculations.</span>
 
 <span class="sd">    If bin_radius is provided, those edges are used directly. Otherwise,</span>
-<span class="sd">    a log-spaced array is generated based on the particle&#39;s minimum and</span>
+<span class="sd">    a log-spaced array is generated based on the particle's minimum and</span>
 <span class="sd">    maximum radii and either a total number of bins or bins per radius</span>
 <span class="sd">    decade.</span>
 
@@ -16221,7 +16221,7 @@ used only if total_bins is None.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        - ValueError : If finite radii cannot be determined for binning.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># if the bin radius is set, return it</span>
     <span class="k">if</span> <span class="n">bin_radius</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">bin_radius</span>
@@ -16231,8 +16231,8 @@ used only if total_bins is None.</p>
     <span class="n">max_radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">[</span><span class="n">particle_radius</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">min_radius</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">max_radius</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Particle radius must be finite. Check the particles,&quot;</span>
-            <span class="s2">&quot;they may all be zero and the kernel cannot be calculated.&quot;</span>
+            <span class="s2">"Particle radius must be finite. Check the particles,"</span>
+            <span class="s2">"they may all be zero and the kernel cannot be calculated."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">min_radius</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">min_radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1e-10</span><span class="p">)</span>
@@ -16411,7 +16411,7 @@ mass and concentration for each species.</li>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">bin_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a ParticleResolvedSpeciatedMass to a SpeciatedMassMovingBin.</span>
+<span class="w">    </span><span class="sd">"""Convert a ParticleResolvedSpeciatedMass to a SpeciatedMassMovingBin.</span>
 
 <span class="sd">    This function bins the mass and charge distributions for each species</span>
 <span class="sd">    according to the provided bin_radius array, using median or mean</span>
@@ -16425,7 +16425,7 @@ mass and concentration for each species.</li>
 <span class="sd">    Returns:</span>
 <span class="sd">        - ParticleRepresentation : A new representation with binned</span>
 <span class="sd">          mass and concentration for each species.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># deep copy the particle to avoid modifying the original</span>
     <span class="n">new_particle</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">new_particle</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">SpeciatedMassMovingBin</span><span class="p">()</span>

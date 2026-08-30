@@ -16941,7 +16941,7 @@ primary commit kernel launches.</p>
     <span class="n">source_amounts</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">sink_amounts</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Synchronously mix gas with caller-owned extensive amount ledgers.</span>
+<span class="w">    </span><span class="sd">"""Synchronously mix gas with caller-owned extensive amount ledgers.</span>
 
 <span class="sd">    The immutable staged ledger is ``amounts = concentration * volume`` in</span>
 <span class="sd">    amount units. An in-domain ``source -&gt; destination`` edge transfers</span>
@@ -16949,7 +16949,7 @@ primary commit kernel launches.</p>
 <span class="sd">    ``amount_deltas``. An open sink ``source -&gt; -1`` uses that same source</span>
 <span class="sd">    amount, debits ``amount_deltas``, and records a positive ``sink_amounts``</span>
 <span class="sd">    entry. An open source ``-1 -&gt; destination`` instead uses the destination</span>
-<span class="sd">    box&#39;s pre-step amount and records its positive transfer in</span>
+<span class="sd">    box's pre-step amount and records its positive transfer in</span>
 <span class="sd">    ``source_amounts``. The sole primary writer assigns</span>
 <span class="sd">    ``gas.concentration = (amounts + amount_deltas) / volume``.</span>
 
@@ -16957,7 +16957,7 @@ primary commit kernel launches.</p>
 <span class="sd">    contiguous ``wp.float64`` arrays shaped ``(B, S)``. A</span>
 <span class="sd">    ``GasCommunicationBuffers`` carrier may provide them. Open accounting</span>
 <span class="sd">    ledgers have the same schema and are required for enabled edges with their</span>
-<span class="sd">    respective boundary direction. Closed maps conserve each species&#39; extensive</span>
+<span class="sd">    respective boundary direction. Closed maps conserve each species' extensive</span>
 <span class="sd">    amount up to atomic floating-point tolerance. Particle fields, prescribed</span>
 <span class="sd">    volumes, and map metadata are read-only. Valid zero-size, empty-map, and</span>
 <span class="sd">    zero-time calls validate observable schemas then leave all buffers and</span>
@@ -16995,7 +16995,7 @@ primary commit kernel launches.</p>
 <span class="sd">        Applicable work and accounting ledgers may be written before an</span>
 <span class="sd">        asynchronous device-domain failure. Rollback is not promised after the</span>
 <span class="sd">        primary commit kernel launches.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">step</span> <span class="o">=</span> <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span>
     <span class="n">typed</span> <span class="o">=</span> <span class="n">_validate_gas_communication_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
     <span class="n">map_data</span> <span class="o">=</span> <span class="n">typed</span><span class="o">.</span><span class="n">communication_map</span>
@@ -17010,7 +17010,7 @@ primary commit kernel launches.</p>
             <span class="p">)</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;buffer carrier cannot be combined with work arrays.&quot;</span>
+                <span class="s2">"buffer carrier cannot be combined with work arrays."</span>
             <span class="p">)</span>
         <span class="n">buffers</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">GasCommunicationBuffers</span><span class="p">,</span> <span class="n">amounts</span><span class="p">)</span>
         <span class="n">amounts</span> <span class="o">=</span> <span class="n">buffers</span><span class="o">.</span><span class="n">amounts</span>
@@ -17019,77 +17019,77 @@ primary commit kernel launches.</p>
         <span class="n">source_amounts</span> <span class="o">=</span> <span class="n">buffers</span><span class="o">.</span><span class="n">source_amounts</span>
         <span class="n">sink_amounts</span> <span class="o">=</span> <span class="n">buffers</span><span class="o">.</span><span class="n">sink_amounts</span>
     <span class="k">if</span> <span class="n">amount_deltas</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">outbound_amounts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;amount_deltas and outbound_amounts are required.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"amount_deltas and outbound_amounts are required."</span><span class="p">)</span>
 
     <span class="n">masses</span><span class="p">,</span> <span class="n">mass_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;masses&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.masses&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.masses&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"masses"</span><span class="p">,</span> <span class="s2">"particles.masses"</span><span class="p">),</span>
+        <span class="s2">"particles.masses"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">3</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">,</span> <span class="n">particle_species</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">device</span>
     <span class="n">particle_concentration</span><span class="p">,</span> <span class="n">particle_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.concentration&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.concentration&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">,</span> <span class="s2">"particles.concentration"</span><span class="p">),</span>
+        <span class="s2">"particles.concentration"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">charge</span><span class="p">,</span> <span class="n">charge_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;charge&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.charge&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.charge&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"charge"</span><span class="p">,</span> <span class="s2">"particles.charge"</span><span class="p">),</span>
+        <span class="s2">"particles.charge"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">density</span><span class="p">,</span> <span class="n">density_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.density&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.density&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">,</span> <span class="s2">"particles.density"</span><span class="p">),</span>
+        <span class="s2">"particles.density"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="p">(</span><span class="n">particle_species</span><span class="p">,),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">volume</span><span class="p">,</span> <span class="n">volume_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.volume&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.volume&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"volume"</span><span class="p">,</span> <span class="s2">"particles.volume"</span><span class="p">),</span>
+        <span class="s2">"particles.volume"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="p">(</span><span class="n">boxes</span><span class="p">,),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">concentration</span><span class="p">,</span> <span class="n">concentration_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">,</span> <span class="s2">&quot;gas.concentration&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;gas.concentration&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">,</span> <span class="s2">"gas.concentration"</span><span class="p">),</span>
+        <span class="s2">"gas.concentration"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">boxes</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gas.concentration shape must match particle masses.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"gas.concentration shape must match particle masses."</span><span class="p">)</span>
     <span class="n">species</span> <span class="o">=</span> <span class="n">concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">molar_mass</span><span class="p">,</span> <span class="n">molar_mass_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span> <span class="s2">&quot;gas.molar_mass&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;gas.molar_mass&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">"molar_mass"</span><span class="p">,</span> <span class="s2">"gas.molar_mass"</span><span class="p">),</span>
+        <span class="s2">"gas.molar_mass"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="p">(</span><span class="n">species</span><span class="p">,),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">vapor_pressure</span><span class="p">,</span> <span class="n">vapor_pressure_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">&quot;vapor_pressure&quot;</span><span class="p">,</span> <span class="s2">&quot;gas.vapor_pressure&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;gas.vapor_pressure&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">"vapor_pressure"</span><span class="p">,</span> <span class="s2">"gas.vapor_pressure"</span><span class="p">),</span>
+        <span class="s2">"gas.vapor_pressure"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">partitioning</span><span class="p">,</span> <span class="n">partitioning_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">&quot;partitioning&quot;</span><span class="p">,</span> <span class="s2">&quot;gas.partitioning&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;gas.partitioning&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">"partitioning"</span><span class="p">,</span> <span class="s2">"gas.partitioning"</span><span class="p">),</span>
+        <span class="s2">"gas.partitioning"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span>
@@ -17097,37 +17097,37 @@ primary commit kernel launches.</p>
     <span class="p">)</span>
     <span class="n">edge_shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">),)</span>
     <span class="n">source</span><span class="p">,</span> <span class="n">source_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span> <span class="s2">&quot;source_boxes&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span> <span class="s2">"source_boxes"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
     <span class="p">)</span>
     <span class="n">destination</span><span class="p">,</span> <span class="n">destination_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
         <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
-        <span class="s2">&quot;destination_boxes&quot;</span><span class="p">,</span>
+        <span class="s2">"destination_boxes"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="n">edge_shape</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">enabled</span><span class="p">,</span> <span class="n">enabled_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span> <span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span> <span class="s2">"enabled"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
     <span class="p">)</span>
     <span class="n">rates</span><span class="p">,</span> <span class="n">rates_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span> <span class="s2">&quot;rates&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span> <span class="s2">"rates"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
     <span class="p">)</span>
     <span class="n">final_volumes</span> <span class="o">=</span> <span class="n">typed</span><span class="o">.</span><span class="n">prescribed_volume</span><span class="o">.</span><span class="n">final_volumes</span>
     <span class="n">final_range</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">final_volumes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">final_volumes</span><span class="p">,</span> <span class="n">final_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-            <span class="n">final_volumes</span><span class="p">,</span> <span class="s2">&quot;final_volumes&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">boxes</span><span class="p">,),</span> <span class="n">device</span>
+            <span class="n">final_volumes</span><span class="p">,</span> <span class="s2">"final_volumes"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">boxes</span><span class="p">,),</span> <span class="n">device</span>
         <span class="p">)</span>
     <span class="n">amounts</span><span class="p">,</span> <span class="n">amounts_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">amounts</span><span class="p">,</span> <span class="s2">&quot;amounts&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span> <span class="n">device</span>
+        <span class="n">amounts</span><span class="p">,</span> <span class="s2">"amounts"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span> <span class="n">device</span>
     <span class="p">)</span>
     <span class="n">deltas</span><span class="p">,</span> <span class="n">deltas_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">amount_deltas</span><span class="p">,</span> <span class="s2">&quot;amount_deltas&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span> <span class="n">device</span>
+        <span class="n">amount_deltas</span><span class="p">,</span> <span class="s2">"amount_deltas"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span> <span class="n">device</span>
     <span class="p">)</span>
     <span class="n">outbound</span><span class="p">,</span> <span class="n">outbound_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
         <span class="n">outbound_amounts</span><span class="p">,</span>
-        <span class="s2">&quot;outbound_amounts&quot;</span><span class="p">,</span>
+        <span class="s2">"outbound_amounts"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span>
@@ -17138,7 +17138,7 @@ primary commit kernel launches.</p>
     <span class="k">if</span> <span class="n">source_amounts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">source_ledger</span><span class="p">,</span> <span class="n">source_ledger_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
             <span class="n">source_amounts</span><span class="p">,</span>
-            <span class="s2">&quot;source_amounts&quot;</span><span class="p">,</span>
+            <span class="s2">"source_amounts"</span><span class="p">,</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
             <span class="mi">2</span><span class="p">,</span>
             <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span>
@@ -17147,7 +17147,7 @@ primary commit kernel launches.</p>
     <span class="k">if</span> <span class="n">sink_amounts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">sink_ledger</span><span class="p">,</span> <span class="n">sink_ledger_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
             <span class="n">sink_amounts</span><span class="p">,</span>
-            <span class="s2">&quot;sink_amounts&quot;</span><span class="p">,</span>
+            <span class="s2">"sink_amounts"</span><span class="p">,</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
             <span class="mi">2</span><span class="p">,</span>
             <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span>
@@ -17684,7 +17684,7 @@ metadata are invalid.</p>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
     <span class="n">buffers</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transport fixed-capacity particle populations across a closed map.</span>
+<span class="w">    </span><span class="sd">"""Transport fixed-capacity particle populations across a closed map.</span>
 
 <span class="sd">    This concrete-only API is available only from</span>
 <span class="sd">    ``particula.gpu.kernels.communication`` and is deliberately not exported</span>
@@ -17727,50 +17727,50 @@ metadata are invalid.</p>
 <span class="sd">        TypeError: If scalar, declaration, or buffer-carrier types are invalid.</span>
 <span class="sd">        ValueError: If observable schemas, devices, aliases, or declaration</span>
 <span class="sd">            metadata are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">step</span> <span class="o">=</span> <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span>
     <span class="n">typed</span> <span class="o">=</span> <span class="n">_validate_particle_communication_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">buffers</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ParticleCommunicationBuffers</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;buffers must be an exact ParticleCommunicationBuffers.&quot;</span>
+            <span class="s2">"buffers must be an exact ParticleCommunicationBuffers."</span>
         <span class="p">)</span>
     <span class="n">buffers</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ParticleCommunicationBuffers</span><span class="p">,</span> <span class="n">buffers</span><span class="p">)</span>
     <span class="n">map_data</span> <span class="o">=</span> <span class="n">typed</span><span class="o">.</span><span class="n">communication_map</span>
     <span class="n">masses</span><span class="p">,</span> <span class="n">mass_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;masses&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.masses&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.masses&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"masses"</span><span class="p">,</span> <span class="s2">"particles.masses"</span><span class="p">),</span>
+        <span class="s2">"particles.masses"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">3</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">,</span> <span class="n">species</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">device</span>
     <span class="n">concentration</span><span class="p">,</span> <span class="n">concentration_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.concentration&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.concentration&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">,</span> <span class="s2">"particles.concentration"</span><span class="p">),</span>
+        <span class="s2">"particles.concentration"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">charge</span><span class="p">,</span> <span class="n">charge_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;charge&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.charge&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.charge&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"charge"</span><span class="p">,</span> <span class="s2">"particles.charge"</span><span class="p">),</span>
+        <span class="s2">"particles.charge"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">density</span><span class="p">,</span> <span class="n">density_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.density&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.density&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">,</span> <span class="s2">"particles.density"</span><span class="p">),</span>
+        <span class="s2">"particles.density"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="p">(</span><span class="n">species</span><span class="p">,),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">volume</span><span class="p">,</span> <span class="n">volume_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.volume&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.volume&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"volume"</span><span class="p">,</span> <span class="s2">"particles.volume"</span><span class="p">),</span>
+        <span class="s2">"particles.volume"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="p">(</span><span class="n">boxes</span><span class="p">,),</span>
@@ -17779,31 +17779,31 @@ metadata are invalid.</p>
     <span class="n">edges</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">)</span>
     <span class="n">edge_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">edges</span><span class="p">,)</span>
     <span class="n">source</span><span class="p">,</span> <span class="n">source_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span> <span class="s2">&quot;source_boxes&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span> <span class="s2">"source_boxes"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
     <span class="p">)</span>
     <span class="n">destination</span><span class="p">,</span> <span class="n">destination_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
         <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
-        <span class="s2">&quot;destination_boxes&quot;</span><span class="p">,</span>
+        <span class="s2">"destination_boxes"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="n">edge_shape</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">enabled</span><span class="p">,</span> <span class="n">enabled_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span> <span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span> <span class="s2">"enabled"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
     <span class="p">)</span>
     <span class="n">rates</span><span class="p">,</span> <span class="n">rates_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span> <span class="s2">&quot;rates&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span> <span class="s2">"rates"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edge_shape</span><span class="p">,</span> <span class="n">device</span>
     <span class="p">)</span>
     <span class="n">final_volumes</span> <span class="o">=</span> <span class="n">typed</span><span class="o">.</span><span class="n">prescribed_volume</span><span class="o">.</span><span class="n">final_volumes</span>
     <span class="n">final_range</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">final_volumes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">final_volumes</span><span class="p">,</span> <span class="n">final_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-            <span class="n">final_volumes</span><span class="p">,</span> <span class="s2">&quot;final_volumes&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">boxes</span><span class="p">,),</span> <span class="n">device</span>
+            <span class="n">final_volumes</span><span class="p">,</span> <span class="s2">"final_volumes"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">boxes</span><span class="p">,),</span> <span class="n">device</span>
         <span class="p">)</span>
     <span class="n">debits</span><span class="p">,</span> <span class="n">debits_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
         <span class="n">buffers</span><span class="o">.</span><span class="n">source_debits</span><span class="p">,</span>
-        <span class="s2">&quot;source_debits&quot;</span><span class="p">,</span>
+        <span class="s2">"source_debits"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">),</span>
@@ -17811,7 +17811,7 @@ metadata are invalid.</p>
     <span class="p">)</span>
     <span class="n">credits</span><span class="p">,</span> <span class="n">credits_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
         <span class="n">buffers</span><span class="o">.</span><span class="n">destination_credits</span><span class="p">,</span>
-        <span class="s2">&quot;destination_credits&quot;</span><span class="p">,</span>
+        <span class="s2">"destination_credits"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">),</span>
@@ -17819,7 +17819,7 @@ metadata are invalid.</p>
     <span class="p">)</span>
     <span class="n">assignments</span><span class="p">,</span> <span class="n">assignments_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
         <span class="n">buffers</span><span class="o">.</span><span class="n">assignments</span><span class="p">,</span>
-        <span class="s2">&quot;assignments&quot;</span><span class="p">,</span>
+        <span class="s2">"assignments"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">slots</span><span class="p">),</span>
@@ -17827,7 +17827,7 @@ metadata are invalid.</p>
     <span class="p">)</span>
     <span class="n">requests</span><span class="p">,</span> <span class="n">requests_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
         <span class="n">buffers</span><span class="o">.</span><span class="n">request_concentrations</span><span class="p">,</span>
-        <span class="s2">&quot;request_concentrations&quot;</span><span class="p">,</span>
+        <span class="s2">"request_concentrations"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">slots</span><span class="p">),</span>
@@ -17871,7 +17871,7 @@ metadata are invalid.</p>
         <span class="k">return</span> <span class="n">particles</span>
     <span class="n">planner_work</span> <span class="o">=</span> <span class="n">boxes</span> <span class="o">*</span> <span class="n">boxes</span> <span class="o">*</span> <span class="n">edges</span> <span class="o">*</span> <span class="n">slots</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">edges</span> <span class="o">*</span> <span class="n">slots</span> <span class="o">*</span> <span class="n">slots</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">planner_work</span> <span class="o">&gt;</span> <span class="n">_PARTICLE_COMMUNICATION_MAX_PLAN_WORK</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;particle communication planner work exceeds budget.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"particle communication planner work exceeds budget."</span><span class="p">)</span>
     <span class="n">invalid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="n">demand</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">final_volumes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -18081,12 +18081,12 @@ allocations, payload scans, host readback, or synchronization.</p>
     <span class="n">invalid</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">active</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dispatch acquired closed GAS resources without public P1 validation.</span>
+<span class="w">    </span><span class="sd">"""Dispatch acquired closed GAS resources without public P1 validation.</span>
 
 <span class="sd">    This private resident seam assumes acquisition has already established every</span>
 <span class="sd">    schema, identity, alias, and static map invariant.  It intentionally has no</span>
 <span class="sd">    allocations, payload scans, host readback, or synchronization.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">map_data</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span>
     <span class="n">concentration</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span>
     <span class="n">volume</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">volume</span>
@@ -18302,11 +18302,11 @@ uses the registry-pinned planner, status, and snapshot storage by identity.</p>
     <span class="n">initial_concentration</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">initial_charge</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dispatch acquired closed PARTICLES resources without public P1 checks.</span>
+<span class="w">    </span><span class="sd">"""Dispatch acquired closed PARTICLES resources without public P1 checks.</span>
 
 <span class="sd">    Acquisition owns payload validation and allocation. This resident-only seam</span>
 <span class="sd">    uses the registry-pinned planner, status, and snapshot storage by identity.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">map_data</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span>
     <span class="n">masses</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span>
     <span class="n">concentration</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span>
@@ -18466,7 +18466,7 @@ uses the registry-pinned planner, status, and snapshot storage by identity.</p>
     <span class="n">invalid</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">changed</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply acquired prescribed volumes without public P1 validation.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Apply acquired prescribed volumes without public P1 validation."""</span>
     <span class="n">volume</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">volume</span>
     <span class="n">particle_concentration</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span>
     <span class="n">gas_concentration</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span>
@@ -18835,7 +18835,7 @@ launches.</p>
 <span class="normal">753</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">volume_evolution_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">final_volumes</span><span class="p">:</span> <span class="nb">object</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply prescribed final volumes while preserving extensive inventories.</span>
+<span class="w">    </span><span class="sd">"""Apply prescribed final volumes while preserving extensive inventories.</span>
 
 <span class="sd">    ``final_volumes`` must be a caller-owned, contiguous active-device</span>
 <span class="sd">    ``wp.float64`` array shaped ``(B,)`` in m^3. Complete read-only preflight</span>
@@ -18867,90 +18867,90 @@ launches.</p>
 <span class="sd">    Note:</span>
 <span class="sd">        Rollback is not promised if an asynchronous apply writer fails after it</span>
 <span class="sd">        launches.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Final-volume form intentionally precedes all container access.</span>
     <span class="n">final_volumes_array</span><span class="p">,</span> <span class="n">final_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">final_volumes</span><span class="p">,</span> <span class="s2">&quot;final_volumes&quot;</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">1</span>
+        <span class="n">final_volumes</span><span class="p">,</span> <span class="s2">"final_volumes"</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">1</span>
     <span class="p">)</span>
     <span class="n">final_volumes</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">final_volumes_array</span><span class="p">)</span>
     <span class="n">masses</span><span class="p">,</span> <span class="n">mass_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;masses&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.masses&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.masses&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"masses"</span><span class="p">,</span> <span class="s2">"particles.masses"</span><span class="p">),</span>
+        <span class="s2">"particles.masses"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">3</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">device</span>
     <span class="n">particle_concentration</span><span class="p">,</span> <span class="n">particle_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.concentration&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.concentration&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">,</span> <span class="s2">"particles.concentration"</span><span class="p">),</span>
+        <span class="s2">"particles.concentration"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">charge</span><span class="p">,</span> <span class="n">charge_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;charge&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.charge&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.charge&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"charge"</span><span class="p">,</span> <span class="s2">"particles.charge"</span><span class="p">),</span>
+        <span class="s2">"particles.charge"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">density</span><span class="p">,</span> <span class="n">density_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.density&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.density&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">,</span> <span class="s2">"particles.density"</span><span class="p">),</span>
+        <span class="s2">"particles.density"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_species</span><span class="p">,),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">volume</span><span class="p">,</span> <span class="n">volume_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">,</span> <span class="s2">&quot;particles.volume&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;particles.volume&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"volume"</span><span class="p">,</span> <span class="s2">"particles.volume"</span><span class="p">),</span>
+        <span class="s2">"particles.volume"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_boxes</span><span class="p">,),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">gas_concentration</span><span class="p">,</span> <span class="n">gas_concentration_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">,</span> <span class="s2">&quot;gas.concentration&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;gas.concentration&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">,</span> <span class="s2">"gas.concentration"</span><span class="p">),</span>
+        <span class="s2">"gas.concentration"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">n_gas</span> <span class="o">=</span> <span class="n">gas_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">gas_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_boxes</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gas.concentration shape must match particle masses.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"gas.concentration shape must match particle masses."</span><span class="p">)</span>
     <span class="n">molar_mass</span><span class="p">,</span> <span class="n">molar_mass_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span> <span class="s2">&quot;gas.molar_mass&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;gas.molar_mass&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">"molar_mass"</span><span class="p">,</span> <span class="s2">"gas.molar_mass"</span><span class="p">),</span>
+        <span class="s2">"gas.molar_mass"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_gas</span><span class="p">,),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">vapor_pressure</span><span class="p">,</span> <span class="n">vapor_pressure_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">&quot;vapor_pressure&quot;</span><span class="p">,</span> <span class="s2">&quot;gas.vapor_pressure&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;gas.vapor_pressure&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">"vapor_pressure"</span><span class="p">,</span> <span class="s2">"gas.vapor_pressure"</span><span class="p">),</span>
+        <span class="s2">"gas.vapor_pressure"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_gas</span><span class="p">),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">partitioning</span><span class="p">,</span> <span class="n">partitioning_range</span> <span class="o">=</span> <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">&quot;partitioning&quot;</span><span class="p">,</span> <span class="s2">&quot;gas.partitioning&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;gas.partitioning&quot;</span><span class="p">,</span>
+        <span class="n">_get_field</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="s2">"partitioning"</span><span class="p">,</span> <span class="s2">"gas.partitioning"</span><span class="p">),</span>
+        <span class="s2">"gas.partitioning"</span><span class="p">,</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_gas</span><span class="p">),</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">final_volumes</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;final_volumes shape must match particle masses.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"final_volumes shape must match particle masses."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">final_volumes</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="n">device</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;final_volumes device must match particle device.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"final_volumes device must match particle device."</span><span class="p">)</span>
     <span class="n">_reject_aliases</span><span class="p">(</span>
         <span class="p">(</span>
             <span class="n">masses</span><span class="p">,</span>

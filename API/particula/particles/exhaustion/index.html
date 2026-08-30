@@ -16518,16 +16518,16 @@ resampling may use the deferred scaling policy.</p>
 <span class="normal">69</span>
 <span class="normal">70</span>
 <span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reject bool-like values so policy controls remain unambiguous.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Reject bool-like values so policy controls remain unambiguous."""</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span>
-        <span class="p">(</span><span class="s2">&quot;resampling&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resampling</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"resampling"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resampling</span><span class="p">),</span>
         <span class="p">(</span>
-            <span class="s2">&quot;representative_volume_scaling&quot;</span><span class="p">,</span>
+            <span class="s2">"representative_volume_scaling"</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">representative_volume_scaling</span><span class="p">,</span>
         <span class="p">),</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an exact Python bool&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an exact Python bool"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17102,7 +17102,7 @@ scaled-volume bounds are invalid. Rejection is atomic.</p>
     <span class="n">minimum_volume</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">resolved_scale</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ParticleData</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply P4 scaling to selected CPU particle-data rows in place.</span>
+<span class="w">    </span><span class="sd">"""Apply P4 scaling to selected CPU particle-data rows in place.</span>
 
 <span class="sd">    A row is selected exactly when ``scaling_required`` is true and its</span>
 <span class="sd">    provisional demand is positive. Each selected row scales its box volume,</span>
@@ -17138,13 +17138,13 @@ scaled-volume bounds are invalid. Rejection is atomic.</p>
 <span class="sd">            dtype.</span>
 <span class="sd">        ValueError: If schemas, physical values, factor bounds, or selected</span>
 <span class="sd">            scaled-volume bounds are invalid. Rejection is atomic.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle_data</span> <span class="o">=</span> <span class="n">_validate_particle_schema</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
     <span class="n">box_count</span> <span class="o">=</span> <span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span>
     <span class="n">demand</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
         <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">_validate_p4_sidecar</span><span class="p">(</span>
-            <span class="s2">&quot;provisional_source_demand&quot;</span><span class="p">,</span>
+            <span class="s2">"provisional_source_demand"</span><span class="p">,</span>
             <span class="n">provisional_source_demand</span><span class="p">,</span>
             <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
             <span class="n">box_count</span><span class="p">,</span>
@@ -17153,31 +17153,31 @@ scaled-volume bounds are invalid. Rejection is atomic.</p>
     <span class="n">flags</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
         <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">],</span>
         <span class="n">_validate_p4_sidecar</span><span class="p">(</span>
-            <span class="s2">&quot;scaling_required&quot;</span><span class="p">,</span> <span class="n">scaling_required</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">box_count</span>
+            <span class="s2">"scaling_required"</span><span class="p">,</span> <span class="n">scaling_required</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">box_count</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">requested</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
         <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">_validate_p4_sidecar</span><span class="p">(</span>
-            <span class="s2">&quot;requested_scale&quot;</span><span class="p">,</span> <span class="n">requested_scale</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">box_count</span>
+            <span class="s2">"requested_scale"</span><span class="p">,</span> <span class="n">requested_scale</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">box_count</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">minimum</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
         <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">_validate_p4_sidecar</span><span class="p">(</span>
-            <span class="s2">&quot;minimum_scale&quot;</span><span class="p">,</span> <span class="n">minimum_scale</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">box_count</span>
+            <span class="s2">"minimum_scale"</span><span class="p">,</span> <span class="n">minimum_scale</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">box_count</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">minimum_box_volume</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
         <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">_validate_p4_sidecar</span><span class="p">(</span>
-            <span class="s2">&quot;minimum_volume&quot;</span><span class="p">,</span> <span class="n">minimum_volume</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">box_count</span>
+            <span class="s2">"minimum_volume"</span><span class="p">,</span> <span class="n">minimum_volume</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">box_count</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">resolved</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
         <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">_validate_p4_sidecar</span><span class="p">(</span>
-            <span class="s2">&quot;resolved_scale&quot;</span><span class="p">,</span> <span class="n">resolved_scale</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">box_count</span>
+            <span class="s2">"resolved_scale"</span><span class="p">,</span> <span class="n">resolved_scale</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">box_count</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
@@ -17189,38 +17189,38 @@ scaled-volume bounds are invalid. Rejection is atomic.</p>
     <span class="n">_cache_particle_state</span><span class="p">(</span><span class="n">particle_data</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">demand</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">demand</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;provisional_source_demand must be finite and nonnegative&quot;</span>
+            <span class="s2">"provisional_source_demand must be finite and nonnegative"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">requested</span><span class="p">))</span>
         <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">minimum</span><span class="p">))</span>
         <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">minimum_box_volume</span><span class="p">))</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;scaling factors and minimum_volume must be finite&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"scaling factors and minimum_volume must be finite"</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">minimum</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">requested</span> <span class="o">&lt;</span> <span class="n">minimum</span><span class="p">)</span>
         <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">requested</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">)</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;scaling factors must satisfy 0 &lt; minimum &lt;= requested &lt;= 1&quot;</span>
+            <span class="s2">"scaling factors must satisfy 0 &lt; minimum &lt;= requested &lt;= 1"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">minimum_box_volume</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;minimum_volume must be finite and positive&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"minimum_volume must be finite and positive"</span><span class="p">)</span>
 
     <span class="n">selected</span> <span class="o">=</span> <span class="n">flags</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">demand</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span>
         <span class="n">particle_data</span><span class="o">.</span><span class="n">volume</span><span class="p">[</span><span class="n">selected</span><span class="p">]</span> <span class="o">*</span> <span class="n">requested</span><span class="p">[</span><span class="n">selected</span><span class="p">]</span>
         <span class="o">&lt;</span> <span class="n">minimum_box_volume</span><span class="p">[</span><span class="n">selected</span><span class="p">]</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;selected scaled volume must meet minimum_volume&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"selected scaled volume must meet minimum_volume"</span><span class="p">)</span>
     <span class="n">factors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">selected</span><span class="p">,</span> <span class="n">requested</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
     <span class="n">scaled_concentration</span> <span class="o">=</span> <span class="n">particle_data</span><span class="o">.</span><span class="n">concentration</span> <span class="o">*</span> <span class="n">factors</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
     <span class="n">active</span> <span class="o">=</span> <span class="n">particle_data</span><span class="o">.</span><span class="n">concentration</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">active</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">scaled_concentration</span><span class="p">)))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span>
         <span class="n">active</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">scaled_concentration</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">)</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;selected scale must preserve active concentrations&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"selected scale must preserve active concentrations"</span><span class="p">)</span>
     <span class="n">resolved</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">factors</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">selected</span><span class="p">):</span>
         <span class="n">particle_data</span><span class="o">.</span><span class="n">volume</span><span class="p">[</span><span class="n">selected</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="n">selected</span><span class="p">]</span>
@@ -17401,7 +17401,7 @@ longer exactly covers the active slots in a resampling box.</p>
     <span class="n">particles</span><span class="p">:</span> <span class="n">ParticleData</span><span class="p">,</span>
     <span class="n">plan</span><span class="p">:</span> <span class="n">_ResamplingPlan</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Atomically apply a previously planned CPU fixed-capacity remap.</span>
+<span class="w">    </span><span class="sd">"""Atomically apply a previously planned CPU fixed-capacity remap.</span>
 
 <span class="sd">    Every plan and target-state validation runs before the first assignment, so</span>
 <span class="sd">    ordinary validation errors cannot partially mutate an earlier box. This</span>
@@ -17421,7 +17421,7 @@ longer exactly covers the active slots in a resampling box.</p>
 <span class="sd">            type or dtype.</span>
 <span class="sd">        ValueError: If the target state or plan is invalid, or the plan no</span>
 <span class="sd">            longer exactly covers the active slots in a resampling box.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle_data</span> <span class="o">=</span> <span class="n">_validate_particle_schema</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
     <span class="n">cached_state</span> <span class="o">=</span> <span class="n">_cache_particle_state</span><span class="p">(</span><span class="n">particle_data</span><span class="p">)</span>
     <span class="n">resampling_plan</span> <span class="o">=</span> <span class="n">_validate_resampling_plan</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">particle_data</span><span class="p">)</span>
@@ -17434,7 +17434,7 @@ longer exactly covers the active slots in a resampling box.</p>
         <span class="n">planned_indices</span> <span class="o">=</span> <span class="n">box_plan</span><span class="o">.</span><span class="n">retained_indices</span> <span class="o">+</span> <span class="n">box_plan</span><span class="o">.</span><span class="n">released_indices</span>
         <span class="k">if</span> <span class="n">active_indices</span> <span class="o">!=</span> <span class="n">planned_indices</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;resampling plan must exactly cover current active slots&quot;</span>
+                <span class="s2">"resampling plan must exactly cover current active slots"</span>
             <span class="p">)</span>
         <span class="n">source</span> <span class="o">=</span> <span class="n">cached_state</span><span class="p">[</span><span class="n">box_index</span><span class="p">]</span>
         <span class="n">source_masses</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
@@ -17447,7 +17447,7 @@ longer exactly covers the active slots in a resampling box.</p>
             <span class="ow">or</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">charges</span><span class="p">)</span>
             <span class="o">!=</span> <span class="n">box_plan</span><span class="o">.</span><span class="n">source_charges</span>
         <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resampling plan source state is stale&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resampling plan source state is stale"</span><span class="p">)</span>
         <span class="n">_validate_remap_diagnostics</span><span class="p">(</span>
             <span class="n">source</span><span class="p">,</span>
             <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">box_plan</span><span class="o">.</span><span class="n">replacement_masses</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
@@ -17669,7 +17669,7 @@ array storage.</p>
     <span class="n">charge</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
     <span class="n">volume</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightedInventory</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate float64 weighted inventories without retaining caller arrays.</span>
+<span class="w">    </span><span class="sd">"""Calculate float64 weighted inventories without retaining caller arrays.</span>
 
 <span class="sd">    Array-like inputs are converted to float64. The mass reduction avoids a</span>
 <span class="sd">    full weighted-mass broadcast product. Returned tuples do not retain caller</span>
@@ -17686,41 +17686,41 @@ array storage.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If converted inputs have invalid shape or physical values.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">mass_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">masses</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">weight_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">charge_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">volume_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">mass_values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;masses must have shape (B, N, S)&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"masses must have shape (B, N, S)"</span><span class="p">)</span>
     <span class="n">box_count</span><span class="p">,</span> <span class="n">particle_count</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mass_values</span><span class="o">.</span><span class="n">shape</span>
     <span class="k">if</span> <span class="n">weight_values</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">box_count</span><span class="p">,</span> <span class="n">particle_count</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;weights must have shape (B, N)&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"weights must have shape (B, N)"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">charge_values</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">box_count</span><span class="p">,</span> <span class="n">particle_count</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;charge must have shape (B, N)&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"charge must have shape (B, N)"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">volume_values</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">box_count</span><span class="p">,):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;volume must have shape (B,)&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"volume must have shape (B,)"</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="p">(</span>
-        <span class="p">(</span><span class="s2">&quot;masses&quot;</span><span class="p">,</span> <span class="n">mass_values</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;weights&quot;</span><span class="p">,</span> <span class="n">weight_values</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;charge&quot;</span><span class="p">,</span> <span class="n">charge_values</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;volume&quot;</span><span class="p">,</span> <span class="n">volume_values</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"masses"</span><span class="p">,</span> <span class="n">mass_values</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"weights"</span><span class="p">,</span> <span class="n">weight_values</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"charge"</span><span class="p">,</span> <span class="n">charge_values</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"volume"</span><span class="p">,</span> <span class="n">volume_values</span><span class="p">),</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">values</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must contain only finite values&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must contain only finite values"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">volume_values</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;volume must be positive&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"volume must be positive"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">mass_values</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;masses must be nonnegative&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"masses must be nonnegative"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">weight_values</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;weights must be nonnegative&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"weights must be nonnegative"</span><span class="p">)</span>
 
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
         <span class="n">number</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weight_values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
         <span class="p">)</span>
         <span class="n">mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
-            <span class="s2">&quot;bn,bns-&gt;bs&quot;</span><span class="p">,</span>
+            <span class="s2">"bn,bns-&gt;bs"</span><span class="p">,</span>
             <span class="n">weight_values</span><span class="p">,</span>
             <span class="n">mass_values</span><span class="p">,</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -17744,7 +17744,7 @@ array storage.</p>
             <span class="n">charge_per_volume</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;weighted inventory reductions must be finite&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"weighted inventory reductions must be finite"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">WeightedInventory</span><span class="p">(</span>
         <span class="n">number</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">number</span><span class="p">),</span>
         <span class="n">mass</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">mass</span><span class="p">),</span>
@@ -17969,7 +17969,7 @@ resampling is infeasible, or a diagnostic exceeds its bound.</p>
     <span class="n">surface_relative_error</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">diversity_absolute_error</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ResamplingPlan</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an immutable, deterministic CPU fixed-capacity resampling plan.</span>
+<span class="w">    </span><span class="sd">"""Create an immutable, deterministic CPU fixed-capacity resampling plan.</span>
 
 <span class="sd">    The function validates all boxes and only plans; it does not mutate P1</span>
 <span class="sd">    records or particle state. The detached plan retains existing active</span>
@@ -17997,7 +17997,7 @@ resampling is infeasible, or a diagnostic exceeds its bound.</p>
 <span class="sd">            an unsupported type or dtype.</span>
 <span class="sd">        ValueError: If the fixed-capacity state or P1 decisions are invalid,</span>
 <span class="sd">            resampling is infeasible, or a diagnostic exceeds its bound.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">bounds</span> <span class="o">=</span> <span class="n">_validate_resampling_bounds</span><span class="p">(</span>
         <span class="n">radius_cubed_relative_error</span><span class="p">,</span>
         <span class="n">mean_radius_relative_error</span><span class="p">,</span>
@@ -18015,7 +18015,7 @@ resampling is infeasible, or a diagnostic exceeds its bound.</p>
             <span class="n">box_plans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_ResamplingBoxPlan</span><span class="p">((),</span> <span class="p">(),</span> <span class="p">(),</span> <span class="p">(),</span> <span class="p">()))</span>
             <span class="k">continue</span>
         <span class="k">if</span> <span class="n">cached_state</span><span class="p">[</span><span class="n">box_index</span><span class="p">]</span><span class="o">.</span><span class="n">active_indices</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resampling box must have active slots&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resampling box must have active slots"</span><span class="p">)</span>
         <span class="n">box_plans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="n">_build_box_remap</span><span class="p">(</span>
                 <span class="n">cached_state</span><span class="p">[</span><span class="n">box_index</span><span class="p">],</span>
@@ -18221,7 +18221,7 @@ exhausted capacity.</p>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">allow_oversized_requests</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExhaustionPlan</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve immutable capacity decisions after complete sidecar validation.</span>
+<span class="w">    </span><span class="sd">"""Resolve immutable capacity decisions after complete sidecar validation.</span>
 
 <span class="sd">    The resolver validates every input box before creating a returned plan.</span>
 <span class="sd">    Activation uses the exact requested free-index prefix. Exhausted capacity</span>
@@ -18242,11 +18242,11 @@ exhausted capacity.</p>
 <span class="sd">        TypeError: If either public record has the wrong type.</span>
 <span class="sd">        ValueError: If sidecars are invalid or no enabled policy can represent</span>
 <span class="sd">            exhausted capacity.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">controls</span><span class="p">,</span> <span class="n">ExhaustionControls</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;controls must be an ExhaustionControls&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"controls must be an ExhaustionControls"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">ExhaustionInputs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;inputs must be an ExhaustionInputs&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"inputs must be an ExhaustionInputs"</span><span class="p">)</span>
 
     <span class="n">box_count</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_validate_sidecars</span><span class="p">(</span>
         <span class="n">inputs</span><span class="p">,</span>
@@ -18271,7 +18271,7 @@ exhausted capacity.</p>
                     <span class="n">policy_code</span><span class="o">=</span><span class="n">POLICY_ACTIVATE</span><span class="p">,</span>
                     <span class="n">activation_indices</span><span class="o">=</span><span class="n">activation_indices</span><span class="p">,</span>
                     <span class="n">release_indices</span><span class="o">=</span><span class="p">(),</span>
-                    <span class="n">scale_factor</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">),</span>
+                    <span class="n">scale_factor</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">),</span>
                 <span class="p">)</span>
             <span class="p">)</span>
             <span class="k">continue</span>
@@ -18283,7 +18283,7 @@ exhausted capacity.</p>
             <span class="n">policy_code</span> <span class="o">=</span> <span class="n">POLICY_SCALE_DEFERRED</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;exhaustion policy cannot represent requested capacity&quot;</span>
+                <span class="s2">"exhaustion policy cannot represent requested capacity"</span>
             <span class="p">)</span>
         <span class="n">box_plans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="n">ExhaustionBoxPlan</span><span class="p">(</span>
@@ -18294,7 +18294,7 @@ exhausted capacity.</p>
                 <span class="n">policy_code</span><span class="o">=</span><span class="n">policy_code</span><span class="p">,</span>
                 <span class="n">activation_indices</span><span class="o">=</span><span class="p">(),</span>
                 <span class="n">release_indices</span><span class="o">=</span><span class="p">(),</span>
-                <span class="n">scale_factor</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">),</span>
+                <span class="n">scale_factor</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">ExhaustionPlan</span><span class="p">(</span><span class="n">box_plans</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">box_plans</span><span class="p">))</span>

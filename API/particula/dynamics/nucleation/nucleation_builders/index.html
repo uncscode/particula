@@ -16295,7 +16295,7 @@ values are normalized to SI units before construction.</p>
 <span class="normal">81</span>
 <span class="normal">82</span>
 <span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unconfigured strategy builder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize an unconfigured strategy builder."""</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">_REQUIRED</span><span class="p">))</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">coefficient_provenance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -16405,7 +16405,7 @@ are missing or invalid.</p>
 <span class="normal">494</span>
 <span class="normal">495</span>
 <span class="normal">496</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActivationNucleationStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a fully validated immutable activation strategy.</span>
+<span class="w">    </span><span class="sd">"""Build a fully validated immutable activation strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Activation strategy with normalized metadata and a survival default</span>
@@ -16414,7 +16414,7 @@ are missing or invalid.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required builder fields or paired saturation bounds</span>
 <span class="sd">            are missing or invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">domain</span><span class="p">,</span> <span class="n">composition</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">survival</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">ActivationNucleationStrategy</span><span class="p">(</span>
         <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">),</span>
@@ -16484,7 +16484,7 @@ normalized to m³/s before construction.</p>
 <span class="normal">81</span>
 <span class="normal">82</span>
 <span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unconfigured strategy builder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize an unconfigured strategy builder."""</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">_REQUIRED</span><span class="p">))</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">coefficient_provenance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -16594,7 +16594,7 @@ are missing or invalid.</p>
 <span class="normal">525</span>
 <span class="normal">526</span>
 <span class="normal">527</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KineticNucleationStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a fully validated immutable kinetic strategy.</span>
+<span class="w">    </span><span class="sd">"""Build a fully validated immutable kinetic strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Kinetic strategy with normalized metadata and a survival default of</span>
@@ -16603,7 +16603,7 @@ are missing or invalid.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required builder fields or paired saturation bounds</span>
 <span class="sd">            are missing or invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">domain</span><span class="p">,</span> <span class="n">composition</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">survival</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">KineticNucleationStrategy</span><span class="p">(</span>
         <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficient</span><span class="p">),</span>
@@ -16666,8 +16666,8 @@ mutation behavior.</p>
 <span class="normal">540</span>
 <span class="normal">541</span>
 <span class="normal">542</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an unconfigured P4 source-selection builder.&quot;&quot;&quot;</span>
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">,</span> <span class="s2">&quot;precursor_index&quot;</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">"""Initialize an unconfigured P4 source-selection builder."""</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">"strategy"</span><span class="p">,</span> <span class="s2">"precursor_index"</span><span class="p">])</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="p">:</span> <span class="n">NucleationStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
@@ -16755,7 +16755,7 @@ mutation behavior.</p>
 <span class="normal">608</span>
 <span class="normal">609</span>
 <span class="normal">610</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NucleationSourceConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build validated immutable P4 source-selection metadata.</span>
+<span class="w">    </span><span class="sd">"""Build validated immutable P4 source-selection metadata.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Metadata selecting a supported strategy and precursor index.</span>
@@ -16763,7 +16763,7 @@ mutation behavior.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required builder fields are missing or invalid.</span>
 <span class="sd">        TypeError: If the precursor index is not an accepted integer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">NucleationSourceConfig</span><span class="p">(</span>
         <span class="n">cast</span><span class="p">(</span><span class="n">NucleationStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="p">),</span>
@@ -16865,7 +16865,7 @@ mutation behavior.</p>
 <span class="normal">592</span>
 <span class="normal">593</span>
 <span class="normal">594</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Atomically configure the exact two-key source metadata schema.</span>
+<span class="w">    </span><span class="sd">"""Atomically configure the exact two-key source metadata schema.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        parameters: Dictionary containing only ``strategy`` and</span>
@@ -16877,16 +16877,16 @@ mutation behavior.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``parameters`` is not a dictionary.</span>
 <span class="sd">        ValueError: If keys or source-selection values are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;parameters must be a dict&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">!=</span> <span class="p">{</span><span class="s2">&quot;strategy&quot;</span><span class="p">,</span> <span class="s2">&quot;precursor_index&quot;</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"parameters must be a dict"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">!=</span> <span class="p">{</span><span class="s2">"strategy"</span><span class="p">,</span> <span class="s2">"precursor_index"</span><span class="p">}:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;parameters must contain only strategy and precursor_index&quot;</span>
+            <span class="s2">"parameters must contain only strategy and precursor_index"</span>
         <span class="p">)</span>
     <span class="n">staged</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)()</span>
-    <span class="n">staged</span><span class="o">.</span><span class="n">set_strategy</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">])</span>
-    <span class="n">staged</span><span class="o">.</span><span class="n">set_precursor_index</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;precursor_index&quot;</span><span class="p">])</span>
+    <span class="n">staged</span><span class="o">.</span><span class="n">set_strategy</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"strategy"</span><span class="p">])</span>
+    <span class="n">staged</span><span class="o">.</span><span class="n">set_precursor_index</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"precursor_index"</span><span class="p">])</span>
     <span class="n">staged</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">staged</span><span class="o">.</span><span class="n">strategy</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span> <span class="o">=</span> <span class="n">staged</span><span class="o">.</span><span class="n">precursor_index</span>
@@ -16951,14 +16951,14 @@ mutation behavior.</p>
 <span class="normal">564</span>
 <span class="normal">565</span>
 <span class="normal">566</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_precursor_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precursor_index</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the candidate nonnegative precursor species index.</span>
+<span class="w">    </span><span class="sd">"""Set the candidate nonnegative precursor species index.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        precursor_index: Index validated when the configuration is built.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        This builder for fluent configuration.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">precursor_index</span> <span class="o">=</span> <span class="n">precursor_index</span>  <span class="c1"># type: ignore[assignment]</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17021,14 +17021,14 @@ mutation behavior.</p>
 <span class="normal">552</span>
 <span class="normal">553</span>
 <span class="normal">554</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the candidate supported nucleation strategy.</span>
+<span class="w">    </span><span class="sd">"""Set the candidate supported nucleation strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        strategy: Activation or kinetic strategy to select.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        This builder for fluent configuration.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">strategy</span>  <span class="c1"># type: ignore[assignment]</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>

@@ -16196,7 +16196,7 @@ protection.</p>
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_safe_exp</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the exponential of each element in the input array, with overflow</span>
+<span class="w">    </span><span class="sd">"""Compute the exponential of each element in the input array, with overflow</span>
 <span class="sd">    protection.</span>
 
 <span class="sd">    The exponential is calculated using:</span>
@@ -16209,7 +16209,7 @@ protection.</p>
 <span class="sd">        - np.ndarray of exponentiated values, with machine-level clipping.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 
@@ -16219,8 +16219,8 @@ protection.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Floating Point Arithmetic,&quot; NumPy Documentation, NumPy.org.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - "Floating Point Arithmetic," NumPy Documentation, NumPy.org.</span>
+<span class="sd">    """</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">max_exp_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_exp_input</span><span class="p">))</span>
@@ -16328,7 +16328,7 @@ underflow protection.</p>
 <span class="normal">70</span>
 <span class="normal">71</span>
 <span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_safe_log</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the natural logarithm of each element in the input array, with</span>
+<span class="w">    </span><span class="sd">"""Compute the natural logarithm of each element in the input array, with</span>
 <span class="sd">    underflow protection.</span>
 
 <span class="sd">    The natural log is calculated using:</span>
@@ -16341,7 +16341,7 @@ underflow protection.</p>
 <span class="sd">        - np.ndarray of natural logarithms, with machine-level clipping.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 
@@ -16351,8 +16351,8 @@ underflow protection.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Logarithms and Machine Precision,&quot; NumPy Documentation, NumPy.org.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - "Logarithms and Machine Precision," NumPy Documentation, NumPy.org.</span>
+<span class="sd">    """</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">min_positive_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">min_positive_value</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
@@ -16460,7 +16460,7 @@ underflow protection.</p>
 <span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_safe_log10</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the base-10 logarithm of each element in the input array, with</span>
+<span class="w">    </span><span class="sd">"""Compute the base-10 logarithm of each element in the input array, with</span>
 <span class="sd">    underflow protection.</span>
 
 <span class="sd">    The base-10 log is calculated using:</span>
@@ -16473,7 +16473,7 @@ underflow protection.</p>
 <span class="sd">        - np.ndarray of base-10 logarithms, with machine-level clipping.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 
@@ -16483,8 +16483,8 @@ underflow protection.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Logarithms and Machine Precision,&quot; NumPy Documentation, NumPy.org.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - "Logarithms and Machine Precision," NumPy Documentation, NumPy.org.</span>
+<span class="sd">    """</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">min_positive_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">min_positive_value</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
@@ -16615,11 +16615,11 @@ The behavior for non-positive bases is undefined.</p>
 <span class="normal">151</span>
 <span class="normal">152</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;base&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"base"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_safe_power</span><span class="p">(</span><span class="n">base</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">exponent</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the power (base ** exponent) with overflow protection.</span>
+<span class="w">    </span><span class="sd">"""Compute the power (base ** exponent) with overflow protection.</span>
 
 <span class="sd">    The power is computed as: result = exp(exponent * log(base))</span>
 <span class="sd">    where the intermediate value is clipped to avoid overflow beyond the</span>
@@ -16634,7 +16634,7 @@ The behavior for non-positive bases is undefined.</p>
 <span class="sd">        - np.ndarray of power values, computed with machine-level clipping.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 
@@ -16645,8 +16645,8 @@ The behavior for non-positive bases is undefined.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Floating Point Arithmetic,&quot; NumPy Documentation, NumPy.org.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        - "Floating Point Arithmetic," NumPy Documentation, NumPy.org.</span>
+<span class="sd">    """</span>
     <span class="n">base</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">exponent</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">exponent</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 

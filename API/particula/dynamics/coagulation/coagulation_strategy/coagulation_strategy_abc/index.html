@@ -16310,7 +16310,7 @@ for particle-resolved coagulation.</p>
         <span class="k">return</span> <span class="n">diff_kn</span> <span class="o">+</span> <span class="n">coulomb_phi</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">kernel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particle</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">1.0</span>
-<span class="n">strategy</span> <span class="o">=</span> <span class="n">ExampleCoagulation</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">ExampleCoagulation</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -16452,11 +16452,11 @@ particle-resolved coagulation instead of using interpolation.</p>
     <span class="n">particle_resolved_kernel_bins_per_decade</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">use_direct_kernel</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the coagulation strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the coagulation strategy.</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        distribution_type: Type of distribution (&quot;discrete&quot;,</span>
-<span class="sd">            &quot;continuous_pdf&quot;, or &quot;particle_resolved&quot;).</span>
+<span class="sd">        distribution_type: Type of distribution ("discrete",</span>
+<span class="sd">            "continuous_pdf", or "particle_resolved").</span>
 <span class="sd">        particle_resolved_kernel_radius: Kernel radius for</span>
 <span class="sd">            particle-resolved simulations.</span>
 <span class="sd">        particle_resolved_kernel_bins_number: Number of bins for</span>
@@ -16468,15 +16468,15 @@ particle-resolved coagulation instead of using interpolation.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If distribution_type is not valid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">distribution_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
-        <span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_resolved&quot;</span><span class="p">,</span>
+        <span class="s2">"discrete"</span><span class="p">,</span>
+        <span class="s2">"continuous_pdf"</span><span class="p">,</span>
+        <span class="s2">"particle_resolved"</span><span class="p">,</span>
     <span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Invalid distribution type. Must be one of &#39;discrete&#39;, &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;&#39;continuous_pdf&#39;, or &#39;particle_resolved&#39;.&quot;</span>
+            <span class="s2">"Invalid distribution type. Must be one of 'discrete', "</span>
+            <span class="o">+</span> <span class="s2">"'continuous_pdf', or 'particle_resolved'."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">=</span> <span class="n">distribution_type</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">random_generator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
@@ -16611,7 +16611,7 @@ for <code>n_boxes == 1</code>.</p>
 <span class="normal">990</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coulomb_potential_ratio</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleLike</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Coulomb potential ratio for each particle.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Coulomb potential ratio for each particle.</span>
 
 <span class="sd">    This ratio characterizes the influence of electrostatic forces on</span>
 <span class="sd">    coagulation processes. CPU ``ParticleData`` inputs are supported only</span>
@@ -16631,7 +16631,7 @@ for <code>n_boxes == 1</code>.</p>
 <span class="sd">        ```py</span>
 <span class="sd">        phi = strategy.coulomb_potential_ratio(particle, 298.15)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">charge</span> <span class="o">=</span> <span class="n">_get_charge</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">charge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -16774,7 +16774,7 @@ supported only for <code>n_boxes == 1</code>.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the diffusive Knudsen number for each particle.</span>
+<span class="w">    </span><span class="sd">"""Calculate the diffusive Knudsen number for each particle.</span>
 
 <span class="sd">    The Knudsen number is used to characterize the relative importance of</span>
 <span class="sd">    diffusion-controlled processes. CPU ``ParticleData`` inputs are</span>
@@ -16795,7 +16795,7 @@ supported only for <code>n_boxes == 1</code>.</p>
 <span class="sd">        ```py</span>
 <span class="sd">        knudsen_nums = strategy.diffusive_knudsen(particle, 298.15, 101325)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="c1"># properties calculation for friction factor</span>
     <span class="n">friction_factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">friction_factor</span><span class="p">(</span>
@@ -16911,7 +16911,7 @@ coagulation.</li>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the dimensionless coagulation kernel.</span>
+<span class="w">    </span><span class="sd">"""Calculate the dimensionless coagulation kernel.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - diffusive_knudsen : The diffusive Knudsen number</span>
@@ -16928,7 +16928,7 @@ coagulation.</li>
 <span class="sd">        H = strategy.dimensionless_kernel(kn_array, phi_array)</span>
 <span class="sd">        # H might be array([...]) representing the dimensionless kernel</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17067,7 +17067,7 @@ inputs are supported only for <code>n_boxes == 1</code>.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the friction factor for each particle in the aerosol.</span>
+<span class="w">    </span><span class="sd">"""Compute the friction factor for each particle in the aerosol.</span>
 
 <span class="sd">    Considers dynamic viscosity, mean free path, and slip correction to</span>
 <span class="sd">    determine the friction factor [dimensionless]. CPU ``ParticleData``</span>
@@ -17089,7 +17089,7 @@ inputs are supported only for <code>n_boxes == 1</code>.</p>
 <span class="sd">        ```py</span>
 <span class="sd">        fr = strategy.friction_factor(particle, 298.15, 101325)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="c1"># assume standard atmospheric composition</span>
     <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
@@ -17239,7 +17239,7 @@ inputs are supported only for <code>n_boxes == 1</code>.</p>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleLike</span><span class="p">,</span>
     <span class="n">kernel</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the coagulation gain rate [kg/s].</span>
+<span class="w">    </span><span class="sd">"""Calculate the coagulation gain rate [kg/s].</span>
 
 <span class="sd">    CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.</span>
 
@@ -17259,23 +17259,23 @@ inputs are supported only for <code>n_boxes == 1</code>.</p>
 <span class="sd">        ```py</span>
 <span class="sd">        gain = strategy.gain_rate(particle, k_val)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;discrete&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"discrete"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">coagulation_rate</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
             <span class="n">radius</span><span class="o">=</span><span class="n">_get_radius</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
             <span class="n">concentration</span><span class="o">=</span><span class="n">_get_concentration</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
             <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"continuous_pdf"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">coagulation_rate</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_continuous</span><span class="p">(</span>
             <span class="n">radius</span><span class="o">=</span><span class="n">_get_radius</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
             <span class="n">concentration</span><span class="o">=</span><span class="n">_get_concentration</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
             <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="s2">&quot;Invalid distribution type. &quot;</span>
-        <span class="s2">&quot;Must be either &#39;discrete&#39; or &#39;continuous_pdf&#39;.&quot;</span>
+        <span class="s2">"Invalid distribution type. "</span>
+        <span class="s2">"Must be either 'discrete' or 'continuous_pdf'."</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17403,7 +17403,7 @@ and pressure to return a dimensional kernel for coagulation. CPU
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the coagulation kernel [m^3/s].</span>
+<span class="w">    </span><span class="sd">"""Calculate the coagulation kernel [m^3/s].</span>
 
 <span class="sd">    Uses particle attributes (e.g., radius, mass) along with temperature</span>
 <span class="sd">    and pressure to return a dimensional kernel for coagulation. CPU</span>
@@ -17426,7 +17426,7 @@ and pressure to return a dimensional kernel for coagulation. CPU
 <span class="sd">        k_val = strategy.kernel(particle, 298.15, 101325)</span>
 <span class="sd">        # k_val can be a scalar or array</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17555,7 +17555,7 @@ and pressure to return a dimensional kernel for coagulation. CPU
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleLike</span><span class="p">,</span>
     <span class="n">kernel</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the coagulation loss rate [kg/s].</span>
+<span class="w">    </span><span class="sd">"""Calculate the coagulation loss rate [kg/s].</span>
 
 <span class="sd">    CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.</span>
 
@@ -17575,22 +17575,22 @@ and pressure to return a dimensional kernel for coagulation. CPU
 <span class="sd">        ```py</span>
 <span class="sd">        loss = strategy.loss_rate(particle, k_val)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;discrete&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"discrete"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">coagulation_rate</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span>
             <span class="n">concentration</span><span class="o">=</span><span class="n">_get_concentration</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
             <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"continuous_pdf"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">coagulation_rate</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_continuous</span><span class="p">(</span>
             <span class="n">radius</span><span class="o">=</span><span class="n">_get_radius</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
             <span class="n">concentration</span><span class="o">=</span><span class="n">_get_concentration</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
             <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="s2">&quot;Invalid distribution type. &quot;</span>
-        <span class="s2">&quot;Must be either &#39;discrete&#39; or &#39;continuous_pdf&#39;.&quot;</span>
+        <span class="s2">"Invalid distribution type. "</span>
+        <span class="s2">"Must be either 'discrete' or 'continuous_pdf'."</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17720,7 +17720,7 @@ and pressure to return a dimensional kernel for coagulation. CPU
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the net coagulation rate = gain - loss [kg/s].</span>
+<span class="w">    </span><span class="sd">"""Compute the net coagulation rate = gain - loss [kg/s].</span>
 
 <span class="sd">    CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.</span>
 
@@ -17740,7 +17740,7 @@ and pressure to return a dimensional kernel for coagulation. CPU
 <span class="sd">        ```py</span>
 <span class="sd">        net = strategy.net_rate(particle, 298.15, 101325)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="n">kernel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">(</span>
         <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span>
@@ -18143,7 +18143,7 @@ or if a CPU ParticleData input has <code>n_boxes != 1</code>.</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleLike</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform a single coagulation step over a specified time interval.</span>
+<span class="w">    </span><span class="sd">"""Perform a single coagulation step over a specified time interval.</span>
 
 <span class="sd">    Updates the particle distribution or representation based on the</span>
 <span class="sd">    net_rate calculated for the given time_step. CPU ``ParticleData``</span>
@@ -18167,11 +18167,11 @@ or if a CPU ParticleData input has <code>n_boxes != 1</code>.</p>
 <span class="sd">        ```py</span>
 <span class="sd">        updated_particle = strategy.step(particle, 298.15, 101325, 1.0)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">particle</span> <span class="o">=</span> <span class="n">_unwrap_particle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">ParticleData</span><span class="p">):</span>
         <span class="n">particle</span> <span class="o">=</span> <span class="n">_require_single_box_particle_data</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span> <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"discrete"</span><span class="p">,</span> <span class="s2">"continuous_pdf"</span><span class="p">]:</span>
         <span class="n">net_rate_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net_rate</span><span class="p">(</span>
             <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
             <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
@@ -18187,7 +18187,7 @@ or if a CPU ParticleData input has <code>n_boxes != 1</code>.</p>
         <span class="n">particle</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span><span class="n">concentration_change</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">particle</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;particle_resolved&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"particle_resolved"</span><span class="p">:</span>
         <span class="n">kernel_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
             <span class="n">Callable</span><span class="p">[</span>
                 <span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
@@ -18218,8 +18218,8 @@ or if a CPU ParticleData input has <code>n_boxes != 1</code>.</p>
             <span class="n">kernel_radius</span> <span class="o">=</span> <span class="n">_get_radius</span><span class="p">(</span><span class="n">kernel_data</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">kernel_radius</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;The kernel radius cannot be zero. &quot;</span>
-                    <span class="s2">&quot;Check the particle representation.&quot;</span>
+                    <span class="s2">"The kernel radius cannot be zero. "</span>
+                    <span class="s2">"Check the particle representation."</span>
                 <span class="p">)</span>
             <span class="n">kernel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">(</span>
                 <span class="n">particle</span><span class="o">=</span><span class="n">kernel_data</span><span class="p">,</span>
@@ -18233,7 +18233,7 @@ or if a CPU ParticleData input has <code>n_boxes != 1</code>.</p>
                 <span class="n">kernel_arr</span> <span class="o">=</span> <span class="n">kernel_arr</span><span class="p">[</span><span class="n">sort_indices</span><span class="p">][:,</span> <span class="n">sort_indices</span><span class="p">]</span>
             <span class="n">step_func</span> <span class="o">=</span> <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">get_particle_resolved_coagulation_step</span>  <span class="c1"># noqa: E501</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_direct_kernel</span><span class="p">:</span>
-                <span class="n">kernel_strategy</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;kernel_strategy&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">kernel_strategy</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"kernel_strategy"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="n">kernel_mapping</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="n">charged_kernel_strategy</span><span class="o">.</span><span class="n">HardSphereKernelStrategy</span><span class="p">:</span> <span class="p">(</span>
                         <span class="n">charged_dimensional_kernel</span><span class="o">.</span><span class="n">get_hard_sphere_kernel_via_system_state</span>
@@ -18266,8 +18266,8 @@ or if a CPU ParticleData input has <code>n_boxes != 1</code>.</p>
                     <span class="p">)</span>
                 <span class="k">if</span> <span class="n">kernel_builder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                        <span class="s2">&quot;Direct kernel disabled for unsupported kernel &quot;</span>
-                        <span class="s2">&quot;strategy.&quot;</span>
+                        <span class="s2">"Direct kernel disabled for unsupported kernel "</span>
+                        <span class="s2">"strategy."</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">particle_radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
@@ -18333,8 +18333,8 @@ or if a CPU ParticleData input has <code>n_boxes != 1</code>.</p>
         <span class="n">kernel_radius</span> <span class="o">=</span> <span class="n">kernel_particle</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">kernel_radius</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;The kernel radius cannot be zero. &quot;</span>
-                <span class="s2">&quot;Check the particle representation.&quot;</span>
+                <span class="s2">"The kernel radius cannot be zero. "</span>
+                <span class="s2">"Check the particle representation."</span>
             <span class="p">)</span>
         <span class="n">kernel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">(</span>
             <span class="n">particle</span><span class="o">=</span><span class="n">kernel_particle</span><span class="p">,</span>
@@ -18354,7 +18354,7 @@ or if a CPU ParticleData input has <code>n_boxes != 1</code>.</p>
             <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">get_particle_resolved_coagulation_step</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_direct_kernel</span><span class="p">:</span>
-            <span class="n">kernel_strategy</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;kernel_strategy&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">kernel_strategy</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"kernel_strategy"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">kernel_mapping</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="n">charged_kernel_strategy</span><span class="o">.</span><span class="n">HardSphereKernelStrategy</span><span class="p">:</span> <span class="p">(</span>
                     <span class="n">charged_dimensional_kernel</span><span class="o">.</span><span class="n">get_hard_sphere_kernel_via_system_state</span>
@@ -18381,8 +18381,8 @@ or if a CPU ParticleData input has <code>n_boxes != 1</code>.</p>
                 <span class="n">kernel_builder</span> <span class="o">=</span> <span class="n">kernel_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">kernel_strategy</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">kernel_builder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;Direct kernel disabled for unsupported kernel &quot;</span>
-                    <span class="s2">&quot;strategy.&quot;</span>
+                    <span class="s2">"Direct kernel disabled for unsupported kernel "</span>
+                    <span class="s2">"strategy."</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">particle_radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
@@ -18422,9 +18422,9 @@ or if a CPU ParticleData input has <code>n_boxes != 1</code>.</p>
         <span class="k">return</span> <span class="n">particle</span>
 
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="s2">&quot;Invalid distribution type. &quot;</span>
-        <span class="s2">&quot;Must be either &#39;discrete&#39;, &#39;continuous_pdf&#39;, or&quot;</span>
-        <span class="s2">&quot; &#39;particle_resolved&#39;.&quot;</span>
+        <span class="s2">"Invalid distribution type. "</span>
+        <span class="s2">"Must be either 'discrete', 'continuous_pdf', or"</span>
+        <span class="s2">" 'particle_resolved'."</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

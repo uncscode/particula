@@ -16282,7 +16282,7 @@
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chahl (2019) dimensioned coagulation kernel via system state.</span>
+<span class="w">    </span><span class="sd">"""Chahl (2019) dimensioned coagulation kernel via system state.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - particle_radius : The radius of the particles [m].</span>
@@ -16296,7 +16296,7 @@
 <span class="sd">          [m^3/s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        kernel_chahl = ()</span>
 <span class="sd">            par.dynamics.get_coulomb_kernel_chahl2019_via_system_state(</span>
@@ -16311,7 +16311,7 @@
 <span class="sd">        molecular regime Coulombic collisions in aerosols and dusty plasmas.</span>
 <span class="sd">        Aerosol Science and Technology, 53(8), 933-957.</span>
 <span class="sd">        https://doi.org/10.1080/02786826.2019.1614522</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="p">(</span>
         <span class="n">coulomb_potential_ratio</span><span class="p">,</span>
         <span class="n">diffusive_knudsen</span><span class="p">,</span>
@@ -16506,7 +16506,7 @@
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The dimensioned coagulation kernel via Dyachkov (2007).</span>
+<span class="w">    </span><span class="sd">"""The dimensioned coagulation kernel via Dyachkov (2007).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - particle_radius : The radius of the particles [m].</span>
@@ -16520,7 +16520,7 @@
 <span class="sd">          [m^3/s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        kernel_dyachkov = (</span>
 <span class="sd">            par.dynamics.get_coulomb_kernel_dyachkov2007_via_system_state(</span>
@@ -16535,7 +16535,7 @@
 <span class="sd">      particles in the transition regime: The effect of the Coulomb potential.</span>
 <span class="sd">      Journal of Chemical Physics, 126(12).</span>
 <span class="sd">      https://doi.org/10.1063/1.2713719</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="p">(</span>
         <span class="n">coulomb_potential_ratio</span><span class="p">,</span>
         <span class="n">diffusive_knudsen</span><span class="p">,</span>
@@ -16730,7 +16730,7 @@
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The dimensioned coagulation kernel via system state using Gatti (2008).</span>
+<span class="w">    </span><span class="sd">"""The dimensioned coagulation kernel via system state using Gatti (2008).</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - particle_radius : The radius of the particles [m].</span>
@@ -16744,7 +16744,7 @@
 <span class="sd">          [m^3/s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        kernel_gatti = (</span>
 <span class="sd">            par.dynamics.get_coulomb_kernel_gatti2008_via_system_state(</span>
@@ -16759,7 +16759,7 @@
 <span class="sd">      charging in plasmas over a wide range of collisionality. Physical Review</span>
 <span class="sd">      E - Statistical, Nonlinear, and Soft Matter Physics, 78(4).</span>
 <span class="sd">      https://doi.org/10.1103/PhysRevE.78.046402</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="p">(</span>
         <span class="n">coulomb_potential_ratio</span><span class="p">,</span>
         <span class="n">diffusive_knudsen</span><span class="p">,</span>
@@ -16954,7 +16954,7 @@
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gopalakrishnan (2012) dimensioned coagulation kernel via system state.</span>
+<span class="w">    </span><span class="sd">"""Gopalakrishnan (2012) dimensioned coagulation kernel via system state.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - particle_radius : The radius of the particles [m].</span>
@@ -16968,7 +16968,7 @@
 <span class="sd">          [m^3/s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        kernel_gopal = (</span>
 <span class="sd">            par.dyanmics.get_coulomb_kernel_gopalakrishnan2012_via_system_state(</span>
@@ -16983,7 +16983,7 @@
 <span class="sd">      in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear</span>
 <span class="sd">      and Soft Matter Physics, 85(2).</span>
 <span class="sd">      https://doi.org/10.1103/PhysRevE.85.026410</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="p">(</span>
         <span class="n">coulomb_potential_ratio</span><span class="p">,</span>
         <span class="n">diffusive_knudsen</span><span class="p">,</span>
@@ -17193,7 +17193,7 @@ particle-particle interactions [m^3/s].</li>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The hard sphere dimensioned coagulation kernel via system state.</span>
+<span class="w">    </span><span class="sd">"""The hard sphere dimensioned coagulation kernel via system state.</span>
 
 <span class="sd">    For the hard sphere kernel, the dimensionless kernel is computed</span>
 <span class="sd">    internally based on the diffusive Knudsen number, then converted</span>
@@ -17216,7 +17216,7 @@ particle-particle interactions [m^3/s].</li>
 <span class="sd">            particle-particle interactions [m^3/s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        kernel_matrix = get_hard_sphere_kernel_via_system_state(</span>
 <span class="sd">            p_radius, p_mass, p_charge, 298.15, 101325</span>
 <span class="sd">        )</span>
@@ -17228,7 +17228,7 @@ particle-particle interactions [m^3/s].</li>
 <span class="sd">      particles in the transition regime: The effect of the Coulomb potential.</span>
 <span class="sd">      Journal of Chemical Physics, 126(12).</span>
 <span class="sd">      https://doi.org/10.1063/1.2713719</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># get system state properties</span>
     <span class="p">(</span>
         <span class="n">coulomb_potential_ratio</span><span class="p">,</span>

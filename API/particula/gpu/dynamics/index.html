@@ -16254,7 +16254,7 @@ with the Stokes-Einstein relation.</p>
     <span class="n">aerodynamic_mobility</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">boltzmann_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate Brownian diffusivity via Stokes-Einstein scaling.</span>
+<span class="w">    </span><span class="sd">"""Calculate Brownian diffusivity via Stokes-Einstein scaling.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.dynamics.coagulation.brownian_kernel._brownian_diffusivity``</span>
@@ -16268,7 +16268,7 @@ with the Stokes-Einstein relation.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Brownian diffusivity in square meters per second.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">boltzmann_constant</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">aerodynamic_mobility</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16446,7 +16446,7 @@ a scalar particle pair using the Fuchs correction to the continuum kernel.</p>
     <span class="n">speed_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the scalar Brownian coagulation kernel for a pair.</span>
+<span class="w">    </span><span class="sd">"""Calculate the scalar Brownian coagulation kernel for a pair.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.dynamics.coagulation.brownian_kernel.get_brownian_kernel`` for</span>
@@ -16465,7 +16465,7 @@ a scalar particle pair using the Fuchs correction to the continuum kernel.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Brownian coagulation kernel for the pair in cubic meters per second.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">pi_value</span> <span class="o">=</span> <span class="n">_PI</span>
     <span class="n">sum_radius</span> <span class="o">=</span> <span class="n">radius_i</span> <span class="o">+</span> <span class="n">radius_j</span>
     <span class="n">sum_diffusivity</span> <span class="o">=</span> <span class="n">diff_i</span> <span class="o">+</span> <span class="n">diff_j</span>
@@ -16575,7 +16575,7 @@ performs no domain checks; callers must provide physically valid SI inputs.</p>
     <span class="n">aerodynamic_mobility</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">boltzmann_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate Stokes-Einstein diffusion from mobility.</span>
+<span class="w">    </span><span class="sd">"""Calculate Stokes-Einstein diffusion from mobility.</span>
 
 <span class="sd">    Evaluates ``D = k_B T B``. This low-level device primitive intentionally</span>
 <span class="sd">    performs no domain checks; callers must provide physically valid SI inputs.</span>
@@ -16587,7 +16587,7 @@ performs no domain checks; callers must provide physically valid SI inputs.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Particle diffusion coefficient ``D`` [m²/s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">boltzmann_constant</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">aerodynamic_mobility</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16688,7 +16688,7 @@ performs no domain checks; callers must provide physically valid SI inputs.</p>
     <span class="n">vapor_transition</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the first-order mass transport coefficient.</span>
+<span class="w">    </span><span class="sd">"""Calculate the first-order mass transport coefficient.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.dynamics.condensation.mass_transfer.get_first_order_mass_transport_k``.</span>
@@ -16700,7 +16700,7 @@ performs no domain checks; callers must provide physically valid SI inputs.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        First-order mass transport coefficient [m³/s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">pi_value</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">3.141592653589793</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)</span>
@@ -16802,7 +16802,7 @@ the Fuchs form for the collection enhancement term.</p>
     <span class="n">mean_free_path_particle</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Brownian coagulation collection term ``g``.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Brownian coagulation collection term ``g``.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.dynamics.coagulation.brownian_kernel._g_collection_term`` using</span>
@@ -16814,7 +16814,7 @@ the Fuchs form for the collection enhancement term.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Collection term ``g`` as a dimensionless quantity.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">two_radius</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">particle_radius</span>
     <span class="n">numerator</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
         <span class="n">two_radius</span> <span class="o">+</span> <span class="n">mean_free_path_particle</span><span class="p">,</span>
@@ -16945,7 +16945,7 @@ the Fuchs form for the collection enhancement term.</p>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">gas_constant</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the condensation mass transfer rate.</span>
+<span class="w">    </span><span class="sd">"""Calculate the condensation mass transfer rate.</span>
 
 <span class="sd">    Port of</span>
 <span class="sd">    ``particula.dynamics.condensation.mass_transfer.get_mass_transfer_rate``.</span>
@@ -16959,7 +16959,7 @@ the Fuchs form for the collection enhancement term.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Mass transfer rate [kg/s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">first_order_mass_transport</span>
         <span class="o">*</span> <span class="n">pressure_delta</span>
@@ -17054,7 +17054,7 @@ second.</p>
     <span class="n">diffusivity_particle</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">mean_thermal_speed_particle</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the particle mean free path for coagulation.</span>
+<span class="w">    </span><span class="sd">"""Calculate the particle mean free path for coagulation.</span>
 
 <span class="sd">    Port of ``particula.dynamics.coagulation.brownian_kernel._mean_free_path_l``</span>
 <span class="sd">    using ``lambda = 8 * diffusivity_particle / (pi * mean_thermal_speed)``.</span>
@@ -17066,7 +17066,7 @@ second.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Particle mean free path in meters.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">pi_value</span> <span class="o">=</span> <span class="n">_PI</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">8.0</span><span class="p">)</span>

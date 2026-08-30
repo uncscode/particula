@@ -16502,12 +16502,12 @@ scale storage. P1 validates but does not read or write it.</p>
     <span class="n">masses</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">mass_transfer</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply condensation mass transfer and clamp masses to non-negative.</span>
+<span class="w">    </span><span class="sd">"""Apply condensation mass transfer and clamp masses to non-negative.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        masses: Particle masses array ``(n_boxes, n_particles, n_species)``.</span>
 <span class="sd">        mass_transfer: Mass transfer array matching ``masses`` shape.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">box_idx</span><span class="p">,</span> <span class="n">particle_idx</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>  <span class="c1"># type: ignore[misc]</span>
     <span class="n">n_species</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">species_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_species</span><span class="p">):</span>
@@ -17079,7 +17079,7 @@ the original isothermal rate path.</p>
     <span class="n">time_step</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">mass_transfer</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a raw condensation mass-transfer proposal per particle species.</span>
+<span class="w">    </span><span class="sd">"""Compute a raw condensation mass-transfer proposal per particle species.</span>
 
 <span class="sd">    Water activity is applied only when enabled and the current species equals</span>
 <span class="sd">    ``water_species_index``. In configured weighted-tension mode, the supplied</span>
@@ -17115,7 +17115,7 @@ the original isothermal rate path.</p>
 <span class="sd">        temperature: Per-box gas temperature [K].</span>
 <span class="sd">        time_step: Condensation substep duration [s].</span>
 <span class="sd">        mass_transfer: Output raw mass-transfer proposal array.</span>
-<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># type: ignore</span>
+<span class="sd">    """</span>  <span class="c1"># type: ignore</span>
     <span class="n">box_idx</span><span class="p">,</span> <span class="n">particle_idx</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>  <span class="c1"># type: ignore[misc]</span>
     <span class="n">dynamic_viscosity_value</span> <span class="o">=</span> <span class="n">dynamic_viscosity</span><span class="p">[</span><span class="n">box_idx</span><span class="p">]</span>
     <span class="n">mean_free_path_value</span> <span class="o">=</span> <span class="n">mean_free_path</span><span class="p">[</span><span class="n">box_idx</span><span class="p">]</span>
@@ -18581,7 +18581,7 @@ NaN/Inf before a call.</p>
     <span class="n">energy_transfer</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">thermal_work</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute a fixed four-substep condensation timestep on the GPU.</span>
+<span class="w">    </span><span class="sd">"""Execute a fixed four-substep condensation timestep on the GPU.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        particles: GPU-resident particle data.</span>
@@ -18741,7 +18741,7 @@ NaN/Inf before a call.</p>
 
 <span class="sd">        Supplied latent sidecars are caller-owned. Latent heat is consumed per</span>
 <span class="sd">        fixed substep without mutation; omitting it or supplying zero for a</span>
-<span class="sd">        species preserves that species&#39; isothermal arithmetic. Thermal work is</span>
+<span class="sd">        species preserves that species' isothermal arithmetic. Thermal work is</span>
 <span class="sd">        validated but unused. Invalid metadata or values leave physical state</span>
 <span class="sd">        and all caller-owned work state unchanged. To make overflow detectable</span>
 <span class="sd">        before launch, finite latent heat is limited to ``1e9`` J/kg.</span>
@@ -18754,7 +18754,7 @@ NaN/Inf before a call.</p>
 <span class="sd">        content-validated because the step</span>
 <span class="sd">        only writes it. This write-only contract permits stale finite values and</span>
 <span class="sd">        NaN/Inf before a call.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_step</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_step</span><span class="p">,</span> <span class="n">Real</span><span class="p">)</span>
@@ -18762,7 +18762,7 @@ NaN/Inf before a call.</p>
         <span class="ow">or</span> <span class="n">time_step</span> <span class="o">&lt;</span> <span class="mf">0.0</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;time_step must be a finite, nonnegative real value and not bool&quot;</span>
+            <span class="s2">"time_step must be a finite, nonnegative real value and not bool"</span>
         <span class="p">)</span>
 
     <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span>
@@ -18776,19 +18776,19 @@ NaN/Inf before a call.</p>
         <span class="n">n_boxes</span><span class="p">,</span>
         <span class="n">n_species</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
-        <span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
+        <span class="s2">"condensation_step_gpu"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">thermodynamics</span> <span class="o">=</span> <span class="n">validate_thermodynamics_config</span><span class="p">(</span>
         <span class="n">thermodynamics</span><span class="p">,</span>
         <span class="n">n_species</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
         <span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>
-        <span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
+        <span class="s2">"condensation_step_gpu"</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">latent_heat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_validate_float64_species_array</span><span class="p">(</span>
-            <span class="s2">&quot;latent_heat&quot;</span><span class="p">,</span>
+            <span class="s2">"latent_heat"</span><span class="p">,</span>
             <span class="n">latent_heat</span><span class="p">,</span>
             <span class="n">n_species</span><span class="p">,</span>
             <span class="n">device</span><span class="p">,</span>
@@ -18797,7 +18797,7 @@ NaN/Inf before a call.</p>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">energy_transfer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">latent_heat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;energy_transfer requires latent_heat&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"energy_transfer requires latent_heat"</span><span class="p">)</span>
         <span class="n">_validate_energy_transfer_buffer</span><span class="p">(</span>
             <span class="n">energy_transfer</span><span class="p">,</span>
             <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_species</span><span class="p">),</span>
@@ -18805,7 +18805,7 @@ NaN/Inf before a call.</p>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">thermal_work</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_validate_float64_species_array</span><span class="p">(</span>
-            <span class="s2">&quot;thermal_work&quot;</span><span class="p">,</span>
+            <span class="s2">"thermal_work"</span><span class="p">,</span>
             <span class="n">thermal_work</span><span class="p">,</span>
             <span class="n">n_species</span><span class="p">,</span>
             <span class="n">device</span><span class="p">,</span>
@@ -18824,12 +18824,12 @@ NaN/Inf before a call.</p>
             <span class="n">n_species</span><span class="p">,</span>
             <span class="n">device</span><span class="p">,</span>
             <span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>
-            <span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
+            <span class="s2">"condensation_step_gpu"</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">surface_tension</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_validate_float64_species_array</span><span class="p">(</span>
-            <span class="s2">&quot;surface_tension&quot;</span><span class="p">,</span>
+            <span class="s2">"surface_tension"</span><span class="p">,</span>
             <span class="n">surface_tension</span><span class="p">,</span>
             <span class="n">n_species</span><span class="p">,</span>
             <span class="n">device</span><span class="p">,</span>
@@ -18837,7 +18837,7 @@ NaN/Inf before a call.</p>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">mass_accommodation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_validate_float64_species_array</span><span class="p">(</span>
-            <span class="s2">&quot;mass_accommodation&quot;</span><span class="p">,</span>
+            <span class="s2">"mass_accommodation"</span><span class="p">,</span>
             <span class="n">mass_accommodation</span><span class="p">,</span>
             <span class="n">n_species</span><span class="p">,</span>
             <span class="n">device</span><span class="p">,</span>
@@ -18845,7 +18845,7 @@ NaN/Inf before a call.</p>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">diffusion_coefficient_vapor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_validate_float64_species_array</span><span class="p">(</span>
-            <span class="s2">&quot;diffusion_coefficient_vapor&quot;</span><span class="p">,</span>
+            <span class="s2">"diffusion_coefficient_vapor"</span><span class="p">,</span>
             <span class="n">diffusion_coefficient_vapor</span><span class="p">,</span>
             <span class="n">n_species</span><span class="p">,</span>
             <span class="n">device</span><span class="p">,</span>
@@ -18883,15 +18883,15 @@ NaN/Inf before a call.</p>
             <span class="n">scratch_buffers</span><span class="p">,</span>
             <span class="n">expected_shape</span><span class="p">,</span>
             <span class="n">device</span><span class="p">,</span>
-            <span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
+            <span class="s2">"condensation_step_gpu"</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">mass_transfer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
             <span class="n">scratch_buffers</span><span class="o">.</span><span class="n">work_mass_transfer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="ow">or</span> <span class="n">scratch_buffers</span><span class="o">.</span><span class="n">total_mass_transfer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;mass_transfer conflicts with supplied scratch transfer &quot;</span>
-                <span class="s2">&quot;buffers in condensation_step_gpu.&quot;</span>
+                <span class="s2">"mass_transfer conflicts with supplied scratch transfer "</span>
+                <span class="s2">"buffers in condensation_step_gpu."</span>
             <span class="p">)</span>
         <span class="n">_validate_no_overlap</span><span class="p">(</span>
             <span class="p">(</span><span class="n">latent_heat</span><span class="p">,</span> <span class="n">thermal_work</span><span class="p">),</span>
@@ -18908,7 +18908,7 @@ NaN/Inf before a call.</p>
             <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
             <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
             <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-            <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
+            <span class="n">caller_name</span><span class="o">=</span><span class="s2">"condensation_step_gpu"</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="n">_validate_partitioning_values</span><span class="p">(</span>
         <span class="n">gas</span><span class="o">.</span><span class="n">partitioning</span><span class="p">,</span>
@@ -18923,7 +18923,7 @@ NaN/Inf before a call.</p>
             <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
             <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
             <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-            <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
+            <span class="n">caller_name</span><span class="o">=</span><span class="s2">"condensation_step_gpu"</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="c1"># P2 primary state and caller-owned sidecars validate before environment</span>
     <span class="c1"># normalization or fallback allocation, so invalid state is fully atomic.</span>
@@ -18933,55 +18933,55 @@ NaN/Inf before a call.</p>
             <span class="n">temperature</span> <span class="k">if</span> <span class="n">_is_warp_array_like</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="p">)</span>
         <span class="n">direct_pressure</span> <span class="o">=</span> <span class="n">pressure</span> <span class="k">if</span> <span class="n">_is_warp_array_like</span><span class="p">(</span><span class="n">pressure</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="n">environment_temperature</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">environment</span><span class="p">,</span> <span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">environment_pressure</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">environment</span><span class="p">,</span> <span class="s2">&quot;pressure&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">environment_temperature</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">environment</span><span class="p">,</span> <span class="s2">"temperature"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">environment_pressure</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">environment</span><span class="p">,</span> <span class="s2">"pressure"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">_validate_scratch_ownership</span><span class="p">(</span>
             <span class="n">scratch_buffers</span><span class="p">,</span>
             <span class="p">(</span>
-                <span class="p">(</span><span class="s2">&quot;particles.masses&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;particles.concentration&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;particles.density&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;particles.charge&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;particles.volume&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;gas.molar_mass&quot;</span><span class="p">,</span> <span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;gas.concentration&quot;</span><span class="p">,</span> <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;gas.vapor_pressure&quot;</span><span class="p">,</span> <span class="n">gas</span><span class="o">.</span><span class="n">vapor_pressure</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;gas.partitioning&quot;</span><span class="p">,</span> <span class="n">gas</span><span class="o">.</span><span class="n">partitioning</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;thermodynamics.modes&quot;</span><span class="p">,</span> <span class="n">thermodynamics</span><span class="o">.</span><span class="n">modes</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;thermodynamics.parameters&quot;</span><span class="p">,</span> <span class="n">thermodynamics</span><span class="o">.</span><span class="n">parameters</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"particles.masses"</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"particles.concentration"</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"particles.density"</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"particles.charge"</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"particles.volume"</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"gas.molar_mass"</span><span class="p">,</span> <span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"gas.concentration"</span><span class="p">,</span> <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"gas.vapor_pressure"</span><span class="p">,</span> <span class="n">gas</span><span class="o">.</span><span class="n">vapor_pressure</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"gas.partitioning"</span><span class="p">,</span> <span class="n">gas</span><span class="o">.</span><span class="n">partitioning</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"thermodynamics.modes"</span><span class="p">,</span> <span class="n">thermodynamics</span><span class="o">.</span><span class="n">modes</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"thermodynamics.parameters"</span><span class="p">,</span> <span class="n">thermodynamics</span><span class="o">.</span><span class="n">parameters</span><span class="p">),</span>
                 <span class="p">(</span>
-                    <span class="s2">&quot;thermodynamics.molar_mass_reference&quot;</span><span class="p">,</span>
+                    <span class="s2">"thermodynamics.molar_mass_reference"</span><span class="p">,</span>
                     <span class="n">thermodynamics</span><span class="o">.</span><span class="n">molar_mass_reference</span><span class="p">,</span>
                 <span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">,</span> <span class="n">latent_heat</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;thermal_work&quot;</span><span class="p">,</span> <span class="n">thermal_work</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;surface_tension&quot;</span><span class="p">,</span> <span class="n">surface_tension</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;mass_accommodation&quot;</span><span class="p">,</span> <span class="n">mass_accommodation</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;diffusion_coefficient_vapor&quot;</span><span class="p">,</span> <span class="n">diffusion_coefficient_vapor</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;mass_transfer&quot;</span><span class="p">,</span> <span class="n">mass_transfer</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;energy_transfer&quot;</span><span class="p">,</span> <span class="n">energy_transfer</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="n">direct_temperature</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;pressure&quot;</span><span class="p">,</span> <span class="n">direct_pressure</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"latent_heat"</span><span class="p">,</span> <span class="n">latent_heat</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"thermal_work"</span><span class="p">,</span> <span class="n">thermal_work</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"surface_tension"</span><span class="p">,</span> <span class="n">surface_tension</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"mass_accommodation"</span><span class="p">,</span> <span class="n">mass_accommodation</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"diffusion_coefficient_vapor"</span><span class="p">,</span> <span class="n">diffusion_coefficient_vapor</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"mass_transfer"</span><span class="p">,</span> <span class="n">mass_transfer</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"energy_transfer"</span><span class="p">,</span> <span class="n">energy_transfer</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"temperature"</span><span class="p">,</span> <span class="n">direct_temperature</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"pressure"</span><span class="p">,</span> <span class="n">direct_pressure</span><span class="p">),</span>
                 <span class="p">(</span>
-                    <span class="s2">&quot;environment.temperature&quot;</span><span class="p">,</span>
+                    <span class="s2">"environment.temperature"</span><span class="p">,</span>
                     <span class="n">environment_temperature</span>
                     <span class="k">if</span> <span class="n">_is_warp_array_like</span><span class="p">(</span><span class="n">environment_temperature</span><span class="p">)</span>
                     <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="p">(</span>
-                    <span class="s2">&quot;environment.pressure&quot;</span><span class="p">,</span>
+                    <span class="s2">"environment.pressure"</span><span class="p">,</span>
                     <span class="n">environment_pressure</span>
                     <span class="k">if</span> <span class="n">_is_warp_array_like</span><span class="p">(</span><span class="n">environment_pressure</span><span class="p">)</span>
                     <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="p">(</span>
-                    <span class="s2">&quot;activity_surface.kappas&quot;</span><span class="p">,</span>
+                    <span class="s2">"activity_surface.kappas"</span><span class="p">,</span>
                     <span class="n">activity_surface</span><span class="o">.</span><span class="n">kappas</span>
                     <span class="k">if</span> <span class="n">activity_surface</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                     <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="p">(</span>
-                    <span class="s2">&quot;activity_surface.molar_mass_reference&quot;</span><span class="p">,</span>
+                    <span class="s2">"activity_surface.molar_mass_reference"</span><span class="p">,</span>
                     <span class="n">activity_surface</span><span class="o">.</span><span class="n">molar_mass_reference</span>
                     <span class="k">if</span> <span class="n">activity_surface</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                     <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
@@ -18995,7 +18995,7 @@ NaN/Inf before a call.</p>
         <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
         <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
         <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-        <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
+        <span class="n">caller_name</span><span class="o">=</span><span class="s2">"condensation_step_gpu"</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">energy_transfer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -19084,12 +19084,12 @@ NaN/Inf before a call.</p>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">scratch_transfer_mode</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">scratch_buffers_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;scratch_buffers unexpectedly missing&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"scratch_buffers unexpectedly missing"</span><span class="p">)</span>
         <span class="n">work_mass_transfer</span> <span class="o">=</span> <span class="n">scratch_buffers_value</span><span class="o">.</span><span class="n">work_mass_transfer</span>
         <span class="n">total_mass_transfer</span> <span class="o">=</span> <span class="n">scratch_buffers_value</span><span class="o">.</span><span class="n">total_mass_transfer</span>
     <span class="k">elif</span> <span class="n">mass_transfer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># The legacy output is the accumulated total, so proposals need private</span>
-        <span class="c1"># step-local storage rather than overwriting the caller&#39;s total buffer.</span>
+        <span class="c1"># step-local storage rather than overwriting the caller's total buffer.</span>
         <span class="n">work_mass_transfer</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">total_mass_transfer</span> <span class="o">=</span> <span class="n">mass_transfer</span>
     <span class="k">else</span><span class="p">:</span>
@@ -19543,7 +19543,7 @@ output buffers unchanged; it never falls back to legacy physics.</p>
     <span class="n">gas_molar_mass</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">caller_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CondensationActivitySurfaceConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and return the identical activity/surface sidecar.</span>
+<span class="w">    </span><span class="sd">"""Validate and return the identical activity/surface sidecar.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        activity_surface: Candidate frozen sidecar to validate.</span>
@@ -19563,69 +19563,69 @@ output buffers unchanged; it never falls back to legacy physics.</p>
 <span class="sd">        This read-only preflight runs before allocation and launch. A malformed</span>
 <span class="sd">        sidecar therefore leaves particle, gas, environment, and supplied</span>
 <span class="sd">        output buffers unchanged; it never falls back to legacy physics.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">activity_surface</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CondensationActivitySurfaceConfig</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;activity_surface must be a CondensationActivitySurfaceConfig &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">"activity_surface must be a CondensationActivitySurfaceConfig "</span>
+            <span class="sa">f</span><span class="s2">"in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
     <span class="n">_validate_int32_selector</span><span class="p">(</span>
-        <span class="s2">&quot;activity_mode&quot;</span><span class="p">,</span> <span class="n">activity_surface</span><span class="o">.</span><span class="n">activity_mode</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="s2">"activity_mode"</span><span class="p">,</span> <span class="n">activity_surface</span><span class="o">.</span><span class="n">activity_mode</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="n">_validate_int32_selector</span><span class="p">(</span>
-        <span class="s2">&quot;surface_tension_mode&quot;</span><span class="p">,</span> <span class="n">activity_surface</span><span class="o">.</span><span class="n">surface_tension_mode</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="s2">"surface_tension_mode"</span><span class="p">,</span> <span class="n">activity_surface</span><span class="o">.</span><span class="n">surface_tension_mode</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="n">water_index</span> <span class="o">=</span> <span class="n">_validate_int32_selector</span><span class="p">(</span>
-        <span class="s2">&quot;water_species_index&quot;</span><span class="p">,</span>
+        <span class="s2">"water_species_index"</span><span class="p">,</span>
         <span class="n">activity_surface</span><span class="o">.</span><span class="n">water_species_index</span><span class="p">,</span>
         <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_species</span><span class="p">)),</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">water_index</span> <span class="o">&gt;=</span> <span class="n">n_species</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;activity_surface.water_species_index is out of range.&quot;</span>
+            <span class="s2">"activity_surface.water_species_index is out of range."</span>
         <span class="p">)</span>
     <span class="n">_validate_array_metadata</span><span class="p">(</span>
-        <span class="s2">&quot;kappas&quot;</span><span class="p">,</span>
+        <span class="s2">"kappas"</span><span class="p">,</span>
         <span class="n">activity_surface</span><span class="o">.</span><span class="n">kappas</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_species</span><span class="p">,),</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
         <span class="n">caller_name</span><span class="p">,</span>
-        <span class="s2">&quot;activity_surface&quot;</span><span class="p">,</span>
+        <span class="s2">"activity_surface"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">_validate_array_metadata</span><span class="p">(</span>
-        <span class="s2">&quot;molar_mass_reference&quot;</span><span class="p">,</span>
+        <span class="s2">"molar_mass_reference"</span><span class="p">,</span>
         <span class="n">activity_surface</span><span class="o">.</span><span class="n">molar_mass_reference</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_species</span><span class="p">,),</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
         <span class="n">caller_name</span><span class="p">,</span>
-        <span class="s2">&quot;activity_surface&quot;</span><span class="p">,</span>
+        <span class="s2">"activity_surface"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">_validate_array_metadata</span><span class="p">(</span>
-        <span class="s2">&quot;gas.molar_mass&quot;</span><span class="p">,</span>
+        <span class="s2">"gas.molar_mass"</span><span class="p">,</span>
         <span class="n">gas_molar_mass</span><span class="p">,</span>
         <span class="p">(</span><span class="n">n_species</span><span class="p">,),</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
         <span class="n">caller_name</span><span class="p">,</span>
-        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">kappas</span> <span class="o">=</span> <span class="n">_read_float64_array</span><span class="p">(</span><span class="n">activity_surface</span><span class="o">.</span><span class="n">kappas</span><span class="p">)</span>
     <span class="n">references</span> <span class="o">=</span> <span class="n">_read_float64_array</span><span class="p">(</span><span class="n">activity_surface</span><span class="o">.</span><span class="n">molar_mass_reference</span><span class="p">)</span>
     <span class="n">gas_masses</span> <span class="o">=</span> <span class="n">_read_float64_array</span><span class="p">(</span><span class="n">gas_molar_mass</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">kappas</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">kappas</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;activity_surface.kappas must be finite and non-negative.&quot;</span>
+            <span class="s2">"activity_surface.kappas must be finite and non-negative."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">references</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">references</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;activity_surface.molar_mass_reference must be finite and positive.&quot;</span>
+            <span class="s2">"activity_surface.molar_mass_reference must be finite and positive."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">references</span><span class="p">,</span> <span class="n">gas_masses</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;activity_surface.molar_mass_reference must exactly match &quot;</span>
-            <span class="s2">&quot;gas.molar_mass.&quot;</span>
+            <span class="s2">"activity_surface.molar_mass_reference must exactly match "</span>
+            <span class="s2">"gas.molar_mass."</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">activity_surface</span>
 </code></pre></div></td></tr></table></div>
@@ -19788,10 +19788,10 @@ supplied field has incompatible shape, dtype, or device.</p>
     <span class="n">device</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">caller_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CondensationScratchBuffers</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate scratch metadata without allocation, reads, or mutation.</span>
+<span class="w">    </span><span class="sd">"""Validate scratch metadata without allocation, reads, or mutation.</span>
 
 <span class="sd">    This atomic metadata-only gate requires the exact</span>
-<span class="sd">    ``CondensationScratchBuffers`` type and validates every supplied field&#39;s</span>
+<span class="sd">    ``CondensationScratchBuffers`` type and validates every supplied field's</span>
 <span class="sd">    stable shape, ``wp.float64`` dtype, and active device. It neither reads nor</span>
 <span class="sd">    writes supplied arrays, allocates fallback buffers, launches Warp work, or</span>
 <span class="sd">    synchronizes.</span>
@@ -19808,21 +19808,21 @@ supplied field has incompatible shape, dtype, or device.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``candidate`` is not the exact sidecar type or a</span>
 <span class="sd">            supplied field has incompatible shape, dtype, or device.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">candidate</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CondensationScratchBuffers</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;scratch_buffers must be a CondensationScratchBuffers &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">"scratch_buffers must be a CondensationScratchBuffers "</span>
+            <span class="sa">f</span><span class="s2">"in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
     <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span> <span class="o">=</span> <span class="n">dimensions</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">shape</span> <span class="ow">in</span> <span class="p">(</span>
-        <span class="p">(</span><span class="s2">&quot;work_mass_transfer&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;total_mass_transfer&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;dynamic_viscosity&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,)),</span>
-        <span class="p">(</span><span class="s2">&quot;mean_free_path&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,)),</span>
-        <span class="p">(</span><span class="s2">&quot;positive_mass_transfer_demand&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;negative_mass_transfer_release&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;positive_mass_transfer_scale&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"work_mass_transfer"</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"total_mass_transfer"</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"dynamic_viscosity"</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,)),</span>
+        <span class="p">(</span><span class="s2">"mean_free_path"</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,)),</span>
+        <span class="p">(</span><span class="s2">"positive_mass_transfer_demand"</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"negative_mass_transfer_release"</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">"positive_mass_transfer_scale"</span><span class="p">,</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)),</span>
     <span class="p">):</span>
         <span class="n">values</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">candidate</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -19833,7 +19833,7 @@ supplied field has incompatible shape, dtype, or device.</p>
                 <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
                 <span class="n">device</span><span class="p">,</span>
                 <span class="n">caller_name</span><span class="p">,</span>
-                <span class="s2">&quot;scratch_buffers&quot;</span><span class="p">,</span>
+                <span class="s2">"scratch_buffers"</span><span class="p">,</span>
             <span class="p">)</span>
     <span class="k">return</span> <span class="n">candidate</span>
 </code></pre></div></td></tr></table></div>

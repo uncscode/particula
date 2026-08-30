@@ -16219,10 +16219,10 @@
 <span class="normal">57</span>
 <span class="normal">58</span>
 <span class="normal">59</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the accommodation coefficient mixin.</span>
+<span class="w">    </span><span class="sd">"""Initialize the accommodation coefficient mixin.</span>
 
 <span class="sd">    Sets the accommodation_coefficient attribute to None.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">accommodation_coefficient</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
         <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
     <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -16272,16 +16272,16 @@
 <span class="normal">70</span>
 <span class="normal">71</span>
 <span class="normal">72</span>
-<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_accommodation_coefficient</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">accommodation_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">accommodation_coefficient_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the dimensionless mass accommodation coefficient.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Set the dimensionless mass accommodation coefficient."""</span>
     <span class="k">if</span> <span class="n">accommodation_coefficient_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;Ignoring units for accommodation coefficient parameter.&quot;</span>
+            <span class="s2">"Ignoring units for accommodation coefficient parameter."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">accommodation_coefficient</span> <span class="o">=</span> <span class="n">accommodation_coefficient</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -16337,10 +16337,10 @@
 <span class="normal">25</span>
 <span class="normal">26</span>
 <span class="normal">27</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the diffusion coefficient mixin.</span>
+<span class="w">    </span><span class="sd">"""Initialize the diffusion coefficient mixin.</span>
 
 <span class="sd">    Sets the diffusion_coefficient attribute to None.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
         <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
     <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -16395,21 +16395,21 @@
 <span class="normal">43</span>
 <span class="normal">44</span>
 <span class="normal">45</span>
-<span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_diffusion_coefficient</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">diffusion_coefficient_units</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the diffusion coefficient for the condensing species.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">diffusion_coefficient_units</span> <span class="o">==</span> <span class="s2">&quot;m^2/s&quot;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set the diffusion coefficient for the condensing species."""</span>
+    <span class="k">if</span> <span class="n">diffusion_coefficient_units</span> <span class="o">==</span> <span class="s2">"m^2/s"</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_coefficient</span> <span class="o">=</span> <span class="n">diffusion_coefficient</span>
         <span class="k">return</span> <span class="bp">self</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_coefficient</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">diffusion_coefficient</span>
         <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
             <span class="n">diffusion_coefficient_units</span><span class="p">,</span>
-            <span class="s2">&quot;m^2/s&quot;</span><span class="p">,</span>
+            <span class="s2">"m^2/s"</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -16463,10 +16463,10 @@
 <span class="normal">82</span>
 <span class="normal">83</span>
 <span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the update gases mixin.</span>
+<span class="w">    </span><span class="sd">"""Initialize the update gases mixin.</span>
 
 <span class="sd">    Sets the update_gases flag to True by default.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">update_gases</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -16512,9 +16512,9 @@
 <span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_update_gases</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">update_gases</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">update_gases_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the flag controlling gas-phase updates.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Set the flag controlling gas-phase updates."""</span>
     <span class="k">if</span> <span class="n">update_gases_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring units for update_gases parameter.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for update_gases parameter."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">update_gases</span> <span class="o">=</span> <span class="n">update_gases</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>

@@ -16247,7 +16247,7 @@ native writer failure.</p>
 <span class="normal">104</span>
 <span class="normal">105</span>
 <span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ResidentCommunicationRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retain one exact communication request.</span>
+<span class="w">    </span><span class="sd">"""Retain one exact communication request.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        request: Identity-bound closed-map resident barrier request.</span>
@@ -16255,10 +16255,10 @@ native writer failure.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``request`` is not an exact</span>
 <span class="sd">            ``ResidentCommunicationRequest``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentCommunicationRequest</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;request must be an exact ResidentCommunicationRequest.&quot;</span>
+            <span class="s2">"request must be an exact ResidentCommunicationRequest."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_request</span> <span class="o">=</span> <span class="n">request</span>
 </code></pre></div></td></tr></table></div>
@@ -16391,7 +16391,7 @@ native errors propagate unchanged.</p>
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dispatch exactly one native communication primitive by mode.</span>
+<span class="w">    </span><span class="sd">"""Dispatch exactly one native communication primitive by mode.</span>
 
 <span class="sd">    The selected GAS or PARTICLES primitive receives resident containers,</span>
 <span class="sd">    configuration, duration, and work record by identity. This method never</span>
@@ -16401,13 +16401,13 @@ native errors propagate unchanged.</p>
 <span class="sd">    native errors propagate unchanged.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        The selected native primitive&#39;s return value.</span>
+<span class="sd">        The selected native primitive's return value.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If request validation finds an invalid duration type.</span>
 <span class="sd">        ValueError: If metadata validation fails or the mode is unsupported.</span>
 <span class="sd">        Exception: Propagates a native primitive error without recovery.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
     <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.communication</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -16440,7 +16440,7 @@ native errors propagate unchanged.</p>
             <span class="n">state</span><span class="o">.</span><span class="n">initial_charge</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="s2">&quot;resident communication supports GAS or PARTICLES only.&quot;</span>
+        <span class="s2">"resident communication supports GAS or PARTICLES only."</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16549,7 +16549,7 @@ rollback after launch.</p>
 <span class="normal">228</span>
 <span class="normal">229</span>
 <span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute_volume_evolution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply the optional prescribed-volume writer without replacement.</span>
+<span class="w">    </span><span class="sd">"""Apply the optional prescribed-volume writer without replacement.</span>
 
 <span class="sd">    If present, final volumes and resident particle and gas containers are</span>
 <span class="sd">    passed to the native writer by identity. If absent, this is a successful</span>
@@ -16559,13 +16559,13 @@ rollback after launch.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ``None`` when no final volumes are pinned; otherwise the native</span>
-<span class="sd">        volume primitive&#39;s return value.</span>
+<span class="sd">        volume primitive's return value.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If request validation finds an invalid duration type.</span>
 <span class="sd">        ValueError: If the resident communication binding is invalid.</span>
 <span class="sd">        Exception: Propagates a native volume-writer error without recovery.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
     <span class="n">final_volumes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">final_volumes</span>
     <span class="k">if</span> <span class="n">final_volumes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -16665,9 +16665,9 @@ barrier-node identity and kind are invalid.</p>
 <span class="normal">141</span>
 <span class="normal">142</span>
 <span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate identity and metadata without P1 scans or allocation.</span>
+<span class="w">    </span><span class="sd">"""Validate identity and metadata without P1 scans or allocation.</span>
 
-<span class="sd">    Validation delegates only to the registry&#39;s metadata seam and verifies</span>
+<span class="sd">    Validation delegates only to the registry's metadata seam and verifies</span>
 <span class="sd">    resolver provenance plus exact barrier-node identities. It performs no</span>
 <span class="sd">    configuration acquisition or P1 scan, payload readback, transfer,</span>
 <span class="sd">    synchronization, allocation, primitive dispatch, or mutation.</span>
@@ -16676,30 +16676,30 @@ barrier-node identity and kind are invalid.</p>
 <span class="sd">        TypeError: If duration is not a non-boolean real value.</span>
 <span class="sd">        ValueError: If duration, registry binding, graph provenance, or</span>
 <span class="sd">            barrier-node identity and kind are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
         <span class="n">request</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">Real</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;duration must be a non-boolean real.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"duration must be a non-boolean real."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_isfinite_real</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span> <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">duration</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;duration must be finite and nonnegative.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"duration must be finite and nonnegative."</span><span class="p">)</span>
     <span class="n">registry</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span>
     <span class="n">registry</span><span class="o">.</span><span class="n">validate_communication_resources</span><span class="p">(</span>
         <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">resources</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_resolver_produced_graph</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">graph</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;graph must be produced by plan resolution.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"graph must be produced by plan resolution."</span><span class="p">)</span>
     <span class="n">nodes</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="o">.</span><span class="n">node_id</span><span class="p">:</span> <span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">}</span>
     <span class="k">if</span> <span class="p">(</span>
-        <span class="n">nodes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;communication&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">communication_node</span>
-        <span class="ow">or</span> <span class="n">nodes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;volume_evolution&quot;</span><span class="p">)</span>
+        <span class="n">nodes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"communication"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">communication_node</span>
+        <span class="ow">or</span> <span class="n">nodes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"volume_evolution"</span><span class="p">)</span>
         <span class="ow">is</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">volume_evolution_node</span>
         <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">communication_node</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NodeKind</span><span class="o">.</span><span class="n">COMMUNICATION</span>
         <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">volume_evolution_node</span><span class="o">.</span><span class="n">kind</span>
         <span class="ow">is</span> <span class="ow">not</span> <span class="n">NodeKind</span><span class="o">.</span><span class="n">VOLUME_EVOLUTION</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;communication barrier nodes do not match graph.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"communication barrier nodes do not match graph."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16878,18 +16878,18 @@ synchronize, or mutate resident state at construction.</p>
 <span class="normal">78</span>
 <span class="normal">79</span>
 <span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact carrier types only.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate exact carrier types only."""</span>
     <span class="n">exact</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="s2">&quot;session&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span> <span class="n">_registry_type</span><span class="p">(),</span> <span class="s2">&quot;registry&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">ResolvedProcessGraph</span><span class="p">,</span> <span class="s2">&quot;graph&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">,</span> <span class="n">CommunicationResources</span><span class="p">,</span> <span class="s2">&quot;resources&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">communication_node</span><span class="p">,</span> <span class="n">ProcessNode</span><span class="p">,</span> <span class="s2">&quot;communication_node&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_evolution_node</span><span class="p">,</span> <span class="n">ProcessNode</span><span class="p">,</span> <span class="s2">&quot;volume_evolution_node&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="s2">"session"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span> <span class="n">_registry_type</span><span class="p">(),</span> <span class="s2">"registry"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">ResolvedProcessGraph</span><span class="p">,</span> <span class="s2">"graph"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">,</span> <span class="n">CommunicationResources</span><span class="p">,</span> <span class="s2">"resources"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">communication_node</span><span class="p">,</span> <span class="n">ProcessNode</span><span class="p">,</span> <span class="s2">"communication_node"</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_evolution_node</span><span class="p">,</span> <span class="n">ProcessNode</span><span class="p">,</span> <span class="s2">"volume_evolution_node"</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">exact</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">expected</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an exact </span><span class="si">{</span><span class="n">expected</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an exact </span><span class="si">{</span><span class="n">expected</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

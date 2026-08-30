@@ -16605,7 +16605,7 @@ invalid. Rejection occurs before any diagnostic or scaling write.</p>
     <span class="n">minimum_volume</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">resolved_scale</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply P4 scaling to selected Warp particle-container rows in place.</span>
+<span class="w">    </span><span class="sd">"""Apply P4 scaling to selected Warp particle-container rows in place.</span>
 
 <span class="sd">    A row is selected exactly when its ``int32`` flag is ``1`` and its</span>
 <span class="sd">    provisional demand is positive. Selected rows scale box volume, every</span>
@@ -16648,45 +16648,45 @@ invalid. Rejection occurs before any diagnostic or scaling write.</p>
 <span class="sd">        ValueError: If schemas, devices, contiguity, ownership, physical</span>
 <span class="sd">            values, factor bounds, flags, or selected scaled-volume bounds are</span>
 <span class="sd">            invalid. Rejection occurs before any diagnostic or scaling write.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">masses</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;masses&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">masses</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"masses"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_warp_array_like</span><span class="p">(</span><span class="n">masses</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;masses must be a Warp array&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"masses must be a Warp array"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">masses</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;masses must have rank 3&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"masses must have rank 3"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">masses</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;masses must have dtype float64&quot;</span><span class="p">)</span>
-    <span class="n">_require_contiguous_array</span><span class="p">(</span><span class="n">masses</span><span class="p">,</span> <span class="s2">&quot;masses&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"masses must have dtype float64"</span><span class="p">)</span>
+    <span class="n">_require_contiguous_array</span><span class="p">(</span><span class="n">masses</span><span class="p">,</span> <span class="s2">"masses"</span><span class="p">)</span>
     <span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;particle capacity must be positive&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"particle capacity must be positive"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;species capacity must be positive&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"species capacity must be positive"</span><span class="p">)</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">device</span>
-    <span class="n">concentration</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">)</span>
-    <span class="n">charge</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;charge&quot;</span><span class="p">)</span>
-    <span class="n">density</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">)</span>
-    <span class="n">volume</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">)</span>
+    <span class="n">concentration</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">)</span>
+    <span class="n">charge</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"charge"</span><span class="p">)</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">)</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"volume"</span><span class="p">)</span>
     <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">concentration</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span>
+        <span class="n">concentration</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span>
     <span class="p">)</span>
-    <span class="n">_validate_array</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="s2">&quot;charge&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-    <span class="n">_validate_array</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-    <span class="n">_validate_array</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="n">_validate_array</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="s2">"charge"</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="n">_validate_array</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="n">_validate_array</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="s2">"volume"</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
     <span class="n">schema</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="p">(</span><span class="s2">&quot;provisional_source_demand&quot;</span><span class="p">,</span> <span class="n">provisional_source_demand</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;scaling_required&quot;</span><span class="p">,</span> <span class="n">scaling_required</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;requested_scale&quot;</span><span class="p">,</span> <span class="n">requested_scale</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;minimum_scale&quot;</span><span class="p">,</span> <span class="n">minimum_scale</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;minimum_volume&quot;</span><span class="p">,</span> <span class="n">minimum_volume</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;resolved_scale&quot;</span><span class="p">,</span> <span class="n">resolved_scale</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"provisional_source_demand"</span><span class="p">,</span> <span class="n">provisional_source_demand</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"scaling_required"</span><span class="p">,</span> <span class="n">scaling_required</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"requested_scale"</span><span class="p">,</span> <span class="n">requested_scale</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"minimum_scale"</span><span class="p">,</span> <span class="n">minimum_scale</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"minimum_volume"</span><span class="p">,</span> <span class="n">minimum_volume</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"resolved_scale"</span><span class="p">,</span> <span class="n">resolved_scale</span><span class="p">,</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">sidecars</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_warp_array_like</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a Warp array&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a Warp array"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dtype</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must have dtype </span><span class="si">{</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must have dtype </span><span class="si">{</span><span class="n">dtype</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">_validate_array</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,),</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
         <span class="n">sidecars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
     <span class="n">protected</span> <span class="o">=</span> <span class="p">[</span><span class="n">masses</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">charge</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">volume</span><span class="p">]</span>
@@ -16695,7 +16695,7 @@ invalid. Rejection occurs before any diagnostic or scaling write.</p>
         <span class="k">for</span> <span class="n">right</span> <span class="ow">in</span> <span class="n">all_arrays</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]:</span>
             <span class="k">if</span> <span class="n">_ranges_overlap</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;representative scaling arrays must not overlap&quot;</span>
+                    <span class="s2">"representative scaling arrays must not overlap"</span>
                 <span class="p">)</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
@@ -16707,8 +16707,8 @@ invalid. Rejection occurs before any diagnostic or scaling write.</p>
     <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">status</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;particles or representative scaling sidecars have &quot;</span>
-                <span class="s2">&quot;invalid values&quot;</span>
+                <span class="s2">"particles or representative scaling sidecars have "</span>
+                <span class="s2">"invalid values"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">particles</span><span class="p">,</span> <span class="n">provisional_source_demand</span><span class="p">,</span> <span class="n">resolved_scale</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
@@ -16732,7 +16732,7 @@ invalid. Rejection occurs before any diagnostic or scaling write.</p>
     <span class="n">status_values</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">status_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;particles or representative scaling sidecars have invalid values&quot;</span>
+            <span class="s2">"particles or representative scaling sidecars have invalid values"</span>
         <span class="p">)</span>
     <span class="n">selected</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
@@ -17137,7 +17137,7 @@ planning diagnostics are invalid.</p>
     <span class="n">surface_relative_error</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">diversity_absolute_error</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply deterministic fixed-capacity P2 equal-weight remapping in place.</span>
+<span class="w">    </span><span class="sd">"""Apply deterministic fixed-capacity P2 equal-weight remapping in place.</span>
 
 <span class="sd">    A nonzero per-box count selects remapping and must not exceed active slots</span>
 <span class="sd">    minus one; zero-demand boxes are write-free. The caller owns particles,</span>
@@ -17171,46 +17171,46 @@ planning diagnostics are invalid.</p>
 <span class="sd">            type.</span>
 <span class="sd">        ValueError: If schemas, physical values, ownership, release counts, or</span>
 <span class="sd">            planning diagnostics are invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">_require_exact_bound</span><span class="p">(</span>
-            <span class="s2">&quot;radius_cubed_relative_error&quot;</span><span class="p">,</span> <span class="n">radius_cubed_relative_error</span>
+            <span class="s2">"radius_cubed_relative_error"</span><span class="p">,</span> <span class="n">radius_cubed_relative_error</span>
         <span class="p">),</span>
         <span class="n">_require_exact_bound</span><span class="p">(</span>
-            <span class="s2">&quot;mean_radius_relative_error&quot;</span><span class="p">,</span> <span class="n">mean_radius_relative_error</span>
+            <span class="s2">"mean_radius_relative_error"</span><span class="p">,</span> <span class="n">mean_radius_relative_error</span>
         <span class="p">),</span>
-        <span class="n">_require_exact_bound</span><span class="p">(</span><span class="s2">&quot;surface_relative_error&quot;</span><span class="p">,</span> <span class="n">surface_relative_error</span><span class="p">),</span>
+        <span class="n">_require_exact_bound</span><span class="p">(</span><span class="s2">"surface_relative_error"</span><span class="p">,</span> <span class="n">surface_relative_error</span><span class="p">),</span>
         <span class="n">_require_exact_bound</span><span class="p">(</span>
-            <span class="s2">&quot;diversity_absolute_error&quot;</span><span class="p">,</span> <span class="n">diversity_absolute_error</span>
+            <span class="s2">"diversity_absolute_error"</span><span class="p">,</span> <span class="n">diversity_absolute_error</span>
         <span class="p">),</span>
     <span class="p">)</span>
-    <span class="n">masses</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;masses&quot;</span><span class="p">)</span>
+    <span class="n">masses</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"masses"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_warp_array_like</span><span class="p">(</span><span class="n">masses</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;masses must be a Warp array&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"masses must be a Warp array"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">masses</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;masses must have rank 3&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"masses must have rank 3"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">masses</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;masses must have dtype float64&quot;</span><span class="p">)</span>
-    <span class="n">_require_contiguous_array</span><span class="p">(</span><span class="n">masses</span><span class="p">,</span> <span class="s2">&quot;masses&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"masses must have dtype float64"</span><span class="p">)</span>
+    <span class="n">_require_contiguous_array</span><span class="p">(</span><span class="n">masses</span><span class="p">,</span> <span class="s2">"masses"</span><span class="p">)</span>
     <span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;particle capacity must be positive&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"particle capacity must be positive"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;species capacity must be positive&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"species capacity must be positive"</span><span class="p">)</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">device</span>
-    <span class="n">concentration</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">)</span>
-    <span class="n">charge</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;charge&quot;</span><span class="p">)</span>
-    <span class="n">density</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">)</span>
-    <span class="n">volume</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">)</span>
+    <span class="n">concentration</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">)</span>
+    <span class="n">charge</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"charge"</span><span class="p">)</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">)</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">_field</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"volume"</span><span class="p">)</span>
     <span class="n">_validate_array</span><span class="p">(</span>
-        <span class="n">concentration</span><span class="p">,</span> <span class="s2">&quot;concentration&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span>
+        <span class="n">concentration</span><span class="p">,</span> <span class="s2">"concentration"</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span>
     <span class="p">)</span>
-    <span class="n">_validate_array</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="s2">&quot;charge&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-    <span class="n">_validate_array</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-    <span class="n">_validate_array</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="n">_validate_array</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="s2">"charge"</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="n">_validate_array</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="n">_validate_array</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="s2">"volume"</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,),</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
     <span class="n">_validate_array</span><span class="p">(</span>
         <span class="n">required_release_counts</span><span class="p">,</span>
-        <span class="s2">&quot;required_release_counts&quot;</span><span class="p">,</span>
+        <span class="s2">"required_release_counts"</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">,</span>
         <span class="p">(</span><span class="n">b</span><span class="p">,),</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
@@ -17241,7 +17241,7 @@ planning diagnostics are invalid.</p>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">invalid</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;particles or required_release_counts have invalid values&quot;</span>
+                <span class="s2">"particles or required_release_counts have invalid values"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">particles</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
@@ -17270,7 +17270,7 @@ planning diagnostics are invalid.</p>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">invalid</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;particles or required_release_counts have invalid values&quot;</span>
+            <span class="s2">"particles or required_release_counts have invalid values"</span>
         <span class="p">)</span>
     <span class="n">demand</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
@@ -17320,7 +17320,7 @@ planning diagnostics are invalid.</p>
         <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">planning_failed</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resampling diagnostic exceeds bound&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resampling diagnostic exceeds bound"</span><span class="p">)</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
         <span class="n">_commit_resampling</span><span class="p">,</span>
         <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">s</span><span class="p">),</span>

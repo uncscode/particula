@@ -16957,7 +16957,7 @@ aerosol.</p>
 <span class="normal">375</span>
 <span class="normal">376</span>
 <span class="normal">377</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ExecutionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute one exact CPU P3 state without fallback or recovery.</span>
+<span class="w">    </span><span class="sd">"""Execute one exact CPU P3 state without fallback or recovery.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        state: Exact selected CPU P3 execution state.</span>
@@ -16969,16 +16969,16 @@ aerosol.</p>
 <span class="sd">        TypeError: If ``state`` or its time step has an invalid type.</span>
 <span class="sd">        ValueError: If controls are invalid or the runnable returns another</span>
 <span class="sd">            aerosol.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CPUCoagulationExecutionState</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;state must be a CPUCoagulationExecutionState.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"state must be a CPUCoagulationExecutionState."</span><span class="p">)</span>
     <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">time_step</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">sub_steps</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">sub_steps</span><span class="p">,</span> <span class="n">Integral</span><span class="p">)</span>
         <span class="ow">or</span> <span class="n">state</span><span class="o">.</span><span class="n">sub_steps</span> <span class="o">&lt;=</span> <span class="mi">0</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sub_steps must be a positive integer.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"sub_steps must be a positive integer."</span><span class="p">)</span>
     <span class="n">_validate_cpu_brownian_runnable</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">runnable</span><span class="p">)</span>
     <span class="n">aerosol</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">runnable</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
         <span class="n">state</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">aerosol</span><span class="p">,</span>
@@ -17166,11 +17166,11 @@ resources remain caller-owned and mutable.</p>
 <span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact P2-state and runnable carrier types.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate exact P2-state and runnable carrier types."""</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CPUCoagulationState</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;state must be an exact CPUCoagulationState.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"state must be an exact CPUCoagulationState."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runnable</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Coagulation</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;runnable must be an exact Coagulation.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"runnable must be an exact Coagulation."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17362,18 +17362,18 @@ exact resource retained by the supplied CPU state.</p>
 <span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate result ownership without inspecting the aerosol.</span>
+<span class="w">    </span><span class="sd">"""Validate result ownership without inspecting the aerosol.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If the state or aerosol has an invalid type.</span>
-<span class="sd">        ValueError: If the result aerosol differs from the state&#39;s aerosol.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        ValueError: If the result aerosol differs from the state's aerosol.</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CPUCoagulationState</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;state must be a CPUCoagulationState.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"state must be a CPUCoagulationState."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">Aerosol</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;aerosol must be an Aerosol.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"aerosol must be an Aerosol."</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aerosol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">aerosol</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;aerosol must be state.aerosol.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"aerosol must be state.aerosol."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17552,16 +17552,16 @@ type.</p>
 <span class="normal">87</span>
 <span class="normal">88</span>
 <span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate carrier types without inspecting aerosol state.</span>
+<span class="w">    </span><span class="sd">"""Validate carrier types without inspecting aerosol state.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If the configuration marker or aerosol has an invalid</span>
 <span class="sd">            type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">BrownianCoagulationConfig</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;config must be a BrownianCoagulationConfig.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"config must be a BrownianCoagulationConfig."</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">Aerosol</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;aerosol must be an Aerosol.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"aerosol must be an Aerosol."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17769,7 +17769,7 @@ preflight.</p>
 <span class="normal">843</span>
 <span class="normal">844</span>
 <span class="normal">845</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ExecutionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Preflight bindings and dispatch one forced-no-reset kernel call.</span>
+<span class="w">    </span><span class="sd">"""Preflight bindings and dispatch one forced-no-reset kernel call.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        state: Exact resident Brownian execution state.</span>
@@ -17784,15 +17784,15 @@ preflight.</p>
 <span class="sd">            or inconsistent.</span>
 <span class="sd">        ImportError: If the optional direct Warp kernel is unavailable after</span>
 <span class="sd">            preflight.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentBrownianCoagulationExecutionState</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;state must be a ResidentBrownianCoagulationExecutionState.&quot;</span>
+            <span class="s2">"state must be a ResidentBrownianCoagulationExecutionState."</span>
         <span class="p">)</span>
     <span class="n">request</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">state</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">initialize_rng</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;resident coagulation initialize_rng must be False.&quot;</span>
+            <span class="s2">"resident coagulation initialize_rng must be False."</span>
         <span class="p">)</span>
     <span class="n">state</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">validate_coagulation_resources</span><span class="p">(</span>
         <span class="n">state</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">resources</span>
@@ -17805,7 +17805,7 @@ preflight.</p>
         <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">rng_states</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">rng_states</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;resident coagulation request does not match resources.&quot;</span>
+            <span class="s2">"resident coagulation request does not match resources."</span>
         <span class="p">)</span>
     <span class="n">coagulation_step_gpu</span> <span class="o">=</span> <span class="n">_get_coagulation_step_gpu</span><span class="p">()</span>
     <span class="n">particles</span><span class="p">,</span> <span class="n">pairs</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">coagulation_step_gpu</span><span class="p">(</span>
@@ -18005,7 +18005,7 @@ reset or inspection APIs are outside this concrete-only boundary.</p>
 <span class="normal">764</span>
 <span class="normal">765</span>
 <span class="normal">766</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate concrete carrier types without acquiring resources.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate concrete carrier types without acquiring resources."""</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.gpu_resources</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">CoagulationResources</span><span class="p">,</span>
         <span class="n">GPUResourceRegistry</span><span class="p">,</span>
@@ -18014,15 +18014,15 @@ reset or inspection APIs are outside this concrete-only boundary.</p>
 
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">WarpBrownianCoagulationExecutionState</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;request must be an exact &quot;</span>
-            <span class="s2">&quot;WarpBrownianCoagulationExecutionState.&quot;</span>
+            <span class="s2">"request must be an exact "</span>
+            <span class="s2">"WarpBrownianCoagulationExecutionState."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentSession</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;session must be an exact ResidentSession.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"session must be an exact ResidentSession."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">GPUResourceRegistry</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;registry must be an exact GPUResourceRegistry.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"registry must be an exact GPUResourceRegistry."</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">CoagulationResources</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;resources must be an exact CoagulationResources.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resources must be an exact CoagulationResources."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18217,7 +18217,7 @@ after local preflight.</p>
 <span class="normal">917</span>
 <span class="normal">918</span>
 <span class="normal">919</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ExecutionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute one exact Warp P3 state without fallback or recovery.</span>
+<span class="w">    </span><span class="sd">"""Execute one exact Warp P3 state without fallback or recovery.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        state: Exact selected resident-Warp P3 execution state.</span>
@@ -18233,10 +18233,10 @@ after local preflight.</p>
 <span class="sd">            unchanged.</span>
 <span class="sd">        ImportError: If optional Warp kernel dependencies are unavailable</span>
 <span class="sd">            after local preflight.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">WarpBrownianCoagulationExecutionState</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;state must be a WarpBrownianCoagulationExecutionState.&quot;</span>
+            <span class="s2">"state must be a WarpBrownianCoagulationExecutionState."</span>
         <span class="p">)</span>
     <span class="n">p2_state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">state</span>
     <span class="n">coagulation_step_gpu</span> <span class="o">=</span> <span class="n">_get_coagulation_step_gpu</span><span class="p">()</span>
@@ -18416,10 +18416,10 @@ resources.</p>
 <span class="normal">712</span>
 <span class="normal">713</span>
 <span class="normal">714</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the exact P2 Warp state carrier type.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate the exact P2 Warp state carrier type."""</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">WarpBrownianCoagulationState</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;state must be an exact WarpBrownianCoagulationState.&quot;</span>
+            <span class="s2">"state must be an exact WarpBrownianCoagulationState."</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -18638,26 +18638,26 @@ required identity.</p>
 <span class="normal">677</span>
 <span class="normal">678</span>
 <span class="normal">679</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate state and state-supplied result-sidecar identities.</span>
+<span class="w">    </span><span class="sd">"""Validate state and state-supplied result-sidecar identities.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If the state is not the exact required carrier type.</span>
 <span class="sd">        ValueError: If a required particle or diagnostic identity differs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">WarpBrownianCoagulationState</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;state must be a WarpBrownianCoagulationState.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"state must be a WarpBrownianCoagulationState."</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">particles</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;particles must be state.particles.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"particles must be state.particles."</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">collision_pairs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">collision_pairs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">collision_pairs</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;collision_pairs must be state.collision_pairs.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"collision_pairs must be state.collision_pairs."</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">n_collisions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_collisions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">n_collisions</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n_collisions must be state.n_collisions.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"n_collisions must be state.n_collisions."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18996,7 +18996,7 @@ ownership is invalid.</p>
 <span class="normal">619</span>
 <span class="normal">620</span>
 <span class="normal">621</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform ordered kind, form, time, required-RNG, and ownership checks.</span>
+<span class="w">    </span><span class="sd">"""Perform ordered kind, form, time, required-RNG, and ownership checks.</span>
 
 <span class="sd">    The configuration check occurs before the lazy Warp import, preserving</span>
 <span class="sd">    CPU-only construction and deterministic error ordering.</span>
@@ -19006,16 +19006,16 @@ ownership is invalid.</p>
 <span class="sd">        RuntimeError: If Warp is unavailable after configuration preflight.</span>
 <span class="sd">        ValueError: If resource form, selected time, RNG presence, or</span>
 <span class="sd">            ownership is invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">BrownianCoagulationConfig</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;config must be a BrownianCoagulationConfig.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"config must be a BrownianCoagulationConfig."</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">warp</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">wp</span>
     <span class="k">except</span> <span class="ne">ModuleNotFoundError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;warp&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">"warp"</span><span class="p">:</span>
             <span class="k">raise</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;Warp is required to construct WarpBrownianCoagulationState.&quot;</span>
+            <span class="s2">"Warp is required to construct WarpBrownianCoagulationState."</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.warp_types</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">WarpEnvironmentData</span><span class="p">,</span>

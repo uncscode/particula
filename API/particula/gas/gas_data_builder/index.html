@@ -16166,9 +16166,9 @@ import numpy as np
 
 gas = (
     GasDataBuilder()
-    .set_names([&quot;Water&quot;, &quot;Ammonia&quot;])
-    .set_molar_mass([18, 17], units=&quot;g/mol&quot;)
-    .set_concentration([1e-6, 5e-9], units=&quot;kg/m^3&quot;)
+    .set_names(["Water", "Ammonia"])
+    .set_molar_mass([18, 17], units="g/mol")
+    .set_concentration([1e-6, 5e-9], units="kg/m^3")
     .set_partitioning([True, True])
     .build()
 )
@@ -16177,8 +16177,8 @@ gas = (
 <div class="highlight"><pre><span></span><code>gas = (
     GasDataBuilder()
     .set_n_boxes(100)
-    .set_names([&quot;Water&quot;, &quot;Ammonia&quot;])
-    .set_molar_mass([0.018, 0.017], units=&quot;kg/mol&quot;)
+    .set_names(["Water", "Ammonia"])
+    .set_molar_mass([0.018, 0.017], units="kg/mol")
     .set_concentration([1e-6, 5e-9])  # Broadcast to 100 boxes
     .set_partitioning([True, True])
     .build()
@@ -16243,7 +16243,7 @@ provided.</p>
 <span class="normal">57</span>
 <span class="normal">58</span>
 <span class="normal">59</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize empty builder state.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize empty builder state."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_molar_mass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_concentration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -16343,22 +16343,22 @@ provided.</p>
 <span class="normal">204</span>
 <span class="normal">205</span>
 <span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GasData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return validated GasData.</span>
+<span class="w">    </span><span class="sd">"""Build and return validated GasData.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A validated GasData instance.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required fields are missing or invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;names is required&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"names is required"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molar_mass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molar_mass is required&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molar_mass is required"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_concentration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;concentration is required&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"concentration is required"</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partitioning</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;partitioning is required&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"partitioning is required"</span><span class="p">)</span>
 
     <span class="c1"># Handle n_boxes broadcasting if set</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_boxes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -16387,7 +16387,7 @@ provided.</p>
 
 
 <a href="#particula.gas.gas_data_builder.GasDataBuilder.set_concentration" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_concentration</span><span class="p">(</span><span class="n">concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;kg/m^3&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;GasDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_concentration</span><span class="p">(</span><span class="n">concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'kg/m^3'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'GasDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16484,9 +16484,9 @@ g/m^3.</p>
 <span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set concentrations with unit conversion and auto batch dimension.</span>
+    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"kg/m^3"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"GasDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set concentrations with unit conversion and auto batch dimension.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        concentration: Concentration values. If 1D (n_species,),</span>
@@ -16499,21 +16499,21 @@ g/m^3.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: When any concentration is negative or wrong dimension.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">concentration_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">concentration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">concentration_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">concentration_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">concentration_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">concentration_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;concentration must be 1D or 2D&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"concentration must be 1D or 2D"</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">"kg/m^3"</span><span class="p">:</span>
         <span class="n">concentration_array</span> <span class="o">=</span> <span class="n">concentration_array</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
-            <span class="n">units</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span>
+            <span class="n">units</span><span class="p">,</span> <span class="s2">"kg/m^3"</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">concentration_array</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;concentration must be non-negative&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"concentration must be non-negative"</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_concentration</span> <span class="o">=</span> <span class="n">concentration_array</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -16531,7 +16531,7 @@ g/m^3.</p>
 
 
 <a href="#particula.gas.gas_data_builder.GasDataBuilder.set_molar_mass" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_molar_mass</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;kg/mol&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;GasDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_molar_mass</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'kg/mol'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'GasDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16621,9 +16621,9 @@ g/m^3.</p>
 <span class="normal">103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_molar_mass</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set molar masses with optional unit conversion.</span>
+    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"kg/mol"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"GasDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set molar masses with optional unit conversion.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        molar_mass: Molar mass values shaped (n_species,).</span>
@@ -16634,18 +16634,18 @@ g/m^3.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: When molar_mass is not 1D or any value is non-positive.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">molar_mass_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">molar_mass_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molar_mass must be 1D&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molar_mass must be 1D"</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">units</span> <span class="o">!=</span> <span class="s2">"kg/mol"</span><span class="p">:</span>
         <span class="n">molar_mass_array</span> <span class="o">=</span> <span class="n">molar_mass_array</span> <span class="o">*</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
-            <span class="n">units</span><span class="p">,</span> <span class="s2">&quot;kg/mol&quot;</span>
+            <span class="n">units</span><span class="p">,</span> <span class="s2">"kg/mol"</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">molar_mass_array</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;molar_mass must be positive&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"molar_mass must be positive"</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_molar_mass</span> <span class="o">=</span> <span class="n">molar_mass_array</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -16663,7 +16663,7 @@ g/m^3.</p>
 
 
 <a href="#particula.gas.gas_data_builder.GasDataBuilder.set_n_boxes" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_n_boxes</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;GasDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_n_boxes</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'GasDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16708,15 +16708,15 @@ g/m^3.</p>
 <span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span>
-<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_n_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set number of boxes for broadcasting 1D concentration.</span>
+<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_n_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"GasDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set number of boxes for broadcasting 1D concentration.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n_boxes: Number of simulation boxes.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Self for fluent chaining.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_n_boxes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16733,7 +16733,7 @@ g/m^3.</p>
 
 
 <a href="#particula.gas.gas_data_builder.GasDataBuilder.set_names" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_names</span><span class="p">(</span><span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;GasDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_names</span><span class="p">(</span><span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">'GasDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16778,15 +16778,15 @@ g/m^3.</p>
 <span class="normal">68</span>
 <span class="normal">69</span>
 <span class="normal">70</span>
-<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set species names.</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"GasDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set species names.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        names: List of species names.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Self for fluent chaining.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -16803,7 +16803,7 @@ g/m^3.</p>
 
 
 <a href="#particula.gas.gas_data_builder.GasDataBuilder.set_partitioning" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_partitioning</span><span class="p">(</span><span class="n">partitioning</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">bool_</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="s1">&#39;GasDataBuilder&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_partitioning</span><span class="p">(</span><span class="n">partitioning</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">bool_</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="s1">'GasDataBuilder'</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16873,8 +16873,8 @@ Shape: (n_species,).</p>
 <span class="normal">161</span>
 <span class="normal">162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_partitioning</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">partitioning</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasDataBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set whether each species can partition.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"GasDataBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Set whether each species can partition.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        partitioning: Boolean array indicating which species partition.</span>
@@ -16885,10 +16885,10 @@ Shape: (n_species,).</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: When partitioning is not 1D.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">partitioning_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">partitioning</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">partitioning_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;partitioning must be 1D&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"partitioning must be 1D"</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_partitioning</span> <span class="o">=</span> <span class="n">partitioning_array</span>
     <span class="k">return</span> <span class="bp">self</span>

@@ -16218,13 +16218,13 @@ https://doi.org/10.1088/1367-2630/10/7/075016</li>
 <span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>
+    <span class="p">{</span><span class="s2">"kinematic_viscosity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"turbulent_dissipation"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kolmogorov_length</span><span class="p">(</span>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Kolmogorov length scale.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Kolmogorov length scale.</span>
 
 <span class="sd">    The Kolmogorov length scale represents the smallest eddies in a turbulent</span>
 <span class="sd">    flow where viscosity dominates. It is defined as:</span>
@@ -16248,7 +16248,7 @@ https://doi.org/10.1088/1367-2630/10/7/075016</li>
 <span class="sd">        - Kolmogorov length scale [m]</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Kolmogorov length scale of a fluid&quot;</span>
+<span class="sd">        ```py title="Kolmogorov length scale of a fluid"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_kolmogorov_length(1.5e-5, 0.1)</span>
 <span class="sd">        # Output: 0.0029154759474226504</span>
@@ -16259,7 +16259,7 @@ https://doi.org/10.1088/1367-2630/10/7/075016</li>
 <span class="sd">        the geometric collision rate of sedimenting droplets. Part 2. Theory</span>
 <span class="sd">        and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">        https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">kinematic_viscosity</span><span class="o">**</span><span class="mi">3</span> <span class="o">/</span> <span class="n">turbulent_dissipation</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16387,13 +16387,13 @@ https://doi.org/10.1088/1367-2630/10/7/075016</li>
 <span class="normal">55</span>
 <span class="normal">56</span>
 <span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>
+    <span class="p">{</span><span class="s2">"kinematic_viscosity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"turbulent_dissipation"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kolmogorov_time</span><span class="p">(</span>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Kolmogorov time of a fluid.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Kolmogorov time of a fluid.</span>
 
 <span class="sd">    The Kolmogorov time scale represents the smallest timescale in turbulence</span>
 <span class="sd">    where viscous forces dominate over inertial effects. This timescale</span>
@@ -16413,7 +16413,7 @@ https://doi.org/10.1088/1367-2630/10/7/075016</li>
 <span class="sd">        - Kolmogorov time [s]</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Kolmogorov time of a fluid&quot;</span>
+<span class="sd">        ```py title="Kolmogorov time of a fluid"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_kolmogorov_time(1.5e-5, 0.1)</span>
 <span class="sd">        # Output: 0.3872983346207417</span>
@@ -16424,7 +16424,7 @@ https://doi.org/10.1088/1367-2630/10/7/075016</li>
 <span class="sd">        the geometric collision rate of sedimenting droplets. Part 2. Theory</span>
 <span class="sd">        and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">        https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">kinematic_viscosity</span> <span class="o">/</span> <span class="n">turbulent_dissipation</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16550,13 +16550,13 @@ https://doi.org/10.1088/1367-2630/10/7/075016</li>
 <span class="normal">142</span>
 <span class="normal">143</span>
 <span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>
+    <span class="p">{</span><span class="s2">"kinematic_viscosity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"turbulent_dissipation"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kolmogorov_velocity</span><span class="p">(</span>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Kolmogorov velocity scale.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Kolmogorov velocity scale.</span>
 
 <span class="sd">    The Kolmogorov velocity scale characterizes the smallest turbulent velocity</span>
 <span class="sd">    fluctuations and is given by:</span>
@@ -16575,7 +16575,7 @@ https://doi.org/10.1088/1367-2630/10/7/075016</li>
 <span class="sd">        - Kolmogorov velocity scale [m/s]</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Kolmogorov velocity scale of a fluid&quot;</span>
+<span class="sd">        ```py title="Kolmogorov velocity scale of a fluid"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_kolmogorov_velocity(1.5e-5, 0.1)</span>
 <span class="sd">        # Output: 0.3872983346207417</span>
@@ -16586,7 +16586,7 @@ https://doi.org/10.1088/1367-2630/10/7/075016</li>
 <span class="sd">        the geometric collision rate of sedimenting droplets. Part 2. Theory</span>
 <span class="sd">        and parameterization. New Journal of Physics, 10.</span>
 <span class="sd">        https://doi.org/10.1088/1367-2630/10/7/075016</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">kinematic_viscosity</span> <span class="o">*</span> <span class="n">turbulent_dissipation</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.25</span>
 </code></pre></div></td></tr></table></div>
             </details>

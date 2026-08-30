@@ -16229,7 +16229,7 @@ Give users a <em>single</em> statement—<code>par.use_backend("taichi")</code>,
 <span class="k">def</span><span class="w"> </span><span class="nf">coagulation_gain_rate</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
     <span class="o">...</span>
 
-<span class="nd">@par</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;coagulation_gain_rate&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;taichi&quot;</span><span class="p">)</span>
+<span class="nd">@par</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">"coagulation_gain_rate"</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">"taichi"</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_fast_taichi_impl</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
     <span class="o">...</span>
 </code></pre></div>
@@ -16242,14 +16242,14 @@ Give users a <em>single</em> statement—<code>par.use_backend("taichi")</code>,
 <h4 id="how-integration-feels-to-each-stakeholder">How integration feels to each stakeholder<a class="headerlink" href="#how-integration-feels-to-each-stakeholder" title="Permanent link">&para;</a></h4>
 <p><em>Users</em></p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;taichi&quot;</span><span class="p">)</span>      <span class="c1"># one line, opt-in</span>
+<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">"taichi"</span><span class="p">)</span>      <span class="c1"># one line, opt-in</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">coagulation_gain_rate</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
 </code></pre></div>
 <p>If Taichi isn’t available—or if that particular kernel hasn’t been ported yet—the same call silently executes the pure-Python path.</p>
 <p><em>Backend Developer</em></p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="kn">import</span> <span class="n">register</span>
 
-<span class="nd">@register</span><span class="p">(</span><span class="s2">&quot;coagulation_gain_rate&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;warp&quot;</span><span class="p">)</span>
+<span class="nd">@register</span><span class="p">(</span><span class="s2">"coagulation_gain_rate"</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">"warp"</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">gain_rate_warp</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
     <span class="o">...</span>
 </code></pre></div>
@@ -16274,7 +16274,7 @@ Give users a <em>single</em> statement—<code>par.use_backend("taichi")</code>,
 What changes is <em>how</em> we wire the backends. Instead of sprinkling <code>if par.backend.is_enabled(): …</code> inside every kernel, we wrap each public-API function in a <strong>single decorator that does automatic dispatch</strong>:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
-<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;taichi&quot;</span><span class="p">)</span>        <span class="c1"># or &quot;warp&quot;, &quot;cpp&quot;, …</span>
+<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">"taichi"</span><span class="p">)</span>        <span class="c1"># or "warp", "cpp", …</span>
 <span class="c1"># builder code stays identical ↓</span>
 <span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">coagulation_gain_rate</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">conc</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 </code></pre></div>
@@ -16298,7 +16298,7 @@ What changes is <em>how</em> we wire the backends. Instead of sprinkling <code>i
 <p><strong>Accelerated versions live in separate modules</strong> and register themselves with:</p>
 </li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="nd">@par</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;coagulation_gain_rate&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;taichi&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@par</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">"coagulation_gain_rate"</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">"taichi"</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">coagulation_gain_rate_taichi</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">conc</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
     <span class="c1"># Taichi kernel here …</span>
 </code></pre></div>
@@ -16335,7 +16335,7 @@ What changes is <em>how</em> we wire the backends. Instead of sprinkling <code>i
 </table>
 <h3 id="example-skeleton">Example skeleton<a class="headerlink" href="#example-skeleton" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># -------- particula/_dispatch.py -----------------</span>
-<span class="n">_backend</span> <span class="o">=</span> <span class="s2">&quot;python&quot;</span>
+<span class="n">_backend</span> <span class="o">=</span> <span class="s2">"python"</span>
 <span class="n">_registry</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">callable</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">use_backend</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># user API</span>
@@ -16346,7 +16346,7 @@ What changes is <em>how</em> we wire the backends. Instead of sprinkling <code>i
     <span class="k">return</span> <span class="n">_backend</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">dispatchable</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator that enables backend dispatch with Python fallback.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Decorator that enables backend dispatch with Python fallback."""</span>
     <span class="n">func_name</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -16354,12 +16354,12 @@ What changes is <em>how</em> we wire the backends. Instead of sprinkling <code>i
         <span class="k">return</span> <span class="n">impl</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="c1"># register default python implementation</span>
-    <span class="n">_registry</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="p">{})[</span><span class="s2">&quot;python&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
+    <span class="n">_registry</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="p">{})[</span><span class="s2">"python"</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
     <span class="n">wrapper</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span>
     <span class="k">return</span> <span class="n">wrapper</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator factory for accelerated implementations.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Decorator factory for accelerated implementations."""</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">accel_func</span><span class="p">):</span>
         <span class="n">_registry</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="p">{})[</span><span class="n">backend</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="o">=</span> <span class="n">accel_func</span>
         <span class="k">return</span> <span class="n">accel_func</span>
@@ -16370,7 +16370,7 @@ What changes is <em>how</em> we wire the backends. Instead of sprinkling <code>i
 
 <span class="nd">@dispatchable</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">coagulation_gain_rate</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute gain rate by trapezoidal integration (pure Python).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Compute gain rate by trapezoidal integration (pure Python)."""</span>
     <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span>
         <span class="n">kernel</span> <span class="o">*</span> <span class="n">concentration</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">concentration</span><span class="p">,</span>
         <span class="n">radius</span><span class="p">,</span>
@@ -16381,14 +16381,14 @@ What changes is <em>how</em> we wire the backends. Instead of sprinkling <code>i
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula._dispatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">register</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">taichi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ti</span>
 
-<span class="nd">@register</span><span class="p">(</span><span class="s2">&quot;coagulation_gain_rate&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;taichi&quot;</span><span class="p">)</span>
+<span class="nd">@register</span><span class="p">(</span><span class="s2">"coagulation_gain_rate"</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">"taichi"</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">coagulation_gain_rate_taichi</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
     <span class="c1"># Taichi implementation here …</span>
     <span class="k">return</span> <span class="n">ti_kernel</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="what-users-see">What users see<a class="headerlink" href="#what-users-see" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;taichi&quot;</span><span class="p">)</span>          <span class="c1"># one-liner switch</span>
+<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">"taichi"</span><span class="p">)</span>          <span class="c1"># one-liner switch</span>
 
 <span class="n">gain_rate</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">coagulation_gain_rate</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>  <span class="c1"># transparently fast</span>
 </code></pre></div>

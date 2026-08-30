@@ -16234,12 +16234,12 @@ SurfaceStrategyMass instance including surface tension and density.</p>
 <span class="normal">118</span>
 <span class="normal">119</span>
 <span class="normal">120</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the SurfaceStrategyMassBuilder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the SurfaceStrategyMassBuilder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    SurfaceStrategyMass instance including surface tension and density.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;surface_tension&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"surface_tension"</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderSurfaceTensionMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderSurfaceTensionTableMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16306,11 +16306,11 @@ SurfaceStrategyMass instance including surface tension and density.</p>
 <span class="normal">133</span>
 <span class="normal">134</span>
 <span class="normal">135</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SurfaceStrategyMass</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and return the SurfaceStrategyMass object.</span>
+<span class="w">    </span><span class="sd">"""Validate and return the SurfaceStrategyMass object.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        SurfaceStrategyMass: Instance of the SurfaceStrategyMass object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">SurfaceStrategyMass</span><span class="p">(</span>
         <span class="n">surface_tension</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surface_tension</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
@@ -16391,13 +16391,13 @@ and molar mass.</p>
 <span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the SurfaceStrategyMolarBuilder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the SurfaceStrategyMolarBuilder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    SurfaceStrategyMolar instance including surface tension, density,</span>
 <span class="sd">    and molar mass.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;surface_tension&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="s2">&quot;molar_mass&quot;</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"surface_tension"</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">,</span> <span class="s2">"molar_mass"</span><span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderSurfaceTensionMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderSurfaceTensionTableMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16466,11 +16466,11 @@ and molar mass.</p>
 <span class="normal">82</span>
 <span class="normal">83</span>
 <span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SurfaceStrategyMolar</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and return the SurfaceStrategyMolar object.</span>
+<span class="w">    </span><span class="sd">"""Validate and return the SurfaceStrategyMolar object.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        SurfaceStrategyMolar: Instance of the SurfaceStrategyMolar object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">SurfaceStrategyMolar</span><span class="p">(</span>
         <span class="n">surface_tension</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surface_tension</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
@@ -16548,12 +16548,12 @@ SurfaceStrategyVolume instance including surface tension and density.</p>
 <span class="normal">169</span>
 <span class="normal">170</span>
 <span class="normal">171</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the SurfaceStrategyVolumeBuilder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the SurfaceStrategyVolumeBuilder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
 <span class="sd">    SurfaceStrategyVolume instance including surface tension and density.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;surface_tension&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"surface_tension"</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderSurfaceTensionMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderSurfaceTensionTableMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16622,12 +16622,12 @@ object.</p>
 <span class="normal">185</span>
 <span class="normal">186</span>
 <span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SurfaceStrategyVolume</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and return the SurfaceStrategyVolume object.</span>
+<span class="w">    </span><span class="sd">"""Validate and return the SurfaceStrategyVolume object.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        SurfaceStrategyVolume: Instance of the SurfaceStrategyVolume</span>
 <span class="sd">            object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">SurfaceStrategyVolume</span><span class="p">(</span>
         <span class="n">surface_tension</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surface_tension</span><span class="p">,</span>  <span class="c1"># type: ignore</span>

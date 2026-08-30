@@ -16413,11 +16413,11 @@ an ActivityIdealMass strategy.</p>
 <span class="normal">68</span>
 <span class="normal">69</span>
 <span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the ActivityIdealMass builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the ActivityIdealMass builder.</span>
 
 <span class="sd">    Sets up the builder with no required parameters for creating</span>
 <span class="sd">    an ActivityIdealMass strategy.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16491,19 +16491,19 @@ ideal mass-based activity calculations.</li>
 <span class="normal">84</span>
 <span class="normal">85</span>
 <span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActivityStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and return an ActivityIdealMass strategy instance.</span>
+<span class="w">    </span><span class="sd">"""Validate and return an ActivityIdealMass strategy instance.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - ActivityIdealMass : The validated strategy for</span>
 <span class="sd">          ideal mass-based activity calculations.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Build Method Example&quot;</span>
+<span class="sd">        ```py title="Build Method Example"</span>
 <span class="sd">        builder = par.particles.ActivityIdealMassBuilder()</span>
 <span class="sd">        mass_activity_strategy = builder.build()</span>
 <span class="sd">        # Use mass_activity_strategy.activity(...)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">ActivityIdealMass</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16588,7 +16588,7 @@ handling).</p>
     <div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">builder</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMolarBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.01815</span><span class="p">,</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.01815</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">activity</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">])</span>
@@ -16625,12 +16625,12 @@ creating an ActivityIdealMolar strategy.</p>
 <span class="normal">129</span>
 <span class="normal">130</span>
 <span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the ActivityIdealMolar builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the ActivityIdealMolar builder.</span>
 
 <span class="sd">    Sets up the builder with required molar_mass parameter for</span>
 <span class="sd">    creating an ActivityIdealMolar strategy.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;molar_mass&quot;</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"molar_mass"</span><span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderMolarMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16683,7 +16683,7 @@ creating an ActivityIdealMolar strategy.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Build Method Example</span><pre><span></span><code><span class="n">builder</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMolarBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.028</span><span class="p">,</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.028</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">molar_activity_strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="c1"># molar_activity_strategy.activity(...)</span>
@@ -16719,7 +16719,7 @@ creating an ActivityIdealMolar strategy.</p>
 <span class="normal">157</span>
 <span class="normal">158</span>
 <span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActivityStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and create an ActivityIdealMolar strategy.</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and create an ActivityIdealMolar strategy.</span>
 
 <span class="sd">    Ensures molar_mass is properly configured before building.</span>
 
@@ -16727,20 +16727,20 @@ creating an ActivityIdealMolar strategy.</p>
 <span class="sd">        - ActivityIdealMolar : An ideal strategy based on mole fractions.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Build Method Example&quot;</span>
+<span class="sd">        ```py title="Build Method Example"</span>
 <span class="sd">        builder = (</span>
 <span class="sd">            par.particles.ActivityIdealMolarBuilder()</span>
-<span class="sd">            .set_molar_mass(0.028, &quot;kg/mol&quot;)</span>
+<span class="sd">            .set_molar_mass(0.028, "kg/mol")</span>
 <span class="sd">        )</span>
 <span class="sd">        molar_activity_strategy = builder.build()</span>
 <span class="sd">        # molar_activity_strategy.activity(...)</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="n">molar_mass_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span>
     <span class="k">if</span> <span class="n">molar_mass_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;Required parameter &#39;molar_mass&#39; not set before building.&quot;</span>
+            <span class="s2">"Required parameter 'molar_mass' not set before building."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
@@ -16876,8 +16876,8 @@ handling).</p>
 <span class="n">builder</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityKappaParameterBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_kappa</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]))</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1200</span><span class="p">]),</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">))</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.058</span><span class="p">]),</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1200</span><span class="p">]),</span> <span class="s2">"kg/m^3"</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.058</span><span class="p">]),</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_water_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -16923,13 +16923,13 @@ molar mass, and water index.</p>
 <span class="normal">222</span>
 <span class="normal">223</span>
 <span class="normal">224</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the ActivityKappaParameter builder.</span>
+<span class="w">    </span><span class="sd">"""Initialize the ActivityKappaParameter builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating an</span>
 <span class="sd">    ActivityKappaParameter strategy, including kappa, density,</span>
 <span class="sd">    molar mass, and water index.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;kappa&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span> <span class="s2">&quot;water_index&quot;</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"kappa"</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">,</span> <span class="s2">"molar_mass"</span><span class="p">,</span> <span class="s2">"water_index"</span><span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderDensityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderMolarMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16986,8 +16986,8 @@ utilizing the kappa hygroscopic parameter.</li>
     <div class="highlight"><span class="filename">Build Method Example</span><pre><span></span><code><span class="n">kappa_activity_strategy</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityKappaParameterBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_kappa</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">])</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1200</span><span class="p">],</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">([</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.046</span><span class="p">],</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_density</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1200</span><span class="p">],</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">([</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.046</span><span class="p">],</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_water_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
@@ -17024,25 +17024,25 @@ utilizing the kappa hygroscopic parameter.</li>
 <span class="normal">288</span>
 <span class="normal">289</span>
 <span class="normal">290</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActivityStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate parameters and build ActivityKappaParameter strategy.</span>
+<span class="w">    </span><span class="sd">"""Validate parameters and build ActivityKappaParameter strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - ActivityKappaParameter : The non-ideal activity strategy</span>
 <span class="sd">          utilizing the kappa hygroscopic parameter.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Build Method Example&quot;</span>
+<span class="sd">        ```py title="Build Method Example"</span>
 <span class="sd">        kappa_activity_strategy = (</span>
 <span class="sd">            par.particles.ActivityKappaParameterBuilder()</span>
 <span class="sd">            .set_kappa([0.1, 0.2])</span>
-<span class="sd">            .set_density([1000, 1200], &quot;kg/m^3&quot;)</span>
-<span class="sd">            .set_molar_mass([0.018, 0.046], &quot;kg/mol&quot;)</span>
+<span class="sd">            .set_density([1000, 1200], "kg/m^3")</span>
+<span class="sd">            .set_molar_mass([0.018, 0.046], "kg/mol")</span>
 <span class="sd">            .set_water_index(0)</span>
 <span class="sd">            .build()</span>
 <span class="sd">        )</span>
 <span class="sd">        # kappa_activity_strategy ...</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">ActivityKappaParameter</span><span class="p">(</span>
         <span class="n">kappa</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kappa</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
@@ -17120,18 +17120,18 @@ utilizing the kappa hygroscopic parameter.</li>
     <span class="n">kappa</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">kappa_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the kappa parameter for the activity calculation.</span>
+<span class="w">    </span><span class="sd">"""Set the kappa parameter for the activity calculation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        kappa: The kappa parameter for the activity calculation.</span>
 <span class="sd">        kappa_units: Not used. (for interface consistency)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">kappa</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;Kappa parameter must be a positive value.&quot;</span>
+        <span class="n">error_message</span> <span class="o">=</span> <span class="s2">"Kappa parameter must be a positive value."</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">kappa_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring units for kappa parameter.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for kappa parameter."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span> <span class="o">=</span> <span class="n">kappa</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17200,18 +17200,18 @@ utilizing the kappa hygroscopic parameter.</li>
 <span class="normal">262</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_water_index</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">water_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">water_index_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the array index of the species.</span>
+<span class="w">    </span><span class="sd">"""Set the array index of the species.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        water_index: The array index of the species.</span>
 <span class="sd">        water_index_units: Not used. (for interface consistency)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">water_index</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
-        <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;Water index must be an integer.&quot;</span>
+        <span class="n">error_message</span> <span class="o">=</span> <span class="s2">"Water index must be an integer."</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">water_index_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring units for water index.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for water index."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">water_index</span> <span class="o">=</span> <span class="n">water_index</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -17267,14 +17267,14 @@ functional group metadata.</p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">builder</span> <span class="o">=</span> <span class="p">(</span>
 <span class="gp">... </span>    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityNonIdealBinaryBuilder</span><span class="p">()</span>
-<span class="gp">... </span>    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.200</span><span class="p">,</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.200</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="o">.</span><span class="n">set_oxygen2carbon</span><span class="p">(</span><span class="mf">0.4</span><span class="p">)</span>
-<span class="gp">... </span>    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">1400.0</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
-<span class="gp">... </span>    <span class="o">.</span><span class="n">set_functional_group</span><span class="p">(</span><span class="s2">&quot;carboxylic_acid&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">1400.0</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="o">.</span><span class="n">set_functional_group</span><span class="p">(</span><span class="s2">"carboxylic_acid"</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
-<span class="go">&#39;ActivityNonIdealBinary&#39;</span>
+<span class="go">'ActivityNonIdealBinary'</span>
 </code></pre></div>
 
         <p>Initialize the builder with required parameters.</p>
@@ -17298,8 +17298,8 @@ functional group metadata.</p>
 <span class="normal">331</span>
 <span class="normal">332</span>
 <span class="normal">333</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the builder with required parameters.&quot;&quot;&quot;</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;molar_mass&quot;</span><span class="p">,</span> <span class="s2">&quot;oxygen2carbon&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Initialize the builder with required parameters."""</span>
+    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"molar_mass"</span><span class="p">,</span> <span class="s2">"oxygen2carbon"</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderMolarMassMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderDensityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -17371,23 +17371,23 @@ functional group metadata.</p>
 <span class="normal">487</span>
 <span class="normal">488</span>
 <span class="normal">489</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActivityNonIdealBinary</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate required inputs then build the strategy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Validate required inputs then build the strategy."""</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;Required parameter &#39;molar_mass&#39; not set before building.&quot;</span>
+            <span class="s2">"Required parameter 'molar_mass' not set before building."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">oxygen2carbon</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;Required parameter &#39;oxygen2carbon&#39; not set before building.&quot;</span>
+            <span class="s2">"Required parameter 'oxygen2carbon' not set before building."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;Required parameter &#39;density&#39; not set before building.&quot;</span>
+            <span class="s2">"Required parameter 'density' not set before building."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
@@ -17488,7 +17488,7 @@ or list.</p>
     <span class="n">functional_group</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span>
     <span class="n">functional_group_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set optional functional group identifier(s).</span>
+<span class="w">    </span><span class="sd">"""Set optional functional group identifier(s).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        functional_group: Functional group value; accepts None, str,</span>
@@ -17498,10 +17498,10 @@ or list.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Self for fluent chaining.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">functional_group_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Ignoring units for functional_group.&quot;</span><span class="p">,</span>
+            <span class="s2">"Ignoring units for functional_group."</span><span class="p">,</span>
             <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="p">)</span>
@@ -17612,7 +17612,7 @@ or list.</p>
     <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">oxygen2carbon_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set oxygen-to-carbon ratio ensuring nonnegativity.</span>
+<span class="w">    </span><span class="sd">"""Set oxygen-to-carbon ratio ensuring nonnegativity.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        oxygen2carbon: Oxygen to carbon atomic ratio (&gt;=0).</span>
@@ -17623,15 +17623,15 @@ or list.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``oxygen2carbon`` contains negative values.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">array_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">array_value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;Oxygen to carbon ratio must be nonnegative.&quot;</span>
+        <span class="n">error_message</span> <span class="o">=</span> <span class="s2">"Oxygen to carbon ratio must be nonnegative."</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">oxygen2carbon_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Ignoring units for oxygen2carbon (dimensionless).&quot;</span><span class="p">,</span>
+            <span class="s2">"Ignoring units for oxygen2carbon (dimensionless)."</span><span class="p">,</span>
             <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="p">)</span>
@@ -17720,59 +17720,59 @@ or list.</p>
 <span class="normal">457</span>
 <span class="normal">458</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ActivityNonIdealBinaryBuilder&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Batch assign parameters with optional units and validation.&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ActivityNonIdealBinaryBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Batch assign parameters with optional units and validation."""</span>
     <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Missing required parameter(s): </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Missing required parameter(s): </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
 
     <span class="n">valid_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span>
-        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span><span class="p">]</span>
-        <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;functional_group&quot;</span><span class="p">,</span> <span class="s2">&quot;functional_group_units&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_parameters</span><span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span><span class="s2">"functional_group"</span><span class="p">,</span> <span class="s2">"functional_group_units"</span><span class="p">]</span>
     <span class="p">)</span>
     <span class="n">invalid_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_keys</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">invalid_keys</span><span class="p">:</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Trying to set an invalid parameter(s) &#39;</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;The valid parameter(s) &#39;</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Trying to set an invalid parameter(s) '</span><span class="si">{</span><span class="n">invalid_keys</span><span class="si">}</span><span class="s2">'. "</span>
+            <span class="sa">f</span><span class="s2">"The valid parameter(s) '</span><span class="si">{</span><span class="n">valid_keys</span><span class="si">}</span><span class="s2">'."</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">&quot;molar_mass_units&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"molar_mass_units"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;molar_mass&quot;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;molar_mass_units&quot;</span><span class="p">]</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"molar_mass"</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s2">"molar_mass_units"</span><span class="p">]</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using default units for parameter: &#39;molar_mass&#39;.&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;molar_mass&quot;</span><span class="p">],</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Using default units for parameter: 'molar_mass'."</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"molar_mass"</span><span class="p">],</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">&quot;oxygen2carbon_units&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"oxygen2carbon_units"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_oxygen2carbon</span><span class="p">(</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;oxygen2carbon&quot;</span><span class="p">],</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;oxygen2carbon_units&quot;</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"oxygen2carbon"</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"oxygen2carbon_units"</span><span class="p">],</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;Using default units for parameter: &#39;oxygen2carbon&#39;.&quot;</span>
+            <span class="s2">"Using default units for parameter: 'oxygen2carbon'."</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_oxygen2carbon</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;oxygen2carbon&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_oxygen2carbon</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"oxygen2carbon"</span><span class="p">])</span>
 
-    <span class="k">if</span> <span class="s2">&quot;density_units&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;density_units&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"density_units"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"density"</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s2">"density_units"</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using default units for parameter: &#39;density&#39;.&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">],</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Using default units for parameter: 'density'."</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"density"</span><span class="p">],</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">&quot;functional_group&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"functional_group"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_functional_group</span><span class="p">(</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;functional_group&quot;</span><span class="p">],</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;functional_group_units&quot;</span><span class="p">),</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"functional_group"</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"functional_group_units"</span><span class="p">),</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="bp">self</span>

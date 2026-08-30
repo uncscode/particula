@@ -16861,10 +16861,10 @@ still allows charge-driven enhancement.</p>
 <span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the charged wall loss builder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the charged wall loss builder."""</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">,</span> <span class="s2">&quot;chamber_geometry&quot;</span><span class="p">],</span>
+        <span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">"wall_eddy_diffusivity"</span><span class="p">,</span> <span class="s2">"chamber_geometry"</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="n">BuilderWallEddyDiffusivityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderDistributionTypeMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -16973,7 +16973,7 @@ missing, or required values are not provided.</p>
 <span class="normal">280</span>
 <span class="normal">281</span>
 <span class="normal">282</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChargedWallLossStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return a charged wall loss strategy.</span>
+<span class="w">    </span><span class="sd">"""Build and return a charged wall loss strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ChargedWallLossStrategy: Charged strategy with geometry-specific</span>
@@ -16982,14 +16982,14 @@ missing, or required values are not provided.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If geometry is unset, matching size parameters are</span>
 <span class="sd">            missing, or required values are not provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wall_eddy_diffusivity must be set before build&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"wall_eddy_diffusivity must be set before build"</span><span class="p">)</span>
     <span class="n">wall_eddy_diffusivity</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">==</span> <span class="s2">&quot;spherical&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">==</span> <span class="s2">"spherical"</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_radius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;chamber_radius must be set for spherical&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"chamber_radius must be set for spherical"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
             <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
             <span class="n">chamber_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span><span class="p">,</span>
@@ -16998,10 +16998,10 @@ missing, or required values are not provided.</p>
             <span class="n">wall_electric_field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_electric_field</span><span class="p">,</span>
             <span class="n">distribution_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">==</span> <span class="s2">&quot;rectangular&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">==</span> <span class="s2">"rectangular"</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;chamber_dimensions must be set for rectangular geometry&quot;</span>
+                <span class="s2">"chamber_dimensions must be set for rectangular geometry"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
             <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
@@ -17011,7 +17011,7 @@ missing, or required values are not provided.</p>
             <span class="n">wall_electric_field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_electric_field</span><span class="p">,</span>
             <span class="n">distribution_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;chamber_geometry must be set before build()&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"chamber_geometry must be set before build()"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17091,21 +17091,21 @@ missing, or required values are not provided.</p>
 <span class="normal">173</span>
 <span class="normal">174</span>
 <span class="normal">175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_chamber_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chamber_geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set chamber geometry.</span>
+<span class="w">    </span><span class="sd">"""Set chamber geometry.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        chamber_geometry: ``&quot;spherical&quot;`` or ``&quot;rectangular&quot;``.</span>
+<span class="sd">        chamber_geometry: ``"spherical"`` or ``"rectangular"``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ChargedWallLossBuilder: Self for method chaining.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``chamber_geometry`` is not supported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">normalized</span> <span class="o">=</span> <span class="n">chamber_geometry</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">normalized</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span> <span class="s2">&quot;rectangular&quot;</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">normalized</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"spherical"</span><span class="p">,</span> <span class="s2">"rectangular"</span><span class="p">}:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;chamber_geometry must be &#39;spherical&#39; or &#39;rectangular&#39;.&quot;</span>
+            <span class="s2">"chamber_geometry must be 'spherical' or 'rectangular'."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">=</span> <span class="n">normalized</span>
     <span class="k">return</span> <span class="bp">self</span>
@@ -17238,7 +17238,7 @@ provided.</p>
 <span class="normal">239</span>
 <span class="normal">240</span>
 <span class="normal">241</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set required and optional parameters from mapping.</span>
+<span class="w">    </span><span class="sd">"""Set required and optional parameters from mapping.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        parameters: Mapping containing required ``wall_eddy_diffusivity``</span>
@@ -17252,55 +17252,55 @@ provided.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required keys are missing or unexpected keys are</span>
 <span class="sd">            provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">required</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">,</span> <span class="s2">&quot;chamber_geometry&quot;</span><span class="p">}</span>
+<span class="sd">    """</span>
+    <span class="n">required</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"wall_eddy_diffusivity"</span><span class="p">,</span> <span class="s2">"chamber_geometry"</span><span class="p">}</span>
     <span class="n">optional</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;chamber_radius&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;chamber_dimensions&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;wall_potential&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;wall_electric_field&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;distribution_type&quot;</span><span class="p">,</span>
+        <span class="s2">"chamber_radius"</span><span class="p">,</span>
+        <span class="s2">"chamber_dimensions"</span><span class="p">,</span>
+        <span class="s2">"wall_potential"</span><span class="p">,</span>
+        <span class="s2">"wall_electric_field"</span><span class="p">,</span>
+        <span class="s2">"distribution_type"</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">required</span>
         <span class="o">|</span> <span class="n">optional</span>
-        <span class="o">|</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">optional</span> <span class="o">|</span> <span class="n">required</span><span class="p">}</span>
+        <span class="o">|</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units"</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">optional</span> <span class="o">|</span> <span class="n">required</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">missing</span> <span class="o">:=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Missing required parameter(s): </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Missing required parameter(s): </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">invalid</span> <span class="o">:=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Trying to set an invalid parameter(s) &#39;</span><span class="si">{</span><span class="n">invalid</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Trying to set an invalid parameter(s) '</span><span class="si">{</span><span class="n">invalid</span><span class="si">}</span><span class="s2">'."</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_wall_eddy_diffusivity</span><span class="p">(</span>
-        <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">],</span>
-        <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wall_eddy_diffusivity_units&quot;</span><span class="p">,</span> <span class="s2">&quot;1/s&quot;</span><span class="p">),</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="s2">"wall_eddy_diffusivity"</span><span class="p">],</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wall_eddy_diffusivity_units"</span><span class="p">,</span> <span class="s2">"1/s"</span><span class="p">),</span>
     <span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">set_chamber_geometry</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;chamber_geometry&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s2">&quot;chamber_radius&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_chamber_geometry</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"chamber_geometry"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"chamber_radius"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_chamber_radius</span><span class="p">(</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;chamber_radius&quot;</span><span class="p">],</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chamber_radius_units&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">),</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"chamber_radius"</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"chamber_radius_units"</span><span class="p">,</span> <span class="s2">"m"</span><span class="p">),</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;chamber_dimensions&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"chamber_dimensions"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_chamber_dimensions</span><span class="p">(</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;chamber_dimensions&quot;</span><span class="p">],</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chamber_dimensions_units&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">),</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"chamber_dimensions"</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"chamber_dimensions_units"</span><span class="p">,</span> <span class="s2">"m"</span><span class="p">),</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;wall_potential&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"wall_potential"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_wall_potential</span><span class="p">(</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;wall_potential&quot;</span><span class="p">],</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wall_potential_units&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">),</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"wall_potential"</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wall_potential_units"</span><span class="p">,</span> <span class="s2">"V"</span><span class="p">),</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;wall_electric_field&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"wall_electric_field"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_wall_electric_field</span><span class="p">(</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;wall_electric_field&quot;</span><span class="p">],</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wall_electric_field_units&quot;</span><span class="p">,</span> <span class="s2">&quot;V/m&quot;</span><span class="p">),</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"wall_electric_field"</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wall_electric_field_units"</span><span class="p">,</span> <span class="s2">"V/m"</span><span class="p">),</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="s2">&quot;distribution_type&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;distribution_type&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"distribution_type"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"distribution_type"</span><span class="p">])</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17325,7 +17325,7 @@ provided.</p>
 
 
 <a href="#particula.dynamics.wall_loss.ChargedWallLossStrategy" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ChargedWallLossStrategy</span><span class="p">(</span><span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chamber_geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">chamber_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wall_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">wall_electric_field</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;discrete&#39;</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ChargedWallLossStrategy</span><span class="p">(</span><span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chamber_geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">chamber_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wall_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">wall_electric_field</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'discrete'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -17520,11 +17520,11 @@ are missing.</p>
 <span class="normal">584</span>
 <span class="normal">585</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;wall_potential&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;wall_electric_field&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;chamber_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;chamber_dimensions&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"wall_eddy_diffusivity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"wall_potential"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"wall_electric_field"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">,</span>
+        <span class="s2">"chamber_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"chamber_dimensions"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -17535,13 +17535,13 @@ are missing.</p>
     <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">wall_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">wall_electric_field</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-    <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"discrete"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize charged wall loss strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize charged wall loss strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        wall_eddy_diffusivity: Wall eddy diffusivity [1/s].</span>
-<span class="sd">        chamber_geometry: Geometry string (&quot;spherical&quot; or &quot;rectangular&quot;).</span>
+<span class="sd">        chamber_geometry: Geometry string ("spherical" or "rectangular").</span>
 <span class="sd">        chamber_radius: Radius for spherical chambers [m].</span>
 <span class="sd">        chamber_dimensions: Dimensions (length, width, height) for</span>
 <span class="sd">            rectangular chambers [m].</span>
@@ -17553,32 +17553,32 @@ are missing.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If geometry is invalid or required geometry parameters</span>
 <span class="sd">            are missing.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
         <span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">geometry</span> <span class="o">=</span> <span class="n">chamber_geometry</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">geometry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span> <span class="s2">&quot;rectangular&quot;</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">geometry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"spherical"</span><span class="p">,</span> <span class="s2">"rectangular"</span><span class="p">}:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;chamber_geometry must be &#39;spherical&#39; or &#39;rectangular&#39;.&quot;</span>
+            <span class="s2">"chamber_geometry must be 'spherical' or 'rectangular'."</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="n">geometry</span> <span class="o">==</span> <span class="s2">&quot;spherical&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">geometry</span> <span class="o">==</span> <span class="s2">"spherical"</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">chamber_radius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;chamber_radius is required for spherical.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"chamber_radius is required for spherical."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chamber_radius</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">chamber_radius</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chamber_dimensions</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">chamber_dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;chamber_dimensions are required for rectangular.&quot;</span>
+                <span class="s2">"chamber_dimensions are required for rectangular."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chamber_dimensions</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;chamber_dimensions must be length, width, height.&quot;</span>
+                <span class="s2">"chamber_dimensions must be length, width, height."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">dimension</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">chamber_dimensions</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All chamber dimensions must be positive&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"All chamber dimensions must be positive"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chamber_dimensions</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">float</span><span class="p">(</span><span class="n">chamber_dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
             <span class="nb">float</span><span class="p">(</span><span class="n">chamber_dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
@@ -17733,7 +17733,7 @@ useful for rate helpers and direct calculations without cached state.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute charged wall loss coefficient from explicit arrays.</span>
+<span class="w">    </span><span class="sd">"""Compute charged wall loss coefficient from explicit arrays.</span>
 
 <span class="sd">    Public method for computing coefficients with explicit charge arrays,</span>
 <span class="sd">    useful for rate helpers and direct calculations without cached state.</span>
@@ -17747,7 +17747,7 @@ useful for rate helpers and direct calculations without cached state.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wall loss coefficient in 1/s for each particle.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">neutral</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_neutral_coefficient</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
         <span class="n">particle_density</span><span class="o">=</span><span class="n">particle_density</span><span class="p">,</span>
@@ -17927,7 +17927,7 @@ charge.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute charged wall loss coefficient from particle properties.</span>
+<span class="w">    </span><span class="sd">"""Compute charged wall loss coefficient from particle properties.</span>
 
 <span class="sd">    Applies image-charge enhancement even when ``wall_potential`` is zero</span>
 <span class="sd">    and adds drift when ``wall_electric_field`` is non-zero.</span>
@@ -17942,7 +17942,7 @@ charge.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wall loss coefficient in 1/s as a scalar or array.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">get_radius</span><span class="p">())</span>
     <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">get_effective_density</span><span class="p">())</span>
     <span class="n">charge</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">get_charge</span><span class="p">()</span>
@@ -17952,7 +17952,7 @@ charge.</p>
         <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;particle_resolved&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"particle_resolved"</span><span class="p">:</span>
         <span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">())</span>
         <span class="n">active</span> <span class="o">=</span> <span class="p">(</span><span class="n">radius</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">concentration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">coefficient</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">concentration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -18136,7 +18136,7 @@ resolved electric field is non-zero.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute charged wall loss coefficient for provided particle arrays.</span>
+<span class="w">    </span><span class="sd">"""Compute charged wall loss coefficient for provided particle arrays.</span>
 
 <span class="sd">    Uses cached particle charges when available. Applies image-charge</span>
 <span class="sd">    enhancement even at zero wall potential and adds drift only when the</span>
@@ -18150,8 +18150,8 @@ resolved electric field is non-zero.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wall loss coefficient in 1/s for each particle.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">charge_cache</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_particle_charge_cache&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">charge_cache</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_particle_charge_cache"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">charge_array</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">charge_cache</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">charge_cache</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
@@ -18354,7 +18354,7 @@ updates particle concentrations and distributions.</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Advance particle-resolved concentration with charged wall loss.</span>
+<span class="w">    </span><span class="sd">"""Advance particle-resolved concentration with charged wall loss.</span>
 
 <span class="sd">    Computes survival probabilities using neutral, image-charge, and</span>
 <span class="sd">    optional drift contributions. Clamps probabilities to [0, 1] and</span>
@@ -18368,8 +18368,8 @@ updates particle concentrations and distributions.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Updated particle representation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">!=</span> <span class="s2">&quot;particle_resolved&quot;</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">!=</span> <span class="s2">"particle_resolved"</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
             <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
             <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
@@ -18527,12 +18527,12 @@ before constructing :class:<code>RectangularWallLossStrategy</code>.</p>
 <span class="normal">100</span>
 <span class="normal">101</span>
 <span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the rectangular wall loss builder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the rectangular wall loss builder."""</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;chamber_dimensions&quot;</span><span class="p">,</span>
+            <span class="s2">"wall_eddy_diffusivity"</span><span class="p">,</span>
+            <span class="s2">"chamber_dimensions"</span><span class="p">,</span>
         <span class="p">],</span>
     <span class="p">)</span>
     <span class="n">BuilderWallEddyDiffusivityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -18616,19 +18616,19 @@ before constructing :class:<code>RectangularWallLossStrategy</code>.</p>
 <span class="normal">121</span>
 <span class="normal">122</span>
 <span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RectangularWallLossStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return the rectangular wall loss strategy.</span>
+<span class="w">    </span><span class="sd">"""Build and return the rectangular wall loss strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        RectangularWallLossStrategy: Configured wall loss strategy.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required parameters are missing or invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="n">wall_eddy_diffusivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span>
     <span class="n">chamber_dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_dimensions</span>
     <span class="k">if</span> <span class="n">wall_eddy_diffusivity</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">chamber_dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Required parameters not set.&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Required parameters not set."</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">RectangularWallLossStrategy</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
@@ -18658,7 +18658,7 @@ before constructing :class:<code>RectangularWallLossStrategy</code>.</p>
 
 
 <a href="#particula.dynamics.wall_loss.RectangularWallLossStrategy" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">RectangularWallLossStrategy</span><span class="p">(</span><span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;discrete&#39;</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">RectangularWallLossStrategy</span><span class="p">(</span><span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'discrete'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -18709,7 +18709,7 @@ discrete, continuous PDF, and particle-resolved distributions.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">RectangularWallLossStrategy</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">chamber_dimensions</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
-<span class="gp">... </span>    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rate</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
@@ -18833,37 +18833,37 @@ three positive values.</p>
 <span class="normal">1105</span>
 <span class="normal">1106</span>
 <span class="normal">1107</span>
-<span class="normal">1108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">1108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"wall_eddy_diffusivity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
-    <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"discrete"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize rectangular wall loss strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize rectangular wall loss strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        wall_eddy_diffusivity: Wall eddy diffusivity [1/s].</span>
 <span class="sd">        chamber_dimensions: Chamber dimensions (length, width, height)</span>
 <span class="sd">            in meters. All must be positive.</span>
-<span class="sd">        distribution_type: Distribution type (&quot;discrete&quot;,</span>
-<span class="sd">            &quot;continuous_pdf&quot;, or &quot;particle_resolved&quot;).</span>
+<span class="sd">        distribution_type: Distribution type ("discrete",</span>
+<span class="sd">            "continuous_pdf", or "particle_resolved").</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``chamber_dimensions`` does not contain exactly</span>
 <span class="sd">            three positive values.</span>
 <span class="sd">        ValueError: If ``distribution_type`` is not supported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
         <span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chamber_dimensions</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;chamber_dimensions must be a tuple of length, width, height&quot;</span>
+            <span class="s2">"chamber_dimensions must be a tuple of length, width, height"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">dimension</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">chamber_dimensions</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All chamber dimensions must be positive&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"All chamber dimensions must be positive"</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">chamber_dimensions</span> <span class="o">=</span> <span class="p">(</span>
         <span class="nb">float</span><span class="p">(</span><span class="n">chamber_dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
         <span class="nb">float</span><span class="p">(</span><span class="n">chamber_dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
@@ -18993,7 +18993,7 @@ three positive values.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the rectangular wall loss coefficient for the state.</span>
+<span class="w">    </span><span class="sd">"""Return the rectangular wall loss coefficient for the state.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        particle: Particle representation providing radius and density.</span>
@@ -19002,11 +19002,11 @@ three positive values.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wall loss coefficient [1/s] for each particle bin.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">get_radius</span><span class="p">())</span>
     <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">get_effective_density</span><span class="p">())</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;particle_resolved&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"particle_resolved"</span><span class="p">:</span>
         <span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">())</span>
         <span class="n">active</span> <span class="o">=</span> <span class="p">(</span><span class="n">radius</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">concentration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">coefficient</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">concentration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -19144,7 +19144,7 @@ representation.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return wall loss coefficient for provided particle properties.</span>
+<span class="w">    </span><span class="sd">"""Return wall loss coefficient for provided particle properties.</span>
 
 <span class="sd">    This method is used for particle-resolved simulations to evaluate</span>
 <span class="sd">    coefficients on active particles without reconstructing the full</span>
@@ -19158,7 +19158,7 @@ representation.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wall loss coefficient [1/s] for each particle.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">coefficient</span> <span class="o">=</span> <span class="n">get_rectangle_wall_loss_coefficient_via_system_state</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
@@ -19253,10 +19253,10 @@ before constructing :class:<code>SphericalWallLossStrategy</code>.</p>
 <span class="normal">48</span>
 <span class="normal">49</span>
 <span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the spherical wall loss builder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the spherical wall loss builder."""</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">,</span> <span class="s2">&quot;chamber_radius&quot;</span><span class="p">],</span>
+        <span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">"wall_eddy_diffusivity"</span><span class="p">,</span> <span class="s2">"chamber_radius"</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="n">BuilderWallEddyDiffusivityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">BuilderChamberRadiusMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -19339,19 +19339,19 @@ before constructing :class:<code>SphericalWallLossStrategy</code>.</p>
 <span class="normal">69</span>
 <span class="normal">70</span>
 <span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SphericalWallLossStrategy</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return the spherical wall loss strategy.</span>
+<span class="w">    </span><span class="sd">"""Build and return the spherical wall loss strategy.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        SphericalWallLossStrategy: Configured wall loss strategy.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If required parameters are missing or invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="n">wall_eddy_diffusivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span>
     <span class="n">chamber_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_radius</span>
     <span class="k">if</span> <span class="n">wall_eddy_diffusivity</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">chamber_radius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Required parameters not set.&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Required parameters not set."</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
@@ -19381,7 +19381,7 @@ before constructing :class:<code>SphericalWallLossStrategy</code>.</p>
 
 
 <a href="#particula.dynamics.wall_loss.SphericalWallLossStrategy" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">SphericalWallLossStrategy</span><span class="p">(</span><span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;discrete&#39;</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">SphericalWallLossStrategy</span><span class="p">(</span><span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'discrete'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -19432,7 +19432,7 @@ using turbulent diffusion and gravitational settling.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rate</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
@@ -19516,24 +19516,24 @@ using turbulent diffusion and gravitational settling.</p>
 <span class="normal">408</span>
 <span class="normal">409</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;chamber_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"wall_eddy_diffusivity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"chamber_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"discrete"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize spherical wall loss strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize spherical wall loss strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        wall_eddy_diffusivity: Wall eddy diffusivity [1/s].</span>
 <span class="sd">        chamber_radius: Radius of the spherical chamber [m].</span>
-<span class="sd">        distribution_type: Distribution type (&quot;discrete&quot;,</span>
-<span class="sd">            &quot;continuous_pdf&quot;, or &quot;particle_resolved&quot;).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        distribution_type: Distribution type ("discrete",</span>
+<span class="sd">            "continuous_pdf", or "particle_resolved").</span>
+<span class="sd">    """</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
         <span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">,</span>
@@ -19668,7 +19668,7 @@ using turbulent diffusion and gravitational settling.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the spherical wall loss coefficient for the given state.</span>
+<span class="w">    </span><span class="sd">"""Return the spherical wall loss coefficient for the given state.</span>
 
 <span class="sd">    The coefficient is computed from the system state using</span>
 <span class="sd">    :func:`get_spherical_wall_loss_coefficient_via_system_state`.</span>
@@ -19680,11 +19680,11 @@ using turbulent diffusion and gravitational settling.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wall loss coefficient [1/s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">get_radius</span><span class="p">())</span>
     <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">get_effective_density</span><span class="p">())</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;particle_resolved&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"particle_resolved"</span><span class="p">:</span>
         <span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">())</span>
         <span class="n">active</span> <span class="o">=</span> <span class="p">(</span><span class="n">radius</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">concentration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">coefficient</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">concentration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -19820,7 +19820,7 @@ need to calculate coefficients for a subset of active particles.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the wall loss coefficient for given particle properties.</span>
+<span class="w">    </span><span class="sd">"""Return the wall loss coefficient for given particle properties.</span>
 
 <span class="sd">    This method is used for particle-resolved simulations where we</span>
 <span class="sd">    need to calculate coefficients for a subset of active particles.</span>
@@ -19833,7 +19833,7 @@ need to calculate coefficients for a subset of active particles.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wall loss coefficient [1/s] for each particle.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">coefficient</span> <span class="o">=</span> <span class="n">get_spherical_wall_loss_coefficient_via_system_state</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
@@ -19951,15 +19951,15 @@ need to calculate coefficients for a subset of active particles.</p>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BuilderType</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return available wall loss builders keyed by strategy name.</span>
+<span class="w">    </span><span class="sd">"""Return available wall loss builders keyed by strategy name.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dict[str, BuilderType]: Mapping of strategy type to builder.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;spherical&quot;</span><span class="p">:</span> <span class="n">SphericalWallLossBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;rectangular&quot;</span><span class="p">:</span> <span class="n">RectangularWallLossBuilder</span><span class="p">(),</span>
-        <span class="s2">&quot;charged&quot;</span><span class="p">:</span> <span class="n">ChargedWallLossBuilder</span><span class="p">(),</span>
+        <span class="s2">"spherical"</span><span class="p">:</span> <span class="n">SphericalWallLossBuilder</span><span class="p">(),</span>
+        <span class="s2">"rectangular"</span><span class="p">:</span> <span class="n">RectangularWallLossBuilder</span><span class="p">(),</span>
+        <span class="s2">"charged"</span><span class="p">:</span> <span class="n">ChargedWallLossBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -20072,11 +20072,11 @@ invalid.</p>
 <span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_strategy</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">strategy_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a wall loss strategy using its corresponding builder.</span>
+<span class="w">    </span><span class="sd">"""Create a wall loss strategy using its corresponding builder.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        strategy_type: Strategy name (&quot;spherical&quot;, &quot;rectangular&quot;, or</span>
-<span class="sd">            &quot;charged&quot;).</span>
+<span class="sd">        strategy_type: Strategy name ("spherical", "rectangular", or</span>
+<span class="sd">            "charged").</span>
 <span class="sd">        parameters: Optional parameter mapping for the builder. Include</span>
 <span class="sd">            geometry keys (``chamber_radius`` or ``chamber_dimensions``)</span>
 <span class="sd">            plus optional ``wall_potential`` and ``wall_electric_field``</span>
@@ -20088,14 +20088,14 @@ invalid.</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``strategy_type`` is unknown or parameters are</span>
 <span class="sd">            invalid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">builder_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
     <span class="n">builder</span> <span class="o">=</span> <span class="n">builder_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">strategy_type</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">builder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown strategy type: </span><span class="si">{</span><span class="n">strategy_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown strategy type: </span><span class="si">{</span><span class="n">strategy_type</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="n">parameter_copy</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="k">if</span> <span class="n">parameters</span> <span class="k">else</span> <span class="p">{}</span>
-    <span class="n">distribution_type</span> <span class="o">=</span> <span class="n">parameter_copy</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;distribution_type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">distribution_type</span> <span class="o">=</span> <span class="n">parameter_copy</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"distribution_type"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">parameter_copy</span><span class="p">:</span>
         <span class="n">builder</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">(</span><span class="n">parameter_copy</span><span class="p">)</span>
@@ -20241,28 +20241,28 @@ particle-resolved simulations.</p>
 <span class="normal">167</span>
 <span class="normal">168</span>
 <span class="normal">169</span>
-<span class="normal">170</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">170</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"wall_eddy_diffusivity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the wall loss strategy.</span>
+<span class="w">    </span><span class="sd">"""Initialize the wall loss strategy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        wall_eddy_diffusivity: Wall eddy diffusivity [1/s].</span>
-<span class="sd">        distribution_type: Distribution type (&quot;discrete&quot;,</span>
-<span class="sd">            &quot;continuous_pdf&quot;, or &quot;particle_resolved&quot;).</span>
+<span class="sd">        distribution_type: Distribution type ("discrete",</span>
+<span class="sd">            "continuous_pdf", or "particle_resolved").</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``distribution_type`` is not supported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">distribution_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
-        <span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_resolved&quot;</span><span class="p">,</span>
+        <span class="s2">"discrete"</span><span class="p">,</span>
+        <span class="s2">"continuous_pdf"</span><span class="p">,</span>
+        <span class="s2">"particle_resolved"</span><span class="p">,</span>
     <span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Invalid distribution type. Must be one of &#39;discrete&#39;, &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;&#39;continuous_pdf&#39;, or &#39;particle_resolved&#39;.&quot;</span>
+            <span class="s2">"Invalid distribution type. Must be one of 'discrete', "</span>
+            <span class="o">+</span> <span class="s2">"'continuous_pdf', or 'particle_resolved'."</span>
         <span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span> <span class="o">=</span> <span class="n">wall_eddy_diffusivity</span>
@@ -20370,7 +20370,7 @@ particle-resolved simulations.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the wall loss coefficient for the given state.</span>
+<span class="w">    </span><span class="sd">"""Return the wall loss coefficient for the given state.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        particle: Particle representation to evaluate.</span>
@@ -20379,7 +20379,7 @@ particle-resolved simulations.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wall loss coefficient [1/s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20488,7 +20488,7 @@ need to calculate coefficients for a subset of active particles.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the wall loss coefficient for given particle properties.</span>
+<span class="w">    </span><span class="sd">"""Return the wall loss coefficient for given particle properties.</span>
 
 <span class="sd">    This method is used for particle-resolved simulations where we</span>
 <span class="sd">    need to calculate coefficients for a subset of active particles.</span>
@@ -20501,7 +20501,7 @@ need to calculate coefficients for a subset of active particles.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wall loss coefficient [1/s] for each particle.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20602,7 +20602,7 @@ concentration.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the wall loss rate for the given state.</span>
+<span class="w">    </span><span class="sd">"""Return the wall loss rate for the given state.</span>
 
 <span class="sd">    The loss rate is computed as ``-k(Dp) * c`` where ``k(Dp)`` is the</span>
 <span class="sd">    size-dependent wall loss coefficient and ``c`` is the particle number</span>
@@ -20615,7 +20615,7 @@ concentration.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Wall loss rate [#/m^3 s] (negative values indicate loss).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">coefficient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_coefficient</span><span class="p">(</span>
         <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
         <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
@@ -20716,7 +20716,7 @@ concentration.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the wall loss rate as an array.</span>
+<span class="w">    </span><span class="sd">"""Return the wall loss rate as an array.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        particle: Particle representation to evaluate.</span>
@@ -20725,7 +20725,7 @@ concentration.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Array of wall loss rates [#/m^3 s].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss_rate</span><span class="p">(</span>
             <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
@@ -20911,11 +20911,11 @@ based on survival probability.</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Advance the particle representation by one wall loss step.</span>
+<span class="w">    </span><span class="sd">"""Advance the particle representation by one wall loss step.</span>
 
-<span class="sd">    For ``&quot;discrete&quot;`` and ``&quot;continuous_pdf&quot;`` distributions, this</span>
+<span class="sd">    For ``"discrete"`` and ``"continuous_pdf"`` distributions, this</span>
 <span class="sd">    applies a deterministic first-order loss to the number</span>
-<span class="sd">    concentration in each bin. For ``&quot;particle_resolved&quot;``, it</span>
+<span class="sd">    concentration in each bin. For ``"particle_resolved"``, it</span>
 <span class="sd">    applies a stochastic removal process using binomial random draws</span>
 <span class="sd">    based on survival probability.</span>
 
@@ -20930,8 +20930,8 @@ based on survival probability.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``distribution_type`` is not supported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span> <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">}:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"discrete"</span><span class="p">,</span> <span class="s2">"continuous_pdf"</span><span class="p">}:</span>
         <span class="n">rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span>
             <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
             <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
@@ -20940,7 +20940,7 @@ based on survival probability.</p>
         <span class="n">particle</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span><span class="n">rate</span> <span class="o">*</span> <span class="n">time_step</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">particle</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;particle_resolved&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"particle_resolved"</span><span class="p">:</span>
         <span class="c1"># For particle-resolved representations, use stochastic removal</span>
         <span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">())</span>
         <span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">get_radius</span><span class="p">())</span>
@@ -20983,8 +20983,8 @@ based on survival probability.</p>
         <span class="k">return</span> <span class="n">particle</span>
 
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-        <span class="s2">&quot;Invalid distribution type. Must be one of &#39;discrete&#39;, &quot;</span>
-        <span class="o">+</span> <span class="s2">&quot;&#39;continuous_pdf&#39;, or &#39;particle_resolved&#39;.&quot;</span>
+        <span class="s2">"Invalid distribution type. Must be one of 'discrete', "</span>
+        <span class="o">+</span> <span class="s2">"'continuous_pdf', or 'particle_resolved'."</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -21248,7 +21248,7 @@ spherical or tuple for rectangular). Zero disables drift.</p>
     <span class="n">wall_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">wall_electric_field</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate charged wall loss rate for spherical or rectangular chambers.</span>
+<span class="w">    </span><span class="sd">"""Calculate charged wall loss rate for spherical or rectangular chambers.</span>
 
 <span class="sd">    Combines neutral deposition with image-charge enhancement and optional</span>
 <span class="sd">    electric-field drift. Image-charge effects apply when particles carry</span>
@@ -21264,8 +21264,8 @@ spherical or tuple for rectangular). Zero disables drift.</p>
 <span class="sd">        particle_charge: Particle charge in elementary charge units.</span>
 <span class="sd">        temperature: Gas temperature in kelvin.</span>
 <span class="sd">        pressure: Gas pressure in pascals.</span>
-<span class="sd">        chamber_geometry: Geometry name, ``&quot;spherical&quot;`` or</span>
-<span class="sd">            ``&quot;rectangular&quot;``.</span>
+<span class="sd">        chamber_geometry: Geometry name, ``"spherical"`` or</span>
+<span class="sd">            ``"rectangular"``.</span>
 <span class="sd">        chamber_radius: Chamber radius in meters for spherical geometry.</span>
 <span class="sd">        chamber_dimensions: ``(length, width, height)`` in meters for</span>
 <span class="sd">            rectangular geometry.</span>
@@ -21280,7 +21280,7 @@ spherical or tuple for rectangular). Zero disables drift.</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If geometry arguments are inconsistent or not finite.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">strategy</span> <span class="o">=</span> <span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
         <span class="n">chamber_geometry</span><span class="o">=</span><span class="n">chamber_geometry</span><span class="p">,</span>
@@ -21288,7 +21288,7 @@ spherical or tuple for rectangular). Zero disables drift.</p>
         <span class="n">chamber_dimensions</span><span class="o">=</span><span class="n">chamber_dimensions</span><span class="p">,</span>
         <span class="n">wall_potential</span><span class="o">=</span><span class="n">wall_potential</span><span class="p">,</span>
         <span class="n">wall_electric_field</span><span class="o">=</span><span class="n">wall_electric_field</span><span class="p">,</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">radius_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">density_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle_density</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -21509,7 +21509,7 @@ geometry should be bound via closure.</p>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">random_generator</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform particle-resolved wall loss step with stochastic removal.</span>
+<span class="w">    </span><span class="sd">"""Perform particle-resolved wall loss step with stochastic removal.</span>
 
 <span class="sd">    For particle-resolved simulations, each computational particle survives</span>
 <span class="sd">    with probability ``exp(-k * dt)``, where ``k`` is the size-dependent wall</span>
@@ -21550,7 +21550,7 @@ geometry should be bound via closure.</p>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; print(survived)</span>
 <span class="sd">        [1. 1. 1.]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Only calculate for active particles (radius &gt; 0)</span>
     <span class="n">active_particles</span> <span class="o">=</span> <span class="n">particle_radius</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
@@ -21764,7 +21764,7 @@ coefficient computed via
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the wall loss rate for a rectangular chamber.</span>
+<span class="w">    </span><span class="sd">"""Calculate the wall loss rate for a rectangular chamber.</span>
 
 <span class="sd">    The loss rate is computed as ``L = -k c`` where ``k`` is the wall</span>
 <span class="sd">    loss coefficient [1/s] and ``c`` is the particle concentration</span>
@@ -21798,8 +21798,8 @@ coefficient computed via
 <span class="sd">        &gt;&gt;&gt; loss_rate  # doctest: +SKIP</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Hinds, W. C. &quot;Aerosol Technology.&quot; 2nd ed. John Wiley &amp; Sons, 1999.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        Hinds, W. C. "Aerosol Technology." 2nd ed. John Wiley &amp; Sons, 1999.</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Calculate the wall loss coefficient</span>
     <span class="n">loss_coefficient</span> <span class="o">=</span> <span class="n">get_rectangle_wall_loss_coefficient_via_system_state</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
@@ -22001,7 +22001,7 @@ https://en.wikipedia.org/wiki/Aerosol.</p>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the wall loss rate for a spherical chamber.</span>
+<span class="w">    </span><span class="sd">"""Calculate the wall loss rate for a spherical chamber.</span>
 
 <span class="sd">    The loss rate is computed as ``L = -k c`` where ``k`` is the wall</span>
 <span class="sd">    loss coefficient [1/s] and ``c`` is the particle concentration</span>
@@ -22035,9 +22035,9 @@ https://en.wikipedia.org/wiki/Aerosol.</p>
 <span class="sd">        &gt;&gt;&gt; rate  # doctest: +SKIP</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Wikipedia contributors. &quot;Aerosol dynamics.&quot; *Wikipedia*.</span>
+<span class="sd">        Wikipedia contributors. "Aerosol dynamics." *Wikipedia*.</span>
 <span class="sd">        https://en.wikipedia.org/wiki/Aerosol.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Calculate the wall loss coefficient</span>
     <span class="n">loss_coefficient</span> <span class="o">=</span> <span class="n">get_spherical_wall_loss_coefficient_via_system_state</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>

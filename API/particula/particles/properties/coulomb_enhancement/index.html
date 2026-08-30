@@ -16197,12 +16197,12 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;coulomb_potential&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"coulomb_potential"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">},</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_coulomb_continuum_limit</span><span class="p">(</span>
     <span class="n">coulomb_potential</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the continuum-limit Coulomb enhancement factor, Γ_c.</span>
+<span class="w">    </span><span class="sd">"""Calculate the continuum-limit Coulomb enhancement factor, Γ_c.</span>
 
 <span class="sd">    The continuum-limit factor is computed by:</span>
 
@@ -16219,7 +16219,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="sd">        - The Coulomb enhancement factor in the continuum limit (dimensionless).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        potential = np.array([-0.5, 0.0, 0.5])</span>
@@ -16232,7 +16232,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="sd">        - Equation (6b): Gopalakrishnan, R., &amp; Hogan, C. J. (2012).</span>
 <span class="sd">          Coulomb-influenced collisions in aerosols and dusty plasmas.</span>
 <span class="sd">          Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">denominator</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">get_safe_exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">coulomb_potential</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
         <span class="n">coulomb_potential</span><span class="p">,</span>
@@ -16422,7 +16422,7 @@ large negative (repulsive) values.</p>
 <span class="normal">95</span>
 <span class="normal">96</span>
 <span class="normal">97</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">},</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_coulomb_enhancement_ratio</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
@@ -16430,7 +16430,7 @@ large negative (repulsive) values.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">298.15</span><span class="p">,</span>
     <span class="n">ratio_lower_limit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">200</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Coulomb potential ratio, ϕ_E, for particle-particle</span>
+<span class="w">    </span><span class="sd">"""Calculate the Coulomb potential ratio, ϕ_E, for particle-particle</span>
 <span class="sd">    interactions.</span>
 
 <span class="sd">    The potential ratio is computed using:</span>
@@ -16455,7 +16455,7 @@ large negative (repulsive) values.</p>
 <span class="sd">        - The Coulomb potential ratio (dimensionless).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_coulomb_enhancement_ratio(</span>
@@ -16471,7 +16471,7 @@ large negative (repulsive) values.</p>
 <span class="sd">        - Equation (7): Gopalakrishnan, R., &amp; Hogan, C. J. (2012).</span>
 <span class="sd">          Coulomb-influenced collisions in aerosols and dusty plasmas.</span>
 <span class="sd">          Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="c1"># square matrix of radius</span>
         <span class="n">particle_radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">)</span>
@@ -16611,12 +16611,12 @@ large negative (repulsive) values.</p>
 <span class="normal">138</span>
 <span class="normal">139</span>
 <span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;coulomb_potential&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"coulomb_potential"</span><span class="p">:</span> <span class="s2">"finite"</span><span class="p">},</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_coulomb_kinetic_limit</span><span class="p">(</span>
     <span class="n">coulomb_potential</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the kinetic-limit Coulomb enhancement factor, Γₖᵢₙ.</span>
+<span class="w">    </span><span class="sd">"""Calculate the kinetic-limit Coulomb enhancement factor, Γₖᵢₙ.</span>
 
 <span class="sd">    The kinetic-limit factor is computed by:</span>
 
@@ -16633,7 +16633,7 @@ large negative (repulsive) values.</p>
 <span class="sd">        - The Coulomb enhancement factor in the kinetic limit (dimensionless).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        potential = np.array([-0.5, 0.0, 0.5])</span>
@@ -16645,7 +16645,7 @@ large negative (repulsive) values.</p>
 <span class="sd">        - Equations (6d) and (6e): Gopalakrishnan, R., &amp; Hogan, C. J. (2012).</span>
 <span class="sd">          Coulomb-influenced collisions in aerosols and dusty plasmas.</span>
 <span class="sd">          Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
         <span class="n">coulomb_potential</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="mi">1</span> <span class="o">+</span> <span class="n">coulomb_potential</span><span class="p">,</span>

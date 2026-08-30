@@ -16190,9 +16190,9 @@ turbulence [-]</p>
 <span class="normal">54</span>
 <span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;kolmogorov_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;re_lambda&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;accel_variance&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"kolmogorov_time"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"re_lambda"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"accel_variance"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_lagrangian_taylor_microscale_time</span><span class="p">(</span>
@@ -16200,7 +16200,7 @@ turbulence [-]</p>
     <span class="n">re_lambda</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">accel_variance</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Lagrangian Taylor microscale time.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Lagrangian Taylor microscale time.</span>
 
 <span class="sd">    The Lagrangian Taylor microscale time (τ_T) represents the characteristic</span>
 <span class="sd">    time for the decay of turbulent velocity correlations. It provides insight</span>
@@ -16220,14 +16220,14 @@ turbulence [-]</p>
 <span class="sd">            turbulence [-]</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_lagrangian_taylor_microscale_time(0.387, 500, 0.05)</span>
 <span class="sd">        # Output: 0.3872983346207417</span>
 <span class="sd">        ```</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        - Lagrangian Taylor microscale time [s]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">kolmogorov_time</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
         <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">re_lambda</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">15</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">accel_variance</span><span class="p">)</span>
     <span class="p">)</span>
@@ -16373,9 +16373,9 @@ in turbulent flows. It is given by:</p>
 <span class="normal">104</span>
 <span class="normal">105</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;fluid_rms_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"fluid_rms_velocity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"kinematic_viscosity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"turbulent_dissipation"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_taylor_microscale</span><span class="p">(</span>
@@ -16383,16 +16383,16 @@ in turbulent flows. It is given by:</p>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Taylor microscale.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Taylor microscale.</span>
 
 <span class="sd">    The Taylor microscale (λ) represents an intermediate length scale in</span>
 <span class="sd">    turbulence, linking the dissipative and energy-containing ranges of</span>
 <span class="sd">    turbulence. It characterizes the smoothness of velocity fluctuations</span>
 <span class="sd">    in turbulent flows. It is given by:</span>
 
-<span class="sd">    - λ = u&#39; * (15 ν² / ε)^(1/2)</span>
+<span class="sd">    - λ = u' * (15 ν² / ε)^(1/2)</span>
 <span class="sd">        - λ is Taylor microscale [m]</span>
-<span class="sd">        - u&#39; (rms_velocity) is Fluid RMS fluctuation velocity [m/s]</span>
+<span class="sd">        - u' (rms_velocity) is Fluid RMS fluctuation velocity [m/s]</span>
 <span class="sd">        - v (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s]</span>
 <span class="sd">        - ε (turbulent_dissipation) is Turbulent kinetic energy dissipation</span>
 <span class="sd">            rate [m²/s³]</span>
@@ -16407,7 +16407,7 @@ in turbulent flows. It is given by:</p>
 <span class="sd">        - Taylor microscale [m]</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_taylor_microscale(0.35, 1.5e-5, 0.1)</span>
 <span class="sd">        # Output: 0.00021081851067789195</span>
@@ -16415,7 +16415,7 @@ in turbulent flows. It is given by:</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - https://en.wikipedia.org/wiki/Taylor_microscale</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">fluid_rms_velocity</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
         <span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="n">kinematic_viscosity</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">turbulent_dissipation</span>
     <span class="p">)</span>
@@ -16551,9 +16551,9 @@ viscous forces at the Taylor microscale.</p>
 <span class="normal">148</span>
 <span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;fluid_rms_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;taylor_microscale&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"fluid_rms_velocity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"taylor_microscale"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"kinematic_viscosity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_taylor_microscale_reynolds_number</span><span class="p">(</span>
@@ -16561,14 +16561,14 @@ viscous forces at the Taylor microscale.</p>
     <span class="n">taylor_microscale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the Taylor-microscale Reynolds number (Re_λ).</span>
+<span class="w">    </span><span class="sd">"""Compute the Taylor-microscale Reynolds number (Re_λ).</span>
 
 <span class="sd">    The Taylor-scale micro Reynolds number is a dimensionless quantity used in</span>
 <span class="sd">    turbulence studies to characterize the relative importance of inertial and</span>
 <span class="sd">    viscous forces at the Taylor microscale.</span>
 
-<span class="sd">    - Re_λ = (u&#39; λ) / ν</span>
-<span class="sd">        - u&#39; (fluid_rms_velocity) is Fluid (RMS) velocity fluctuation [m/s].</span>
+<span class="sd">    - Re_λ = (u' λ) / ν</span>
+<span class="sd">        - u' (fluid_rms_velocity) is Fluid (RMS) velocity fluctuation [m/s].</span>
 <span class="sd">        - λ (taylor_microscale) is Taylor microscale [m].</span>
 <span class="sd">        - ν (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s].</span>
 
@@ -16581,7 +16581,7 @@ viscous forces at the Taylor microscale.</p>
 <span class="sd">        - Taylor-microscale Reynolds number [dimensionless].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example Usage&quot;</span>
+<span class="sd">        ``` py title="Example Usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_taylor_microscale_reynolds_number(0.35, 0.00021, 1.5e-5)</span>
 <span class="sd">        # Output: 500.0</span>
@@ -16589,7 +16589,7 @@ viscous forces at the Taylor microscale.</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        - https://en.wikipedia.org/wiki/Taylor_microscale</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">fluid_rms_velocity</span> <span class="o">*</span> <span class="n">taylor_microscale</span><span class="p">)</span> <span class="o">/</span> <span class="n">kinematic_viscosity</span>
 </code></pre></div></td></tr></table></div>
             </details>

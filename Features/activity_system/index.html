@@ -16899,7 +16899,7 @@
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
-<span class="c1"># Ideal molar activity (Raoult&#39;s Law)</span>
+<span class="c1"># Ideal molar activity (Raoult's Law)</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMolar</span><span class="p">(</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.015e-3</span><span class="p">,</span> <span class="mf">200.0e-3</span><span class="p">]),</span>  <span class="c1"># kg/mol: water, organic</span>
 <span class="p">)</span>
@@ -16935,9 +16935,9 @@
 <span class="c1"># Build non-ideal activity strategy</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityNonIdealBinaryBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">200.0e-3</span><span class="p">,</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">200.0e-3</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_oxygen2carbon</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">1200.0</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">1200.0</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -16953,7 +16953,7 @@
 <span class="c1"># Molar activity with unit conversion</span>
 <span class="n">molar_activity</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMolarBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.015</span><span class="p">,</span> <span class="mf">200.0</span><span class="p">]),</span> <span class="s2">&quot;g/mol&quot;</span><span class="p">)</span>  <span class="c1"># converts to kg/mol</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.015</span><span class="p">,</span> <span class="mf">200.0</span><span class="p">]),</span> <span class="s2">"g/mol"</span><span class="p">)</span>  <span class="c1"># converts to kg/mol</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -16961,8 +16961,8 @@
 <span class="n">kappa_activity</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityKappaParameterBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_kappa</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.61</span><span class="p">]))</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.77</span><span class="p">]),</span> <span class="s2">&quot;g/cm^3&quot;</span><span class="p">)</span>  <span class="c1"># converts to kg/m^3</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.015</span><span class="p">,</span> <span class="mf">132.14</span><span class="p">]),</span> <span class="s2">&quot;g/mol&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.77</span><span class="p">]),</span> <span class="s2">"g/cm^3"</span><span class="p">)</span>  <span class="c1"># converts to kg/m^3</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.015</span><span class="p">,</span> <span class="mf">132.14</span><span class="p">]),</span> <span class="s2">"g/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_water_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
@@ -16976,22 +16976,22 @@
 
 <span class="c1"># Select ideal molar strategy</span>
 <span class="n">ideal</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;ideal_molar&quot;</span><span class="p">,</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"ideal_molar"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.015e-3</span><span class="p">,</span> <span class="mf">200.0e-3</span><span class="p">]),</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.015e-3</span><span class="p">,</span> <span class="mf">200.0e-3</span><span class="p">]),</span>
     <span class="p">},</span>
 <span class="p">)</span>
 
 <span class="c1"># Select kappa strategy</span>
 <span class="n">kappa</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;kappa&quot;</span><span class="p">,</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"kappa"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;kappa&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]),</span>
-        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">1500.0</span><span class="p">]),</span>
-        <span class="s2">&quot;density_units&quot;</span><span class="p">:</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.015</span><span class="p">,</span> <span class="mf">342.29</span><span class="p">]),</span>
-        <span class="s2">&quot;molar_mass_units&quot;</span><span class="p">:</span> <span class="s2">&quot;g/mol&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;water_index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"kappa"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]),</span>
+        <span class="s2">"density"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">1500.0</span><span class="p">]),</span>
+        <span class="s2">"density_units"</span><span class="p">:</span> <span class="s2">"kg/m^3"</span><span class="p">,</span>
+        <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.015</span><span class="p">,</span> <span class="mf">342.29</span><span class="p">]),</span>
+        <span class="s2">"molar_mass_units"</span><span class="p">:</span> <span class="s2">"g/mol"</span><span class="p">,</span>
+        <span class="s2">"water_index"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -17015,8 +17015,8 @@
 <span class="p">)</span>
 
 <span class="c1"># Access results</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Partition coefficients: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">partition_coefficients</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Alpha phase water: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">alpha_phase</span><span class="o">.</span><span class="n">water_concentration</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Partition coefficients: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">partition_coefficients</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Alpha phase water: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">alpha_phase</span><span class="o">.</span><span class="n">water_concentration</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
 <h3 id="quick-start-ideal-activity-calculation">Quick start: ideal activity calculation<a class="headerlink" href="#quick-start-ideal-activity-calculation" title="Permanent link">&para;</a></h3>
@@ -17033,7 +17033,7 @@
 
 <span class="c1"># 3. Compute activity</span>
 <span class="n">activity</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">activity</span><span class="p">(</span><span class="n">mass_concentration</span><span class="o">=</span><span class="n">mass</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Activity: </span><span class="si">{</span><span class="n">activity</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Activity: </span><span class="si">{</span><span class="n">activity</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># 4. Compute partial pressures</span>
 <span class="n">pure_pressure</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">3169.0</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">])</span>  <span class="c1"># Pa</span>
@@ -17041,7 +17041,7 @@
     <span class="n">pure_vapor_pressure</span><span class="o">=</span><span class="n">pure_pressure</span><span class="p">,</span>
     <span class="n">mass_concentration</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Partial pressures: </span><span class="si">{</span><span class="n">partial_p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Partial pressures: </span><span class="si">{</span><span class="n">partial_p</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
 <ul>
@@ -17061,9 +17061,9 @@
 <p>Use builders for validated configuration:</p>
 <div class="highlight"><pre><span></span><code><span class="n">strategy</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityNonIdealBinaryBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">200.0</span><span class="p">,</span> <span class="s2">&quot;g/mol&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">200.0</span><span class="p">,</span> <span class="s2">"g/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_oxygen2carbon</span><span class="p">(</span><span class="mf">0.4</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="s2">&quot;g/cm^3&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="s2">"g/cm^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </code></pre></div>

@@ -16284,10 +16284,10 @@
 <span class="normal">98</span>
 <span class="normal">99</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;slip_correction_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dynamic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"particle_density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"slip_correction_factor"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"dynamic_viscosity"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_particle_settling_velocity</span><span class="p">(</span>
@@ -16299,7 +16299,7 @@
     <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
     <span class="c1"># pylint: disable=too-many-arguments, too-many-positional-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate particle settling velocity using Stokes&#39; law.</span>
+<span class="w">    </span><span class="sd">"""Calculate particle settling velocity using Stokes' law.</span>
 
 <span class="sd">    The settling velocity (vₛ) is given by the equation:</span>
 
@@ -16325,7 +16325,7 @@
 <span class="sd">        - Settling velocity of the particle in m/s.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Array Input Example&quot;</span>
+<span class="sd">        ```py title="Array Input Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.particle_settling_velocity(</span>
@@ -16338,9 +16338,9 @@
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Stokes&#39; Law,&quot; Wikipedia,</span>
+<span class="sd">        - "Stokes' Law," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Stokes%27_law</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Calculate the settling velocity using the given formula</span>
     <span class="n">settling_velocity</span> <span class="o">=</span> <span class="p">(</span>
         <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">particle_radius</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
@@ -16548,9 +16548,9 @@
 <span class="normal">173</span>
 <span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_inertia_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;gravitational_acceleration&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;slip_correction_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_inertia_time"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"gravitational_acceleration"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"slip_correction_factor"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_particle_settling_velocity_via_inertia</span><span class="p">(</span>
@@ -16562,7 +16562,7 @@
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
     <span class="c1"># pylint: disable=too-many-arguments, too-many-positional-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate gravitational settling velocity using particle inertia time.</span>
+<span class="w">    </span><span class="sd">"""Calculate gravitational settling velocity using particle inertia time.</span>
 
 <span class="sd">    The settling velocity (vₛ) is determined by:</span>
 
@@ -16587,7 +16587,7 @@
 <span class="sd">        - Particle settling velocity in m/s.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_particle_settling_velocity_via_inertia(</span>
 <span class="sd">            particle_inertia_time=0.002,</span>
@@ -16602,11 +16602,11 @@
 
 <span class="sd">    References:</span>
 <span class="sd">        - Ayala, O., Rosa, B., Wang, L. P., &amp; Grabowski, W. W. (2008).</span>
-<span class="sd">          &quot;Effects of turbulence on the geometric collision rate of</span>
+<span class="sd">          "Effects of turbulence on the geometric collision rate of</span>
 <span class="sd">          sedimenting droplets. Part 1. Results from direct numerical</span>
-<span class="sd">          simulation.&quot; New Journal of Physics, 10.</span>
+<span class="sd">          simulation." New Journal of Physics, 10.</span>
 <span class="sd">          https://doi.org/10.1088/1367-2630/10/7/075015</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">re_p</span> <span class="o">=</span> <span class="n">get_particle_reynolds_number</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
         <span class="n">particle_velocity</span><span class="o">=</span><span class="n">relative_velocity</span><span class="p">,</span>
@@ -16790,12 +16790,12 @@ the settling velocity from Stokes' law with slip correction.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the particle settling velocity based on system state parameters.</span>
+<span class="w">    </span><span class="sd">"""Compute the particle settling velocity based on system state parameters.</span>
 
 <span class="sd">    This function calculates the dynamic viscosity from temperature, the mean</span>
 <span class="sd">    free path from the same system state, and the Knudsen number of the</span>
 <span class="sd">    particle, then applies the slip correction factor. Finally, it returns</span>
-<span class="sd">    the settling velocity from Stokes&#39; law with slip correction.</span>
+<span class="sd">    the settling velocity from Stokes' law with slip correction.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - particle_radius : Particle radius in meters (m).</span>
@@ -16807,7 +16807,7 @@ the settling velocity from Stokes' law with slip correction.</p>
 <span class="sd">        - Settling velocity of the particle in m/s.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;System State Example&quot;</span>
+<span class="sd">        ```py title="System State Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.particle_settling_velocity_via_system_state(</span>
 <span class="sd">            particle_radius=1e-6,</span>
@@ -16824,7 +16824,7 @@ the settling velocity from Stokes' law with slip correction.</p>
 <span class="sd">        - Slip correction and Knudsen number relations from:</span>
 <span class="sd">          Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric</span>
 <span class="sd">          Chemistry and Physics. Wiley-Interscience.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Step 1: Calculate the dynamic viscosity of the gas</span>
     <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
 
@@ -17153,10 +17153,10 @@ default is 100.</p>
 <span class="normal">395</span>
 <span class="normal">396</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;particle_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;fluid_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dynamic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"particle_radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"particle_density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"fluid_density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span>
+        <span class="s2">"dynamic_viscosity"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_particle_settling_velocity_with_drag</span><span class="p">(</span>
@@ -17171,7 +17171,7 @@ default is 100.</p>
     <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
     <span class="c1"># pylint: disable=too-many-arguments, too-many-locals, too-many-positional-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate terminal settling velocity with full drag model.</span>
+<span class="w">    </span><span class="sd">"""Calculate terminal settling velocity with full drag model.</span>
 
 <span class="sd">    For low Reynolds numbers (Re &lt; re_threshold), the Stokes settling velocity</span>
 <span class="sd">    (with slip correction) is used:</span>
@@ -17204,7 +17204,7 @@ default is 100.</p>
 <span class="sd">        - Terminal settling velocity (m/s). Scalar or NDArray.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example&quot;</span>
+<span class="sd">        ```py title="Example"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        r_array = np.array([1e-6, 5e-5, 2e-4])</span>
@@ -17220,11 +17220,11 @@ default is 100.</p>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Drag Coefficient,&quot; Wikipedia,</span>
+<span class="sd">        - "Drag Coefficient," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Drag_coefficient</span>
 <span class="sd">        - Seinfeld, J. H., &amp; Pandis, S. N. (2016). *Atmospheric Chemistry</span>
 <span class="sd">          and Physics*, 3rd ed., John Wiley &amp; Sons.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># --- Step 1: Broadcast inputs to matching shapes if arrays are passed. ---</span>
     <span class="p">(</span><span class="n">particle_radius_arr</span><span class="p">,</span> <span class="n">particle_density_arr</span><span class="p">,</span> <span class="n">slip_corr_arr</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">broadcast_arrays</span><span class="p">(</span>
@@ -17238,7 +17238,7 @@ default is 100.</p>
     <span class="c1"># --- Main loop: handle each element individually. ---</span>
     <span class="n">it</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span>
         <span class="p">[</span><span class="n">particle_radius_arr</span><span class="p">,</span> <span class="n">particle_density_arr</span><span class="p">,</span> <span class="n">slip_corr_arr</span><span class="p">],</span>
-        <span class="n">flags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;multi_index&quot;</span><span class="p">],</span>
+        <span class="n">flags</span><span class="o">=</span><span class="p">[</span><span class="s2">"multi_index"</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="k">while</span> <span class="ow">not</span> <span class="n">it</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span>
         <span class="n">radius</span> <span class="o">=</span> <span class="n">it</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>

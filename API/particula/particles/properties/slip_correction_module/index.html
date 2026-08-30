@@ -16134,15 +16134,15 @@ law. It is calculated using:</p>
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
-<span class="normal">42</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;knudsen_number&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="normal">42</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"knudsen_number"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_cunningham_slip_correction</span><span class="p">(</span>
     <span class="n">knudsen_number</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Cunningham slip correction factor for small particles in a</span>
+<span class="w">    </span><span class="sd">"""Calculate the Cunningham slip correction factor for small particles in a</span>
 <span class="sd">    fluid.</span>
 
 <span class="sd">    The slip correction factor (C_c) accounts for non-continuum effects on</span>
-<span class="sd">    small particles, correcting for the no-slip assumption used in Stokes&#39;</span>
+<span class="sd">    small particles, correcting for the no-slip assumption used in Stokes'</span>
 <span class="sd">    law. It is calculated using:</span>
 
 <span class="sd">    - C_c = 1 + Kn × (1.257 + 0.4 × exp(-1.1 / Kn))</span>
@@ -16155,16 +16155,16 @@ law. It is calculated using:</p>
 <span class="sd">        - Slip correction factor (dimensionless).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_cunningham_slip_correction(0.1)</span>
 <span class="sd">        # Output: ...</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Cunningham correction factor,&quot; Wikipedia,</span>
+<span class="sd">        - "Cunningham correction factor," Wikipedia,</span>
 <span class="sd">          https://en.wikipedia.org/wiki/Cunningham_correction_factor</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">knudsen_number</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.257</span> <span class="o">+</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.1</span> <span class="o">/</span> <span class="n">knudsen_number</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>

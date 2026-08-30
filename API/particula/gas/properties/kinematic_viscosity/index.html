@@ -16197,12 +16197,12 @@ by the fluid density (ρ).</p>
 <span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span>
-<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;dynamic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;fluid_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"dynamic_viscosity"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"fluid_density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kinematic_viscosity</span><span class="p">(</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the kinematic viscosity of a fluid.</span>
+<span class="w">    </span><span class="sd">"""Calculate the kinematic viscosity of a fluid.</span>
 
 <span class="sd">    The function calculates ν by dividing the dynamic viscosity (μ)</span>
 <span class="sd">    by the fluid density (ρ).</span>
@@ -16220,16 +16220,16 @@ by the fluid density (ρ).</p>
 <span class="sd">        - The kinematic viscosity [m²/s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example usage&quot;</span>
+<span class="sd">        ```py title="Example usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_kinematic_viscosity(1.8e-5, 1.2)</span>
 <span class="sd">        # Output: ~1.5e-5</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Viscosity Conversion Formula,&quot; Wolfram Formula Repository.</span>
+<span class="sd">        - "Viscosity Conversion Formula," Wolfram Formula Repository.</span>
 <span class="sd">          https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">dynamic_viscosity</span> <span class="o">/</span> <span class="n">fluid_density</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16387,14 +16387,14 @@ fluid_density to get the kinematic viscosity.</p>
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
-<span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;fluid_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"temperature"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">,</span> <span class="s2">"fluid_density"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kinematic_viscosity_via_system_state</span><span class="p">(</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">reference_viscosity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">REF_VISCOSITY_AIR_STP</span><span class="p">,</span>
     <span class="n">reference_temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">REF_TEMPERATURE_STP</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the kinematic viscosity of air by first computing its dynamic</span>
+<span class="w">    </span><span class="sd">"""Calculate the kinematic viscosity of air by first computing its dynamic</span>
 <span class="sd">    viscosity.</span>
 
 <span class="sd">    This function uses get_dynamic_viscosity(...) and divides by the given</span>
@@ -16420,16 +16420,16 @@ fluid_density to get the kinematic viscosity.</p>
 <span class="sd">        - The kinematic viscosity of air [m²/s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example usage&quot;</span>
+<span class="sd">        ```py title="Example usage"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.gas.get_kinematic_viscosity_via_system_state(300, 1.2)</span>
 <span class="sd">        # Output: ~1.5e-5</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Sutherland&#39;s Formula,&quot; Wolfram Formula Repository,</span>
+<span class="sd">        - "Sutherland's Formula," Wolfram Formula Repository,</span>
 <span class="sd">          https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">get_dynamic_viscosity</span><span class="p">(</span>
         <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
         <span class="n">reference_viscosity</span><span class="o">=</span><span class="n">reference_viscosity</span><span class="p">,</span>

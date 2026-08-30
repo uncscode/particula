@@ -16096,13 +16096,13 @@ A scalar input returns a 0-d <code>numpy.ndarray</code> for consistency.</li>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Scalar temperature</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.materials.surface_tension</span><span class="w"> </span><span class="kn">import</span>             <span class="n">get_surface_tension</span>
-<span class="n">get_surface_tension</span><span class="p">(</span><span class="s2">&quot;water&quot;</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span>
+<span class="n">get_surface_tension</span><span class="p">(</span><span class="s2">"water"</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span>
 <span class="c1"># Output: 0.072 (≈ N/m)</span>
 </code></pre></div>
 <div class="highlight"><span class="filename">Array temperature</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.materials.surface_tension</span><span class="w"> </span><span class="kn">import</span>             <span class="n">get_surface_tension</span>
 <span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">280.0</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">,</span> <span class="mf">320.0</span><span class="p">])</span>
-<span class="n">get_surface_tension</span><span class="p">(</span><span class="s2">&quot;water&quot;</span><span class="p">,</span> <span class="n">temps</span><span class="p">)</span>
+<span class="n">get_surface_tension</span><span class="p">(</span><span class="s2">"water"</span><span class="p">,</span> <span class="n">temps</span><span class="p">)</span>
 <span class="c1"># Output: array([0.076, 0.072, 0.065])</span>
 </code></pre></div>
 
@@ -16178,7 +16178,7 @@ A scalar input returns a 0-d <code>numpy.ndarray</code> for consistency.</li>
 <span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_chemical_surface_tension</span><span class="p">(</span>
     <span class="n">chemical_identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the surface tension of a pure chemical in N/m.</span>
+<span class="w">    </span><span class="sd">"""Calculate the surface tension of a pure chemical in N/m.</span>
 
 <span class="sd">    The calculation delegates to ``thermo.chemical.Chemical.SurfaceTension``,</span>
 <span class="sd">    evaluated at the requested temperature(s):</span>
@@ -16197,32 +16197,32 @@ A scalar input returns a 0-d <code>numpy.ndarray</code> for consistency.</li>
 <span class="sd">          A scalar input returns a 0-d ``numpy.ndarray`` for consistency.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Scalar temperature&quot;</span>
+<span class="sd">        ``` py title="Scalar temperature"</span>
 <span class="sd">        from particula.util.materials.surface_tension import \</span>
 <span class="sd">            get_surface_tension</span>
-<span class="sd">        get_surface_tension(&quot;water&quot;, 298.15)</span>
+<span class="sd">        get_surface_tension("water", 298.15)</span>
 <span class="sd">        # Output: 0.072 (≈ N/m)</span>
 <span class="sd">        ```</span>
 
-<span class="sd">        ``` py title=&quot;Array temperature&quot;</span>
+<span class="sd">        ``` py title="Array temperature"</span>
 <span class="sd">        import numpy as np</span>
 <span class="sd">        from particula.util.materials.surface_tension import \</span>
 <span class="sd">            get_surface_tension</span>
 <span class="sd">        temps = np.array([280.0, 298.15, 320.0])</span>
-<span class="sd">        get_surface_tension(&quot;water&quot;, temps)</span>
+<span class="sd">        get_surface_tension("water", temps)</span>
 <span class="sd">        # Output: array([0.076, 0.072, 0.065])</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        - &quot;Surface tension&quot;,</span>
+<span class="sd">        - "Surface tension",</span>
 <span class="sd">          [Wikipedia](https://en.wikipedia.org/wiki/Surface_tension)</span>
 <span class="sd">        - D. R. Lide, *CRC Handbook of Chemistry and Physics*, 90th ed.,</span>
 <span class="sd">          CRC Press, 2009.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">Chemical</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;The &#39;thermo&#39; package is required for vapor pressure calculations.&quot;</span>
-            <span class="s2">&quot;Please install it using &#39;pip install thermo&#39;.&quot;</span>
+            <span class="s2">"The 'thermo' package is required for vapor pressure calculations."</span>
+            <span class="s2">"Please install it using 'pip install thermo'."</span>
         <span class="p">)</span>
 
     <span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>

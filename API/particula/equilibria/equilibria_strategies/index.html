@@ -16225,10 +16225,10 @@ solid-liquid, or other phase equilibria problems.</p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">CustomEquilibria</span><span class="p">(</span><span class="n">EquilibriaStrategy</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="gp">... </span>        <span class="k">return</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;equilibrium_result&quot;</span><span class="p">]</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"equilibrium_result"</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span> <span class="o">=</span> <span class="n">CustomEquilibria</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strategy</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
-<span class="go">&#39;CustomEquilibria&#39;</span>
+<span class="go">'CustomEquilibria'</span>
 </code></pre></div>
 
 
@@ -16273,7 +16273,7 @@ solid-liquid, or other phase equilibria problems.</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">111</span>
 <span class="normal">112</span>
 <span class="normal">113</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a stable strategy identifier.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return a stable strategy identifier."""</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16409,7 +16409,7 @@ partition coefficients [-].</p>
     <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">partition_coefficient_guess</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EquilibriumResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solve for equilibrium state.</span>
+<span class="w">    </span><span class="sd">"""Solve for equilibrium state.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        c_star_j_dry: Dry saturation concentrations [µg/m³].</span>
@@ -16422,7 +16422,7 @@ partition coefficients [-].</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Structured equilibrium result.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16614,10 +16614,10 @@ condensed phases while exposing structured results.</p>
 <span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">water_activity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the strategy with the requested water activity.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Initialize the strategy with the requested water activity."""</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">water_activity</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;water_activity must be in [0, 1], got </span><span class="si">{</span><span class="n">water_activity</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"water_activity must be in [0, 1], got </span><span class="si">{</span><span class="n">water_activity</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">water_activity</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">water_activity</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16703,9 +16703,9 @@ condensed phases while exposing structured results.</p>
     <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">partition_coefficient_guess</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EquilibriumResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solve for equilibrium state using liquid-vapor partitioning.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Solve for equilibrium state using liquid-vapor partitioning."""</span>
     <span class="k">if</span> <span class="n">c_star_j_dry</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;input arrays must be non-empty&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"input arrays must be non-empty"</span><span class="p">)</span>
 
     <span class="n">gamma_organic_ab</span><span class="p">,</span> <span class="n">mass_fraction_water_ab</span><span class="p">,</span> <span class="n">q_ab</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">partitioning</span><span class="o">.</span><span class="n">get_properties_for_liquid_vapor_partitioning</span><span class="p">(</span>

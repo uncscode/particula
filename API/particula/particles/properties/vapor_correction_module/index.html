@@ -16167,15 +16167,15 @@ transport.</p>
 <span class="normal">61</span>
 <span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;knudsen_number&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mass_accommodation&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">"knudsen_number"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
+        <span class="s2">"mass_accommodation"</span><span class="p">:</span> <span class="s2">"nonnegative"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_vapor_transition_correction</span><span class="p">(</span>
     <span class="n">knudsen_number</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">mass_accommodation</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Fuchs–Sutugin vapor transition correction factor.</span>
+<span class="w">    </span><span class="sd">"""Calculate the Fuchs–Sutugin vapor transition correction factor.</span>
 
 <span class="sd">    This correction factor (f) accounts for the transition regime between free</span>
 <span class="sd">    molecular flow and continuum diffusion when computing mass or heat</span>
@@ -16195,7 +16195,7 @@ transport.</p>
 <span class="sd">        - Transition correction factor (float or NDArray[np.float64]).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``` py title=&quot;Example&quot;</span>
+<span class="sd">        ``` py title="Example"</span>
 <span class="sd">        import particula as par</span>
 <span class="sd">        par.particles.get_vapor_transition_correction(</span>
 <span class="sd">            knudsen_number=0.1, mass_accommodation=1.0</span>
@@ -16208,7 +16208,7 @@ transport.</p>
 <span class="sd">          and Physics, Ch. 12. Equation 12.43.</span>
 <span class="sd">        - Fuchs, N. A., &amp; Sutugin, A. G. (1971). *High-Dispersed Aerosols*.</span>
 <span class="sd">          In *Topics in Current Aerosol Research*, Elsevier, pp. 1–60.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="mf">0.75</span> <span class="o">*</span> <span class="n">mass_accommodation</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">knudsen_number</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span>
         <span class="p">(</span><span class="n">knudsen_number</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">knudsen_number</span><span class="p">)</span>
         <span class="o">+</span> <span class="mf">0.283</span> <span class="o">*</span> <span class="n">mass_accommodation</span> <span class="o">*</span> <span class="n">knudsen_number</span>

@@ -16161,7 +16161,7 @@
     <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">Union</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure distribution bins are sorted by increasing radius.</span>
+<span class="w">    </span><span class="sd">"""Ensure distribution bins are sorted by increasing radius.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - radius : The radii of the particles.</span>
@@ -16173,7 +16173,7 @@
 <span class="sd">        - distribution : The sorted distribution of particle sizes or masses.</span>
 <span class="sd">        - concentration : The sorted concentration of each particle size/mass.</span>
 <span class="sd">        - charge : The sorted charge of each particle size/mass.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
     <span class="n">is_sorted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">radius</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">is_sorted</span><span class="p">:</span>

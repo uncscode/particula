@@ -16040,7 +16040,7 @@
 
 
 <a href="#particula.util.lf2013_coagulation.lf2013_coag_full" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">lf2013_coag_full</span><span class="p">(</span><span class="n">ion_type</span><span class="o">=</span><span class="s1">&#39;air&#39;</span><span class="p">,</span> <span class="n">particle_type</span><span class="o">=</span><span class="s1">&#39;conductive&#39;</span><span class="p">,</span> <span class="n">temperature_val</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span> <span class="n">pressure_val</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span> <span class="n">charge_vals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">radius_vals</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">lf2013_coag_full</span><span class="p">(</span><span class="n">ion_type</span><span class="o">=</span><span class="s1">'air'</span><span class="p">,</span> <span class="n">particle_type</span><span class="o">=</span><span class="s1">'conductive'</span><span class="p">,</span> <span class="n">temperature_val</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span> <span class="n">pressure_val</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span> <span class="n">charge_vals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">radius_vals</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16134,43 +16134,43 @@
 <span class="normal">93</span>
 <span class="normal">94</span>
 <span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">lf2013_coag_full</span><span class="p">(</span>
-    <span class="n">ion_type</span><span class="o">=</span><span class="s2">&quot;air&quot;</span><span class="p">,</span>
-    <span class="n">particle_type</span><span class="o">=</span><span class="s2">&quot;conductive&quot;</span><span class="p">,</span>
+    <span class="n">ion_type</span><span class="o">=</span><span class="s2">"air"</span><span class="p">,</span>
+    <span class="n">particle_type</span><span class="o">=</span><span class="s2">"conductive"</span><span class="p">,</span>
     <span class="n">temperature_val</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
     <span class="n">pressure_val</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>
     <span class="n">charge_vals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">radius_vals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate ion--particle coagulation according to lf2013.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Calculate ion--particle coagulation according to lf2013."""</span>
     <span class="k">if</span> <span class="n">charge_vals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
         <span class="nb">max</span><span class="p">(</span><span class="n">charge_vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">100</span> <span class="ow">or</span> <span class="nb">min</span><span class="p">(</span><span class="n">charge_vals</span><span class="p">)</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">100</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;charge_vals must be between -100 and 100&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"charge_vals must be between -100 and 100"</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">ion_type</span> <span class="o">==</span> <span class="s2">&quot;air&quot;</span> <span class="ow">and</span> <span class="n">particle_type</span> <span class="o">==</span> <span class="s2">&quot;conductive&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">ion_type</span> <span class="o">==</span> <span class="s2">"air"</span> <span class="ow">and</span> <span class="n">particle_type</span> <span class="o">==</span> <span class="s2">"conductive"</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">temperature_val</span> <span class="o">==</span> <span class="mf">298.15</span> <span class="ow">and</span> <span class="n">pressure_val</span> <span class="o">==</span> <span class="mi">101325</span><span class="p">:</span>
-            <span class="n">negfn</span> <span class="o">=</span> <span class="s2">&quot;S1.txt&quot;</span>
-            <span class="n">posfn</span> <span class="o">=</span> <span class="s2">&quot;S2.txt&quot;</span>
+            <span class="n">negfn</span> <span class="o">=</span> <span class="s2">"S1.txt"</span>
+            <span class="n">posfn</span> <span class="o">=</span> <span class="s2">"S2.txt"</span>
         <span class="k">elif</span> <span class="n">temperature_val</span> <span class="o">==</span> <span class="mf">218.15</span> <span class="ow">and</span> <span class="n">pressure_val</span> <span class="o">==</span> <span class="mi">4480</span><span class="p">:</span>
-            <span class="n">negfn</span> <span class="o">=</span> <span class="s2">&quot;S7.txt&quot;</span>
-            <span class="n">posfn</span> <span class="o">=</span> <span class="s2">&quot;S8.txt&quot;</span>
+            <span class="n">negfn</span> <span class="o">=</span> <span class="s2">"S7.txt"</span>
+            <span class="n">posfn</span> <span class="o">=</span> <span class="s2">"S8.txt"</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid combination&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">ion_type</span> <span class="o">==</span> <span class="s2">&quot;water&quot;</span> <span class="ow">and</span> <span class="n">particle_type</span> <span class="o">==</span> <span class="s2">&quot;conductive&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid combination"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">ion_type</span> <span class="o">==</span> <span class="s2">"water"</span> <span class="ow">and</span> <span class="n">particle_type</span> <span class="o">==</span> <span class="s2">"conductive"</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">temperature_val</span> <span class="o">==</span> <span class="mf">298.15</span> <span class="ow">and</span> <span class="n">pressure_val</span> <span class="o">==</span> <span class="mi">101325</span><span class="p">:</span>
-            <span class="n">negfn</span> <span class="o">=</span> <span class="s2">&quot;S4.txt&quot;</span>
-            <span class="n">posfn</span> <span class="o">=</span> <span class="s2">&quot;S5.txt&quot;</span>
+            <span class="n">negfn</span> <span class="o">=</span> <span class="s2">"S4.txt"</span>
+            <span class="n">posfn</span> <span class="o">=</span> <span class="s2">"S5.txt"</span>
         <span class="k">elif</span> <span class="n">temperature_val</span> <span class="o">==</span> <span class="mf">218.15</span> <span class="ow">and</span> <span class="n">pressure_val</span> <span class="o">==</span> <span class="mi">4480</span><span class="p">:</span>
-            <span class="n">negfn</span> <span class="o">=</span> <span class="s2">&quot;S10.txt&quot;</span>
-            <span class="n">posfn</span> <span class="o">=</span> <span class="s2">&quot;S11.txt&quot;</span>
+            <span class="n">negfn</span> <span class="o">=</span> <span class="s2">"S10.txt"</span>
+            <span class="n">posfn</span> <span class="o">=</span> <span class="s2">"S11.txt"</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid combination&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">ion_type</span> <span class="o">==</span> <span class="s2">&quot;air&quot;</span> <span class="ow">and</span> <span class="n">particle_type</span> <span class="o">==</span> <span class="s2">&quot;polystyrene&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid combination"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">ion_type</span> <span class="o">==</span> <span class="s2">"air"</span> <span class="ow">and</span> <span class="n">particle_type</span> <span class="o">==</span> <span class="s2">"polystyrene"</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">temperature_val</span> <span class="o">!=</span> <span class="mf">298.15</span> <span class="ow">and</span> <span class="n">pressure_val</span> <span class="o">!=</span> <span class="mi">101325</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid combination&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid combination"</span><span class="p">)</span>
 
-        <span class="n">negfn</span> <span class="o">=</span> <span class="s2">&quot;S13.txt&quot;</span>
-        <span class="n">posfn</span> <span class="o">=</span> <span class="s2">&quot;S14.txt&quot;</span>
+        <span class="n">negfn</span> <span class="o">=</span> <span class="s2">"S13.txt"</span>
+        <span class="n">posfn</span> <span class="o">=</span> <span class="s2">"S14.txt"</span>
 
     <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
 
