@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import pytest
@@ -22,6 +23,10 @@ from particula.execution.graph_capture import (
     create_resident_graph_capture_signature,
     resolve_graph_capture_capability,
 )
+
+if TYPE_CHECKING:
+    from particula.execution.graph_capture import GraphCaptureRuntimeProbe
+    from particula.execution.resident_scheduler import ResidentSimulationRequest
 
 
 class RecordingProbe:
@@ -172,7 +177,9 @@ def test_resolve_capability_rejects_missing_probe_method_before_resolution() -> 
     with pytest.raises(
         TypeError, match="probe.runtime_available must be callable"
     ):
-        resolve_graph_capture_capability(Device(Backend.CPU, "cpu"), probe)
+        resolve_graph_capture_capability(
+            Device(Backend.CPU, "cpu"), cast("GraphCaptureRuntimeProbe", probe)
+        )
 
 
 @pytest.mark.warp
@@ -180,7 +187,7 @@ def test_resident_signature_accepts_real_request_by_identity(
     resident_request: object,
 ) -> None:
     """A real, unchanged resident request remains signature-compatible."""
-    request = resident_request
+    request = cast("ResidentSimulationRequest", resident_request)
     signature = create_resident_graph_capture_signature(request)
 
     compatible = compare_resident_graph_capture_signature(signature, request)
@@ -194,7 +201,7 @@ def test_signature_reports_schedule_order_after_real_request(
     resident_request: object,
 ) -> None:
     """Schedule-order replacement is reported after all earlier groups match."""
-    request = resident_request
+    request = cast("ResidentSimulationRequest", resident_request)
     signature = create_resident_graph_capture_signature(request)
     object.__setattr__(request.schedule, "ordered_node_ids", object())
 
@@ -232,7 +239,7 @@ def test_signature_reports_representative_real_request_drift(
     reason: GraphCaptureDriftReason,
 ) -> None:
     """Each structural group reports its documented representative drift."""
-    request = resident_request
+    request = cast("ResidentSimulationRequest", resident_request)
     signature = create_resident_graph_capture_signature(request)
     targets = {
         "particles": request.session.particles,
@@ -257,7 +264,7 @@ def test_signature_ignores_rng_words_when_rng_array_identity_is_stable(
     resident_request: object,
 ) -> None:
     """Changing words in a published RNG sidecar does not inspect payloads."""
-    request = resident_request
+    request = cast("ResidentSimulationRequest", resident_request)
     signature = create_resident_graph_capture_signature(request)
     rng_states = request.coagulation.resources.rng_states
     rng_states.assign(np.full(rng_states.shape, 13, dtype=np.uint32))
@@ -273,7 +280,7 @@ def test_signature_reports_rng_resource_after_resource_views(
     resident_request: object,
 ) -> None:
     """Replacing an RNG array reports its dedicated final drift group."""
-    request = resident_request
+    request = cast("ResidentSimulationRequest", resident_request)
     signature = create_resident_graph_capture_signature(request)
     object.__setattr__(request.coagulation.resources, "rng_states", object())
 
@@ -310,8 +317,9 @@ def test_signature_rejects_inexact_request_without_attribute_access(
 
 def test_signature_carrier_requires_exact_identity_metadata() -> None:
     """Signature carriers reject malformed field containers at construction."""
+    values: tuple[object, ...] = (object(),) * 14
     with pytest.raises(TypeError):
-        ResidentGraphCaptureSignature(*([object()] * 14))
+        ResidentGraphCaptureSignature(*values)  # type: ignore[arg-type]
 
 
 def test_capability_and_compatibility_are_identity_carriers() -> None:

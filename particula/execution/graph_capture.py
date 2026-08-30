@@ -12,9 +12,17 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol, cast
 
 from particula.execution import Backend, Device
+
+if TYPE_CHECKING:
+    from particula.execution.resident_scheduler import ResidentSimulationRequest
+    from particula.gpu.warp_types import (
+        WarpEnvironmentData,
+        WarpGasData,
+        WarpParticleData,
+    )
 
 
 class GraphCaptureAvailability(str, Enum):
@@ -229,11 +237,12 @@ def create_resident_graph_capture_signature(
     request_type = _resident_request_type()
     if type(request) is not request_type:
         raise TypeError("request must be an exact ResidentSimulationRequest.")
+    request = cast("ResidentSimulationRequest", request)
 
     session = request.session
-    particles = session.particles
-    gas = session.gas
-    environment = session.environment
+    particles = cast("WarpParticleData", session.particles)
+    gas = cast("WarpGasData", session.gas)
+    environment = cast("WarpEnvironmentData", session.environment)
     condensation = request.condensation
     coagulation = request.coagulation
     wall_loss = request.wall_loss
