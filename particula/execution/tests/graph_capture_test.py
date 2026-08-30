@@ -20,10 +20,20 @@ from particula.execution.graph_capture import (
     GraphCaptureCapability,
     GraphCaptureCompatibility,
     GraphCaptureDriftReason,
+    GraphCaptureFailureClassification,
+    GraphCaptureLifecycle,
+    GraphCaptureLifecycleState,
     ResidentGraphCaptureSignature,
+    classify_graph_capture_failure,
+    close_graph_capture,
     compare_resident_graph_capture_signature,
+    complete_graph_capture,
+    create_graph_capture_lifecycle,
     create_resident_graph_capture_signature,
+    invalidate_graph_capture,
+    renew_retired_graph_capture,
     resolve_graph_capture_capability,
+    retire_graph_capture,
 )
 
 if TYPE_CHECKING:
@@ -704,14 +714,452 @@ def test_graph_capture_names_remain_direct_import_only() -> None:
         "GraphCaptureDriftReason",
         "GraphCaptureCompatibility",
         "ResidentGraphCaptureSignature",
+        "GraphCaptureLifecycleState",
+        "GraphCaptureFailureClassification",
+        "GraphCaptureLifecycle",
         "resolve_graph_capture_capability",
         "create_resident_graph_capture_signature",
         "compare_resident_graph_capture_signature",
+        "create_graph_capture_lifecycle",
+        "complete_graph_capture",
+        "invalidate_graph_capture",
+        "classify_graph_capture_failure",
+        "retire_graph_capture",
+        "renew_retired_graph_capture",
+        "close_graph_capture",
     )
     for name in names:
         assert name not in execution.__all__
         assert not hasattr(execution, name)
         assert not hasattr(particula, name)
+
+
+def _available_lifecycle() -> GraphCaptureLifecycle:
+    """Create minimal host-only lifecycle metadata with an available capability."""
+    signature = ResidentGraphCaptureSignature(
+        object(),
+        object(),
+        object(),
+        object(),
+        (),
+        (),
+        (),
+        (),
+        (),
+        (),
+        (),
+        (),
+        (),
+        (),
+    )
+    return create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"), GraphCaptureAvailability.AVAILABLE
+        ),
+        signature,
+    )
+
+
+def test_lifecycle_successful_transitions_retain_p1_carrier_identities() -> (
+    None
+):
+    """Successful lifecycle successors retain immutable P1 metadata identities."""
+    ready = _available_lifecycle()
+    captured = complete_graph_capture(ready)
+    invalidated = invalidate_graph_capture(
+        captured,
+        GraphCaptureCompatibility(False, GraphCaptureDriftReason.REQUEST),
+    )
+    retired = retire_graph_capture(invalidated)
+    renewed = renew_retired_graph_capture(
+        retired, _available_lifecycle().signature
+    )
+    faulted = classify_graph_capture_failure(
+        captured, GraphCaptureFailureClassification.WRITER_MAY_HAVE_LAUNCHED
+    )
+
+    assert ready.state is GraphCaptureLifecycleState.READY
+    assert captured.state is GraphCaptureLifecycleState.CAPTURED
+    assert invalidated.state is GraphCaptureLifecycleState.INVALIDATED
+    assert retired.state is GraphCaptureLifecycleState.RETIRED
+    assert renewed.state is GraphCaptureLifecycleState.READY
+    assert faulted.state is GraphCaptureLifecycleState.FAULTED
+    for successor in (captured, invalidated, retired, faulted):
+        assert successor.capability is ready.capability
+        assert successor.signature is ready.signature
+    assert renewed.capability is retired.capability
+    assert renewed.signature is not retired.signature
+    assert renewed.first_invalidation_reason is None
+    assert retired.first_invalidation_reason is GraphCaptureDriftReason.REQUEST
+
+
+@pytest.mark.parametrize(
+    "availability",
+    [
+        GraphCaptureAvailability.UNSUPPORTED_CPU,
+        GraphCaptureAvailability.UNSUPPORTED_WARP_CPU,
+        GraphCaptureAvailability.UNAVAILABLE_RUNTIME,
+        GraphCaptureAvailability.UNAVAILABLE_DEVICE,
+        GraphCaptureAvailability.UNSUPPORTED_API,
+    ],
+)
+def test_create_lifecycle_rejects_nonavailable_capability(
+    availability: GraphCaptureAvailability,
+) -> None:
+    """Only an exact available capability can start a lifecycle."""
+    lifecycle = _available_lifecycle()
+    capability = GraphCaptureCapability(
+        Device(Backend.WARP, "cuda:0"), availability
+    )
+
+    with pytest.raises(ValueError, match="available"):
+        create_graph_capture_lifecycle(capability, lifecycle.signature)
+
+
+@pytest.mark.parametrize(
+    ("state", "reason", "exception"),
+    [
+        (
+            GraphCaptureLifecycleState.READY,
+            GraphCaptureDriftReason.REQUEST,
+            ValueError,
+        ),
+        (
+            GraphCaptureLifecycleState.CAPTURED,
+            GraphCaptureDriftReason.REQUEST,
+            ValueError,
+        ),
+        (GraphCaptureLifecycleState.INVALIDATED, None, ValueError),
+        (GraphCaptureLifecycleState.FAULTED, None, None),
+        (
+            GraphCaptureLifecycleState.RETIRED,
+            GraphCaptureDriftReason.REQUEST,
+            None,
+        ),
+        (GraphCaptureLifecycleState.CLOSED, None, None),
+    ],
+)
+def test_lifecycle_reason_state_invariants(
+    state: GraphCaptureLifecycleState,
+    reason: GraphCaptureDriftReason | None,
+    exception: type[Exception] | None,
+) -> None:
+    """Lifecycle construction accepts only documented reason-state combinations."""
+    lifecycle = _available_lifecycle()
+    if exception is None:
+        result = GraphCaptureLifecycle(
+            lifecycle.capability, lifecycle.signature, state, reason
+        )
+        assert result.state is state
+    else:
+        with pytest.raises(exception):
+            GraphCaptureLifecycle(
+                lifecycle.capability, lifecycle.signature, state, reason
+            )
+
+
+def test_invalidation_and_failure_paths_preserve_first_reason_and_identity() -> (
+    None
+):
+    """Compatible and repeated paths preserve captured metadata by identity."""
+    captured = complete_graph_capture(_available_lifecycle())
+    assert (
+        invalidate_graph_capture(
+            captured, GraphCaptureCompatibility(True, None)
+        )
+        is captured
+    )
+    invalidated = invalidate_graph_capture(
+        captured,
+        GraphCaptureCompatibility(False, GraphCaptureDriftReason.REQUEST),
+    )
+    repeated = invalidate_graph_capture(
+        invalidated,
+        GraphCaptureCompatibility(False, GraphCaptureDriftReason.SESSION),
+    )
+    assert repeated is invalidated
+    assert repeated.first_invalidation_reason is GraphCaptureDriftReason.REQUEST
+    assert (
+        invalidate_graph_capture(
+            invalidated, GraphCaptureCompatibility(True, None)
+        )
+        is invalidated
+    )
+    assert (
+        classify_graph_capture_failure(
+            invalidated, GraphCaptureFailureClassification.READ_ONLY
+        )
+        is invalidated
+    )
+    faulted = classify_graph_capture_failure(
+        invalidated, GraphCaptureFailureClassification.WRITER_MAY_HAVE_LAUNCHED
+    )
+    assert faulted.first_invalidation_reason is GraphCaptureDriftReason.REQUEST
+    for classification in GraphCaptureFailureClassification:
+        assert (
+            classify_graph_capture_failure(faulted, classification) is faulted
+        )
+
+
+@pytest.mark.parametrize(
+    ("state", "reason"),
+    [
+        (GraphCaptureLifecycleState.READY, None),
+        (GraphCaptureLifecycleState.CAPTURED, None),
+        (
+            GraphCaptureLifecycleState.INVALIDATED,
+            GraphCaptureDriftReason.REQUEST,
+        ),
+    ],
+)
+def test_read_only_failure_is_an_identity_no_op_from_every_open_state(
+    state: GraphCaptureLifecycleState,
+    reason: GraphCaptureDriftReason | None,
+) -> None:
+    """Read-only failures preserve every accepted pre-failure lifecycle."""
+    base = _available_lifecycle()
+    lifecycle = GraphCaptureLifecycle(
+        base.capability,
+        base.signature,
+        state,
+        reason,
+    )
+
+    result = classify_graph_capture_failure(
+        lifecycle,
+        GraphCaptureFailureClassification.READ_ONLY,
+    )
+
+    assert result is lifecycle
+
+
+def test_writer_failure_faults_ready_lifecycle_without_a_reason() -> None:
+    """Writer-capable failure faults ready metadata without inventing drift."""
+    ready = _available_lifecycle()
+
+    faulted = classify_graph_capture_failure(
+        ready,
+        GraphCaptureFailureClassification.WRITER_MAY_HAVE_LAUNCHED,
+    )
+
+    assert faulted is not ready
+    assert faulted.state is GraphCaptureLifecycleState.FAULTED
+    assert faulted.first_invalidation_reason is None
+    assert faulted.capability is ready.capability
+    assert faulted.signature is ready.signature
+
+
+@pytest.mark.parametrize(
+    "state",
+    [
+        GraphCaptureLifecycleState.READY,
+        GraphCaptureLifecycleState.CAPTURED,
+        GraphCaptureLifecycleState.INVALIDATED,
+        GraphCaptureLifecycleState.FAULTED,
+        GraphCaptureLifecycleState.RETIRED,
+        GraphCaptureLifecycleState.CLOSED,
+    ],
+)
+def test_close_transitions_every_open_state_and_is_idempotent(
+    state: GraphCaptureLifecycleState,
+) -> None:
+    """Close accepts every lifecycle state and preserves retained reason metadata."""
+    base = _available_lifecycle()
+    reason = (
+        GraphCaptureDriftReason.REQUEST
+        if state
+        in (
+            GraphCaptureLifecycleState.INVALIDATED,
+            GraphCaptureLifecycleState.FAULTED,
+            GraphCaptureLifecycleState.RETIRED,
+        )
+        else None
+    )
+    lifecycle = GraphCaptureLifecycle(
+        base.capability, base.signature, state, reason
+    )
+    closed = close_graph_capture(lifecycle)
+
+    assert closed.state is GraphCaptureLifecycleState.CLOSED
+    assert closed.first_invalidation_reason is reason
+    assert close_graph_capture(closed) is closed
+
+
+@pytest.mark.parametrize(
+    ("operation", "states"),
+    [
+        (
+            "complete",
+            ("captured", "invalidated", "faulted", "retired", "closed"),
+        ),
+        ("invalidate", ("ready", "faulted", "retired", "closed")),
+        ("classify", ("retired", "closed")),
+        ("retire", ("ready", "captured", "faulted", "closed")),
+        ("renew", ("ready", "captured", "invalidated", "faulted", "closed")),
+    ],
+)
+def test_lifecycle_operations_reject_illegal_source_states(
+    operation: str, states: tuple[str, ...]
+) -> None:
+    """Each transition operation rejects every source state outside its table."""
+    base = _available_lifecycle()
+    for state_name in states:
+        state = GraphCaptureLifecycleState(state_name)
+        reason = (
+            GraphCaptureDriftReason.REQUEST
+            if state
+            in (
+                GraphCaptureLifecycleState.INVALIDATED,
+                GraphCaptureLifecycleState.FAULTED,
+                GraphCaptureLifecycleState.RETIRED,
+            )
+            else None
+        )
+        lifecycle = GraphCaptureLifecycle(
+            base.capability, base.signature, state, reason
+        )
+        with pytest.raises(ValueError):
+            if operation == "complete":
+                complete_graph_capture(lifecycle)
+            elif operation == "invalidate":
+                invalidate_graph_capture(
+                    lifecycle, GraphCaptureCompatibility(True, None)
+                )
+            elif operation == "classify":
+                classify_graph_capture_failure(
+                    lifecycle, GraphCaptureFailureClassification.READ_ONLY
+                )
+            elif operation == "retire":
+                retire_graph_capture(lifecycle)
+            else:
+                renew_retired_graph_capture(lifecycle, base.signature)
+
+
+def test_lifecycle_operations_reject_inexact_carriers_before_attribute_access() -> (
+    None
+):
+    """Every lifecycle operation rejects inexact inputs without attribute reads."""
+
+    class AttributeTrap:
+        """Fail if a rejected carrier attribute is read."""
+
+        def __getattribute__(self, name: str) -> object:
+            raise AssertionError(f"unexpected attribute access: {name}")
+
+    lifecycle = _available_lifecycle()
+    with pytest.raises(TypeError):
+        create_graph_capture_lifecycle(
+            cast(GraphCaptureCapability, AttributeTrap()), lifecycle.signature
+        )
+    with pytest.raises(TypeError):
+        create_graph_capture_lifecycle(
+            lifecycle.capability,
+            cast(ResidentGraphCaptureSignature, AttributeTrap()),
+        )
+    with pytest.raises(TypeError):
+        complete_graph_capture(cast(GraphCaptureLifecycle, AttributeTrap()))
+    with pytest.raises(TypeError):
+        invalidate_graph_capture(
+            cast(GraphCaptureLifecycle, AttributeTrap()),
+            GraphCaptureCompatibility(True, None),
+        )
+    with pytest.raises(TypeError):
+        invalidate_graph_capture(
+            lifecycle, cast(GraphCaptureCompatibility, AttributeTrap())
+        )
+    with pytest.raises(TypeError):
+        classify_graph_capture_failure(
+            lifecycle, cast(GraphCaptureFailureClassification, AttributeTrap())
+        )
+    with pytest.raises(TypeError):
+        renew_retired_graph_capture(
+            cast(GraphCaptureLifecycle, AttributeTrap()), lifecycle.signature
+        )
+    with pytest.raises(TypeError):
+        renew_retired_graph_capture(
+            lifecycle, cast(ResidentGraphCaptureSignature, AttributeTrap())
+        )
+    with pytest.raises(TypeError):
+        close_graph_capture(cast(GraphCaptureLifecycle, AttributeTrap()))
+
+
+@pytest.mark.parametrize(
+    "field_values",
+    [
+        (
+            object(),
+            _available_lifecycle().signature,
+            GraphCaptureLifecycleState.READY,
+            None,
+        ),
+        (
+            _available_lifecycle().capability,
+            object(),
+            GraphCaptureLifecycleState.READY,
+            None,
+        ),
+        (
+            _available_lifecycle().capability,
+            _available_lifecycle().signature,
+            "ready",
+            None,
+        ),
+        (
+            _available_lifecycle().capability,
+            _available_lifecycle().signature,
+            GraphCaptureLifecycleState.READY,
+            "request",
+        ),
+    ],
+)
+def test_lifecycle_carrier_rejects_inexact_fields(
+    field_values: tuple[object, object, object, object],
+) -> None:
+    """Lifecycle construction requires exact carriers and enumerations."""
+    with pytest.raises(TypeError):
+        GraphCaptureLifecycle(*field_values)  # type: ignore[arg-type]
+
+
+def test_lifecycle_sequence_does_not_import_warp_or_resident_boundaries() -> (
+    None
+):
+    """Legal host metadata transitions retain the declaration-only import boundary."""
+    script = textwrap.dedent(
+        """
+        import builtins
+        import importlib
+        import sys
+
+        blocked = ("warp", "particula.gpu", "particula.execution.gpu_session",
+                   "particula.execution.gpu_resources",
+                   "particula.execution.resident_scheduler")
+        original_import = builtins.__import__
+        def guarded_import(name, *args, **kwargs):
+            if any(name == item or name.startswith(item + ".") for item in blocked):
+                raise AssertionError(f"forbidden import: {name}")
+            return original_import(name, *args, **kwargs)
+        builtins.__import__ = guarded_import
+        module = importlib.import_module("particula.execution.graph_capture")
+        from particula.execution import Backend, Device
+        signature = module.ResidentGraphCaptureSignature(*((object(),) * 4), *(((),) * 10))
+        capability = module.GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"), module.GraphCaptureAvailability.AVAILABLE)
+        ready = module.create_graph_capture_lifecycle(capability, signature)
+        captured = module.complete_graph_capture(ready)
+        invalidated = module.invalidate_graph_capture(
+            captured, module.GraphCaptureCompatibility(False, module.GraphCaptureDriftReason.REQUEST))
+        assert module.retire_graph_capture(invalidated).state is module.GraphCaptureLifecycleState.RETIRED
+        assert all(name not in sys.modules for name in blocked)
+        """
+    )
+    result = subprocess.run(  # noqa: S603
+        [sys.executable, "-c", script],
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
 
 
 def test_graph_capture_import_does_not_import_warp() -> None:

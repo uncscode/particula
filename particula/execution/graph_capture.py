@@ -521,3 +521,253 @@ def compare_resident_graph_capture_signature(
         ):
             return GraphCaptureCompatibility(False, reason)
     return GraphCaptureCompatibility(True, None)
+
+
+class GraphCaptureLifecycleState(str, Enum):
+    """Enumerate host-side graph-capture lifecycle declarations."""
+
+    READY = "ready"
+    CAPTURED = "captured"
+    INVALIDATED = "invalidated"
+    FAULTED = "faulted"
+    RETIRED = "retired"
+    CLOSED = "closed"
+
+
+class GraphCaptureFailureClassification(str, Enum):
+    """Classify whether a graph-capture failure may follow a writer launch."""
+
+    READ_ONLY = "read_only"
+    WRITER_MAY_HAVE_LAUNCHED = "writer_may_have_launched"
+
+
+@dataclass(frozen=True, eq=False)
+class GraphCaptureLifecycle:
+    """Retain immutable host metadata for one graph-capture lifecycle.
+
+    Attributes:
+        capability: Exact available graph-capture capability declaration.
+        signature: Exact resident graph-capture identity signature.
+        state: Current lifecycle declaration.
+        first_invalidation_reason: First structural drift reason, if recorded.
+    """
+
+    capability: GraphCaptureCapability
+    signature: ResidentGraphCaptureSignature
+    state: GraphCaptureLifecycleState
+    first_invalidation_reason: GraphCaptureDriftReason | None
+
+    def __post_init__(self) -> None:
+        """Validate exact lifecycle metadata and reason-state invariants."""
+        if type(self.capability) is not GraphCaptureCapability:
+            raise TypeError(
+                "capability must be an exact GraphCaptureCapability."
+            )
+        if type(self.signature) is not ResidentGraphCaptureSignature:
+            raise TypeError(
+                "signature must be an exact ResidentGraphCaptureSignature."
+            )
+        if type(self.state) is not GraphCaptureLifecycleState:
+            raise TypeError(
+                "state must be an exact GraphCaptureLifecycleState."
+            )
+        if (
+            self.first_invalidation_reason is not None
+            and type(self.first_invalidation_reason)
+            is not GraphCaptureDriftReason
+        ):
+            raise TypeError(
+                "first_invalidation_reason must be an exact "
+                "GraphCaptureDriftReason or None."
+            )
+        if (
+            self.state
+            in (
+                GraphCaptureLifecycleState.READY,
+                GraphCaptureLifecycleState.CAPTURED,
+            )
+            and self.first_invalidation_reason is not None
+        ):
+            raise ValueError("ready and captured lifecycles require no reason.")
+        if (
+            self.state is GraphCaptureLifecycleState.INVALIDATED
+            and self.first_invalidation_reason is None
+        ):
+            raise ValueError("invalidated lifecycles require a reason.")
+
+
+def _require_lifecycle(lifecycle: object) -> GraphCaptureLifecycle:
+    """Require an exact lifecycle record before accessing its metadata."""
+    if type(lifecycle) is not GraphCaptureLifecycle:
+        raise TypeError("lifecycle must be an exact GraphCaptureLifecycle.")
+    return lifecycle
+
+
+def _lifecycle_successor(
+    lifecycle: GraphCaptureLifecycle,
+    state: GraphCaptureLifecycleState,
+    reason: GraphCaptureDriftReason | None,
+) -> GraphCaptureLifecycle:
+    """Create a successor retaining P1 capability and signature identities."""
+    return GraphCaptureLifecycle(
+        capability=lifecycle.capability,
+        signature=lifecycle.signature,
+        state=state,
+        first_invalidation_reason=reason,
+    )
+
+
+def create_graph_capture_lifecycle(
+    capability: GraphCaptureCapability,
+    signature: ResidentGraphCaptureSignature,
+) -> GraphCaptureLifecycle:
+    """Create ready host metadata without capturing or acting on a session.
+
+    This declaration-only operation does not import Warp, allocate a graph, or
+    validate or mutate a resident binding.
+
+    Raises:
+        TypeError: If either P1 carrier is inexact.
+        ValueError: If graph capture is not available.
+    """
+    if type(capability) is not GraphCaptureCapability:
+        raise TypeError("capability must be an exact GraphCaptureCapability.")
+    if type(signature) is not ResidentGraphCaptureSignature:
+        raise TypeError(
+            "signature must be an exact ResidentGraphCaptureSignature."
+        )
+    if capability.availability is not GraphCaptureAvailability.AVAILABLE:
+        raise ValueError("capability must declare graph capture as available.")
+    return GraphCaptureLifecycle(
+        capability=capability,
+        signature=signature,
+        state=GraphCaptureLifecycleState.READY,
+        first_invalidation_reason=None,
+    )
+
+
+def complete_graph_capture(
+    lifecycle: GraphCaptureLifecycle,
+) -> GraphCaptureLifecycle:
+    """Declare capture completion without native or resident-session work."""
+    lifecycle = _require_lifecycle(lifecycle)
+    if lifecycle.state is not GraphCaptureLifecycleState.READY:
+        raise ValueError("graph capture can complete only from ready.")
+    return _lifecycle_successor(
+        lifecycle,
+        GraphCaptureLifecycleState.CAPTURED,
+        None,
+    )
+
+
+def invalidate_graph_capture(
+    lifecycle: GraphCaptureLifecycle,
+    compatibility: GraphCaptureCompatibility,
+) -> GraphCaptureLifecycle:
+    """Record structural invalidation host metadata without comparing requests.
+
+    This operation neither imports Warp nor acts on a resident session.
+    """
+    lifecycle = _require_lifecycle(lifecycle)
+    if type(compatibility) is not GraphCaptureCompatibility:
+        raise TypeError(
+            "compatibility must be an exact GraphCaptureCompatibility."
+        )
+    if lifecycle.state not in (
+        GraphCaptureLifecycleState.CAPTURED,
+        GraphCaptureLifecycleState.INVALIDATED,
+    ):
+        raise ValueError("graph capture can invalidate only from captured.")
+    if (
+        compatibility.compatible
+        or lifecycle.state is GraphCaptureLifecycleState.INVALIDATED
+    ):
+        return lifecycle
+    return _lifecycle_successor(
+        lifecycle,
+        GraphCaptureLifecycleState.INVALIDATED,
+        compatibility.reason,
+    )
+
+
+def classify_graph_capture_failure(
+    lifecycle: GraphCaptureLifecycle,
+    classification: GraphCaptureFailureClassification,
+) -> GraphCaptureLifecycle:
+    """Classify host failure metadata without executing a resident operation.
+
+    This declaration-only operation does not import Warp or act on a resident
+    session.
+    """
+    lifecycle = _require_lifecycle(lifecycle)
+    if type(classification) is not GraphCaptureFailureClassification:
+        raise TypeError(
+            "classification must be an exact GraphCaptureFailureClassification."
+        )
+    if lifecycle.state in (
+        GraphCaptureLifecycleState.RETIRED,
+        GraphCaptureLifecycleState.CLOSED,
+    ):
+        raise ValueError(
+            "graph capture failure cannot be classified from terminal state."
+        )
+    if (
+        classification is GraphCaptureFailureClassification.READ_ONLY
+        or lifecycle.state is GraphCaptureLifecycleState.FAULTED
+    ):
+        return lifecycle
+    return _lifecycle_successor(
+        lifecycle,
+        GraphCaptureLifecycleState.FAULTED,
+        lifecycle.first_invalidation_reason,
+    )
+
+
+def retire_graph_capture(
+    lifecycle: GraphCaptureLifecycle,
+) -> GraphCaptureLifecycle:
+    """Retire invalidated host metadata without native graph or session work."""
+    lifecycle = _require_lifecycle(lifecycle)
+    if lifecycle.state is GraphCaptureLifecycleState.RETIRED:
+        return lifecycle
+    if lifecycle.state is not GraphCaptureLifecycleState.INVALIDATED:
+        raise ValueError("graph capture can retire only from invalidated.")
+    return _lifecycle_successor(
+        lifecycle,
+        GraphCaptureLifecycleState.RETIRED,
+        lifecycle.first_invalidation_reason,
+    )
+
+
+def renew_retired_graph_capture(
+    lifecycle: GraphCaptureLifecycle,
+    signature: ResidentGraphCaptureSignature,
+) -> GraphCaptureLifecycle:
+    """Prepare ready host metadata without recapture or session work."""
+    lifecycle = _require_lifecycle(lifecycle)
+    if type(signature) is not ResidentGraphCaptureSignature:
+        raise TypeError(
+            "signature must be an exact ResidentGraphCaptureSignature."
+        )
+    if lifecycle.state is not GraphCaptureLifecycleState.RETIRED:
+        raise ValueError("graph capture can renew only from retired.")
+    return GraphCaptureLifecycle(
+        capability=lifecycle.capability,
+        signature=signature,
+        state=GraphCaptureLifecycleState.READY,
+        first_invalidation_reason=None,
+    )
+
+
+def close_graph_capture(
+    lifecycle: GraphCaptureLifecycle,
+) -> GraphCaptureLifecycle:
+    """Close host metadata without releasing native resources or a session."""
+    lifecycle = _require_lifecycle(lifecycle)
+    if lifecycle.state is GraphCaptureLifecycleState.CLOSED:
+        return lifecycle
+    return _lifecycle_successor(
+        lifecycle,
+        GraphCaptureLifecycleState.CLOSED,
+        lifecycle.first_invalidation_reason,
+    )
