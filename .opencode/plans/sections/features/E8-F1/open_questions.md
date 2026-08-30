@@ -55,18 +55,21 @@
       values already stored in bound device arrays can vary without preparation.
   - Resolved by: plan-question-resolver
 
-- [ ] Does Warp provide a stable public API to explicitly destroy a graph
+- [x] Does Warp provide a stable public API to explicitly destroy a graph
   handle across all supported versions?
-  - Open: The repository uses an unbounded Warp dependency and verifies only
-    capture begin, end, and launch; it establishes no cross-version destroy API.
-  - Recommendation: **A - Retire the owner and use native destroy only when a qualified public API exists**
-  - Suggested answer: Choose **A** because Particula can guarantee replay
-    rejection without calling private or undocumented Warp internals.
+  - Resolved 2026-08-30: Retire the Particula Python owner on every teardown and
+    call native release only when the active Warp version exposes a documented,
+    qualified public operation.
+  - Rationale: Particula can guarantee lifecycle invalidation and replay
+    rejection without relying on private Warp internals. A qualified public
+    release may improve native cleanup without making one undocumented operation
+    a cross-version requirement.
   - Options:
-    - [ ] A. Retire the owner and use native destroy only when a qualified public API exists (Recommended)
+    - [x] A. Retire the owner and use native destroy only when a qualified public API exists (Selected)
     - [ ] B. Pin a Warp version with a verified public destroy API and require it
     - [ ] C. Require reference retirement only and never call native teardown
-  - Evidence considered:
+  - Evidence:
     - `particula/gpu/kernels/tests/condensation_graph_capture_test.py:186` - The
       tested public surface contains only capture begin, end, and launch.
     - `pyproject.toml:24` - The Warp dependency has no repository version bound.
+  - Resolved by: user decision

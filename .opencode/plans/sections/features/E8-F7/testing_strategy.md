@@ -17,7 +17,13 @@ assertion thresholds.
 - **P3:** Parser tests use checked-in bounded text/JSON fixtures for supported
   profiler exports. Cover unit conversion, duplicate invocations, unattributed
   kernels, missing counters, unsupported versions, bounded errors, and stable
-  aggregation. An opt-in command may pass or cleanly report unavailable.
+  aggregation. Process-runner tests mock `nsys` and `ncu` and cover argument
+  vectors, `shell=False`, version probes, timeouts, exit status, bounded output,
+  and safe export paths. A separate opt-in smoke test invokes both installed
+  binaries around one bounded CUDA workload, exports real reports, and passes
+  those reports through the production parser. It may pass or report explicit
+  unavailable evidence; a schema or parser mismatch for the selected installed
+  versions is a failure.
 - **P4:** Unit tests cover contribution reconciliation, deterministic ranking,
   ties, low-confidence/missing evidence, machine-bound wording, and rejection
   of recommendations that alter scientific or ownership contracts.
@@ -38,12 +44,15 @@ pytest particula/gpu/tests/profiling_support_test.py \
   particula/gpu/tests/benchmark_helpers_test.py -q
 pytest particula/gpu/tests/benchmark_test.py --benchmark \
   -k "resident and (launch or profile)" -v -s
+pytest particula/gpu/tests/profiling_smoke_test.py --benchmark \
+  -m "warp and cuda" -q -Werror
 ```
 
-The second command is CUDA-only and may pass or cleanly skip. A skip is not a
-measurement and must remain an unavailable artifact row. It must never route to
-Warp CPU. Vendor profiler commands run separately and record literal output;
-their overhead-tainted timings are not benchmark thresholds.
+The second and third commands are CUDA-only and may pass or cleanly report an
+unavailable prerequisite. A skip is not a measurement and must remain an
+unavailable artifact row. Neither command may route to Warp CPU. The smoke test
+runs vendor profilers only to verify executable, export, and parser integration;
+its overhead-tainted timings are not benchmark thresholds.
 
 ## Coverage and Final Validation
 

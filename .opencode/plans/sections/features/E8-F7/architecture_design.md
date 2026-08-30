@@ -41,11 +41,21 @@ E8-F5 fixture + E8-F6 matrix + qualified CUDA device
   recommendation provenance. Durations use integer nanoseconds where possible;
   percentages are derived, never primary evidence.
 - **Artifact model:** Keep normalized JSON under `.artifacts/benchmarks` and
-  reference external profiler exports by safe relative filename plus checksum.
-  Do not commit bulky binary reports or absolute local paths.
+  stage uncommitted raw profiler exports only under the gitignored
+  `.artifacts/benchmarks/profiling/raw/` subtree. Reference local raw exports by
+  safe relative filename, byte size, and SHA-256 checksum. Do not upload or
+  commit bulky binary reports or absolute local paths; document that committed
+  summaries cannot provide shared full-report inspection.
 - **API surface:** No package or top-level export. Extend only opt-in pytest
   benchmark/profiling support and documented external commands. `--benchmark`
   remains the sole collection-affecting switch.
+- **Process boundary:** Python test-support orchestration invokes `nsys` and
+  `ncu` as optional external executables with explicit argument vectors,
+  `shell=False`, bounded timeouts, captured exit status, and bounded stdout and
+  stderr. It records literal version output before collection, writes exports
+  only beneath the controlled artifact root, and parses only the selected
+  machine-readable schemas. Default tests mock process execution or parse
+  checked-in fixtures; they never launch a profiler or require CUDA.
 - **Workflow hooks:** Consume E8-F3 resource identities, E8-F4 captured replay,
   E8-F5 validated fixtures, and E8-F6 scaling/timing/memory artifacts. Feed
   bounded findings to Epic H documentation and explicitly created follow-ups.
@@ -56,10 +66,13 @@ E8-F5 fixture + E8-F6 matrix + qualified CUDA device
 
 ## Security & Compliance
 
-The workflow requires no network, credential, permission, or public API change.
+The workflow requires no network, credential, or public API change. Real
+profiling may require NVIDIA driver permission for hardware counters; failure
+records unavailable evidence rather than changing host permissions.
 Metadata is allow-listed and must omit environment secrets, usernames, absolute
 paths, device pointers, array payloads, RNG words, and unbounded exception text.
 Artifact paths reject traversal and symlink escape. External commands are
-documented for a human operator and never shell-expand values from artifacts.
+constructed from allow-listed arguments and never shell-expand values from
+artifacts.
 Missing CUDA, permissions, profiler binaries, counters, or compatible metrics
 produces explicit unavailable evidence and no CPU fallback.

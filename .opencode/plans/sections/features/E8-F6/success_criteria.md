@@ -13,9 +13,14 @@
 - [ ] The memory model accounts separately for primary state, inactive fixed
   slots, E8-F3 reusable resources, diagnostics, communication, checkpoints, and
   projected autodiff tape without double counting.
+- [ ] Full-retention and checkpoint-interval tape scenarios use documented
+  symbolic inputs and formulas and are never labeled measured or complete Epic I
+  tape storage.
 - [ ] Analytical logical bytes are compared with observed peak device-memory
-  deltas for representative executed rows; probe method and unexplained delta
-  are retained and allocator equality is not claimed.
+  deltas for representative executed rows only when a documented allocator API
+  is version-qualified with sufficient coverage; otherwise observed peaks are
+  explicitly unavailable. Probe method, coverage, and unexplained delta are
+  retained and allocator equality is not claimed.
 - [ ] Sizing is deterministic and overflow-safe, and identical case/resource
   inputs produce byte-identical normalized evidence aside from timestamps and
   raw measured values.

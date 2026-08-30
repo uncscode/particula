@@ -18,11 +18,19 @@
 ## Closeout and Roadmap
 
 - [ ] Inventory executable modules changed by E8-F1--E8-F7 from implementation
-  records and the final diff; derive coverage targets before running commands.
+  records and the final diff; freeze the complete production-module target list
+  before running commands and exclude documentation-only and test files.
 - [ ] Record date, commit, Warp availability, qualified devices, Python/Warp/
   driver/runtime versions, commands, literal output, and artifact checksums.
+- [ ] Designate one qualified CUDA device for the closeout gate and require every
+  required capture, correctness, benchmark, memory, and profiler row on that
+  exact device and final revision. Keep additional device rows supplemental
+  unless explicitly promoted to required.
 - [ ] Link correctness, scaling, memory, launch-overhead, and profiling evidence
   to each E8 success metric; record unavailable evidence rather than omitting it.
+- [ ] Accept only committed normalized E8-F6/E8-F7 artifacts whose schema,
+  source revision, workload IDs, provenance, and SHA-256 match the closeout
+  manifest; reject latest-path selection and manually copied summary values.
 - [ ] Create `docs/Features/Roadmap/graph-capture-closeout.md` and leave status
   unshipped whenever any required row is failed, unavailable, or stale.
 - [ ] Reconcile E8 parent child labels with the orchestrator assignment: E8-F7

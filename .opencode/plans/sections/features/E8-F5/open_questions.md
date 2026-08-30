@@ -28,21 +28,28 @@
       independent state and amount equations for composed resident behavior.
   - Resolved by: plan-question-resolver
 
-- [ ] What qualified CUDA devices will provide literal captured evidence?
-  - Open: Device qualification depends on runtime availability and successful
-    capture/replay; historical hardware records do not qualify the current run.
-  - Recommendation: **A - Qualify every available CUDA device at runtime and record literal metadata**
-  - Suggested answer: Choose **A** because a clean skip reports availability but
-    cannot substitute for required captured evidence.
+- [x] What qualified CUDA devices will provide literal captured evidence?
+  - Resolved 2026-08-30: Probe every CUDA device visible to the active Warp
+    runtime and record each device result independently. The current local
+    development host has one NVIDIA GeForce RTX 5060; this is an initial evidence
+    device, not a hardware allow-list. Future devices qualify through the same
+    capture/replay and metadata contract.
+  - Rationale: Runtime enumeration permits future hardware evidence without
+    hiding device-specific failures behind the default `cuda` alias or treating
+    driver visibility as successful capture.
   - Options:
-    - [ ] A. Qualify every available CUDA device at runtime and record literal metadata (Recommended)
+    - [x] A. Qualify every available CUDA device at runtime and record literal metadata (Selected)
     - [ ] B. Require only the default `cuda` device alias to qualify
     - [ ] C. Name a fixed hardware model and block all other devices
-  - Evidence considered:
+  - Evidence:
     - `particula/gpu/tests/cuda_availability.py:17` - CUDA availability is probed
       from the active Warp runtime.
     - `particula/gpu/kernels/tests/condensation_graph_capture_test.py:186` - A
       qualified capture device must expose all required public capture calls.
+    - Local development probe, 2026-08-30 - `nvidia-smi` reports one NVIDIA
+      GeForce RTX 5060 with KMD/driver `610.57.04` and CUDA UMD `13.3`; actual
+      qualification still requires the Warp capture/replay probe.
+  - Resolved by: user decision
 
 - [x] Should exact seed-by-seed CPU/CUDA stochastic replay be required?
   - Resolved 2026-08-30: No. Use aggregate stochastic bounds while checking RNG

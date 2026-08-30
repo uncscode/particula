@@ -36,9 +36,17 @@
 - [ ] Model selected diagnostics, GAS/PARTICLES communication, checkpoint host
   copies, and projected tape storage as named optional categories with distinct
   logical-versus-observed labels.
+- [ ] Implement symbolic tape scenarios using explicit `S`, `C`, `T`, and `K`
+  inputs: full retention `T * S` and checkpointed working storage
+  `ceil(T / K) * C + K * S`. Label both projected and exclude unknown Epic I
+  operation/intermediate overhead.
 - [ ] Implement `probe_device_memory()` behind the optional CUDA benchmark path;
-  record probe method, availability, and before/peak/after values without
-  treating allocator reservation as logical bytes.
+  accept only a documented, version-qualified public allocator high-water API,
+  record its coverage, method, versions, availability, and before/peak/after
+  values, and never treat allocator reservation as logical bytes.
+- [ ] Add a local opt-in allocator-probe smoke test. Unsupported Warp/CUDA
+  versions, incomplete graph/non-Warp coverage, or inaccessible counters must
+  produce an unavailable observed-memory record without NVML substitution.
 - [ ] Implement `compare_memory_evidence()` to retain the analytical total,
   observed delta, and unexplained difference rather than forcing equality.
 

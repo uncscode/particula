@@ -14,35 +14,40 @@
       Python scalar changes require a new prepared record.
   - Resolved by: plan-question-resolver
 
-- [ ] Should checkpoint/finalize operations be legal while a captured graph
+- [x] Should checkpoint/finalize operations be legal while a captured graph
   object exists but is not executing?
-  - Open: Current checkpoints require a closed guard and synchronize resident
-    state, but no shipped capture owner defines safe dormant-handle coexistence.
-  - Recommendation: **A - Require capture teardown before checkpoint or finalize**
-  - Suggested answer: Choose **A** because it preserves a fail-closed lifecycle
-    without inventing native graph-handle synchronization semantics.
+  - Resolved 2026-08-30: Require successful captured-graph teardown before
+    checkpoint or finalize. A later continuation or restart must establish a
+    fresh capture against its active identities.
+  - Rationale: This preserves the existing fail-closed checkpoint lifecycle and
+    avoids inventing dormant native-handle synchronization, pointer-lifetime, or
+    post-checkpoint replay semantics.
   - Options:
-    - [ ] A. Require capture teardown before checkpoint or finalize (Recommended)
+    - [x] A. Require capture teardown before checkpoint or finalize (Selected)
     - [ ] B. Permit checkpoint between replays after explicit synchronization
-  - Evidence considered:
+  - Evidence:
     - `particula/execution/checkpoint.py:386` - Checkpoint validates a closed
       identity-bound lifecycle and then synchronizes resident state.
+    - `.opencode/plans/sections/features/E8-F1/open_questions.md:15` - Native
+      graph handles are excluded from checkpoint continuation state.
+  - Resolved by: user decision
 
-- [ ] What minimum repeated-timestep count defines the launch-overhead
+- [x] What minimum repeated-timestep count defines the launch-overhead
   benchmark matrix?
-  - Open: The roadmap requires small and medium repeated workloads but defines
-    no canonical replay counts.
-  - Recommendation: **A - Measure 1, 10, 100, and 1000 timesteps**
-  - Suggested answer: Choose **A** because it separates one-launch overhead from
-    short, medium, and amortized replay behavior while permitting unavailable
-    rows to remain explicit.
+  - Resolved 2026-08-30: Measure exactly `1`, `10`, `100`, and `1000` repeated
+    timesteps for each canonical workload and replay mode. Keep any row that
+    exceeds a documented runtime or memory budget explicitly unavailable rather
+    than changing its count.
+  - Rationale: The fixed matrix separates one-launch, short, medium, and strongly
+    amortized behavior while preserving cross-run and cross-device comparison.
   - Options:
-    - [ ] A. Measure 1, 10, 100, and 1000 timesteps (Recommended)
+    - [x] A. Measure 1, 10, 100, and 1000 timesteps (Selected)
     - [ ] B. Measure 1, 10, and 100 timesteps only to bound runtime
     - [ ] C. Select counts dynamically per device and forgo a cross-run matrix
-  - Evidence considered:
+  - Evidence:
     - `docs/Features/Roadmap/data-oriented-gpu.md:1779` - The roadmap requires
       small and medium repeated-timestep launch-overhead evidence without counts.
+  - Resolved by: user decision
 
 - [x] Which peak-memory measurement method is portable enough for the closeout
   artifact?

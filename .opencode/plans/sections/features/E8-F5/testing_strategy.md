@@ -11,9 +11,10 @@ lowered, and production behavior is not changed solely to expose test internals.
 - **P2:** Integration-test the uncaptured prepared path on Warp CPU over multiple
   timesteps. Compare fields individually, assert diagnostics and identities, and
   reject hidden upload/allocation/readback/synchronization.
-- **P3:** Mark CUDA capture rows `warp`, `cuda`, and `gpu_parity`. Compare captured
-  CUDA with P1/P2, cover both closed-map families, and cleanly skip when no
-  qualified CUDA capture device exists. Never run a CPU fallback for this row.
+- **P3:** Enumerate every CUDA device visible to Warp and mark capture rows
+  `warp`, `cuda`, and `gpu_parity`. Compare each captured CUDA device with P1/P2,
+  cover both closed-map families, and record an independent unavailable result
+  when a device cannot qualify. Never run a CPU fallback for these rows.
 - **P4:** Use deterministic lifecycle tables plus `stochastic` aggregate rows for
   RNG. Assert explicit reset and continuation semantics separately from exact
   state parity; verify no graph launch after preflight rejection.

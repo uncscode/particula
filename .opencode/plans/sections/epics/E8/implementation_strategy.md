@@ -28,6 +28,9 @@ The implementation should keep three explicit boundaries:
   nonaliasing process, communication, diagnostic, and RNG sidecars.
 - The graph lifecycle record owns compatibility metadata and the captured graph
   handle; it does not own or silently replace caller state.
+- Checkpoint and finalize require successful graph teardown first. Checkpoints
+  never retain a dormant graph handle, and continuation or restart requires a
+  fresh capture against the active session identities.
 - Persistent coagulation and wall-loss RNG words advance during replay.
   Initialization/reset is explicit before capture, and checkpoint continuation
   remains governed by the shipped schema-v3 contract.

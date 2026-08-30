@@ -1,22 +1,28 @@
 # Open Questions
 
-- [ ] Which Warp/CUDA memory API is sufficiently stable to serve as the observed
+- [x] Which Warp/CUDA memory API is sufficiently stable to serve as the observed
   peak-memory source of record?
-  - Open: Current code records device capacity and analytical bytes but no
-    allocator high-water mark, and the Warp dependency is not version-bounded.
-  - Recommendation: **A - Qualify one documented public allocator peak API by Warp/CUDA version**
-  - Suggested answer: Choose **A** because source-of-record status requires known
-    pool, graph-storage, and non-Warp allocation coverage; otherwise record the
-    observed measurement as unavailable.
+  - Resolved 2026-08-30: Use a documented public allocator high-water API only
+    after qualifying it against the active Warp/CUDA version and documenting its
+    pool, CUDA graph-storage, and relevant non-Warp allocation coverage. When no
+    API meets that contract, record observed peak memory as unavailable.
+  - Rationale: Analytical shape/dtype and registry bytes remain the portable
+    authority. A version-qualified allocator probe supplies bounded observed
+    evidence without substituting sampled NVML values or claiming coverage the
+    API does not provide.
   - Options:
-    - [ ] A. Qualify one documented public allocator peak API by Warp/CUDA version (Recommended)
+    - [x] A. Qualify one documented public allocator peak API by Warp/CUDA version (Selected)
     - [ ] B. Use a qualified CUDA or NVML process-level measurement with documented exclusions
     - [ ] C. Publish no observed peak and retain analytical and registry bytes only
-  - Evidence considered:
+  - Evidence:
     - `particula/gpu/tests/benchmark_test.py:246` - Existing metadata exposes
       total device memory but no runtime peak.
     - `particula/gpu/tests/benchmark_test.py:312` - Current memory accounting is
       deterministic shape-and-dtype analysis.
+    - `.opencode/plans/sections/epics/E8/open_questions.md:47` - The epic-level
+      policy keeps analytical/registry accounting portable and observed peaks
+      conditional on a version-qualified API.
+  - Resolved by: user decision
 
 - [x] Should the 1000-box row use one canonical particle/species fixture or a
   budget-derived smaller capacity?
@@ -32,20 +38,23 @@
       requires represented 1, 10, 100, and 1000-box rows where feasible.
   - Resolved by: plan-question-resolver
 
-- [ ] What tape projection scenarios should be frozen before Epic I has measured
+- [x] What tape projection scenarios should be frozen before Epic I has measured
   storage records?
-  - Open: The roadmap establishes fp64 state scaling and checkpointing as a
-    concern but does not authorize empirical multipliers or checkpoint intervals.
-  - Recommendation: **A - Publish symbolic full-retention and checkpoint-interval projections**
-  - Suggested answer: Choose **A** because formulas can be auditable and clearly
-    labeled projected without pretending to be measured tape storage.
+  - Resolved 2026-08-30: Publish symbolic full-retention and checkpoint-interval
+    scenarios. Define per-step retained-state bytes `S`, checkpoint bytes `C`,
+    timesteps `T`, and checkpoint interval `K`; report `T * S` and
+    `ceil(T / K) * C + K * S` as projected scenarios, not measured tape usage.
+  - Rationale: Auditable formulas expose timestep and checkpoint scaling without
+    inventing an empirical multiplier or claiming to represent unknown Epic I
+    operation/intermediate storage.
   - Options:
-    - [ ] A. Publish symbolic full-retention and checkpoint-interval projections (Recommended)
+    - [x] A. Publish symbolic full-retention and checkpoint-interval projections (Selected)
     - [ ] B. Publish only an fp64 full-retention lower bound
     - [ ] C. Defer every tape projection until Epic I produces measurements
-  - Evidence considered:
+  - Evidence:
     - `docs/Features/Roadmap/data-oriented-gpu.md:1910` - Tape storage is expected
       to scale with timesteps and fp64 resident state and may need checkpointing.
+  - Resolved by: user decision
 
 - [x] Should benchmark JSON remain one aggregate file or add one file per run?
   - Resolved 2026-08-30: Retain one aggregate source-of-record JSON per benchmark

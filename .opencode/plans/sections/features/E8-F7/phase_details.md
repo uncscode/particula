@@ -20,13 +20,16 @@
 
 - [ ] **E8-F7-P3:** Collect per-kernel CUDA timing occupancy and memory-access evidence with tests
   - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add reproducible Nsight Systems/Compute or supported Warp profiler
-    commands and normalize exported dominant-kernel metrics without fabricating
-    values when a tool or metric is unavailable.
+  - Goal: Add bounded Python orchestration for the selected Nsight
+    Systems/Compute baseline and normalize exported dominant-kernel metrics
+    without fabricating values when a tool or metric is unavailable.
   - Files: `particula/gpu/tests/profiling_support.py`,
-    `particula/gpu/tests/profiling_support_test.py`, `.opencode/tools/`
-  - Tests: Export parsing fixtures, unit normalization, kernel-name mapping,
-    invocation aggregation, missing metric handling, and bounded diagnostics.
+    `particula/gpu/tests/profiling_support_test.py`,
+    `particula/gpu/tests/profiling_smoke_test.py`, `.opencode/tools/`
+  - Tests: Mocked subprocess boundaries, export parsing fixtures, unit
+    normalization, kernel-name mapping, invocation aggregation, missing metric
+    handling, bounded diagnostics, and opt-in real-binary export/parser smoke
+    coverage on a qualified CUDA device.
 
 - [ ] **E8-F7-P4:** Analyze bottlenecks and generate machine-bounded recommendations with tests
   - Issue: TBD | Size: S | Status: Not Started

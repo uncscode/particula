@@ -1,19 +1,24 @@
 # Open Questions
 
-- [ ] Which Warp graph-handle teardown operation is available and required for
+- [x] Which Warp graph-handle teardown operation is available and required for
   the repository's supported Warp version, if any?
-  - Open: Repository tests establish capture begin, end, and launch but no
-    public graph-destroy operation; dependency policy does not bound all versions.
-  - Recommendation: **A - Always retire the Python owner and call only a verified public native release**
-  - Suggested answer: Choose **A** because lifecycle rejection can remain
-    deterministic even when a qualified Warp runtime exposes no destroy call.
+  - Resolved 2026-08-30: Always retire the Python owner. Call a native release
+    only when the active Warp version exposes a documented public operation that
+    has passed version-qualified lifecycle tests; otherwise owner retirement is
+    the complete supported teardown.
+  - Rationale: Lifecycle rejection remains deterministic when no public native
+    release exists, while qualified runtimes may use documented cleanup without
+    private or guessed APIs.
   - Options:
-    - [ ] A. Always retire the Python owner and call only a verified public native release (Recommended)
+    - [x] A. Always retire the Python owner and call only a verified public native release (Selected)
     - [ ] B. Pin and require a Warp version with an explicit public release API
     - [ ] C. Retire the Python owner only and prohibit native release calls
-  - Evidence considered:
+  - Evidence:
     - `particula/gpu/kernels/tests/condensation_graph_capture_test.py:186` - The
       current required API set contains no graph-destroy operation.
+    - `.opencode/plans/sections/features/E8-F1/open_questions.md:58` - E8-F1 uses
+      the same owner-retirement and qualified-public-release policy.
+  - Resolved by: user decision
 
 - [x] Should replay duration be represented by a fixed captured Python scalar or
   an E8-F3 pinned device control array?

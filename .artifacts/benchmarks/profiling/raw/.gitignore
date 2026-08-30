@@ -1,0 +1,3 @@
+# Keep this staging directory while ignoring generated profiler reports.
+*
+!.gitignore

@@ -14,11 +14,20 @@
 - [ ] Closeout records date, revision, software/runtime/device identity, derived
   executable targets, exact commands, literal output, artifact links/checksums,
   and required/optional disposition.
+- [ ] Every consumed E8-F6/E8-F7 normalized artifact matches the committed
+  closeout manifest by schema, source revision, workload IDs, provenance, and
+  SHA-256; local-only raw reports are not treated as retrievable closeout inputs.
 - [ ] Every Epic H success metric links to current evidence; any failed,
   unavailable, missing, or stale required row leaves Epic H Active.
+- [ ] One designated qualified CUDA device completes every required measured exit
+  row at the final revision; clean skips, historical runs, and supplemental
+  devices do not satisfy a missing required row.
 - [ ] Focused tests, linters, untargeted repository coverage, changed-module
   coverage where applicable, plan validation, and `mkdocs build --strict` pass
   without lowering thresholds.
+- [ ] The changed-module coverage list is frozen from shipped implementation
+  records plus the final production diff, and every listed module has a literal
+  per-target result.
 - [ ] Parent/sibling labels consistently assign profiling to E8-F7 and the T8
   example, runbook, roadmap, and closeout to E8-F8.
 

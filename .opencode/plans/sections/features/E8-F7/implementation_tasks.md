@@ -6,8 +6,19 @@
   `particula/gpu/tests/profiling_support.py`.
 - [ ] Define deterministic small and medium workloads with fixed box, particle,
   species, communication, replay-count, warmup, and sample parameters.
+- [ ] Select those workload IDs once from shipped E8-F6 evidence: the smallest
+  launch-sensitive executed row and largest repeatably feasible executed row.
+  Freeze their exact dimensions; later devices must execute them unchanged or
+  record them unavailable.
 - [ ] Reuse the benchmark artifact root and safe filename rules; add checksums
   and relative references for raw profiler exports.
+- [ ] Create `.artifacts/benchmarks/profiling/raw/` on demand as the only local
+  raw-report staging directory. Enforce canonical containment, reject symlink or
+  traversal escape, and keep its narrow `.gitignore` rule from hiding normalized
+  evidence elsewhere in `.artifacts/benchmarks`.
+- [ ] Commit only bounded normalized summaries and parser fixtures. Include raw
+  filename, byte size, and SHA-256 provenance, but provide no upload, attachment,
+  release-asset, Git LFS, or ordinary-Git raw-report path.
 - [ ] Add separate host enqueue/launch and synchronized elapsed samplers without
   placing setup, capture construction, fixture reset, or serialization in the
   measured region.
@@ -15,6 +26,14 @@
   explicit unavailable rows for missing CUDA/capture support.
 - [ ] Add parsers for selected machine-readable Nsight Systems/Compute exports;
   fail closed on unsupported schema or units and retain raw source references.
+- [ ] Qualify the Arch Linux `nsight-systems 2026.1.3.425-1` and
+  `nsight-compute 2026.2.1.5-1` package pair, persist literal CLI version
+  output, and keep both profilers as optional external tools rather than Python
+  dependencies.
+- [ ] Add bounded Python subprocess orchestration for version probes, collection,
+  and export. Use explicit argument vectors with `shell=False`, capture exit
+  status and bounded diagnostics, and write only beneath the controlled artifact
+  root; do not launch external tools from the default test suite.
 - [ ] Map observed kernel names to canonical resident process IDs where the
   mapping is evidenced; preserve an `unattributed` category otherwise.
 - [ ] Aggregate duration and invocation counts and retain occupancy, achieved
@@ -36,8 +55,22 @@
   `slow`, `performance`, `warp`, and `cuda` intent markers as applicable.
 - [ ] Store compact text/JSON parser fixtures in a bounded test-data directory;
   do not require NVIDIA tooling for default unit tests.
+- [ ] Unit-test subprocess argument construction, version rejection, timeout,
+  nonzero exit, truncated diagnostics, path safety, and fixture parsing without
+  launching `nsys`, `ncu`, or a GPU workload.
+- [ ] Add `particula/gpu/tests/profiling_smoke_test.py` as an explicit
+  `--benchmark` CUDA smoke test. It must invoke the installed `nsys` and `ncu`
+  binaries, verify the selected version identities, profile one bounded CUDA
+  workload, export both supported machine-readable formats, and parse them with
+  the production profiling parser.
+- [ ] Keep smoke artifacts beneath `.artifacts/benchmarks`, retain command and
+  exit-status provenance, and report missing binaries, unsupported versions,
+  denied counters, export failures, or missing metrics without changing host
+  permissions or using CPU fallback.
 - [ ] Record exact profiler commands, selected metric sets, exit codes, and
   literal result summaries; unavailable required rows remain unshipped.
+- [ ] Require a qualified NVIDIA CUDA GPU for real profiler rows; missing CUDA,
+  profiler access, or hardware counters must not route to Warp CPU.
 
 ## Documentation
 

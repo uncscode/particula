@@ -69,6 +69,8 @@ pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
+.artifacts/benchmarks/profiling/raw/*
+!.artifacts/benchmarks/profiling/raw/.gitignore
 .tox/
 .nox/
 .coverage

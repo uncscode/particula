@@ -10,7 +10,8 @@ follows the explicit assignment and tracks reconciliation as an open question.
 ## In Scope
 
 - Define small and medium representative resident workloads using fixed boxes,
-  particles, species, process order, communication mode, and replay counts.
+  particles, species, process order, communication mode, and canonical replay
+  counts of `1`, `10`, `100`, and `1000`.
 - Record device identity, architecture, driver/runtime/Warp/Python versions,
   command, warmup, sample count, synchronization method, and profiler versions.
 - Measure uncaptured host dispatch, captured graph launch, synchronized

@@ -1,8 +1,9 @@
 # Success Criteria
 
 - [ ] One identical fixed-shape scenario runs for multiple timesteps through the
-  CPU oracle and uncaptured Warp CPU path; captured CUDA runs when qualified or
-  records a clean skip without fallback.
+  CPU oracle and uncaptured Warp CPU path; every Warp-visible CUDA device runs
+  captured qualification or records an independent unavailable result without
+  fallback.
 - [ ] Primary particle, gas, and environment fields and every registered
   diagnostic are compared separately with explicit deterministic tolerances.
 - [ ] Per-box/per-species concentration-weighted inventory satisfies tight

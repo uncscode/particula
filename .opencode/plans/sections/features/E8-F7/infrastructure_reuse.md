@@ -35,3 +35,40 @@
 - Follow `.opencode/guides/testing_guide.md:167-203` and `237-252`: performance
   evidence is opt-in, Warp CPU remains non-profile parity evidence, and optional
   CUDA rows pass or cleanly skip.
+
+## Local Development Reference
+
+The 2026-08-30 Arch Linux/Omarchy development probe selected this initial P3
+toolchain baseline:
+
+| Component | Observed identity |
+|-----------|-------------------|
+| Arch package | `nsight-systems 2026.1.3.425-1` |
+| `nsys --version` | `NVIDIA Nsight Systems version 2026.1.3.425-261338342291v0` |
+| Arch package | `nsight-compute 2026.2.1.5-1` |
+| `ncu --version` | `Version 2026.2.1.0 (build 38283040) (public-release)` |
+| CUDA device | `NVIDIA GeForce RTX 5060` |
+| KMD / driver | `610.57.04` |
+| CUDA UMD | `13.3` |
+| Reported device memory | `8151 MiB` |
+
+Install the external tools from the official Arch `Extra` repository with
+`omarchy pkg add nsight-systems nsight-compute`. Verify them with
+`nsys --version`, `ncu --version`, `nvidia-smi`, and
+`nsys status --environment`. These tools are not `pyproject.toml`
+dependencies. Their presence establishes local availability only; a complete
+profiling row still requires successful export parsing, zero collection/export
+exit status, access to the required counters, and the metric floor in
+`success_criteria.md`.
+
+After P3 implements the runner and parsers, validate this local integration with:
+
+```bash
+pytest particula/gpu/tests/profiling_smoke_test.py --benchmark \
+  -m "warp and cuda" -q -Werror
+```
+
+This smoke test intentionally launches `nsys` and `ncu`; it is excluded from
+default collection by the existing `--benchmark` opt-in policy. It profiles one
+bounded CUDA workload and verifies real export parsing, not performance
+thresholds.

@@ -2,7 +2,8 @@
 
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` with E8-F7 status,
   measured machine/software identity, exact workload matrix, commands, raw
-  artifact references, and the distinction between launch and kernel costs.
+  local-artifact checksums, the local-only retention limitation, and the
+  distinction between launch and kernel costs.
 - Create or update `docs/Features/gpu_graph_capture_performance.md` with the
   profiling method, warmup/synchronization rules, captured-versus-uncaptured
   results, dominant-kernel metrics, bottleneck table, recommendations, and
