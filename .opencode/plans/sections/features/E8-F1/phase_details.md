@@ -29,8 +29,8 @@
     failure-classification, direct-import-only, and forbidden-import subprocess
     coverage in `graph_capture_test.py`.
 
-- [ ] **E8-F1-P3:** Define recapture gates and resident binding validation with integration tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E8-F1-P3:** Define recapture gates and resident binding validation with integration tests
+  - Issue: #1549 | Size: S | Status: Delivered
   - Goal: Bind lifecycle checks to the exact resident request and require
     explicit recapture after any device, dimension, schedule, map, or resource
     identity change.
@@ -38,9 +38,16 @@
     `particula/execution/resident_scheduler.py`,
     `particula/execution/tests/graph_capture_test.py`,
     `particula/execution/tests/full_loop_test.py`
-  - Tests: Exact session/registry/guard/request acceptance; every documented
-    structural recapture trigger; stable active-slot payload changes remain
-    compatible; no CPU fallback; optional CUDA capability rows cleanly skip.
+  - Delivered: `ResidentGraphCaptureBinding` retains exact resident identities
+    and owns lifecycle gate transitions. A private one-time attachment binds it
+    to the final frozen request. The optional scheduler binding gates before
+    token entry and preserves scheduler ordering and writer-failure behavior.
+    Captured signature drift invalidates metadata; explicit retirement, renewal,
+    and completion are required before later admission.
+  - Tests: `graph_capture_test.py` covers exact identity, attachment, gate,
+    drift, payload compatibility, and lifecycle cases; `full_loop_test.py`
+    covers scheduler pre-token rejection, dispatch preservation, and writer
+    failure. CUDA admission is optional; Warp CPU is rejected.
 
 - [ ] **E8-F1-P4:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

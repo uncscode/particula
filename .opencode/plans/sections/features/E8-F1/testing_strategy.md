@@ -24,12 +24,16 @@ must not be lowered. Test files use the repository's `*_test.py` convention in
   nor resident execution modules. These tests establish metadata behavior only;
   they do not claim native capture, replay, transfer, synchronization, or
   resident-session mutation.
-- **P3 — Resident recapture integration:** Exercise exact session/registry/guard
-  identity, closed-step gates, all structural drift triggers, active-slot
-  payload changes that remain compatible, terminal/faulted resident states,
-  and writer-may-have-launched fault behavior. Extend
-  `particula/execution/tests/full_loop_test.py` only for contract integration;
-  CPU/uncaptured/captured numerical parity remains E8-F4 scope.
+- **P3 — Resident recapture integration (delivered for #1549):**
+  `particula/execution/tests/graph_capture_test.py` covers exact binding and
+  one-time attachment, deterministic pre-dispatch gate rejection, structural
+  drift invalidation, stable payload/slot/RNG-word compatibility, lifecycle
+  recovery, and direct-import-only boundaries. Integration coverage in
+  `particula/execution/tests/full_loop_test.py` verifies rejection before token
+  entry or adapter dispatch, unchanged ungated ordering, and writer-failure
+  classification after a successful gate. CUDA admission is optional and skips
+  cleanly; Warp CPU never admits capture. Numerical replay parity remains
+  outside this phase.
 - **P4 — Documentation:** Validate contract strings or export boundaries where
   existing docs tests apply, and run `mkdocs build --strict` for links and
   publication structure.

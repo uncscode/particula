@@ -41,6 +41,16 @@ renewal only after retirement. They neither capture nor replay a native graph,
 inspect a resident binding, nor mutate a resident session; those integration
 gates remain P3 work.
 
+E8-F1-P3 was delivered for issue #1549. `graph_capture.py` now owns an exact,
+direct-module-only `ResidentGraphCaptureBinding` lifecycle and gate for one
+final resident request, session, pinned registry, and closed guard. The
+optional binding is attached once to the frozen request and is gated by the
+resident scheduler before token entry. It fails closed for non-CUDA or
+unavailable capability, stale identity, non-captured lifecycle, resident-state
+failure, or signature drift; captured drift invalidates the binding and
+writer-may-have-launched failures fault its lifecycle. This adds neither native
+capture/replay nor a user-facing API or documentation update.
+
 ## User Stories
 
 - As a resident-simulation developer, I want an immutable capture signature so

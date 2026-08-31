@@ -88,6 +88,27 @@ idempotent. P2 deliberately does not compare a resident request, validate an
 active session/registry/guard binding, capture a graph, or fault a session;
 those operations remain P3 scope.
 
+## Implemented P3 Binding and Scheduler Gate
+
+Issue #1549 added `ResidentGraphCaptureBinding` in `graph_capture.py`. The
+binding retains one exact final request, resident session, pinned registry,
+closed guard, and lifecycle. A private one-time attachment helper is the only
+writer of the request's optional binding field, preserving the signature's
+exclusion of binding and lifecycle state. The binding owns lifecycle successors
+for capture completion, invalidation, retirement/renewal, and eligible
+writer-failure classification.
+
+`ResidentSimulationRequest` now accepts the optional binding, and
+`ResidentSimulationScheduler` runs its gate after its existing resident
+identity/state checks and before `begin_step()` or adapter dispatch. The gate
+requires exact retained identities, a closed active resident binding, an exact
+available CUDA capability for the resident device, a `CAPTURED` lifecycle, and
+an unchanged structural signature. It invalidates captured metadata on drift;
+other read-only rejection leaves lifecycle state unchanged. Scheduler cleanup
+preserves its original error and only reports writer-may-have-launched outcomes
+to an attached binding. No native graph capture/replay, resource replacement,
+transfer, synchronization, fallback, retry, or automatic renewal was added.
+
 ## Security & Compliance
 
 No new network, credential, file-deserialization, or permission boundary is

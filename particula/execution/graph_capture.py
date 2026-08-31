@@ -897,9 +897,12 @@ def close_graph_capture(
 class ResidentGraphCaptureBinding:
     """Retain one exact resident binding and its mutable lifecycle metadata.
 
-    This direct-module-only carrier owns lifecycle successors.  It is metadata
-    only: it neither captures nor replays a graph and never accesses resident
-    payloads.
+    This direct-module-only carrier owns lifecycle successors for the attached
+    final request. It is metadata only: it neither captures nor replays a graph,
+    accesses resident payloads, transfers data, synchronizes, or falls back.
+
+    Attributes:
+        lifecycle: Current immutable lifecycle metadata retained by the binding.
     """
 
     _request: object
@@ -996,6 +999,24 @@ def _require_binding(binding: object) -> ResidentGraphCaptureBinding:
     return binding
 
 
+def _require_attached_resident_binding(
+    binding: object,
+) -> ResidentGraphCaptureBinding:
+    """Require an exact binding attached to its retained final request."""
+    binding = _require_binding(binding)
+    _validate_resident_binding(
+        binding._request,
+        binding._session,
+        binding._registry,
+        binding._guard,
+        binding._lifecycle,
+    )
+    request = cast("ResidentSimulationRequest", binding._request)
+    if request.graph_capture_binding is not binding:
+        raise ValueError("request graph-capture attachment does not match.")
+    return binding
+
+
 def _attach_resident_graph_capture_binding(
     request: object, binding: object
 ) -> None:
@@ -1039,29 +1060,46 @@ def _attach_resident_graph_capture_binding(
 
 
 def complete_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
-    """Explicitly declare capture completion on one retained binding."""
-    binding = _require_binding(binding)
-    _validate_resident_binding(
-        binding._request,
-        binding._session,
-        binding._registry,
-        binding._guard,
-        binding._lifecycle,
-    )
+    """Explicitly declare capture completion on one retained binding.
+
+    This metadata transition does not perform native graph capture or resident
+    work.
+
+    Args:
+        binding: Exact resident graph-capture binding to transition.
+
+    Returns:
+        Captured lifecycle metadata now owned by ``binding``.
+
+    Raises:
+        TypeError: If ``binding`` is not an exact binding.
+        ValueError: If the retained carriers are inconsistent or the lifecycle
+            is not ready.
+    """
+    binding = _require_attached_resident_binding(binding)
     binding._lifecycle = complete_graph_capture(binding._lifecycle)
     return binding._lifecycle
 
 
 def gate_resident_graph_capture(binding: object) -> None:
-    """Fail closed unless a captured binding remains exactly dispatchable."""
-    binding = _require_binding(binding)
-    _validate_resident_binding(
-        binding._request,
-        binding._session,
-        binding._registry,
-        binding._guard,
-        binding._lifecycle,
-    )
+    """Fail closed unless a captured binding remains exactly dispatchable.
+
+    The gate verifies the attached request, resident binding, closed guard,
+    active pinned session, available CUDA capability, captured lifecycle, and
+    unchanged structural signature before scheduler token entry. Structural
+    drift invalidates a captured lifecycle; all other rejection is read-only.
+    This operation neither captures nor replays graphs, transfers data,
+    synchronizes, acquires resources, or falls back.
+
+    Args:
+        binding: Exact resident graph-capture binding to admit.
+
+    Raises:
+        TypeError: If ``binding`` or its retained carriers have inexact types.
+        ValueError: If the binding is stale, unavailable, not captured, or
+            structurally incompatible with its resident request.
+    """
+    binding = _require_attached_resident_binding(binding)
     request = cast("ResidentSimulationRequest", binding._request)
     session = cast("ResidentSession", binding._session)
     registry = cast("GPUResourceRegistry", binding._registry)
@@ -1097,8 +1135,20 @@ def gate_resident_graph_capture(binding: object) -> None:
 
 
 def classify_resident_graph_capture_writer_failure(binding: object) -> None:
-    """Record a scheduler-confirmed possible writer failure on a binding."""
-    binding = _require_binding(binding)
+    """Record a scheduler-confirmed possible writer failure on a binding.
+
+    The scheduler calls this only after its existing cleanup determines that a
+    writer may have launched. It records metadata only and does not retry,
+    roll back, or act on resident resources.
+
+    Args:
+        binding: Exact binding whose lifecycle receives the classification.
+
+    Raises:
+        TypeError: If ``binding`` is not an exact binding.
+        ValueError: If its lifecycle is retired or closed.
+    """
+    binding = _require_attached_resident_binding(binding)
     binding._lifecycle = classify_graph_capture_failure(
         binding._lifecycle,
         GraphCaptureFailureClassification.WRITER_MAY_HAVE_LAUNCHED,
@@ -1106,8 +1156,19 @@ def classify_resident_graph_capture_writer_failure(binding: object) -> None:
 
 
 def retire_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
-    """Explicitly retire invalidated lifecycle metadata on one binding."""
-    binding = _require_binding(binding)
+    """Explicitly retire invalidated lifecycle metadata on one binding.
+
+    Args:
+        binding: Exact binding that owns invalidated lifecycle metadata.
+
+    Returns:
+        Retired lifecycle metadata now owned by ``binding``.
+
+    Raises:
+        TypeError: If ``binding`` is not an exact binding.
+        ValueError: If the lifecycle is not invalidated or already retired.
+    """
+    binding = _require_attached_resident_binding(binding)
     binding._lifecycle = retire_graph_capture(binding._lifecycle)
     return binding._lifecycle
 
@@ -1115,19 +1176,30 @@ def retire_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
 def renew_resident_graph_capture(
     binding: object, signature: object
 ) -> GraphCaptureLifecycle:
-    """Explicitly renew a retired exact binding with a new request signature."""
-    binding = _require_binding(binding)
+    """Explicitly renew a retired exact binding with a new request signature.
+
+    Renewal prepares ready metadata only; callers must separately declare
+    capture completion before the scheduler can admit the binding. It does not
+    recapture or replay a graph, replace resources, transfer data, synchronize,
+    or fall back.
+
+    Args:
+        binding: Exact binding that owns retired lifecycle metadata.
+        signature: Exact new signature for the binding's retained request.
+
+    Returns:
+        Ready lifecycle metadata now owned by ``binding``.
+
+    Raises:
+        TypeError: If ``binding`` or ``signature`` is inexact.
+        ValueError: If retained identities differ or the lifecycle is not
+            retired.
+    """
+    binding = _require_attached_resident_binding(binding)
     if type(signature) is not ResidentGraphCaptureSignature:
         raise TypeError(
             "signature must be an exact ResidentGraphCaptureSignature."
         )
-    _validate_resident_binding(
-        binding._request,
-        binding._session,
-        binding._registry,
-        binding._guard,
-        binding._lifecycle,
-    )
     if (
         signature.request is not binding._request
         or signature.session is not binding._session

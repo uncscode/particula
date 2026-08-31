@@ -21,8 +21,11 @@ work; it does not yet promise a complete graph-captured physics loop.
   not launch, synchronize, transfer, allocate, or inspect payload values.
 - Explicit recapture eligibility: closed guard, active resident session,
   compatible pinned resources, supported CUDA device, and no hidden fallback.
-- Co-located tests in `particula/execution/tests/` plus development-facing
-  contract documentation.
+- A direct-module-only exact resident binding, one-time frozen-request
+  attachment, explicit lifecycle-owned gate, and narrow pre-token scheduler
+  composition seam.
+- Co-located tests in `particula/execution/tests/`; issue #1549 explicitly
+  excludes user-documentation changes.
 
 ## Out of Scope
 
@@ -38,3 +41,4 @@ work; it does not yet promise a complete graph-captured physics loop.
   final profiling, which belong to E8-F5 through E8-F8.
 - New physics, new public top-level exports, broad autodiff, or checkpointing a
   native graph handle.
+- User-facing documentation or examples for the binding/gate contract.

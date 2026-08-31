@@ -19,12 +19,12 @@
   invalidated, faulted, retired, and closed states with explicit close metadata.
 - [x] Preserve the first incompatible P1 drift reason and retained capability/
   signature identities through lifecycle successors; do not perform native work.
-- [ ] Require active session plus closed guard/registry gates before capture or
+- [x] Require active session plus closed guard/registry gates before capture or
   recapture eligibility; reject finalized, faulted, and closed sessions.
-- [ ] Preserve existing scheduler failure classification: read-only rejection
+- [x] Preserve existing scheduler failure classification: read-only rejection
   leaves state active; possible writer launch faults the exact binding without
   rollback, fallback, or retry.
-- [ ] Add only the narrow integration seam needed in
+- [x] Add only the narrow integration seam needed in
   `particula/execution/resident_scheduler.py`; do not fork its twelve-node order
   or move adapter dispatch into this feature.
 
@@ -33,15 +33,15 @@
 - [x] Add `particula/execution/tests/graph_capture_test.py` using `*_test.py`
   naming, hardware-free capability/import fakes, and Warp-guarded real-request
   signature cases.
-- [ ] Parametrize all signature drift triggers: backend/native device,
+- [x] Parametrize all signature drift triggers: backend/native device,
   dimensions, container/array identity, graph, schedule/order, process config,
   sidecar, diagnostics, communication map/buffer, and RNG resource.
-- [ ] Assert payload-only changes and active/free slot changes do not invalidate
+- [x] Assert payload-only changes and active/free slot changes do not invalidate
   stable-shape compatibility.
-- [ ] Assert CPU capture is unsupported rather than emulated, CUDA absence
+- [x] Assert CPU capture is unsupported rather than emulated, CUDA absence
   cleanly skips hardware rows, and unexpected allocation/runtime failures are
   not converted to capability skips.
-- [ ] Extend `particula/execution/tests/full_loop_test.py` with exact resident
+- [x] Extend `particula/execution/tests/full_loop_test.py` with exact resident
   binding and recapture-gate integration assertions, without claiming captured
   physics parity before E8-F4.
 - [x] Add/retain graph-capture test assertions proving internals are

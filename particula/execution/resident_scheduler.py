@@ -139,6 +139,9 @@ class ResidentSimulationRequest:
         environment_update: Optional exact environment update request.
         gas_update: Optional exact gas update request.
         communication: Exact request for the communication and volume barriers.
+        graph_capture_binding: Optional exact direct-module-only binding. It is
+            attached only after final request construction and gates admission;
+            it neither captures nor replays graphs nor changes dispatch.
     """
 
     session: ResidentSession
@@ -231,7 +234,9 @@ class ResidentSimulationScheduler:
     reset disabled. Scheduler-resolved wall-loss selection reaches the adapter,
     which excludes disabled logical-box lanes from direct dispatch. The
     scheduler neither allocates, reseeds, inspects, nor synchronizes either
-    stream.
+    stream. An optional attached graph-capture binding is only a pre-dispatch
+    metadata gate: the scheduler does not capture or replay graphs, recapture,
+    transfer, synchronize, fall back, or replace resources for it.
     """
 
     def __init__(self, request: ResidentSimulationRequest) -> None:
@@ -282,7 +287,12 @@ class ResidentSimulationScheduler:
         request.guard.assert_step_closed()
         registry.validate_pinned_session(request.session)
         if request.graph_capture_binding is not None:
-            gate_resident_graph_capture(request.graph_capture_binding)
+            binding = cast(Any, request.graph_capture_binding)
+            if binding._request is not request:
+                raise ValueError(
+                    "graph-capture binding must retain the executing request."
+                )
+            gate_resident_graph_capture(binding)
         if not _is_resolver_produced_graph(request.graph):
             raise ValueError("graph must be produced by plan resolution.")
         if not is_resolver_produced_schedule(request.schedule, request.graph):
@@ -497,7 +507,10 @@ class ResidentSimulationScheduler:
 
         Failures before a writer-capable invocation leave the session active.
         Once dispatch begins, the token is closed and the session faults without
-        rollback because a native writer may already have launched.
+        rollback because a native writer may already have launched. For an
+        attached binding, the existing writer-failure classification is recorded
+        only after cleanup confirms that outcome; no capture, replay, retry, or
+        fallback occurs.
 
         Args:
             duration: Nonnegative finite duration matching each process request.

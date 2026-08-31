@@ -4,6 +4,7 @@ These tests exercise the real resident session, registry, schedule, and loop
 coordinator while keeping the direct process adapters bounded and deterministic.
 """
 
+import copy
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -60,7 +61,7 @@ from particula.execution.graph_capture import (
     GraphCaptureLifecycleState,
     ResidentGraphCaptureBinding,
     _attach_resident_graph_capture_binding,
-    complete_graph_capture,
+    complete_resident_graph_capture,
     create_graph_capture_lifecycle,
     create_resident_graph_capture_signature,
 )
@@ -993,14 +994,12 @@ def test_writer_failure_faults_attached_graph_capture_lifecycle(
         wall_loss_failure=True,
     )
     request = fixture.request
-    lifecycle = complete_graph_capture(
-        create_graph_capture_lifecycle(
-            GraphCaptureCapability(
-                Device(Backend.WARP, "cuda:0"),
-                GraphCaptureAvailability.AVAILABLE,
-            ),
-            create_resident_graph_capture_signature(request),
-        )
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(request),
     )
     binding = ResidentGraphCaptureBinding(
         request,
@@ -1010,6 +1009,7 @@ def test_writer_failure_faults_attached_graph_capture_lifecycle(
         lifecycle,
     )
     _attach_resident_graph_capture_binding(request, binding)
+    complete_resident_graph_capture(binding)
     monkeypatch.setattr(
         _scheduler_module(),
         "gate_resident_graph_capture",
@@ -1030,14 +1030,12 @@ def test_unsupported_capture_binding_rejects_before_token_or_dispatch(
     fixture = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
     request = fixture.request
     signature = create_resident_graph_capture_signature(request)
-    lifecycle = complete_graph_capture(
-        create_graph_capture_lifecycle(
-            GraphCaptureCapability(
-                Device(Backend.WARP, "cpu"),
-                GraphCaptureAvailability.AVAILABLE,
-            ),
-            signature,
-        )
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cpu"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        signature,
     )
     binding = ResidentGraphCaptureBinding(
         request,
@@ -1047,10 +1045,44 @@ def test_unsupported_capture_binding_rejects_before_token_or_dispatch(
         lifecycle,
     )
     _attach_resident_graph_capture_binding(request, binding)
+    complete_resident_graph_capture(binding)
 
     with pytest.raises(ValueError, match="CUDA"):
         fixture.scheduler.execute(0.0)
 
     assert fixture.trace == []
     assert fixture.guard.completed_steps == 0
-    assert fixture.session.lifecycle is ResidentLifecycle.ACTIVE
+
+
+@pytest.mark.warp
+def test_swapped_capture_binding_rejects_before_token_or_dispatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A binding for one request cannot admit an equivalent second request."""
+    first = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(first.request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        first.request,
+        first.session,
+        first.registry,
+        first.guard,
+        lifecycle,
+    )
+    _attach_resident_graph_capture_binding(first.request, binding)
+    complete_resident_graph_capture(binding)
+    second_request = copy.copy(first.request)
+    second_scheduler = ResidentSimulationScheduler(second_request)
+    object.__setattr__(second_request, "graph_capture_binding", binding)
+
+    with pytest.raises(ValueError, match="executing request"):
+        second_scheduler.execute(0.0)
+
+    assert first.trace == []
+    assert first.guard.completed_steps == 0
+    assert first.session.lifecycle is ResidentLifecycle.ACTIVE

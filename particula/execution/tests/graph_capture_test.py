@@ -1334,20 +1334,21 @@ def test_binding_renewal_rejects_a_signature_for_another_request(
     """Renewal preserves the binding's final request and session identities."""
     request = cast("ResidentSimulationRequest", resident_request)
     signature = create_resident_graph_capture_signature(request)
-    lifecycle = invalidate_graph_capture(
-        complete_graph_capture(
-            create_graph_capture_lifecycle(
-                GraphCaptureCapability(
-                    Device(Backend.WARP, "cuda:0"),
-                    GraphCaptureAvailability.AVAILABLE,
-                ),
-                signature,
-            )
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
         ),
-        GraphCaptureCompatibility(False, GraphCaptureDriftReason.REQUEST),
+        signature,
     )
     binding = ResidentGraphCaptureBinding(
         request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    complete_resident_graph_capture(binding)
+    binding._lifecycle = invalidate_graph_capture(
+        binding.lifecycle,
+        GraphCaptureCompatibility(False, GraphCaptureDriftReason.REQUEST),
     )
     retire_resident_graph_capture(binding)
     foreign_signature = copy.copy(signature)
@@ -1387,30 +1388,56 @@ def test_binding_completion_updates_only_its_lifecycle(
 
 
 @pytest.mark.warp
+def test_binding_completion_rejects_detached_binding_without_mutation(
+    resident_request: object,
+) -> None:
+    """Completion requires the binding's prior exact request attachment."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+
+    with pytest.raises(ValueError, match="attachment does not match"):
+        complete_resident_graph_capture(binding)
+
+    assert binding.lifecycle is lifecycle
+    _attach_resident_graph_capture_binding(request, binding)
+    assert complete_resident_graph_capture(binding).state is (
+        GraphCaptureLifecycleState.CAPTURED
+    )
+
+
+@pytest.mark.warp
 def test_binding_gate_rejects_warp_cpu_before_dispatch(
     resident_request: object,
 ) -> None:
     """A captured binding still rejects the unsupported Warp CPU resident."""
     request = cast("ResidentSimulationRequest", resident_request)
     signature = create_resident_graph_capture_signature(request)
-    lifecycle = complete_graph_capture(
-        create_graph_capture_lifecycle(
-            GraphCaptureCapability(
-                Device(Backend.WARP, "cpu"),
-                GraphCaptureAvailability.AVAILABLE,
-            ),
-            signature,
-        )
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cpu"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        signature,
     )
     binding = ResidentGraphCaptureBinding(
         request, request.session, request.registry, request.guard, lifecycle
     )
     _attach_resident_graph_capture_binding(request, binding)
+    complete_resident_graph_capture(binding)
 
     with pytest.raises(ValueError, match="CUDA"):
         gate_resident_graph_capture(binding)
 
-    assert binding.lifecycle is lifecycle
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.CAPTURED
 
 
 @pytest.mark.warp
@@ -1419,18 +1446,17 @@ def test_binding_writer_classification_faults_captured_lifecycle(
 ) -> None:
     """A scheduler-confirmed writer outcome faults only binding metadata."""
     request = cast("ResidentSimulationRequest", resident_request)
-    lifecycle = complete_graph_capture(
-        create_graph_capture_lifecycle(
-            GraphCaptureCapability(
-                Device(Backend.WARP, "cuda:0"),
-                GraphCaptureAvailability.AVAILABLE,
-            ),
-            create_resident_graph_capture_signature(request),
-        )
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(request),
     )
     binding = ResidentGraphCaptureBinding(
         request, request.session, request.registry, request.guard, lifecycle
     )
+    _attach_resident_graph_capture_binding(request, binding)
 
     classify_resident_graph_capture_writer_failure(binding)
 
@@ -1445,22 +1471,23 @@ def test_binding_renews_only_after_explicit_retirement(
     """A binding renews retired metadata and still requires completion."""
     request = cast("ResidentSimulationRequest", resident_request)
     signature = create_resident_graph_capture_signature(request)
-    lifecycle = invalidate_graph_capture(
-        complete_graph_capture(
-            create_graph_capture_lifecycle(
-                GraphCaptureCapability(
-                    Device(Backend.WARP, "cuda:0"),
-                    GraphCaptureAvailability.AVAILABLE,
-                ),
-                signature,
-            )
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
         ),
-        GraphCaptureCompatibility(
-            False, GraphCaptureDriftReason.CONFIGURATIONS
-        ),
+        signature,
     )
     binding = ResidentGraphCaptureBinding(
         request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    complete_resident_graph_capture(binding)
+    binding._lifecycle = invalidate_graph_capture(
+        binding.lifecycle,
+        GraphCaptureCompatibility(
+            False, GraphCaptureDriftReason.CONFIGURATIONS
+        ),
     )
 
     retired = retire_resident_graph_capture(binding)
