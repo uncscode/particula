@@ -1685,6 +1685,49 @@ distributed execution, and autodiff remain deferred to Epics H and I.
 Status: active. This is the next roadmap step after E7; its ADW plan and child
 feature decomposition are not yet scheduled.
 
+### E8-F1 shipped contract
+
+E8-F1 ships host metadata and scheduler admission only. Its concrete-only
+direct-import boundary is `particula.execution.graph_capture`; its carriers and
+lifecycle operations remain absent from `particula.execution` and top-level
+`particula` exports. It supplies neither native CUDA graph capture nor replay,
+parity, performance evidence, or a user workflow.
+
+Eligibility is CUDA-only and fail-closed. CPU and Warp CPU are neither capture
+paths nor fallback/emulation paths. E8-F1 provides no availability-policy
+selection or cross-device replay.
+
+Compatibility compares identity in this exact first-drift order: `request`,
+`session`, `device`, `dimensions`, `primary_containers`, `primary_arrays`,
+`resource_views`, `graph`, `schedule`, `schedule_order`, `diagnostics`,
+`communication`, `configurations`, and `rng_resources`. Identity replacement or
+another structural drift invalidates with the first detected reason. This is
+payload-only compatibility: unchanged-shape field-value updates, active/free
+slot changes, and advancing RNG words remain compatible; replacing an
+array/resource identity does not.
+
+The host lifecycle states are `READY`, `CAPTURED`, `INVALIDATED`, `FAULTED`,
+`RETIRED`, and `CLOSED`. `READY` requires explicit
+`complete_resident_graph_capture()` to become `CAPTURED`. Structural drift moves
+a captured lifecycle to `INVALIDATED`; explicit retirement then renewal creates
+a fresh `READY` lifecycle that again requires explicit completion. Renewal is
+not native recapture or replay. A writer-may-have-launched classification moves
+the lifecycle to `FAULTED`, and `CLOSED` is terminal.
+
+Scheduler admission before token entry requires the attached exact
+request/session/registry/closed-guard binding, an `ACTIVE` pinned session,
+available CUDA capability, `CAPTURED` lifecycle, and a compatible signature. A
+writer-may-have-launched failure records `FAULTED` metadata with no retry or
+rollback guarantee.
+
+Excluded from E8-F1 are native/full-loop capture or replay, no automatic recapture,
+retries, rollback, CPU fallback/emulation, hidden allocation/transfer/
+synchronization, checkpointed native graph handles, cross-device replay,
+captured numerical parity, benchmark/profiling/memory claims, root-README
+changes, and user examples. E8-F2--E8-F8 own capture-ready enqueue, resource
+preparation, native capture/replay, parity, benchmarks, profiling, memory
+evidence, and examples.
+
 Reduce launch overhead with graph capture and establish performance and memory
 targets aligned with the multi-box scaling goal.
 

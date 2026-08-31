@@ -12,3 +12,4 @@
 | Contract feature is misdocumented as complete captured-loop support | Medium | Medium | Scope docs and success criteria explicitly defer execution parity, example, benchmark, and profiling claims to E8-F4 through E8-F8 | E8-F1 P4 implementer |
 | Optional CUDA coverage is unavailable in CI | High | Medium | Keep hardware-free lifecycle/signature unit tests mandatory; make CUDA rows pass-or-clean-skip evidence without inferring success | Test owner |
 | Contract layer becomes a second scheduler | Low | High | Retain exact resolver-produced graph/schedule and delegate authoritative ordering to `ResidentSimulationScheduler` | Architecture reviewer |
+| Later tracks add hidden replay work, weaken no-retry/no-rollback writer semantics, or claim executable captured-loop support | Medium | Critical | Keep E8-F2--E8-F8 scope and evidence explicit; require focused regression and review before publication | E8-F2--E8-F8 owners |

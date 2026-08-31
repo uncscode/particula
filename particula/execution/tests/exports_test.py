@@ -105,6 +105,16 @@ DENIED_PUBLIC_NAMES = (
     "StreamManifest",
     "StreamRegistry",
     "PublishedStreamManifest",
+    "GraphCaptureAvailability",
+    "GraphCaptureCapability",
+    "GraphCaptureRuntimeProbe",
+    "GraphCaptureDriftReason",
+    "GraphCaptureCompatibility",
+    "ResidentGraphCaptureSignature",
+    "GraphCaptureLifecycleState",
+    "GraphCaptureFailureClassification",
+    "GraphCaptureLifecycle",
+    "ResidentGraphCaptureBinding",
 )
 
 FORBIDDEN_MODULE_PREFIXES = (
@@ -122,6 +132,7 @@ FORBIDDEN_MODULE_PREFIXES = (
     "particula.execution.process_graph",
     "particula.execution.thermodynamic_updates",
     "particula.execution.rng",
+    "particula.execution.graph_capture",
 )
 
 

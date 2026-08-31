@@ -83,6 +83,16 @@ EXCLUDED_EXPORTS = (
     "PublishedStreamManifest",
     "PROCESS_IDS",
     "SUPPORTED_PROCESS_IDS",
+    "GraphCaptureAvailability",
+    "GraphCaptureCapability",
+    "GraphCaptureRuntimeProbe",
+    "GraphCaptureDriftReason",
+    "GraphCaptureCompatibility",
+    "ResidentGraphCaptureSignature",
+    "GraphCaptureLifecycleState",
+    "GraphCaptureFailureClassification",
+    "GraphCaptureLifecycle",
+    "ResidentGraphCaptureBinding",
 )
 
 DIRECT_IMPORT_ONLY_NAMES = (

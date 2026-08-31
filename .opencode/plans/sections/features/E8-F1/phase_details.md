@@ -50,10 +50,18 @@
     failure. CUDA admission is optional; Warp CPU is rejected.
 
 - [ ] **E8-F1-P4:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
+  - Issue: #1550 | Size: XS | Status: In Progress
   - Goal: Publish the contract boundaries and handoff requirements for E8-F2
     through E8-F8 without advertising executable graph replay prematurely.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`, relevant
     E8 plan sections
-  - Tests: Documentation contract assertions where applicable and
-    `mkdocs build --strict`.
+  - Files changed: `AGENTS.md`, `docs/Features/Roadmap/data-oriented-gpu.md`,
+    `particula/execution/tests/graph_capture_docs_test.py`,
+    `particula/execution/tests/exports_test.py`, and
+    `particula/tests/execution_exports_test.py`.
+  - Validation on 2026-08-30: focused developer-document and export checks
+    passed (17 passed). The untargeted `.opencode/tools/run_pytest.py` passed
+    with 6381 passed, 9 skipped, 1 xfailed, and 93.59% coverage. `mkdocs build
+    --strict` is unavailable because no supported MkDocs runner is available.
+    P4 and its parent handoff remain incomplete.
+  - No user example is in scope.

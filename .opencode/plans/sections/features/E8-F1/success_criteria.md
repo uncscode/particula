@@ -16,19 +16,25 @@
 - [x] P2 lifecycle metadata covers all six states, legal host-only transitions,
   exact carrier validation, first-reason retention, and idempotent paths; it
   rejects every other lifecycle transition without inspecting a resident binding.
-- [ ] Recapture is explicit and creates a new record only after eligibility
+- [x] Recapture is explicit and creates a new record only after eligibility
   checks; there is no automatic replacement, migration, fallback, retry, or
   graph-handle checkpointing.
 - [x] P2 read-only classification preserves accepted lifecycle metadata by
   identity, while writer-may-have-launched classification produces immutable
   fault metadata without asserting resident-session mutation or rollback.
-- [ ] Persistent coagulation and wall-loss RNG sidecars advance by identity and
+- [x] Persistent coagulation and wall-loss RNG sidecars advance by identity and
   are never implicitly initialized or reset by replay/recapture checks.
 - [ ] Focused execution tests pass; the untargeted repository runner supplies
   full-package coverage without lowering thresholds; documentation builds
   strictly.
 - [ ] E8-F2 and E8-F3 can consume the documented contract without redefining
   lifecycle states or recapture triggers.
+
+Validation record for #1550 (2026-08-30): focused documentation/export checks
+passed (17 passed); the untargeted `.opencode/tools/run_pytest.py` passed with
+6381 passed, 9 skipped, 1 xfailed, and 93.59% coverage. `mkdocs build --strict`
+is unavailable because no supported MkDocs runner is available. The strict-build
+criterion and delivery handoff remain unchecked.
 
 ## Metrics
 

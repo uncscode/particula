@@ -958,6 +958,38 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   `python -Werror docs/Examples/Nucleation/gpu_direct_nucleation.py` and
   `pytest particula/gpu/tests/gpu_direct_nucleation_example_test.py -q -Werror`.
 
+### Resident graph-capture admission lifecycle
+
+- E8-F1 supplies host metadata and scheduler admission only through the
+  concrete-only `particula.execution.graph_capture` import boundary. Its
+  carriers and lifecycle operations are absent from `particula.execution` and
+  top-level `particula`; it supplies no native CUDA graph capture, replay,
+  parity, performance evidence, or user workflow.
+- Eligibility is CUDA-only and fail-closed. CPU and Warp CPU are neither capture
+  nor fallback/emulation paths; E8-F1 supplies no availability-policy selection
+  or cross-device replay.
+- Compatibility checks identity in this exact first-drift order: `request`,
+  `session`, `device`, `dimensions`, `primary_containers`, `primary_arrays`,
+  `resource_views`, `graph`, `schedule`, `schedule_order`, `diagnostics`,
+  `communication`, `configurations`, and `rng_resources`. This is payload-only
+  compatibility: unchanged-shape
+  field-value updates, active/free-slot changes, and advancing RNG words remain
+  compatible; replacing an array/resource identity does not.
+- Lifecycle states are `READY`, `CAPTURED`, `INVALIDATED`, `FAULTED`,
+  `RETIRED`, and terminal `CLOSED`. `READY` requires explicit
+  `complete_resident_graph_capture()` for `CAPTURED`; drift invalidates captured
+  metadata; explicit retirement then renewal creates a fresh `READY` lifecycle
+  requiring explicit completion again. Renewal is not native recapture or
+  replay. Writer-may-have-launched failure records `FAULTED` metadata with no
+  retry or rollback guarantee.
+- Admission before scheduler token entry requires the attached exact
+  request/session/registry/closed-guard binding, an `ACTIVE` pinned session,
+  available CUDA capability, `CAPTURED` lifecycle, and compatible signature.
+  E8-F2--E8-F8 own native/full-loop capture or replay, no automatic recapture,
+  hidden allocation/transfer/synchronization, checkpointed native graph handles,
+  cross-device replay, captured numerical parity, benchmark/profiling/memory
+  evidence, and user examples.
+
 ### GPU-resident session lifecycle
 
 - `particula.execution.availability` is a concrete direct-import-only P2
