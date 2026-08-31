@@ -327,6 +327,14 @@ rollback is promised after E6-F6 primitive entry or P5 writer launch. The direct
 step has no hidden transfer, CPU fallback, resize/compaction, GPU `Runnable`, or
 E6-F9 integration.
 
+`particula.execution.resident_enqueue` is the concrete, direct-import-only
+E8-F2 P1 READY-state preparation boundary. It retains frozen identity metadata
+and invokes shared no-construction read-only validation. It excludes capture,
+replay, enqueue, dispatch, executor/token construction, resource acquisition,
+payload inspection, transfer, synchronization, lifecycle mutation, fallback,
+and exports. `graph_capture` owns lifecycle; `resident_scheduler` retains
+CAPTURED admission and normal dispatch.
+
 ## Scientific Utilities
 
 - Physical constants belong in `particula.util.constants`.

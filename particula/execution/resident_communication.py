@@ -118,29 +118,7 @@ class ResidentCommunicationExecutor:
             ValueError: If duration, registry binding, graph provenance, or
                 barrier-node identity and kind are invalid.
         """
-        request = self._request
-        if isinstance(request.duration, bool) or not isinstance(
-            request.duration, Real
-        ):
-            raise TypeError("duration must be a non-boolean real.")
-        if not _isfinite_real(request.duration) or request.duration < 0:
-            raise ValueError("duration must be finite and nonnegative.")
-        registry = cast(Any, request.registry)
-        registry.validate_communication_resources(
-            request.session, request.resources
-        )
-        if not _is_resolver_produced_graph(request.graph):
-            raise ValueError("graph must be produced by plan resolution.")
-        nodes = {node.node_id: node for node in request.graph.nodes}
-        if (
-            nodes.get("communication") is not request.communication_node
-            or nodes.get("volume_evolution")
-            is not request.volume_evolution_node
-            or request.communication_node.kind is not NodeKind.COMMUNICATION
-            or request.volume_evolution_node.kind
-            is not NodeKind.VOLUME_EVOLUTION
-        ):
-            raise ValueError("communication barrier nodes do not match graph.")
+        validate_resident_communication_request(self._request)
 
     def execute_communication(self) -> object:
         """Dispatch exactly one native communication primitive by mode.
@@ -228,3 +206,45 @@ class ResidentCommunicationExecutor:
             self._request.resources.execution_state.volume_invalid,
             self._request.resources.execution_state.volume_changed,
         )
+
+
+def validate_resident_communication_request(
+    request: object,
+) -> ResidentCommunicationRequest:
+    """Validate one resident communication request without an executor.
+
+    Args:
+        request: Candidate exact resident communication request.
+
+    Returns:
+        The unchanged validated request.
+
+    Raises:
+        TypeError: If the request or its duration has an invalid type.
+        ValueError: If metadata, duration, or barrier nodes are invalid.
+    """
+    if type(request) is not ResidentCommunicationRequest:
+        raise TypeError(
+            "request must be an exact ResidentCommunicationRequest."
+        )
+    if isinstance(request.duration, bool) or not isinstance(
+        request.duration, Real
+    ):
+        raise TypeError("duration must be a non-boolean real.")
+    if not _isfinite_real(request.duration) or request.duration < 0:
+        raise ValueError("duration must be finite and nonnegative.")
+    registry = cast(Any, request.registry)
+    registry.validate_communication_resources(
+        request.session, request.resources
+    )
+    if not _is_resolver_produced_graph(request.graph):
+        raise ValueError("graph must be produced by plan resolution.")
+    nodes = {node.node_id: node for node in request.graph.nodes}
+    if (
+        nodes.get("communication") is not request.communication_node
+        or nodes.get("volume_evolution") is not request.volume_evolution_node
+        or request.communication_node.kind is not NodeKind.COMMUNICATION
+        or request.volume_evolution_node.kind is not NodeKind.VOLUME_EVOLUTION
+    ):
+        raise ValueError("communication barrier nodes do not match graph.")
+    return request

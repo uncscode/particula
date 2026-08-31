@@ -1,0 +1,166 @@
+"""Contract tests for READY-only resident enqueue preparation."""
+
+from dataclasses import FrozenInstanceError
+from typing import Any
+
+import pytest
+
+from particula.execution import Backend, Device
+from particula.execution.graph_capture import (
+    GraphCaptureAvailability,
+    GraphCaptureCapability,
+    GraphCaptureCompatibility,
+    GraphCaptureDriftReason,
+    GraphCaptureLifecycleState,
+    ResidentGraphCaptureBinding,
+    _attach_resident_graph_capture_binding,
+    create_graph_capture_lifecycle,
+    create_resident_graph_capture_signature,
+)
+from particula.execution.resident_enqueue import prepare_resident_timestep
+
+
+def _ready_request(monkeypatch: pytest.MonkeyPatch) -> Any:
+    """Build an attached READY request without completing capture."""
+    pytest.importorskip("warp")
+    from particula.execution.communication import CommunicationTransportMode
+    from particula.execution.tests.full_loop_test import _build_loop_fixture
+
+    fixture = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
+    request = fixture.request
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request,
+        request.session,
+        request.registry,
+        request.guard,
+        lifecycle,
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    return fixture
+
+
+@pytest.mark.warp
+def test_prepare_retains_ready_metadata_without_opening_a_step(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A valid READY declaration returns frozen identity-only metadata."""
+    fixture = _ready_request(monkeypatch)
+    request = fixture.request
+    binding = request.graph_capture_binding
+    assert binding is not None
+    begin_calls: list[object] = []
+
+    def reject_step(*args: object, **kwargs: object) -> None:
+        """Record forbidden token entry during metadata preparation."""
+        begin_calls.append((args, kwargs))
+        raise AssertionError("preparation must not open a resident step")
+
+    monkeypatch.setattr(request.guard, "begin_step", reject_step)
+
+    prepared = prepare_resident_timestep(request, 0.0)
+
+    assert prepared.request is request
+    assert prepared.binding is binding
+    assert prepared.lifecycle is binding.lifecycle
+    assert prepared.signature is binding.lifecycle.signature
+    assert prepared.session is request.session
+    assert prepared.registry is request.registry
+    assert prepared.guard is request.guard
+    assert prepared.device is binding.lifecycle.signature.device
+    assert prepared.dimensions is binding.lifecycle.signature.dimensions
+    assert prepared.graph is request.graph
+    assert prepared.schedule is request.schedule
+    assert prepared.ordered_node_ids is request.schedule.ordered_node_ids
+    assert prepared.primary_arrays is binding.lifecycle.signature.primary_arrays
+    assert prepared.resource_views is binding.lifecycle.signature.resource_views
+    assert all(
+        actual is expected
+        for actual, expected in zip(
+            prepared.primary_arrays,
+            binding.lifecycle.signature.primary_arrays,
+            strict=True,
+        )
+    )
+    assert all(
+        actual is expected
+        for actual, expected in zip(
+            prepared.resource_views,
+            binding.lifecycle.signature.resource_views,
+            strict=True,
+        )
+    )
+    assert prepared.duration == 0.0
+    assert begin_calls == []
+    assert request.guard.completed_steps == 0
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
+    with pytest.raises(FrozenInstanceError):
+        prepared.duration = 1.0  # type: ignore[misc]
+    assert prepare_resident_timestep(request, 0.0) != prepared
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("duration", (None, True, "0", float("nan"), -1.0))
+def test_prepare_rejects_invalid_duration_without_mutating_ready_lifecycle(
+    monkeypatch: pytest.MonkeyPatch, duration: object
+) -> None:
+    """Duration preflight leaves the attached declaration READY and unchanged."""
+    fixture = _ready_request(monkeypatch)
+    request = fixture.request
+    binding = request.graph_capture_binding
+    assert binding is not None
+
+    with pytest.raises((TypeError, ValueError), match="duration must"):
+        prepare_resident_timestep(request, duration)
+
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
+    assert request.graph_capture_binding is binding
+    assert request.guard.completed_steps == 0
+
+
+@pytest.mark.warp
+def test_prepare_rechecks_signature_after_metadata_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Drift detected after shared validation returns no prepared carrier."""
+    fixture = _ready_request(monkeypatch)
+    request = fixture.request
+    binding = request.graph_capture_binding
+    assert binding is not None
+    import particula.execution.graph_capture as graph_capture
+
+    calls: list[object] = []
+
+    def compare_after_validation(
+        signature: object, candidate: object
+    ) -> object:
+        """Accept the first comparison and report drift at the return guard."""
+        calls.append((signature, candidate))
+        return GraphCaptureCompatibility(
+            compatible=len(calls) == 1,
+            reason=(
+                None
+                if len(calls) == 1
+                else GraphCaptureDriftReason.SCHEDULE_ORDER
+            ),
+        )
+
+    monkeypatch.setattr(
+        graph_capture,
+        "compare_resident_graph_capture_signature",
+        compare_after_validation,
+    )
+
+    with pytest.raises(ValueError, match="signature is incompatible"):
+        prepare_resident_timestep(request, 0.0)
+
+    assert len(calls) == 2
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
+    assert request.graph_capture_binding is binding
+    assert request.guard.completed_steps == 0

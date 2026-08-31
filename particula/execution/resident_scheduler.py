@@ -28,6 +28,7 @@ from particula.execution.adapters.condensation import (
 from particula.execution.diagnostics import (
     ResidentDiagnosticsExecutor,
     ResidentDiagnosticsPlan,
+    validate_resident_diagnostics_plan,
 )
 from particula.execution.gpu_session import (
     ResidentSession,
@@ -58,6 +59,7 @@ from particula.execution.process_graph import (
 from particula.execution.resident_communication import (
     ResidentCommunicationExecutor,
     ResidentCommunicationRequest,
+    validate_resident_communication_request,
 )
 from particula.execution.scheduler import (
     ResolvedTimestepSchedule,
@@ -294,214 +296,24 @@ class ResidentSimulationScheduler:
                     "graph-capture binding must retain the executing request."
                 )
             gate_resident_graph_capture(binding)
-        if not _is_resolver_produced_graph(request.graph):
-            raise ValueError("graph must be produced by plan resolution.")
-        if not is_resolver_produced_schedule(request.schedule, request.graph):
-            raise ValueError(
-                "schedule must be produced for the exact resolved graph."
-            )
-        ids = request.schedule.ordered_node_ids
-        complete_ids = frozenset(ids)
-        if complete_ids != _COMPLETE_IDS or len(ids) != len(complete_ids):
-            raise ValueError(
-                "schedule must contain exactly the complete resident loop."
-            )
-        if request.communication is None:
-            raise ValueError(
-                "complete barrier schedule requires communication request."
-            )
-        if ids != resolve_canonical_topological_order(
-            request.schedule.nodes, request.schedule.dependencies
-        ):
-            raise ValueError("schedule must use canonical topological order.")
-        graph_by_id = {node.node_id: node for node in request.graph.nodes}
-        for node in request.schedule.nodes:
-            node_id = node.node_id
-            if graph_by_id.get(node_id) is not node:
-                raise ValueError(
-                    "schedule nodes must be identical graph members."
-                )
-        self._validate_virtual_refresh_windows(
-            ids, request.schedule.dependencies
-        )
-        self._validate_request_nodes(graph_by_id)
-        ResidentDiagnosticsExecutor().validate(request.diagnostics)
-        self._validate_durations(duration)
+        _validate_complete_resident_timestep_metadata(request, duration)
+
+    def _validate_request_nodes(
+        self, graph_by_id: dict[str, ProcessNode]
+    ) -> None:
+        """Validate request bindings against exact resolved graph nodes."""
+        _validate_resident_request_nodes(self._request, graph_by_id)
+
+    def _validate_durations(self, duration: Real) -> None:
+        """Require every process request to retain the exact step duration."""
+        _validate_resident_durations(self._request, duration)
 
     @staticmethod
     def _validate_virtual_refresh_windows(
         ids: tuple[str, ...], dependencies: tuple[DependencyEdge, ...]
     ) -> None:
-        """Require the complete resolver freshness window.
-
-        The refresh nodes must remain adjacent to condensation and diagnostics
-        before lifecycle entry.
-        """
-        positions = {node_id: index for index, node_id in enumerate(ids)}
-        vapor = positions["vapor_pressure_refresh"]
-        saturation = positions["saturation_refresh"]
-        condensation = positions["condensation"]
-        diagnostics = positions["diagnostics"]
-        pairs = {(edge.before_id, edge.after_id) for edge in dependencies}
-        if (
-            saturation != vapor + 1
-            or condensation != saturation + 1
-            or diagnostics != len(ids) - 1
-            or ("vapor_pressure_refresh", "saturation_refresh") not in pairs
-            or ("saturation_refresh", "condensation") not in pairs
-            or ("saturation_refresh", "diagnostics") not in pairs
-        ):
-            raise ValueError(
-                "schedule must retain complete thermodynamic refresh windows."
-            )
-
-    def _validate_request_nodes(  # noqa: C901
-        self, graph_by_id: dict[str, ProcessNode]
-    ) -> None:
-        """Validate request bindings against exact resolved graph nodes.
-
-        Args:
-            graph_by_id: Resolved graph nodes indexed by their canonical IDs.
-
-        Raises:
-            ValueError: If a state update, diagnostics plan, process request, or
-            execution state does not retain the scheduler's binding. This
-            metadata preflight does not dispatch, transfer, synchronize, acquire
-            resources, or mutate resident arrays.
-        """
-        request = self._request
-        registry = cast(Any, request.registry)
-        node_fields = (
-            (request.environment_update, "environment_update"),
-            (request.gas_update, "gas_update"),
-        )
-        for item, node_id in node_fields:
-            if (
-                item is None
-                or item.graph is not request.graph
-                or item.session is not request.session
-                or item.registry is not request.registry
-                or item.node is not graph_by_id[node_id]
-            ):
-                raise ValueError(
-                    "state update request does not match resolved binding."
-                )
-        plan = request.diagnostics
-        if (
-            plan.session is not request.session
-            or plan.registry is not request.registry
-            or plan.graph is not request.graph
-            or plan.schedule is not request.schedule
-            or plan.node is not graph_by_id["diagnostics"]
-        ):
-            raise ValueError(
-                "diagnostics plan does not match resolved binding."
-            )
-        for process_request in (
-            request.dilution,
-            request.wall_loss,
-            request.nucleation,
-        ):
-            if (
-                process_request.session is not request.session
-                or process_request.registry is not request.registry
-            ):
-                raise ValueError(
-                    "process request does not match resident binding."
-                )
-        communication = request.communication
-        if communication is not None:
-            if (
-                communication.session is not request.session
-                or communication.registry is not request.registry
-                or communication.graph is not request.graph
-                or communication.duration != request.dilution.time_step
-                or communication.communication_node
-                is not graph_by_id.get("communication")
-                or communication.volume_evolution_node
-                is not graph_by_id.get("volume_evolution")
-            ):
-                raise ValueError(
-                    "communication request does not match resolved binding."
-                )
-            ResidentCommunicationExecutor(communication).validate()
-        condensation = request.condensation.state
-        if (
-            condensation.particles is not request.session.particles
-            or condensation.gas is not request.session.gas
-            or condensation.environment is not request.session.environment
-            or condensation.thermodynamics is not request.thermodynamics
-        ):
-            raise ValueError(
-                "condensation state does not match resident binding."
-            )
-        coagulation_request = request.coagulation
-        coagulation = coagulation_request.request.state
-        if (
-            coagulation.particles is not request.session.particles
-            or coagulation.environment is not request.session.environment
-        ):
-            raise ValueError(
-                "coagulation state does not match resident binding."
-            )
-        condensation_resources = registry._views.get("condensation")
-        if condensation.scratch_buffers is not getattr(
-            condensation_resources, "scratch_buffers", None
-        ):
-            raise ValueError("condensation state must use published resources.")
-        registry.validate_condensation_resources(
-            request.session, condensation_resources
-        )
-        coagulation_resources = registry._views.get("coagulation")
-        if (
-            coagulation.collision_pairs
-            is not getattr(coagulation_resources, "collision_pairs", None)
-            or coagulation.n_collisions
-            is not getattr(coagulation_resources, "n_collisions", None)
-            or coagulation.rng_states
-            is not getattr(coagulation_resources, "rng_states", None)
-        ):
-            raise ValueError("coagulation state must use published resources.")
-        registry.validate_coagulation_resources(
-            request.session, coagulation_resources
-        )
-        if (
-            coagulation_request.session is not request.session
-            or coagulation_request.registry is not request.registry
-            or coagulation_request.resources is not coagulation_resources
-        ):
-            raise ValueError(
-                "coagulation request does not match resident binding."
-            )
-        registry.validate_wall_loss_resources(
-            request.session, request.wall_loss.resources
-        )
-        request.wall_loss.validate_enabled_box_indices()
-        registry.validate_nucleation_resources(
-            request.session, request.nucleation.resources
-        )
-
-    def _validate_durations(self, duration: Real) -> None:
-        """Require every process request to retain the exact step duration.
-
-        Args:
-            duration: Prevalidated duration supplied to :meth:`execute`.
-
-        Raises:
-            ValueError: If a participating process ``time_step`` differs.
-        """
-        request = self._request
-        values = (
-            request.condensation.time_step,
-            request.coagulation.request.state.time_step,
-            request.dilution.time_step,
-            request.wall_loss.time_step,
-            request.nucleation.time_step,
-        )
-        if any(value != duration for value in values):
-            raise ValueError(
-                "all process time_step values must equal duration."
-            )
+        """Require the complete resolver freshness window."""
+        _validate_virtual_refresh_windows(ids, dependencies)
 
     def execute(self, duration: object) -> None:  # noqa: C901
         """Preflight then run one complete ordered timestep.
@@ -623,3 +435,180 @@ class ResidentSimulationScheduler:
                     )
                     raise error from classification_error
             raise
+
+
+def _validate_complete_resident_timestep_metadata(
+    request: ResidentSimulationRequest, duration: Real
+) -> None:
+    """Validate complete-loop metadata without scheduler construction."""
+    if not _is_resolver_produced_graph(request.graph):
+        raise ValueError("graph must be produced by plan resolution.")
+    if not is_resolver_produced_schedule(request.schedule, request.graph):
+        raise ValueError(
+            "schedule must be produced for the exact resolved graph."
+        )
+    ids = request.schedule.ordered_node_ids
+    complete_ids = frozenset(ids)
+    if complete_ids != _COMPLETE_IDS or len(ids) != len(complete_ids):
+        raise ValueError(
+            "schedule must contain exactly the complete resident loop."
+        )
+    if request.communication is None:
+        raise ValueError(
+            "complete barrier schedule requires communication request."
+        )
+    if ids != resolve_canonical_topological_order(
+        request.schedule.nodes, request.schedule.dependencies
+    ):
+        raise ValueError("schedule must use canonical topological order.")
+    graph_by_id = {node.node_id: node for node in request.graph.nodes}
+    for node in request.schedule.nodes:
+        if graph_by_id.get(node.node_id) is not node:
+            raise ValueError("schedule nodes must be identical graph members.")
+    _validate_virtual_refresh_windows(ids, request.schedule.dependencies)
+    _validate_resident_request_nodes(request, graph_by_id)
+    validate_resident_diagnostics_plan(request.diagnostics)
+    _validate_resident_durations(request, duration)
+
+
+def _validate_virtual_refresh_windows(
+    ids: tuple[str, ...], dependencies: tuple[DependencyEdge, ...]
+) -> None:
+    """Require the resolver's thermodynamic refresh windows."""
+    positions = {node_id: index for index, node_id in enumerate(ids)}
+    vapor = positions["vapor_pressure_refresh"]
+    saturation = positions["saturation_refresh"]
+    condensation = positions["condensation"]
+    diagnostics = positions["diagnostics"]
+    pairs = {(edge.before_id, edge.after_id) for edge in dependencies}
+    if (
+        saturation != vapor + 1
+        or condensation != saturation + 1
+        or diagnostics != len(ids) - 1
+        or ("vapor_pressure_refresh", "saturation_refresh") not in pairs
+        or ("saturation_refresh", "condensation") not in pairs
+        or ("saturation_refresh", "diagnostics") not in pairs
+    ):
+        raise ValueError(
+            "schedule must retain complete thermodynamic refresh windows."
+        )
+
+
+def _validate_resident_request_nodes(  # noqa: C901
+    request: ResidentSimulationRequest, graph_by_id: dict[str, ProcessNode]
+) -> None:
+    """Validate request bindings against resolved graph and resources."""
+    registry = cast(Any, request.registry)
+    for item, node_id in (
+        (request.environment_update, "environment_update"),
+        (request.gas_update, "gas_update"),
+    ):
+        if (
+            item is None
+            or item.graph is not request.graph
+            or item.session is not request.session
+            or item.registry is not request.registry
+            or item.node is not graph_by_id[node_id]
+        ):
+            raise ValueError(
+                "state update request does not match resolved binding."
+            )
+    plan = request.diagnostics
+    if (
+        plan.session is not request.session
+        or plan.registry is not request.registry
+        or plan.graph is not request.graph
+        or plan.schedule is not request.schedule
+        or plan.node is not graph_by_id["diagnostics"]
+    ):
+        raise ValueError("diagnostics plan does not match resolved binding.")
+    for process_request in (
+        request.dilution,
+        request.wall_loss,
+        request.nucleation,
+    ):
+        if (
+            process_request.session is not request.session
+            or process_request.registry is not request.registry
+        ):
+            raise ValueError("process request does not match resident binding.")
+    communication = request.communication
+    if communication is not None:
+        if (
+            communication.session is not request.session
+            or communication.registry is not request.registry
+            or communication.graph is not request.graph
+            or communication.duration != request.dilution.time_step
+            or communication.communication_node
+            is not graph_by_id.get("communication")
+            or communication.volume_evolution_node
+            is not graph_by_id.get("volume_evolution")
+        ):
+            raise ValueError(
+                "communication request does not match resolved binding."
+            )
+        validate_resident_communication_request(communication)
+    condensation = request.condensation.state
+    if (
+        condensation.particles is not request.session.particles
+        or condensation.gas is not request.session.gas
+        or condensation.environment is not request.session.environment
+        or condensation.thermodynamics is not request.thermodynamics
+    ):
+        raise ValueError("condensation state does not match resident binding.")
+    coagulation_request = request.coagulation
+    coagulation = coagulation_request.request.state
+    if (
+        coagulation.particles is not request.session.particles
+        or coagulation.environment is not request.session.environment
+    ):
+        raise ValueError("coagulation state does not match resident binding.")
+    condensation_resources = registry._views.get("condensation")
+    if condensation.scratch_buffers is not getattr(
+        condensation_resources, "scratch_buffers", None
+    ):
+        raise ValueError("condensation state must use published resources.")
+    registry.validate_condensation_resources(
+        request.session, condensation_resources
+    )
+    coagulation_resources = registry._views.get("coagulation")
+    if (
+        coagulation.collision_pairs
+        is not getattr(coagulation_resources, "collision_pairs", None)
+        or coagulation.n_collisions
+        is not getattr(coagulation_resources, "n_collisions", None)
+        or coagulation.rng_states
+        is not getattr(coagulation_resources, "rng_states", None)
+    ):
+        raise ValueError("coagulation state must use published resources.")
+    registry.validate_coagulation_resources(
+        request.session, coagulation_resources
+    )
+    if (
+        coagulation_request.session is not request.session
+        or coagulation_request.registry is not request.registry
+        or coagulation_request.resources is not coagulation_resources
+    ):
+        raise ValueError("coagulation request does not match resident binding.")
+    registry.validate_wall_loss_resources(
+        request.session, request.wall_loss.resources
+    )
+    request.wall_loss.validate_enabled_box_indices()
+    registry.validate_nucleation_resources(
+        request.session, request.nucleation.resources
+    )
+
+
+def _validate_resident_durations(
+    request: ResidentSimulationRequest, duration: Real
+) -> None:
+    """Require every process request to retain the exact step duration."""
+    values = (
+        request.condensation.time_step,
+        request.coagulation.request.state.time_step,
+        request.dilution.time_step,
+        request.wall_loss.time_step,
+        request.nucleation.time_step,
+    )
+    if any(value != duration for value in values):
+        raise ValueError("all process time_step values must equal duration.")

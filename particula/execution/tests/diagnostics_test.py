@@ -14,6 +14,7 @@ from particula.execution.diagnostics import (
     ResidentDiagnosticRegistration,
     ResidentDiagnosticsExecutor,
     ResidentDiagnosticsPlan,
+    validate_resident_diagnostics_plan,
 )
 from particula.execution.gpu_resources import GPUResourceRegistry
 from particula.execution.gpu_session import (
@@ -207,6 +208,10 @@ def test_diagnostics_reducers_match_independent_numpy_oracle() -> None:
         saturation.numpy(),
         cast(Any, session.environment).saturation_ratio.numpy(),
     )
+    npt.assert_array_equal(
+        saturation.numpy(),
+        cast(Any, session.environment).saturation_ratio.numpy(),
+    )
 
 
 @pytest.mark.warp
@@ -231,10 +236,24 @@ def test_legacy_two_snapshot_plan_remains_supported() -> None:
     npt.assert_array_equal(
         gas.numpy(), cast(Any, session.gas).concentration.numpy()
     )
-    npt.assert_array_equal(
-        saturation.numpy(),
-        cast(Any, session.environment).saturation_ratio.numpy(),
+
+
+@pytest.mark.warp
+def test_functional_validator_matches_executor_validation() -> None:
+    """The no-construction validator retains the accepted plan by identity."""
+    session = _session()
+    registrations = (
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT, _matrix()
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT, _matrix()
+        ),
     )
+    plan = _plan(session, registrations)
+
+    assert validate_resident_diagnostics_plan(plan) is plan
+    assert ResidentDiagnosticsExecutor().validate(plan) is plan
 
 
 @pytest.mark.warp

@@ -115,6 +115,8 @@ DENIED_PUBLIC_NAMES = (
     "GraphCaptureFailureClassification",
     "GraphCaptureLifecycle",
     "ResidentGraphCaptureBinding",
+    "PreparedResidentTimestep",
+    "prepare_resident_timestep",
 )
 
 GRAPH_CAPTURE_NAMES = DENIED_PUBLIC_NAMES[48:]
@@ -135,6 +137,7 @@ FORBIDDEN_MODULE_PREFIXES = (
     "particula.execution.thermodynamic_updates",
     "particula.execution.rng",
     "particula.execution.graph_capture",
+    "particula.execution.resident_enqueue",
 )
 
 

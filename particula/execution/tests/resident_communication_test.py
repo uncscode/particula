@@ -26,6 +26,7 @@ from particula.execution.process_graph import (
 from particula.execution.resident_communication import (
     ResidentCommunicationExecutor,
     ResidentCommunicationRequest,
+    validate_resident_communication_request,
 )
 
 
@@ -203,6 +204,15 @@ def test_executor_rejects_invalid_duration_before_native_dispatch(
     np.testing.assert_array_equal(
         cast(Any, request.session.gas).concentration.numpy(), gas_before
     )
+
+
+@pytest.mark.warp
+def test_functional_validator_matches_executor_validation() -> None:
+    """The no-construction validator retains the accepted request by identity."""
+    request = _request(CommunicationTransportMode.GAS)
+
+    assert validate_resident_communication_request(request) is request
+    assert ResidentCommunicationExecutor(request).validate() is None
 
 
 @pytest.mark.warp

@@ -337,10 +337,7 @@ class ResidentDiagnosticsExecutor:
             ValueError: If the plan's graph, bindings, or registration protocol
                 is invalid.
         """
-        if type(plan) is not ResidentDiagnosticsPlan:
-            raise TypeError("plan must be an exact ResidentDiagnosticsPlan.")
-        self._validate(plan)
-        return plan
+        return validate_resident_diagnostics_plan(plan)
 
     def execute(self, plan: object) -> None:
         """Validate and dispatch each registration in declared order.
@@ -436,6 +433,7 @@ class ResidentDiagnosticsExecutor:
                         ],
                         device=particles.masses.device,
                     )
+
                     if dimensions.n_particles:
                         wp.launch(
                             _accumulate_particle_species_mass,
@@ -481,3 +479,70 @@ class ResidentDiagnosticsExecutor:
                         ],
                         device=particles.masses.device,
                     )
+
+
+def validate_resident_diagnostics_plan(  # noqa: C901
+    plan: object,
+) -> ResidentDiagnosticsPlan:
+    """Validate an exact diagnostics plan without constructing an executor.
+
+    Args:
+        plan: Candidate concrete diagnostics plan.
+
+    Returns:
+        The unchanged, exact validated plan.
+
+    Raises:
+        TypeError: If ``plan`` is not an exact diagnostics plan.
+        ValueError: If its binding, graph, or registration metadata is invalid.
+    """
+    if type(plan) is not ResidentDiagnosticsPlan:
+        raise TypeError("plan must be an exact ResidentDiagnosticsPlan.")
+    registry = cast(Any, plan.registry)
+    if registry._session is not plan.session:
+        raise ValueError("diagnostics registry must be bound to session.")
+    registry.validate_pinned_session(plan.session)
+    if not _is_resolver_produced_graph(plan.graph):
+        raise ValueError(
+            "diagnostics graph must be produced by plan resolution."
+        )
+    if not is_resolver_produced_schedule(plan.schedule, plan.graph):
+        raise ValueError(
+            "diagnostics schedule must be produced for the exact graph."
+        )
+    if not any(node is plan.node for node in plan.graph.nodes):
+        raise ValueError("diagnostics node must be a graph member.")
+    if not any(node is plan.node for node in plan.schedule.nodes):
+        raise ValueError("diagnostics node must be a schedule member.")
+    if (
+        plan.node.node_id != "diagnostics"
+        or plan.node.kind is not NodeKind.DIAGNOSTIC
+        or plan.node.resources
+        != frozenset(
+            {
+                ResourceRequirement.PARTICLES,
+                ResourceRequirement.GAS,
+                ResourceRequirement.ENVIRONMENT,
+                ResourceRequirement.THERMODYNAMICS,
+                ResourceRequirement.DIAGNOSTICS,
+            }
+        )
+    ):
+        raise ValueError("diagnostics node has an invalid canonical role.")
+    if plan.schedule.ordered_node_ids[-1:] != ("diagnostics",):
+        raise ValueError("diagnostics must be the final scheduled node.")
+    if plan.schedule.ordered_node_ids != resolve_canonical_topological_order(
+        plan.schedule.nodes, plan.schedule.dependencies
+    ):
+        raise ValueError("diagnostics schedule must be canonical.")
+    operations = tuple(item.operation for item in plan.registrations)
+    if operations not in (
+        tuple(ResidentDiagnosticOperation)[:2],
+        tuple(ResidentDiagnosticOperation),
+    ):
+        raise ValueError(
+            "diagnostic operations must be unique and match the legacy "
+            "two-snapshot or current six-operation canonical tuple."
+        )
+    registry.validate_diagnostic_registrations(plan.session, plan.registrations)
+    return plan

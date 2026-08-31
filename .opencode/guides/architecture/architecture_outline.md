@@ -261,6 +261,12 @@ The exact downstream ordering remains
     not acquire, replace, inspect, synchronize, or reseed either stream. See
    [ADR-012](decisions/ADR-012-resident-complete-loop-and-diagnostics.md) and
    [ADR-018](decisions/ADR-018-resident-communication-integration.md).
+- `resident_enqueue.py` - Concrete direct-import-only E8-F2 P1 READY-state
+   preparation boundary. It freezes identity metadata after shared read-only
+   validation and excludes capture/replay, enqueue/dispatch, executors/tokens,
+   resource acquisition, payload inspection, transfer, synchronization,
+   lifecycle mutation, fallback, and exports. Graph capture owns lifecycle;
+   scheduler owns CAPTURED admission and dispatch.
 - `process_adapters.py` - Concrete-only, direct-import resident delegation
    boundary for dilution, wall loss, and nucleation. Frozen request carriers
    retain the exact active `ResidentSession`, its pinned
