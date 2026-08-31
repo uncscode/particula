@@ -48,6 +48,9 @@ from particula.execution.graph_capture import (
 if TYPE_CHECKING:
     from particula.execution.gpu_resources import GPUResourceRegistry
     from particula.execution.graph_capture import GraphCaptureRuntimeProbe
+    from particula.execution.resident_communication import (
+        ResidentCommunicationRequest,
+    )
     from particula.execution.resident_scheduler import ResidentSimulationRequest
 
 
@@ -519,14 +522,19 @@ def test_signature_tracks_nested_dispatch_sidecar_array_identities(
 ) -> None:
     """Replacing any nested sidecar under a retained wrapper causes drift."""
     request = cast("ResidentSimulationRequest", resident_request)
+    communication_request = cast(
+        "ResidentCommunicationRequest", request.communication
+    )
+    communication = communication_request.resources
+    assert communication is not None
     roots = (
         request.condensation.state.scratch_buffers,
         request.nucleation.resources.scratch,
         request.nucleation.resources.finalized_demand,
         request.nucleation.resources.diagnostics,
         request.nucleation.resources.exhaustion,
-        request.communication.resources.buffers,
-        request.communication.resources.execution_state,
+        communication.buffers,
+        communication.execution_state,
     )
     control = create_resident_graph_capture_signature(request)
     assert compare_resident_graph_capture_signature(control, request).compatible
