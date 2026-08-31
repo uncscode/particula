@@ -117,6 +117,8 @@ DENIED_PUBLIC_NAMES = (
     "ResidentGraphCaptureBinding",
 )
 
+GRAPH_CAPTURE_NAMES = DENIED_PUBLIC_NAMES[48:]
+
 FORBIDDEN_MODULE_PREFIXES = (
     "warp",
     "particula.gpu",
@@ -154,6 +156,8 @@ def test_execution_keeps_concrete_boundary_names_private() -> None:
     for name in DENIED_PUBLIC_NAMES:
         assert name not in execution.__all__
         assert not hasattr(particula, name)
+    for name in GRAPH_CAPTURE_NAMES:
+        assert not hasattr(execution, name)
 
 
 def test_public_execution_import_is_cpu_only_in_a_fresh_guarded_process() -> (

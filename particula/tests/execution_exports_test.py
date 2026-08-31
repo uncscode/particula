@@ -309,6 +309,14 @@ def test_result_and_cpu_types_remain_off_public_export_boundaries() -> None:
         assert not hasattr(particula, name)
 
 
+def test_graph_capture_carriers_remain_off_execution_attributes() -> None:
+    """Test graph-capture carriers stay concrete-module-only."""
+    for name in EXCLUDED_EXPORTS[33:]:
+        assert name not in execution.__all__
+        assert not hasattr(execution, name)
+        assert not hasattr(particula, name)
+
+
 def test_public_error_and_policy_values_are_cpu_only_in_fresh_process() -> None:
     """Test public values retain identity without optional-backend imports."""
     root = Path(__file__).parents[2]

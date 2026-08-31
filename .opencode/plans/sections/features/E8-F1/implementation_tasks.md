@@ -49,15 +49,16 @@
 - [x] Add hardware-free P2 coverage for legal and illegal transitions, exact
   argument validation, first-reason retention, failure classification, and a
   lifecycle subprocess that forbids Warp and resident-module imports.
-- [ ] Run focused assertions with coverage disabled, then run the untargeted
+- [x] Run focused assertions with coverage disabled, then run the untargeted
   `.opencode/tools/run_pytest.py` suite for repository-configured full-package
   coverage; focused-target coverage is invalid evidence.
-- [ ] Run Ruff formatting/checks and mypy for changed Python modules.
+- Downstream Validate and Polish own Ruff formatting/checks and mypy; they are
+  not E8-F1 delivery acceptance criteria.
 
 ## Documentation
 
-- [ ] Update the Epic H roadmap text to distinguish E8-F1's lifecycle contract
+- [x] Update the Epic H roadmap text to distinguish E8-F1's lifecycle contract
   from executable capture and replay delivered by later tracks.
-- [ ] Record the full recapture-trigger table and no-fallback/no-checkpointed-
+- [x] Record the full recapture-trigger table and no-fallback/no-checkpointed-
   graph-handle constraints in `AGENTS.md` for downstream agents.
-- [ ] Mark E8-F1 plan phases and changelog accurately after implementation.
+- [x] Mark E8-F1 plan phases and changelog accurately after implementation.

@@ -17,9 +17,10 @@ Issue #1550 added the bounded developer contract to `AGENTS.md` and the GPU
 roadmap, plus hardware-free documentation and export-boundary regressions. No
 user-facing `docs/Examples/` graph-capture example was added.
 
-Validation on 2026-08-30: focused developer-document and export checks passed
-(17 passed). The untargeted `.opencode/tools/run_pytest.py` passed with 6381
-passed, 9 skipped, 1 xfailed, and 93.59% coverage. `mkdocs build --strict` is
-unavailable because no supported MkDocs runner is available. Preserve the
-no-CPU-fallback boundary through implementation and export tests; do not mark
-P4 delivered until the strict documentation build succeeds.
+Validation on 2026-08-30: focused developer-document checks passed (2 passed)
+and export checks passed (16 passed). The untargeted
+`.opencode/tools/run_pytest.py` passed with 6382 passed, 9 skipped, and 94%
+coverage. `mkdocs build --strict` passed (exit 0). P4 is delivered and handed
+off to E8. Preserve the no-CPU-fallback boundary through implementation and
+export tests. Native capture/replay and any user example remain assigned to
+E8-F2--E8-F8.

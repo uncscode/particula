@@ -49,8 +49,8 @@
     covers scheduler pre-token rejection, dispatch preservation, and writer
     failure. CUDA admission is optional; Warp CPU is rejected.
 
-- [ ] **E8-F1-P4:** Update development documentation
-  - Issue: #1550 | Size: XS | Status: In Progress
+- [x] **E8-F1-P4:** Update development documentation
+  - Issue: #1550 | Size: XS | Status: Delivered on 2026-08-30
   - Goal: Publish the contract boundaries and handoff requirements for E8-F2
     through E8-F8 without advertising executable graph replay prematurely.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`, relevant
@@ -60,8 +60,8 @@
     `particula/execution/tests/exports_test.py`, and
     `particula/tests/execution_exports_test.py`.
   - Validation on 2026-08-30: focused developer-document and export checks
-    passed (17 passed). The untargeted `.opencode/tools/run_pytest.py` passed
-    with 6381 passed, 9 skipped, 1 xfailed, and 93.59% coverage. `mkdocs build
-    --strict` is unavailable because no supported MkDocs runner is available.
-    P4 and its parent handoff remain incomplete.
+    passed (2 graph-document tests and 16 export tests). The untargeted
+    `.opencode/tools/run_pytest.py` passed with 6382 passed, 9 skipped, and
+    94% coverage. `mkdocs build --strict` passed (exit 0). P4 and the E8 parent
+    handoff are shipped.
   - No user example is in scope.

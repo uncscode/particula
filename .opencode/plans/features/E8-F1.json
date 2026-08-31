@@ -2,13 +2,13 @@
   "id": "E8-F1",
   "type": "feature",
   "title": "Graph-Capture Capability and Lifecycle Contracts",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
+  "completion_date": "2026-08-30",
   "last_updated": "2026-08-30",
   "dependencies": [],
   "section_files": {
@@ -32,11 +32,11 @@
     {
       "id": "E8-F1-P1",
       "title": "Declare graph-capture capability and compatibility signature with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-08-30",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -46,11 +46,11 @@
     {
       "id": "E8-F1-P2",
       "title": "Implement capture lifecycle and explicit invalidation with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-08-30",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -60,11 +60,11 @@
     {
       "id": "E8-F1-P3",
       "title": "Define recapture gates and resident binding validation with integration tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-08-30",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -74,11 +74,11 @@
     {
       "id": "E8-F1-P4",
       "title": "Update development documentation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-08-30",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -86,6 +86,15 @@
       "reconciliation_evidence_fingerprint": null
     }
   ],
-  "totals": null,
-  "lifecycle": "active"
+  "totals": {
+    "total_duration_minutes": 0,
+    "total_cost_usd": 0.0,
+    "total_tokens_input": 0,
+    "total_tokens_output": 0,
+    "total_tests_run": 0,
+    "total_tests_failed": 0,
+    "phases_total": 4,
+    "phases_shipped": 4
+  },
+  "lifecycle": "completed"
 }

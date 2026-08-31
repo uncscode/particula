@@ -24,17 +24,19 @@
   fault metadata without asserting resident-session mutation or rollback.
 - [x] Persistent coagulation and wall-loss RNG sidecars advance by identity and
   are never implicitly initialized or reset by replay/recapture checks.
-- [ ] Focused execution tests pass; the untargeted repository runner supplies
+- [x] Focused execution tests pass; the untargeted repository runner supplies
   full-package coverage without lowering thresholds; documentation builds
   strictly.
-- [ ] E8-F2 and E8-F3 can consume the documented contract without redefining
+- [x] E8-F2 and E8-F3 can consume the documented contract without redefining
   lifecycle states or recapture triggers.
 
-Validation record for #1550 (2026-08-30): focused documentation/export checks
-passed (17 passed); the untargeted `.opencode/tools/run_pytest.py` passed with
-6381 passed, 9 skipped, 1 xfailed, and 93.59% coverage. `mkdocs build --strict`
-is unavailable because no supported MkDocs runner is available. The strict-build
-criterion and delivery handoff remain unchecked.
+Validation record for #1550 (2026-08-30): focused documentation checks passed
+(2 passed) and export checks passed (16 passed); the untargeted
+`.opencode/tools/run_pytest.py` passed with 6382 passed, 9 skipped, and 94%
+coverage. `mkdocs build --strict` passed (exit 0). The strict-build criterion
+and delivery handoff are checked. Native capture/replay, captured parity,
+benchmarks, profiling, and user examples remain unchecked work for
+E8-F2--E8-F8.
 
 ## Metrics
 

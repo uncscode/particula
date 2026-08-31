@@ -965,9 +965,10 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   carriers and lifecycle operations are absent from `particula.execution` and
   top-level `particula`; it supplies no native CUDA graph capture, replay,
   parity, performance evidence, or user workflow.
-- Eligibility is CUDA-only and fail-closed. CPU and Warp CPU are neither capture
-  nor fallback/emulation paths; E8-F1 supplies no availability-policy selection
-  or cross-device replay.
+- Eligibility is fail-closed: non-CPU Warp native devices require
+  caller-provided availability/probe qualification. CPU and Warp CPU are neither
+  capture nor fallback/emulation paths; E8-F1 supplies no availability-policy
+  selection or cross-device replay.
 - Compatibility checks identity in this exact first-drift order: `request`,
   `session`, `device`, `dimensions`, `primary_containers`, `primary_arrays`,
   `resource_views`, `graph`, `schedule`, `schedule_order`, `diagnostics`,
@@ -984,7 +985,8 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   retry or rollback guarantee.
 - Admission before scheduler token entry requires the attached exact
   request/session/registry/closed-guard binding, an `ACTIVE` pinned session,
-  available CUDA capability, `CAPTURED` lifecycle, and compatible signature.
+  available qualified non-CPU Warp capability, `CAPTURED` lifecycle, and a
+  compatible signature.
   E8-F2--E8-F8 own native/full-loop capture or replay, no automatic recapture,
   hidden allocation/transfer/synchronization, checkpointed native graph handles,
   cross-device replay, captured numerical parity, benchmark/profiling/memory

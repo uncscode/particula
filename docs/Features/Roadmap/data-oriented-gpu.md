@@ -1682,8 +1682,8 @@ distributed execution, and autodiff remain deferred to Epics H and I.
 
 ## Epic H: Graph Capture and Performance
 
-Status: active. This is the next roadmap step after E7; its ADW plan and child
-feature decomposition are not yet scheduled.
+Status: active. E8-F1 is shipped; E8-F2--E8-F8 remain the scheduled deferred
+feature tracks for native capture/replay and its later evidence.
 
 ### E8-F1 shipped contract
 
@@ -1693,9 +1693,10 @@ lifecycle operations remain absent from `particula.execution` and top-level
 `particula` exports. It supplies neither native CUDA graph capture nor replay,
 parity, performance evidence, or a user workflow.
 
-Eligibility is CUDA-only and fail-closed. CPU and Warp CPU are neither capture
-paths nor fallback/emulation paths. E8-F1 provides no availability-policy
-selection or cross-device replay.
+Eligibility is fail-closed: non-CPU Warp native devices require caller-provided
+availability/probe qualification. CPU and Warp CPU are neither capture paths nor
+fallback/emulation paths. E8-F1 provides no availability-policy selection or
+cross-device replay.
 
 Compatibility compares identity in this exact first-drift order: `request`,
 `session`, `device`, `dimensions`, `primary_containers`, `primary_arrays`,
@@ -1716,9 +1717,9 @@ the lifecycle to `FAULTED`, and `CLOSED` is terminal.
 
 Scheduler admission before token entry requires the attached exact
 request/session/registry/closed-guard binding, an `ACTIVE` pinned session,
-available CUDA capability, `CAPTURED` lifecycle, and a compatible signature. A
-writer-may-have-launched failure records `FAULTED` metadata with no retry or
-rollback guarantee.
+available qualified non-CPU Warp capability, `CAPTURED` lifecycle, and a
+compatible signature. A writer-may-have-launched failure records `FAULTED`
+metadata with no retry or rollback guarantee.
 
 Excluded from E8-F1 are native/full-loop capture or replay, no automatic recapture,
 retries, rollback, CPU fallback/emulation, hidden allocation/transfer/
