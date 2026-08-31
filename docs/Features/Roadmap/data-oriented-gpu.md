@@ -1598,8 +1598,6 @@ Broader transport and mixing/advection work remain deferred.
 E7-F8 is shipped: it owns the bounded scheduled persistent-stream identity,
 reset, and checkpoint/restart policy. E7-F9 owns final diagnostics products,
 complete examples, and closeout; its P7 validation gate is shipped.
-reset, and checkpoint/restart policy. E7-F9 shipped the final diagnostics,
-full-loop regression, documentation, and closeout scope.
 High-level GPU adapters and user-facing CPU/GPU orchestration remain later
 contracts after E7-F6 establishes policy. They must not imply availability
 probing, fallback, retry, graph capture, performance claims, distributed or
@@ -1669,16 +1667,18 @@ cleanly when unavailable; no CPU/Warp/CUDA replay guarantee is made.
 bounded concrete-only resident scheduler. E7-F7 and E7-F8 are shipped; E7-F9
 P7 is shipped as of 2026-08-11. See the
 [support matrix](../data-containers-and-gpu-foundations.md#e7-f9-resident-support-validation-matrix-2026-08-11)
-for the dated evidence. Epic G is shipped. Epics H and I remain deferred. Any
-public, availability-policy, fallback/retry, graph-capture, performance, or
+for the dated evidence. Epic G is shipped. At that closeout, Epics H and I were
+deferred; Epic H subsequently became active with E8-F1 shipped. Any public,
+availability-policy, fallback/retry, native graph-capture, performance, or
 distributed integration must establish its own contract. The direct GPU path
 remains explicit and unchanged.
 **Exit bar:** Satisfied on 2026-08-30. E7-F1 remains a bounded selection seam,
 E7-F5 remains a bounded concrete-only resident scheduler, and E7-F7--E7-F9
 close the communication, RNG/restart, diagnostics, validation, documentation,
 and epic publication scope. The direct GPU path remains explicit and unchanged.
-Graph capture, performance profiling and targets, memory-budget evidence,
-distributed execution, and autodiff remain deferred to Epics H and I.
+Native graph capture/replay beyond E8-F1 host admission, performance profiling
+and targets, memory-budget evidence, distributed execution, and autodiff remain
+deferred to the later Epic H tracks and Epic I.
 
 ## Epic H: Graph Capture and Performance
 

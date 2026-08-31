@@ -6,6 +6,7 @@ import copy
 import subprocess
 import sys
 import textwrap
+from dataclasses import fields, is_dataclass
 from typing import TYPE_CHECKING, cast
 
 import numpy as np
@@ -29,6 +30,7 @@ from particula.execution.graph_capture import (
     classify_graph_capture_failure,
     classify_resident_graph_capture_writer_failure,
     close_graph_capture,
+    close_resident_graph_capture,
     compare_resident_graph_capture_signature,
     complete_graph_capture,
     complete_resident_graph_capture,
@@ -264,13 +266,17 @@ def test_resolve_capability_propagates_probe_exception_unchanged(
 
 
 @pytest.mark.parametrize(
-    "method_name",
-    ["runtime_available", "device_available", "capture_api_available"],
+    ("method_name", "calls"),
+    [
+        ("runtime_available", []),
+        ("device_available", ["runtime"]),
+        ("capture_api_available", ["runtime", "device"]),
+    ],
 )
-def test_resolve_capability_validates_all_probe_methods_before_probing(
-    method_name: str,
+def test_resolve_capability_resolves_probe_methods_when_reached(
+    method_name: str, calls: list[str]
 ) -> None:
-    """Missing or non-callable probe members reject before the first probe."""
+    """Probe descriptors are resolved only after earlier checks succeed."""
     probe = RecordingProbe(True, True, True)
     setattr(probe, method_name, None)
 
@@ -279,7 +285,27 @@ def test_resolve_capability_validates_all_probe_methods_before_probing(
     ):
         resolve_graph_capture_capability(Device(Backend.WARP, "cuda:0"), probe)
 
-    assert probe.calls == []
+    assert probe.calls == calls
+
+
+def test_unavailable_runtime_does_not_resolve_later_descriptors() -> None:
+    """Runtime rejection returns without touching later probe descriptors."""
+
+    class RuntimeOnlyProbe:
+        """Expose only the prerequisite needed for runtime rejection."""
+
+        def runtime_available(self) -> bool:
+            return False
+
+        def __getattr__(self, name: str) -> object:
+            raise AssertionError(f"later descriptor was resolved: {name}")
+
+    result = resolve_graph_capture_capability(
+        Device(Backend.WARP, "cuda:0"),
+        cast("GraphCaptureRuntimeProbe", RuntimeOnlyProbe()),
+    )
+
+    assert result.availability is GraphCaptureAvailability.UNAVAILABLE_RUNTIME
 
 
 def test_resolve_capability_rejects_inexact_device() -> None:
@@ -471,6 +497,56 @@ def test_signature_tracks_every_published_resource_view_identity(
         finally:
             object.__setattr__(parent, attribute, original)
         assert result.reason is GraphCaptureDriftReason.RESOURCE_VIEWS, path
+
+
+def _sidecar_leaves(value: object) -> list[tuple[object, str]]:
+    """Return mutable owner/field pairs for every nested dataclass leaf."""
+    if not is_dataclass(value):
+        return []
+    leaves: list[tuple[object, str]] = []
+    for field in fields(value):
+        child = getattr(value, field.name)
+        if is_dataclass(child):
+            leaves.extend(_sidecar_leaves(child))
+        else:
+            leaves.append((value, field.name))
+    return leaves
+
+
+@pytest.mark.warp
+def test_signature_tracks_nested_dispatch_sidecar_array_identities(
+    resident_request: object,
+) -> None:
+    """Replacing any nested sidecar under a retained wrapper causes drift."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    roots = (
+        request.condensation.state.scratch_buffers,
+        request.nucleation.resources.scratch,
+        request.nucleation.resources.finalized_demand,
+        request.nucleation.resources.diagnostics,
+        request.nucleation.resources.exhaustion,
+        request.communication.resources.buffers,
+        request.communication.resources.execution_state,
+    )
+    control = create_resident_graph_capture_signature(request)
+    assert compare_resident_graph_capture_signature(control, request).compatible
+
+    for root in roots:
+        for owner, attribute in _sidecar_leaves(root):
+            signature = create_resident_graph_capture_signature(request)
+            original = getattr(owner, attribute)
+            object.__setattr__(owner, attribute, object())
+            try:
+                result = compare_resident_graph_capture_signature(
+                    signature, request
+                )
+            finally:
+                object.__setattr__(owner, attribute, original)
+            assert result.reason is GraphCaptureDriftReason.RESOURCE_VIEWS, (
+                type(root).__name__,
+                type(owner).__name__,
+                attribute,
+            )
 
 
 @pytest.mark.warp
@@ -838,6 +914,7 @@ def test_create_lifecycle_rejects_nonavailable_capability(
             ValueError,
         ),
         (GraphCaptureLifecycleState.INVALIDATED, None, ValueError),
+        (GraphCaptureLifecycleState.RETIRED, None, ValueError),
         (GraphCaptureLifecycleState.FAULTED, None, None),
         (
             GraphCaptureLifecycleState.RETIRED,
@@ -864,6 +941,23 @@ def test_lifecycle_reason_state_invariants(
             GraphCaptureLifecycle(
                 lifecycle.capability, lifecycle.signature, state, reason
             )
+
+
+def test_direct_lifecycle_construction_requires_available_capability() -> None:
+    """Every direct lifecycle state rejects unavailable capability metadata."""
+    lifecycle = _available_lifecycle()
+    capability = GraphCaptureCapability(
+        Device(Backend.WARP, "cuda:0"),
+        GraphCaptureAvailability.UNAVAILABLE_DEVICE,
+    )
+
+    with pytest.raises(ValueError, match="capability must be available"):
+        GraphCaptureLifecycle(
+            capability,
+            lifecycle.signature,
+            GraphCaptureLifecycleState.READY,
+            None,
+        )
 
 
 def test_invalidation_and_failure_paths_preserve_first_reason_and_identity() -> (
@@ -1412,6 +1506,59 @@ def test_binding_completion_rejects_detached_binding_without_mutation(
     assert complete_resident_graph_capture(binding).state is (
         GraphCaptureLifecycleState.CAPTURED
     )
+
+
+@pytest.mark.warp
+def test_binding_close_is_owned_validated_and_idempotent(
+    resident_request: object,
+) -> None:
+    """Attached binding closure updates only its lifecycle and repeats by identity."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    complete_resident_graph_capture(binding)
+
+    closed = close_resident_graph_capture(binding)
+
+    assert closed.state is GraphCaptureLifecycleState.CLOSED
+    assert close_resident_graph_capture(binding) is closed
+    with pytest.raises(ValueError, match="terminal state"):
+        classify_resident_graph_capture_writer_failure(binding)
+
+
+@pytest.mark.warp
+def test_binding_close_rejects_detached_or_stale_ownership(
+    resident_request: object,
+) -> None:
+    """Binding-owned closure rejects missing attachment and stale ownership."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    with pytest.raises(ValueError, match="attachment does not match"):
+        close_resident_graph_capture(binding)
+
+    _attach_resident_graph_capture_binding(request, binding)
+    object.__setattr__(request, "graph_capture_binding", None)
+    with pytest.raises(ValueError, match="attachment does not match"):
+        close_resident_graph_capture(binding)
+    assert binding.lifecycle is lifecycle
 
 
 @pytest.mark.warp

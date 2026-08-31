@@ -141,18 +141,18 @@ def resolve_graph_capture_capability(
             device, GraphCaptureAvailability.UNSUPPORTED_WARP_CPU
         )
     runtime_available = _require_probe_method(probe, "runtime_available")
-    device_available = _require_probe_method(probe, "device_available")
-    capture_api_available = _require_probe_method(
-        probe, "capture_api_available"
-    )
     if not _require_bool(runtime_available(), "runtime_available"):
         return GraphCaptureCapability(
             device, GraphCaptureAvailability.UNAVAILABLE_RUNTIME
         )
+    device_available = _require_probe_method(probe, "device_available")
     if not _require_bool(device_available(device), "device_available"):
         return GraphCaptureCapability(
             device, GraphCaptureAvailability.UNAVAILABLE_DEVICE
         )
+    capture_api_available = _require_probe_method(
+        probe, "capture_api_available"
+    )
     if not _require_bool(
         capture_api_available(device), "capture_api_available"
     ):
@@ -311,6 +311,17 @@ def _identity_tuple(*values: object) -> tuple[object, ...]:
     return values
 
 
+def _nested_sidecar_identities(value: object) -> tuple[object, ...]:
+    """Flatten dataclass sidecar leaves in deterministic declaration order."""
+    fields = getattr(type(value), "__dataclass_fields__", None)
+    if type(fields) is not dict:
+        return (value,)
+    identities: list[object] = []
+    for name in fields:
+        identities.extend(_nested_sidecar_identities(getattr(value, name)))
+    return tuple(identities)
+
+
 def create_resident_graph_capture_signature(
     request: object,
 ) -> ResidentGraphCaptureSignature:
@@ -380,6 +391,7 @@ def create_resident_graph_capture_signature(
         ),
         resource_views=_identity_tuple(
             condensation.state.scratch_buffers,
+            *_nested_sidecar_identities(condensation.state.scratch_buffers),
             coagulation.resources,
             coagulation.resources.collision_pairs,
             coagulation.resources.n_collisions,
@@ -389,6 +401,10 @@ def create_resident_graph_capture_signature(
             nucleation.resources.finalized_demand,
             nucleation.resources.diagnostics,
             nucleation.resources.exhaustion,
+            *_nested_sidecar_identities(nucleation.resources.scratch),
+            *_nested_sidecar_identities(nucleation.resources.finalized_demand),
+            *_nested_sidecar_identities(nucleation.resources.diagnostics),
+            *_nested_sidecar_identities(nucleation.resources.exhaustion),
             communication_resources,
             (
                 None
@@ -404,6 +420,18 @@ def create_resident_graph_capture_signature(
                 None
                 if communication_resources is None
                 else communication_resources.final_volumes
+            ),
+            *(
+                ()
+                if communication_resources is None
+                else _nested_sidecar_identities(communication_resources.buffers)
+            ),
+            *(
+                ()
+                if communication_resources is None
+                else _nested_sidecar_identities(
+                    communication_resources.execution_state
+                )
             ),
         ),
         graph=_identity_tuple(graph, graph.nodes, graph.dependencies),
@@ -612,6 +640,11 @@ class GraphCaptureLifecycle:
                 "state must be an exact GraphCaptureLifecycleState."
             )
         if (
+            self.capability.availability
+            is not GraphCaptureAvailability.AVAILABLE
+        ):
+            raise ValueError("lifecycle capability must be available.")
+        if (
             self.first_invalidation_reason is not None
             and type(self.first_invalidation_reason)
             is not GraphCaptureDriftReason
@@ -630,10 +663,16 @@ class GraphCaptureLifecycle:
         ):
             raise ValueError("ready and captured lifecycles require no reason.")
         if (
-            self.state is GraphCaptureLifecycleState.INVALIDATED
+            self.state
+            in (
+                GraphCaptureLifecycleState.INVALIDATED,
+                GraphCaptureLifecycleState.RETIRED,
+            )
             and self.first_invalidation_reason is None
         ):
-            raise ValueError("invalidated lifecycles require a reason.")
+            raise ValueError(
+                "invalidated and retired lifecycles require a reason."
+            )
 
 
 def _require_lifecycle(lifecycle: object) -> GraphCaptureLifecycle:
@@ -1155,6 +1194,23 @@ def classify_resident_graph_capture_writer_failure(binding: object) -> None:
     )
 
 
+def _fault_resident_graph_capture_after_classification_failure(
+    binding: object,
+) -> None:
+    """Fault an attached binding after classification itself fails."""
+    binding = _require_attached_resident_binding(binding)
+    if binding._lifecycle.state in (
+        GraphCaptureLifecycleState.RETIRED,
+        GraphCaptureLifecycleState.CLOSED,
+    ):
+        raise ValueError("terminal graph capture cannot be faulted.")
+    binding._lifecycle = _lifecycle_successor(
+        binding._lifecycle,
+        GraphCaptureLifecycleState.FAULTED,
+        binding._lifecycle.first_invalidation_reason,
+    )
+
+
 def retire_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
     """Explicitly retire invalidated lifecycle metadata on one binding.
 
@@ -1166,7 +1222,8 @@ def retire_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
 
     Raises:
         TypeError: If ``binding`` is not an exact binding.
-        ValueError: If the lifecycle is not invalidated or already retired.
+        ValueError: If the lifecycle is neither invalidated nor already
+            retired.
     """
     binding = _require_attached_resident_binding(binding)
     binding._lifecycle = retire_graph_capture(binding._lifecycle)
@@ -1208,4 +1265,25 @@ def renew_resident_graph_capture(
     binding._lifecycle = renew_retired_graph_capture(
         binding._lifecycle, signature
     )
+    return binding._lifecycle
+
+
+def close_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
+    """Close lifecycle metadata owned by one exact attached binding.
+
+    Repeated closure returns the identical closed lifecycle. This metadata-only
+    operation does not dispatch, release resources, or mutate resident state.
+
+    Args:
+        binding: Exact attached resident graph-capture binding to close.
+
+    Returns:
+        Closed lifecycle metadata now owned by ``binding``.
+
+    Raises:
+        TypeError: If ``binding`` is not an exact binding.
+        ValueError: If retained ownership or attachment identities are stale.
+    """
+    binding = _require_attached_resident_binding(binding)
+    binding._lifecycle = close_graph_capture(binding._lifecycle)
     return binding._lifecycle

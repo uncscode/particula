@@ -36,6 +36,7 @@ from particula.execution.gpu_session import (
     _ResidentOperationOutcome,
 )
 from particula.execution.graph_capture import (
+    _fault_resident_graph_capture_after_classification_failure,
     classify_resident_graph_capture_writer_failure,
     gate_resident_graph_capture,
 )
@@ -616,6 +617,9 @@ class ResidentSimulationScheduler:
                     classify_resident_graph_capture_writer_failure(
                         request.graph_capture_binding
                     )
-                except BaseException:  # noqa: S110
-                    pass
+                except BaseException as classification_error:
+                    _fault_resident_graph_capture_after_classification_failure(
+                        request.graph_capture_binding
+                    )
+                    raise error from classification_error
             raise

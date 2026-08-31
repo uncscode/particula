@@ -1023,6 +1023,51 @@ def test_writer_failure_faults_attached_graph_capture_lifecycle(
 
 
 @pytest.mark.warp
+def test_writer_and_capture_classification_failure_preserve_both_errors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Writer failure remains primary while classification failure is chained."""
+    fixture = _build_loop_fixture(
+        monkeypatch,
+        CommunicationTransportMode.GAS,
+        wall_loss_failure=True,
+    )
+    request = fixture.request
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request,
+        fixture.session,
+        fixture.registry,
+        fixture.guard,
+        lifecycle,
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    complete_resident_graph_capture(binding)
+    module = _scheduler_module()
+    classification_failure = RuntimeError("classification failed")
+    monkeypatch.setattr(module, "gate_resident_graph_capture", lambda _: None)
+    monkeypatch.setattr(
+        module,
+        "classify_resident_graph_capture_writer_failure",
+        lambda _: (_ for _ in ()).throw(classification_failure),
+    )
+
+    with pytest.raises(RuntimeError, match="wall-loss writer failed") as caught:
+        fixture.scheduler.execute(0.0)
+
+    assert caught.value.__cause__ is classification_failure
+    assert fixture.session.lifecycle is ResidentLifecycle.FAULTED
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.FAULTED
+    fixture.guard.assert_step_closed()
+
+
+@pytest.mark.warp
 def test_unsupported_capture_binding_rejects_before_token_or_dispatch(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1052,6 +1097,75 @@ def test_unsupported_capture_binding_rejects_before_token_or_dispatch(
 
     assert fixture.trace == []
     assert fixture.guard.completed_steps == 0
+
+
+def _attach_hardware_free_cuda_capture(
+    monkeypatch: pytest.MonkeyPatch, fixture: _LoopFixture
+) -> ResidentGraphCaptureBinding:
+    """Attach a qualified CUDA declaration while retaining CPU test storage."""
+    device = Device(Backend.WARP, "cuda:0")
+    object.__setattr__(fixture.session.metadata, "device", device)
+    for name in (
+        "validate_pinned_session",
+        "validate_condensation_resources",
+        "validate_coagulation_resources",
+        "validate_wall_loss_resources",
+        "validate_nucleation_resources",
+    ):
+        monkeypatch.setattr(
+            fixture.registry, name, lambda *_args, **_kwargs: None
+        )
+    request = fixture.request
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            device,
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request,
+        fixture.session,
+        fixture.registry,
+        fixture.guard,
+        lifecycle,
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    complete_resident_graph_capture(binding)
+    return binding
+
+
+@pytest.mark.warp
+def test_compatible_capture_passes_real_scheduler_gate_and_dispatches(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The scheduler's real gate admits compatible metadata before dispatch."""
+    fixture = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
+    binding = _attach_hardware_free_cuda_capture(monkeypatch, fixture)
+
+    fixture.scheduler.execute(0.0)
+
+    assert fixture.trace
+    assert fixture.guard.completed_steps == 1
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.CAPTURED
+
+
+@pytest.mark.warp
+def test_nested_sidecar_drift_rejects_before_token_or_dispatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The real scheduler gate invalidates nested drift before token entry."""
+    fixture = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
+    binding = _attach_hardware_free_cuda_capture(monkeypatch, fixture)
+    scratch = fixture.request.condensation.state.scratch_buffers
+    object.__setattr__(scratch, "work_mass_transfer", object())
+
+    with pytest.raises(ValueError, match="signature is incompatible"):
+        fixture.scheduler.execute(0.0)
+
+    assert fixture.trace == []
+    assert fixture.guard.completed_steps == 0
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.INVALIDATED
 
 
 @pytest.mark.warp
