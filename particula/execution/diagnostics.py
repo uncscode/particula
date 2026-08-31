@@ -1,7 +1,9 @@
 """Write closed resident diagnostics into caller-owned Warp arrays.
 
 This concrete direct-import-only module has no callback registration or package
-export. Registrations execute in this fixed order: gas-concentration snapshot,
+export. Its shared validator performs read-only metadata checks without
+constructing an executor or mutating resident state. Registrations execute in
+this fixed order: gas-concentration snapshot,
 saturation-ratio snapshot, total species mass, particle-number concentration,
 latent heat energy, and conservation residual. Matrix operations use ``(B, S)``
 ``wp.float64`` arrays; particle number uses a ``(B,)`` ``wp.float64`` array.
@@ -485,6 +487,10 @@ def validate_resident_diagnostics_plan(  # noqa: C901
     plan: object,
 ) -> ResidentDiagnosticsPlan:
     """Validate an exact diagnostics plan without constructing an executor.
+
+    This read-only shared validation seam performs no diagnostic dispatch,
+    resource acquisition, payload inspection, transfer, synchronization, or
+    resident-state mutation.
 
     Args:
         plan: Candidate concrete diagnostics plan.

@@ -8,6 +8,11 @@ concrete-only and retain exact caller-owned resident identities.
 
 ## In Scope
 
+- **Completed P1 (#1552):** provide the direct-import-only READY preparation
+  boundary and immutable aggregate metadata carrier in
+  `particula/execution/resident_enqueue.py`; extract read-only diagnostics and
+  communication validators; and share complete-loop metadata validation with
+  the scheduler without executor construction or lifecycle mutation.
 - Define immutable prepared-enqueue carriers tied to the exact E8-F1 capture
   lifecycle signature and `ResidentSimulationRequest`.
 - Move repeated scheduler metadata checks and executor construction into an
@@ -25,6 +30,9 @@ concrete-only and retain exact caller-owned resident identities.
 
 ## Out of Scope
 
+- P1 does not capture, replay, enqueue, dispatch, create scheduler/executor
+  instances, enter a guard token, acquire resources, inspect payloads, transfer,
+  synchronize, select a device, or mutate lifecycle state.
 - Owning the graph lifecycle, compatibility signature, invalidation, or
   recapture policy established by E8-F1.
 - Completing the reusable registry inventory or changing buffer ownership;

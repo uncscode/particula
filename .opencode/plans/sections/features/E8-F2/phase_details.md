@@ -1,16 +1,26 @@
 # Phase Details
 
-- [ ] **E8-F2-P1:** Define validated resident enqueue plans and setup contract with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Introduce exact immutable prepared-plan records and one setup boundary
-    that validates the resident request, E8-F1 lifecycle/signature, duration,
-    node order, and retained resource identities before any capture begins.
-  - Files: `particula/execution/resident_scheduler.py` or
-    `particula/execution/resident_enqueue.py`,
-    `particula/execution/tests/resident_enqueue_test.py`
-  - Tests: Exact carrier types, complete canonical schedule, signature drift,
-    lifecycle gates, duration agreement, read-only rejection, and no public
-    exports.
+- [x] **E8-F2-P1:** Define validated resident enqueue plans and setup contract with unit tests
+  - Issue: #1552 | Size: S | Status: Implemented
+  - Delivered: Added concrete-only `particula.execution.resident_enqueue` with
+    frozen `PreparedResidentTimestep` metadata and
+    `prepare_resident_timestep()`. Preparation accepts only an exact READY E8-F1
+    binding, retains exact resident identities and canonical schedule metadata,
+    performs initial and final signature-drift checks, and does not construct an
+    executor/scheduler or mutate lifecycle state.
+  - Shared validation: extracted read-only diagnostics and communication
+    validators and added scheduler complete-loop metadata validation for reuse by
+    preparation while preserving scheduler CAPTURED admission and dispatch.
+  - Files: `particula/execution/resident_enqueue.py`,
+    `particula/execution/resident_scheduler.py`,
+    `particula/execution/diagnostics.py`,
+    `particula/execution/resident_communication.py`, and focused execution tests.
+  - Evidence: `resident_enqueue_test.py` covers exact/frozen identity retention,
+    READY/lifecycle/attachment/duration/schedule/signature rejection, including
+    second-check drift, and traps forbidden guard-token entry. Broader
+    forbidden-operation trap coverage remains with later enqueue phases. Adjacent diagnostics,
+    communication, graph-capture, scheduler-loop, and export-boundary regressions
+    cover the extracted validators and concrete-only export contract.
 
 - [ ] **E8-F2-P2:** Split state, thermodynamic, and diagnostic setup from device enqueue with unit tests
   - Issue: TBD | Size: S | Status: Not Started

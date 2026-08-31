@@ -1,8 +1,10 @@
 """Compose pinned communication resources into resident barrier calls.
 
 This concrete-only module dispatches already acquired closed-map communication
-and optional volume evolution.  It never performs P1 validation, acquisition,
-host conversion, synchronization, fallback, or recovery.
+and optional volume evolution. Its shared validator checks retained metadata
+without constructing an executor or mutating resident state. It never performs
+P1 validation, acquisition, host conversion, synchronization, fallback, or
+recovery.
 """
 
 from __future__ import annotations
@@ -212,6 +214,10 @@ def validate_resident_communication_request(
     request: object,
 ) -> ResidentCommunicationRequest:
     """Validate one resident communication request without an executor.
+
+    This read-only shared validation seam performs no resource acquisition,
+    payload inspection, primitive dispatch, transfer, synchronization, or
+    resident-state mutation.
 
     Args:
         request: Candidate exact resident communication request.

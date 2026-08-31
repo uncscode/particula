@@ -10,6 +10,12 @@
 - Update docstrings in every changed execution and kernel module to identify
   which functions validate, which only enqueue, and the post-launch recovery
   limit.
+- Completed for P1 (#1552): `.opencode/guides/architecture_reference.md` and
+  `.opencode/guides/architecture/architecture_outline.md` describe
+  `resident_enqueue` as the direct-import-only READY preparation boundary, its
+  frozen identity metadata and shared read-only validation, and its exclusions.
+  They retain `graph_capture` lifecycle ownership and scheduler CAPTURED
+  admission/dispatch ownership.
 - Add or update documentation contract assertions under `particula/tests/` or
   `particula/execution/tests/` when user-facing contract text changes.
 - Update all E8-F2 plan sections and parent E8 child/dependency status during

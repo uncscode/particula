@@ -34,3 +34,15 @@
 
 Performance speedup is deliberately not a success metric for E8-F2; E8-F5 and
 E8-F8 own benchmark and profiling evidence.
+
+## P1 Completion Evidence (#1552)
+
+- [x] `prepare_resident_timestep()` constructs a frozen, exact-identity READY
+  metadata carrier for the canonical twelve-node request only after shared
+  complete-loop validation and a second signature-drift check.
+- [x] Preparation is proven setup-only by a focused guard-token-entry trap; no
+  enqueue or dispatch path was introduced. Broader forbidden-operation trap
+  coverage remains owned by later enqueue phases.
+- [x] Extracted diagnostics and communication functional validators retain
+  executor-wrapper regression coverage, while export tests keep
+  `resident_enqueue` and its names absent from package and top-level APIs.

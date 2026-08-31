@@ -41,6 +41,26 @@ wrapper. The prepared resident plan calls the same private enqueue primitive
 after setup has proved all preconditions. This avoids divergent physics while
 keeping unsafe bypasses concrete-only and inaccessible to ordinary callers.
 
+## P1 Implementation Record
+
+Issue #1552 implements the READY-only aggregate metadata boundary in
+`particula.execution.resident_enqueue`. Its frozen, `eq=False`
+`PreparedResidentTimestep` retains the exact request, attached binding,
+lifecycle/signature, session, registry, closed guard, device, dimensions,
+graph, schedule, canonical node-ID tuple, duration, primary-array tuple, and
+published-resource tuple without copying payloads. The boundary validates the
+exact attached ACTIVE/pinned/closed chain, requires READY, compares the E8-F1
+signature before and after setup, and leaves lifecycle ownership with
+`graph_capture`.
+
+`resident_scheduler._validate_complete_resident_timestep_metadata()` is now the
+shared read-only complete-loop validator. It reuses extracted functional
+validators in `diagnostics.py` and `resident_communication.py`, so preparation
+does not construct their executors or a scheduler and does not invoke the
+CAPTURED-only scheduler graph gate. Capture/replay, token entry, resource
+acquisition, payload inspection, transfer, synchronization, lifecycle mutation,
+and device selection remain excluded from P1.
+
 ## Data / API / Workflow Changes
 
 - **Data model:** Add frozen prepared request records for the full timestep and

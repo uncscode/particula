@@ -21,6 +21,15 @@ fallback, or dynamic scheduling. E8-F1 can capture that sequence, E8-F3 can pin
 every required reusable buffer, and ordinary direct callers retain their
 current validation and error contracts.
 
+## Implemented P1 Boundary
+
+Issue #1552 delivers the first setup-only seam:
+`particula.execution.resident_enqueue.prepare_resident_timestep()`. It returns
+an immutable, identity-semantic `PreparedResidentTimestep` only for an exact
+READY E8-F1 binding after shared complete-loop metadata validation and two
+signature comparisons. P1 performs neither capture nor enqueue/dispatch; later
+E8-F2 phases own device-only process preparation and execution.
+
 ## User Stories
 
 - As a resident-loop integrator, I want setup to reject incompatible state

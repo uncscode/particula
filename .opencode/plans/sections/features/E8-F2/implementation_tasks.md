@@ -2,21 +2,20 @@
 
 ## Backend
 
-- [ ] Add exact frozen prepared-plan carriers and `prepare_*` validation in
-  `particula/execution/resident_scheduler.py` or a focused concrete-only
-  `particula/execution/resident_enqueue.py` module.
+- [x] Add exact frozen prepared-plan carriers and `prepare_*` validation in the
+  focused concrete-only `particula/execution/resident_enqueue.py` module
+  (#1552). The READY-only carrier retains metadata by identity and performs no
+  executor construction or lifecycle mutation.
 - [ ] Extract fixed state-update copy launches from validation/readback in
   `particula/execution/state_updates.py`; bind input arrays and validation
   status during preparation.
 - [ ] Resolve thermodynamic refresh windows once and expose fixed
   vapor-pressure/saturation enqueue operations in
   `particula/execution/thermodynamic_updates.py`.
-- [ ] Split `ResidentDiagnosticsExecutor` into explicit validate/prepare and
-  enqueue methods while preserving the canonical operation order and empty
-  schemas in `particula/execution/diagnostics.py`.
-- [ ] Split communication and volume metadata validation from resident primitive
-  calls in `particula/execution/resident_communication.py` and
-  `particula/gpu/kernels/communication.py`.
+- [x] Extract read-only `ResidentDiagnosticsExecutor` validation into a
+  functional seam while retaining the executor compatibility wrapper (#1552).
+- [x] Extract read-only resident communication-request validation and reuse it
+  through shared scheduler complete-loop metadata validation (#1552).
 - [ ] Refactor `condensation_step_gpu` so its public boundary validates and then
   calls one private prepared launch sequence in
   `particula/gpu/kernels/condensation.py`.
@@ -35,9 +34,9 @@
 
 ## Tooling and Tests
 
-- [ ] Add setup/enqueue contract tests under `particula/execution/tests/` for
-  exact bindings, deterministic operation order, lifecycle gating, and no
-  mutation on setup rejection.
+- [x] Add P1 setup contract tests for exact bindings, lifecycle/signature and
+  schedule gating, second-check drift, and no mutation or forbidden host work
+  on preparation rejection (#1552).
 - [ ] Add per-module tests proving prepared enqueue performs no `wp.zeros`,
   `wp.array`, `.numpy()`, transfer, synchronization, resource acquisition,
   runtime device selection, or RNG initialization.

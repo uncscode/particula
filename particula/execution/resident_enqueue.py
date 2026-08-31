@@ -1,8 +1,9 @@
 """Prepare READY resident graph metadata for later enqueue phases.
 
-This concrete direct-import-only P1 boundary validates and freezes identity
-metadata only. It does not capture, enqueue, dispatch, acquire resources,
-inspect payloads, transfer, synchronize, mutate a lifecycle, or fall back.
+This concrete direct-import-only P1 boundary validates and freezes READY-state
+identity metadata only. It does not construct executors, capture, enqueue,
+dispatch, acquire resources, inspect payloads, transfer, synchronize, mutate a
+lifecycle, or fall back.
 """
 
 from __future__ import annotations
@@ -24,14 +25,22 @@ if TYPE_CHECKING:
 
 
 def _request_type() -> type[object]:
-    """Lazily return the concrete resident simulation request type."""
+    """Return the concrete resident simulation request type lazily.
+
+    Returns:
+        The direct-import-only resident simulation request type.
+    """
     from particula.execution.resident_scheduler import ResidentSimulationRequest
 
     return ResidentSimulationRequest
 
 
 def _graph_capture_types() -> tuple[type[object], type[object], type[object]]:
-    """Lazily return the concrete graph-capture carrier types."""
+    """Return concrete graph-capture carrier types lazily.
+
+    Returns:
+        Exact binding, lifecycle, and signature types in that order.
+    """
     from particula.execution.graph_capture import (
         GraphCaptureLifecycle,
         ResidentGraphCaptureBinding,
@@ -45,12 +54,72 @@ def _graph_capture_types() -> tuple[type[object], type[object], type[object]]:
     )
 
 
+def _validate_ready_attachment(
+    request: object,
+    binding: object,
+    lifecycle: object,
+    signature: object,
+    session: object,
+    registry: object,
+    guard: object,
+) -> None:
+    """Require one exact, closed, active READY resident attachment.
+
+    This check is shared by direct prepared-carrier construction and preparation
+    return guards so neither path can retain stale attachment metadata.
+    """
+    from particula.execution.graph_capture import GraphCaptureLifecycleState
+
+    if (
+        request.graph_capture_binding is not binding
+        or binding._request is not request
+        or binding._session is not session
+        or binding._registry is not registry
+        or binding._guard is not guard
+        or binding.lifecycle is not lifecycle
+        or lifecycle.signature is not signature
+        or request.session is not session
+        or request.registry is not registry
+        or request.guard is not guard
+        or guard._session is not session
+        or guard._registry is not registry
+        or registry._session is not session
+    ):
+        raise ValueError("graph-capture binding identities do not match.")
+    guard.assert_step_closed()
+    registry.validate_pinned_session(session)
+    if session.lifecycle.name != "ACTIVE":
+        raise ValueError("resident session must be ACTIVE.")
+    if lifecycle.state is not GraphCaptureLifecycleState.READY:
+        raise ValueError("graph capture must be ready for preparation.")
+    if lifecycle.capability.device != session.metadata.device:
+        raise ValueError("capability device does not match session.")
+
+
 @dataclass(frozen=True, eq=False)
 class PreparedResidentTimestep:
     """Retain exact READY-bound metadata for a future resident enqueue.
 
-    All fields retain existing host metadata and published resources by
-    identity.
+    This frozen, identity-semantic carrier is preparation output only. It
+    retains existing host metadata and published resources without copying or
+    acquiring them, and it does not authorize capture, enqueue, or dispatch.
+
+    Attributes:
+        request: Exact complete resident request retained by the binding.
+        binding: Exact READY graph-capture binding for ``request``.
+        lifecycle: Exact READY lifecycle retained by ``binding``.
+        signature: Exact lifecycle signature used for compatibility checks.
+        session: Exact resident session shared by request and binding.
+        registry: Exact resource registry shared by request and binding.
+        guard: Exact closed resident-step guard shared by request and binding.
+        device: Exact signature device.
+        dimensions: Exact signature resident dimensions.
+        graph: Exact resolved graph retained by ``request``.
+        schedule: Exact resolved schedule retained by ``request``.
+        ordered_node_ids: Exact canonical schedule node-ID tuple.
+        duration: Original finite, nonnegative timestep duration.
+        primary_arrays: Exact signature primary-array tuple.
+        resource_views: Exact signature published-resource tuple.
     """
 
     request: "ResidentSimulationRequest"
@@ -70,7 +139,13 @@ class PreparedResidentTimestep:
     resource_views: tuple[object, ...]
 
     def __post_init__(self) -> None:  # noqa: C901
-        """Require exact carriers and their retained identity links."""
+        """Validate exact carriers, READY state, and retained identities.
+
+        Raises:
+            TypeError: If a carrier, tuple, or duration has an invalid type.
+            ValueError: If duration is invalid, identities drift, or lifecycle
+                state is not READY.
+        """
         from particula.execution import Device
         from particula.execution.gpu_resources import GPUResourceRegistry
         from particula.execution.gpu_session import (
@@ -121,8 +196,6 @@ class PreparedResidentTimestep:
             raise TypeError("duration must be a non-boolean real.")
         if not _isfinite_real(self.duration) or self.duration < 0:
             raise ValueError("duration must be finite and nonnegative.")
-        from particula.execution.graph_capture import GraphCaptureLifecycleState
-
         if (
             self.binding._request is not self.request
             or self.binding._session is not self.session
@@ -149,10 +222,15 @@ class PreparedResidentTimestep:
             raise ValueError(
                 "prepared resident timestep identities do not match."
             )
-        if self.lifecycle.state is not GraphCaptureLifecycleState.READY:
-            raise ValueError(
-                "prepared resident timestep requires ready lifecycle."
-            )
+        _validate_ready_attachment(
+            self.request,
+            self.binding,
+            self.lifecycle,
+            self.signature,
+            self.session,
+            self.registry,
+            self.guard,
+        )
 
 
 def prepare_resident_timestep(  # noqa: C901
@@ -160,12 +238,24 @@ def prepare_resident_timestep(  # noqa: C901
 ) -> PreparedResidentTimestep:
     """Validate and freeze one READY resident timestep without side effects.
 
+    The direct-only preparation boundary performs shared read-only metadata
+    validation and retains identities in a frozen carrier. It does not construct
+    executors, open a guard token, acquire resources, inspect payloads, capture,
+    enqueue, dispatch, transfer, synchronize, mutate lifecycle state, or fall
+    back.
+
     Args:
         request: Exact attached resident simulation request.
         duration: Non-boolean finite, nonnegative timestep duration.
 
     Returns:
         A frozen identity-only prepared timestep.
+
+    Raises:
+        TypeError: If a request, attachment, retained carrier, or duration has
+            an inexact or invalid type.
+        ValueError: If duration, ownership, lifecycle state, signature, or
+            complete-loop metadata is invalid.
     """
     if type(request) is not _request_type():
         raise TypeError("request must be an exact ResidentSimulationRequest.")
@@ -201,33 +291,22 @@ def prepare_resident_timestep(  # noqa: C901
             "signature must be an exact ResidentGraphCaptureSignature."
         )
     signature: Any = signature_value
-    registry = cast(Any, request_any.registry)
-    if (
-        binding_any._request is not request_any
-        or binding_any._session is not request_any.session
-        or binding_any._registry is not request_any.registry
-        or binding_any._guard is not request_any.guard
-        or request_any.guard._session is not request_any.session
-        or request_any.guard._registry is not request_any.registry
-        or registry._session is not request_any.session
-    ):
-        raise ValueError(
-            "resident graph-capture binding identities do not match."
-        )
-    request_any.guard.assert_step_closed()
-    registry.validate_pinned_session(request_any.session)
     from particula.execution.graph_capture import (
-        GraphCaptureLifecycleState,
         compare_resident_graph_capture_signature,
     )
     from particula.execution.resident_scheduler import (
         _validate_complete_resident_timestep_metadata,
     )
 
-    if lifecycle.state is not GraphCaptureLifecycleState.READY:
-        raise ValueError(
-            "resident graph capture must be ready for preparation."
-        )
+    _validate_ready_attachment(
+        request_any,
+        binding_any,
+        lifecycle,
+        signature,
+        request_any.session,
+        request_any.registry,
+        request_any.guard,
+    )
     compatibility = compare_resident_graph_capture_signature(
         cast(Any, signature), cast(Any, request_any)
     )
@@ -239,6 +318,15 @@ def prepare_resident_timestep(  # noqa: C901
     )
     if not compatibility.compatible:
         raise ValueError("resident graph-capture signature is incompatible.")
+    _validate_ready_attachment(
+        request_any,
+        binding_any,
+        lifecycle,
+        signature,
+        request_any.session,
+        request_any.registry,
+        request_any.guard,
+    )
     return PreparedResidentTimestep(
         request=request_any,
         binding=binding_any,

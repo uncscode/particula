@@ -5,10 +5,15 @@ Coverage thresholds and the normal collection policy must not be lowered.
 
 ## Per-Phase Approach
 
-- **P1:** Unit-test exact prepared carriers, setup validation order, E8-F1
-  lifecycle/signature binding, canonical schedule and duration checks,
-  structural drift, and no mutation on rejected setup in
-  `particula/execution/tests/resident_enqueue_test.py`.
+- **P1 (implemented, #1552):** `resident_enqueue_test.py` covers exact frozen
+  prepared carriers; READY E8-F1 attachment/lifecycle/signature gates; canonical
+  schedule, duration, and structural-drift rejection; and read-only rejection.
+   It traps guard-token entry during successful preparation. Other forbidden
+   host-operation traps remain coverage for their owning later phases.
+   `diagnostics_test.py`, `resident_communication_test.py`,
+  `graph_capture_test.py`, `full_loop_test.py`, and `exports_test.py` provide
+  adjacent regression evidence for shared validators, unchanged scheduler
+  behavior, and concrete-only exports.
 - **P2:** Extend `state_updates_test.py`, `thermodynamic_updates_test.py`, and
   `diagnostics_test.py` with validate-once/enqueue-many tests. Spy on `wp.zeros`,
   `wp.array`, `.numpy()`, synchronization, and registry validation to prove none

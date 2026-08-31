@@ -440,7 +440,22 @@ class ResidentSimulationScheduler:
 def _validate_complete_resident_timestep_metadata(
     request: ResidentSimulationRequest, duration: Real
 ) -> None:
-    """Validate complete-loop metadata without scheduler construction."""
+    """Validate complete-loop metadata without scheduler construction.
+
+    This shared read-only seam validates the resolver-produced canonical
+    schedule, retained request bindings, diagnostics, communication, and
+    process-duration agreement. It does not create executors, enter a guard,
+    acquire resources, inspect payloads, dispatch work, or mutate lifecycle
+    state.
+
+    Args:
+        request: Exact resident request with an attached complete-loop graph.
+        duration: Already validated finite, nonnegative timestep duration.
+
+    Raises:
+        ValueError: If graph, schedule, request bindings, metadata, or duration
+            agreement is invalid.
+    """
     if not _is_resolver_produced_graph(request.graph):
         raise ValueError("graph must be produced by plan resolution.")
     if not is_resolver_produced_schedule(request.schedule, request.graph):
@@ -474,7 +489,16 @@ def _validate_complete_resident_timestep_metadata(
 def _validate_virtual_refresh_windows(
     ids: tuple[str, ...], dependencies: tuple[DependencyEdge, ...]
 ) -> None:
-    """Require the resolver's thermodynamic refresh windows."""
+    """Require the resolver's canonical thermodynamic refresh windows.
+
+    Args:
+        ids: Canonically ordered resolved node identifiers.
+        dependencies: Resolved directed dependency edges.
+
+    Raises:
+        ValueError: If virtual refresh nodes do not retain their required order
+            and dependency edges.
+    """
     positions = {node_id: index for index, node_id in enumerate(ids)}
     vapor = positions["vapor_pressure_refresh"]
     saturation = positions["saturation_refresh"]
@@ -497,7 +521,16 @@ def _validate_virtual_refresh_windows(
 def _validate_resident_request_nodes(  # noqa: C901
     request: ResidentSimulationRequest, graph_by_id: dict[str, ProcessNode]
 ) -> None:
-    """Validate request bindings against resolved graph and resources."""
+    """Validate request bindings against resolved graph and resources.
+
+    Args:
+        request: Exact resident request whose retained bindings are checked.
+        graph_by_id: Exact resolved graph nodes keyed by node identifier.
+
+    Raises:
+        ValueError: If a process, diagnostic, communication, or published
+            resource binding does not match the resident request.
+    """
     registry = cast(Any, request.registry)
     for item, node_id in (
         (request.environment_update, "environment_update"),
@@ -602,7 +635,15 @@ def _validate_resident_request_nodes(  # noqa: C901
 def _validate_resident_durations(
     request: ResidentSimulationRequest, duration: Real
 ) -> None:
-    """Require every process request to retain the exact step duration."""
+    """Require every process request to retain the exact step duration.
+
+    Args:
+        request: Exact resident request containing process timestep values.
+        duration: Already validated duration required by every process.
+
+    Raises:
+        ValueError: If any process timestep differs from ``duration``.
+    """
     values = (
         request.condensation.time_step,
         request.coagulation.request.state.time_step,

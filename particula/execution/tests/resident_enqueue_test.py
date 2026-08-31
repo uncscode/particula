@@ -1,6 +1,6 @@
 """Contract tests for READY-only resident enqueue preparation."""
 
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from typing import Any
 
 import pytest
@@ -17,7 +17,10 @@ from particula.execution.graph_capture import (
     create_graph_capture_lifecycle,
     create_resident_graph_capture_signature,
 )
-from particula.execution.resident_enqueue import prepare_resident_timestep
+from particula.execution.resident_enqueue import (
+    PreparedResidentTimestep,
+    prepare_resident_timestep,
+)
 
 
 def _ready_request(monkeypatch: pytest.MonkeyPatch) -> Any:
@@ -30,7 +33,7 @@ def _ready_request(monkeypatch: pytest.MonkeyPatch) -> Any:
     request = fixture.request
     lifecycle = create_graph_capture_lifecycle(
         GraphCaptureCapability(
-            Device(Backend.WARP, "cuda:0"),
+            request.session.metadata.device,
             GraphCaptureAvailability.AVAILABLE,
         ),
         create_resident_graph_capture_signature(request),
@@ -163,4 +166,58 @@ def test_prepare_rechecks_signature_after_metadata_validation(
     assert len(calls) == 2
     assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
     assert request.graph_capture_binding is binding
+    assert request.guard.completed_steps == 0
+
+
+@pytest.mark.warp
+def test_direct_prepared_carrier_rejects_detached_binding(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Direct carrier construction cannot bypass exact request attachment."""
+    fixture = _ready_request(monkeypatch)
+    request = fixture.request
+    binding = request.graph_capture_binding
+    assert binding is not None
+    signature = binding.lifecycle.signature
+    object.__setattr__(request, "graph_capture_binding", None)
+
+    with pytest.raises(ValueError, match="binding identities do not match"):
+        PreparedResidentTimestep(
+            request=request,
+            binding=binding,
+            lifecycle=binding.lifecycle,
+            signature=signature,
+            session=request.session,
+            registry=request.registry,
+            guard=request.guard,
+            device=signature.device,
+            dimensions=signature.dimensions,
+            graph=request.graph,
+            schedule=request.schedule,
+            ordered_node_ids=request.schedule.ordered_node_ids,
+            duration=0.0,
+            primary_arrays=signature.primary_arrays,
+            resource_views=signature.resource_views,
+        )
+
+
+@pytest.mark.warp
+def test_prepare_rejects_ready_capability_device_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """READY preparation rejects a capability for another resident device."""
+    fixture = _ready_request(monkeypatch)
+    request = fixture.request
+    binding = request.graph_capture_binding
+    assert binding is not None
+    capability = GraphCaptureCapability(
+        Device(Backend.WARP, "cuda:99"),
+        GraphCaptureAvailability.AVAILABLE,
+    )
+    binding._lifecycle = replace(binding.lifecycle, capability=capability)
+
+    with pytest.raises(ValueError, match="capability device does not match"):
+        prepare_resident_timestep(request, 0.0)
+
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
     assert request.guard.completed_steps == 0
