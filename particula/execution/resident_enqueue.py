@@ -155,7 +155,7 @@ class PreparedResidentTimestep:
             )
 
 
-def prepare_resident_timestep(
+def prepare_resident_timestep(  # noqa: C901
     request: object, duration: object
 ) -> PreparedResidentTimestep:
     """Validate and freeze one READY resident timestep without side effects.
@@ -169,31 +169,53 @@ def prepare_resident_timestep(
     """
     if type(request) is not _request_type():
         raise TypeError("request must be an exact ResidentSimulationRequest.")
-    request = cast("ResidentSimulationRequest", request)
+    request_any: Any = request
     if isinstance(duration, bool) or not isinstance(duration, Real):
         raise TypeError("duration must be a non-boolean real.")
     if not _isfinite_real(duration) or duration < 0:
         raise ValueError("duration must be finite and nonnegative.")
-    binding = request.graph_capture_binding
-    binding_type, _, _ = _graph_capture_types()
+    from particula.execution.gpu_resources import GPUResourceRegistry
+    from particula.execution.gpu_session import (
+        ResidentSession,
+        ResidentStepGuard,
+    )
+
+    if type(request_any.session) is not ResidentSession:
+        raise TypeError("session must be an exact ResidentSession.")
+    if type(request_any.registry) is not GPUResourceRegistry:
+        raise TypeError("registry must be an exact GPUResourceRegistry.")
+    if type(request_any.guard) is not ResidentStepGuard:
+        raise TypeError("guard must be an exact ResidentStepGuard.")
+    binding = request_any.graph_capture_binding
+    binding_type, lifecycle_type, signature_type = _graph_capture_types()
     if type(binding) is not binding_type:
         raise TypeError("graph_capture_binding must be an exact binding.")
-    binding = cast(Any, binding)
-    registry = cast(Any, request.registry)
+    binding_any: Any = binding
+    lifecycle_value = binding_any.lifecycle
+    if type(lifecycle_value) is not lifecycle_type:
+        raise TypeError("lifecycle must be an exact GraphCaptureLifecycle.")
+    lifecycle: Any = lifecycle_value
+    signature_value = lifecycle.signature
+    if type(signature_value) is not signature_type:
+        raise TypeError(
+            "signature must be an exact ResidentGraphCaptureSignature."
+        )
+    signature: Any = signature_value
+    registry = cast(Any, request_any.registry)
     if (
-        binding._request is not request
-        or binding._session is not request.session
-        or binding._registry is not request.registry
-        or binding._guard is not request.guard
-        or request.guard._session is not request.session
-        or request.guard._registry is not request.registry
-        or registry._session is not request.session
+        binding_any._request is not request_any
+        or binding_any._session is not request_any.session
+        or binding_any._registry is not request_any.registry
+        or binding_any._guard is not request_any.guard
+        or request_any.guard._session is not request_any.session
+        or request_any.guard._registry is not request_any.registry
+        or registry._session is not request_any.session
     ):
         raise ValueError(
             "resident graph-capture binding identities do not match."
         )
-    request.guard.assert_step_closed()
-    registry.validate_pinned_session(request.session)
+    request_any.guard.assert_step_closed()
+    registry.validate_pinned_session(request_any.session)
     from particula.execution.graph_capture import (
         GraphCaptureLifecycleState,
         compare_resident_graph_capture_signature,
@@ -202,36 +224,34 @@ def prepare_resident_timestep(
         _validate_complete_resident_timestep_metadata,
     )
 
-    lifecycle = binding.lifecycle
     if lifecycle.state is not GraphCaptureLifecycleState.READY:
         raise ValueError(
             "resident graph capture must be ready for preparation."
         )
     compatibility = compare_resident_graph_capture_signature(
-        lifecycle.signature, request
+        cast(Any, signature), cast(Any, request_any)
     )
     if not compatibility.compatible:
         raise ValueError("resident graph-capture signature is incompatible.")
-    _validate_complete_resident_timestep_metadata(request, duration)
+    _validate_complete_resident_timestep_metadata(request_any, duration)
     compatibility = compare_resident_graph_capture_signature(
-        lifecycle.signature, request
+        cast(Any, signature), cast(Any, request_any)
     )
     if not compatibility.compatible:
         raise ValueError("resident graph-capture signature is incompatible.")
-    signature = lifecycle.signature
     return PreparedResidentTimestep(
-        request=request,
-        binding=binding,
+        request=request_any,
+        binding=binding_any,
         lifecycle=lifecycle,
         signature=signature,
-        session=request.session,
-        registry=request.registry,
-        guard=request.guard,
+        session=request_any.session,
+        registry=request_any.registry,
+        guard=request_any.guard,
         device=signature.device,
         dimensions=signature.dimensions,
-        graph=request.graph,
-        schedule=request.schedule,
-        ordered_node_ids=request.schedule.ordered_node_ids,
+        graph=request_any.graph,
+        schedule=request_any.schedule,
+        ordered_node_ids=request_any.schedule.ordered_node_ids,
         duration=duration,
         primary_arrays=signature.primary_arrays,
         resource_views=signature.resource_views,
