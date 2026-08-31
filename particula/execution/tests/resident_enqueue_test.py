@@ -101,7 +101,7 @@ def test_prepare_retains_ready_metadata_without_opening_a_step(
     assert request.guard.completed_steps == 0
     assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
     with pytest.raises(FrozenInstanceError):
-        prepared.duration = 1.0  # type: ignore[misc]
+        prepared.duration = 1.0  # type: ignore[assignment, misc]
     assert prepare_resident_timestep(request, 0.0) != prepared
 
 

@@ -20,6 +20,7 @@ if TYPE_CHECKING:
         ResidentGraphCaptureSignature,
     )
     from particula.execution.resident_scheduler import ResidentSimulationRequest
+    from particula.execution.scheduler import ResolvedTimestepSchedule
 
 
 def _request_type() -> type[object]:
@@ -62,7 +63,7 @@ class PreparedResidentTimestep:
     device: object
     dimensions: object
     graph: object
-    schedule: object
+    schedule: "ResolvedTimestepSchedule"
     ordered_node_ids: tuple[object, ...]
     duration: Real
     primary_arrays: tuple[object, ...]
@@ -168,6 +169,7 @@ def prepare_resident_timestep(
     """
     if type(request) is not _request_type():
         raise TypeError("request must be an exact ResidentSimulationRequest.")
+    request = cast("ResidentSimulationRequest", request)
     if isinstance(duration, bool) or not isinstance(duration, Real):
         raise TypeError("duration must be a non-boolean real.")
     if not _isfinite_real(duration) or duration < 0:

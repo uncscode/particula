@@ -212,7 +212,7 @@ def test_functional_validator_matches_executor_validation() -> None:
     request = _request(CommunicationTransportMode.GAS)
 
     assert validate_resident_communication_request(request) is request
-    assert ResidentCommunicationExecutor(request).validate() is None
+    ResidentCommunicationExecutor(request).validate()
 
 
 @pytest.mark.warp
