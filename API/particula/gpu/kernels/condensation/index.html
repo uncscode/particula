@@ -4240,6 +4240,8 @@
       
         
       
+        
+      
     
     
     
@@ -4524,6 +4526,34 @@
     
   
     particula.execution.gpu_session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../execution/graph_capture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.graph_capture
   
 
     
@@ -4843,10 +4873,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_20" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_21" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_20" id="__nav_2_3_19_20_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_21" id="__nav_2_3_19_21_label" tabindex="0">
             
   
   
@@ -4864,8 +4894,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_20_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_20">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16475,14 +16505,7 @@ scale storage. P1 validates but does not read or write it.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/condensation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">744</span>
-<span class="normal">745</span>
-<span class="normal">746</span>
-<span class="normal">747</span>
-<span class="normal">748</span>
-<span class="normal">749</span>
-<span class="normal">750</span>
-<span class="normal">751</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">751</span>
 <span class="normal">752</span>
 <span class="normal">753</span>
 <span class="normal">754</span>
@@ -16496,7 +16519,14 @@ scale storage. P1 validates but does not read or write it.</p>
 <span class="normal">762</span>
 <span class="normal">763</span>
 <span class="normal">764</span>
-<span class="normal">765</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>  <span class="c1"># pragma: no cover - device kernels execute outside Python coverage</span>
+<span class="normal">765</span>
+<span class="normal">766</span>
+<span class="normal">767</span>
+<span class="normal">768</span>
+<span class="normal">769</span>
+<span class="normal">770</span>
+<span class="normal">771</span>
+<span class="normal">772</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>  <span class="c1"># pragma: no cover - device kernels execute outside Python coverage</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_mass_transfer_kernel</span><span class="p">(</span>
     <span class="n">masses</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -16754,14 +16784,7 @@ the original isothermal rate path.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/condensation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">355</span>
-<span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span>
-<span class="normal">359</span>
-<span class="normal">360</span>
-<span class="normal">361</span>
-<span class="normal">362</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">362</span>
 <span class="normal">363</span>
 <span class="normal">364</span>
 <span class="normal">365</span>
@@ -17050,7 +17073,14 @@ the original isothermal rate path.</p>
 <span class="normal">648</span>
 <span class="normal">649</span>
 <span class="normal">650</span>
-<span class="normal">651</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>  <span class="c1"># pragma: no cover - device kernels execute outside Python coverage</span>
+<span class="normal">651</span>
+<span class="normal">652</span>
+<span class="normal">653</span>
+<span class="normal">654</span>
+<span class="normal">655</span>
+<span class="normal">656</span>
+<span class="normal">657</span>
+<span class="normal">658</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>  <span class="c1"># pragma: no cover - device kernels execute outside Python coverage</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">condensation_mass_transfer_kernel</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">masses</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -17791,14 +17821,7 @@ NaN/Inf before a call.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/condensation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1814</span>
-<span class="normal">1815</span>
-<span class="normal">1816</span>
-<span class="normal">1817</span>
-<span class="normal">1818</span>
-<span class="normal">1819</span>
-<span class="normal">1820</span>
-<span class="normal">1821</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1821</span>
 <span class="normal">1822</span>
 <span class="normal">1823</span>
 <span class="normal">1824</span>
@@ -18562,7 +18585,16 @@ NaN/Inf before a call.</p>
 <span class="normal">2582</span>
 <span class="normal">2583</span>
 <span class="normal">2584</span>
-<span class="normal">2585</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">condensation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">2585</span>
+<span class="normal">2586</span>
+<span class="normal">2587</span>
+<span class="normal">2588</span>
+<span class="normal">2589</span>
+<span class="normal">2590</span>
+<span class="normal">2591</span>
+<span class="normal">2592</span>
+<span class="normal">2593</span>
+<span class="normal">2594</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">condensation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -19196,7 +19228,9 @@ NaN/Inf before a call.</p>
         <span class="p">)</span>
     <span class="n">substep_time_step</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">time_step</span> <span class="o">/</span> <span class="mf">4.0</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">surface_tension_mode</span> <span class="o">==</span> <span class="n">SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">surface_tension_mode</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED</span>
+        <span class="p">):</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
                 <span class="n">_effective_surface_tension_kernel</span><span class="p">,</span>
                 <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span>
@@ -19328,8 +19362,8 @@ NaN/Inf before a call.</p>
         <span class="k">if</span> <span class="n">energy_transfer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
                 <span class="n">_accumulate_energy_transfer_kernel</span><span class="p">,</span>
-                <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span>
-                <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">finalized</span><span class="p">,</span> <span class="n">latent_heat</span><span class="p">,</span> <span class="n">energy_transfer</span><span class="p">],</span>
+                <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_species</span><span class="p">),</span>
+                <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">total_mass_transfer</span><span class="p">,</span> <span class="n">latent_heat</span><span class="p">,</span> <span class="n">energy_transfer</span><span class="p">],</span>
                 <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -19445,14 +19479,7 @@ output buffers unchanged; it never falls back to legacy physics.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/condensation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
-<span class="normal">267</span>
-<span class="normal">268</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">268</span>
 <span class="normal">269</span>
 <span class="normal">270</span>
 <span class="normal">271</span>
@@ -19536,7 +19563,14 @@ output buffers unchanged; it never falls back to legacy physics.</p>
 <span class="normal">349</span>
 <span class="normal">350</span>
 <span class="normal">351</span>
-<span class="normal">352</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_condensation_activity_surface_config</span><span class="p">(</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_condensation_activity_surface_config</span><span class="p">(</span>
     <span class="n">activity_surface</span><span class="p">:</span> <span class="n">CondensationActivitySurfaceConfig</span> <span class="o">|</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">n_species</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -19729,14 +19763,7 @@ supplied field has incompatible shape, dtype, or device.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/condensation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
 <span class="normal">197</span>
@@ -19782,7 +19809,14 @@ supplied field has incompatible shape, dtype, or device.</p>
 <span class="normal">237</span>
 <span class="normal">238</span>
 <span class="normal">239</span>
-<span class="normal">240</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_condensation_scratch_buffers</span><span class="p">(</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_condensation_scratch_buffers</span><span class="p">(</span>
     <span class="n">candidate</span><span class="p">:</span> <span class="n">CondensationScratchBuffers</span> <span class="o">|</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">dimensions</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>

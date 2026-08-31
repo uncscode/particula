@@ -4230,6 +4230,8 @@
       
         
       
+        
+      
     
     
     
@@ -4514,6 +4516,34 @@
     
   
     particula.execution.gpu_session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API/particula/execution/graph_capture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.graph_capture
   
 
     
@@ -4833,10 +4863,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_20" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_21" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_20" id="__nav_2_3_19_20_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_21" id="__nav_2_3_19_21_label" tabindex="0">
             
   
   
@@ -4854,8 +4884,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_20_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_20">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13521,6 +13551,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#e8-f1-shipped-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F1 shipped contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#warp-graph-capture" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -16935,6 +16976,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#e8-f1-shipped-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F1 shipped contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#warp-graph-capture" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -19269,8 +19321,6 @@ Broader transport and mixing/advection work remain deferred.
 E7-F8 is shipped: it owns the bounded scheduled persistent-stream identity,
 reset, and checkpoint/restart policy. E7-F9 owns final diagnostics products,
 complete examples, and closeout; its P7 validation gate is shipped.
-reset, and checkpoint/restart policy. E7-F9 shipped the final diagnostics,
-full-loop regression, documentation, and closeout scope.
 High-level GPU adapters and user-facing CPU/GPU orchestration remain later
 contracts after E7-F6 establishes policy. They must not imply availability
 probing, fallback, retry, graph capture, performance claims, distributed or
@@ -19330,19 +19380,58 @@ cleanly when unavailable; no CPU/Warp/CUDA replay guarantee is made.</p>
 bounded concrete-only resident scheduler. E7-F7 and E7-F8 are shipped; E7-F9
 P7 is shipped as of 2026-08-11. See the
 <a href="../../data-containers-and-gpu-foundations/#e7-f9-resident-support-validation-matrix-2026-08-11">support matrix</a>
-for the dated evidence. Epic G is shipped. Epics H and I remain deferred. Any
-public, availability-policy, fallback/retry, graph-capture, performance, or
+for the dated evidence. Epic G is shipped. At that closeout, Epics H and I were
+deferred; Epic H subsequently became active with E8-F1 shipped. Any public,
+availability-policy, fallback/retry, native graph-capture, performance, or
 distributed integration must establish its own contract. The direct GPU path
 remains explicit and unchanged.
 <strong>Exit bar:</strong> Satisfied on 2026-08-30. E7-F1 remains a bounded selection seam,
 E7-F5 remains a bounded concrete-only resident scheduler, and E7-F7--E7-F9
 close the communication, RNG/restart, diagnostics, validation, documentation,
 and epic publication scope. The direct GPU path remains explicit and unchanged.
-Graph capture, performance profiling and targets, memory-budget evidence,
-distributed execution, and autodiff remain deferred to Epics H and I.</p>
+Native graph capture/replay beyond E8-F1 host admission, performance profiling
+and targets, memory-budget evidence, distributed execution, and autodiff remain
+deferred to the later Epic H tracks and Epic I.</p>
 <h2 id="epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance<a class="headerlink" href="#epic-h-graph-capture-and-performance" title="Permanent link">&para;</a></h2>
-<p>Status: active. This is the next roadmap step after E7; its ADW plan and child
-feature decomposition are not yet scheduled.</p>
+<p>Status: active. E8-F1 is shipped; E8-F2--E8-F8 remain the scheduled deferred
+feature tracks for native capture/replay and its later evidence.</p>
+<h3 id="e8-f1-shipped-contract">E8-F1 shipped contract<a class="headerlink" href="#e8-f1-shipped-contract" title="Permanent link">&para;</a></h3>
+<p>E8-F1 ships host metadata and scheduler admission only. Its concrete-only
+direct-import boundary is <code>particula.execution.graph_capture</code>; its carriers and
+lifecycle operations remain absent from <code>particula.execution</code> and top-level
+<code>particula</code> exports. It supplies neither native CUDA graph capture nor replay,
+parity, performance evidence, or a user workflow.</p>
+<p>Eligibility is fail-closed: non-CPU Warp native devices require caller-provided
+availability/probe qualification. CPU and Warp CPU are neither capture paths nor
+fallback/emulation paths. E8-F1 provides no availability-policy selection or
+cross-device replay.</p>
+<p>Compatibility compares identity in this exact first-drift order: <code>request</code>,
+<code>session</code>, <code>device</code>, <code>dimensions</code>, <code>primary_containers</code>, <code>primary_arrays</code>,
+<code>resource_views</code>, <code>graph</code>, <code>schedule</code>, <code>schedule_order</code>, <code>diagnostics</code>,
+<code>communication</code>, <code>configurations</code>, and <code>rng_resources</code>. Identity replacement or
+another structural drift invalidates with the first detected reason. This is
+payload-only compatibility: unchanged-shape field-value updates, active/free
+slot changes, and advancing RNG words remain compatible; replacing an
+array/resource identity does not.</p>
+<p>The host lifecycle states are <code>READY</code>, <code>CAPTURED</code>, <code>INVALIDATED</code>, <code>FAULTED</code>,
+<code>RETIRED</code>, and <code>CLOSED</code>. <code>READY</code> requires explicit
+<code>complete_resident_graph_capture()</code> to become <code>CAPTURED</code>. Structural drift moves
+a captured lifecycle to <code>INVALIDATED</code>; explicit retirement then renewal creates
+a fresh <code>READY</code> lifecycle that again requires explicit completion. Renewal is
+not native recapture or replay. A writer-may-have-launched classification moves
+the lifecycle to <code>FAULTED</code>, and <code>CLOSED</code> is terminal.</p>
+<p>Scheduler admission before token entry requires the attached exact
+request/session/registry/closed-guard binding, an <code>ACTIVE</code> pinned session,
+available qualified non-CPU Warp capability, <code>CAPTURED</code> lifecycle, and a
+compatible signature. A writer-may-have-launched failure records <code>FAULTED</code>
+metadata with no retry or rollback guarantee.</p>
+<p>Excluded from E8-F1 are native/full-loop capture or replay, no automatic recapture,
+retries, rollback, CPU fallback/emulation, hidden allocation/transfer/
+synchronization, checkpointed native graph handles, cross-device replay,
+captured numerical parity, benchmark/profiling/memory claims, root-README
+changes, and user examples. E8-F2--E8-F8 own capture-ready enqueue, resource
+preparation, native capture/replay, parity, benchmarks, profiling, memory
+evidence, and examples.</p>
 <p>Reduce launch overhead with graph capture and establish performance and memory
 targets aligned with the multi-box scaling goal.</p>
 <p>Planned features:</p>

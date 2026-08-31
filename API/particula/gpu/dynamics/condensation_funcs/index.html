@@ -4240,6 +4240,8 @@
       
         
       
+        
+      
     
     
     
@@ -4524,6 +4526,34 @@
     
   
     particula.execution.gpu_session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../execution/graph_capture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.graph_capture
   
 
     
@@ -4843,10 +4873,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_20" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_21" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_20" id="__nav_2_3_19_20_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_21" id="__nav_2_3_19_21_label" tabindex="0">
             
   
   
@@ -4864,8 +4894,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_20_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_20">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16403,8 +16433,7 @@ otherwise selects static mode.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/condensation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">19</span>
-<span class="normal">20</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">20</span>
 <span class="normal">21</span>
 <span class="normal">22</span>
 <span class="normal">23</span>
@@ -16448,10 +16477,9 @@ otherwise selects static mode.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        First-order mass transport coefficient [m³/s].</span>
 <span class="sd">    """</span>
-    <span class="n">pi_value</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">3.141592653589793</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)</span>
-        <span class="o">*</span> <span class="n">pi_value</span>
+        <span class="o">*</span> <span class="n">_PI</span>
         <span class="o">*</span> <span class="n">particle_radius</span>
         <span class="o">*</span> <span class="n">diffusion_coefficient</span>
         <span class="o">*</span> <span class="n">vapor_transition</span>
