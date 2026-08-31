@@ -4,6 +4,9 @@ This concrete direct-import-only composition boundary dispatches communication,
 then optional volume evolution, before the ten ordinary loop nodes. It retains
 every resident object by identity and performs no upload, restore,
 synchronization, fallback, resource acquisition, retry, or rollback.
+When a graph-capture binding is attached, admission is gated by that binding's
+exact resident identities, capability, lifecycle, and structural signature
+before the step token is opened.
 """
 
 from __future__ import annotations
@@ -248,6 +251,11 @@ class ResidentSimulationScheduler:
 
     def _validate(self, duration: object) -> None:  # noqa: C901
         """Preflight the lifecycle, graph, request, and duration bindings.
+
+        An attached graph-capture binding is checked after the resident guard
+        and registry links, but before graph and process validation or token
+        entry. A failed gate therefore cannot dispatch an adapter or mutate
+        lifecycle state except for deliberate structural-drift invalidation.
 
         Args:
             duration: Candidate nonnegative finite timestep duration.

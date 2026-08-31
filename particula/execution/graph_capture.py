@@ -4,7 +4,9 @@ This concrete, direct-import-only, declaration-only boundary resolves whether a
 caller-provided probe reports graph-capture support and records identity-based
 compatibility for an already-built resident request. It neither captures nor
 replays graphs, imports Warp, probes devices itself, acquires resources,
-launches work, transfers data, or synchronizes.
+launches work, transfers data, or synchronizes. Its binding helpers gate
+scheduler admission and record explicit lifecycle successors without changing
+resident payloads.
 """
 
 from __future__ import annotations
@@ -997,7 +999,21 @@ def _require_binding(binding: object) -> ResidentGraphCaptureBinding:
 def _attach_resident_graph_capture_binding(
     request: object, binding: object
 ) -> None:
-    """Attach one exact binding to a final frozen request exactly once."""
+    """Attach one exact binding to a final frozen request exactly once.
+
+    The request must be constructed without an attachment first. After all
+    retained identities are checked, this construction-only helper performs the
+    sole assignment to the frozen request's optional binding field.
+
+    Args:
+        request: Exact resident simulation request to attach.
+        binding: Exact binding retaining the same request and resident carriers.
+
+    Raises:
+        TypeError: If either argument is not the required exact concrete type.
+        ValueError: If the binding retains another request or the request is
+            already attached.
+    """
     request = cast(
         "ResidentSimulationRequest",
         _require_exact_resident_carrier(
