@@ -70,29 +70,35 @@ def _validate_ready_attachment(
     """
     from particula.execution.graph_capture import GraphCaptureLifecycleState
 
+    request_any = cast(Any, request)
+    binding_any = cast(Any, binding)
+    lifecycle_any = cast(Any, lifecycle)
+    session_any = cast(Any, session)
+    registry_any = cast(Any, registry)
+    guard_any = cast(Any, guard)
     if (
-        request.graph_capture_binding is not binding
-        or binding._request is not request
-        or binding._session is not session
-        or binding._registry is not registry
-        or binding._guard is not guard
-        or binding.lifecycle is not lifecycle
-        or lifecycle.signature is not signature
-        or request.session is not session
-        or request.registry is not registry
-        or request.guard is not guard
-        or guard._session is not session
-        or guard._registry is not registry
-        or registry._session is not session
+        request_any.graph_capture_binding is not binding_any
+        or binding_any._request is not request_any
+        or binding_any._session is not session_any
+        or binding_any._registry is not registry_any
+        or binding_any._guard is not guard_any
+        or binding_any.lifecycle is not lifecycle_any
+        or lifecycle_any.signature is not signature
+        or request_any.session is not session_any
+        or request_any.registry is not registry_any
+        or request_any.guard is not guard_any
+        or guard_any._session is not session_any
+        or guard_any._registry is not registry_any
+        or registry_any._session is not session_any
     ):
         raise ValueError("graph-capture binding identities do not match.")
-    guard.assert_step_closed()
-    registry.validate_pinned_session(session)
-    if session.lifecycle.name != "ACTIVE":
+    guard_any.assert_step_closed()
+    registry_any.validate_pinned_session(session_any)
+    if session_any.lifecycle.name != "ACTIVE":
         raise ValueError("resident session must be ACTIVE.")
-    if lifecycle.state is not GraphCaptureLifecycleState.READY:
+    if lifecycle_any.state is not GraphCaptureLifecycleState.READY:
         raise ValueError("graph capture must be ready for preparation.")
-    if lifecycle.capability.device != session.metadata.device:
+    if lifecycle_any.capability.device != session_any.metadata.device:
         raise ValueError("capability device does not match session.")
 
 
@@ -134,7 +140,7 @@ class PreparedResidentTimestep:
     graph: object
     schedule: "ResolvedTimestepSchedule"
     ordered_node_ids: tuple[object, ...]
-    duration: Real
+    duration: object
     primary_arrays: tuple[object, ...]
     resource_views: tuple[object, ...]
 
