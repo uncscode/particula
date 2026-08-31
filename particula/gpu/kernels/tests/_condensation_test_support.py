@@ -4493,20 +4493,22 @@ def test_condensation_partitioning_metadata_failure_is_atomic(
     gpu_gas = to_warp_gas_data(
         gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(1, 2)
     )
-    if mask.dtype == np.int32:
+    if mask.dtype == np.int32 and mask.ndim == 2:
         gpu_gas.partitioning = wp.array(
             mask, dtype=wp.int32, device=warp_cpu_device
         )
         gas_for_step = gpu_gas
     else:
-        # Warp structs reject a wrong field dtype at assignment, so use the
+        # Warp structs reject wrong field metadata at assignment, so use the
         # entry point's duck-typed container contract to exercise preflight.
         gas_for_step = SimpleNamespace(
             molar_mass=gpu_gas.molar_mass,
             concentration=gpu_gas.concentration,
             vapor_pressure=gpu_gas.vapor_pressure,
             partitioning=wp.array(
-                mask, dtype=wp.float64, device=warp_cpu_device
+                mask,
+                dtype=wp.int32 if mask.dtype == np.int32 else wp.float64,
+                device=warp_cpu_device,
             ),
         )
     scratch = _make_condensation_scratch_buffers(

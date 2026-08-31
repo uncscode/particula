@@ -9,6 +9,7 @@ import builtins
 import importlib
 import sys
 import warnings
+from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
@@ -1405,10 +1406,14 @@ class TestFromWarpGasData:
     ) -> None:
         """Test partitioning must exactly match the concentration layout."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
-        gpu_data.partitioning = wp.array(
-            partitioning,
-            dtype=wp.int32,
-            device="cpu",
+        gpu_data = SimpleNamespace(
+            molar_mass=gpu_data.molar_mass,
+            concentration=gpu_data.concentration,
+            partitioning=wp.array(
+                partitioning,
+                dtype=wp.int32,
+                device="cpu",
+            ),
         )
 
         with pytest.raises(ValueError, match="same .*shape as concentration"):
@@ -1792,12 +1797,11 @@ class TestFromWarpEnvironmentData:
         self,
     ) -> None:
         """Test malformed Warp environment data fails CPU schema validation."""
-        from particula.gpu.warp_types import WarpEnvironmentData
-
-        gpu_data = WarpEnvironmentData()
-        gpu_data.temperature = wp.array([298.15], dtype=wp.float64)
-        gpu_data.pressure = wp.array([101325.0], dtype=wp.float64)
-        gpu_data.saturation_ratio = wp.array([0.95, 1.05], dtype=wp.float64)
+        gpu_data = SimpleNamespace(
+            temperature=wp.array([298.15], dtype=wp.float64),
+            pressure=wp.array([101325.0], dtype=wp.float64),
+            saturation_ratio=wp.array([0.95, 1.05], dtype=wp.float64),
+        )
 
         with pytest.raises(ValueError, match="saturation_ratio must be 2D"):
             from_warp_environment_data(gpu_data)

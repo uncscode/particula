@@ -794,9 +794,14 @@ def test_concentration_shape_errors_reject_before_writes(
     particles, gas = _containers()
     snapshots = _state_snapshots(particles, gas)
     if field == "particle":
-        particles.concentration = wp.ones(shape, dtype=wp.float64, device="cpu")
+        particles = SimpleNamespace(
+            masses=particles.masses,
+            concentration=wp.ones(shape, dtype=wp.float64, device="cpu"),
+        )
     else:
-        gas.concentration = wp.ones(shape, dtype=wp.float64, device="cpu")
+        gas = SimpleNamespace(
+            concentration=wp.ones(shape, dtype=wp.float64, device="cpu"),
+        )
 
     with pytest.raises(ValueError, match=message):
         dilution_step_gpu(particles, gas, 1.0, 1.0)
