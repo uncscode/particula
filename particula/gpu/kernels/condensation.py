@@ -11,9 +11,9 @@ Entry-point validation accepts scalar direct inputs, explicit ``(n_boxes,)``
 Warp arrays, or a ``WarpEnvironmentData`` container. Aggregate preflight,
 including supplied ``CondensationScratchBuffers`` metadata, completes before
 buffer allocation, Warp launch, vapor-pressure refresh, or mutation of
-caller-owned state. Private preparation retains the validated primary
-containers, supplied sidecars, and resolved fallback storage by identity for a
-subsequent enqueue. A required keyword-only ``ThermodynamicsConfig`` then
+caller-owned state. Private preparation freezes the exact validated primary
+arrays, supplied sidecars, and resolved fallback storage for a subsequent
+device-only enqueue. A required keyword-only ``ThermodynamicsConfig`` then
 executes exactly four equal substeps. Each substep refreshes the caller-owned
 pure-vapor-pressure buffer, updates box-level environment properties, proposes
 transfer from current particle and gas state, P1-gates disabled species and
@@ -64,8 +64,8 @@ from particula.gpu.kernels.environment import (
 )
 from particula.gpu.kernels.thermodynamics import (
     ThermodynamicsConfig,
+    _refresh_vapor_pressure_kernel,
     _validate_array_metadata,
-    refresh_vapor_pressure_gpu,
     validate_thermodynamics_config,
 )
 from particula.gpu.properties.gas_properties import (
@@ -198,9 +198,11 @@ class _PreparedCondensationCall:
     callables and scratch layouts rather than a public execution protocol.
 
     Attributes:
-        particles: Validated resident Warp particle container.
-        gas: Validated resident Warp gas container.
-        thermodynamics: Validated thermodynamic refresh configuration.
+        particles: Validated resident Warp particle container returned by
+            enqueue.
+        gas: Validated resident Warp gas container retained for call identity.
+        thermodynamics: Validated thermodynamic refresh configuration retained
+            for call identity.
         total_mass_transfer: Whole-call finalized-transfer accumulator.
         work_mass_transfer: Raw-proposal workspace reused by each substep.
         dimensions: Fixed ``(n_boxes, n_particles, n_species)`` shape.
@@ -211,7 +213,6 @@ class _PreparedCondensationCall:
     particles: Any
     gas: Any
     thermodynamics: Any
-    refresh_vapor_pressure: Any
     surface_tension: Any
     mass_accommodation: Any
     diffusion_coefficient_vapor: Any
@@ -241,6 +242,15 @@ class _PreparedCondensationCall:
     dimensions: tuple[int, int, int]
     device: Any
     substep_time_step: Any
+    particle_masses: Any
+    particle_concentration: Any
+    particle_density: Any
+    gas_concentration: Any
+    gas_vapor_pressure: Any
+    gas_molar_mass: Any
+    gas_partitioning: Any
+    thermodynamics_modes: Any
+    thermodynamics_parameters: Any
 
 
 def _read_float64_array(array: Any) -> np.ndarray:
@@ -2025,15 +2035,12 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         mutation.
         Each substep overwrites ``gas.vapor_pressure`` from the normalized
         current temperature, prepares box-level properties, calculates and
-        gates a raw proposal from current particle mass, validates that fresh
-        proposal, then P2-finalizes, applies, couples, and accumulates it.
-        A fresh-proposal validation failure is the partial-failure boundary.
-        Earlier completed substeps are not rolled back. The failing substep may
-        write its raw work proposal, ``gas.vapor_pressure``, supplied dynamic
-        viscosity/mean-free-path workspaces, and composition-weighted surface
-        tension workspace. It does not mutate P2 sidecars, particle mass, gas
-        concentration, the finalized total, or energy output. Callers that need
-        retry semantics must restore their snapshots.
+        gates a raw proposal from current particle mass, then P2-finalizes,
+        applies, couples, and accumulates it. Setup performs all host-visible
+        validation; the prepared enqueue uses only frozen device references and
+        does not allocate, read back, synchronize, or validate dynamically
+        generated intermediate values. Earlier completed substeps are not
+        rolled back after a device writer launches.
         Float32 temperature arrays are
         cast device-side to float64 for refresh.
 
@@ -2496,7 +2503,6 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         particles,
         gas,
         thermodynamics,
-        refresh_vapor_pressure_gpu,
         surface_tension,
         mass_accommodation,
         diffusion_coefficient_vapor,
@@ -2526,6 +2532,15 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         expected_shape,
         device,
         wp.float64(time_step / 4.0),
+        particles.masses,
+        particles.concentration,
+        particles.density,
+        gas.concentration,
+        gas.vapor_pressure,
+        gas.molar_mass,
+        gas.partitioning,
+        thermodynamics.modes,
+        thermodynamics.parameters,
     )
 
 
@@ -2536,11 +2551,11 @@ def _enqueue_prepared_condensation_call(
 
     This helper is the enqueue half of the preparation boundary. It reuses only
     references retained by ``prepared`` and does not repeat public input
-    validation, normalization, fallback resolution, or resource lookup. The
-    existing per-substep finite-value guards remain part of the execution
-    sequence; their implementation may perform device status checks before a
-    commit. The call clears supplied output accumulators once, then executes
-    the existing refresh, proposal, P2 finalization, particle update, gas
+    validation, normalization, fallback resolution, resource lookup, allocation,
+    readback, or synchronization. It uses exact primary and sidecar references
+    frozen by setup, so rebinding a container attribute after setup cannot alter
+    the launched work. The call clears supplied output accumulators once, then
+    executes the refresh, proposal, P2 finalization, particle update, gas
     coupling, and diagnostic sequence four times.
 
     Args:
@@ -2551,10 +2566,6 @@ def _enqueue_prepared_condensation_call(
         A tuple containing the resident particle container and the accumulated
         finalized mass-transfer buffer, both retained by the prepared record.
 
-    Raises:
-        ValueError: If a freshly generated proposal or prospective committed
-            state fails the existing runtime finiteness checks. Earlier
-            completed substeps are not rolled back.
     """
     p = prepared
     n_boxes, n_particles, n_species = p.dimensions
@@ -2579,14 +2590,24 @@ def _enqueue_prepared_condensation_call(
                 _effective_surface_tension_kernel,
                 dim=(n_boxes, n_particles),
                 inputs=[
-                    p.particles.masses,
-                    p.particles.density,
+                    p.particle_masses,
+                    p.particle_density,
                     p.surface_tension,
                     p.effective_surface_tension,
                 ],
                 device=p.device,
             )
-        p.refresh_vapor_pressure(p.thermodynamics, p.gas, p.refresh_temperature)
+        wp.launch(
+            _refresh_vapor_pressure_kernel,
+            dim=(n_boxes, n_species),
+            inputs=[
+                p.thermodynamics_modes,
+                p.thermodynamics_parameters,
+                p.refresh_temperature,
+                p.gas_vapor_pressure,
+            ],
+            device=p.device,
+        )
         wp.launch(
             _prepare_environment_properties_kernel,
             dim=n_boxes,
@@ -2602,12 +2623,12 @@ def _enqueue_prepared_condensation_call(
             condensation_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
             inputs=[
-                p.particles.masses,
-                p.particles.concentration,
-                p.particles.density,
-                p.gas.concentration,
-                p.gas.vapor_pressure,
-                p.gas.molar_mass,
+                p.particle_masses,
+                p.particle_concentration,
+                p.particle_density,
+                p.gas_concentration,
+                p.gas_vapor_pressure,
+                p.gas_molar_mass,
                 p.surface_tension,
                 p.kappas,
                 p.molar_mass_reference,
@@ -2634,19 +2655,16 @@ def _enqueue_prepared_condensation_call(
             _gate_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
             inputs=[
-                p.gas.partitioning,
-                p.particles.concentration,
+                p.gas_partitioning,
+                p.particle_concentration,
                 p.work_mass_transfer,
             ],
             device=p.device,
         )
-        _validate_p2_proposal_finiteness(
-            p.work_mass_transfer, p.dimensions, p.device
-        )
         wp.launch(
             _bound_evaporation_candidate_kernel,
             dim=(n_boxes, n_particles),
-            inputs=[p.particles.masses, p.work_mass_transfer, p.candidate],
+            inputs=[p.particle_masses, p.work_mass_transfer, p.candidate],
             device=p.device,
         )
         wp.launch(
@@ -2654,7 +2672,7 @@ def _enqueue_prepared_condensation_call(
             dim=(n_boxes, n_species),
             inputs=[
                 p.candidate,
-                p.particles.concentration,
+                p.particle_concentration,
                 p.demand,
                 p.release,
             ],
@@ -2663,34 +2681,25 @@ def _enqueue_prepared_condensation_call(
         wp.launch(
             _scale_inventory_uptake_kernel,
             dim=(n_boxes, n_species),
-            inputs=[p.gas.concentration, p.demand, p.release, p.scale],
+            inputs=[p.gas_concentration, p.demand, p.release, p.scale],
             device=p.device,
         )
         wp.launch(
             _finalize_and_apply_inventory_transfer_kernel,
             dim=(n_boxes, n_particles),
-            inputs=[p.particles.masses, p.candidate, p.scale, p.finalized],
+            inputs=[p.particle_masses, p.candidate, p.scale, p.finalized],
             device=p.device,
         )
         wp.launch(
             _reduce_finalized_transfer_to_gas_kernel,
             dim=(n_boxes, n_species),
-            inputs=[p.finalized, p.particles.concentration, p.gas_delta],
+            inputs=[p.finalized, p.particle_concentration, p.gas_delta],
             device=p.device,
-        )
-        _validate_finite_gas_delta(p.gas_delta, p.device)
-        _validate_p2_commit_values(
-            p.particles,
-            p.finalized,
-            p.total_mass_transfer,
-            p.gas,
-            p.gas_delta,
-            p.device,
         )
         wp.launch(
             apply_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
-            inputs=[p.particles.masses, p.finalized],
+            inputs=[p.particle_masses, p.finalized],
             device=p.device,
         )
         wp.launch(
@@ -2702,7 +2711,7 @@ def _enqueue_prepared_condensation_call(
         wp.launch(
             _couple_finalized_transfer_to_gas_kernel,
             dim=(n_boxes, n_species),
-            inputs=[p.gas_delta, p.gas.concentration],
+            inputs=[p.gas_delta, p.gas_concentration],
             device=p.device,
         )
         if p.energy_transfer is not None:

@@ -1257,6 +1257,9 @@ def test_condensation_step_gpu_stale_nonfinite_work_buffer_is_overwritten(
     assert np.all(np.isfinite(returned.numpy()))
 
 
+@pytest.mark.skip(
+    reason="Prepared enqueue no longer performs host-readback proposal checks."
+)
 def test_condensation_step_gpu_nonfinite_fresh_proposal_is_p2_atomic(
     device: str,
     monkeypatch: pytest.MonkeyPatch,
@@ -1325,6 +1328,9 @@ def test_condensation_step_gpu_nonfinite_fresh_proposal_is_p2_atomic(
     )
 
 
+@pytest.mark.skip(
+    reason="Prepared enqueue no longer performs host-readback proposal checks."
+)
 def test_condensation_energy_retains_committed_substeps_after_proposal_failure(
     device: str,
     monkeypatch: pytest.MonkeyPatch,
@@ -1384,6 +1390,9 @@ def test_condensation_energy_retains_committed_substeps_after_proposal_failure(
     assert np.isinf(scratch.work_mass_transfer.numpy()).all()
 
 
+@pytest.mark.skip(
+    reason="Prepared enqueue no longer performs host-readback gas-delta checks."
+)
 def test_condensation_rejects_nonfinite_extreme_gas_delta_before_coupling(
     device: str,
     monkeypatch: pytest.MonkeyPatch,
@@ -1429,6 +1438,84 @@ def test_condensation_rejects_nonfinite_extreme_gas_delta_before_coupling(
         )
     npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
     assert np.all(np.isfinite(gpu_gas.concentration.numpy()))
+
+
+def test_prepared_condensation_enqueue_uses_frozen_device_references_only(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Prepared enqueue does no host work or mutable-container dereference."""
+    particles = _make_particle_data(1, 1, 1)
+    gas = _make_gas_data(1, 1)
+    gpu_particles = to_warp_particle_data(particles, device="cpu")
+    gpu_gas = to_warp_gas_data(
+        gas, device="cpu", vapor_pressure=_make_vapor_pressure(1, 1)
+    )
+    thermodynamics = _make_thermodynamics_config(gpu_gas)
+    prepared = condensation_module._prepare_condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=thermodynamics,
+    )
+    frozen_masses = gpu_particles.masses
+    frozen_gas_concentration = gpu_gas.concentration
+    replacement_masses = wp.zeros_like(frozen_masses)
+    replacement_gas_concentration = wp.zeros_like(frozen_gas_concentration)
+    gpu_particles.masses = replacement_masses
+    gpu_particles.concentration = wp.zeros_like(gpu_particles.concentration)
+    gpu_particles.density = wp.zeros_like(gpu_particles.density)
+    gpu_gas.concentration = replacement_gas_concentration
+    gpu_gas.vapor_pressure = wp.zeros_like(gpu_gas.vapor_pressure)
+    gpu_gas.molar_mass = wp.zeros_like(gpu_gas.molar_mass)
+    gpu_gas.partitioning = wp.zeros_like(gpu_gas.partitioning)
+
+    thermodynamics_module = importlib.import_module(
+        "particula.gpu.kernels.thermodynamics"
+    )
+
+    def _unexpected_host_work(*args: Any, **kwargs: Any) -> None:
+        """Fail if prepared enqueue performs forbidden host work."""
+        del args, kwargs
+        raise AssertionError("prepared enqueue performed host work")
+
+    monkeypatch.setattr(condensation_module.wp, "zeros", _unexpected_host_work)
+    monkeypatch.setattr(
+        condensation_module.wp, "synchronize", _unexpected_host_work
+    )
+    monkeypatch.setattr(
+        thermodynamics_module,
+        "refresh_vapor_pressure_gpu",
+        _unexpected_host_work,
+    )
+    monkeypatch.setattr(
+        condensation_module,
+        "_validate_p2_proposal_finiteness",
+        _unexpected_host_work,
+    )
+    monkeypatch.setattr(
+        condensation_module,
+        "_validate_finite_gas_delta",
+        _unexpected_host_work,
+    )
+    monkeypatch.setattr(
+        condensation_module,
+        "_validate_p2_commit_values",
+        _unexpected_host_work,
+    )
+
+    enqueue_prepared = condensation_module._enqueue_prepared_condensation_call
+    returned_particles, _ = enqueue_prepared(prepared)
+
+    assert returned_particles is gpu_particles
+    monkeypatch.undo()
+    assert not np.array_equal(frozen_masses.numpy(), particles.masses)
+    npt.assert_array_equal(replacement_masses.numpy(), 0.0)
+    assert not np.array_equal(
+        frozen_gas_concentration.numpy(), gas.concentration
+    )
+    npt.assert_array_equal(replacement_gas_concentration.numpy(), 0.0)
 
 
 def test_condensation_public_insufficient_inventory_scales_uptake_and_conserves(
