@@ -36,6 +36,7 @@ from particula.execution.diagnostics import (
 from particula.execution.gpu_session import (
     ResidentSession,
     ResidentStepGuard,
+    ResidentStepToken,
     _handle_failed_resident_operation,
     _ResidentOperationOutcome,
 )
@@ -509,7 +510,7 @@ def _cleanup_resident_execution_failure(
             request.session,
             cast(Any, request.registry),
             request.guard,
-            token,
+            cast(ResidentStepToken, token),
             outcome,
         )
     except BaseException as cleanup_error:

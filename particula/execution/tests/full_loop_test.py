@@ -80,6 +80,7 @@ from particula.execution.resident_communication import (
     ResidentCommunicationRequest,
 )
 from particula.execution.resident_scheduler import (
+    PreparedResidentSimulation,
     ResidentSimulationRequest,
     ResidentSimulationScheduler,
     enqueue_prepared_resident_simulation,
@@ -98,6 +99,7 @@ from particula.execution.state_updates import (
 )
 from particula.execution.tests.gpu_session_test import _cpu_resources
 from particula.execution.thermodynamic_updates import (
+    PreparedResidentThermodynamicSequence,
     ResidentThermodynamicUpdateCoordinator,
 )
 from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
@@ -1005,7 +1007,10 @@ def test_prepared_ready_simulation_retains_twelve_operations(
     ):
         monkeypatch.setattr(module, name, PreparedAdapter)
 
-    prepared = prepare_resident_simulation(request, 0.0)
+    prepared = cast(
+        PreparedResidentSimulation,
+        prepare_resident_simulation(request, 0.0),
+    )
 
     assert type(prepared).__name__ == "PreparedResidentSimulation"
     assert tuple(item.node.node_id for item in prepared.operations) == _NODE_IDS
@@ -1016,8 +1021,12 @@ def test_prepared_ready_simulation_retains_twelve_operations(
 
     assert fixture.guard.completed_steps == 1
     assert fixture.session.lifecycle is ResidentLifecycle.ACTIVE
-    assert prepared.thermal.cursor == len(_NODE_IDS)
-    assert prepared.thermal.stale_states == set()
+    thermal = cast(
+        PreparedResidentThermodynamicSequence,
+        prepared.thermal,
+    )
+    assert thermal.cursor == len(_NODE_IDS)
+    assert thermal.stale_states == set()
 
 
 @pytest.mark.warp
