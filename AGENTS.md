@@ -1053,12 +1053,16 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   wall loss, nucleation, and diagnostics. The barriers use pre-update volumes
   and invalidate saturation ratio only; vapor pressure remains fresh. The
   virtual refresh nodes run vapor-pressure then saturation immediately before
-  condensation and diagnostics. It retains one exact active session, pinned
-  registry, and closed guard by identity; opens one token only after preflight;
-  and dispatches the resolved order. It performs no transfer, restore,
-  synchronization, checkpoint/finalize, resource acquisition or replacement,
-  fallback, retry, resize, or compaction. A failure after a writer-capable call
-  closes the token, faults the session, and has no rollback or retry guarantee.
+  condensation and diagnostics. Alongside legacy CAPTURED execution admission,
+  the concrete scheduler composes a READY-only, uncaptured prepared path:
+  setup freezes validated operations, then enqueue rechecks structural and
+  lifecycle drift before opening one token and dispatching the retained order.
+  It neither captures nor replays graphs, and does not create a public API.
+  Both paths retain one exact active session, pinned registry, and closed guard
+  by identity; they perform no transfer, restore, synchronization,
+  checkpoint/finalize, resource acquisition or replacement, fallback, retry,
+  resize, or compaction. A failure after a writer-capable call closes the token,
+  faults the session, and has no rollback or retry guarantee.
 - Compatibility is fail-closed: schema-v1 noncommunication, schema-v2
   optional-communication, and schema-v3 continuation checkpoints require
   carrier type `"ResidentSession"`, ACTIVE state, complete valid payloads, and

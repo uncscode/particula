@@ -1,7 +1,7 @@
 # Architecture Reference
 
 **Project:** particula  
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 This reference summarizes the particula package structure and key architectural
 conventions migrated from the legacy guide set.
@@ -343,7 +343,14 @@ and invokes shared no-construction read-only validation. It excludes capture,
 replay, enqueue, dispatch, executor/token construction, resource acquisition,
 payload inspection, transfer, synchronization, lifecycle mutation, fallback,
 and exports. `graph_capture` owns lifecycle; `resident_scheduler` retains
-CAPTURED admission and normal dispatch.
+legacy CAPTURED admission and normal dispatch. It also composes an internal,
+READY-only prepared full-timestep path: setup validates and retains the exact
+twelve-node operations, while enqueue rechecks structural/lifecycle drift,
+opens one token, and invokes only those retained operations. This uncaptured
+path neither captures nor replays graphs and does not add a public API,
+resource acquisition, transfer, synchronization, fallback, or retry. Enqueue
+uses setup-bound handlers and launch arguments only: it performs no setup,
+allocation, signature reconstruction, or node lookup.
 
 ## Scientific Utilities
 

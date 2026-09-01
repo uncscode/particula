@@ -1091,6 +1091,114 @@ def test_prepared_simulation_drift_rejects_before_token_entry(
 
 
 @pytest.mark.warp
+def test_prepared_writer_failure_faults_ready_capture_lifecycle(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A prepared writer failure closes its token and faults READY metadata."""
+    fixture = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
+    request = fixture.request
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cpu"), GraphCaptureAvailability.AVAILABLE
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, fixture.session, fixture.registry, fixture.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+
+    class PreparedCall:
+        """Provide a no-op prepared operation."""
+
+        def execute(self) -> None:
+            return None
+
+    class FailingPreparedCall:
+        """Inject a failure after the prepared writer boundary begins."""
+
+        def execute(self) -> None:
+            raise RuntimeError("prepared wall-loss writer failed")
+
+    class PreparedAdapter:
+        """Return a failure only for the retained wall-loss operation."""
+
+        def prepare(self, item: object) -> PreparedCall | FailingPreparedCall:
+            if item is request.wall_loss:
+                return FailingPreparedCall()
+            return PreparedCall()
+
+    module = _scheduler_module()
+    for name in (
+        "WarpCondensationExecutionAdapter",
+        "ResidentBrownianCoagulationExecutionAdapter",
+        "ResidentDilutionAdapter",
+        "ResidentWallLossAdapter",
+        "ResidentNucleationAdapter",
+    ):
+        monkeypatch.setattr(module, name, PreparedAdapter)
+    prepared = prepare_resident_simulation(request, 0.0)
+
+    with pytest.raises(RuntimeError, match="prepared wall-loss writer failed"):
+        enqueue_prepared_resident_simulation(prepared)
+
+    fixture.guard.assert_step_closed()
+    assert fixture.session.lifecycle is ResidentLifecycle.FAULTED
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.FAULTED
+
+
+@pytest.mark.warp
+def test_prepared_handler_drift_rejects_before_token_entry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Replacing a retained handler cannot alter prepared dispatch behavior."""
+    fixture = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
+    request = fixture.request
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cpu"), GraphCaptureAvailability.AVAILABLE
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, fixture.session, fixture.registry, fixture.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+
+    class PreparedCall:
+        """Provide a write-free retained operation for scheduler preparation."""
+
+        def execute(self) -> None:
+            return None
+
+    class PreparedAdapter:
+        """Replace native setup while retaining the prepare protocol."""
+
+        def prepare(self, _request: object) -> PreparedCall:
+            return PreparedCall()
+
+    module = _scheduler_module()
+    for name in (
+        "WarpCondensationExecutionAdapter",
+        "ResidentBrownianCoagulationExecutionAdapter",
+        "ResidentDilutionAdapter",
+        "ResidentWallLossAdapter",
+        "ResidentNucleationAdapter",
+    ):
+        monkeypatch.setattr(module, name, PreparedAdapter)
+    prepared = prepare_resident_simulation(request, 0.0)
+    object.__setattr__(prepared.operations[0], "handler", lambda *_: None)
+
+    with pytest.raises(ValueError, match="products do not match"):
+        enqueue_prepared_resident_simulation(prepared)
+
+    fixture.guard.assert_step_closed()
+    assert fixture.guard.completed_steps == 0
+    assert fixture.session.lifecycle is ResidentLifecycle.ACTIVE
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
+
+
+@pytest.mark.warp
 def test_wall_loss_failure_faults_session_and_blocks_later_dispatch(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

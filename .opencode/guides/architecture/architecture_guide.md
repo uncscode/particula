@@ -241,8 +241,10 @@
    only when final volumes are pinned. The standalone `volume_evolution_step_gpu`
    is independently callable; this resident use is an optional scheduled barrier
    with separate composition rules. A pinned final-volume sidecar equal to the
-   resident volumes is a write-free resident barrier and does not write primary,
-   ledger, or volume-status storage. Both barriers invalidate `SATURATION_RATIO`
+   resident volumes makes only volume evolution write-free; communication still
+   executes and may mutate resident state. The write-free volume node does not
+   write primary, ledger, or volume-status storage. Both barriers invalidate
+   `SATURATION_RATIO`
    only, leaving vapor pressure fresh. This seam has no package or top-level export
    and no fallback, retry, or rollback behavior. See
    [ADR-018](decisions/ADR-018-resident-communication-integration.md).
@@ -285,6 +287,12 @@
   authoritative owner of its logical-box selection; the scheduler validates and
   forwards that selection before opening the token, without deriving selection
   from particle state or reseeding/inspecting the pinned wall-loss stream.
+  The scheduler also provides an internal READY, uncaptured prepared-dispatch
+  seam: setup retains scheduler-owned fixed operation handlers and validated
+  arguments, then enqueue rechecks only attachment, lifecycle, and structural
+  identities before opening one token and invoking the retained order. It does
+  no setup, allocation, lookup, capture, replay, resource acquisition,
+  transfer, or synchronization, and adds no public API.
   Neither seam is package- or top-level-exported
   and neither transfers, restores, synchronizes, checkpoints, finalizes,
    acquires/replaces resources, resizes, compacts, or falls back. See

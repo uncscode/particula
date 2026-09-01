@@ -1,9 +1,11 @@
 """Coordinate resident thermodynamic derived-state freshness.
 
 This direct-import-only Warp boundary consumes resolver-produced graph and
-schedule metadata. Callers explicitly report successful ordinary nodes and
-bracket supported consumer callbacks. The coordinator refreshes stale
-vapor-pressure and saturation-ratio fields immediately before a consumer.
+schedule metadata. Legacy callers explicitly report successful ordinary nodes
+and bracket supported consumer callbacks. The READY-prepared path validates
+and freezes both consumer windows during setup, then enqueues only retained
+writers and records successful-node freshness metadata. Both paths refresh
+stale vapor-pressure and saturation-ratio fields immediately before a consumer.
 Communication and volume-evolution barriers invalidate saturation ratio
 without invalidating or refreshing vapor pressure.
 
@@ -175,9 +177,10 @@ class PreparedResidentThermodynamicConsumer:
 class PreparedResidentThermodynamicSequence:
     """Freeze the two thermodynamic consumer windows for resident enqueue.
 
-    The coordinator is used only while constructing this carrier.  Enqueue uses
-    the retained writer functions and consumer products directly, so it does not
-    validate bindings, resolve nodes, or construct a coordinator.
+    The coordinator is used only while constructing this carrier. Enqueue uses
+    the retained writer inputs and consumer products directly, then records
+    successful nodes, so it does not validate bindings, resolve nodes, or
+    construct a coordinator.
 
     Attributes:
         binding: Common resident arrays and thermodynamic configuration.

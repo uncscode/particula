@@ -1,18 +1,19 @@
-"""Run the closed twelve-node GPU-resident simulation schedule.
+"""Run legacy and READY-prepared twelve-node GPU-resident schedules.
 
 This concrete direct-import-only composition boundary dispatches communication,
 then optional volume evolution, before the ten ordinary loop nodes. It retains
 every resident object by identity and performs no upload, restore,
 synchronization, fallback, resource acquisition, retry, or rollback.
-When a graph-capture binding is attached, admission is gated by that binding's
-exact resident identities, capability, lifecycle, and structural signature
-before the step token is opened.
+Legacy scheduler execution gates an attached graph-capture binding by its exact
+resident identities, capability, lifecycle, and structural signature before the
+step token is opened. The prepared path is concrete-only, READY, and
+uncaptured; it retains setup-validated operation callables and rechecks only
+its attachment and structural signature before opening its token.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import partial
 from numbers import Real
 from typing import Any, Callable, cast
 
@@ -137,13 +138,15 @@ class PreparedResidentOperation:
 
     Attributes:
         node: Resolver-produced node represented by this operation.
-        enqueue: Zero-argument callable that enqueues the retained operation.
-        product: Setup product captured by ``enqueue`` and retained by identity.
-        writer_capable: Whether invoking ``enqueue`` may launch a device writer.
+        handler: Scheduler-owned fixed handler for the prepared operation.
+        arguments: Setup-bound arguments supplied to ``handler`` at enqueue.
+        product: Setup product retained by identity for drift detection.
+        writer_capable: Whether invoking ``handler`` may launch a device writer.
     """
 
     node: ProcessNode
-    enqueue: Callable[[], object]
+    handler: Callable[..., object]
+    arguments: tuple[object, ...]
     product: object
     writer_capable: bool
 
@@ -155,7 +158,8 @@ class PreparedResidentSimulation:
     The carrier is identity-semantic: its metadata, setup products, node order,
     and operation callables are all retained during preparation. Enqueue can
     therefore dispatch the complete schedule without reconstructing executors,
-    resolving nodes, or repeating payload validation.
+    resolving nodes, repeating payload validation, or invoking graph-capture
+    admission. It represents a READY attachment, not a captured graph.
 
     Attributes:
         timestep: Prepared P1 timestep retained by identity.
@@ -399,69 +403,85 @@ def prepare_resident_simulation(
     operations = (
         PreparedResidentOperation(
             nodes["communication"],
-            partial(
-                _enqueue_prepared_resident_communication_node, communication
-            ),
+            _enqueue_prepared_resident_communication_node,
+            (communication,),
             communication,
             True,
         ),
         PreparedResidentOperation(
             nodes["volume_evolution"],
-            partial(
-                _enqueue_prepared_resident_volume_evolution_node, communication
-            ),
+            _enqueue_prepared_resident_volume_evolution_node,
+            (communication,),
             communication,
             True,
         ),
         PreparedResidentOperation(
             nodes["environment_update"],
-            partial(_enqueue_prepared_environment_update, environment),
+            _enqueue_prepared_environment_update,
+            (environment,),
             environment,
             True,
         ),
         PreparedResidentOperation(
             nodes["gas_update"],
-            partial(_enqueue_prepared_gas_update, gas),
+            _enqueue_prepared_gas_update,
+            (gas,),
             gas,
             True,
         ),
         PreparedResidentOperation(
             nodes["vapor_pressure_refresh"],
-            partial(_enqueue_prepared_vapor_pressure, thermal.condensation),
+            _enqueue_prepared_vapor_pressure,
+            (thermal.condensation,),
             thermal.condensation,
             True,
         ),
         PreparedResidentOperation(
             nodes["saturation_refresh"],
-            partial(_enqueue_prepared_saturation_ratio, thermal.condensation),
+            _enqueue_prepared_saturation_ratio,
+            (thermal.condensation,),
             thermal.condensation,
             True,
         ),
         PreparedResidentOperation(
-            nodes["condensation"], condensation.execute, condensation, True
+            nodes["condensation"],
+            _enqueue_prepared_operation_execute,
+            (condensation,),
+            condensation,
+            True,
         ),
         PreparedResidentOperation(
             nodes["brownian_coagulation"],
-            coagulation.execute,
+            _enqueue_prepared_operation_execute,
+            (coagulation,),
             coagulation,
             True,
         ),
         PreparedResidentOperation(
-            nodes["dilution"], dilution.execute, dilution, True
+            nodes["dilution"],
+            _enqueue_prepared_operation_execute,
+            (dilution,),
+            dilution,
+            True,
         ),
         PreparedResidentOperation(
-            nodes["wall_loss"], wall_loss.execute, wall_loss, True
+            nodes["wall_loss"],
+            _enqueue_prepared_operation_execute,
+            (wall_loss,),
+            wall_loss,
+            True,
         ),
         PreparedResidentOperation(
-            nodes["nucleation"], nucleation.execute, nucleation, True
+            nodes["nucleation"],
+            _enqueue_prepared_operation_execute,
+            (nucleation,),
+            nucleation,
+            True,
         ),
         PreparedResidentOperation(
             nodes["diagnostics"],
-            partial(
-                _enqueue_prepared_diagnostics_window,
-                thermal.diagnostics,
-                diagnostics,
-            ),
+            _enqueue_prepared_diagnostics_window,
+            (thermal.diagnostics, diagnostics),
             diagnostics,
             True,
         ),
@@ -539,10 +559,50 @@ def _validate_prepared_resident_simulation(prepared: object) -> None:
         typed.nucleation,
         typed.diagnostics,
     )
+    expected_handlers = (
+        _enqueue_prepared_resident_communication_node,
+        _enqueue_prepared_resident_volume_evolution_node,
+        _enqueue_prepared_environment_update,
+        _enqueue_prepared_gas_update,
+        _enqueue_prepared_vapor_pressure,
+        _enqueue_prepared_saturation_ratio,
+        _enqueue_prepared_operation_execute,
+        _enqueue_prepared_operation_execute,
+        _enqueue_prepared_operation_execute,
+        _enqueue_prepared_operation_execute,
+        _enqueue_prepared_operation_execute,
+        _enqueue_prepared_diagnostics_window,
+    )
+    expected_arguments = (
+        (typed.communication,),
+        (typed.communication,),
+        (typed.environment,),
+        (typed.gas,),
+        (typed.thermal.condensation,),
+        (typed.thermal.condensation,),
+        (typed.condensation,),
+        (typed.coagulation,),
+        (typed.dilution,),
+        (typed.wall_loss,),
+        (typed.nucleation,),
+        (typed.thermal.diagnostics, typed.diagnostics),
+    )
     if any(
-        operation.product is not expected
-        for operation, expected in zip(
-            typed.operations, expected_products, strict=True
+        operation.product is not product
+        or operation.handler is not handler
+        or len(operation.arguments) != len(arguments)
+        or any(
+            argument is not expected
+            for argument, expected in zip(
+                operation.arguments, arguments, strict=True
+            )
+        )
+        for operation, product, handler, arguments in zip(
+            typed.operations,
+            expected_products,
+            expected_handlers,
+            expected_arguments,
+            strict=True,
         )
     ):
         raise ValueError("prepared resident simulation products do not match.")
@@ -563,14 +623,6 @@ def _validate_prepared_resident_simulation(prepared: object) -> None:
         typed.registry,
         typed.guard,
     )
-    from particula.execution.graph_capture import (
-        compare_resident_graph_capture_signature,
-    )
-
-    if not compare_resident_graph_capture_signature(
-        cast(Any, typed.signature), cast(Any, typed.request)
-    ).compatible:
-        raise ValueError("resident graph-capture signature is incompatible.")
 
 
 def enqueue_prepared_resident_simulation(prepared: object) -> None:
@@ -598,14 +650,14 @@ def enqueue_prepared_resident_simulation(prepared: object) -> None:
     try:
         for operation in typed.operations:
             writer_called = writer_called or operation.writer_capable
-            operation.enqueue()
+            operation.handler(*operation.arguments)
             record_prepared_thermodynamic_success(
                 cast(Any, typed.thermal), operation.node
             )
         cast(Any, typed.guard).complete_step(token)
     except BaseException as error:
         _cleanup_resident_execution_failure(
-            typed.request, token, writer_called, error, classify_capture=False
+            typed.request, token, writer_called, error, classify_capture=True
         )
 
 
@@ -654,9 +706,14 @@ def _enqueue_prepared_diagnostics_window(
     consumer: object,
     diagnostics: object,
 ) -> None:
-    """Refresh diagnostic saturation then issue its retained copy operation."""
+    """Issue the retained diagnostic saturation refresh and copy operations."""
     _enqueue_prepared_saturation_ratio(cast(Any, consumer))
     _enqueue_prepared_resident_diagnostics(cast(Any, diagnostics))
+
+
+def _enqueue_prepared_operation_execute(operation: object) -> object:
+    """Invoke one setup-bound prepared operation without resolving it again."""
+    return cast(Any, operation).execute()
 
 
 class ResidentSimulationScheduler:
