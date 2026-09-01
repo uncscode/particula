@@ -583,7 +583,8 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
     prepared: PreparedResidentDiagnostics,
 ) -> None:
     """Dispatch only registrations retained by prepared diagnostics setup."""
-    dimensions = prepared.dimensions
+    dimensions = cast(Any, prepared.dimensions)
+    device = cast(Any, prepared.device)
     if not dimensions.n_boxes:
         return
     for index, registration in enumerate(prepared.registrations):
@@ -597,14 +598,14 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
                 _clear_particle_number,
                 dim=dimensions.n_boxes,
                 inputs=[output],
-                device=prepared.device,
+                device=device,
             )
             if dimensions.n_particles:
                 wp.launch(
                     _accumulate_particle_number,
                     dim=(dimensions.n_boxes, dimensions.n_particles),
                     inputs=[prepared.particle_concentration, output],
-                    device=prepared.device,
+                    device=device,
                 )
         elif dimensions.n_species:
             matrix_dim = (dimensions.n_boxes, dimensions.n_species)
@@ -616,7 +617,7 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
                     _copy_snapshot,
                     dim=matrix_dim,
                     inputs=[prepared.gas_concentration, output],
-                    device=prepared.device,
+                    device=device,
                 )
             elif (
                 operation
@@ -626,7 +627,7 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
                     _copy_snapshot,
                     dim=matrix_dim,
                     inputs=[prepared.saturation_ratio, output],
-                    device=prepared.device,
+                    device=device,
                 )
             elif operation is ResidentDiagnosticOperation.TOTAL_SPECIES_MASS:
                 wp.launch(
@@ -637,7 +638,7 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
                         prepared.particle_volume,
                         output,
                     ],
-                    device=prepared.device,
+                    device=device,
                 )
                 if dimensions.n_particles:
                     wp.launch(
@@ -653,14 +654,14 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
                             prepared.particle_volume,
                             output,
                         ],
-                        device=prepared.device,
+                        device=device,
                     )
             elif operation is ResidentDiagnosticOperation.LATENT_HEAT_ENERGY:
                 wp.launch(
                     _copy_snapshot,
                     dim=matrix_dim,
                     inputs=[prepared.energy_transfers[index], output],
-                    device=prepared.device,
+                    device=device,
                 )
             else:
                 if prepared.total_mass_output is None:
@@ -677,7 +678,7 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
                         prepared.sink_ledgers[index],
                         output,
                     ],
-                    device=prepared.device,
+                    device=device,
                 )
 
 

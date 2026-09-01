@@ -10,7 +10,7 @@ import importlib
 import sys
 import warnings
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import pytest
@@ -1405,7 +1405,7 @@ class TestFromWarpGasData:
         partitioning: np.ndarray,
     ) -> None:
         """Test partitioning must exactly match the concentration layout."""
-        gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
+        gpu_data: Any = to_warp_gas_data(sample_gas_data, device="cpu")
         gpu_data = SimpleNamespace(
             molar_mass=gpu_data.molar_mass,
             concentration=gpu_data.concentration,
@@ -1804,7 +1804,7 @@ class TestFromWarpEnvironmentData:
         )
 
         with pytest.raises(ValueError, match="saturation_ratio must be 2D"):
-            from_warp_environment_data(gpu_data)
+            from_warp_environment_data(cast(Any, gpu_data))
 
 
 class TestGpuContext:

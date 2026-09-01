@@ -165,7 +165,7 @@ def setup_prepared_thermodynamic_binding(
             "prepared timestep does not retain the supplied request."
         )
     typed = ResidentThermodynamicUpdateRequest(
-        prepared.session,
+        cast(ResidentSession, prepared.session),
         prepared.registry,
         cast(ResolvedProcessGraph, prepared.graph),
         prepared.schedule,
@@ -214,7 +214,7 @@ def setup_prepared_thermodynamic_binding(
         environment.temperature,
         environment.saturation_ratio,
         gas.concentration.device,
-        session.dimensions,
+        cast(Any, session.dimensions),
         thermodynamics,
     )
 
@@ -239,11 +239,12 @@ def _enqueue_prepared_saturation_ratio(
     if not prepared.refresh_saturation:
         return
     binding = prepared.binding
-    if not binding.dimensions.n_boxes or not binding.dimensions.n_species:
+    dimensions = cast(Any, binding.dimensions)
+    if not dimensions.n_boxes or not dimensions.n_species:
         return
     wp.launch(
         _refresh_saturation_ratio_kernel,
-        dim=(binding.dimensions.n_boxes, binding.dimensions.n_species),
+        dim=(dimensions.n_boxes, dimensions.n_species),
         inputs=[
             binding.gas_concentration,
             binding.gas_molar_mass,
@@ -251,7 +252,7 @@ def _enqueue_prepared_saturation_ratio(
             binding.environment_temperature,
             binding.environment_saturation_ratio,
         ],
-        device=binding.device,
+        device=cast(Any, binding.device),
     )
 
 

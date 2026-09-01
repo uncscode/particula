@@ -423,7 +423,7 @@ def setup_prepared_environment_update(
     """Validate once and bind an environment replacement for enqueue."""
     _validate_prepared_binding(prepared_timestep, request, environment=True)
     typed = cast(ResidentEnvironmentUpdateRequest, request)
-    dimensions = typed.session.dimensions
+    dimensions = cast(Any, typed.session.dimensions)
     target = cast(Any, typed.session.environment)
     shape = (dimensions.n_boxes,)
     temperature_range = _validate_array(
@@ -496,7 +496,8 @@ def _enqueue_prepared_environment_update(
     prepared: PreparedResidentEnvironmentUpdate,
 ) -> object:
     """Issue only the bound temperature-then-pressure copies."""
-    if prepared.dimensions.n_boxes:
+    dimensions = cast(Any, prepared.dimensions)
+    if dimensions.n_boxes:
         wp.copy(
             cast(Any, prepared.target_temperature),
             cast(Any, prepared.temperature),
@@ -509,7 +510,8 @@ def _enqueue_prepared_environment_update(
 
 def _enqueue_prepared_gas_update(prepared: PreparedResidentGasUpdate) -> object:
     """Issue only the bound gas-concentration copy."""
-    if prepared.dimensions.n_boxes * prepared.dimensions.n_species:
+    dimensions = cast(Any, prepared.dimensions)
+    if dimensions.n_boxes * dimensions.n_species:
         wp.copy(
             cast(Any, prepared.target_concentration),
             cast(Any, prepared.concentration),
