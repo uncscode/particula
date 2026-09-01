@@ -174,7 +174,12 @@ class PreparedResidentCommunicationBinding:
 
 
 def _enqueue_prepared_noop() -> None:
-    """Provide the setup-bound write-free path without enqueue branching."""
+    """Provide the setup-bound write-free path without enqueue branching.
+
+    This callable is selected during preparation when no final volume array is
+    configured. Keeping it as a bound operation lets enqueue use the same
+    communication/volume dispatch shape for configured and unconfigured paths.
+    """
 
 
 def setup_prepared_resident_communication(  # noqa: C901
@@ -420,14 +425,28 @@ def _enqueue_prepared_resident_communication(
 def _enqueue_prepared_resident_communication_node(
     binding: PreparedResidentCommunicationBinding,
 ) -> object | None:
-    """Enqueue only the already-bound communication barrier."""
+    """Enqueue only the already-bound communication barrier.
+
+    Args:
+        binding: Setup-validated communication inputs and native callable.
+
+    Returns:
+        The native communication result, when the selected mode returns one.
+    """
     return binding.communication_enqueue(*binding.communication_arguments)
 
 
 def _enqueue_prepared_resident_volume_evolution_node(
     binding: PreparedResidentCommunicationBinding,
 ) -> object | None:
-    """Enqueue only the already-bound optional volume-evolution barrier."""
+    """Enqueue only the already-bound optional volume-evolution barrier.
+
+    Args:
+        binding: Setup-validated volume inputs and native or no-op callable.
+
+    Returns:
+        The native volume result, or ``None`` for the bound no-op path.
+    """
     return binding.volume_enqueue(*binding.volume_arguments)
 
 

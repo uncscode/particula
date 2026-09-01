@@ -71,7 +71,11 @@ def _refresh_saturation_ratio_kernel(
 
 
 def _registry_type() -> type[object]:
-    """Lazily resolve the concrete registry type without a package export."""
+    """Lazily resolve the concrete registry type without a package export.
+
+    Returns:
+        The direct-module-only ``GPUResourceRegistry`` class.
+    """
     from particula.execution.gpu_resources import GPUResourceRegistry
 
     return GPUResourceRegistry

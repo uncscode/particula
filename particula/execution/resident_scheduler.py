@@ -518,7 +518,17 @@ def prepare_resident_simulation(
 
 
 def _validate_prepared_resident_simulation(prepared: object) -> None:
-    """Perform the READY-only identity and signature gate before token entry."""
+    """Perform the READY-only identity and signature gate before token entry.
+
+    Args:
+        prepared: Candidate prepared simulation carrier whose retained
+            identities and setup products must be checked.
+
+    Raises:
+        TypeError: If ``prepared`` is not an exact prepared simulation carrier.
+        ValueError: If any retained identity, operation, or READY attachment
+            metadata has drifted.
+    """
     if type(prepared) is not PreparedResidentSimulation:
         raise TypeError("prepared must be an exact PreparedResidentSimulation.")
     typed = cast(PreparedResidentSimulation, prepared)
@@ -712,7 +722,14 @@ def _enqueue_prepared_diagnostics_window(
 
 
 def _enqueue_prepared_operation_execute(operation: object) -> object:
-    """Invoke one setup-bound prepared operation without resolving it again."""
+    """Invoke one setup-bound prepared operation without resolving it again.
+
+    Args:
+        operation: Prepared adapter operation retaining its execution product.
+
+    Returns:
+        The result returned by the retained operation's ``execute`` method.
+    """
     return cast(Any, operation).execute()
 
 
