@@ -27,6 +27,7 @@ from particula.execution.process_graph import (
     ResourceRequirement,
     _is_resolver_produced_graph,
 )
+from particula.execution.resident_enqueue import PreparedResidentTimestep
 
 if TYPE_CHECKING:
     from particula.execution.gpu_resources import GPUResourceRegistry
@@ -150,6 +151,30 @@ class ResidentGasUpdateRequest:
             raise TypeError("node must be an exact ProcessNode.")
 
 
+@dataclass(frozen=True, eq=False)
+class PreparedResidentEnvironmentUpdate:
+    """Retain validated environment-copy arrays for an enqueue-only phase."""
+
+    request: ResidentEnvironmentUpdateRequest
+    target: object
+    temperature: object
+    pressure: object
+    target_temperature: object
+    target_pressure: object
+    dimensions: object
+
+
+@dataclass(frozen=True, eq=False)
+class PreparedResidentGasUpdate:
+    """Retain validated gas-copy arrays for an enqueue-only phase."""
+
+    request: ResidentGasUpdateRequest
+    target: object
+    concentration: object
+    target_concentration: object
+    dimensions: object
+
+
 def _array_range(
     value: Any,
     shape: tuple[int, ...],
@@ -225,13 +250,13 @@ def _primary_arrays(session: ResidentSession) -> tuple[Any, ...]:
     return (
         particles.masses,
         particles.concentration,
-        particles.charge,
         particles.density,
         particles.volume,
+        particles.charge,
         gas.molar_mass,
         gas.concentration,
-        gas.vapor_pressure,
         gas.partitioning,
+        gas.vapor_pressure,
         environment.temperature,
         environment.pressure,
         environment.saturation_ratio,
@@ -339,6 +364,157 @@ def _scan(
             "finite and positive" if positive else "finite and nonnegative"
         )
         raise ValueError(f"{name} values must be {constraint}.")
+
+
+def _validate_prepared_binding(
+    prepared_timestep: object, request: object, *, environment: bool
+) -> None:
+    """Validate the exact P1 binding before retaining copy identities."""
+    if type(prepared_timestep) is not PreparedResidentTimestep:
+        raise TypeError(
+            "prepared_timestep must be an exact PreparedResidentTimestep."
+        )
+    expected_type = (
+        ResidentEnvironmentUpdateRequest
+        if environment
+        else ResidentGasUpdateRequest
+    )
+    if type(request) is not expected_type:
+        raise TypeError(
+            "request must be an exact resident state update request."
+        )
+    prepared = cast(PreparedResidentTimestep, prepared_timestep)
+    request_any = cast(Any, request)
+    attached = (
+        prepared.request.environment_update
+        if environment
+        else prepared.request.gas_update
+    )
+    if attached is not request:
+        raise ValueError(
+            "prepared timestep does not retain the supplied request."
+        )
+    if (
+        prepared.session is not request_any.session
+        or prepared.registry is not request_any.registry
+        or prepared.graph is not request_any.graph
+        or prepared.dimensions is not request_any.session.dimensions
+    ):
+        raise ValueError("prepared timestep identities do not match request.")
+    request_any.registry.validate_pinned_session(request_any.session)
+    _validate_node(request, environment=environment)
+    if not any(node is request_any.node for node in prepared.schedule.nodes):
+        raise ValueError(
+            "prepared timestep schedule does not retain request node."
+        )
+    primaries = _primary_arrays(request_any.session)
+    if len(prepared.primary_arrays) != len(primaries) or any(
+        left is not right
+        for left, right in zip(prepared.primary_arrays, primaries, strict=True)
+    ):
+        raise ValueError(
+            "prepared timestep primary arrays do not match session."
+        )
+
+
+def setup_prepared_environment_update(
+    prepared_timestep: object, request: object
+) -> PreparedResidentEnvironmentUpdate:
+    """Validate once and bind an environment replacement for enqueue."""
+    _validate_prepared_binding(prepared_timestep, request, environment=True)
+    typed = cast(ResidentEnvironmentUpdateRequest, request)
+    dimensions = typed.session.dimensions
+    target = cast(Any, typed.session.environment)
+    shape = (dimensions.n_boxes,)
+    temperature_range = _validate_array(
+        typed.temperature, shape, target.temperature.device, "temperature"
+    )
+    pressure_range = _validate_array(
+        typed.pressure, shape, target.pressure.device, "pressure"
+    )
+    if typed.temperature is typed.pressure or _overlaps(
+        temperature_range, pressure_range
+    ):
+        raise ValueError("Environment update inputs must not alias each other.")
+    _reject_primary_aliases(
+        typed.session,
+        (typed.temperature, typed.pressure),
+        (temperature_range, pressure_range),
+    )
+    _scan(
+        cast(Any, typed.temperature),
+        dimensions.n_boxes,
+        positive=True,
+        name="temperature",
+    )
+    _scan(
+        cast(Any, typed.pressure),
+        dimensions.n_boxes,
+        positive=True,
+        name="pressure",
+    )
+    return PreparedResidentEnvironmentUpdate(
+        typed,
+        target,
+        typed.temperature,
+        typed.pressure,
+        target.temperature,
+        target.pressure,
+        dimensions,
+    )
+
+
+def setup_prepared_gas_update(
+    prepared_timestep: object, request: object
+) -> PreparedResidentGasUpdate:
+    """Validate once and bind a gas replacement for enqueue."""
+    _validate_prepared_binding(prepared_timestep, request, environment=False)
+    typed = cast(ResidentGasUpdateRequest, request)
+    dimensions = typed.session.dimensions
+    target = cast(Any, typed.session.gas)
+    shape = (dimensions.n_boxes, dimensions.n_species)
+    value_range = _validate_array(
+        typed.concentration, shape, target.concentration.device, "concentration"
+    )
+    _reject_primary_aliases(
+        typed.session, (typed.concentration,), (value_range,)
+    )
+    size = dimensions.n_boxes * dimensions.n_species
+    _scan(
+        cast(Any, typed.concentration),
+        size,
+        positive=False,
+        name="concentration",
+        matrix_shape=shape,
+    )
+    return PreparedResidentGasUpdate(
+        typed, target, typed.concentration, target.concentration, dimensions
+    )
+
+
+def _enqueue_prepared_environment_update(
+    prepared: PreparedResidentEnvironmentUpdate,
+) -> object:
+    """Issue only the bound temperature-then-pressure copies."""
+    if prepared.dimensions.n_boxes:
+        wp.copy(
+            cast(Any, prepared.target_temperature),
+            cast(Any, prepared.temperature),
+        )
+        wp.copy(
+            cast(Any, prepared.target_pressure), cast(Any, prepared.pressure)
+        )
+    return prepared.target
+
+
+def _enqueue_prepared_gas_update(prepared: PreparedResidentGasUpdate) -> object:
+    """Issue only the bound gas-concentration copy."""
+    if prepared.dimensions.n_boxes * prepared.dimensions.n_species:
+        wp.copy(
+            cast(Any, prepared.target_concentration),
+            cast(Any, prepared.concentration),
+        )
+    return prepared.target
 
 
 class ResidentStateUpdateExecutor:

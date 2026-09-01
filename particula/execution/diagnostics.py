@@ -36,6 +36,7 @@ from particula.execution.process_graph import (
     _is_resolver_produced_graph,
     resolve_canonical_topological_order,
 )
+from particula.execution.resident_enqueue import PreparedResidentTimestep
 from particula.execution.scheduler import (
     ResolvedTimestepSchedule,
     is_resolver_produced_schedule,
@@ -166,6 +167,27 @@ class ResidentDiagnosticsPlan:
                 "registrations must be exact "
                 "ResidentDiagnosticRegistration tuple."
             )
+
+
+@dataclass(frozen=True, eq=False)
+class PreparedResidentDiagnostics:
+    """Retain validated diagnostics sources and canonical registrations."""
+
+    plan: ResidentDiagnosticsPlan
+    particle_masses: object
+    particle_concentration: object
+    particle_volume: object
+    gas_concentration: object
+    saturation_ratio: object
+    device: object
+    dimensions: object
+    registrations: tuple[ResidentDiagnosticRegistration, ...]
+    outputs: tuple[object, ...]
+    energy_transfers: tuple[object | None, ...]
+    baseline_total_masses: tuple[object | None, ...]
+    source_ledgers: tuple[object | None, ...]
+    sink_ledgers: tuple[object | None, ...]
+    total_mass_output: object | None
 
 
 @wp.kernel
@@ -435,7 +457,6 @@ class ResidentDiagnosticsExecutor:
                         ],
                         device=particles.masses.device,
                     )
-
                     if dimensions.n_particles:
                         wp.launch(
                             _accumulate_particle_species_mass,
@@ -481,6 +502,183 @@ class ResidentDiagnosticsExecutor:
                         ],
                         device=particles.masses.device,
                     )
+
+
+def setup_prepared_resident_diagnostics(
+    prepared_timestep: object, plan: object
+) -> PreparedResidentDiagnostics:
+    """Validate a P1 diagnostics attachment and bind its enqueue identities."""
+    if type(prepared_timestep) is not PreparedResidentTimestep:
+        raise TypeError(
+            "prepared_timestep must be an exact PreparedResidentTimestep."
+        )
+    if type(plan) is not ResidentDiagnosticsPlan:
+        raise TypeError("plan must be an exact ResidentDiagnosticsPlan.")
+    prepared = cast(PreparedResidentTimestep, prepared_timestep)
+    typed = cast(ResidentDiagnosticsPlan, plan)
+    if prepared.request.diagnostics is not typed:
+        raise ValueError("prepared timestep does not retain the supplied plan.")
+    if (
+        prepared.session is not typed.session
+        or prepared.registry is not typed.registry
+        or prepared.graph is not typed.graph
+        or prepared.schedule is not typed.schedule
+        or prepared.dimensions is not typed.session.dimensions
+    ):
+        raise ValueError("prepared timestep identities do not match plan.")
+    validate_resident_diagnostics_plan(typed)
+    particles = cast(Any, typed.session.particles)
+    gas = cast(Any, typed.session.gas)
+    environment = cast(Any, typed.session.environment)
+    primaries = (
+        particles.masses,
+        particles.concentration,
+        particles.density,
+        particles.volume,
+        particles.charge,
+        gas.molar_mass,
+        gas.concentration,
+        gas.partitioning,
+        gas.vapor_pressure,
+        environment.temperature,
+        environment.pressure,
+        environment.saturation_ratio,
+    )
+    if len(prepared.primary_arrays) != len(primaries) or any(
+        left is not right
+        for left, right in zip(prepared.primary_arrays, primaries, strict=True)
+    ):
+        raise ValueError(
+            "prepared timestep primary arrays do not match session."
+        )
+    total_mass_output = next(
+        (
+            registration.output
+            for registration in typed.registrations
+            if registration.operation
+            is ResidentDiagnosticOperation.TOTAL_SPECIES_MASS
+        ),
+        None,
+    )
+    return PreparedResidentDiagnostics(
+        typed,
+        particles.masses,
+        particles.concentration,
+        particles.volume,
+        gas.concentration,
+        environment.saturation_ratio,
+        particles.masses.device,
+        typed.session.dimensions,
+        typed.registrations,
+        tuple(item.output for item in typed.registrations),
+        tuple(item.energy_transfer for item in typed.registrations),
+        tuple(item.baseline_total_mass for item in typed.registrations),
+        tuple(item.source_ledger for item in typed.registrations),
+        tuple(item.sink_ledger for item in typed.registrations),
+        total_mass_output,
+    )
+
+
+def _enqueue_prepared_resident_diagnostics(  # noqa: C901
+    prepared: PreparedResidentDiagnostics,
+) -> None:
+    """Dispatch only registrations retained by prepared diagnostics setup."""
+    dimensions = prepared.dimensions
+    if not dimensions.n_boxes:
+        return
+    for index, registration in enumerate(prepared.registrations):
+        operation = registration.operation
+        output = prepared.outputs[index]
+        if (
+            operation
+            is ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION
+        ):
+            wp.launch(
+                _clear_particle_number,
+                dim=dimensions.n_boxes,
+                inputs=[output],
+                device=prepared.device,
+            )
+            if dimensions.n_particles:
+                wp.launch(
+                    _accumulate_particle_number,
+                    dim=(dimensions.n_boxes, dimensions.n_particles),
+                    inputs=[prepared.particle_concentration, output],
+                    device=prepared.device,
+                )
+        elif dimensions.n_species:
+            matrix_dim = (dimensions.n_boxes, dimensions.n_species)
+            if (
+                operation
+                is ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT
+            ):
+                wp.launch(
+                    _copy_snapshot,
+                    dim=matrix_dim,
+                    inputs=[prepared.gas_concentration, output],
+                    device=prepared.device,
+                )
+            elif (
+                operation
+                is ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT
+            ):
+                wp.launch(
+                    _copy_snapshot,
+                    dim=matrix_dim,
+                    inputs=[prepared.saturation_ratio, output],
+                    device=prepared.device,
+                )
+            elif operation is ResidentDiagnosticOperation.TOTAL_SPECIES_MASS:
+                wp.launch(
+                    _initialize_total_species_mass,
+                    dim=matrix_dim,
+                    inputs=[
+                        prepared.gas_concentration,
+                        prepared.particle_volume,
+                        output,
+                    ],
+                    device=prepared.device,
+                )
+                if dimensions.n_particles:
+                    wp.launch(
+                        _accumulate_particle_species_mass,
+                        dim=(
+                            dimensions.n_boxes,
+                            dimensions.n_particles,
+                            dimensions.n_species,
+                        ),
+                        inputs=[
+                            prepared.particle_masses,
+                            prepared.particle_concentration,
+                            prepared.particle_volume,
+                            output,
+                        ],
+                        device=prepared.device,
+                    )
+            elif operation is ResidentDiagnosticOperation.LATENT_HEAT_ENERGY:
+                wp.launch(
+                    _copy_snapshot,
+                    dim=matrix_dim,
+                    inputs=[prepared.energy_transfers[index], output],
+                    device=prepared.device,
+                )
+            else:
+                if prepared.total_mass_output is None:
+                    raise ValueError(
+                        "conservation residual requires total species mass."
+                    )
+                wp.launch(
+                    _conservation_residual,
+                    dim=matrix_dim,
+                    inputs=[
+                        prepared.total_mass_output,
+                        prepared.baseline_total_masses[index],
+                        prepared.source_ledgers[index],
+                        prepared.sink_ledgers[index],
+                        output,
+                    ],
+                    device=prepared.device,
+                )
 
 
 def validate_resident_diagnostics_plan(  # noqa: C901

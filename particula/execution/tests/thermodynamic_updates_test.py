@@ -565,3 +565,31 @@ def test_empty_saturation_refresh_is_write_free(
     )
 
     coordinator._refresh_saturation_ratio()
+
+
+@pytest.mark.warp
+def test_prepared_thermodynamic_binding_retains_ready_timestep_identities(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Prepared thermodynamics binds only the request's resident primaries."""
+    from particula.execution.resident_enqueue import prepare_resident_timestep
+    from particula.execution.tests.resident_enqueue_test import _ready_request
+    from particula.execution.thermodynamic_updates import (
+        setup_prepared_thermodynamic_binding,
+    )
+
+    fixture = _ready_request(monkeypatch)
+    request = fixture.request
+    prepared_timestep = prepare_resident_timestep(request, 0.0)
+    binding = setup_prepared_thermodynamic_binding(
+        prepared_timestep, request.thermodynamics
+    )
+
+    assert binding.request is request.thermodynamics
+    assert binding.gas is request.session.gas
+    assert binding.gas_concentration is request.session.gas.concentration
+    assert (
+        binding.environment_temperature
+        is request.session.environment.temperature
+    )
+    assert binding.dimensions is request.session.dimensions

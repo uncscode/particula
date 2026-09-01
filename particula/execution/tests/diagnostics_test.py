@@ -581,3 +581,38 @@ def test_valid_diagnostics_dispatch_avoids_executor_host_boundaries(
 
     monkeypatch.setattr(diagnostics.wp, "synchronize", forbidden)
     ResidentDiagnosticsExecutor().execute(_plan(session, registrations))
+
+
+@pytest.mark.warp
+def test_prepared_diagnostics_retains_validated_plan_and_total_output(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Prepared diagnostics carries the exact plan sources and reduction output."""
+    pytest.importorskip("warp")
+    from particula.execution.diagnostics import (
+        setup_prepared_resident_diagnostics,
+    )
+    from particula.execution.resident_enqueue import prepare_resident_timestep
+    from particula.execution.tests.resident_enqueue_test import _ready_request
+
+    fixture = _ready_request(monkeypatch)
+    request = fixture.request
+    prepared_timestep = prepare_resident_timestep(request, 0.0)
+    plan = request.diagnostics
+    assert plan is not None
+    prepared = setup_prepared_resident_diagnostics(prepared_timestep, plan)
+    total_output = next(
+        registration.output
+        for registration in plan.registrations
+        if registration.operation
+        is ResidentDiagnosticOperation.TOTAL_SPECIES_MASS
+    )
+
+    assert prepared.plan is plan
+    assert prepared.particle_masses is request.session.particles.masses
+    assert prepared.gas_concentration is request.session.gas.concentration
+    assert (
+        prepared.saturation_ratio
+        is request.session.environment.saturation_ratio
+    )
+    assert prepared.total_mass_output is total_output

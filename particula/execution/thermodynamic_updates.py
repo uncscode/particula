@@ -29,6 +29,7 @@ from particula.execution.process_graph import (
     _is_resolver_produced_graph,
     resolve_canonical_topological_order,
 )
+from particula.execution.resident_enqueue import PreparedResidentTimestep
 from particula.execution.scheduler import (
     ResolvedTimestepSchedule,
     is_resolver_produced_schedule,
@@ -118,6 +119,140 @@ class ResidentThermodynamicUpdateRequest:
             raise TypeError(
                 "thermodynamics must be an exact ThermodynamicsConfig."
             )
+
+
+@dataclass(frozen=True, eq=False)
+class PreparedResidentThermodynamicBinding:
+    """Retain validated P1-bound thermodynamic writer identities."""
+
+    request: ThermodynamicsConfig
+    gas: object
+    gas_concentration: object
+    gas_molar_mass: object
+    gas_vapor_pressure: object
+    environment_temperature: object
+    environment_saturation_ratio: object
+    device: object
+    dimensions: object
+    thermodynamics: ThermodynamicsConfig
+
+
+@dataclass(frozen=True, eq=False)
+class PreparedResidentThermodynamicConsumer:
+    """Retain one current coordinator consumer window without mutating it."""
+
+    binding: PreparedResidentThermodynamicBinding
+    node: ProcessNode
+    virtual_nodes: tuple[ProcessNode, ...]
+    refresh_vapor: bool
+    refresh_saturation: bool
+
+
+def setup_prepared_thermodynamic_binding(
+    prepared_timestep: object, request: object
+) -> PreparedResidentThermodynamicBinding:
+    """Validate a P1 timestep and bind its thermodynamic primary arrays once."""
+    if type(prepared_timestep) is not PreparedResidentTimestep:
+        raise TypeError(
+            "prepared_timestep must be an exact PreparedResidentTimestep."
+        )
+    if type(request) is not ThermodynamicsConfig:
+        raise TypeError("request must be an exact ThermodynamicsConfig.")
+    prepared = cast(PreparedResidentTimestep, prepared_timestep)
+    thermodynamics = cast(ThermodynamicsConfig, request)
+    if prepared.request.thermodynamics is not thermodynamics:
+        raise ValueError(
+            "prepared timestep does not retain the supplied request."
+        )
+    typed = ResidentThermodynamicUpdateRequest(
+        prepared.session,
+        prepared.registry,
+        cast(ResolvedProcessGraph, prepared.graph),
+        prepared.schedule,
+        thermodynamics,
+    )
+    if (
+        prepared.session is not typed.session
+        or prepared.registry is not typed.registry
+        or prepared.graph is not typed.graph
+        or prepared.schedule is not typed.schedule
+        or prepared.dimensions is not typed.session.dimensions
+    ):
+        raise ValueError("prepared timestep identities do not match request.")
+    coordinator = ResidentThermodynamicUpdateCoordinator(typed)
+    coordinator._validate_binding()
+    session = typed.session
+    gas = cast(Any, session.gas)
+    environment = cast(Any, session.environment)
+    primaries = (
+        cast(Any, session.particles).masses,
+        cast(Any, session.particles).concentration,
+        cast(Any, session.particles).density,
+        cast(Any, session.particles).volume,
+        cast(Any, session.particles).charge,
+        gas.molar_mass,
+        gas.concentration,
+        gas.partitioning,
+        gas.vapor_pressure,
+        environment.temperature,
+        environment.pressure,
+        environment.saturation_ratio,
+    )
+    if len(prepared.primary_arrays) != len(primaries) or any(
+        left is not right
+        for left, right in zip(prepared.primary_arrays, primaries, strict=True)
+    ):
+        raise ValueError(
+            "prepared timestep primary arrays do not match session."
+        )
+    return PreparedResidentThermodynamicBinding(
+        thermodynamics,
+        gas,
+        gas.concentration,
+        gas.molar_mass,
+        gas.vapor_pressure,
+        environment.temperature,
+        environment.saturation_ratio,
+        gas.concentration.device,
+        session.dimensions,
+        thermodynamics,
+    )
+
+
+def _enqueue_prepared_vapor_pressure(
+    prepared: PreparedResidentThermodynamicConsumer,
+) -> None:
+    """Issue only the already-bound vapor-pressure writer when selected."""
+    if prepared.refresh_vapor:
+        binding = prepared.binding
+        refresh_vapor_pressure_gpu(
+            binding.thermodynamics,
+            cast(Any, binding.gas),
+            cast(Any, binding.environment_temperature),
+        )
+
+
+def _enqueue_prepared_saturation_ratio(
+    prepared: PreparedResidentThermodynamicConsumer,
+) -> None:
+    """Issue only the already-bound saturation writer when selected."""
+    if not prepared.refresh_saturation:
+        return
+    binding = prepared.binding
+    if not binding.dimensions.n_boxes or not binding.dimensions.n_species:
+        return
+    wp.launch(
+        _refresh_saturation_ratio_kernel,
+        dim=(binding.dimensions.n_boxes, binding.dimensions.n_species),
+        inputs=[
+            binding.gas_concentration,
+            binding.gas_molar_mass,
+            binding.gas_vapor_pressure,
+            binding.environment_temperature,
+            binding.environment_saturation_ratio,
+        ],
+        device=binding.device,
+    )
 
 
 _ROLE_SCHEMAS = {
@@ -405,6 +540,69 @@ class ResidentThermodynamicUpdateCoordinator:
             device=gas.concentration.device,
         )
 
+    def prepare_consumer(
+        self,
+        binding: PreparedResidentThermodynamicBinding,
+        node: ProcessNode,
+    ) -> PreparedResidentThermodynamicConsumer:
+        """Bind the current consumer window without changing state.
+
+        This P1-consumer seam intentionally reads the coordinator's current
+        state on every call.  It does not execute writers or consume schedule
+        entries; the caller must report successful completion separately.
+        """
+        if type(binding) is not PreparedResidentThermodynamicBinding:
+            raise TypeError(
+                "binding must be an exact PreparedResidentThermodynamicBinding."
+            )
+        if type(node) is not ProcessNode:
+            raise TypeError("node must be an exact ProcessNode.")
+        if binding.request is not self._request.thermodynamics:
+            raise ValueError(
+                "binding must retain the coordinator thermodynamics."
+            )
+        session = self._request.session
+        gas = cast(Any, session.gas)
+        environment = cast(Any, session.environment)
+        if (
+            binding.gas is not gas
+            or binding.gas_concentration is not gas.concentration
+            or binding.gas_molar_mass is not gas.molar_mass
+            or binding.gas_vapor_pressure is not gas.vapor_pressure
+            or binding.environment_temperature is not environment.temperature
+            or binding.environment_saturation_ratio
+            is not environment.saturation_ratio
+            or binding.device != gas.concentration.device
+            or binding.dimensions is not session.dimensions
+        ):
+            raise ValueError(
+                "binding does not retain coordinator primary arrays."
+            )
+        self._validate_binding()
+        virtual_nodes, expected = self._resolve_consumer_window()
+        if expected.node_id not in _CONSUMER_IDS or node is not expected:
+            raise ValueError(
+                "node must be the next scheduled thermodynamic consumer."
+            )
+        virtual_ids = {item.node_id for item in virtual_nodes}
+        vapor = InvalidatedState.VAPOR_PRESSURE in self._stale
+        saturation = InvalidatedState.SATURATION_RATIO in self._stale
+        if vapor and "vapor_pressure_refresh" not in virtual_ids:
+            raise ValueError(
+                "stale vapor pressure requires a virtual refresh node."
+            )
+        if (
+            saturation
+            and "saturation_refresh" not in virtual_ids
+            and virtual_nodes
+        ):
+            raise ValueError(
+                "stale saturation ratio requires a virtual refresh node."
+            )
+        return PreparedResidentThermodynamicConsumer(
+            binding, expected, tuple(virtual_nodes), vapor, saturation
+        )
+
     def execute_consumer(
         self, node: ProcessNode, callback: Callable[[], object]
     ) -> object:
@@ -437,28 +635,20 @@ class ResidentThermodynamicUpdateCoordinator:
             raise TypeError("node must be an exact ProcessNode.")
         if not callable(callback):
             raise TypeError("callback must be callable.")
-        self._validate_binding()
-        virtual_nodes, expected = self._resolve_consumer_window()
-        if expected.node_id not in _CONSUMER_IDS or node is not expected:
-            raise ValueError(
-                "node must be the next scheduled thermodynamic consumer."
-            )
-        virtual_ids = {item.node_id for item in virtual_nodes}
-        if (
-            InvalidatedState.VAPOR_PRESSURE in self._stale
-            and "vapor_pressure_refresh" not in virtual_ids
-        ):
-            raise ValueError(
-                "stale vapor pressure requires a virtual refresh node."
-            )
-        if (
-            InvalidatedState.SATURATION_RATIO in self._stale
-            and "saturation_refresh" not in virtual_ids
-            and virtual_nodes
-        ):
-            raise ValueError(
-                "stale saturation ratio requires a virtual refresh node."
-            )
+        binding = PreparedResidentThermodynamicBinding(
+            self._request.thermodynamics,
+            self._request.session.gas,
+            cast(Any, self._request.session.gas).concentration,
+            cast(Any, self._request.session.gas).molar_mass,
+            cast(Any, self._request.session.gas).vapor_pressure,
+            cast(Any, self._request.session.environment).temperature,
+            cast(Any, self._request.session.environment).saturation_ratio,
+            cast(Any, self._request.session.gas).concentration.device,
+            self._request.session.dimensions,
+            self._request.thermodynamics,
+        )
+        prepared = self.prepare_consumer(binding, node)
+        virtual_nodes = prepared.virtual_nodes
         self._refresh_stale_fields()
         result = callback()
         self._stale.update(node.invalidates)

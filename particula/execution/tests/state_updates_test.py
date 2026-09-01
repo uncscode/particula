@@ -604,3 +604,56 @@ assert 'warp' not in sys.modules
         updates.ResidentGasUpdateRequest(
             object(), object(), object(), object(), object()
         )
+
+
+@pytest.mark.warp
+def test_prepared_state_updates_bind_and_enqueue_prescribed_inputs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Prepared updates retain validated inputs and issue only their copies."""
+    updates = _state_updates()
+    wp = pytest.importorskip("warp")
+    from particula.execution.resident_enqueue import prepare_resident_timestep
+    from particula.execution.tests.resident_enqueue_test import _ready_request
+
+    fixture = _ready_request(monkeypatch)
+    request = fixture.request
+    prepared_timestep = prepare_resident_timestep(request, 0.0)
+    environment_request = request.environment_update
+    gas_request = request.gas_update
+    assert environment_request is not None
+    assert gas_request is not None
+    wp.copy(
+        environment_request.temperature,
+        wp.full(3, 290.0, dtype=wp.float64, device="cpu"),
+    )
+    wp.copy(
+        environment_request.pressure,
+        wp.full(3, 90000.0, dtype=wp.float64, device="cpu"),
+    )
+    wp.copy(
+        gas_request.concentration,
+        wp.full((3, 1), 2.0, dtype=wp.float64, device="cpu"),
+    )
+
+    environment = updates.setup_prepared_environment_update(
+        prepared_timestep, environment_request
+    )
+    gas = updates.setup_prepared_gas_update(prepared_timestep, gas_request)
+
+    assert environment.request is environment_request
+    assert gas.request is gas_request
+    assert (
+        updates._enqueue_prepared_environment_update(environment)
+        is request.session.environment
+    )
+    assert updates._enqueue_prepared_gas_update(gas) is request.session.gas
+    npt.assert_array_equal(
+        request.session.environment.temperature.numpy(), [290.0] * 3
+    )
+    npt.assert_array_equal(
+        request.session.environment.pressure.numpy(), [90000.0] * 3
+    )
+    npt.assert_array_equal(
+        request.session.gas.concentration.numpy(), [[2.0]] * 3
+    )
