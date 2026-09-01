@@ -226,19 +226,25 @@
    synchronization, fallback, or scheduling behavior and is not exported through
    `particula.execution` or top-level `particula`.
 - `particula.execution.resident_communication` is the separate concrete-only,
-  direct-import P5 composition seam. `GPUResourceRegistry.acquire_communication`
+   direct-import P5 composition seam. `GPUResourceRegistry.acquire_communication`
   is the sole P1 payload-validation and allocation point: it pins one exact
   closed-map `GAS` or `PARTICLES` configuration, its maps, native work record,
   and optional final-volume sidecar by identity. Normal execution uses only
   metadata/identity validation; it neither reacquires nor scans payloads.
-  Combined maps and open `-1` endpoints are not resident forms. The executor
-  dispatches gas or particle communication using pre-update volumes, then calls
-  prescribed volume evolution only when final volumes are pinned. The standalone
-  `volume_evolution_step_gpu` is independently callable; this resident use is
-  an optional scheduled barrier with separate composition rules. Both barriers
-   invalidate `SATURATION_RATIO` only, leaving vapor pressure fresh. This seam
-   has no package or top-level export and no transfer, synchronization, fallback,
-   retry, or rollback behavior. See
+   Combined maps and open `-1` endpoints are not resident forms. Its prepared
+   binding is explicitly two-phase: setup validates the READY P1 timestep and
+   exact request, resource, primary-array, and closed-map identities, then
+   freezes the native inputs by identity. Enqueue performs only those pre-bound
+   device calls, with no dynamic lookup, validation, allocation, host inspection,
+   transfer, readback, or synchronization. It dispatches gas or particle
+   communication using pre-update volumes, then calls prescribed volume evolution
+   only when final volumes are pinned. The standalone `volume_evolution_step_gpu`
+   is independently callable; this resident use is an optional scheduled barrier
+   with separate composition rules. A pinned final-volume sidecar equal to the
+   resident volumes is a write-free resident barrier and does not write primary,
+   ledger, or volume-status storage. Both barriers invalidate `SATURATION_RATIO`
+   only, leaving vapor pressure fresh. This seam has no package or top-level export
+   and no fallback, retry, or rollback behavior. See
    [ADR-018](decisions/ADR-018-resident-communication-integration.md).
 - `particula.execution.thermodynamic_updates` is a concrete-only,
   direct-import Warp-dependent freshness coordinator. Its exact request binds

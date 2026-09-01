@@ -1,10 +1,11 @@
 """Compose pinned communication resources into resident barrier calls.
 
-This concrete-only module dispatches already acquired closed-map communication
-and optional volume evolution. Its shared validator checks retained metadata
-without constructing an executor or mutating resident state. It never performs
-P1 validation, acquisition, host conversion, synchronization, fallback, or
-recovery.
+This concrete-only module validates and freezes a READY P1 binding for
+already-acquired closed-map communication and optional volume evolution. Its
+prepared enqueue dispatches only those retained device barriers, without
+validation, acquisition, host conversion, synchronization, fallback, or
+recovery. The shared validator remains a read-only metadata seam for legacy
+execution.
 """
 
 from __future__ import annotations

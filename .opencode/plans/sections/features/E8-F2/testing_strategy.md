@@ -22,9 +22,14 @@ Coverage thresholds and the normal collection policy must not be lowered.
   operation traps cover allocation, host readback/synchronization, binding or
   registry validation, and schedule/registration/freshness resolution after
   successful preparation.
-- **P3:** Extend `resident_communication_test.py` and communication kernel tests
-  for prepared GAS/PARTICLES/volume calls, mode resolution, no-op behavior,
-  stable buffers, and absence of P1 scans or readback during enqueue.
+- **P3 (implemented, #1554):** `resident_communication_test.py` and
+  `communication_test.py` cover P1-bound closed GAS/PARTICLES setup, exact
+  resource/primary/work-array retention, structural and identity-drift
+  rejection, and prepared native dispatch. They exercise absent, equal, and
+  changed final-volume sidecars; equal-volume write-free behavior; empty/zero
+  barriers; communication-before-volume ordering; and GAS aggregate-overdraw
+  commit gating. Scoped spies prove enqueue does not revalidate, resolve maps,
+  reacquire resources, allocate, transfer/read back, or synchronize.
 - **P4:** Extend condensation kernel and adapter tests with independent launch
   traces and numerical fixtures. Public calls must retain full validation;
   prepared calls must use the same four-substep kernels and supplied sidecars

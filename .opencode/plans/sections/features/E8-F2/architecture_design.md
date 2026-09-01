@@ -78,6 +78,26 @@ not perform lookup, binding validation, allocation, host readback, or
 synchronization. Valid empty schemas remain write-free, and the established
 state, thermodynamic, and diagnostics writer ordering is unchanged.
 
+## P3 Implementation Record
+
+Issue #1554 adds frozen, identity-semantic
+`PreparedResidentCommunicationBinding` and
+`setup_prepared_resident_communication()` beside the legacy communication
+executor. Setup proves exact P1 READY ownership, request/duration/node/schedule
+retention, primary and published resource-view identities, one closed GAS or
+PARTICLES map mode, mode-specific ledgers/statuses/snapshots, and an optional
+compatible final-volume array. It rejects drift and unsupported/open maps before
+native launch.
+
+`_enqueue_prepared_resident_communication()` selects the already-bound mode
+without lookup and invokes only explicit-input native helpers: communication
+first, then volume when a sidecar is present. The helpers preserve GAS gated
+aggregate-overdraw behavior and PARTICLES planning/commit behavior. An equal
+final-volume sidecar returns without modifying primaries, work ledgers, or volume
+status lanes; a changed sidecar retains the resident status, concentration
+scaling, and volume-update sequence. Compatibility adapters retain legacy
+executor and public direct-kernel contracts.
+
 ## Data / API / Workflow Changes
 
 - **Data model:** Add frozen prepared request records for the full timestep and

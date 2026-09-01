@@ -21,6 +21,13 @@
   retaining the standalone executor path (#1553).
 - [x] Extract read-only resident communication-request validation and reuse it
   through shared scheduler complete-loop metadata validation (#1552).
+- [x] Add P1-bound closed-map GAS/PARTICLES communication setup and a frozen
+  prepared binding in `particula/execution/resident_communication.py`; retain
+  exact pinned resources, duration, and optional final-volume identity (#1554).
+- [x] Extract explicit-input native prepared GAS, PARTICLES, and resident-volume
+  launches in `particula/gpu/kernels/communication.py`; compose fixed
+  communication-before-volume enqueue without host work and retain legacy
+  compatibility adapters (#1554).
 - [ ] Refactor `condensation_step_gpu` so its public boundary validates and then
   calls one private prepared launch sequence in
   `particula/gpu/kernels/condensation.py`.
@@ -46,6 +53,10 @@
   thermodynamic, and diagnostics seams. They cover identity/pinning rejection,
   writer order, empty no-ops, and traps for setup-only validation, allocation,
   readback, synchronization, registry, schedule, and freshness work (#1553).
+- [x] Add P3 communication/volume regressions for closed GAS/PARTICLES bindings,
+  identity drift rejection, absent/equal/changed final volumes, no-op barriers,
+  gated GAS overdraw, dispatch order, and forbidden enqueue-time operations
+  (#1554).
 - [ ] Run existing direct-kernel test modules to prove public wrappers retain
   validation, atomic preflight, return identity, and numerical behavior.
 - [ ] Add a CUDA-gated capture smoke test using the repository's established

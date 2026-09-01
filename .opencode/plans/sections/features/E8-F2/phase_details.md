@@ -38,17 +38,27 @@
     identity/pinning rejection, writer ordering, empty no-ops, and forbidden
     setup-time operations after successful preparation.
 
-- [ ] **E8-F2-P3:** Add capture-ready communication and volume enqueue paths with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Resolve GAS/PARTICLES mode, exact closed-map resources, duration, and
-    optional final-volume behavior in setup, leaving a fixed device-only barrier
-    sequence.
+- [x] **E8-F2-P3:** Add capture-ready communication and volume enqueue paths with unit tests
+  - Issue: #1554 | Size: S | Status: Implemented
+  - Delivered: Added frozen P1-bound `PreparedResidentCommunicationBinding` and
+    setup in `resident_communication.py`. Setup retains exact closed-map GAS or
+    PARTICLES resources, primaries, duration, mode-specific work/status state,
+    and optional final volumes, rejecting structural or identity drift before
+    launch.
+  - Enqueue: Added fixed native GAS, PARTICLES, and volume helper paths in
+    `communication.py`. Prepared enqueue performs communication before a present
+    volume barrier with no enqueue-time validation, lookup, allocation,
+    transfer/readback, synchronization, or reacquisition. Equal final volumes
+    are write-free; changed volumes retain resident status/scaling/update
+    semantics. Legacy executor and direct helper behavior remain intact.
   - Files: `particula/execution/resident_communication.py`,
     `particula/gpu/kernels/communication.py`,
-    `particula/execution/tests/resident_communication_test.py`
-  - Tests: Both closed modes, absent/present volume evolution, empty/no-op maps,
-    identity preservation, canonical order, and no P1 scan or host work during
-    prepared enqueue.
+    `particula/execution/tests/resident_communication_test.py`, and
+    `particula/gpu/kernels/tests/communication_test.py`
+  - Evidence: Focused execution and native-helper tests cover both closed modes;
+    absent, equal, and changed final volumes; empty/zero barriers; identity and
+    setup rejection; communication-before-volume ordering; aggregate-overdraw
+    gated commit; and forbidden enqueue-time operation traps.
 
 - [ ] **E8-F2-P4:** Add prepared condensation device enqueue path with unit tests
   - Issue: TBD | Size: S | Status: Not Started

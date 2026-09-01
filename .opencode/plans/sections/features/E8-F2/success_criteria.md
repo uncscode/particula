@@ -57,3 +57,17 @@ E8-F8 own benchmark and profiling evidence.
   coordinator's established vapor/saturation cursor and freshness semantics.
 - [x] Validate-once/enqueue-only tests prove prepared dispatch does not repeat
   setup work while legacy standalone executor/coordinator paths remain valid.
+
+## P3 Completion Evidence (#1554)
+
+- [x] P1-bound setup freezes one exact closed-map GAS or PARTICLES communication
+  family, associated primary/work/status identities, duration, and optional
+  final-volume sidecar; invalid mode, endpoint, schema, or identity drift rejects
+  before prepared launch.
+- [x] Prepared dispatch uses bound native communication helpers followed only by
+  a present volume helper, with no enqueue-time validation, lookup, acquisition,
+  allocation, transfer/readback, or synchronization.
+- [x] Regression coverage proves absent/equal/changed volume behavior,
+  communication-before-volume ordering, no-op barriers, GAS overdraw gated
+  commit, and legacy/direct-path compatibility. Equal final volumes leave
+  primaries, work ledgers, and resident volume status lanes unchanged.

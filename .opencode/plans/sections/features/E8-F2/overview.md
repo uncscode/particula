@@ -41,7 +41,20 @@ chains, then freezes the copy or kernel inputs. Enqueue uses only those bound
 records: it preserves state-writer order and empty no-ops, keeps thermodynamic
 vapor/saturation freshness and cursor behavior, and dispatches diagnostics in
 its fixed registration order. The standalone executor/coordinator paths remain
-available and retain their validate-then-execute contracts.
+ available and retain their validate-then-execute contracts.
+
+## Implemented P3 Boundary
+
+Issue #1554 adds the concrete-only prepared resident-communication seam in
+`particula.execution.resident_communication` and fixed native launch helpers in
+`particula.gpu.kernels.communication`. Setup freezes one exact P1 READY
+prepared timestep, its closed-map GAS or PARTICLES request and pinned resources,
+duration, and optional final-volume sidecar. Enqueue dispatches communication
+before a present volume barrier without validation, resource acquisition,
+allocation, transfer/readback, synchronization, or dynamic map resolution.
+Equal final volumes are a write-free barrier; changed volumes retain resident
+concentration-scaling and volume-status behavior. Legacy executor and public
+direct-kernel paths remain compatible.
 
 ## User Stories
 

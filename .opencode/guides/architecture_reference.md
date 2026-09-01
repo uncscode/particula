@@ -1,7 +1,7 @@
 # Architecture Reference
 
 **Project:** particula  
-**Last Updated:** 2026-08-09
+**Last Updated:** 2026-08-31
 
 This reference summarizes the particula package structure and key architectural
 conventions migrated from the legacy guide set.
@@ -240,14 +240,22 @@ containers and records by identity. This canonical barrier precedes all ten
 ordinary nodes in the closed twelve-node schedule. The barriers invalidate
 saturation ratio only, retain fresh vapor pressure, and provide no hidden
 transfer, synchronization, fallback, retry, rollback, or public API. Combined
-communication maps and open endpoints are not resident forms. See
+communication maps and open endpoints are not resident forms. A concrete-only
+two-phase prepared binding preserves the READY P1 timestep plus exact request,
+resource, primary-array, and map identities: setup performs the bounded
+metadata/identity validation and freezes native inputs, while enqueue performs
+only pre-bound device work. Enqueue has no dynamic lookup, validation,
+allocation, host inspection, transfer, readback, or synchronization. See
 [ADR-018](architecture/decisions/ADR-018-resident-communication-integration.md).
 Acquisition pins maps, native work, and an optional final-volume sidecar once.
 Normal steps validate only that identity and metadata: they do not inspect map
 payloads, allocate, transfer, synchronize, restore, or replace resources.
 Standalone direct-kernel empty or disabled maps and unchanged final volumes are
-write-free no-ops; resident barriers instead follow their own composition and
-validation rules. Schema-v1 restart remains noncommunication; schema-v2 permits no family
+write-free no-ops. The prepared resident barrier likewise treats a present
+final-volume sidecar equal to resident volumes as write-free, without writing
+primary, ledger, or volume-status arrays; its distinct composition rules retain
+the pre-bound identity and no-host-work requirements. Schema-v1 restart remains
+noncommunication; schema-v2 permits no family
 or one complete closed-map family. Both require an ACTIVE valid record and an
 exact device; explicit restart creates fresh identities and is never automatic,
 migratory, or rollback-capable.

@@ -18,7 +18,13 @@ concrete-only and retain exact caller-owned resident identities.
   and saturation refresh, and diagnostics. Setup validates exact ownership and
   identity chains; enqueue consumes pre-bound arrays only while preserving
   writer order, thermodynamic cursor/freshness semantics, and empty no-ops.
-  Existing standalone executor/coordinator paths remain compatible.
+   Existing standalone executor/coordinator paths remain compatible.
+- **Completed P3 (#1554):** bind one exact P1 READY closed-map GAS or PARTICLES
+  communication resource family, duration, and optional final-volume sidecar in
+  `particula/execution/resident_communication.py`; dispatch fixed native
+  communication then volume barriers through
+  `particula/gpu/kernels/communication.py`. Equal final volumes are write-free;
+  changed final volumes preserve established resident evolution semantics.
 - Define immutable prepared-enqueue carriers tied to the exact E8-F1 capture
   lifecycle signature and `ResidentSimulationRequest`.
 - Move repeated scheduler metadata checks and executor construction into an

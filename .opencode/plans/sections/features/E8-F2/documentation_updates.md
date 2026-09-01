@@ -20,6 +20,10 @@
   required. The concrete-only setup/enqueue contract is recorded in this plan;
   changed execution modules retain local implementation documentation while
   standalone APIs preserve their existing contract.
+- Completed for P3 (#1554): no user-facing documentation or export change was
+  required. Concrete-only execution and kernel docstrings describe closed-map
+  prepared binding, fixed native enqueue, equal-volume write-free behavior, and
+  post-launch recovery limits; this plan records the implementation boundary.
 - Add or update documentation contract assertions under `particula/tests/` or
   `particula/execution/tests/` when user-facing contract text changes.
 - Update all E8-F2 plan sections and parent E8 child/dependency status during
