@@ -1079,6 +1079,16 @@ def test_prepared_simulation_drift_rejects_before_token_entry(
     fixture.guard.assert_step_closed()
     assert fixture.session.lifecycle is ResidentLifecycle.ACTIVE
 
+    prepared = prepare_resident_simulation(request, 0.0)
+    object.__setattr__(prepared.operations[0], "product", object())
+
+    with pytest.raises(ValueError, match="products do not match"):
+        enqueue_prepared_resident_simulation(prepared)
+
+    assert fixture.guard.completed_steps == 0
+    fixture.guard.assert_step_closed()
+    assert fixture.session.lifecycle is ResidentLifecycle.ACTIVE
+
 
 @pytest.mark.warp
 def test_wall_loss_failure_faults_session_and_blocks_later_dispatch(

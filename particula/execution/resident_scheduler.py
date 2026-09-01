@@ -61,6 +61,7 @@ from particula.execution.process_graph import (
     resolve_canonical_topological_order,
 )
 from particula.execution.resident_communication import (
+    PreparedResidentCommunicationBinding,
     ResidentCommunicationExecutor,
     ResidentCommunicationRequest,
     _enqueue_prepared_resident_communication_node,
@@ -157,6 +158,15 @@ class PreparedResidentSimulation:
     resource_views: tuple[object, ...]
     nodes: tuple[ProcessNode, ...]
     thermal: object
+    communication: PreparedResidentCommunicationBinding
+    environment: object
+    gas: object
+    condensation: object
+    coagulation: object
+    dilution: object
+    wall_loss: object
+    nucleation: object
+    diagnostics: object
     operations: tuple[PreparedResidentOperation, ...]
     duration: object
 
@@ -417,6 +427,15 @@ def prepare_resident_simulation(
         prepared.resource_views,
         node_sequence,
         thermal,
+        communication,
+        environment,
+        gas,
+        condensation,
+        coagulation,
+        dilution,
+        wall_loss,
+        nucleation,
+        diagnostics,
         operations,
         duration,
     )
@@ -451,6 +470,35 @@ def _validate_prepared_resident_simulation(prepared: object) -> None:
     ):
         raise ValueError(
             "prepared resident simulation identities do not match."
+        )
+    expected_products = (
+        typed.communication,
+        typed.communication,
+        typed.environment,
+        typed.gas,
+        typed.thermal.condensation,
+        typed.thermal.condensation,
+        typed.condensation,
+        typed.coagulation,
+        typed.dilution,
+        typed.wall_loss,
+        typed.nucleation,
+        typed.diagnostics,
+    )
+    if any(
+        operation.product is not expected
+        for operation, expected in zip(
+            typed.operations, expected_products, strict=True
+        )
+    ):
+        raise ValueError("prepared resident simulation products do not match.")
+    if (
+        typed.primary_arrays is not typed.timestep.primary_arrays
+        or typed.resource_views is not typed.timestep.resource_views
+        or typed.duration != typed.timestep.duration
+    ):
+        raise ValueError(
+            "prepared resident simulation metadata identities do not match."
         )
     _validate_ready_attachment(
         typed.request,
