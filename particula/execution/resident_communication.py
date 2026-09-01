@@ -99,6 +99,39 @@ class PreparedResidentCommunicationBinding:
     fallback. Only closed GAS or PARTICLES maps are supported. Equal final
     volumes are a write-free barrier; after a changed-volume device writer
     launches, rollback is not promised.
+
+    Attributes:
+        prepared_timestep: Exact READY P1 timestep retained by identity.
+        request: Validated resident communication request retained by identity.
+        particles: Resident Warp particle container.
+        gas: Resident Warp gas container.
+        masses: Resident particle mass array.
+        particle_concentration: Resident particle concentration array.
+        density: Resident particle density array.
+        volume: Resident per-box volume array.
+        charge: Resident particle charge array.
+        gas_concentration: Resident gas concentration array.
+        source_boxes: Closed-map source endpoint array.
+        destination_boxes: Closed-map destination endpoint array.
+        enabled: Communication edge enablement array.
+        rates: Communication edge-rate array.
+        configuration: Validated communication configuration.
+        map_form: Communication map dimensionality declaration.
+        one_dimensional: Integer flag for one-dimensional planning.
+        mode: GAS or PARTICLES transport mode.
+        edge_capacity: Number of retained map edge slots.
+        duration: Nonnegative resident barrier duration in seconds.
+        device: Device hosting all retained Warp arrays.
+        dimensions: Fixed resident particle and gas dimensions.
+        buffers: Mode-specific caller-owned work buffers.
+        invalid: Registry-pinned validation status array.
+        active_or_demand: Registry-pinned activity or demand status array.
+        volume_invalid: Registry-pinned volume validation status array.
+        volume_changed: Registry-pinned volume-change status array.
+        initial_masses: Particle commit snapshot, when retained.
+        initial_concentration: Particle concentration snapshot, when retained.
+        initial_charge: Particle charge snapshot, when retained.
+        final_volumes: Optional prescribed final-volume array.
     """
 
     prepared_timestep: PreparedResidentTimestep
@@ -287,7 +320,20 @@ def setup_prepared_resident_communication(  # noqa: C901
 def _enqueue_prepared_resident_communication(
     binding: PreparedResidentCommunicationBinding,
 ) -> object | None:
-    """Enqueue only the communication-then-volume launches retained by setup."""
+    """Enqueue the retained communication barrier and optional volume barrier.
+
+    The binding is assumed to have passed setup validation. This function only
+    dispatches the already-bound native helpers in communication-first order;
+    it performs no lookup, allocation, validation, transfer, synchronization,
+    or host inspection. A device writer has no rollback guarantee.
+
+    Args:
+        binding: Frozen resident communication inputs and caller-owned buffers.
+
+    Returns:
+        The mode-specific communication result, or ``None`` only when the
+        selected native helper reports no result.
+    """
     if binding.mode is CommunicationTransportMode.GAS:
         result: object = _enqueue_prepared_resident_gas_communication(
             binding.particles,

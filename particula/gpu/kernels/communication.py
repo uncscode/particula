@@ -1862,7 +1862,27 @@ def _enqueue_prepared_resident_gas_communication(
 ) -> tuple[Any, Any]:
     """Launch already-bound GAS communication without validation or allocation.
 
-    Caller-owned inputs remain resident; a writer launch has no rollback.
+    Caller-owned containers, map arrays, status arrays, and ledgers remain
+    resident and are passed directly to the established staged GAS kernels.
+    The helper performs no setup work or host inspection; a writer launch has
+    no rollback guarantee.
+
+    Args:
+        particles: Bound resident particle container supplying box volumes.
+        gas: Bound resident gas container supplying concentrations.
+        source_boxes: Bound source endpoint array.
+        destination_boxes: Bound destination endpoint array.
+        enabled: Bound edge-enable array.
+        rates: Bound edge-rate array.
+        edge_capacity: Number of retained edge slots.
+        time_step: Validated barrier duration in seconds.
+        device: Device hosting all bound arrays.
+        buffers: Pinned GAS work ledgers.
+        invalid: Pinned validation status array.
+        active: Pinned activity status array.
+
+    Returns:
+        The exact resident ``(particles, gas)`` containers.
     """
     concentration = gas.concentration
     volume = particles.volume
@@ -1960,7 +1980,32 @@ def _enqueue_prepared_resident_particle_communication(
     initial_concentration: Any,
     initial_charge: Any,
 ) -> Any:
-    """Launch already-bound PARTICLES communication without setup work."""
+    """Launch bound PARTICLES communication without setup or allocation.
+
+    The planner, snapshot, and gated commit run against caller-owned resident
+    arrays. This seam performs no validation, lookup, transfer, synchronization,
+    or host inspection, and provides no rollback after a writer launches.
+
+    Args:
+        particles: Bound resident particle container.
+        source_boxes: Bound source endpoint array.
+        destination_boxes: Bound destination endpoint array.
+        enabled: Bound edge-enable array.
+        rates: Bound edge-rate array.
+        edge_capacity: Number of retained edge slots.
+        one_dimensional: Integer flag for one-dimensional map validation.
+        time_step: Validated barrier duration in seconds.
+        device: Device hosting all bound arrays.
+        buffers: Pinned PARTICLES planning buffers.
+        invalid: Pinned validation status array.
+        demand: Pinned demand status array.
+        initial_masses: Pinned immutable mass snapshot.
+        initial_concentration: Pinned immutable concentration snapshot.
+        initial_charge: Pinned immutable charge snapshot.
+
+    Returns:
+        The exact resident ``particles`` container.
+    """
     masses = particles.masses
     concentration = particles.concentration
     charge = particles.charge
@@ -2049,7 +2094,24 @@ def _enqueue_prepared_resident_volume_evolution(
     changed: Any,
     device: Any,
 ) -> tuple[Any, Any]:
-    """Launch a bound volume barrier; equal final volumes are write-free."""
+    """Launch a bound volume barrier with an equal-volume write-free path.
+
+    The device-resident status scan leaves status lanes and primary arrays
+    untouched when every final volume equals its current value. Changed values
+    use the established concentration scaling and volume writer. No host
+    inspection or rollback is provided after a writer launch.
+
+    Args:
+        particles: Bound resident particle container.
+        gas: Bound resident gas container.
+        final_volumes: Caller-owned bound final volumes in m^3.
+        invalid: Pinned volume validation status array.
+        changed: Pinned volume-change status array.
+        device: Device hosting all bound arrays.
+
+    Returns:
+        The exact resident ``(particles, gas)`` containers.
+    """
     volume = particles.volume
     particle_concentration = particles.concentration
     gas_concentration = gas.concentration
