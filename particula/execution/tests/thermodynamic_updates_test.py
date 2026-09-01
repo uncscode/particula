@@ -575,17 +575,25 @@ def test_prepared_thermodynamic_binding_retains_ready_timestep_identities(
     from particula.execution.resident_enqueue import prepare_resident_timestep
     from particula.execution.tests.resident_enqueue_test import _ready_request
     from particula.execution.thermodynamic_updates import (
+        ResidentThermodynamicUpdateRequest,
         setup_prepared_thermodynamic_binding,
     )
 
     fixture = _ready_request(monkeypatch)
     request = fixture.request
     prepared_timestep = prepare_resident_timestep(request, 0.0)
+    thermodynamic_request = ResidentThermodynamicUpdateRequest(
+        request.session,
+        request.registry,
+        request.graph,
+        request.schedule,
+        request.thermodynamics,
+    )
     binding = setup_prepared_thermodynamic_binding(
-        prepared_timestep, request.thermodynamics
+        prepared_timestep, thermodynamic_request
     )
 
-    assert binding.request is request.thermodynamics
+    assert binding.request is thermodynamic_request
     assert binding.gas is request.session.gas
     assert binding.gas_concentration is request.session.gas.concentration
     assert (

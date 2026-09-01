@@ -125,7 +125,7 @@ class ResidentThermodynamicUpdateRequest:
 class PreparedResidentThermodynamicBinding:
     """Retain validated P1-bound thermodynamic writer identities."""
 
-    request: ThermodynamicsConfig
+    request: ResidentThermodynamicUpdateRequest
     gas: object
     gas_concentration: object
     gas_molar_mass: object
@@ -151,26 +151,21 @@ class PreparedResidentThermodynamicConsumer:
 def setup_prepared_thermodynamic_binding(
     prepared_timestep: object, request: object
 ) -> PreparedResidentThermodynamicBinding:
-    """Validate a P1 timestep and bind its thermodynamic primary arrays once."""
+    """Validate a P1 timestep and bind thermodynamic arrays once."""
     if type(prepared_timestep) is not PreparedResidentTimestep:
         raise TypeError(
             "prepared_timestep must be an exact PreparedResidentTimestep."
         )
-    if type(request) is not ThermodynamicsConfig:
-        raise TypeError("request must be an exact ThermodynamicsConfig.")
+    if type(request) is not ResidentThermodynamicUpdateRequest:
+        raise TypeError(
+            "request must be an exact ResidentThermodynamicUpdateRequest."
+        )
     prepared = cast(PreparedResidentTimestep, prepared_timestep)
-    thermodynamics = cast(ThermodynamicsConfig, request)
-    if prepared.request.thermodynamics is not thermodynamics:
+    typed = cast(ResidentThermodynamicUpdateRequest, request)
+    if prepared.request.thermodynamics is not typed.thermodynamics:
         raise ValueError(
             "prepared timestep does not retain the supplied request."
         )
-    typed = ResidentThermodynamicUpdateRequest(
-        cast(ResidentSession, prepared.session),
-        prepared.registry,
-        cast(ResolvedProcessGraph, prepared.graph),
-        prepared.schedule,
-        thermodynamics,
-    )
     if (
         prepared.session is not typed.session
         or prepared.registry is not typed.registry
@@ -206,7 +201,7 @@ def setup_prepared_thermodynamic_binding(
             "prepared timestep primary arrays do not match session."
         )
     return PreparedResidentThermodynamicBinding(
-        thermodynamics,
+        typed,
         gas,
         gas.concentration,
         gas.molar_mass,
@@ -215,7 +210,7 @@ def setup_prepared_thermodynamic_binding(
         environment.saturation_ratio,
         gas.concentration.device,
         cast(Any, session.dimensions),
-        thermodynamics,
+        typed.thermodynamics,
     )
 
 
@@ -558,10 +553,8 @@ class ResidentThermodynamicUpdateCoordinator:
             )
         if type(node) is not ProcessNode:
             raise TypeError("node must be an exact ProcessNode.")
-        if binding.request is not self._request.thermodynamics:
-            raise ValueError(
-                "binding must retain the coordinator thermodynamics."
-            )
+        if binding.request is not self._request:
+            raise ValueError("binding must retain the coordinator request.")
         session = self._request.session
         gas = cast(Any, session.gas)
         environment = cast(Any, session.environment)
@@ -637,7 +630,7 @@ class ResidentThermodynamicUpdateCoordinator:
         if not callable(callback):
             raise TypeError("callback must be callable.")
         binding = PreparedResidentThermodynamicBinding(
-            self._request.thermodynamics,
+            self._request,
             self._request.session.gas,
             cast(Any, self._request.session.gas).concentration,
             cast(Any, self._request.session.gas).molar_mass,
