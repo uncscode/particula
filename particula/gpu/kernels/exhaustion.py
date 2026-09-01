@@ -1545,9 +1545,13 @@ def _prepare_resampling_step_gpu(
     surface_relative_error: float = 1.0,
     diversity_absolute_error: float = 1.0,
     _upstream_invalid: Any | None = None,
-    _validate_payload: bool = True,
 ) -> _PreparedResamplingCall:
-    """Validate, allocate, and pin one private resampling invocation."""
+    """Validate metadata, allocate, and pin one private resampling invocation.
+
+    This private setup phase validates fixed schemas and controls but does not
+    inspect mutable payload values. Enqueue owns device validation and all
+    writes; observation is the sole status readback.
+    """
     bounds = (
         _require_exact_bound(
             "radius_cubed_relative_error", radius_cubed_relative_error
@@ -1642,19 +1646,17 @@ def _prepare_resampling_step_gpu(
         planning_failed=wp.zeros(1, dtype=wp.int32, device=device),
         upstream_invalid=_validate_prepared_upstream(_upstream_invalid, device),
     )
-    if _validate_payload:
-        _enqueue_resampling_validation(prepared)
-        if prepared.invalid.numpy()[0] != 0:
-            raise ValueError(
-                "particles or required_release_counts have invalid values"
-            )
     return prepared
 
 
 def _enqueue_prepared_resampling_call(
     prepared: _PreparedResamplingCall,
 ) -> Any:
-    """Enqueue one fixed resampling sequence using only pinned arrays."""
+    """Enqueue one fixed resampling sequence using only pinned arrays.
+
+    This phase performs no allocation, host readback, synchronization, or
+    container lookup. A writer launch has the primitive's no-rollback boundary.
+    """
     _enqueue_resampling_validation(prepared)
     b, n, s = prepared.dimensions
     if not b:
@@ -1758,9 +1760,12 @@ def _prepare_representative_volume_scaling_step_gpu(  # noqa: C901
     resolved_scale: Any,
     *,
     _upstream_invalid: Any | None = None,
-    _validate_payload: bool = True,
 ) -> _PreparedRepresentativeVolumeScalingCall:
-    """Validate, allocate, and pin one private scaling invocation."""
+    """Validate metadata, allocate, and pin one private scaling invocation.
+
+    This private setup phase validates fixed schemas but leaves mutable payload
+    validation to enqueue and bounded status observation to the observer.
+    """
     masses = _field(particles, "masses")
     if not _is_warp_array_like(masses):
         raise TypeError("masses must be a Warp array")
@@ -1833,13 +1838,6 @@ def _prepare_representative_volume_scaling_step_gpu(  # noqa: C901
         selected=wp.zeros(b, dtype=wp.int32, device=device),
         upstream_invalid=_validate_prepared_upstream(_upstream_invalid, device),
     )
-    if _validate_payload:
-        _enqueue_scaling_validation(prepared)
-        if prepared.status.numpy()[0] != 0:
-            raise ValueError(
-                "particles or representative scaling sidecars have "
-                "invalid values"
-            )
     return prepared
 
 
@@ -1884,7 +1882,11 @@ def _enqueue_scaling_validation(
 def _enqueue_prepared_representative_volume_scaling_call(
     prepared: _PreparedRepresentativeVolumeScalingCall,
 ) -> tuple[Any, Any, Any]:
-    """Enqueue one fixed scaling sequence using only pinned arrays."""
+    """Enqueue one fixed scaling sequence using only pinned arrays.
+
+    This phase performs no allocation, host readback, synchronization, or
+    container lookup. Rollback is not promised after a writer launch.
+    """
     _enqueue_scaling_validation(prepared)
     b, n, _ = prepared.dimensions
     if not b:

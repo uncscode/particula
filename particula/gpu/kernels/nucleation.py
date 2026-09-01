@@ -1040,6 +1040,7 @@ def _preflight_nucleation(  # noqa: C901
     scratch: NucleationScratchBuffers | None = None,
     finalized_demand: NucleationFinalizedDemandBuffers | None = None,
     diagnostics: NucleationDiagnosticBuffers | None = None,
+    validate_payload: bool = True,
 ) -> _NucleationPreflight:
     """Validate the deferred P1 boundary without writing caller-owned arrays.
 
@@ -1060,6 +1061,8 @@ def _preflight_nucleation(  # noqa: C901
         scratch: Optional caller-owned planning sidecars.
         finalized_demand: Optional caller-owned finalized-demand sidecars.
         diagnostics: Optional caller-owned diagnostic sidecars.
+        validate_payload: Whether to scan mutable device payloads. Prepared
+            calls disable this so their enqueue phase owns dynamic validation.
 
     Returns:
         Private normalized metadata, including eligibility and all-box gate
@@ -1188,6 +1191,26 @@ def _preflight_nucleation(  # noqa: C901
         )
     if any(count > np.iinfo(np.int32).max for count in config.molecule_counts):
         raise ValueError("molecule_counts must fit int32.")
+    if not validate_payload:
+        return _NucleationPreflight(
+            particles,
+            gas,
+            config,
+            n_boxes,
+            n_particles,
+            n_species,
+            device,
+            temperature_value,
+            saturation_value,
+            True,
+            False,
+            None,
+            normalized_time_step,
+            finalized_demand=finalized_demand,
+            diagnostics=diagnostics,
+            p3_sidecars=p3_sidecars,
+            protected_sidecars=sidecars,
+        )
     for value, name, positive in zip(
         (particle_arrays[0], particle_arrays[1], *particle_arrays[3:]),
         (
@@ -3317,7 +3340,13 @@ def _prepare_nucleation_step_gpu(
     saturation: Any | None = None,
     environment: Any | None = None,
 ) -> _PreparedNucleationCall:
-    """Validate, allocate, and pin one private nucleation invocation."""
+    """Validate metadata, allocate, and pin one private nucleation invocation.
+
+    Pinned arrays retain live payload authority: setup validates fixed schemas,
+    identities, and scalar controls without scanning mutable device values.
+    Enqueue owns dynamic validation and writers, while observation is the sole
+    bounded status readback.
+    """
     if not isinstance(scratch, NucleationScratchBuffers):
         raise ValueError("scratch must be NucleationScratchBuffers.")
     if not isinstance(finalized_demand, NucleationFinalizedDemandBuffers):
@@ -3337,6 +3366,7 @@ def _prepare_nucleation_step_gpu(
         scratch=scratch,
         finalized_demand=finalized_demand,
         diagnostics=diagnostics,
+        validate_payload=False,
     )
     _validate_public_p4_inputs(
         preflight, exhaustion_controls, exhaustion_buffers
@@ -3410,7 +3440,6 @@ def _prepare_nucleation_step_gpu(
             p4_work[1],
             exhaustion_buffers.resampling_buffers,
             _upstream_invalid=pipeline_invalid,
-            _validate_payload=False,
         )
         scaling_call = _prepare_representative_volume_scaling_step_gpu(
             particles,
@@ -3421,7 +3450,6 @@ def _prepare_nucleation_step_gpu(
             p4_arrays[4],
             p4_arrays[5],
             _upstream_invalid=pipeline_invalid,
-            _validate_payload=False,
         )
     return _PreparedNucleationCall(
         result=(particles, gas),
@@ -3481,7 +3509,12 @@ def _prepare_nucleation_step_gpu(
 def _enqueue_prepared_nucleation_call(
     prepared: _PreparedNucleationCall,
 ) -> tuple[Any, Any]:
-    """Enqueue one fixed P1--P5 sequence using only pinned arrays."""
+    """Enqueue one fixed P1--P5 sequence using only pinned arrays.
+
+    The device-only phase performs no allocation, readback, synchronization,
+    policy resolution, or container lookup. There is no rollback after a writer
+    launch.
+    """
     b, n, s = prepared.dimensions
     particles = prepared.particle_arrays
     gas = prepared.gas_arrays
