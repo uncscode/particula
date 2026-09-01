@@ -23,7 +23,10 @@ from particula.execution.process_graph import (
     ResolvedProcessGraph,
     _is_resolver_produced_graph,
 )
-from particula.execution.resident_enqueue import PreparedResidentTimestep
+from particula.execution.resident_enqueue import (
+    PreparedResidentTimestep,
+    _validate_ready_attachment,
+)
 from particula.gpu.kernels.communication import (
     GasCommunicationBuffers,
     ParticleCommunicationBuffers,
@@ -161,6 +164,15 @@ def setup_prepared_resident_communication(  # noqa: C901
         )
     prepared = cast(PreparedResidentTimestep, prepared_timestep)
     typed = cast(ResidentCommunicationRequest, request)
+    _validate_ready_attachment(
+        prepared.request,
+        prepared.binding,
+        prepared.lifecycle,
+        prepared.signature,
+        prepared.session,
+        prepared.registry,
+        prepared.guard,
+    )
     if prepared.request.communication is not typed:
         raise ValueError(
             "prepared timestep does not retain the supplied request."
@@ -179,6 +191,8 @@ def setup_prepared_resident_communication(  # noqa: C901
         or typed.volume_evolution_node.node_id != "volume_evolution"
         or "communication" not in prepared.ordered_node_ids
         or "volume_evolution" not in prepared.ordered_node_ids
+        or prepared.ordered_node_ids.index("communication")
+        >= prepared.ordered_node_ids.index("volume_evolution")
     ):
         raise ValueError("prepared communication nodes do not match schedule.")
     particles = cast(Any, typed.session.particles)
