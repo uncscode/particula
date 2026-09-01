@@ -88,6 +88,7 @@ from particula.execution.state_updates import (
     setup_prepared_gas_update,
 )
 from particula.execution.thermodynamic_updates import (
+    PreparedResidentThermodynamicSequence,
     ResidentThermodynamicUpdateCoordinator,
     ResidentThermodynamicUpdateRequest,
     _enqueue_prepared_saturation_ratio,
@@ -132,7 +133,14 @@ _CANONICAL_IDS = (
 
 @dataclass(frozen=True, eq=False)
 class PreparedResidentOperation:
-    """Retain one setup-validated resident operation for direct enqueue."""
+    """Retain one setup-validated resident operation for direct enqueue.
+
+    Attributes:
+        node: Resolver-produced node represented by this operation.
+        enqueue: Zero-argument callable that enqueues the retained operation.
+        product: Setup product captured by ``enqueue`` and retained by identity.
+        writer_capable: Whether invoking ``enqueue`` may launch a device writer.
+    """
 
     node: ProcessNode
     enqueue: Callable[[], object]
@@ -142,7 +150,40 @@ class PreparedResidentOperation:
 
 @dataclass(frozen=True, eq=False)
 class PreparedResidentSimulation:
-    """Freeze all READY-bound products required for one uncaptured timestep."""
+    """Freeze all READY-bound products required for one uncaptured timestep.
+
+    The carrier is identity-semantic: its metadata, setup products, node order,
+    and operation callables are all retained during preparation. Enqueue can
+    therefore dispatch the complete schedule without reconstructing executors,
+    resolving nodes, or repeating payload validation.
+
+    Attributes:
+        timestep: Prepared P1 timestep retained by identity.
+        request: Complete resident request retained by identity.
+        session: Resident session owning the dispatched containers.
+        registry: Resource registry pinned to ``session``.
+        guard: Closed step guard for the exact session and registry binding.
+        lifecycle: READY lifecycle metadata retained from the P1 timestep.
+        signature: Prepared graph-capture signature metadata.
+        graph: Resolver-produced graph for the complete loop.
+        schedule: Resolver-produced schedule for the complete loop.
+        ordered_node_ids: Canonical twelve-node operation identifiers.
+        primary_arrays: Resident primary arrays retained by identity.
+        resource_views: Published resource views retained by identity.
+        nodes: Canonical graph nodes in operation order.
+        thermal: Prepared thermodynamic refresh sequence.
+        communication: Prepared communication and volume barriers.
+        environment: Prepared environment update operation.
+        gas: Prepared gas update operation.
+        condensation: Prepared condensation operation.
+        coagulation: Prepared Brownian coagulation operation.
+        dilution: Prepared dilution operation.
+        wall_loss: Prepared wall-loss operation.
+        nucleation: Prepared nucleation operation.
+        diagnostics: Prepared diagnostics operation.
+        operations: Ordered callables dispatched during enqueue.
+        duration: Nonnegative timestep duration in seconds.
+    """
 
     timestep: PreparedResidentTimestep
     request: ResidentSimulationRequest
@@ -157,7 +198,7 @@ class PreparedResidentSimulation:
     primary_arrays: tuple[object, ...]
     resource_views: tuple[object, ...]
     nodes: tuple[ProcessNode, ...]
-    thermal: object
+    thermal: PreparedResidentThermodynamicSequence
     communication: PreparedResidentCommunicationBinding
     environment: object
     gas: object
@@ -304,8 +345,21 @@ def prepare_resident_simulation(
     """Prepare all twelve resident operations while the attachment is READY.
 
     Setup deliberately performs validation and private kernel preparation before
-    the returned carrier exists.  The later enqueue path only invokes the
+    the returned carrier exists. The later enqueue path only invokes the
     retained callables under one lifecycle token.
+
+    Args:
+        request: Exact complete resident simulation request to prepare.
+        duration: Finite, nonnegative timestep duration in seconds.
+
+    Returns:
+        Frozen identity-semantic carrier containing the twelve prepared
+        operations.
+
+    Raises:
+        TypeError: If a request or prepared component has an invalid type.
+        ValueError: If resident metadata, schedule, or resource identities do
+            not satisfy the READY preparation contract.
     """
     prepared = prepare_resident_timestep(request, duration)
     typed = prepared.request
@@ -520,7 +574,23 @@ def _validate_prepared_resident_simulation(prepared: object) -> None:
 
 
 def enqueue_prepared_resident_simulation(prepared: object) -> None:
-    """Enqueue one prepared READY simulation under exactly one token."""
+    """Enqueue one prepared READY simulation under exactly one token.
+
+    The pre-token gate checks only retained lifecycle and identity metadata.
+    After admission, the function invokes the twelve setup-bound operations in
+    canonical order and closes the token exactly once. A failure after a writer
+    may have launched follows the resident fault-classification policy.
+
+    Args:
+        prepared: Exact prepared simulation carrier returned by
+            :func:`prepare_resident_simulation`.
+
+    Raises:
+        TypeError: If ``prepared`` is not an exact prepared simulation carrier.
+        ValueError: If retained identities, lifecycle, or signature metadata
+            have drifted before token entry.
+        BaseException: Propagates an operation failure after lifecycle cleanup.
+    """
     _validate_prepared_resident_simulation(prepared)
     typed = cast(PreparedResidentSimulation, prepared)
     token = cast(Any, typed.guard).begin_step(typed.duration)

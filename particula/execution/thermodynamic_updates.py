@@ -178,6 +178,13 @@ class PreparedResidentThermodynamicSequence:
     The coordinator is used only while constructing this carrier.  Enqueue uses
     the retained writer functions and consumer products directly, so it does not
     validate bindings, resolve nodes, or construct a coordinator.
+
+    Attributes:
+        binding: Common resident arrays and thermodynamic configuration.
+        condensation: Prepared refresh window before condensation.
+        diagnostics: Prepared refresh window before diagnostics.
+        cursor: Number of successful operations recorded during enqueue.
+        stale_states: Derived fields requiring refresh before consumption.
     """
 
     binding: PreparedResidentThermodynamicBinding
@@ -198,7 +205,22 @@ def setup_prepared_thermodynamic_sequence(
     condensation_node: object,
     diagnostics_node: object,
 ) -> PreparedResidentThermodynamicSequence:
-    """Validate and freeze the condensation and diagnostics windows."""
+    """Validate and freeze the condensation and diagnostics windows.
+
+    Args:
+        prepared_timestep: Exact READY P1 timestep retaining resident arrays.
+        request: Exact thermodynamic request associated with the timestep.
+        condensation_node: Resolver-produced condensation consumer node.
+        diagnostics_node: Resolver-produced diagnostics consumer node.
+
+    Returns:
+        Prepared sequence with both consumer refresh windows retained by
+        identity.
+
+    Raises:
+        TypeError: If a supplied carrier or node has an invalid exact type.
+        ValueError: If nodes do not belong to the prepared canonical schedule.
+    """
     binding = setup_prepared_thermodynamic_binding(prepared_timestep, request)
     if type(condensation_node) is not ProcessNode:
         raise TypeError("condensation_node must be an exact ProcessNode.")
