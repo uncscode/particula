@@ -323,8 +323,8 @@ class ResidentWallLossAdapter:
     recovery.
     """
 
-    def prepare(self, request: object) -> tuple[Any, Any]:
-        """Preflight resident ownership and retain one wall-loss invocation."""
+    def prepare(self, request: object) -> _PreparedResidentProcessBinding:
+        """Preflight resident ownership and prepare one wall-loss call."""
         if type(request) is not ResidentWallLossRequest:
             raise TypeError("request must be an exact ResidentWallLossRequest.")
         request.registry.validate_pinned_session(request.session)
@@ -332,7 +332,103 @@ class ResidentWallLossAdapter:
             request.session, request.resources
         )
         enabled_logical_boxes = request.validate_enabled_box_indices()
-        return request, enabled_logical_boxes
+        if not enabled_logical_boxes:
+            return _PreparedResidentProcessBinding(
+                request.session.particles,
+                lambda particles: particles,
+            )
+        if len(enabled_logical_boxes) != request.session.dimensions.n_boxes:
+            return _PreparedResidentProcessBinding(
+                (request, enabled_logical_boxes),
+                lambda prepared: self._enqueue_selected(*prepared),
+            )
+
+        wall_loss_step_gpu = _get_wall_loss_step_gpu()
+        from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+        if not isinstance(request.config, NeutralWallLossConfig):
+            return _PreparedResidentProcessBinding(
+                request,
+                lambda prepared: wall_loss_step_gpu(
+                    prepared.session.particles,
+                    None,
+                    None,
+                    prepared.time_step,
+                    config=prepared.config,
+                    rng_seed=prepared.rng_seed,
+                    rng_states=prepared.resources.rng_states,
+                    initialize_rng=False,
+                    environment=prepared.session.environment,
+                ),
+            )
+        from particula.gpu.kernels import wall_loss_step_gpu as supported_step
+
+        if wall_loss_step_gpu is not supported_step:
+            return _PreparedResidentProcessBinding(
+                request,
+                lambda prepared: wall_loss_step_gpu(
+                    prepared.session.particles,
+                    None,
+                    None,
+                    prepared.time_step,
+                    config=prepared.config,
+                    rng_seed=prepared.rng_seed,
+                    rng_states=prepared.resources.rng_states,
+                    initialize_rng=False,
+                    environment=prepared.session.environment,
+                ),
+            )
+        from particula.gpu.kernels.wall_loss import (
+            _enqueue_prepared_wall_loss_call,
+            _prepare_wall_loss_step_gpu,
+        )
+
+        prepared = _prepare_wall_loss_step_gpu(
+            request.session.particles,
+            None,
+            None,
+            request.time_step,
+            config=request.config,
+            rng_seed=cast(int, request.rng_seed),
+            rng_states=request.resources.rng_states,
+            initialize_rng=False,
+            environment=request.session.environment,
+        )
+        return _PreparedResidentProcessBinding(
+            prepared,
+            _enqueue_prepared_wall_loss_call,
+        )
+
+    def _enqueue_selected(
+        self,
+        request: ResidentWallLossRequest,
+        enabled_logical_boxes: tuple[int, ...],
+    ) -> object:
+        """Retain the legacy selected-lane dispatch for partial selections."""
+        import warp as wp
+
+        stream = request.session.metadata.stream
+        enabled_physical_lanes = (
+            enabled_logical_boxes
+            if stream.n_boxes == 0
+            else tuple(stream.lanes[index] for index in enabled_logical_boxes)
+        )
+        selected_boxes: Any = wp.array(
+            enabled_physical_lanes,
+            dtype=wp.int32,
+            device=request.resources.rng_states.device,
+        )
+        return _get_wall_loss_selected_boxes_step_gpu()(
+            request.session.particles,
+            None,
+            None,
+            request.time_step,
+            config=request.config,
+            rng_seed=request.rng_seed,
+            rng_states=request.resources.rng_states,
+            selected_boxes=selected_boxes,
+            environment=request.session.environment,
+        )
 
     def execute(self, request: object) -> object:
         """Validate and delegate one wall-loss request.
@@ -355,54 +451,7 @@ class ResidentWallLossAdapter:
         Direct-kernel exceptions and mutations propagate without adapter retry,
         rollback, recovery, transfer, or synchronization.
         """
-        if type(request) is not ResidentWallLossRequest:
-            raise TypeError("request must be an exact ResidentWallLossRequest.")
-        request.registry.validate_pinned_session(request.session)
-        request.registry.validate_wall_loss_resources(
-            request.session, request.resources
-        )
-        enabled_logical_boxes = request.validate_enabled_box_indices()
-        if not enabled_logical_boxes:
-            return request.session.particles
-        if len(enabled_logical_boxes) != request.session.dimensions.n_boxes:
-            import warp as wp
-
-            stream = request.session.metadata.stream
-            enabled_physical_lanes = (
-                enabled_logical_boxes
-                if stream.n_boxes == 0
-                else tuple(
-                    stream.lanes[index] for index in enabled_logical_boxes
-                )
-            )
-            selected_boxes: Any = wp.array(
-                enabled_physical_lanes,
-                dtype=wp.int32,
-                device=request.resources.rng_states.device,
-            )
-            return _get_wall_loss_selected_boxes_step_gpu()(
-                request.session.particles,
-                None,
-                None,
-                request.time_step,
-                config=request.config,
-                rng_seed=request.rng_seed,
-                rng_states=request.resources.rng_states,
-                selected_boxes=selected_boxes,
-                environment=request.session.environment,
-            )
-        step = _get_wall_loss_step_gpu()
-        return step(
-            request.session.particles,
-            None,
-            None,
-            request.time_step,
-            config=request.config,
-            rng_seed=request.rng_seed,
-            rng_states=request.resources.rng_states,
-            initialize_rng=False,
-            environment=request.session.environment,
-        )
+        return self.prepare(request).execute()
 
 
 class ResidentNucleationAdapter:

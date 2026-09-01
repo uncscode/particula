@@ -1157,20 +1157,15 @@ def _charged_rectangular_wall_loss_remove_selected(
 
 @dataclass(frozen=True)
 class _PreparedWallLossCall:
-    """Freeze direct wall-loss call references for the private enqueue seam."""
+    """Freeze all setup state required by one wall-loss enqueue."""
 
     particles: Any
-    temperature: Any
-    pressure: Any
-    time_step: Any
-    config: NeutralWallLossConfig
-    rng_seed: int
-    rng_states: Any | None
-    initialize_rng: bool
-    environment: Any | None
+    launch_kernel: Any | None
+    launch_dim: Any
+    launch_inputs: tuple[Any, ...]
 
 
-def _wall_loss_step_gpu_impl(
+def _prepare_wall_loss_step_gpu(
     particles: Any,
     temperature: float | Any | None,
     pressure: float | Any | None,
@@ -1181,7 +1176,7 @@ def _wall_loss_step_gpu_impl(
     rng_states: Any | None = None,
     initialize_rng: bool = False,
     environment: Any | None = None,
-) -> Any:
+) -> _PreparedWallLossCall:
     """Apply direct neutral or charged wall loss to eligible fixed slots.
 
     The configuration supports particle-resolved neutral and charged wall loss.
@@ -1251,7 +1246,7 @@ def _wall_loss_step_gpu_impl(
     )
     _validate_rng(rng_seed, rng_states, initialize_rng, n_boxes, device)
     if validated_time_step == 0.0:
-        return particles
+        return _PreparedWallLossCall(particles, None, 0, ())
 
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature,
@@ -1276,127 +1271,89 @@ def _wall_loss_step_gpu_impl(
     geometry_mode = 0 if validated_config.geometry == "spherical" else 1
     chamber_radius = float(validated_config.chamber_radius or 0.0)
     dimensions = validated_config.chamber_dimensions or (0.0, 0.0, 0.0)
+    launch_inputs: tuple[Any, ...]
     if validated_config.mode == "neutral":
-        wp.launch(
-            _wall_loss_remove,
-            dim=n_boxes,
-            inputs=[
-                particles.masses,
-                particles.concentration,
-                particles.charge,
-                particles.density,
-                temperature_array,
-                pressure_array,
-                validated_time_step,
-                float(validated_config.wall_eddy_diffusivity),
-                chamber_radius,
-                float(dimensions[0]),
-                float(dimensions[1]),
-                float(dimensions[2]),
-                geometry_mode,
-                n_particles,
-                n_species,
-                execution_rng_states,
-                int(rng_seed),
-                int(initialize_rng),
-            ],
-            device=device,
+        launch_kernel = _wall_loss_remove
+        launch_inputs = (
+            particles.masses,
+            particles.concentration,
+            particles.charge,
+            particles.density,
+            temperature_array,
+            pressure_array,
+            validated_time_step,
+            float(validated_config.wall_eddy_diffusivity),
+            chamber_radius,
+            float(dimensions[0]),
+            float(dimensions[1]),
+            float(dimensions[2]),
+            geometry_mode,
+            n_particles,
+            n_species,
+            execution_rng_states,
+            int(rng_seed),
+            int(initialize_rng),
         )
     elif validated_config.geometry == "spherical":
-        wp.launch(
-            _charged_spherical_wall_loss_remove,
-            dim=n_boxes,
-            inputs=[
-                particles.masses,
-                particles.concentration,
-                particles.charge,
-                particles.density,
-                temperature_array,
-                pressure_array,
-                validated_time_step,
-                float(validated_config.wall_eddy_diffusivity),
-                chamber_radius,
-                float(validated_config.wall_potential),
-                float(validated_config.wall_electric_field),
-                n_particles,
-                n_species,
-                execution_rng_states,
-                int(rng_seed),
-                int(initialize_rng),
-            ],
-            device=device,
+        launch_kernel = _charged_spherical_wall_loss_remove
+        launch_inputs = (
+            particles.masses,
+            particles.concentration,
+            particles.charge,
+            particles.density,
+            temperature_array,
+            pressure_array,
+            validated_time_step,
+            float(validated_config.wall_eddy_diffusivity),
+            chamber_radius,
+            float(validated_config.wall_potential),
+            float(validated_config.wall_electric_field),
+            n_particles,
+            n_species,
+            execution_rng_states,
+            int(rng_seed),
+            int(initialize_rng),
         )
     else:
-        wp.launch(
-            _charged_rectangular_wall_loss_remove,
-            dim=n_boxes,
-            inputs=[
-                particles.masses,
-                particles.concentration,
-                particles.charge,
-                particles.density,
-                temperature_array,
-                pressure_array,
-                validated_time_step,
-                float(validated_config.wall_eddy_diffusivity),
-                float(dimensions[0]),
-                float(dimensions[1]),
-                float(dimensions[2]),
-                float(validated_config.wall_potential),
-                validated_config.wall_electric_field,
-                n_particles,
-                n_species,
-                execution_rng_states,
-                int(rng_seed),
-                int(initialize_rng),
-            ],
-            device=device,
+        launch_kernel = _charged_rectangular_wall_loss_remove
+        launch_inputs = (
+            particles.masses,
+            particles.concentration,
+            particles.charge,
+            particles.density,
+            temperature_array,
+            pressure_array,
+            validated_time_step,
+            float(validated_config.wall_eddy_diffusivity),
+            float(dimensions[0]),
+            float(dimensions[1]),
+            float(dimensions[2]),
+            float(validated_config.wall_potential),
+            validated_config.wall_electric_field,
+            n_particles,
+            n_species,
+            execution_rng_states,
+            int(rng_seed),
+            int(initialize_rng),
         )
-    return particles
-
-
-def _prepare_wall_loss_step_gpu(
-    particles: Any,
-    temperature: float | Any | None,
-    pressure: float | Any | None,
-    time_step: float | Any,
-    *,
-    config: NeutralWallLossConfig,
-    rng_seed: int = 0,
-    rng_states: Any | None = None,
-    initialize_rng: bool = False,
-    environment: Any | None = None,
-) -> _PreparedWallLossCall:
-    """Retain one wall-loss call for the concrete prepare/enqueue boundary."""
-    # Preserve the earliest stable rejection at setup time. The legacy launch
-    # implementation retains the remaining established validation ordering.
-    _validate_config(config)
     return _PreparedWallLossCall(
         particles,
-        temperature,
-        pressure,
-        time_step,
-        config,
-        rng_seed,
-        rng_states,
-        initialize_rng,
-        environment,
+        launch_kernel,
+        n_boxes,
+        launch_inputs,
     )
 
 
 def _enqueue_prepared_wall_loss_call(prepared: _PreparedWallLossCall) -> Any:
-    """Run the retained direct wall-loss call without changing its API."""
-    return _wall_loss_step_gpu_impl(
-        prepared.particles,
-        prepared.temperature,
-        prepared.pressure,
-        prepared.time_step,
-        config=prepared.config,
-        rng_seed=prepared.rng_seed,
-        rng_states=prepared.rng_states,
-        initialize_rng=prepared.initialize_rng,
-        environment=prepared.environment,
-    )
+    """Issue only the frozen wall-loss launch, without setup or validation."""
+    if prepared.launch_kernel is not None:
+        wp.launch(
+            prepared.launch_kernel,
+            dim=prepared.launch_dim,
+            inputs=prepared.launch_inputs,
+            device=prepared.particles.masses.device,
+        )
+    return prepared.particles
 
 
 def wall_loss_step_gpu(
