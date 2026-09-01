@@ -2,6 +2,7 @@
 
 from dataclasses import FrozenInstanceError
 from types import SimpleNamespace
+from typing import cast
 
 import numpy as np
 import pytest
@@ -599,11 +600,11 @@ def test_public_prepared_path_preserves_legacy_sidecar_error_precedence(
         nucleation_step_gpu(
             particles,
             gas,
-            object(),
+            cast(NucleationConfig, object()),
             object(),
             **sidecars,
-            exhaustion_controls=object(),
-            exhaustion_buffers=object(),
+            exhaustion_controls=cast(NucleationExhaustionControls, object()),
+            exhaustion_buffers=cast(NucleationExhaustionBuffers, object()),
             temperature=object(),
             saturation=object(),
             environment=object(),

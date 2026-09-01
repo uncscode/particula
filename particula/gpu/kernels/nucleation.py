@@ -3294,7 +3294,43 @@ def _commit_prepared_p3_diagnostics(
 
 @dataclass(frozen=True)
 class _PreparedNucleationCall:
-    """Pin one allocation-complete P1--P5 nucleation launch sequence."""
+    """Pin one allocation-complete P1--P5 nucleation launch sequence.
+
+    Preparation fixes container-array identities, dimensions, device, scalar
+    controls, immutable policy controls, and private workspace allocations.
+    Pinned arrays retain live device payload authority; enqueue validates their
+    current values and observation performs the sole bounded status readback.
+
+    Attributes:
+        result: Original particle and gas containers returned by the public
+            boundary.
+        particle_arrays: Pinned particle fields in P1 validation order.
+        gas_arrays: Pinned gas fields in P1 validation order.
+        temperature: Pinned or preparation-owned temperature array [K].
+        saturation: Pinned or preparation-owned saturation array.
+        scalar_controls: Validated scalar P1--P2 controls.
+        policy_controls: Frozen integer P4 resampling and scaling controls.
+        molecule_counts: Preparation-owned molecule counts per event.
+        scratch_arrays: Pinned caller-owned P2 planning sidecars.
+        finalized_arrays: Pinned caller-owned P2/P3 finalized sidecars.
+        diagnostic_arrays: Pinned caller-owned P2/P3 diagnostic sidecars.
+        p4_arrays: Pinned caller-owned P4 workspace and diagnostic sidecars.
+        p2_work: Preparation-owned P2 work arrays.
+        p3_work: Preparation-owned P3 work arrays.
+        p4_work: Preparation-owned P4 work arrays.
+        p1_status: Preparation-owned ordered P1 status counters.
+        pipeline_invalid: Preparation-owned aggregate device failure gate.
+        p2_status: Preparation-owned P2 status counters.
+        p3_status: Preparation-owned P3 status counters.
+        molecule_status: Preparation-owned P5 molecule-eligibility status.
+        p4_status: Preparation-owned P4 handoff and policy status.
+        p4_final_status: Preparation-owned P4 finalized-capacity status.
+        p5_status: Preparation-owned P5 handoff status.
+        resampling: Prepared nested resampling call, when dimensions permit it.
+        scaling: Prepared nested scaling call, when dimensions permit it.
+        dimensions: Fixed ``(B, N, S)`` dimensions.
+        device: Shared active Warp device.
+    """
 
     result: tuple[Any, Any]
     particle_arrays: tuple[Any, ...]
@@ -3346,6 +3382,28 @@ def _prepare_nucleation_step_gpu(
     identities, and scalar controls without scanning mutable device values.
     Enqueue owns dynamic validation and writers, while observation is the sole
     bounded status readback.
+
+    Args:
+        particles: Caller-owned fixed-capacity Warp particle container.
+        gas: Caller-owned same-device Warp gas container.
+        config: Immutable scalar nucleation controls.
+        time_step: Finite nonnegative step duration [s].
+        scratch: Caller-owned P2 planning sidecars.
+        finalized_demand: Caller-owned P2/P3 finalized-demand sidecars.
+        diagnostics: Caller-owned P2/P3 diagnostic sidecars.
+        exhaustion_controls: Exact-Boolean P4 resampling and scaling controls.
+        exhaustion_buffers: Caller-owned P4 workspace and diagnostics.
+        temperature: Positive scalar [K] or same-device ``wp.float64 (B,)``.
+        saturation: Configured same-device ``wp.float64 (B, S)`` ratios.
+        environment: Optional same-device owner of temperature and saturation.
+
+    Returns:
+        Private prepared call with pinned storage and allocated work arrays.
+
+    Raises:
+        TypeError: If a required scalar has an unsupported type.
+        ValueError: If fixed schemas, identities, controls, or sidecars are
+            invalid.
     """
     if not isinstance(scratch, NucleationScratchBuffers):
         raise ValueError("scratch must be NucleationScratchBuffers.")
@@ -3387,7 +3445,7 @@ def _prepare_nucleation_step_gpu(
     saturation_work = preflight.saturation
     if saturation_work is None:
         saturation_work = wp.zeros((b, s), dtype=wp.float64, device=device)
-    molecule_counts = wp.array(
+    molecule_counts: Any = wp.array(
         np.asarray(config.molecule_counts, dtype=np.int32),
         dtype=wp.int32,
         device=device,
@@ -3514,6 +3572,13 @@ def _enqueue_prepared_nucleation_call(
     The device-only phase performs no allocation, readback, synchronization,
     policy resolution, or container lookup. There is no rollback after a writer
     launch.
+
+    Args:
+        prepared: Allocation-complete call with pinned arrays and controls.
+
+    Returns:
+        The original ``(particles, gas)`` containers. Device errors remain in
+        preparation-owned status arrays until observation.
     """
     b, n, s = prepared.dimensions
     particles = prepared.particle_arrays
@@ -3899,7 +3964,22 @@ def _enqueue_prepared_nucleation_call(
 def _observe_prepared_nucleation_call(  # noqa: C901
     prepared: _PreparedNucleationCall,
 ) -> tuple[Any, Any]:
-    """Interpret bounded device status in legacy phase-error order."""
+    """Interpret bounded device status in legacy phase-error order.
+
+    This is the sole host readback boundary for a prepared call. It translates
+    device status counters without inspecting or replacing caller-owned payload
+    storage. Writer failures preserve the established no-rollback contract.
+
+    Args:
+        prepared: Enqueued call whose status arrays are ready for observation.
+
+    Returns:
+        The original ``(particles, gas)`` containers when every phase succeeds.
+
+    Raises:
+        ValueError: If P1--P5 validation or a nested exhaustion operation
+            recorded an error.
+    """
     p1 = prepared.p1_status.numpy()
     p1_errors = (
         "particles.masses must be finite and nonnegative.",
