@@ -71,3 +71,16 @@ E8-F8 own benchmark and profiling evidence.
   communication-before-volume ordering, no-op barriers, GAS overdraw gated
   commit, and legacy/direct-path compatibility. Equal final volumes leave
   primaries, work ledgers, and resident volume status lanes unchanged.
+
+## P4 Completion Evidence (#1555)
+
+- [x] Private `_PreparedCondensationCall` setup retains validated direct-kernel
+  inputs and sidecars while preserving the public wrapper's validation,
+  fallback-allocation, identity, and return contracts.
+- [x] Prepared enqueue retains the four equal gas-coupled, inventory-limited P2
+  substeps and performs no validation, allocation, host refresh/readback,
+  synchronization, or resource lookup.
+- [x] Private `_PreparedWarpCondensationBinding` retains the concrete resident
+  adapter's prepared call without changing public APIs, scheduler dispatch,
+  checkpoint/resource schemas, or condensation physics. Changed local
+  Google-style docstrings are covered by focused docstring validation.

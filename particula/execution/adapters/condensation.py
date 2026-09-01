@@ -3,10 +3,12 @@
 Import these carriers from ``particula.execution.adapters.condensation``, not
 from ``particula.execution`` or top-level ``particula``. They retain
 caller-owned resources by identity. P2 carriers perform read-only
-construction-time metadata checks; P3 adapters make one selected native call.
-Neither selection nor these adapters transfer, allocate, restore, synchronize,
-retry, or fall back. Frozen fields prevent rebinding only; retained resources
-remain mutable and caller-owned. Native calls may mutate particle masses, gas
+construction-time metadata checks; P3 adapters prepare then make one selected
+native call. Adapter carriers and bindings neither transfer, restore,
+synchronize, retry, nor fall back. Kernel preparation owns any direct-kernel
+fallback allocation, while a prepared binding reuses its retained resources for
+enqueue. Frozen fields prevent rebinding only; retained resources remain
+mutable and caller-owned. Native calls may mutate particle masses, gas
 concentration or vapor pressure, and writable sidecars. Callers own resource
 lifetime, synchronization, concurrency, and any post-launch recovery limits.
 """
@@ -662,8 +664,10 @@ class _PreparedWarpCondensationBinding:
 
     The binding keeps the exact selected state, prepared kernel record, and
     enqueue delegate together so repeated execution cannot silently replace
-    caller-owned resident resources. It is concrete-module-only and does not
-    perform validation, allocation, transfer, or synchronization itself.
+    caller-owned resident resources. It is concrete-module-only. Construction
+    delegates validation and any fallback resolution to kernel preparation;
+    ``execute()`` delegates to the retained enqueue callable without repeating
+    adapter setup, allocation, transfer, or synchronization.
 
     Attributes:
         state: Exact selected Warp execution state retained by identity.

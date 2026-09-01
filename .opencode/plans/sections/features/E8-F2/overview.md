@@ -56,6 +56,20 @@ Equal final volumes are a write-free barrier; changed volumes retain resident
 concentration-scaling and volume-status behavior. Legacy executor and public
 direct-kernel paths remain compatible.
 
+## Implemented P4 Boundary
+
+Issue #1555 splits direct GPU condensation into private setup and enqueue
+boundaries. `particula.gpu.kernels.condensation` now prepares an immutable
+`_PreparedCondensationCall` after preserving the public wrapper's validation,
+fallback-allocation, supplied-sidecar identity, and return contracts. Its
+enqueue path uses retained references only and performs the existing four equal,
+gas-coupled, inventory-limited substeps without validation, allocation, host
+refresh/readback, synchronization, or resource lookup.
+
+The concrete resident adapter adds `_PreparedWarpCondensationBinding`, which
+retains the prepared kernel call and its exact adapter binding. No public API,
+scheduler behavior, checkpoint/resource schema, or condensation physics changed.
+
 ## User Stories
 
 - As a resident-loop integrator, I want setup to reject incompatible state

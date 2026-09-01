@@ -24,6 +24,13 @@
   required. Concrete-only execution and kernel docstrings describe closed-map
   prepared binding, fixed native enqueue, equal-volume write-free behavior, and
   post-launch recovery limits; this plan records the implementation boundary.
+- Completed for P4 (#1555): no user-facing documentation, export, scheduler,
+  checkpoint, or resource-schema update was required. Private Google-style
+  docstrings in `particula/gpu/kernels/condensation.py` and
+  `particula/execution/adapters/condensation.py` describe setup ownership,
+  retained identities, enqueue-only restrictions, and the post-launch failure
+  boundary. The focused kernel and adapter docstring validation covers these
+  local concrete-only descriptions.
 - Add or update documentation contract assertions under `particula/tests/` or
   `particula/execution/tests/` when user-facing contract text changes.
 - Update all E8-F2 plan sections and parent E8 child/dependency status during

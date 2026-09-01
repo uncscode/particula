@@ -11,7 +11,9 @@ Entry-point validation accepts scalar direct inputs, explicit ``(n_boxes,)``
 Warp arrays, or a ``WarpEnvironmentData`` container. Aggregate preflight,
 including supplied ``CondensationScratchBuffers`` metadata, completes before
 buffer allocation, Warp launch, vapor-pressure refresh, or mutation of
-caller-owned state. A required keyword-only ``ThermodynamicsConfig`` then
+caller-owned state. Private preparation retains the validated primary
+containers, supplied sidecars, and resolved fallback storage by identity for a
+subsequent enqueue. A required keyword-only ``ThermodynamicsConfig`` then
 executes exactly four equal substeps. Each substep refreshes the caller-owned
 pure-vapor-pressure buffer, updates box-level environment properties, proposes
 transfer from current particle and gas state, P1-gates disabled species and
@@ -191,7 +193,7 @@ class _PreparedCondensationCall:
     """Retain validated state and device operations for one enqueue.
 
     Setup owns validation, normalization, and fallback allocation. The enqueue
-    phase uses only these retained references for its four device substeps. The
+    phase reuses these retained references for its four device substeps. The
     record is private because it captures implementation-specific Warp
     callables and scratch layouts rather than a public execution protocol.
 
@@ -2532,13 +2534,14 @@ def _enqueue_prepared_condensation_call(
 ) -> tuple[Any, Any]:
     """Enqueue the bound four-substep device sequence without setup work.
 
-    This helper is the device-only half of the preparation boundary. It uses
-    only references retained by ``prepared`` and therefore performs no input
-    validation, normalization, fallback allocation, host readback,
-    synchronization, or resource lookup. The call clears supplied output
-    accumulators once, then executes the existing refresh, proposal, P2
-    finalization, particle update, gas coupling, and diagnostic sequence four
-    times.
+    This helper is the enqueue half of the preparation boundary. It reuses only
+    references retained by ``prepared`` and does not repeat public input
+    validation, normalization, fallback resolution, or resource lookup. The
+    existing per-substep finite-value guards remain part of the execution
+    sequence; their implementation may perform device status checks before a
+    commit. The call clears supplied output accumulators once, then executes
+    the existing refresh, proposal, P2 finalization, particle update, gas
+    coupling, and diagnostic sequence four times.
 
     Args:
         prepared: Fully validated call record returned by

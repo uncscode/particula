@@ -22,9 +22,17 @@ concrete-only and retain exact caller-owned resident identities.
 - **Completed P3 (#1554):** bind one exact P1 READY closed-map GAS or PARTICLES
   communication resource family, duration, and optional final-volume sidecar in
   `particula/execution/resident_communication.py`; dispatch fixed native
-  communication then volume barriers through
-  `particula/gpu/kernels/communication.py`. Equal final volumes are write-free;
-  changed final volumes preserve established resident evolution semantics.
+   communication then volume barriers through
+   `particula/gpu/kernels/communication.py`. Equal final volumes are write-free;
+   changed final volumes preserve established resident evolution semantics.
+- **Completed P4 (#1555):** split the direct condensation call into private
+  `_PreparedCondensationCall` setup and device-only enqueue in
+  `particula/gpu/kernels/condensation.py`, then retain it through the concrete
+  `_PreparedWarpCondensationBinding` in
+  `particula/execution/adapters/condensation.py`. Public validation, fallback
+  allocation, output identity, and four-substep gas-coupled P2 physics remain
+  unchanged; no public, scheduler, checkpoint, or resource-schema change was
+  introduced.
 - Define immutable prepared-enqueue carriers tied to the exact E8-F1 capture
   lifecycle signature and `ResidentSimulationRequest`.
 - Move repeated scheduler metadata checks and executor construction into an

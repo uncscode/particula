@@ -28,9 +28,14 @@
   launches in `particula/gpu/kernels/communication.py`; compose fixed
   communication-before-volume enqueue without host work and retain legacy
   compatibility adapters (#1554).
-- [ ] Refactor `condensation_step_gpu` so its public boundary validates and then
-  calls one private prepared launch sequence in
-  `particula/gpu/kernels/condensation.py`.
+- [x] Refactor `condensation_step_gpu` into private
+  `_PreparedCondensationCall` setup and enqueue paths in
+  `particula/gpu/kernels/condensation.py`, preserving validation, fallback
+  allocation, identity, return, and fixed-four-substep physics contracts (#1555).
+- [x] Retain the prepared condensation call through the concrete private
+  `_PreparedWarpCondensationBinding` in
+  `particula/execution/adapters/condensation.py`; enqueue uses retained
+  references only and adds no scheduler/resource/checkpoint integration (#1555).
 - [ ] Refactor resident Brownian coagulation, dilution, and selected/all-box wall
   loss into validated setup plus private enqueue in
   `particula/gpu/kernels/{coagulation,dilution,wall_loss}.py` and their resident
@@ -57,8 +62,9 @@
   identity drift rejection, absent/equal/changed final volumes, no-op barriers,
   gated GAS overdraw, dispatch order, and forbidden enqueue-time operations
   (#1554).
-- [ ] Run existing direct-kernel test modules to prove public wrappers retain
-  validation, atomic preflight, return identity, and numerical behavior.
+- [x] Extend focused condensation kernel and adapter tests for prepared setup,
+  enqueue-only restrictions, direct-wrapper compatibility, retained identities,
+  and four-substep behavior (#1555).
 - [ ] Add a CUDA-gated capture smoke test using the repository's established
   pass-or-clean-skip helper; Warp CPU must explicitly remain uncaptured.
 - [ ] Run focused tests without coverage, then the untargeted

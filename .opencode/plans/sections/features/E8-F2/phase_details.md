@@ -60,17 +60,25 @@
     setup rejection; communication-before-volume ordering; aggregate-overdraw
     gated commit; and forbidden enqueue-time operation traps.
 
-- [ ] **E8-F2-P4:** Add prepared condensation device enqueue path with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Refactor the authoritative fixed-four-substep condensation launch
-    sequence behind a validated prepared record without changing public direct
-    API behavior or inventory-finalization physics.
+- [x] **E8-F2-P4:** Add prepared condensation device enqueue path with unit tests
+  - Issue: #1555 | Size: S | Status: Implemented
+  - Delivered: Added private `_PreparedCondensationCall` setup/enqueue separation
+    in `particula/gpu/kernels/condensation.py`. Setup preserves existing direct
+    validation, fallback allocation, supplied-sidecar identity, and return
+    contracts; enqueue retains the authoritative four equal gas-coupled,
+    inventory-limited substeps without validation, allocation, host
+    refresh/readback, synchronization, or resource lookup.
+  - Adapter: Added private `_PreparedWarpCondensationBinding` in
+    `particula/execution/adapters/condensation.py`, retaining the prepared kernel
+    call for the exact concrete resident binding and delegating only to enqueue.
+  - Compatibility: No public APIs, exports, scheduler behavior,
+    checkpoint/resource schemas, or condensation physics changed.
   - Files: `particula/gpu/kernels/condensation.py`,
     `particula/execution/adapters/condensation.py`, condensation and adapter
     `*_test.py` files
-  - Tests: Public validation order and atomic preflight, prepared sidecar
-    identity, exact four-cycle launch trace, uptake/evaporation/no-op behavior,
-    and no prepared-path allocation, host refresh, or readback.
+  - Documentation: Private Google-style docstrings record setup/enqueue
+    ownership and failure boundaries; focused docstring validation covers the
+    changed concrete modules without requiring a public-documentation update.
 
 - [ ] **E8-F2-P5:** Add prepared coagulation, dilution, and wall-loss enqueue paths with unit tests
   - Issue: TBD | Size: S | Status: Not Started

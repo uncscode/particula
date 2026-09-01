@@ -98,6 +98,24 @@ status lanes; a changed sidecar retains the resident status, concentration
 scaling, and volume-update sequence. Compatibility adapters retain legacy
 executor and public direct-kernel contracts.
 
+## P4 Implementation Record
+
+Issue #1555 adds the private frozen `_PreparedCondensationCall` in
+`particula.gpu.kernels.condensation`. Setup retains the already validated Warp
+containers, thermodynamic and optional inputs, fixed duration, scratch/output
+sidecars, and required launch inputs. The public `condensation_step_gpu()` keeps
+its existing validation order, fallback allocations, supplied-object identity,
+and return tuple, then delegates to the prepared enqueue helper.
+
+The helper clears the retained total-transfer output once and runs the unchanged
+four equal substeps: vapor-pressure/property refresh, proposal, P2 inventory
+finalization, particle mutation, and gas coupling. It has no validation,
+allocation, host refresh/readback, synchronization, or registry/resource lookup.
+The concrete adapter's private `_PreparedWarpCondensationBinding` holds this
+kernel record for its exact resident binding and delegates directly to enqueue.
+No public exports, scheduler dispatch, checkpoint/resource schema, or physics
+semantics were modified.
+
 ## Data / API / Workflow Changes
 
 - **Data model:** Add frozen prepared request records for the full timestep and

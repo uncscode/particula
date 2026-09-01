@@ -30,10 +30,15 @@ Coverage thresholds and the normal collection policy must not be lowered.
   barriers; communication-before-volume ordering; and GAS aggregate-overdraw
   commit gating. Scoped spies prove enqueue does not revalidate, resolve maps,
   reacquire resources, allocate, transfer/read back, or synchronize.
-- **P4:** Extend condensation kernel and adapter tests with independent launch
-  traces and numerical fixtures. Public calls must retain full validation;
-  prepared calls must use the same four-substep kernels and supplied sidecars
-  without allocation or host-side vapor-pressure work.
+- **P4 (implemented, #1555):** `condensation_test.py` and
+  `condensation_adapter_test.py` cover the private prepared kernel call and
+  concrete adapter binding. They retain direct-wrapper validation, fallback and
+  supplied-sidecar identity coverage, the four equal gas-coupled
+  inventory-limited substeps, and adapter binding behavior. Focused
+  instrumentation verifies prepared enqueue performs no validation, allocation,
+  host refresh/readback, synchronization, or resource lookup. Local docstrings
+  document the setup/enqueue ownership and failure boundary; no user-facing
+  documentation validation was required.
 - **P5:** Extend coagulation, dilution, wall-loss, and process-adapter tests for
   public-wrapper parity, persistent RNG advancement without reset, selected-box
   reuse, zero-work behavior, and forbidden enqueue-time host operations.
