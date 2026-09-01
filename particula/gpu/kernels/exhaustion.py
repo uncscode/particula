@@ -967,7 +967,7 @@ def _validate_buffers(
                 raise ValueError("resampling arrays must not overlap")
 
 
-def resampling_step_gpu(  # noqa: C901, PLR0913
+def _execute_resampling_step_gpu(  # noqa: C901, PLR0913
     particles: Any,
     required_release_counts: Any,
     buffers: ResamplingBuffers,
@@ -1181,7 +1181,7 @@ def resampling_step_gpu(  # noqa: C901, PLR0913
     return particles
 
 
-def representative_volume_scaling_step_gpu(  # noqa: C901, PLR0913
+def _execute_representative_volume_scaling_step_gpu(  # noqa: C901, PLR0913
     particles: Any,
     provisional_source_demand: Any,
     scaling_required: Any,
@@ -1350,3 +1350,282 @@ def representative_volume_scaling_step_gpu(  # noqa: C901, PLR0913
             device=device,
         )
     return particles, provisional_source_demand, resolved_scale
+
+
+@dataclass(frozen=True)
+class _PreparedResamplingCall:
+    """Pin one resampling request for private prepare/enqueue delegation.
+
+    Preparation retains caller references and scalar bounds.  The legacy
+    execution boundary remains the authority for dynamic payload validation and
+    error translation; observation is intentionally a no-op because that
+    boundary reports synchronous errors itself.
+    """
+
+    particles: Any
+    required_release_counts: Any
+    buffers: ResamplingBuffers
+    bounds: tuple[float, float, float, float]
+
+
+@dataclass(frozen=True)
+class _PreparedRepresentativeVolumeScalingCall:
+    """Pin one representative-volume scaling request for private delegation."""
+
+    particles: Any
+    provisional_source_demand: Any
+    scaling_required: Any
+    requested_scale: Any
+    minimum_scale: Any
+    minimum_volume: Any
+    resolved_scale: Any
+
+
+def _prepare_resampling_step_gpu(
+    particles: Any,
+    required_release_counts: Any,
+    buffers: ResamplingBuffers,
+    *,
+    radius_cubed_relative_error: float = 1.0,
+    mean_radius_relative_error: float = 1.0,
+    surface_relative_error: float = 1.0,
+    diversity_absolute_error: float = 1.0,
+) -> _PreparedResamplingCall:
+    """Prepare a private resampling call while pinning controls by identity.
+
+    The matching enqueue helper delegates to the established direct primitive,
+    which owns dynamic validation, device status observation, and its documented
+    no-rollback boundary.
+    """
+    bounds = (
+        _require_exact_bound(
+            "radius_cubed_relative_error", radius_cubed_relative_error
+        ),
+        _require_exact_bound(
+            "mean_radius_relative_error", mean_radius_relative_error
+        ),
+        _require_exact_bound("surface_relative_error", surface_relative_error),
+        _require_exact_bound(
+            "diversity_absolute_error", diversity_absolute_error
+        ),
+    )
+    if not isinstance(buffers, ResamplingBuffers):
+        raise TypeError("buffers must be a ResamplingBuffers")
+    masses = _field(particles, "masses")
+    if not _is_warp_array_like(masses) or masses.ndim != 3:
+        raise ValueError("masses must be a rank-3 Warp array")
+    if masses.dtype != wp.float64:
+        raise ValueError("masses must have dtype float64")
+    _require_contiguous_array(masses, "masses")
+    b, n, s = tuple(masses.shape)
+    if n == 0 or s == 0:
+        raise ValueError("particle dimensions must be positive")
+    device = masses.device
+    concentration = _field(particles, "concentration")
+    charge = _field(particles, "charge")
+    density = _field(particles, "density")
+    volume = _field(particles, "volume")
+    _validate_array(
+        concentration, "concentration", 2, (b, n), wp.float64, device
+    )
+    _validate_array(charge, "charge", 2, (b, n), wp.float64, device)
+    _validate_array(density, "density", 1, (s,), wp.float64, device)
+    _validate_array(volume, "volume", 1, (b,), wp.float64, device)
+    _validate_array(
+        required_release_counts,
+        "required_release_counts",
+        1,
+        (b,),
+        wp.int32,
+        device,
+    )
+    _validate_buffers(
+        buffers,
+        b,
+        n,
+        s,
+        device,
+        [
+            masses,
+            concentration,
+            charge,
+            density,
+            volume,
+            required_release_counts,
+        ],
+    )
+    return _PreparedResamplingCall(
+        particles,
+        required_release_counts,
+        buffers,
+        bounds,
+    )
+
+
+def _enqueue_prepared_resampling_call(prepared: _PreparedResamplingCall) -> Any:
+    """Execute the pinned resampling call using its original references."""
+    return _execute_resampling_step_gpu(
+        prepared.particles,
+        prepared.required_release_counts,
+        prepared.buffers,
+        radius_cubed_relative_error=prepared.bounds[0],
+        mean_radius_relative_error=prepared.bounds[1],
+        surface_relative_error=prepared.bounds[2],
+        diversity_absolute_error=prepared.bounds[3],
+    )
+
+
+def _observe_prepared_resampling_call(result: Any) -> Any:
+    """Return an already-observed legacy resampling result."""
+    return result
+
+
+def resampling_step_gpu(  # noqa: PLR0913
+    particles: Any,
+    required_release_counts: Any,
+    buffers: ResamplingBuffers,
+    *,
+    radius_cubed_relative_error: float = 1.0,
+    mean_radius_relative_error: float = 1.0,
+    surface_relative_error: float = 1.0,
+    diversity_absolute_error: float = 1.0,
+) -> Any:
+    """Apply deterministic fixed-capacity P2 equal-weight remapping in place."""
+    return _observe_prepared_resampling_call(
+        _enqueue_prepared_resampling_call(
+            _prepare_resampling_step_gpu(
+                particles,
+                required_release_counts,
+                buffers,
+                radius_cubed_relative_error=radius_cubed_relative_error,
+                mean_radius_relative_error=mean_radius_relative_error,
+                surface_relative_error=surface_relative_error,
+                diversity_absolute_error=diversity_absolute_error,
+            )
+        )
+    )
+
+
+def _prepare_representative_volume_scaling_step_gpu(  # noqa: C901
+    particles: Any,
+    provisional_source_demand: Any,
+    scaling_required: Any,
+    requested_scale: Any,
+    minimum_scale: Any,
+    minimum_volume: Any,
+    resolved_scale: Any,
+) -> _PreparedRepresentativeVolumeScalingCall:
+    """Prepare a private P4 scaling call with pinned caller-owned arrays."""
+    if not _is_warp_array_like(provisional_source_demand):
+        raise TypeError("provisional_source_demand must be a Warp array")
+    if not _is_warp_array_like(scaling_required):
+        raise TypeError("scaling_required must be a Warp array")
+    if not _is_warp_array_like(requested_scale):
+        raise TypeError("requested_scale must be a Warp array")
+    if not _is_warp_array_like(minimum_scale):
+        raise TypeError("minimum_scale must be a Warp array")
+    if not _is_warp_array_like(minimum_volume):
+        raise TypeError("minimum_volume must be a Warp array")
+    if not _is_warp_array_like(resolved_scale):
+        raise TypeError("resolved_scale must be a Warp array")
+    masses = _field(particles, "masses")
+    if not _is_warp_array_like(masses) or masses.ndim != 3:
+        raise ValueError("masses must be a rank-3 Warp array")
+    if masses.dtype != wp.float64:
+        raise ValueError("masses must have dtype float64")
+    _require_contiguous_array(masses, "masses")
+    b, n, s = tuple(masses.shape)
+    if n == 0 or s == 0:
+        raise ValueError("particle dimensions must be positive")
+    device = masses.device
+    concentration = _field(particles, "concentration")
+    charge = _field(particles, "charge")
+    density = _field(particles, "density")
+    volume = _field(particles, "volume")
+    _validate_array(
+        concentration, "concentration", 2, (b, n), wp.float64, device
+    )
+    _validate_array(charge, "charge", 2, (b, n), wp.float64, device)
+    _validate_array(density, "density", 1, (s,), wp.float64, device)
+    _validate_array(volume, "volume", 1, (b,), wp.float64, device)
+    sidecars = (
+        provisional_source_demand,
+        scaling_required,
+        requested_scale,
+        minimum_scale,
+        minimum_volume,
+        resolved_scale,
+    )
+    schemas = (
+        ("provisional_source_demand", wp.float64),
+        ("scaling_required", wp.int32),
+        ("requested_scale", wp.float64),
+        ("minimum_scale", wp.float64),
+        ("minimum_volume", wp.float64),
+        ("resolved_scale", wp.float64),
+    )
+    for (name, dtype), value in zip(schemas, sidecars, strict=True):
+        _validate_array(value, name, 1, (b,), dtype, device)
+    all_arrays = [masses, concentration, charge, density, volume, *sidecars]
+    for index, left in enumerate(all_arrays):
+        for right in all_arrays[index + 1 :]:
+            if _ranges_overlap(left, right):
+                raise ValueError(
+                    "representative scaling arrays must not overlap"
+                )
+    return _PreparedRepresentativeVolumeScalingCall(
+        particles,
+        provisional_source_demand,
+        scaling_required,
+        requested_scale,
+        minimum_scale,
+        minimum_volume,
+        resolved_scale,
+    )
+
+
+def _enqueue_prepared_representative_volume_scaling_call(
+    prepared: _PreparedRepresentativeVolumeScalingCall,
+) -> tuple[Any, Any, Any]:
+    """Execute the pinned representative-volume scaling operation."""
+    return _execute_representative_volume_scaling_step_gpu(
+        prepared.particles,
+        prepared.provisional_source_demand,
+        prepared.scaling_required,
+        prepared.requested_scale,
+        prepared.minimum_scale,
+        prepared.minimum_volume,
+        prepared.resolved_scale,
+    )
+
+
+def _observe_prepared_representative_volume_scaling_call(
+    result: tuple[Any, Any, Any],
+) -> tuple[Any, Any, Any]:
+    """Return the already-observed legacy representative-scaling result."""
+    return result
+
+
+def representative_volume_scaling_step_gpu(  # noqa: PLR0913
+    particles: Any,
+    provisional_source_demand: Any,
+    scaling_required: Any,
+    requested_scale: Any,
+    minimum_scale: Any,
+    minimum_volume: Any,
+    resolved_scale: Any,
+) -> tuple[Any, Any, Any]:
+    """Apply P4 scaling to selected Warp particle-container rows in place."""
+    return _observe_prepared_representative_volume_scaling_call(
+        _enqueue_prepared_representative_volume_scaling_call(
+            _prepare_representative_volume_scaling_step_gpu(
+                particles,
+                provisional_source_demand,
+                scaling_required,
+                requested_scale,
+                minimum_scale,
+                minimum_volume,
+                resolved_scale,
+            )
+        )
+    )

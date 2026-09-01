@@ -560,6 +560,82 @@ class ResidentNucleationAdapter:
     provides no acquisition, transfer, synchronization, or recovery.
     """
 
+    def prepare(self, request: object) -> _PreparedResidentProcessBinding:
+        """Pin an exact resident nucleation request before its one launch.
+
+        This concrete-only boundary validates resident and published-resource
+        identity before resolving a kernel.  It neither enters a scheduler token
+        nor acquires, replaces, transfers, synchronizes, or inspects payload
+        state.  Production delegates to nucleation's private prepare/enqueue
+        seam; a replaced public resolver remains a one-call compatibility path
+        for dependency-injection tests.
+
+        Args:
+            request: Exact resident nucleation request to validate and bind.
+
+        Returns:
+            A frozen binding whose execution issues the already prepared call.
+
+        Raises:
+            TypeError: If ``request`` is not the exact request carrier.
+            ValueError: If session or published-resource identity has drifted.
+        """
+        if type(request) is not ResidentNucleationRequest:
+            raise TypeError(
+                "request must be an exact ResidentNucleationRequest."
+            )
+        request.registry.validate_pinned_session(request.session)
+        request.registry.validate_nucleation_resources(
+            request.session, request.resources
+        )
+        step = _get_nucleation_step_gpu()
+        from particula.gpu.kernels import nucleation_step_gpu as supported_step
+
+        call_kwargs = dict(
+            scratch=request.resources.scratch,
+            finalized_demand=request.resources.finalized_demand,
+            diagnostics=request.resources.diagnostics,
+            exhaustion_controls=request.exhaustion_controls,
+            exhaustion_buffers=request.resources.exhaustion,
+            temperature=None,
+            saturation=None,
+            environment=request.session.environment,
+        )
+        call_args = (
+            request.session.particles,
+            request.session.gas,
+            request.config,
+            request.time_step,
+        )
+        if step is not supported_step:
+            return _PreparedResidentProcessBinding(
+                None,
+                lambda _: step(*call_args, **call_kwargs),
+            )
+        from particula.gpu.kernels.nucleation import (
+            _enqueue_prepared_nucleation_call,
+            _prepare_nucleation_step_gpu,
+        )
+
+        prepared = _prepare_nucleation_step_gpu(
+            cast(Any, call_args[0]),
+            cast(Any, call_args[1]),
+            cast(Any, call_args[2]),
+            cast(Any, call_args[3]),
+            scratch=cast(Any, call_kwargs["scratch"]),
+            finalized_demand=cast(Any, call_kwargs["finalized_demand"]),
+            diagnostics=cast(Any, call_kwargs["diagnostics"]),
+            exhaustion_controls=cast(Any, call_kwargs["exhaustion_controls"]),
+            exhaustion_buffers=cast(Any, call_kwargs["exhaustion_buffers"]),
+            temperature=cast(Any, call_kwargs["temperature"]),
+            saturation=cast(Any, call_kwargs["saturation"]),
+            environment=cast(Any, call_kwargs["environment"]),
+        )
+        return _PreparedResidentProcessBinding(
+            prepared,
+            _enqueue_prepared_nucleation_call,
+        )
+
     def execute(self, request: object) -> object:
         """Validate and delegate one nucleation request without altering result.
 
@@ -579,26 +655,4 @@ class ResidentNucleationAdapter:
         Direct-kernel exceptions and mutations propagate without adapter retry,
         rollback, recovery, transfer, or synchronization.
         """
-        if type(request) is not ResidentNucleationRequest:
-            raise TypeError(
-                "request must be an exact ResidentNucleationRequest."
-            )
-        request.registry.validate_pinned_session(request.session)
-        request.registry.validate_nucleation_resources(
-            request.session, request.resources
-        )
-        step = _get_nucleation_step_gpu()
-        return step(
-            request.session.particles,
-            request.session.gas,
-            request.config,
-            request.time_step,
-            scratch=request.resources.scratch,
-            finalized_demand=request.resources.finalized_demand,
-            diagnostics=request.resources.diagnostics,
-            exhaustion_controls=request.exhaustion_controls,
-            exhaustion_buffers=request.resources.exhaustion,
-            temperature=None,
-            saturation=None,
-            environment=request.session.environment,
-        )
+        return self.prepare(request).execute()

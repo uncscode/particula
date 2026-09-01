@@ -4,13 +4,94 @@ from __future__ import annotations
 
 from dataclasses import replace
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import numpy.testing as npt
 import pytest
 
 pytestmark = [pytest.mark.warp, pytest.mark.gpu_parity]
+
+
+def test_resampling_wrapper_delegates_through_prepared_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The public resampling wrapper enqueues its exact prepared record."""
+    from particula.gpu.kernels import exhaustion as exhaustion_module
+
+    particles = object()
+    required_release_counts = object()
+    buffers = object()
+    prepared = object()
+    result = object()
+    calls: list[tuple[tuple[object, ...], dict[str, float]]] = []
+
+    def prepare(*args: object, **kwargs: float) -> object:
+        calls.append((args, kwargs))
+        return prepared
+
+    monkeypatch.setattr(
+        exhaustion_module, "_prepare_resampling_step_gpu", prepare
+    )
+    monkeypatch.setattr(
+        exhaustion_module,
+        "_enqueue_prepared_resampling_call",
+        lambda value: result
+        if value is prepared
+        else pytest.fail("wrong call"),
+    )
+
+    assert (
+        exhaustion_module.resampling_step_gpu(
+            particles,
+            required_release_counts,
+            cast(Any, buffers),
+            radius_cubed_relative_error=0.1,
+            mean_radius_relative_error=0.2,
+            surface_relative_error=0.3,
+            diversity_absolute_error=0.4,
+        )
+        is result
+    )
+    assert calls == [
+        (
+            (particles, required_release_counts, buffers),
+            {
+                "radius_cubed_relative_error": 0.1,
+                "mean_radius_relative_error": 0.2,
+                "surface_relative_error": 0.3,
+                "diversity_absolute_error": 0.4,
+            },
+        )
+    ]
+
+
+def test_representative_scaling_wrapper_delegates_through_prepared_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The public scaling wrapper enqueues its exact prepared record."""
+    from particula.gpu.kernels import exhaustion as exhaustion_module
+
+    arguments = tuple(object() for _ in range(7))
+    prepared = object()
+    result = (object(), object(), object())
+    monkeypatch.setattr(
+        exhaustion_module,
+        "_prepare_representative_volume_scaling_step_gpu",
+        lambda *args: prepared,
+    )
+    monkeypatch.setattr(
+        exhaustion_module,
+        "_enqueue_prepared_representative_volume_scaling_call",
+        lambda value: result
+        if value is prepared
+        else pytest.fail("wrong call"),
+    )
+
+    assert (
+        exhaustion_module.representative_volume_scaling_step_gpu(*arguments)
+        is result
+    )
 
 
 def _warp():

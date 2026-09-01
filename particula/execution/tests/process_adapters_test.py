@@ -519,6 +519,43 @@ def test_nucleation_adapter_delegates_all_published_sidecars_once(
 
 
 @pytest.mark.warp
+def test_nucleation_adapter_prepare_uses_private_prepared_seam(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test production preparation resolves the concrete private seam once."""
+    session = _session()
+    registry = _registry(session)
+    resources = registry.acquire_nucleation()
+    request = ResidentNucleationRequest(
+        session, registry, resources, object(), object(), object()
+    )
+    prepared = object()
+    calls: list[tuple[str, object]] = []
+
+    def prepare(*_args: object, **_kwargs: object) -> object:
+        calls.append(("prepare", _args[0]))
+        return prepared
+
+    def enqueue(value: object) -> object:
+        calls.append(("enqueue", value))
+        return session.particles
+
+    import particula.gpu.kernels.nucleation as nucleation_module
+
+    monkeypatch.setattr(
+        nucleation_module, "_prepare_nucleation_step_gpu", prepare
+    )
+    monkeypatch.setattr(
+        nucleation_module, "_enqueue_prepared_nucleation_call", enqueue
+    )
+
+    binding = ResidentNucleationAdapter().prepare(request)
+    assert calls == [("prepare", session.particles)]
+    assert binding.execute() is session.particles
+    assert calls == [("prepare", session.particles), ("enqueue", prepared)]
+
+
+@pytest.mark.warp
 @pytest.mark.parametrize(
     ("adapter", "candidate_request"),
     [

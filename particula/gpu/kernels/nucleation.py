@@ -2896,7 +2896,7 @@ def _commit_nucleation_p5(
     return True
 
 
-def nucleation_step_gpu(
+def _execute_nucleation_step_gpu(
     particles: Any,
     gas: Any,
     config: NucleationConfig,
@@ -2990,3 +2990,155 @@ def nucleation_step_gpu(
     )
     _commit_nucleation_p5(preflight, exhaustion_buffers, p4_storage)
     return particles, gas
+
+
+@dataclass(frozen=True)
+class _PreparedNucleationCall:
+    """Pin one private direct-nucleation request for deferred execution.
+
+    The record retains caller-owned containers, sidecars, controls, and direct
+    environment inputs by identity.  It intentionally owns no payload snapshot:
+    the established direct implementation remains authoritative for reading live
+    device payloads, translating errors, and defining the post-writer rollback
+    boundary.
+    """
+
+    particles: Any
+    gas: Any
+    config: NucleationConfig
+    time_step: Any
+    scratch: NucleationScratchBuffers
+    finalized_demand: NucleationFinalizedDemandBuffers
+    diagnostics: NucleationDiagnosticBuffers
+    exhaustion_controls: NucleationExhaustionControls
+    exhaustion_buffers: NucleationExhaustionBuffers
+    temperature: Any | None
+    saturation: Any | None
+    environment: Any | None
+
+
+def _prepare_nucleation_step_gpu(
+    particles: Any,
+    gas: Any,
+    config: NucleationConfig,
+    time_step: Any,
+    *,
+    scratch: NucleationScratchBuffers,
+    finalized_demand: NucleationFinalizedDemandBuffers,
+    diagnostics: NucleationDiagnosticBuffers,
+    exhaustion_controls: NucleationExhaustionControls,
+    exhaustion_buffers: NucleationExhaustionBuffers,
+    temperature: Any | None = None,
+    saturation: Any | None = None,
+    environment: Any | None = None,
+) -> _PreparedNucleationCall:
+    """Prepare a private nucleation call and pin all supplied references.
+
+    This concrete-only seam deliberately does not create a public API or copy
+    mutable Warp payload values.  The paired enqueue/observe helpers preserve
+    the legacy direct boundary's validation ordering and writer semantics.
+    """
+    if not isinstance(config, NucleationConfig):
+        raise TypeError("config must be a NucleationConfig.")
+    normalized_time_step = _real(time_step, "time_step")
+    if not isinstance(scratch, NucleationScratchBuffers):
+        raise ValueError("scratch must be NucleationScratchBuffers.")
+    if not isinstance(finalized_demand, NucleationFinalizedDemandBuffers):
+        raise ValueError(
+            "finalized_demand must be NucleationFinalizedDemandBuffers."
+        )
+    if not isinstance(diagnostics, NucleationDiagnosticBuffers):
+        raise ValueError("diagnostics must be NucleationDiagnosticBuffers.")
+    if not isinstance(exhaustion_controls, NucleationExhaustionControls):
+        raise ValueError("controls must be NucleationExhaustionControls.")
+    exhaustion_controls.__post_init__()
+    if not isinstance(exhaustion_buffers, NucleationExhaustionBuffers):
+        raise ValueError(
+            "exhaustion_buffers must be NucleationExhaustionBuffers."
+        )
+    return _PreparedNucleationCall(
+        particles,
+        gas,
+        config,
+        normalized_time_step,
+        scratch,
+        finalized_demand,
+        diagnostics,
+        exhaustion_controls,
+        exhaustion_buffers,
+        temperature,
+        saturation,
+        environment,
+    )
+
+
+def _enqueue_prepared_nucleation_call(
+    prepared: _PreparedNucleationCall,
+) -> tuple[Any, Any]:
+    """Run one pinned direct nucleation call against live device payloads.
+
+    The legacy implementation performs the device launches and bounded status
+    observations.  It preserves the existing no-rollback guarantee once an
+    exhaustion primitive or P5 writer may have launched.
+    """
+    return _execute_nucleation_step_gpu(
+        prepared.particles,
+        prepared.gas,
+        prepared.config,
+        prepared.time_step,
+        scratch=prepared.scratch,
+        finalized_demand=prepared.finalized_demand,
+        diagnostics=prepared.diagnostics,
+        exhaustion_controls=prepared.exhaustion_controls,
+        exhaustion_buffers=prepared.exhaustion_buffers,
+        temperature=prepared.temperature,
+        saturation=prepared.saturation,
+        environment=prepared.environment,
+    )
+
+
+def _observe_prepared_nucleation_call(
+    result: tuple[Any, Any],
+) -> tuple[Any, Any]:
+    """Return the direct call result after its legacy observer has run."""
+    return result
+
+
+def nucleation_step_gpu(
+    particles: Any,
+    gas: Any,
+    config: NucleationConfig,
+    time_step: Any,
+    *,
+    scratch: NucleationScratchBuffers,
+    finalized_demand: NucleationFinalizedDemandBuffers,
+    diagnostics: NucleationDiagnosticBuffers,
+    exhaustion_controls: NucleationExhaustionControls,
+    exhaustion_buffers: NucleationExhaustionBuffers,
+    temperature: Any | None = None,
+    saturation: Any | None = None,
+    environment: Any | None = None,
+) -> tuple[Any, Any]:
+    """Execute one fixed-capacity direct-Warp nucleation step.
+
+    This public boundary is intentionally the narrow ``prepare → enqueue →
+    observe`` composition.  Its private records remain concrete-module-only.
+    """
+    return _observe_prepared_nucleation_call(
+        _enqueue_prepared_nucleation_call(
+            _prepare_nucleation_step_gpu(
+                particles,
+                gas,
+                config,
+                time_step,
+                scratch=scratch,
+                finalized_demand=finalized_demand,
+                diagnostics=diagnostics,
+                exhaustion_controls=exhaustion_controls,
+                exhaustion_buffers=exhaustion_buffers,
+                temperature=temperature,
+                saturation=saturation,
+                environment=environment,
+            )
+        )
+    )

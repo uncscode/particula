@@ -2,6 +2,7 @@
 
 from dataclasses import FrozenInstanceError
 from types import SimpleNamespace
+from typing import Any, cast
 
 import numpy as np
 import pytest
@@ -39,6 +40,50 @@ if wp.is_cuda_available():
     _DEVICE_CASES.append(
         pytest.param("cuda:0", marks=pytest.mark.cuda, id="cuda")
     )
+
+
+def test_nucleation_wrapper_delegates_through_prepared_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The public nucleation wrapper enqueues its exact prepared record."""
+    prepared = object()
+    result = (object(), object())
+    arguments = (object(), object(), object(), object())
+    sidecars = {
+        "scratch": object(),
+        "finalized_demand": object(),
+        "diagnostics": object(),
+        "exhaustion_controls": object(),
+        "exhaustion_buffers": object(),
+        "temperature": object(),
+        "saturation": object(),
+        "environment": object(),
+    }
+    calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
+
+    def prepare(*args: object, **kwargs: object) -> object:
+        calls.append((args, kwargs))
+        return prepared
+
+    monkeypatch.setattr(
+        nucleation_module, "_prepare_nucleation_step_gpu", prepare
+    )
+    monkeypatch.setattr(
+        nucleation_module,
+        "_enqueue_prepared_nucleation_call",
+        lambda value: result
+        if value is prepared
+        else pytest.fail("wrong call"),
+    )
+
+    assert (
+        nucleation_module.nucleation_step_gpu(
+            *cast(tuple[Any, ...], arguments),
+            **cast(dict[str, Any], sidecars),
+        )
+        is result
+    )
+    assert calls == [(arguments, sidecars)]
 
 
 def _state(
