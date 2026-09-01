@@ -191,7 +191,19 @@ class _PreparedCondensationCall:
     """Retain validated state and device operations for one enqueue.
 
     Setup owns validation, normalization, and fallback allocation. The enqueue
-    phase uses only these retained references for its four device substeps.
+    phase uses only these retained references for its four device substeps. The
+    record is private because it captures implementation-specific Warp
+    callables and scratch layouts rather than a public execution protocol.
+
+    Attributes:
+        particles: Validated resident Warp particle container.
+        gas: Validated resident Warp gas container.
+        thermodynamics: Validated thermodynamic refresh configuration.
+        total_mass_transfer: Whole-call finalized-transfer accumulator.
+        work_mass_transfer: Raw-proposal workspace reused by each substep.
+        dimensions: Fixed ``(n_boxes, n_particles, n_species)`` shape.
+        device: Active Warp device for all retained arrays.
+        substep_time_step: Equal duration of each of four substeps [s].
     """
 
     particles: Any
@@ -2518,7 +2530,29 @@ def _prepare_condensation_step_gpu(  # noqa: C901
 def _enqueue_prepared_condensation_call(
     prepared: _PreparedCondensationCall,
 ) -> tuple[Any, Any]:
-    """Enqueue the bound four-substep device sequence without setup work."""
+    """Enqueue the bound four-substep device sequence without setup work.
+
+    This helper is the device-only half of the preparation boundary. It uses
+    only references retained by ``prepared`` and therefore performs no input
+    validation, normalization, fallback allocation, host readback,
+    synchronization, or resource lookup. The call clears supplied output
+    accumulators once, then executes the existing refresh, proposal, P2
+    finalization, particle update, gas coupling, and diagnostic sequence four
+    times.
+
+    Args:
+        prepared: Fully validated call record returned by
+            ``_prepare_condensation_step_gpu``.
+
+    Returns:
+        A tuple containing the resident particle container and the accumulated
+        finalized mass-transfer buffer, both retained by the prepared record.
+
+    Raises:
+        ValueError: If a freshly generated proposal or prospective committed
+            state fails the existing runtime finiteness checks. Earlier
+            completed substeps are not rolled back.
+    """
     p = prepared
     n_boxes, n_particles, n_species = p.dimensions
     wp.launch(
@@ -2701,7 +2735,44 @@ def condensation_step_gpu(
     energy_transfer: Any | None = None,
     thermal_work: Any | None = None,
 ) -> tuple[Any, Any]:
-    """Validate a direct call, then enqueue its prepared device sequence."""
+    """Validate a direct call, then enqueue its prepared device sequence.
+
+    Preparation performs the complete read-only public preflight and resolves
+    all fallback storage. Only after preparation succeeds does this function
+    enqueue the four equal condensation substeps. The return values and
+    caller-owned buffer identities are unchanged from the direct condensation
+    API.
+
+    Args:
+        particles: GPU-resident particle data container.
+        gas: GPU-resident gas data container.
+        temperature: Direct scalar or per-box Warp temperature [K], or ``None``
+            when ``environment`` supplies it.
+        pressure: Direct scalar or per-box Warp pressure [Pa], or ``None`` when
+            ``environment`` supplies it.
+        time_step: Total condensation duration [s].
+        surface_tension: Optional per-species surface tension [N/m].
+        mass_accommodation: Optional per-species accommodation coefficients.
+        diffusion_coefficient_vapor: Optional vapor diffusion coefficients
+            [m²/s].
+        mass_transfer: Optional caller-owned total-transfer output buffer.
+        environment: Optional device-resident environment container.
+        thermodynamics: Required thermodynamic vapor-pressure configuration.
+        activity_surface: Optional activity and surface-tension sidecar.
+        scratch_buffers: Optional reusable condensation scratch sidecar.
+        latent_heat: Optional per-species latent heat [J/kg].
+        energy_transfer: Optional caller-owned energy output [J].
+        thermal_work: Optional validated but unused thermal-work sidecar.
+
+    Returns:
+        A tuple ``(particles, total_mass_transfer)``. The particle container is
+        returned by identity, and supplied total-transfer storage is also
+        returned by identity.
+
+    Raises:
+        ValueError: If preflight rejects the containers, inputs, sidecars, or
+            output ownership, or if a post-launch runtime validation fails.
+    """
     return _enqueue_prepared_condensation_call(
         _prepare_condensation_step_gpu(
             particles,

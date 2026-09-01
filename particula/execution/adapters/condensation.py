@@ -658,14 +658,35 @@ class WarpCondensationExecutionState:
 
 @dataclass(frozen=True)
 class _PreparedWarpCondensationBinding:
-    """Retain one validated Warp condensation call for device enqueue."""
+    """Retain one validated Warp condensation call for device enqueue.
+
+    The binding keeps the exact selected state, prepared kernel record, and
+    enqueue delegate together so repeated execution cannot silently replace
+    caller-owned resident resources. It is concrete-module-only and does not
+    perform validation, allocation, transfer, or synchronization itself.
+
+    Attributes:
+        state: Exact selected Warp execution state retained by identity.
+        prepared: Private kernel record produced during preparation.
+        enqueue: Private device-only enqueue callable.
+    """
 
     state: WarpCondensationExecutionState
     prepared: Any
     enqueue: Any
 
     def execute(self) -> tuple[Any, Any]:
-        """Enqueue the retained kernel call without repeating setup."""
+        """Enqueue the retained kernel call without repeating setup.
+
+        Returns:
+            The direct-kernel result, normally the resident particle container
+            and finalized total-transfer buffer.
+
+        Raises:
+            ValueError: If the already-prepared device sequence encounters an
+                existing runtime validation failure. Post-launch rollback is
+                not provided.
+        """
         return self.enqueue(self.prepared)
 
 
@@ -720,9 +741,10 @@ def _get_condensation_step_gpu() -> Any:
             _prepare_condensation_step_gpu(*args, **kwargs)
         )
 
-    execute_prepared.prepare = _prepare_condensation_step_gpu
-    execute_prepared.enqueue = _enqueue_prepared_condensation_call
-    return execute_prepared
+    prepared_executor = cast(Any, execute_prepared)
+    prepared_executor.prepare = _prepare_condensation_step_gpu
+    prepared_executor.enqueue = _enqueue_prepared_condensation_call
+    return prepared_executor
 
 
 class CPUCondensationExecutionAdapter:
