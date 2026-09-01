@@ -2134,7 +2134,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     validate_charge_finite: bool = False,
     turbulent_dissipation: float | Any | None = None,
     fluid_density: float | Any | None = None,
-) -> tuple[Any, Any, Any]:
+) -> _PreparedCoagulationCall:
     """Execute one direct, particle-resolved Warp coagulation timestep.
 
     This low-level API is not a CPU strategy-composition or ``Runnable`` API.

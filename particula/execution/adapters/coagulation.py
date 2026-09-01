@@ -825,13 +825,13 @@ class ResidentBrownianCoagulationExecutionAdapter:
 
         call_args = (
             request.particles,
-            request.temperature,
-            request.pressure,
-            request.time_step,
-            request.volume,
+            cast(Any, request.temperature),
+            cast(Any, request.pressure),
+            cast(object, request.time_step),
+            cast(Any, request.volume),
         )
-        call_kwargs = dict(
-            rng_seed=request.rng_seed,
+        call_kwargs: dict[str, Any] = dict(
+            rng_seed=cast(int, request.rng_seed),
             collision_pairs=request.collision_pairs,
             n_collisions=request.n_collisions,
             rng_states=request.rng_states,

@@ -12,7 +12,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from numbers import Integral
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from particula.execution.gpu_session import ResidentSession
 
@@ -270,8 +270,8 @@ class ResidentDilutionAdapter:
         call_args = (
             request.session.particles,
             request.session.gas,
-            request.coefficient,
-            request.time_step,
+            cast(Any, request.coefficient),
+            cast(float, request.time_step),
         )
         if dilution_step_gpu is not supported_step:
             return _PreparedResidentProcessBinding(

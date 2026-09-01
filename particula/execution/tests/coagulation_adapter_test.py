@@ -1764,7 +1764,11 @@ def test_resident_adapter_prepares_then_enqueues_native_coagulation_once(
     assert kwargs["environment"] is environment
     assert enqueue_calls == [prepared]
     assert result.backend_result is not None
-    assert result.backend_result.value.particles is particles
+    backend_result = cast(
+        coagulation_adapter.WarpBrownianCoagulationResult,
+        result.backend_result.value,
+    )
+    assert backend_result.particles is particles
 
 
 def assert_binding(
