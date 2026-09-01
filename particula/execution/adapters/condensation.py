@@ -656,6 +656,19 @@ class WarpCondensationExecutionState:
         return self.state.backend_payload
 
 
+@dataclass(frozen=True)
+class _PreparedWarpCondensationBinding:
+    """Retain one validated Warp condensation call for device enqueue."""
+
+    state: WarpCondensationExecutionState
+    prepared: Any
+    enqueue: Any
+
+    def execute(self) -> tuple[Any, Any]:
+        """Enqueue the retained kernel call without repeating setup."""
+        return self.enqueue(self.prepared)
+
+
 def _validate_time_step(time_step: object) -> None:
     """Validate a non-boolean, finite, nonnegative real time step.
 
@@ -707,6 +720,8 @@ def _get_condensation_step_gpu() -> Any:
             _prepare_condensation_step_gpu(*args, **kwargs)
         )
 
+    execute_prepared.prepare = _prepare_condensation_step_gpu
+    execute_prepared.enqueue = _enqueue_prepared_condensation_call
     return execute_prepared
 
 
@@ -782,6 +797,59 @@ class WarpCondensationExecutionAdapter:
     native kernel tuple without reconstructing it.
     """
 
+    def prepare(
+        self, state: WarpCondensationExecutionState
+    ) -> _PreparedWarpCondensationBinding:
+        """Validate and bind one resident state for repeated device enqueues.
+
+        Args:
+            state: Exact selected Warp P3 execution state.
+
+        Returns:
+            A concrete binding retaining the prepared kernel record and enqueue
+            delegate by identity.
+
+        Raises:
+            TypeError: If ``state`` or its time step has an invalid type.
+            ValueError: If controls, profile, or selected sidecars are invalid.
+            ImportError: If the optional Warp kernel cannot be imported.
+        """
+        if type(state) is not WarpCondensationExecutionState:
+            raise TypeError("state must be a WarpCondensationExecutionState.")
+        _validate_time_step(state.time_step)
+        p2_state = state.state
+        configuration = p2_state.config.configuration
+        require_condensation_profile(Backend.WARP, configuration)
+        _validate_selected_warp_sidecars(p2_state, configuration)
+        condensation_step_gpu = _get_condensation_step_gpu()
+        prepare = getattr(condensation_step_gpu, "prepare", None)
+        enqueue = getattr(condensation_step_gpu, "enqueue", None)
+        call_args = (
+            p2_state.particles,
+            p2_state.gas,
+            None,
+            None,
+            state.time_step,
+        )
+        call_kwargs = dict(
+            mass_transfer=p2_state.mass_transfer,
+            environment=p2_state.environment,
+            thermodynamics=p2_state.thermodynamics,
+            activity_surface=p2_state.activity_surface,
+            scratch_buffers=p2_state.scratch_buffers,
+            latent_heat=p2_state.latent_heat,
+            energy_transfer=p2_state.energy_transfer,
+            thermal_work=p2_state.thermal_work,
+        )
+        if prepare is None or enqueue is None:
+            return _PreparedWarpCondensationBinding(
+                state,
+                None,
+                lambda _: condensation_step_gpu(*call_args, **call_kwargs),
+            )
+        prepared = prepare(*call_args, **call_kwargs)
+        return _PreparedWarpCondensationBinding(state, prepared, enqueue)
+
     def execute(self, state: ExecutionState) -> ExecutionResult:
         """Execute one exact Warp P3 state with no post-launch recovery.
 
@@ -805,29 +873,8 @@ class WarpCondensationExecutionAdapter:
             ImportError: If the optional Warp kernel cannot be imported after
                 successful preflight.
         """
-        if type(state) is not WarpCondensationExecutionState:
-            raise TypeError("state must be a WarpCondensationExecutionState.")
-        _validate_time_step(state.time_step)
-        p2_state = state.state
-        configuration = p2_state.config.configuration
-        require_condensation_profile(Backend.WARP, configuration)
-        _validate_selected_warp_sidecars(p2_state, configuration)
-        condensation_step_gpu = _get_condensation_step_gpu()
-        value = condensation_step_gpu(
-            p2_state.particles,
-            p2_state.gas,
-            None,
-            None,
-            state.time_step,
-            mass_transfer=p2_state.mass_transfer,
-            environment=p2_state.environment,
-            thermodynamics=p2_state.thermodynamics,
-            activity_surface=p2_state.activity_surface,
-            scratch_buffers=p2_state.scratch_buffers,
-            latent_heat=p2_state.latent_heat,
-            energy_transfer=p2_state.energy_transfer,
-            thermal_work=p2_state.thermal_work,
-        )
+        binding = self.prepare(cast(WarpCondensationExecutionState, state))
+        value = binding.execute()
         return ExecutionResult(
             state,
             (),
