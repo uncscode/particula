@@ -23,10 +23,11 @@
   - Rationale: Existing kernels and scheduler consume host scalars, and E8-F3
     has not defined a stable control-array schema.
   - Evidence:
-    - `particula/execution/resident_scheduler.py:443` - Current duration agreement
-      is enforced across host scalar request values.
-    - `.opencode/plans/sections/features/E8-F2/architecture_design.md:63` - Python
-      scalar changes require a new prepared record.
+    - `particula.execution.resident_scheduler._validate_resident_durations()`
+      (called by `_validate_complete_resident_timestep_metadata`) enforces
+      duration agreement across host scalar request values.
+    - `architecture_design.md` — **Data / API / Workflow Changes**, “Dynamic
+      controls” - Python scalar changes require a new prepared record.
   - Resolved by: plan-question-resolver
 
 - [x] Can selected wall-loss logical lanes be frozen as one reusable device
@@ -36,8 +37,8 @@
   - Rationale: The current adapter allocates the selected-lane array at dispatch,
     but reusable capture-lifetime storage belongs to the registry track.
   - Evidence:
-    - `particula/execution/process_adapters.py:319` - Partial wall-loss dispatch
-      currently creates a new Warp selected-box array.
+    - `particula.execution.process_adapters.ResidentWallLossAdapter._enqueue_selected()`
+      - Partial wall-loss dispatch creates a private Warp selected-box array.
     - `.opencode/plans/sections/features/E8-F3/architecture_design.md:5` - E8-F3
       establishes the registry as capture storage authority.
   - Resolved by: plan-question-resolver
@@ -52,8 +53,8 @@
   - Rationale: P5 spans three independent process families, while P6 and P7 each
     represent one deliberate semantic or integration boundary.
   - Evidence:
-    - `.opencode/plans/sections/features/E8-F2/phase_details.md:50` - P5 combines
-      coagulation, dilution, wall loss, selected lanes, and persistent RNG.
+    - `phase_details.md` — **E8-F2-P5** - P5 combines coagulation, dilution,
+      wall loss, selected lanes, and persistent RNG.
     - `.opencode/plans/templates/feature/phase_details.md:3` - Feature phases
       target one reviewable approximately 100-LOC production change.
   - Resolved by: plan-question-resolver

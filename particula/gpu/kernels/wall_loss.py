@@ -1157,19 +1157,26 @@ def _charged_rectangular_wall_loss_remove_selected(
 
 @dataclass(frozen=True)
 class _PreparedWallLossCall:
-    """Freeze all setup state required by one wall-loss enqueue.
+    """Privately freeze all setup state required by one wall-loss enqueue.
+
+    Launch arguments and device retain exact references established during
+    preparation, so later container-attribute rebinding cannot redirect a
+    writer. Validation, normalization, RNG setup, and allocation precede
+    enqueue; enqueue never rereads container attributes.
 
     Attributes:
         particles: Caller-owned particle container returned by the operation.
         launch_kernel: Selected native kernel, or ``None`` for a no-op.
         launch_dim: Frozen launch dimensions for the selected kernel.
         launch_inputs: Frozen kernel arguments, including caller-owned fields.
+        device: Frozen Warp device used for the selected launch.
     """
 
     particles: Any
     launch_kernel: Any | None
     launch_dim: Any
     launch_inputs: tuple[Any, ...]
+    device: Any
 
 
 def _prepare_wall_loss_step_gpu(
@@ -1184,7 +1191,7 @@ def _prepare_wall_loss_step_gpu(
     initialize_rng: bool = False,
     environment: Any | None = None,
 ) -> _PreparedWallLossCall:
-    """Apply direct neutral or charged wall loss to eligible fixed slots.
+    """Privately prepare direct neutral or charged wall loss for fixed slots.
 
     The configuration supports particle-resolved neutral and charged wall loss.
     Charged nonzero slots compose private P2 image enhancement and P3 signed
@@ -1195,10 +1202,11 @@ def _prepare_wall_loss_step_gpu(
     temperature [K], pressure [Pa], and ``time_step`` [s]. A charged rectangular
     electric-field vector is caller-owned read-only storage; only charged
     rectangular execution reads its three lanes.
-    After frozen P3 preflight, positive-time calls evaluate neutral coefficients
-    for usable slots, apply survival probability ``exp(-k * time_step)``, and
-    clear every mass lane, concentration, and charge for removed slots. Zero
-    time is a post-preflight write-free no-op.
+    The matching enqueue helper evaluates neutral coefficients for usable slots
+    in positive-time calls after frozen P3 preflight. It applies survival
+    probability ``exp(-k * time_step)`` and clears every mass lane,
+    concentration, and charge for removed slots. Zero time is a post-preflight
+    write-free no-op.
 
     Omitted ``rng_states`` uses a private per-call sidecar initialized from
     ``rng_seed`` after successful positive-time preflight. A supplied
@@ -1228,7 +1236,7 @@ def _prepare_wall_loss_step_gpu(
             combined with direct ``temperature`` or ``pressure`` inputs.
 
     Returns:
-        The identical ``particles`` object. Private RNG state is not returned.
+        A private frozen call record for the matching enqueue helper.
 
     Raises:
         TypeError: If the configuration, scalar charged input, time step, or
@@ -1253,7 +1261,7 @@ def _prepare_wall_loss_step_gpu(
     )
     _validate_rng(rng_seed, rng_states, initialize_rng, n_boxes, device)
     if validated_time_step == 0.0:
-        return _PreparedWallLossCall(particles, None, 0, ())
+        return _PreparedWallLossCall(particles, None, 0, (), device)
 
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature,
@@ -1348,11 +1356,15 @@ def _prepare_wall_loss_step_gpu(
         launch_kernel,
         n_boxes,
         launch_inputs,
+        device,
     )
 
 
 def _enqueue_prepared_wall_loss_call(prepared: _PreparedWallLossCall) -> Any:
     """Issue only the frozen wall-loss launch, without setup or validation.
+
+    This private enqueue boundary performs no allocation, normalization, RNG
+    initialization, or resource lookup.
 
     Args:
         prepared: Validated call record produced by
@@ -1366,7 +1378,7 @@ def _enqueue_prepared_wall_loss_call(prepared: _PreparedWallLossCall) -> Any:
             prepared.launch_kernel,
             dim=prepared.launch_dim,
             inputs=prepared.launch_inputs,
-            device=prepared.particles.masses.device,
+            device=prepared.device,
         )
     return prepared.particles
 
@@ -1401,6 +1413,124 @@ def wall_loss_step_gpu(
             initialize_rng=initialize_rng,
             environment=environment,
         )
+    )
+
+
+def _prepare_selected_wall_loss_call(
+    particles: Any,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    time_step: float | Any,
+    *,
+    config: NeutralWallLossConfig,
+    rng_seed: int,
+    rng_states: Any,
+    selected_boxes: Any,
+    environment: Any | None = None,
+) -> _PreparedWallLossCall:
+    """Prepare a frozen selected-lane wall-loss launch."""
+    validated_config = _validate_config(config)
+    n_boxes, device = _validate_particle_schema(particles)
+    if (
+        not _is_warp_array_like(selected_boxes)
+        or selected_boxes.dtype != wp.int32
+        or selected_boxes.ndim != 1
+        or selected_boxes.shape[0] == 0
+        or str(selected_boxes.device) != str(device)
+    ):
+        raise ValueError(
+            "selected_boxes must be a nonempty same-device int32 array."
+        )
+    _validate_charged_rectangular_field(validated_config, device)
+    _validate_particle_values(particles)
+    validated_time_step = _validate_time_step(time_step)
+    validate_environment_inputs(
+        temperature,
+        pressure,
+        environment,
+        n_boxes,
+        device,
+        caller_name="wall_loss_selected_boxes_step_gpu",
+    )
+    _validate_rng(rng_seed, rng_states, False, n_boxes, device)
+    if validated_time_step == 0.0:
+        return _PreparedWallLossCall(particles, None, 0, (), device)
+    temperature_array, pressure_array = _ensure_environment_arrays(
+        temperature,
+        pressure,
+        environment,
+        n_boxes,
+        device,
+        caller_name="wall_loss_selected_boxes_step_gpu",
+    )
+    temperature_array = _normalize_execution_environment_array(
+        temperature_array, n_boxes
+    )
+    pressure_array = _normalize_execution_environment_array(
+        pressure_array, n_boxes
+    )
+    n_particles = particles.masses.shape[1]
+    n_species = particles.masses.shape[2]
+    dimensions = validated_config.chamber_dimensions or (0.0, 0.0, 0.0)
+    common = (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        temperature_array,
+        pressure_array,
+        validated_time_step,
+        float(validated_config.wall_eddy_diffusivity),
+    )
+    if validated_config.mode == "neutral":
+        launch_kernel = _wall_loss_remove_selected
+        launch_inputs = common + (
+            float(validated_config.chamber_radius or 0.0),
+            float(dimensions[0]),
+            float(dimensions[1]),
+            float(dimensions[2]),
+            0 if validated_config.geometry == "spherical" else 1,
+            n_particles,
+            n_species,
+            rng_states,
+            int(rng_seed),
+            0,
+            selected_boxes,
+        )
+    elif validated_config.geometry == "spherical":
+        launch_kernel = _charged_spherical_wall_loss_remove_selected
+        launch_inputs = common + (
+            float(validated_config.chamber_radius or 0.0),
+            float(validated_config.wall_potential),
+            float(validated_config.wall_electric_field),
+            n_particles,
+            n_species,
+            rng_states,
+            int(rng_seed),
+            0,
+            selected_boxes,
+        )
+    else:
+        launch_kernel = _charged_rectangular_wall_loss_remove_selected
+        launch_inputs = common + (
+            float(dimensions[0]),
+            float(dimensions[1]),
+            float(dimensions[2]),
+            float(validated_config.wall_potential),
+            validated_config.wall_electric_field,
+            n_particles,
+            n_species,
+            rng_states,
+            int(rng_seed),
+            0,
+            selected_boxes,
+        )
+    return _PreparedWallLossCall(
+        particles,
+        launch_kernel,
+        selected_boxes.shape[0],
+        launch_inputs,
+        device,
     )
 
 

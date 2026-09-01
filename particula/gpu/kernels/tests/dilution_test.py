@@ -14,6 +14,29 @@ import pytest
 pytestmark = pytest.mark.warp
 
 
+def test_public_dilution_wrapper_delegates_through_prepared_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The public dilution wrapper preserves prepare-then-enqueue delegation."""
+    from particula.gpu.kernels import dilution as dilution_module
+
+    prepared = object()
+    result = (object(), object())
+    arguments = (object(), object(), object(), object())
+    monkeypatch.setattr(
+        dilution_module, "_prepare_dilution_step_gpu", lambda *args: prepared
+    )
+    monkeypatch.setattr(
+        dilution_module,
+        "_enqueue_prepared_dilution_call",
+        lambda value: result
+        if value is prepared
+        else pytest.fail("wrong call"),
+    )
+
+    assert dilution_module.dilution_step_gpu(*arguments) is result
+
+
 def _warp():
     """Import Warp at test runtime to preserve marker deselection."""
     return pytest.importorskip("warp")

@@ -33,7 +33,7 @@ enqueue_prepared_timestep()                 DEVICE ENQUEUE ONLY
   -> nucleation -> diagnostics
                                      |
                                      v
-                              capture_end / replay (E8-F1)
+                               capture_end / replay (E8-F4)
 ```
 
 Each public direct-kernel API remains a `validate/normalize -> private enqueue`
@@ -115,6 +115,24 @@ The concrete adapter's private `_PreparedWarpCondensationBinding` holds this
 kernel record for its exact resident binding and delegates directly to enqueue.
 No public exports, scheduler dispatch, checkpoint/resource schema, or physics
 semantics were modified.
+
+## P5 Implementation Record
+
+Issue #1556 adds frozen private `_PreparedCoagulationCall`,
+`_PreparedDilutionCall`, and `_PreparedWallLossCall` records beside their
+direct-kernel owners. Each public wrapper retains its existing validation and
+setup behavior, then delegates to its enqueue helper. Enqueue uses only frozen
+references and existing device launches; it does not revalidate, normalize,
+allocate, initialize RNG, look up resources, read back, synchronize, fall back,
+or re-enter the public wrapper.
+
+`_PreparedResidentBrownianCoagulationBinding` and the private
+`_PreparedResidentProcessBinding` retain exact resident preflight results and
+the corresponding kernel prepared call. Their `execute()` paths invoke the
+retained delegate only. Resident coagulation remains Brownian-only and uses the
+existing persistent RNG sidecar without reset; wall loss preserves all, partial,
+and empty selected-lane behavior. No public export, scheduler composition,
+checkpoint/resource schema, or physics behavior changed.
 
 ## Data / API / Workflow Changes
 

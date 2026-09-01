@@ -30,7 +30,12 @@
   `particula/execution/adapters/condensation.py` describe setup ownership,
   retained identities, enqueue-only restrictions, and the post-launch failure
   boundary. The focused kernel and adapter docstring validation covers these
-  local concrete-only descriptions.
+   local concrete-only descriptions.
+- Completed for P5 (#1556): no user-facing documentation or export update was
+  required because the change is a private refactor with unchanged direct and
+  resident contracts. Local documentation in the changed kernel and adapter
+  modules records frozen-reference setup/enqueue ownership and the writer
+  failure boundary; this plan records the implementation disposition.
 - Add or update documentation contract assertions under `particula/tests/` or
   `particula/execution/tests/` when user-facing contract text changes.
 - Update all E8-F2 plan sections and parent E8 child/dependency status during

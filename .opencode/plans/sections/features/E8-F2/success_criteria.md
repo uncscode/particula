@@ -83,4 +83,16 @@ E8-F8 own benchmark and profiling evidence.
 - [x] Private `_PreparedWarpCondensationBinding` retains the concrete resident
   adapter's prepared call without changing public APIs, scheduler dispatch,
   checkpoint/resource schemas, or condensation physics. Changed local
-  Google-style docstrings are covered by focused docstring validation.
+   Google-style docstrings are covered by focused docstring validation.
+
+## P5 Completion Evidence (#1556)
+
+- [x] Private prepared records retain validated coagulation, dilution, and
+  wall-loss launch inputs; their public direct wrappers preserve existing
+  validation, identity, no-op, selected-lane, RNG, and physics contracts.
+- [x] Resident Brownian coagulation and dilution/wall-loss adapter bindings pin
+  their exact prepared calls after existing resident preflight and invoke only
+  retained enqueue delegates.
+- [x] Focused regression coverage exercises frozen references, direct/prepared
+  delegation, identity forwarding, no-op behavior, persistent no-reset RNG, and
+  all/partial/empty wall-loss selection while trapping enqueue-time setup work.

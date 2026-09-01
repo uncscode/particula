@@ -80,17 +80,28 @@
     ownership and failure boundaries; focused docstring validation covers the
     changed concrete modules without requiring a public-documentation update.
 
-- [ ] **E8-F2-P5:** Add prepared coagulation, dilution, and wall-loss enqueue paths with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Bind Brownian controls, dilution inputs, wall-loss geometry and selected
-    lanes, and persistent RNG resources during setup, then expose fixed private
-    enqueue sequences.
+- [x] **E8-F2-P5:** Add prepared coagulation, dilution, and wall-loss enqueue paths with unit tests
+  - Issue: #1556 | Size: S | Status: Implemented
+  - Delivered: Added private frozen prepared calls and enqueue helpers in
+    `particula/gpu/kernels/{coagulation,dilution,wall_loss}.py`. Public direct
+    wrappers preserve validation, allocation, identity, no-op, RNG, selected-lane,
+    and physics contracts while delegating through the private seam.
+  - Resident adapters: Added `_PreparedResidentBrownianCoagulationBinding` and
+    private process bindings that retain exact preflight results and invoke only
+    their pinned enqueue delegates. Partial wall-loss setup freezes selected
+    physical lanes, its device array, and the selected-box delegate before
+    enqueue; enqueue does not redo setup or reread mutable references. Resident
+    coagulation remains Brownian-only; dilution and wall loss retain exact
+    primary and selected-lane behavior.
   - Files: `particula/gpu/kernels/{coagulation,dilution,wall_loss}.py`,
     `particula/execution/adapters/coagulation.py`,
     `particula/execution/process_adapters.py`, adjacent tests
-  - Tests: Numerical/direct-wrapper regression, selected/all/empty wall-loss
-    lanes, RNG advances without reseeding, zero-work behavior, stable output
-    identities, and forbidden-host-operation spies.
+  - Evidence: Focused kernel and adapter tests cover direct-wrapper/prepared
+    delegation, frozen references, Brownian persistent RNG/no-reset behavior,
+    dilution no-ops and identities, wall-loss all/partial/empty selections, and
+    enqueue-only operation traps.
+  - Documentation: No public documentation change was required; local private
+    seam documentation records ownership and failure boundaries.
 
 - [ ] **E8-F2-P6:** Add prepared nucleation and exhaustion enqueue path with unit tests
   - Issue: TBD | Size: S | Status: Not Started

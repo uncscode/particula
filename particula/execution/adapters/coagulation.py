@@ -773,7 +773,11 @@ class ResidentBrownianCoagulationExecutionState:
 
 @dataclass(frozen=True)
 class _PreparedResidentBrownianCoagulationBinding:
-    """Retain one preflighted resident coagulation enqueue by identity.
+    """Privately retain one preflighted resident coagulation enqueue.
+
+    The prepared record freezes direct-kernel references after resident binding
+    preflight. ``execute`` only invokes the retained enqueue delegate; it does
+    not repeat validation, allocation, normalization, lookup, or RNG setup.
 
     Attributes:
         state: Resident request and resource binding validated during setup.

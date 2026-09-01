@@ -36,10 +36,12 @@
   `_PreparedWarpCondensationBinding` in
   `particula/execution/adapters/condensation.py`; enqueue uses retained
   references only and adds no scheduler/resource/checkpoint integration (#1555).
-- [ ] Refactor resident Brownian coagulation, dilution, and selected/all-box wall
+- [x] Refactor resident Brownian coagulation, dilution, and selected/all-box wall
   loss into validated setup plus private enqueue in
   `particula/gpu/kernels/{coagulation,dilution,wall_loss}.py` and their resident
-  adapters.
+  adapters (#1556). Private frozen calls/bindings retain validated references;
+  public wrappers, exports, process behavior, and persistent-RNG semantics are
+  unchanged.
 - [ ] Refactor nucleation and nested exhaustion operations into a prepared,
   fixed launch sequence in `particula/gpu/kernels/{nucleation,exhaustion}.py`.
 - [ ] Compose all prepared operations in canonical schedule order without
@@ -65,6 +67,10 @@
 - [x] Extend focused condensation kernel and adapter tests for prepared setup,
   enqueue-only restrictions, direct-wrapper compatibility, retained identities,
   and four-substep behavior (#1555).
+- [x] Extend focused coagulation, dilution, wall-loss, and resident-adapter tests
+  for prepared setup/enqueue delegation, frozen references, selected lanes,
+  no-op behavior, output/RNG identity, and forbidden enqueue-time setup work
+  (#1556).
 - [ ] Add a CUDA-gated capture smoke test using the repository's established
   pass-or-clean-skip helper; Warp CPU must explicitly remain uncaptured.
 - [ ] Run focused tests without coverage, then the untargeted

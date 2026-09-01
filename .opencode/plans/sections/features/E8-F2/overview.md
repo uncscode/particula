@@ -17,9 +17,10 @@ An exact resident request can be prepared once, proving that its device,
 shapes, process order, resource identities, controls, and physical inputs are
 valid. The resulting concrete-only prepared plan then enqueues the same fixed
 process sequence with no host readback, allocation, resource acquisition,
-fallback, or dynamic scheduling. E8-F1 can capture that sequence, E8-F3 can pin
-every required reusable buffer, and ordinary direct callers retain their
-current validation and error contracts.
+fallback, or dynamic scheduling. E8-F1 owns the lifecycle, signature, and
+admission metadata; E8-F4 owns native capture and replay; E8-F3 can pin every
+required reusable buffer; and ordinary direct callers retain their current
+validation and error contracts.
 
 ## Implemented P1 Boundary
 
@@ -69,6 +70,25 @@ refresh/readback, synchronization, or resource lookup.
 The concrete resident adapter adds `_PreparedWarpCondensationBinding`, which
 retains the prepared kernel call and its exact adapter binding. No public API,
 scheduler behavior, checkpoint/resource schema, or condensation physics changed.
+
+## Implemented P5 Boundary
+
+Issue #1556 adds private prepared-call and enqueue seams for direct GPU
+coagulation, dilution, and wall loss in
+`particula.gpu.kernels.{coagulation,dilution,wall_loss}`. Their public
+`*_step_gpu` wrappers continue to prepare and enqueue with their existing
+validation, return, identity, no-op, physics, selected-lane, and persistent-RNG
+contracts. The frozen calls retain the validated containers, controls,
+sidecars, launch choices, and selected lanes; enqueue uses those retained
+references without setup work.
+
+The resident Brownian coagulation adapter and dilution/wall-loss process
+adapters now retain private prepared bindings and delegate only to the pinned
+enqueue helper after their existing resident preflight. Partial wall-loss setup
+also resolves physical lanes, allocates its selected-box array, and retains the
+private delegate once; its enqueue never looks up, validates, allocates, or
+rereads lanes or device references. Public APIs and exports, scheduler
+composition, resource/checkpoint schemas, and process physics remain unchanged.
 
 ## User Stories
 

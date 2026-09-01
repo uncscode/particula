@@ -39,9 +39,12 @@ Coverage thresholds and the normal collection policy must not be lowered.
   host refresh/readback, synchronization, or resource lookup. Local docstrings
   document the setup/enqueue ownership and failure boundary; no user-facing
   documentation validation was required.
-- **P5:** Extend coagulation, dilution, wall-loss, and process-adapter tests for
-  public-wrapper parity, persistent RNG advancement without reset, selected-box
-  reuse, zero-work behavior, and forbidden enqueue-time host operations.
+- **P5 (implemented, #1556):** focused coagulation, dilution, wall-loss, and
+  resident-adapter tests cover prepared/direct-wrapper delegation, frozen
+  references, stable returned and sidecar identities, dilution no-ops,
+  persistent Brownian RNG advancement without reset, and wall-loss all/partial/
+  empty selected lanes. Enqueue-only traps verify that prepared dispatch does
+  not repeat setup work or re-enter public wrappers.
 - **P6:** Extend nucleation and exhaustion tests for admission/no-admission,
   activation, resampling precedence, scaling fallback, conservation, fixed
   capacity, failure gating, and fully supplied scratch/status storage.

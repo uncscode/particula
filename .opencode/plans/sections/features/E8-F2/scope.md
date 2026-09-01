@@ -32,7 +32,14 @@ concrete-only and retain exact caller-owned resident identities.
   `particula/execution/adapters/condensation.py`. Public validation, fallback
   allocation, output identity, and four-substep gas-coupled P2 physics remain
   unchanged; no public, scheduler, checkpoint, or resource-schema change was
-  introduced.
+   introduced.
+- **Completed P5 (#1556):** split direct coagulation, dilution, and wall-loss
+  calls into private prepared/enqueue seams in their owning kernel modules, and
+  retain them through concrete resident coagulation/process adapter bindings.
+  Existing public validation, return/identity, no-op, selected-lane, and
+  persistent-RNG contracts remain unchanged; resident coagulation remains
+  Brownian-only. No public, scheduler, checkpoint, resource-schema, or physics
+  change was introduced.
 - Define immutable prepared-enqueue carriers tied to the exact E8-F1 capture
   lifecycle signature and `ResidentSimulationRequest`.
 - Move repeated scheduler metadata checks and executor construction into an

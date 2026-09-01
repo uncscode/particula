@@ -61,6 +61,90 @@ def test_prepare_wall_loss_rejects_invalid_config_before_enqueue() -> None:
         )
 
 
+def test_prepared_wall_loss_pins_device_without_container_reread(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Enqueue launches against the device pinned by preparation."""
+    from particula.gpu.kernels import wall_loss as wall_loss_module
+    from particula.gpu.kernels.wall_loss import (
+        _enqueue_prepared_wall_loss_call,
+        _prepare_wall_loss_step_gpu,
+    )
+
+    source_particles = _particles()
+    particles = SimpleNamespace(
+        masses=source_particles.masses,
+        concentration=source_particles.concentration,
+        charge=source_particles.charge,
+        density=source_particles.density,
+        volume=source_particles.volume,
+    )
+    prepared = _prepare_wall_loss_step_gpu(
+        particles, 298.15, 101325.0, 1.0, config=_config()
+    )
+    expected_device = prepared.device
+    launches: list[object] = []
+    original_launch = wall_loss_module.wp.launch
+
+    def record_launch(*args: object, **kwargs: object) -> object:
+        launches.append(kwargs["device"])
+        return original_launch(*args, **kwargs)
+
+    monkeypatch.setattr(wall_loss_module.wp, "launch", record_launch)
+    particles.masses = object()
+
+    assert _enqueue_prepared_wall_loss_call(prepared) is particles
+    assert launches == [expected_device]
+
+
+def test_public_wall_loss_wrapper_delegates_through_prepared_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The compatibility wrapper retains prepare-then-enqueue delegation."""
+    from particula.gpu.kernels import wall_loss as wall_loss_module
+
+    particles = object()
+    time_step = object()
+    config = object()
+    prepared = object()
+    result = object()
+    calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
+
+    def prepare(*args: object, **kwargs: object) -> object:
+        calls.append((args, kwargs))
+        return prepared
+
+    monkeypatch.setattr(
+        wall_loss_module, "_prepare_wall_loss_step_gpu", prepare
+    )
+    monkeypatch.setattr(
+        wall_loss_module,
+        "_enqueue_prepared_wall_loss_call",
+        lambda value: result
+        if value is prepared
+        else pytest.fail("wrong call"),
+    )
+
+    assert (
+        wall_loss_module.wall_loss_step_gpu(
+            particles, None, None, time_step, config=cast(Any, config)
+        )
+        is result
+    )
+    assert calls == [
+        (
+            (particles, None, None, time_step),
+            {
+                "config": config,
+                "rng_seed": 0,
+                "rng_states": None,
+                "initialize_rng": False,
+                "environment": None,
+            },
+        )
+    ]
+
+
 def _config(geometry: str = "spherical"):
     """Build one valid neutral configuration for the selected geometry."""
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig

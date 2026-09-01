@@ -241,7 +241,11 @@ def _get_nucleation_step_gpu() -> Callable[..., object]:
 
 @dataclass(frozen=True)
 class _PreparedResidentProcessBinding:
-    """Keep one prepared process record and its enqueue delegate together.
+    """Privately keep one prepared process record and enqueue delegate together.
+
+    For prepared direct-kernel calls, the record freezes validated references
+    and ``execute`` only invokes the retained delegate. It performs no repeated
+    validation, allocation, normalization, lookup, or RNG setup.
 
     Attributes:
         prepared: Frozen direct-kernel preparation record, or adapter-local
@@ -255,6 +259,39 @@ class _PreparedResidentProcessBinding:
     def execute(self) -> object:
         """Enqueue the pinned native call without repeating adapter setup."""
         return self.enqueue(self.prepared)
+
+
+@dataclass(frozen=True)
+class _PreparedSelectedWallLossCall:
+    """Freeze private selected-lane wall-loss launch state at setup.
+
+    The selected physical lanes, device array, direct delegate, and all launch
+    references are established once. Enqueue only invokes ``delegate`` and
+    never looks up, validates, allocates, or rereads the request/session.
+    """
+
+    delegate: Callable[..., object]
+    particles: Any
+    time_step: object
+    config: object
+    rng_seed: object
+    rng_states: Any
+    selected_boxes: Any
+    environment: Any
+
+    def enqueue(self) -> object:
+        """Issue the frozen selected-lane call without setup work."""
+        return self.delegate(
+            self.particles,
+            None,
+            None,
+            self.time_step,
+            config=self.config,
+            rng_seed=self.rng_seed,
+            rng_states=self.rng_states,
+            selected_boxes=self.selected_boxes,
+            environment=self.environment,
+        )
 
 
 class ResidentDilutionAdapter:
@@ -368,10 +405,7 @@ class ResidentWallLossAdapter:
                 lambda particles: particles,
             )
         if len(enabled_logical_boxes) != request.session.dimensions.n_boxes:
-            return _PreparedResidentProcessBinding(
-                (request, enabled_logical_boxes),
-                lambda prepared: self._enqueue_selected(*prepared),
-            )
+            return self._prepare_selected(request, enabled_logical_boxes)
 
         wall_loss_step_gpu = _get_wall_loss_step_gpu()
         from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
@@ -429,12 +463,17 @@ class ResidentWallLossAdapter:
             _enqueue_prepared_wall_loss_call,
         )
 
-    def _enqueue_selected(
+    def _prepare_selected(
         self,
         request: ResidentWallLossRequest,
         enabled_logical_boxes: tuple[int, ...],
     ) -> object:
-        """Retain the legacy selected-lane dispatch for partial selections."""
+        """Prepare the complete private selected-lane launch once.
+
+        Selection validation, physical-lane resolution, device allocation, and
+        direct-boundary lookup all occur before the retained binding is
+        returned. Its execution is strictly enqueue-only.
+        """
         import warp as wp
 
         stream = request.session.metadata.stream
@@ -448,16 +487,44 @@ class ResidentWallLossAdapter:
             dtype=wp.int32,
             device=request.resources.rng_states.device,
         )
-        return _get_wall_loss_selected_boxes_step_gpu()(
+        selected_step = _get_wall_loss_selected_boxes_step_gpu()
+        from particula.gpu.kernels.wall_loss import (
+            _enqueue_prepared_wall_loss_call,
+            _prepare_selected_wall_loss_call,
+            wall_loss_selected_boxes_step_gpu,
+        )
+
+        # Keep dependency injection of the private selected-box seam usable in
+        # adapter tests without routing the production path through a wrapper.
+        if selected_step is not wall_loss_selected_boxes_step_gpu:
+            prepared = _PreparedSelectedWallLossCall(
+                selected_step,
+                request.session.particles,
+                request.time_step,
+                request.config,
+                request.rng_seed,
+                request.resources.rng_states,
+                selected_boxes,
+                request.session.environment,
+            )
+            return _PreparedResidentProcessBinding(
+                prepared,
+                lambda call: call.enqueue(),
+            )
+        prepared = _prepare_selected_wall_loss_call(
             request.session.particles,
             None,
             None,
             request.time_step,
             config=request.config,
-            rng_seed=request.rng_seed,
+            rng_seed=cast(int, request.rng_seed),
             rng_states=request.resources.rng_states,
             selected_boxes=selected_boxes,
             environment=request.session.environment,
+        )
+        return _PreparedResidentProcessBinding(
+            prepared,
+            _enqueue_prepared_wall_loss_call,
         )
 
     def execute(self, request: object) -> object:
@@ -477,7 +544,8 @@ class ResidentWallLossAdapter:
                 registry-pinned publication.
 
         An empty selection returns without resolving the kernel. For a partial
-        selection, direct dispatch receives a private selected-box launch set.
+        selection, preparation freezes a private selected-box launch set. The
+        retained binding executes only its already-resolved delegate.
         Direct-kernel exceptions and mutations propagate without adapter retry,
         rollback, recovery, transfer, or synchronization.
         """

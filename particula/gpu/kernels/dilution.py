@@ -315,10 +315,11 @@ def _validate_no_overlap(
 
 @dataclass(frozen=True)
 class _PreparedDilutionCall:
-    """Freeze one validated dilution launch without retaining containers.
+    """Privately freeze one validated dilution launch and its references.
 
     Enqueue uses only these pinned field references; replacing a container
-    attribute after preparation therefore cannot redirect a writer.
+    attribute after preparation therefore cannot redirect a writer. Validation,
+    normalization, and private allocation are complete before enqueue.
 
     Attributes:
         particles: Caller-owned particle container returned by the operation.
@@ -353,12 +354,12 @@ def _prepare_dilution_step_gpu(
     coefficient: float | Any,
     time_step: float,
 ) -> _PreparedDilutionCall:
-    """Apply GPU dilution after complete atomic entry-point preflight.
+    """Privately prepare GPU dilution after complete entry-point preflight.
 
     Arguments are positional in the order ``particles``, ``gas``,
     ``coefficient``, and ``time_step``. The coefficient ``alpha = Q / V`` has
-    SI units [s^-1], and ``time_step`` is in seconds. This function applies the
-    finite-step update ``c_new = c * exp(-alpha * time_step)`` in place.
+    SI units [s^-1], and ``time_step`` is in seconds. The matching private
+    enqueue helper applies ``c_new = c * exp(-alpha * time_step)`` in place.
 
     P3 retains P1's coefficient-input contract: a finite, nonnegative
     Python/NumPy real scalar or a caller-owned, active-device ``wp.float64``
@@ -391,7 +392,7 @@ def _prepare_dilution_step_gpu(
         time_step: Finite, nonnegative duration [s].
 
     Returns:
-        The identical ``(particles, gas)`` input objects after in-place decay.
+        A private frozen call record for the matching enqueue helper.
 
     Raises:
         TypeError: If a scalar coefficient or ``time_step`` is not a supported
@@ -491,6 +492,9 @@ def _enqueue_prepared_dilution_call(
     prepared: _PreparedDilutionCall,
 ) -> tuple[Any, Any]:
     """Issue only the frozen dilution launches for one prepared call.
+
+    This private enqueue boundary performs no validation, allocation,
+    normalization, or resource lookup.
 
     Args:
         prepared: Validated dilution record produced by

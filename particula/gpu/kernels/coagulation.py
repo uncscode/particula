@@ -2102,12 +2102,13 @@ def _ensure_volume_array(
 
 @dataclass(frozen=True)
 class _PreparedCoagulationCall:
-    """Freeze validated coagulation inputs and scratch for device enqueue.
+    """Privately freeze validated coagulation inputs and scratch for enqueue.
 
     The carrier stores the exact caller-owned fields, outputs, device, and
     selector arguments established during preparation. Enqueue therefore does
     not repeat validation, allocation, normalization, RNG initialization, or
-    resource lookup.
+    resource lookup. Rebinding a source-container attribute cannot redirect an
+    already prepared writer.
 
     Attributes:
         particles: Caller-owned particle container returned by the operation.
@@ -2153,9 +2154,11 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     turbulent_dissipation: float | Any | None = None,
     fluid_density: float | Any | None = None,
 ) -> _PreparedCoagulationCall:
-    """Prepare one direct, particle-resolved Warp coagulation timestep.
+    """Privately prepare one direct, particle-resolved Warp coagulation step.
 
-    This low-level API is not a CPU strategy-composition or ``Runnable`` API.
+    This private helper performs the public wrapper's validation, normalization,
+    allocation, and optional RNG initialization, then freezes launch references.
+    It is not a CPU strategy-composition or ``Runnable`` API.
     It supports only ``"particle_resolved"`` execution: omission selects
     Brownian; the executable singleton masks are ``1``, ``2``, ``4``, and ``8``;
     unordered two-way masks are ``3``, ``5``, ``6``, ``9``, ``10``, and ``12``;
@@ -2279,9 +2282,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
             and is ignored by non-turbulent masks.
 
     Returns:
-        Tuple containing ``particles`` after in-place coagulation, the
-        ``collision_pairs`` buffer for the step, and the ``n_collisions``
-        buffer with per-box accepted collision counts.
+        A private frozen call record for the matching enqueue helper.
 
     Raises:
         ValueError: If array shapes or devices mismatch expectations.
@@ -2603,6 +2604,9 @@ def _enqueue_prepared_coagulation_call(
     prepared: _PreparedCoagulationCall,
 ) -> tuple[Any, Any, Any]:
     """Issue only the frozen selector, apply, and compaction kernels.
+
+    This private enqueue boundary performs no validation, allocation,
+    normalization, RNG initialization, or resource lookup.
 
     Args:
         prepared: Validated call record produced by

@@ -127,6 +127,30 @@ if wp is not None:
 
 BROWNIAN_COAGULATION_MASK_INPUT_INDEX = 28
 
+
+def test_public_coagulation_wrapper_delegates_through_prepared_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The public coagulation wrapper preserves prepare-then-enqueue delegation."""
+    prepared = object()
+    result = (object(), object(), object())
+    arguments = (object(), object(), object(), object())
+    monkeypatch.setattr(
+        coagulation_module,
+        "_prepare_coagulation_step_gpu",
+        lambda *args, **kwargs: prepared,
+    )
+    monkeypatch.setattr(
+        coagulation_module,
+        "_enqueue_prepared_coagulation_call",
+        lambda value: result
+        if value is prepared
+        else pytest.fail("wrong call"),
+    )
+
+    assert coagulation_module.coagulation_step_gpu(*arguments) is result
+
+
 _TEST_BOLTZMANN_CONSTANT = wp.constant(wp.float64(constants.BOLTZMANN_CONSTANT))
 _TEST_ELEMENTARY_CHARGE = wp.constant(
     wp.float64(constants.ELEMENTARY_CHARGE_VALUE)

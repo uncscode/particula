@@ -398,6 +398,52 @@ def test_wall_loss_adapter_dispatches_selected_lanes_once(
 
 
 @pytest.mark.warp
+def test_wall_loss_partial_binding_does_no_setup_work_at_enqueue(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Partial execution uses the delegate and lanes frozen during preparation."""
+    session = _session(boxes=2)
+    registry = _registry(session)
+    resources = registry.acquire_wall_loss()
+    request = ResidentWallLossRequest(
+        session,
+        registry,
+        resources,
+        object(),
+        0,
+        enabled_box_indices=(0,),
+    )
+    calls: list[dict[str, object]] = []
+
+    def step(*_args: object, **kwargs: object) -> object:
+        calls.append(kwargs)
+        return session.particles
+
+    monkeypatch.setattr(
+        process_adapters, "_get_wall_loss_selected_boxes_step_gpu", lambda: step
+    )
+    binding = ResidentWallLossAdapter().prepare(request)
+    monkeypatch.setattr(
+        process_adapters,
+        "_get_wall_loss_selected_boxes_step_gpu",
+        lambda: pytest.fail("enqueue must not resolve the selected-box kernel"),
+    )
+    monkeypatch.setattr(
+        ResidentWallLossRequest,
+        "validate_enabled_box_indices",
+        lambda _request: pytest.fail(
+            "enqueue must not repeat selection validation"
+        ),
+    )
+
+    assert binding.execute() is session.particles
+    assert len(calls) == 1
+    np.testing.assert_array_equal(
+        cast(Any, calls[0]["selected_boxes"]).numpy(), [0]
+    )
+
+
+@pytest.mark.warp
 def test_wall_loss_selected_lanes_preserve_disabled_and_no_work_rng() -> None:
     """Only a selected lane with eligible work may advance its RNG word."""
     wp = pytest.importorskip("warp")
