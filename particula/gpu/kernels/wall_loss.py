@@ -1157,7 +1157,14 @@ def _charged_rectangular_wall_loss_remove_selected(
 
 @dataclass(frozen=True)
 class _PreparedWallLossCall:
-    """Freeze all setup state required by one wall-loss enqueue."""
+    """Freeze all setup state required by one wall-loss enqueue.
+
+    Attributes:
+        particles: Caller-owned particle container returned by the operation.
+        launch_kernel: Selected native kernel, or ``None`` for a no-op.
+        launch_dim: Frozen launch dimensions for the selected kernel.
+        launch_inputs: Frozen kernel arguments, including caller-owned fields.
+    """
 
     particles: Any
     launch_kernel: Any | None
@@ -1345,7 +1352,15 @@ def _prepare_wall_loss_step_gpu(
 
 
 def _enqueue_prepared_wall_loss_call(prepared: _PreparedWallLossCall) -> Any:
-    """Issue only the frozen wall-loss launch, without setup or validation."""
+    """Issue only the frozen wall-loss launch, without setup or validation.
+
+    Args:
+        prepared: Validated call record produced by
+            ``_prepare_wall_loss_step_gpu``.
+
+    Returns:
+        The pinned particle container.
+    """
     if prepared.launch_kernel is not None:
         wp.launch(
             prepared.launch_kernel,
@@ -1368,7 +1383,12 @@ def wall_loss_step_gpu(
     initialize_rng: bool = False,
     environment: Any | None = None,
 ) -> Any:
-    """Prepare then execute one direct neutral or charged wall-loss call."""
+    """Prepare and enqueue one direct neutral or charged wall-loss call.
+
+    Returns:
+        The identical caller-owned particle container after the asynchronous
+        wall-loss launch, or immediately for a valid no-op.
+    """
     return _enqueue_prepared_wall_loss_call(
         _prepare_wall_loss_step_gpu(
             particles,

@@ -2102,7 +2102,25 @@ def _ensure_volume_array(
 
 @dataclass(frozen=True)
 class _PreparedCoagulationCall:
-    """Freeze validated coagulation inputs and scratch for device enqueue."""
+    """Freeze validated coagulation inputs and scratch for device enqueue.
+
+    The carrier stores the exact caller-owned fields, outputs, device, and
+    selector arguments established during preparation. Enqueue therefore does
+    not repeat validation, allocation, normalization, RNG initialization, or
+    resource lookup.
+
+    Attributes:
+        particles: Caller-owned particle container returned by the operation.
+        masses: Frozen particle-mass array used by the apply kernel.
+        concentration: Frozen particle-concentration array.
+        charge: Frozen particle-charge array.
+        collision_pairs: Collision-pair output buffer.
+        n_collisions: Per-box collision-count output buffer.
+        n_boxes: Number of simulation boxes.
+        max_collisions: Effective collision capacity per box.
+        device: Active Warp device for all launches.
+        selector_inputs: Frozen arguments for the selector kernel.
+    """
 
     particles: Any
     masses: Any
@@ -2135,7 +2153,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     turbulent_dissipation: float | Any | None = None,
     fluid_density: float | Any | None = None,
 ) -> _PreparedCoagulationCall:
-    """Execute one direct, particle-resolved Warp coagulation timestep.
+    """Prepare one direct, particle-resolved Warp coagulation timestep.
 
     This low-level API is not a CPU strategy-composition or ``Runnable`` API.
     It supports only ``"particle_resolved"`` execution: omission selects
@@ -2584,7 +2602,17 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
 def _enqueue_prepared_coagulation_call(
     prepared: _PreparedCoagulationCall,
 ) -> tuple[Any, Any, Any]:
-    """Issue only the selector, apply, and compaction kernels for a call."""
+    """Issue only the frozen selector, apply, and compaction kernels.
+
+    Args:
+        prepared: Validated call record produced by
+            ``_prepare_coagulation_step_gpu``.
+
+    Returns:
+        The pinned particle container, collision-pair buffer, and
+        collision-count buffer, in the same order as the public direct-kernel
+        API.
+    """
     wp.launch(
         brownian_coagulation_kernel,
         dim=(prepared.n_boxes,),
@@ -2633,7 +2661,16 @@ def coagulation_step_gpu(  # noqa: C901
     turbulent_dissipation: float | Any | None = None,
     fluid_density: float | Any | None = None,
 ) -> tuple[Any, Any, Any]:
-    """Prepare then enqueue one direct particle-resolved coagulation step."""
+    """Prepare and enqueue one direct particle-resolved coagulation step.
+
+    This public wrapper preserves the direct API while keeping all validation,
+    allocation, and optional RNG initialization in the private preparation
+    phase. The enqueue phase uses only the resulting frozen call record.
+
+    Returns:
+        The particle container, collision-pair output, and per-box collision
+        counts returned by the direct kernel.
+    """
     return _enqueue_prepared_coagulation_call(
         _prepare_coagulation_step_gpu(
             particles,

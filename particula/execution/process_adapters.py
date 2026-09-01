@@ -241,7 +241,13 @@ def _get_nucleation_step_gpu() -> Callable[..., object]:
 
 @dataclass(frozen=True)
 class _PreparedResidentProcessBinding:
-    """Keep one prepared process record and its enqueue delegate together."""
+    """Keep one prepared process record and its enqueue delegate together.
+
+    Attributes:
+        prepared: Frozen direct-kernel preparation record, or adapter-local
+            no-op state.
+        enqueue: Callable that issues the already prepared native operation.
+    """
 
     prepared: Any
     enqueue: Callable[[Any], object]
@@ -260,7 +266,19 @@ class ResidentDilutionAdapter:
     """
 
     def prepare(self, request: object) -> _PreparedResidentProcessBinding:
-        """Validate resident ownership and prepare one pinned dilution call."""
+        """Validate resident ownership and prepare one pinned dilution call.
+
+        Args:
+            request: Exact resident dilution request to validate and bind.
+
+        Returns:
+            A binding whose execution reuses the validated direct-kernel state.
+
+        Raises:
+            TypeError: If ``request`` is not the exact request carrier.
+            ValueError: If the request session is not pinned by its registry or
+                direct-kernel preparation rejects its inputs.
+        """
         if type(request) is not ResidentDilutionRequest:
             raise TypeError("request must be an exact ResidentDilutionRequest.")
         request.registry.validate_pinned_session(request.session)
@@ -324,7 +342,19 @@ class ResidentWallLossAdapter:
     """
 
     def prepare(self, request: object) -> _PreparedResidentProcessBinding:
-        """Preflight resident ownership and prepare one wall-loss call."""
+        """Preflight resident ownership and prepare one wall-loss call.
+
+        Args:
+            request: Exact resident wall-loss request to validate and bind.
+
+        Returns:
+            A binding for the selected, all-box, or valid empty dispatch.
+
+        Raises:
+            TypeError: If ``request`` is not the exact request carrier.
+            ValueError: If the session or resource publication is stale, or
+                selection validation fails.
+        """
         if type(request) is not ResidentWallLossRequest:
             raise TypeError("request must be an exact ResidentWallLossRequest.")
         request.registry.validate_pinned_session(request.session)

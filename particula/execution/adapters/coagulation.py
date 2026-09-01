@@ -773,7 +773,13 @@ class ResidentBrownianCoagulationExecutionState:
 
 @dataclass(frozen=True)
 class _PreparedResidentBrownianCoagulationBinding:
-    """Retain one preflighted resident coagulation enqueue by identity."""
+    """Retain one preflighted resident coagulation enqueue by identity.
+
+    Attributes:
+        state: Resident request and resource binding validated during setup.
+        prepared: Frozen direct-kernel preparation record.
+        enqueue: Callable that issues the already prepared native operation.
+    """
 
     state: ResidentBrownianCoagulationExecutionState
     prepared: Any
@@ -797,7 +803,21 @@ class ResidentBrownianCoagulationExecutionAdapter:
     def prepare(
         self, state: ExecutionState
     ) -> _PreparedResidentBrownianCoagulationBinding:
-        """Preflight and freeze one resident Brownian kernel call."""
+        """Preflight and freeze one resident Brownian kernel call.
+
+        Args:
+            state: Exact resident Brownian state containing the pinned request
+                and published resource view.
+
+        Returns:
+            A binding that can enqueue the native call without repeating setup.
+
+        Raises:
+            TypeError: If ``state`` is not the exact resident state carrier.
+            ValueError: If reset is requested or a resident identity is stale
+                or inconsistent.
+            ImportError: If the optional direct Warp kernel is unavailable.
+        """
         if type(state) is not ResidentBrownianCoagulationExecutionState:
             raise TypeError(
                 "state must be a ResidentBrownianCoagulationExecutionState."

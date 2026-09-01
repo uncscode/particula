@@ -319,6 +319,19 @@ class _PreparedDilutionCall:
 
     Enqueue uses only these pinned field references; replacing a container
     attribute after preparation therefore cannot redirect a writer.
+
+    Attributes:
+        particles: Caller-owned particle container returned by the operation.
+        gas: Caller-owned gas container returned by the operation.
+        coefficient: Frozen per-box coefficient array, or ``None`` for a no-op.
+        time_step: Validated duration in seconds.
+        particle_concentration: Frozen particle concentration target.
+        gas_concentration: Frozen gas concentration target.
+        factors: Private factor array, or ``None`` for a no-op.
+        n_boxes: Number of simulation boxes.
+        n_particles: Number of particle slots per box.
+        n_gas_species: Number of gas species per box.
+        device: Active Warp device for the launches.
     """
 
     particles: Any
@@ -477,7 +490,15 @@ def _prepare_dilution_step_gpu(
 def _enqueue_prepared_dilution_call(
     prepared: _PreparedDilutionCall,
 ) -> tuple[Any, Any]:
-    """Issue only the frozen dilution launches for one prepared call."""
+    """Issue only the frozen dilution launches for one prepared call.
+
+    Args:
+        prepared: Validated dilution record produced by
+            ``_prepare_dilution_step_gpu``.
+
+    Returns:
+        The pinned particle and gas containers, unchanged in identity.
+    """
     if prepared.factors is None:
         return prepared.particles, prepared.gas
     wp.launch(
@@ -517,7 +538,7 @@ def dilution_step_gpu(
     coefficient: float | Any,
     time_step: float,
 ) -> tuple[Any, Any]:
-    """Apply GPU dilution after complete atomic entry-point preflight.
+    """Prepare and enqueue GPU dilution after complete entry-point preflight.
 
     This public wrapper preserves the direct API while the private prepared
     record isolates validation and allocation from device enqueue.
