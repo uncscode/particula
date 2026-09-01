@@ -153,10 +153,14 @@ def test_prepared_enqueue_uses_frozen_arrays_without_runtime_dispatch(
     session_particles = cast(Any, request.session.particles)
     session_gas = cast(Any, request.session.gas)
     session_particles.masses = wp.zeros(
-        binding.masses.shape, dtype=wp.float64, device=binding.device
+        cast(Any, binding.masses).shape,
+        dtype=wp.float64,
+        device=binding.device,
     )
     session_gas.concentration = wp.zeros(
-        binding.gas_concentration.shape, dtype=wp.float64, device=binding.device
+        cast(Any, binding.gas_concentration).shape,
+        dtype=wp.float64,
+        device=binding.device,
     )
 
     _enqueue_prepared_resident_communication(binding)

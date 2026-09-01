@@ -294,6 +294,7 @@ def setup_prepared_resident_communication(  # noqa: C901
             )
     boxes, slots, particle_species = particles.masses.shape
     gas_species = gas.concentration.shape[1]
+    communication_arguments: tuple[Any, ...]
     if mode is CommunicationTransportMode.GAS:
         communication_enqueue: Callable[..., object] = (
             _enqueue_prepared_resident_gas_communication

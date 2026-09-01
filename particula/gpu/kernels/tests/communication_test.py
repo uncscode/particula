@@ -222,7 +222,7 @@ def test_prepared_resident_equal_volumes_preserve_fields_and_statuses() -> None:
         changed.numpy().copy(),
     )
 
-    returned = _enqueue_prepared_resident_volume_evolution(
+    _enqueue_prepared_resident_volume_evolution(
         particles.volume,
         particles.concentration,
         gas.concentration,
@@ -233,7 +233,6 @@ def test_prepared_resident_equal_volumes_preserve_fields_and_statuses() -> None:
         particles.volume.device,
     )
 
-    assert returned is None
     for actual, expected in zip(
         (
             particles.volume.numpy(),
@@ -2188,7 +2187,7 @@ def test_prepared_resident_gas_enqueue_uses_pinned_work_and_status_arrays() -> (
     active = wp.array([0], dtype=wp.int32, device="cpu")
     map_data = configuration.communication_map
 
-    returned = _enqueue_prepared_resident_gas_communication(
+    _enqueue_prepared_resident_gas_communication(
         particles.volume,
         gas.concentration,
         2,
@@ -2206,7 +2205,6 @@ def test_prepared_resident_gas_enqueue_uses_pinned_work_and_status_arrays() -> (
     )
     wp.synchronize()
 
-    assert returned is None
     npt.assert_array_equal(invalid.numpy(), [0])
     npt.assert_array_equal(active.numpy(), [1])
     npt.assert_allclose(gas.concentration.numpy(), [[3.0], [2.0]])
@@ -2240,7 +2238,7 @@ def test_prepared_resident_particle_enqueue_uses_pinned_snapshots() -> None:
     initial_charge = wp.zeros((2, 1), dtype=wp.float64, device="cpu")
     map_data = configuration.communication_map
 
-    returned = _enqueue_prepared_resident_particle_communication(
+    _enqueue_prepared_resident_particle_communication(
         particles.masses,
         particles.concentration,
         particles.charge,
@@ -2266,7 +2264,6 @@ def test_prepared_resident_particle_enqueue_uses_pinned_snapshots() -> None:
     )
     wp.synchronize()
 
-    assert returned is None
     npt.assert_array_equal(invalid.numpy(), [0])
     npt.assert_array_equal(demand.numpy(), [1])
     npt.assert_allclose(particles.concentration.numpy(), [[1.0], [1.0]])
