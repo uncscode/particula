@@ -21,6 +21,7 @@ launched kernel failure is not promised.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from numbers import Real
 from typing import Any, cast
 
@@ -312,12 +313,33 @@ def _validate_no_overlap(
                 )
 
 
-def dilution_step_gpu(
+@dataclass(frozen=True)
+class _PreparedDilutionCall:
+    """Freeze one validated dilution launch without retaining containers.
+
+    Enqueue uses only these pinned field references; replacing a container
+    attribute after preparation therefore cannot redirect a writer.
+    """
+
+    particles: Any
+    gas: Any
+    coefficient: Any | None
+    time_step: float
+    particle_concentration: Any
+    gas_concentration: Any
+    factors: Any | None
+    n_boxes: int
+    n_particles: int
+    n_gas_species: int
+    device: Any
+
+
+def _prepare_dilution_step_gpu(
     particles: Any,
     gas: Any,
     coefficient: float | Any,
     time_step: float,
-) -> tuple[Any, Any]:
+) -> _PreparedDilutionCall:
     """Apply GPU dilution after complete atomic entry-point preflight.
 
     Arguments are positional in the order ``particles``, ``gas``,
@@ -415,7 +437,19 @@ def dilution_step_gpu(
         or normalized_time_step == 0.0
         or (not is_per_box_coefficient and scalar_coefficient == 0.0)
     ):
-        return particles, gas
+        return _PreparedDilutionCall(
+            particles,
+            gas,
+            None,
+            normalized_time_step,
+            particle_concentration,
+            gas_concentration,
+            None,
+            n_boxes,
+            n_particles,
+            gas_concentration.shape[1],
+            device,
+        )
 
     if not is_per_box_coefficient:
         normalized_coefficient = _normalize_coefficient(
@@ -425,25 +459,69 @@ def dilution_step_gpu(
         )
 
     factors = wp.empty(n_boxes, dtype=wp.float64, device=device)
+    return _PreparedDilutionCall(
+        particles,
+        gas,
+        normalized_coefficient,
+        normalized_time_step,
+        particle_concentration,
+        gas_concentration,
+        factors,
+        n_boxes,
+        n_particles,
+        gas_concentration.shape[1],
+        device,
+    )
+
+
+def _enqueue_prepared_dilution_call(
+    prepared: _PreparedDilutionCall,
+) -> tuple[Any, Any]:
+    """Issue only the frozen dilution launches for one prepared call."""
+    if prepared.factors is None:
+        return prepared.particles, prepared.gas
     wp.launch(
         _dilution_factors,
-        dim=n_boxes,
-        inputs=[normalized_coefficient, normalized_time_step, factors],
-        device=device,
+        dim=prepared.n_boxes,
+        inputs=[prepared.coefficient, prepared.time_step, prepared.factors],
+        device=prepared.device,
     )
-    if n_particles > 0:
+    if prepared.n_particles > 0:
         wp.launch(
             _apply_particle_dilution,
-            dim=(n_boxes, n_particles),
-            inputs=[particle_concentration, normalized_coefficient, factors],
-            device=device,
+            dim=(prepared.n_boxes, prepared.n_particles),
+            inputs=[
+                prepared.particle_concentration,
+                prepared.coefficient,
+                prepared.factors,
+            ],
+            device=prepared.device,
         )
-    n_gas_species = gas_concentration.shape[1]
-    if n_gas_species > 0:
+    if prepared.n_gas_species > 0:
         wp.launch(
             _apply_gas_dilution,
-            dim=(n_boxes, n_gas_species),
-            inputs=[gas_concentration, normalized_coefficient, factors],
-            device=device,
+            dim=(prepared.n_boxes, prepared.n_gas_species),
+            inputs=[
+                prepared.gas_concentration,
+                prepared.coefficient,
+                prepared.factors,
+            ],
+            device=prepared.device,
         )
-    return particles, gas
+    return prepared.particles, prepared.gas
+
+
+def dilution_step_gpu(
+    particles: Any,
+    gas: Any,
+    coefficient: float | Any,
+    time_step: float,
+) -> tuple[Any, Any]:
+    """Apply GPU dilution after complete atomic entry-point preflight.
+
+    This public wrapper preserves the direct API while the private prepared
+    record isolates validation and allocation from device enqueue.
+    """
+    return _enqueue_prepared_dilution_call(
+        _prepare_dilution_step_gpu(particles, gas, coefficient, time_step)
+    )

@@ -180,6 +180,66 @@ def test_dilution_adapter_delegates_exactly_once(
 
 
 @pytest.mark.warp
+def test_dilution_adapter_prepares_then_enqueues_supported_kernel_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Supported resident dilution freezes setup before its native enqueue."""
+    from particula.gpu.kernels import dilution as dilution_kernel
+    from particula.gpu.kernels import dilution_step_gpu
+
+    session = _session()
+    registry = _registry(session)
+    request = ResidentDilutionRequest(session, registry, object(), object())
+    prepared = object()
+    prepare_calls: list[tuple[object, ...]] = []
+    enqueue_calls: list[object] = []
+    result = object()
+
+    def prepare(*args: object) -> object:
+        """Record resident setup arguments without running a kernel."""
+        prepare_calls.append(args)
+        return prepared
+
+    def enqueue(value: object) -> object:
+        """Record the frozen setup record and return a native sentinel."""
+        enqueue_calls.append(value)
+        return result
+
+    monkeypatch.setattr(
+        process_adapters, "_get_dilution_step_gpu", lambda: dilution_step_gpu
+    )
+    monkeypatch.setattr(dilution_kernel, "_prepare_dilution_step_gpu", prepare)
+    monkeypatch.setattr(
+        dilution_kernel, "_enqueue_prepared_dilution_call", enqueue
+    )
+
+    assert ResidentDilutionAdapter().execute(request) is result
+    assert prepare_calls == [
+        (session.particles, session.gas, request.coefficient, request.time_step)
+    ]
+    assert enqueue_calls == [prepared]
+
+
+@pytest.mark.warp
+def test_wall_loss_adapter_exposes_prepared_binding_after_preflight() -> None:
+    """Resident wall loss prepares its validated binding before device enqueue."""
+    session = _session()
+    registry = _registry(session)
+    resources = registry.acquire_wall_loss()
+    request = ResidentWallLossRequest(
+        session,
+        registry,
+        resources,
+        object(),
+        0.0,
+    )
+
+    prepared = ResidentWallLossAdapter().prepare(request)
+
+    assert prepared is not None
+
+
+@pytest.mark.warp
 def test_wall_loss_adapter_delegates_published_rng_once(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

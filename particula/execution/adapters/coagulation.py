@@ -771,6 +771,19 @@ class ResidentBrownianCoagulationExecutionState:
         return self.request.backend_payload
 
 
+@dataclass(frozen=True)
+class _PreparedResidentBrownianCoagulationBinding:
+    """Retain one preflighted resident coagulation enqueue by identity."""
+
+    state: ResidentBrownianCoagulationExecutionState
+    prepared: Any
+    enqueue: Any
+
+    def execute(self) -> tuple[Any, Any, Any]:
+        """Enqueue the frozen native call without repeating setup."""
+        return self.enqueue(self.prepared)
+
+
 class ResidentBrownianCoagulationExecutionAdapter:
     """Dispatch one pre-acquired resident Brownian request by identity.
 
@@ -781,23 +794,10 @@ class ResidentBrownianCoagulationExecutionAdapter:
     inspect, transfer, or synchronize the stream.
     """
 
-    def execute(self, state: ExecutionState) -> ExecutionResult:
-        """Preflight bindings and dispatch one forced-no-reset kernel call.
-
-        Args:
-            state: Exact resident Brownian execution state.
-
-        Returns:
-            A result retaining the request and kernel result resources by
-            identity.
-
-        Raises:
-            TypeError: If ``state`` is not the exact resident execution state.
-            ValueError: If reset is requested or resident identities are stale
-                or inconsistent.
-            ImportError: If the optional direct Warp kernel is unavailable after
-                preflight.
-        """
+    def prepare(
+        self, state: ExecutionState
+    ) -> _PreparedResidentBrownianCoagulationBinding:
+        """Preflight and freeze one resident Brownian kernel call."""
         if type(state) is not ResidentBrownianCoagulationExecutionState:
             raise TypeError(
                 "state must be a ResidentBrownianCoagulationExecutionState."
@@ -821,12 +821,16 @@ class ResidentBrownianCoagulationExecutionAdapter:
                 "resident coagulation request does not match resources."
             )
         coagulation_step_gpu = _get_coagulation_step_gpu()
-        particles, pairs, counts = coagulation_step_gpu(
+        from particula.gpu.kernels import coagulation_step_gpu as supported_step
+
+        call_args = (
             request.particles,
             request.temperature,
             request.pressure,
             request.time_step,
             request.volume,
+        )
+        call_kwargs = dict(
             rng_seed=request.rng_seed,
             collision_pairs=request.collision_pairs,
             n_collisions=request.n_collisions,
@@ -834,6 +838,46 @@ class ResidentBrownianCoagulationExecutionAdapter:
             initialize_rng=False,
             environment=request.environment,
         )
+        if coagulation_step_gpu is not supported_step:
+            return _PreparedResidentBrownianCoagulationBinding(
+                state,
+                None,
+                lambda _: coagulation_step_gpu(*call_args, **call_kwargs),
+            )
+        from particula.gpu.kernels.coagulation import (
+            _enqueue_prepared_coagulation_call,
+            _prepare_coagulation_step_gpu,
+        )
+
+        prepared = _prepare_coagulation_step_gpu(*call_args, **call_kwargs)
+        return _PreparedResidentBrownianCoagulationBinding(
+            state,
+            prepared,
+            _enqueue_prepared_coagulation_call,
+        )
+
+    def execute(self, state: ExecutionState) -> ExecutionResult:
+        """Preflight bindings and dispatch one forced-no-reset kernel call.
+
+        Args:
+            state: Exact resident Brownian execution state.
+
+        Returns:
+            A result retaining the request and kernel result resources by
+            identity.
+
+        Raises:
+            TypeError: If ``state`` is not the exact resident execution state.
+            ValueError: If reset is requested or resident identities are stale
+                or inconsistent.
+            ImportError: If the optional direct Warp kernel is unavailable after
+                preflight.
+        """
+        binding = self.prepare(
+            cast(ResidentBrownianCoagulationExecutionState, state)
+        )
+        request = binding.state.request.state
+        particles, pairs, counts = binding.execute()
         result = WarpBrownianCoagulationResult(
             request, particles, pairs, counts
         )

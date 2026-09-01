@@ -1155,7 +1155,22 @@ def _charged_rectangular_wall_loss_remove_selected(
     )
 
 
-def wall_loss_step_gpu(
+@dataclass(frozen=True)
+class _PreparedWallLossCall:
+    """Freeze direct wall-loss call references for the private enqueue seam."""
+
+    particles: Any
+    temperature: Any
+    pressure: Any
+    time_step: Any
+    config: NeutralWallLossConfig
+    rng_seed: int
+    rng_states: Any | None
+    initialize_rng: bool
+    environment: Any | None
+
+
+def _wall_loss_step_gpu_impl(
     particles: Any,
     temperature: float | Any | None,
     pressure: float | Any | None,
@@ -1338,6 +1353,78 @@ def wall_loss_step_gpu(
             device=device,
         )
     return particles
+
+
+def _prepare_wall_loss_step_gpu(
+    particles: Any,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    time_step: float | Any,
+    *,
+    config: NeutralWallLossConfig,
+    rng_seed: int = 0,
+    rng_states: Any | None = None,
+    initialize_rng: bool = False,
+    environment: Any | None = None,
+) -> _PreparedWallLossCall:
+    """Retain one wall-loss call for the concrete prepare/enqueue boundary."""
+    # Preserve the earliest stable rejection at setup time. The legacy launch
+    # implementation retains the remaining established validation ordering.
+    _validate_config(config)
+    return _PreparedWallLossCall(
+        particles,
+        temperature,
+        pressure,
+        time_step,
+        config,
+        rng_seed,
+        rng_states,
+        initialize_rng,
+        environment,
+    )
+
+
+def _enqueue_prepared_wall_loss_call(prepared: _PreparedWallLossCall) -> Any:
+    """Run the retained direct wall-loss call without changing its API."""
+    return _wall_loss_step_gpu_impl(
+        prepared.particles,
+        prepared.temperature,
+        prepared.pressure,
+        prepared.time_step,
+        config=prepared.config,
+        rng_seed=prepared.rng_seed,
+        rng_states=prepared.rng_states,
+        initialize_rng=prepared.initialize_rng,
+        environment=prepared.environment,
+    )
+
+
+def wall_loss_step_gpu(
+    particles: Any,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    time_step: float | Any,
+    *,
+    config: NeutralWallLossConfig,
+    rng_seed: int = 0,
+    rng_states: Any | None = None,
+    initialize_rng: bool = False,
+    environment: Any | None = None,
+) -> Any:
+    """Prepare then execute one direct neutral or charged wall-loss call."""
+    return _enqueue_prepared_wall_loss_call(
+        _prepare_wall_loss_step_gpu(
+            particles,
+            temperature,
+            pressure,
+            time_step,
+            config=config,
+            rng_seed=rng_seed,
+            rng_states=rng_states,
+            initialize_rng=initialize_rng,
+            environment=environment,
+        )
+    )
 
 
 def wall_loss_selected_boxes_step_gpu(

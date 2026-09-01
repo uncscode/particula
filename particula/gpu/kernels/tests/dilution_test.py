@@ -195,6 +195,49 @@ def _forbid_preflight_side_effects(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(dilution_module.wp, "launch", reject_dilution_launch)
 
 
+def test_prepared_dilution_enqueue_uses_frozen_concentration_fields() -> None:
+    """Prepared enqueue must not follow concentration fields replaced after setup."""
+    wp = _warp()
+    from particula.gpu.kernels.dilution import (
+        _enqueue_prepared_dilution_call,
+        _prepare_dilution_step_gpu,
+    )
+
+    particles, gas = _containers()
+    original_particle_concentration = particles.concentration
+    original_gas_concentration = gas.concentration
+    expected_particles = original_particle_concentration.numpy() * np.exp(-1.0)
+    expected_gas = original_gas_concentration.numpy() * np.exp(-1.0)
+    prepared = _prepare_dilution_step_gpu(particles, gas, 0.5, 2.0)
+    replacement_particles = wp.full(
+        original_particle_concentration.shape,
+        17.0,
+        dtype=wp.float64,
+        device="cpu",
+    )
+    replacement_gas = wp.full(
+        original_gas_concentration.shape,
+        19.0,
+        dtype=wp.float64,
+        device="cpu",
+    )
+    particles.concentration = replacement_particles
+    gas.concentration = replacement_gas
+
+    returned_particles, returned_gas = _enqueue_prepared_dilution_call(prepared)
+
+    assert returned_particles is particles
+    assert returned_gas is gas
+    npt.assert_allclose(
+        original_particle_concentration.numpy(), expected_particles, rtol=1e-12
+    )
+    npt.assert_allclose(
+        original_gas_concentration.numpy(), expected_gas, rtol=1e-12
+    )
+    npt.assert_array_equal(replacement_particles.numpy(), 17.0)
+    npt.assert_array_equal(replacement_gas.numpy(), 19.0)
+
+
 @dataclass(frozen=True)
 class P4DilutionCase:
     """Immutable finite-step fixture for deterministic P4 parity coverage."""

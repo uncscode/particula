@@ -1682,6 +1682,91 @@ def test_resident_adapter_forces_no_rng_reset_and_pins_resources(
     ]
 
 
+@pytest.mark.warp
+def test_resident_adapter_prepares_then_enqueues_native_coagulation_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Resident native dispatch separates setup from its frozen enqueue call."""
+    wp = pytest.importorskip("warp")
+    from particula.gpu.kernels import coagulation as coagulation_kernel
+    from particula.gpu.kernels import coagulation_step_gpu
+
+    particles = _warp_particles()
+    environment = _environment()
+    pairs = wp.zeros((1, 1, 2), dtype=wp.int32, device="cpu")
+    counts = wp.zeros(1, dtype=wp.int32, device="cpu")
+    rng_states = wp.zeros(1, dtype=wp.uint32, device="cpu")
+    request = WarpBrownianCoagulationExecutionState(
+        WarpBrownianCoagulationState(
+            BrownianCoagulationConfig(),
+            particles,
+            None,
+            None,
+            1.0,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=rng_states,
+            environment=environment,
+        )
+    )
+    session = object.__new__(ResidentSession)
+    object.__setattr__(session, "particles", particles)
+    object.__setattr__(session, "environment", environment)
+    registry = object.__new__(GPUResourceRegistry)
+    resources = CoagulationResources(1, pairs, counts, rng_states)
+    state = coagulation_adapter.ResidentBrownianCoagulationExecutionState(
+        request, session, registry, resources
+    )
+    prepared = object()
+    prepare_calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
+    enqueue_calls: list[object] = []
+
+    def prepare(*args: object, **kwargs: object) -> object:
+        """Record setup inputs and return a unique frozen native record."""
+        prepare_calls.append((args, kwargs))
+        return prepared
+
+    def enqueue(value: object) -> tuple[Any, Any, Any]:
+        """Record one native enqueue using the prepared record."""
+        enqueue_calls.append(value)
+        return particles, pairs, counts
+
+    monkeypatch.setattr(
+        registry,
+        "validate_coagulation_resources",
+        lambda received_session, received_resources: assert_binding(
+            received_session, received_resources, session, resources
+        ),
+    )
+    monkeypatch.setattr(
+        coagulation_adapter,
+        "_get_coagulation_step_gpu",
+        lambda: coagulation_step_gpu,
+    )
+    monkeypatch.setattr(
+        coagulation_kernel, "_prepare_coagulation_step_gpu", prepare
+    )
+    monkeypatch.setattr(
+        coagulation_kernel, "_enqueue_prepared_coagulation_call", enqueue
+    )
+
+    result = coagulation_adapter.ResidentBrownianCoagulationExecutionAdapter().execute(
+        state
+    )
+
+    assert len(prepare_calls) == 1
+    args, kwargs = prepare_calls[0]
+    assert args == (particles, None, None, 1.0, None)
+    assert kwargs["collision_pairs"] is pairs
+    assert kwargs["n_collisions"] is counts
+    assert kwargs["rng_states"] is rng_states
+    assert kwargs["initialize_rng"] is False
+    assert kwargs["environment"] is environment
+    assert enqueue_calls == [prepared]
+    assert result.backend_result is not None
+    assert result.backend_result.value.particles is particles
+
+
 def assert_binding(
     received_session: object,
     received_resources: object,

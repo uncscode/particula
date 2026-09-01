@@ -239,6 +239,18 @@ def _get_nucleation_step_gpu() -> Callable[..., object]:
     return nucleation_step_gpu
 
 
+@dataclass(frozen=True)
+class _PreparedResidentProcessBinding:
+    """Keep one prepared process record and its enqueue delegate together."""
+
+    prepared: Any
+    enqueue: Callable[[Any], object]
+
+    def execute(self) -> object:
+        """Enqueue the pinned native call without repeating adapter setup."""
+        return self.enqueue(self.prepared)
+
+
 class ResidentDilutionAdapter:
     """Delegate one dilution request through its exact pinned session.
 
@@ -246,6 +258,37 @@ class ResidentDilutionAdapter:
     metadata-only preflight. It does not acquire resources, transfer data,
     synchronize, retry, roll back, or recover writer failures.
     """
+
+    def prepare(self, request: object) -> _PreparedResidentProcessBinding:
+        """Validate resident ownership and prepare one pinned dilution call."""
+        if type(request) is not ResidentDilutionRequest:
+            raise TypeError("request must be an exact ResidentDilutionRequest.")
+        request.registry.validate_pinned_session(request.session)
+        dilution_step_gpu = _get_dilution_step_gpu()
+        from particula.gpu.kernels import dilution_step_gpu as supported_step
+
+        call_args = (
+            request.session.particles,
+            request.session.gas,
+            request.coefficient,
+            request.time_step,
+        )
+        if dilution_step_gpu is not supported_step:
+            return _PreparedResidentProcessBinding(
+                None,
+                lambda _: dilution_step_gpu(*call_args),
+            )
+        from particula.gpu.kernels.dilution import (
+            _enqueue_prepared_dilution_call,
+            _prepare_dilution_step_gpu,
+        )
+
+        return _PreparedResidentProcessBinding(
+            _prepare_dilution_step_gpu(
+                *call_args,
+            ),
+            _enqueue_prepared_dilution_call,
+        )
 
     def execute(self, request: object) -> object:
         """Validate and delegate one dilution request.
@@ -265,16 +308,7 @@ class ResidentDilutionAdapter:
         Direct-kernel exceptions and mutations propagate without adapter retry,
         rollback, recovery, transfer, or synchronization.
         """
-        if type(request) is not ResidentDilutionRequest:
-            raise TypeError("request must be an exact ResidentDilutionRequest.")
-        request.registry.validate_pinned_session(request.session)
-        step = _get_dilution_step_gpu()
-        return step(
-            request.session.particles,
-            request.session.gas,
-            request.coefficient,
-            request.time_step,
-        )
+        return self.prepare(request).execute()
 
 
 class ResidentWallLossAdapter:
@@ -288,6 +322,17 @@ class ResidentWallLossAdapter:
     It provides no acquisition, transfer, synchronization, rollback, or
     recovery.
     """
+
+    def prepare(self, request: object) -> tuple[Any, Any]:
+        """Preflight resident ownership and retain one wall-loss invocation."""
+        if type(request) is not ResidentWallLossRequest:
+            raise TypeError("request must be an exact ResidentWallLossRequest.")
+        request.registry.validate_pinned_session(request.session)
+        request.registry.validate_wall_loss_resources(
+            request.session, request.resources
+        )
+        enabled_logical_boxes = request.validate_enabled_box_indices()
+        return request, enabled_logical_boxes
 
     def execute(self, request: object) -> object:
         """Validate and delegate one wall-loss request.

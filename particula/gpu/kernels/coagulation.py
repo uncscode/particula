@@ -55,6 +55,7 @@ before any output, RNG, or particle-state mutation.
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast, no_type_check
 
 import numpy as np
@@ -2099,7 +2100,23 @@ def _ensure_volume_array(
     return _broadcast_scalar_array(volume_scalar, n_boxes, device)
 
 
-def coagulation_step_gpu(  # noqa: C901
+@dataclass(frozen=True)
+class _PreparedCoagulationCall:
+    """Freeze validated coagulation inputs and scratch for device enqueue."""
+
+    particles: Any
+    masses: Any
+    concentration: Any
+    charge: Any
+    collision_pairs: Any
+    n_collisions: Any
+    n_boxes: int
+    max_collisions: int
+    device: Any
+    selector_inputs: tuple[Any, ...]
+
+
+def _prepare_coagulation_step_gpu(  # noqa: C901
     particles: Any,
     temperature: float | Any | None,
     pressure: float | Any | None,
@@ -2519,10 +2536,17 @@ def coagulation_step_gpu(  # noqa: C901
             device=device,
         )
 
-    wp.launch(
-        brownian_coagulation_kernel,
-        dim=(n_boxes,),
-        inputs=[
+    return _PreparedCoagulationCall(
+        particles,
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        collision_pairs,
+        n_collisions,
+        n_boxes,
+        max_collisions_value,
+        device,
+        (
             particles.masses,
             particles.concentration,
             particles.density,
@@ -2553,27 +2577,80 @@ def coagulation_step_gpu(  # noqa: C901
             rng_states,
             wp.int32(resolved_mechanism_config.mask),
             wp.int32(max_collisions_value),
-        ],
-        device=device,
+        ),
+    )
+
+
+def _enqueue_prepared_coagulation_call(
+    prepared: _PreparedCoagulationCall,
+) -> tuple[Any, Any, Any]:
+    """Issue only the selector, apply, and compaction kernels for a call."""
+    wp.launch(
+        brownian_coagulation_kernel,
+        dim=(prepared.n_boxes,),
+        inputs=list(prepared.selector_inputs),
+        device=prepared.device,
     )
 
     wp.launch(
         apply_coagulation_kernel,
-        dim=(n_boxes, max_collisions_value),
+        dim=(prepared.n_boxes, prepared.max_collisions),
         inputs=[
-            particles.masses,
-            particles.concentration,
-            particles.charge,
-            collision_pairs,
-            n_collisions,
+            prepared.masses,
+            prepared.concentration,
+            prepared.charge,
+            prepared.collision_pairs,
+            prepared.n_collisions,
         ],
-        device=device,
+        device=prepared.device,
     )
     wp.launch(
         _compact_applied_collision_pairs_kernel,
-        dim=(n_boxes,),
-        inputs=[collision_pairs, n_collisions],
-        device=device,
+        dim=(prepared.n_boxes,),
+        inputs=[prepared.collision_pairs, prepared.n_collisions],
+        device=prepared.device,
     )
 
-    return particles, collision_pairs, n_collisions
+    return prepared.particles, prepared.collision_pairs, prepared.n_collisions
+
+
+def coagulation_step_gpu(  # noqa: C901
+    particles: Any,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    time_step: object,
+    volume: float | Any | None = None,
+    max_collisions: object = 256,
+    rng_seed: int = 0,
+    collision_pairs: Any | None = None,
+    n_collisions: Any | None = None,
+    rng_states: Any | None = None,
+    *,
+    mechanism_config: CoagulationMechanismConfig | None = None,
+    initialize_rng: bool = False,
+    environment: Any | None = None,
+    validate_charge_finite: bool = False,
+    turbulent_dissipation: float | Any | None = None,
+    fluid_density: float | Any | None = None,
+) -> tuple[Any, Any, Any]:
+    """Prepare then enqueue one direct particle-resolved coagulation step."""
+    return _enqueue_prepared_coagulation_call(
+        _prepare_coagulation_step_gpu(
+            particles,
+            temperature,
+            pressure,
+            time_step,
+            volume,
+            max_collisions,
+            rng_seed,
+            collision_pairs,
+            n_collisions,
+            rng_states,
+            mechanism_config=mechanism_config,
+            initialize_rng=initialize_rng,
+            environment=environment,
+            validate_charge_finite=validate_charge_finite,
+            turbulent_dissipation=turbulent_dissipation,
+            fluid_density=fluid_density,
+        )
+    )

@@ -45,6 +45,22 @@ def _particles(device: str = "cpu"):
     return particles
 
 
+def test_prepare_wall_loss_rejects_invalid_config_before_enqueue() -> None:
+    """Prepared wall-loss setup performs direct configuration validation."""
+    from particula.gpu.kernels.wall_loss import _prepare_wall_loss_step_gpu
+
+    with pytest.raises(
+        TypeError, match="config must be a NeutralWallLossConfig"
+    ):
+        _prepare_wall_loss_step_gpu(
+            object(),
+            None,
+            None,
+            1.0,
+            config=cast(Any, object()),
+        )
+
+
 def _config(geometry: str = "spherical"):
     """Build one valid neutral configuration for the selected geometry."""
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
