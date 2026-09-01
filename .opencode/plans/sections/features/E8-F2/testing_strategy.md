@@ -45,9 +45,16 @@ Coverage thresholds and the normal collection policy must not be lowered.
   persistent Brownian RNG advancement without reset, and wall-loss all/partial/
   empty selected lanes. Enqueue-only traps verify that prepared dispatch does
   not repeat setup work or re-enter public wrappers.
-- **P6:** Extend nucleation and exhaustion tests for admission/no-admission,
-  activation, resampling precedence, scaling fallback, conservation, fixed
-  capacity, failure gating, and fully supplied scratch/status storage.
+- **P6 (implemented, #1557):** `nucleation_test.py`, `exhaustion_test.py`,
+  `nucleation_parity_test.py`, and `process_adapters_test.py` cover complete
+  preparation validation/preallocation, direct-wrapper versus prepared behavior,
+  live payload scans, pinned-array rebinding, dynamic writer gating, fixed-policy
+  non-substitution, sidecar and return identities, resampling precedence,
+  scaling fallback, no-admission primary no-ops, exact error precedence, and
+  tight particle-plus-gas conservation. Scoped traps prove enqueue performs no
+  allocation, readback, synchronization, mutable-carrier lookup, or legacy/public
+  executor call. Resident binding remains enqueue-only and injected public-
+  resolver fallback coverage remains intact.
 - **P7:** Add full resident integration coverage for canonical operation order,
   uncaptured prepared output regression, one-token lifecycle behavior, and
   writer-fault handling. CUDA graph capture is optional pass-or-clean-skip

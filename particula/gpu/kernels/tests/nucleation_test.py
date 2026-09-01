@@ -2,7 +2,6 @@
 
 from dataclasses import FrozenInstanceError
 from types import SimpleNamespace
-from typing import Any, cast
 
 import numpy as np
 import pytest
@@ -42,48 +41,204 @@ if wp.is_cuda_available():
     )
 
 
-def test_nucleation_wrapper_delegates_through_prepared_call(
+def test_nucleation_prepared_enqueue_is_setup_free_and_pinned(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """The public nucleation wrapper enqueues its exact prepared record."""
-    prepared = object()
-    result = (object(), object())
-    arguments = (object(), object(), object(), object())
-    sidecars = {
-        "scratch": object(),
-        "finalized_demand": object(),
-        "diagnostics": object(),
-        "exhaustion_controls": object(),
-        "exhaustion_buffers": object(),
-        "temperature": object(),
-        "saturation": object(),
-        "environment": object(),
-    }
-    calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
-
-    def prepare(*args: object, **kwargs: object) -> object:
-        calls.append((args, kwargs))
-        return prepared
-
-    monkeypatch.setattr(
-        nucleation_module, "_prepare_nucleation_step_gpu", prepare
+    """Prepared nucleation uses pinned arrays without host setup work."""
+    warm_particles, warm_gas = _state(particles=2)
+    warm_particles.concentration = wp.zeros(
+        (1, 2), dtype=wp.float64, device="cpu"
     )
-    monkeypatch.setattr(
-        nucleation_module,
-        "_enqueue_prepared_nucleation_call",
-        lambda value: result
-        if value is prepared
-        else pytest.fail("wrong call"),
+    warm_scratch, warm_finalized, warm_diagnostics = _sidecars(1, 2, 1)
+    warm_buffers = _exhaustion_buffers(1, 2, 1)
+    warm_prepared = nucleation_module._prepare_nucleation_step_gpu(
+        warm_particles,
+        warm_gas,
+        _config(coefficient=0.1 / AVOGADRO_NUMBER),
+        1.0,
+        scratch=warm_scratch,
+        finalized_demand=warm_finalized,
+        diagnostics=warm_diagnostics,
+        exhaustion_controls=NucleationExhaustionControls(False, False),
+        exhaustion_buffers=warm_buffers,
+        temperature=300.0,
     )
+    nucleation_module._enqueue_prepared_nucleation_call(warm_prepared)
 
-    assert (
-        nucleation_module.nucleation_step_gpu(
-            *cast(tuple[Any, ...], arguments),
-            **cast(dict[str, Any], sidecars),
+    particles, gas = _state(particles=2)
+    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    buffers = _exhaustion_buffers(1, 2, 1)
+    prepared = nucleation_module._prepare_nucleation_step_gpu(
+        particles,
+        gas,
+        _config(coefficient=0.1 / AVOGADRO_NUMBER),
+        1.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+        exhaustion_controls=NucleationExhaustionControls(False, False),
+        exhaustion_buffers=buffers,
+        temperature=300.0,
+    )
+    pinned_masses = prepared.particle_arrays[0]
+    pinned_gas = prepared.gas_arrays[1]
+    replacement_masses = wp.zeros((1, 2, 1), dtype=wp.float64, device="cpu")
+    replacement_gas = wp.full((1, 1), 7.0, dtype=wp.float64, device="cpu")
+    particles.masses = replacement_masses
+    gas.concentration = replacement_gas
+
+    def forbidden(*_args: object, **_kwargs: object) -> None:
+        pytest.fail("prepared enqueue performed forbidden host setup")
+
+    status_arrays = (
+        prepared.p1_status,
+        prepared.p2_status,
+        prepared.p3_status,
+        prepared.molecule_status,
+        prepared.p4_status,
+        prepared.p4_final_status,
+        prepared.p5_status,
+    )
+    with monkeypatch.context() as context:
+        for name in ("zeros", "empty", "array", "full", "synchronize"):
+            context.setattr(nucleation_module.wp, name, forbidden)
+        for name in (
+            "_execute_nucleation_step_gpu",
+            "resampling_step_gpu",
+            "representative_volume_scaling_step_gpu",
+        ):
+            context.setattr(nucleation_module, name, forbidden)
+        for status in status_arrays:
+            context.setattr(status, "numpy", forbidden)
+        assert nucleation_module._enqueue_prepared_nucleation_call(
+            prepared
+        ) == (particles, gas)
+
+    assert nucleation_module._observe_prepared_nucleation_call(prepared) == (
+        particles,
+        gas,
+    )
+    np.testing.assert_array_equal(
+        replacement_masses.numpy(), np.zeros((1, 2, 1))
+    )
+    np.testing.assert_array_equal(replacement_gas.numpy(), [[7.0]])
+    assert pinned_masses.numpy()[0, 0, 0] > 0.0
+    np.testing.assert_array_equal(buffers.final_counts.numpy(), [1])
+    assert pinned_gas is not replacement_gas
+
+
+def test_nucleation_prepared_enqueue_gates_live_invalid_payload() -> None:
+    """A post-prepare invalid gas value prevents every dependent writer."""
+    particles, gas = _state(particles=2)
+    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    buffers = _exhaustion_buffers(1, 2, 1)
+    prepared = nucleation_module._prepare_nucleation_step_gpu(
+        particles,
+        gas,
+        _config(coefficient=0.1 / AVOGADRO_NUMBER),
+        1.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+        exhaustion_controls=NucleationExhaustionControls(False, False),
+        exhaustion_buffers=buffers,
+        temperature=300.0,
+    )
+    particle_before = tuple(
+        values.numpy().copy() for values in prepared.particle_arrays[:3]
+    )
+    final_before = tuple(
+        values.numpy().copy()
+        for values in (
+            buffers.final_demand,
+            buffers.final_counts,
+            buffers.final_selected_slot_indices,
         )
-        is result
     )
-    assert calls == [(arguments, sidecars)]
+    wp.copy(
+        prepared.gas_arrays[1],
+        wp.array([[np.nan]], dtype=wp.float64, device="cpu"),
+    )
+
+    nucleation_module._enqueue_prepared_nucleation_call(prepared)
+
+    with pytest.raises(ValueError, match="gas.concentration"):
+        nucleation_module._observe_prepared_nucleation_call(prepared)
+    for expected, values in zip(
+        particle_before, prepared.particle_arrays[:3], strict=True
+    ):
+        np.testing.assert_array_equal(values.numpy(), expected)
+    for expected, values in zip(
+        final_before,
+        (
+            buffers.final_demand,
+            buffers.final_counts,
+            buffers.final_selected_slot_indices,
+        ),
+        strict=True,
+    ):
+        np.testing.assert_array_equal(values.numpy(), expected)
+
+
+@pytest.mark.parametrize(
+    "config_changes",
+    ({"coefficient": 0.0}, {"survival_factor": 0.0}),
+    ids=("zero_coefficient", "zero_survival"),
+)
+def test_public_zero_rate_preserves_late_validation_short_circuit(
+    config_changes: dict[str, float],
+) -> None:
+    """Zero rate retains the legacy no-admission temperature precedence."""
+    particles, gas = _state(particles=2)
+    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    buffers = _exhaustion_buffers(1, 2, 1)
+    before = _snapshot_arrays(particles, gas)
+
+    assert nucleation_step_gpu(
+        particles,
+        gas,
+        _config(**config_changes),
+        1.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+        exhaustion_controls=NucleationExhaustionControls(False, False),
+        exhaustion_buffers=buffers,
+        temperature=500.0,
+    ) == (particles, gas)
+
+    _assert_snapshot_unchanged(before)
+
+
+def test_empty_prepared_enqueue_revalidates_live_global_arrays() -> None:
+    """Empty-box enqueue still scans mutable density and molar-mass payloads."""
+    particles, gas = _state(boxes=0)
+    scratch, finalized, diagnostics = _sidecars(0, 2, 1)
+    buffers = _exhaustion_buffers(0, 2, 1)
+    prepared = nucleation_module._prepare_nucleation_step_gpu(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+        exhaustion_controls=NucleationExhaustionControls(False, False),
+        exhaustion_buffers=buffers,
+        temperature=300.0,
+    )
+    wp.copy(
+        prepared.particle_arrays[3],
+        wp.array([np.nan], dtype=wp.float64, device="cpu"),
+    )
+
+    nucleation_module._enqueue_prepared_nucleation_call(prepared)
+
+    with pytest.raises(ValueError, match="particles.density"):
+        nucleation_module._observe_prepared_nucleation_call(prepared)
 
 
 def _state(
@@ -411,6 +566,52 @@ def test_public_step_rejects_missing_required_sidecars(
     _assert_snapshot_unchanged(before)
 
 
+@pytest.mark.parametrize(
+    ("missing", "message"),
+    [
+        ("scratch", "scratch must be NucleationScratchBuffers"),
+        (
+            "finalized_demand",
+            "finalized_demand must be NucleationFinalizedDemandBuffers",
+        ),
+        ("diagnostics", "diagnostics must be NucleationDiagnosticBuffers"),
+    ],
+)
+def test_public_prepared_path_preserves_legacy_sidecar_error_precedence(
+    missing: str,
+    message: str,
+) -> None:
+    """Required sidecars reject before every later malformed input."""
+    particles, gas = _state()
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    sidecars = {
+        "scratch": scratch,
+        "finalized_demand": finalized,
+        "diagnostics": diagnostics,
+    }
+    ordered_fields = ("scratch", "finalized_demand", "diagnostics")
+    missing_index = ordered_fields.index(missing)
+    for field in ordered_fields[missing_index:]:
+        sidecars[field] = None
+    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)
+
+    with pytest.raises(ValueError, match=message):
+        nucleation_step_gpu(
+            particles,
+            gas,
+            object(),
+            object(),
+            **sidecars,
+            exhaustion_controls=object(),
+            exhaustion_buffers=object(),
+            temperature=object(),
+            saturation=object(),
+            environment=object(),
+        )
+
+    _assert_snapshot_unchanged(before)
+
+
 def test_p5_scales_gas_before_finalized_source_removal() -> None:
     """Representative-volume scaling applies equally to pre-existing gas."""
     particles, gas, scratch, finalized, diagnostics = _stage_slots(
@@ -493,7 +694,7 @@ def test_public_empty_step_validates_p4_inputs_before_noop(
 def test_public_step_rejects_nonparticipating_demand_before_p4(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Positive non-participant demand rejects before P4 mutation or P5 launch."""
+    """Positive non-participant demand device-gates P4 and P5 mutation."""
     particles, gas = _state(boxes=2, particles=2, species=2)
     particles.masses = wp.ones((2, 2, 2), dtype=wp.float64, device="cpu")
     gas.partitioning = wp.array([[1, 0], [1, 0]], dtype=wp.int32, device="cpu")
@@ -527,7 +728,7 @@ def test_public_step_rejects_nonparticipating_demand_before_p4(
             temperature=300.0,
         )
 
-    assert p5_launches == 0
+    assert p5_launches == 1
     _assert_snapshot_unchanged(before)
 
 
@@ -609,21 +810,17 @@ def test_public_nucleation_step_rejects_corrupt_p5_handoff_without_commit(
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     buffers = _exhaustion_buffers(1, 2, 1)
     before = _snapshot_arrays(particles, gas)
-    original_orchestrate = nucleation_module._orchestrate_nucleation_exhaustion
+    original_launch = nucleation_module.wp.launch
 
-    def _corrupt_finalized_prefix(*args, **kwargs):
-        result = original_orchestrate(*args, **kwargs)
-        wp.copy(
-            buffers.final_selected_slot_indices,
-            wp.array([[1, 1]], dtype=wp.int32, device="cpu"),
-        )
-        return result
+    def _launch(kernel, dim=None, inputs=None, device=None):
+        if kernel is nucleation_module._validate_p5_handoff:
+            wp.copy(
+                buffers.final_selected_slot_indices,
+                wp.array([[1, 1]], dtype=wp.int32, device="cpu"),
+            )
+        return original_launch(kernel, dim=dim, inputs=inputs, device=device)
 
-    monkeypatch.setattr(
-        nucleation_module,
-        "_orchestrate_nucleation_exhaustion",
-        _corrupt_finalized_prefix,
-    )
+    monkeypatch.setattr(nucleation_module.wp, "launch", _launch)
 
     with pytest.raises(ValueError, match="P5 finalized nucleation handoff"):
         nucleation_step_gpu(
@@ -723,19 +920,15 @@ def test_public_nucleation_step_rejects_invalid_p5_handoffs_without_commit(
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     buffers = _exhaustion_buffers(1, 2, 1)
     handoff_snapshot = []
-    original_orchestrate = nucleation_module._orchestrate_nucleation_exhaustion
+    original_launch = nucleation_module.wp.launch
 
-    def _corrupt_p5_handoff(*args, **kwargs):
-        result = original_orchestrate(*args, **kwargs)
-        corrupt(buffers, gas)
-        handoff_snapshot.extend(_snapshot_arrays(particles, gas))
-        return result
+    def _launch(kernel, dim=None, inputs=None, device=None):
+        if kernel is nucleation_module._validate_p5_handoff:
+            corrupt(buffers, gas)
+            handoff_snapshot.extend(_snapshot_arrays(particles, gas))
+        return original_launch(kernel, dim=dim, inputs=inputs, device=device)
 
-    monkeypatch.setattr(
-        nucleation_module,
-        "_orchestrate_nucleation_exhaustion",
-        _corrupt_p5_handoff,
-    )
+    monkeypatch.setattr(nucleation_module.wp, "launch", _launch)
 
     with pytest.raises(ValueError, match="P5 finalized nucleation handoff"):
         nucleation_step_gpu(
@@ -754,45 +947,40 @@ def test_public_nucleation_step_rejects_invalid_p5_handoffs_without_commit(
     _assert_snapshot_unchanged(handoff_snapshot)
 
 
-def test_public_nucleation_step_rejects_rebound_p4_storage_without_commit(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """P5 rejects a finalized P4 buffer rebound after P4 validation."""
+def test_prepared_nucleation_p4_rebinding_cannot_redirect_dispatch() -> None:
+    """Prepared P4 writes and P5 reads retain the originally pinned arrays."""
     particles, gas = _state(particles=2)
     particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     buffers = _exhaustion_buffers(1, 2, 1)
-    before = _snapshot_arrays(particles, gas)
-    original_orchestrate = nucleation_module._orchestrate_nucleation_exhaustion
     replacement = wp.ones(1, dtype=wp.float64, device="cpu")
+    prepared = nucleation_module._prepare_nucleation_step_gpu(
+        particles,
+        gas,
+        _config(coefficient=0.1 / AVOGADRO_NUMBER),
+        1.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+        exhaustion_controls=NucleationExhaustionControls(False, False),
+        exhaustion_buffers=buffers,
+        temperature=300.0,
+    )
+    pinned_final_demand = prepared.p4_arrays[1]
+    object.__setattr__(buffers, "final_demand", replacement)
 
-    def _rebind_p4_storage(*args, **kwargs):
-        result = original_orchestrate(*args, **kwargs)
-        object.__setattr__(buffers, "final_demand", replacement)
-        return result
-
-    monkeypatch.setattr(
-        nucleation_module,
-        "_orchestrate_nucleation_exhaustion",
-        _rebind_p4_storage,
+    assert nucleation_module._enqueue_prepared_nucleation_call(prepared) == (
+        particles,
+        gas,
+    )
+    assert nucleation_module._observe_prepared_nucleation_call(prepared) == (
+        particles,
+        gas,
     )
 
-    with pytest.raises(ValueError, match="P5 fields must be the P4-validated"):
-        nucleation_step_gpu(
-            particles,
-            gas,
-            _config(coefficient=0.1 / AVOGADRO_NUMBER),
-            1.0,
-            scratch=scratch,
-            finalized_demand=finalized,
-            diagnostics=diagnostics,
-            exhaustion_controls=NucleationExhaustionControls(False, False),
-            exhaustion_buffers=buffers,
-            temperature=300.0,
-        )
-
-    _assert_snapshot_unchanged(before)
     np.testing.assert_array_equal(replacement.numpy(), [1.0])
+    np.testing.assert_allclose(pinned_final_demand.numpy(), [1.0])
+    assert prepared.particle_arrays[0].numpy()[0, 0, 0] > 0.0
 
 
 @pytest.mark.parametrize(
@@ -2650,7 +2838,7 @@ def test_p2_inventory_rounding_raises_exact_failure_after_four_corrections(
     def _launch(kernel, dim=None, inputs=None, device=None):
         if kernel is nucleation_module._plan_demand_work:
             monkeypatch.setattr(
-                inputs[-1],
+                inputs[-2],
                 "numpy",
                 lambda: np.array([0, 1], dtype=np.int32),
                 raising=False,

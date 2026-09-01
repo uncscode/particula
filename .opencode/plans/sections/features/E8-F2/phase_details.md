@@ -103,16 +103,31 @@
   - Documentation: No public documentation change was required; local private
     seam documentation records ownership and failure boundaries.
 
-- [ ] **E8-F2-P6:** Add prepared nucleation and exhaustion enqueue path with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Resolve fixed-capacity source, admission, exhaustion policy, resampling
-    or scaling controls, and all sidecars before enqueueing the existing P1-P5
-    device sequence.
+- [x] **E8-F2-P6:** Add prepared nucleation and exhaustion enqueue path with unit tests
+  - Issue: #1557 | Size: M | Status: Implemented
+  - Delivery: Added allocation-complete prepared resampling, representative-
+    volume scaling, and nucleation records. Preparation retains legacy public
+    validation precedence, pins all launch arrays, freezes controls, and owns
+    private statuses and P1--P5/P4 workspace.
+  - Enqueue behavior: Resets retained status and launches a fixed device-gated
+    sequence over live pinned payload values. It performs no allocation,
+    readback, synchronization, host policy resolution, mutable-carrier lookup,
+    or public/legacy executor call. Rebinding cannot redirect dispatch.
+  - Observation: Direct wrappers interpret bounded status after enqueue and
+    retain legacy error ordering and return identities. Resident adapter
+    execution remains observation-free. No-admission preserves particle/gas
+    primaries while documented diagnostics may update.
+  - Adapter: `ResidentNucleationAdapter` now pins exact resident identities in a
+    private prepared process binding and delegates only to enqueue. It rejects
+    drift before resolution or launch; its one-call public resolver fallback is
+    limited to injected compatibility tests and does not alter scheduler flow.
   - Files: `particula/gpu/kernels/{nucleation,exhaustion}.py`,
-    `particula/execution/process_adapters.py`, nucleation/exhaustion tests
-  - Tests: No-admission no-op, free-slot activation, resampling-first and scaling
-    fallback paths, conservation, failure gating, fixed shapes, and no enqueue
-    allocation/readback/automatic policy change.
+    `particula/execution/process_adapters.py`, and adjacent nucleation,
+    exhaustion, and process-adapter tests.
+  - Evidence: Focused tests cover operation traps, pinned-array rebinding,
+    dynamic writer gating, free-slot/resampling/scaling paths, error precedence,
+    public-wrapper identities, independent parity, conservation, exact resident
+    binding, and injected compatibility fallback.
 
 - [ ] **E8-F2-P7:** Compose capture-ready resident sequence with integration tests
   - Issue: TBD | Size: S | Status: Not Started

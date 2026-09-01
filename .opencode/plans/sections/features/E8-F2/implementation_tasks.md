@@ -42,8 +42,16 @@
   adapters (#1556). Private frozen calls/bindings retain validated references;
   public wrappers, exports, process behavior, and persistent-RNG semantics are
   unchanged.
-- [ ] Refactor nucleation and nested exhaustion operations into a prepared,
-  fixed launch sequence in `particula/gpu/kernels/{nucleation,exhaustion}.py`.
+- [x] Complete the nucleation and nested exhaustion prepared device-only enqueue
+  sequence in `particula/gpu/kernels/{nucleation,exhaustion}.py` (#1557).
+  Preparation preserves direct validation precedence, pins launch arrays,
+  freezes scalar controls, and allocates all private status/workspace storage.
+  Enqueue scans live pinned payloads and issues only a fixed device-gated
+  P1--P5/P4 sequence; observers alone perform bounded status interpretation.
+- [x] Bind `ResidentNucleationAdapter` to its exact resident identities and the
+  prepared nucleation enqueue delegate without scheduler composition, resource
+  changes, token entry, payload inspection, transfer, synchronization, or cache
+  retention (#1557).
 - [ ] Compose all prepared operations in canonical schedule order without
   per-node dictionary lookup, executor construction, allocation, validation,
   import resolution, host readback, or synchronization during enqueue.
@@ -70,7 +78,12 @@
 - [x] Extend focused coagulation, dilution, wall-loss, and resident-adapter tests
   for prepared setup/enqueue delegation, frozen references, selected lanes,
   no-op behavior, output/RNG identity, and forbidden enqueue-time setup work
-  (#1556).
+   (#1556).
+- [x] Add completion evidence for the device-only nucleation/exhaustion enqueue:
+  prepared equivalence, post-prepare dynamic payload gating, fixed-policy
+  non-substitution, forbidden allocation/readback/synchronization operations,
+  and P1--P5/P4 conservation/error precedence (#1557). Existing adapter identity
+  and public-resolver compatibility-fallback coverage remains valid (#1557).
 - [ ] Add a CUDA-gated capture smoke test using the repository's established
   pass-or-clean-skip helper; Warp CPU must explicitly remain uncaptured.
 - [ ] Run focused tests without coverage, then the untargeted

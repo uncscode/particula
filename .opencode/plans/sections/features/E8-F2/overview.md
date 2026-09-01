@@ -90,6 +90,32 @@ private delegate once; its enqueue never looks up, validates, allocates, or
 rereads lanes or device references. Public APIs and exports, scheduler
 composition, resource/checkpoint schemas, and process physics remain unchanged.
 
+## P6 Prepared Nucleation and Exhaustion
+
+Issue #1557 adds complete private preparation, enqueue, and observation seams
+for direct exhaustion and nucleation in
+`particula.gpu.kernels.exhaustion` and `particula.gpu.kernels.nucleation`.
+Preparation preserves the established public validation order, pins every
+launch array independently of mutable carrier fields, freezes scalar controls,
+and allocates private status and workspace arrays. Mutable values in those
+pinned arrays remain live; rebinding a carrier field cannot redirect dispatch.
+
+Prepared enqueue resets retained status, repeats live payload validation, and
+issues a fixed device-gated P1--P5 sequence. Nested resampling and
+representative-volume scaling use their prepared device paths directly. Enqueue
+does not allocate, read back, synchronize, resolve policy on the host,
+dereference mutable carriers, or call a public/legacy executor. The direct
+wrappers alone observe bounded status and preserve legacy error ordering;
+resident adapter execution remains enqueue-only for capture composition.
+
+`ResidentNucleationAdapter` now creates an exact private prepared process
+binding and delegates through the prepared operation. It rejects resident
+identity drift before helper resolution or launch and retains a one-call public
+resolver fallback only for injected compatibility tests. No export, scheduler
+composition, registry/checkpoint schema, or nucleation/exhaustion physics
+changed. No-admission calls remain write-free for particle and gas primaries;
+documented diagnostic sidecars may still record the completed P2--P4 path.
+
 ## User Stories
 
 - As a resident-loop integrator, I want setup to reject incompatible state

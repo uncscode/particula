@@ -134,6 +134,36 @@ existing persistent RNG sidecar without reset; wall loss preserves all, partial,
 and empty selected-lane behavior. No public export, scheduler composition,
 checkpoint/resource schema, or physics behavior changed.
 
+## P6 Prepared Nucleation and Exhaustion Design
+
+Issue #1557 adds allocation-complete frozen prepared records for resampling and
+representative-volume scaling in `particula.gpu.kernels.exhaustion`, and a
+private `_PreparedNucleationCall` in `particula.gpu.kernels.nucleation`.
+Preparation performs legacy-ordered schema, identity, device, contiguity,
+nonaliasing, control, and current-payload validation. It pins every launch array
+rather than using mutable carriers as enqueue-time field authorities, freezes
+scalar controls, and allocates all private status and workspace storage.
+
+The P6 enqueue is a retained-reference, device-gated P1--P5 sequence
+with shared inventory admission, ascending free-slot selection, fully viable
+resampling before representative-volume scaling, no source-demand truncation,
+scaling before gas removal, and one fused particle/gas commit. Current enqueue
+resets retained statuses, scans live pinned payload values, and launches the
+fixed sequence without allocation, host readback, synchronization, host policy
+resolution, mutable-carrier lookup, or public/legacy executor delegation.
+Device status gates each dependent sidecar or primary writer. Direct observers
+perform the bounded status read and translate failures in established P1--P5
+order. Post-prepare carrier rebinding cannot redirect work; payload mutations to
+the pinned arrays remain authoritative.
+
+`ResidentNucleationAdapter.prepare()` now proves its exact request/session/
+published-resource binding and returns a private prepared process binding whose
+delegate invokes the prepared operation. `execute()` creates a fresh binding per
+call. It does not compose the resident scheduler or cache scheduler state; the
+delegate is enqueue-only and performs no observation. Direct public wrappers
+compose prepare, enqueue, and observe; the retained public one-call path is only
+an injected resolver compatibility fallback.
+
 ## Data / API / Workflow Changes
 
 - **Data model:** Add frozen prepared request records for the full timestep and

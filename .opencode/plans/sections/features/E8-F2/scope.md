@@ -39,7 +39,18 @@ concrete-only and retain exact caller-owned resident identities.
   Existing public validation, return/identity, no-op, selected-lane, and
   persistent-RNG contracts remain unchanged; resident coagulation remains
   Brownian-only. No public, scheduler, checkpoint, resource-schema, or physics
-  change was introduced.
+   change was introduced.
+- **Completed P6 (#1557):** split exhaustion and nucleation into private
+  allocation-complete preparation, fixed device-gated enqueue, and bounded
+  direct observation seams in
+  `particula/gpu/kernels/{exhaustion,nucleation}.py`. Preparation pins launch
+  arrays and freezes scalar controls; enqueue consumes live pinned values without
+  allocation, readback, synchronization, host policy resolution, mutable-carrier
+  lookup, or legacy/public delegation. Resampling-first and scaling-fallback
+  behavior, P1--P5 errors, physics, identities, and no-admission primary no-op
+  semantics remain intact. `ResidentNucleationAdapter` retains an exact
+  observation-free prepared binding without scheduler composition. Public APIs,
+  exports, scheduler behavior, and resource/checkpoint schemas are unchanged.
 - Define immutable prepared-enqueue carriers tied to the exact E8-F1 capture
   lifecycle signature and `ResidentSimulationRequest`.
 - Move repeated scheduler metadata checks and executor construction into an

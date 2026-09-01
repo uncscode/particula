@@ -244,8 +244,12 @@ class _PreparedResidentProcessBinding:
     """Privately keep one prepared process record and enqueue delegate together.
 
     For prepared direct-kernel calls, the record freezes validated references
-    and ``execute`` only invokes the retained delegate. It performs no repeated
-    validation, allocation, normalization, lookup, or RNG setup.
+    and ``execute`` only invokes the retained delegate.  It performs no repeated
+    adapter validation, resource lookup, allocation, normalization, token entry,
+    or RNG setup.  The direct-kernel record pins object identity, not a snapshot
+    of mutable device payloads; the delegate's live inputs remain authoritative.
+    Any direct-kernel status observation and writer rollback boundary remain
+    with that delegate rather than this resident adapter.
 
     Attributes:
         prepared: Frozen direct-kernel preparation record, or adapter-local
@@ -257,7 +261,15 @@ class _PreparedResidentProcessBinding:
     enqueue: Callable[[Any], object]
 
     def execute(self) -> object:
-        """Enqueue the pinned native call without repeating adapter setup."""
+        """Invoke the pinned delegate without repeating adapter setup.
+
+        Returns:
+            Result returned by the retained direct-kernel delegate.
+
+        The binding does not enter a scheduler token, inspect payloads, acquire
+        resources, synchronize, or provide rollback.  Delegate exceptions and
+        any observer readback propagate unchanged.
+        """
         return self.enqueue(self.prepared)
 
 
@@ -555,20 +567,24 @@ class ResidentWallLossAdapter:
 class ResidentNucleationAdapter:
     """Delegate one nucleation request through its exact published view.
 
-    This concrete-only adapter resolves one supported direct kernel after
-    metadata-only preflight. It preserves container and sidecar identity and
-    provides no acquisition, transfer, synchronization, or recovery.
+    This concrete-only adapter validates the exact resident publication before
+    resolving the private prepare/enqueue seam.  It pins container and sidecar
+    identity, while mutable device payload values remain the direct kernel's
+    live authority.  It provides no acquisition, transfer, synchronization,
+    scheduler-token entry, caching, recovery, or rollback.
     """
 
     def prepare(self, request: object) -> _PreparedResidentProcessBinding:
         """Pin an exact resident nucleation request before its one launch.
 
         This concrete-only boundary validates resident and published-resource
-        identity before resolving a kernel.  It neither enters a scheduler token
-        nor acquires, replaces, transfers, synchronizes, or inspects payload
-        state.  Production delegates to nucleation's private prepare/enqueue
-        seam; a replaced public resolver remains a one-call compatibility path
-        for dependency-injection tests.
+        identity before resolving a kernel.  Identity drift rejects before a
+        resolver call or device launch.  It neither enters a scheduler token nor
+        acquires, replaces, transfers, synchronizes, caches scheduler state, or
+        inspects payload state.  Production delegates to nucleation's private
+        prepare/enqueue seam; a replaced public resolver remains a one-call
+        compatibility path for dependency-injection tests.  The returned record
+        pins identities, not mutable payload values.
 
         Args:
             request: Exact resident nucleation request to validate and bind.
@@ -652,7 +668,10 @@ class ResidentNucleationAdapter:
             ValueError: If the session or resource view is no longer the active
                 registry-pinned publication.
 
-        Direct-kernel exceptions and mutations propagate without adapter retry,
-        rollback, recovery, transfer, or synchronization.
+        This is a fresh ``prepare(request).execute()`` delegation and does not
+        cache a convenience binding. Direct-kernel exceptions, including any
+        observer error, and mutations propagate without adapter retry, rollback,
+        recovery, transfer, or synchronization. A writer-capable direct-kernel
+        failure therefore retains that kernel's no-rollback boundary.
         """
         return self.prepare(request).execute()

@@ -44,6 +44,12 @@ except ImportError as exc:  # pragma: no cover - import guard
 from particula.gpu.kernels.environment import _is_warp_array_like
 from particula.gpu.kernels.exhaustion import (
     ResamplingBuffers,
+    _enqueue_prepared_representative_volume_scaling_call,
+    _enqueue_prepared_resampling_call,
+    _prepare_representative_volume_scaling_step_gpu,
+    _prepare_resampling_step_gpu,
+    _PreparedRepresentativeVolumeScalingCall,
+    _PreparedResamplingCall,
     representative_volume_scaling_step_gpu,
     resampling_step_gpu,
 )
@@ -1485,6 +1491,7 @@ def _plan_demand_work(  # noqa: C901
     removal: wp.array2d(dtype=wp.float64),
     gate_codes: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
+    upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Plan one box of P2 demand in private device-resident work storage.
 
@@ -1525,6 +1532,8 @@ def _plan_demand_work(  # noqa: C901
             inventory-safety failures.
     """
     box = wp.tid()
+    if upstream_invalid[0] != 0:
+        return
     precursor = (
         concentration[box, precursor_index]
         * _AVOGADRO_NUMBER
@@ -1641,6 +1650,8 @@ def _commit_demand_plan(
     finalized_demand: wp.array(dtype=wp.float64),
     finalized_removal: wp.array2d(dtype=wp.float64),
     diagnostics: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
+    upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Commit exactly the P2-owned sidecar fields for one box.
 
@@ -1660,6 +1671,8 @@ def _commit_demand_plan(
         diagnostics: P2-owned gate-code sidecar.
     """
     box = wp.tid()
+    if invalid[0] != 0 or invalid[1] != 0 or upstream_invalid[0] != 0:
+        return
     scratch_number_concentration[box] = number_concentration[box]
     scratch_rate[box] = rate[box]
     scratch_demand[box] = potential[box]
@@ -1773,6 +1786,7 @@ def _plan_nucleation_demand_from_preflight(
     removal = wp.zeros((boxes, species), dtype=wp.float64, device=device)
     gate_codes = wp.zeros(boxes, dtype=wp.int32, device=device)
     invalid = wp.zeros(2, dtype=wp.int32, device=device)
+    upstream_invalid = wp.zeros(1, dtype=wp.int32, device=device)
     saturation_work = preflight.saturation
     if saturation_work is None:
         saturation_work = wp.zeros(
@@ -1810,6 +1824,7 @@ def _plan_nucleation_demand_from_preflight(
             removal,
             gate_codes,
             invalid,
+            upstream_invalid,
         ],
         device=device,
     )
@@ -1837,6 +1852,8 @@ def _plan_nucleation_demand_from_preflight(
             finalized_demand.accepted_demand,
             finalized_demand.precursor_mass_change,
             diagnostics.gate_codes,
+            invalid,
+            upstream_invalid,
         ],
         device=device,
     )
@@ -1850,6 +1867,7 @@ def _convert_admitted_demand_to_counts(
     counts: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
     invalid_index: wp.int32,
+    upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Convert per-volume admitted demand to integral provisional counts.
 
@@ -1866,6 +1884,8 @@ def _convert_admitted_demand_to_counts(
         invalid_index: Status lane reserved for invalid conversions.
     """
     box = wp.tid()
+    if upstream_invalid[0] != 0:
+        return
     events = accepted_demand[box] * volume[box]
     if (
         not wp.isfinite(accepted_demand[box])
@@ -1890,6 +1910,8 @@ def _commit_staged_nucleation_slots(
     accepted_counts: wp.array(dtype=wp.int32),
     selected_slot_indices: wp.array2d(dtype=wp.int32),
     n_particles: int,
+    invalid: wp.array(dtype=wp.int32),
+    upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Commit full P3 counts and the selectable E6-F5 free-slot prefix.
 
@@ -1907,6 +1929,8 @@ def _commit_staged_nucleation_slots(
         n_particles: Fixed particle capacity ``N`` per box.
     """
     box = wp.tid()
+    if invalid[0] != 0 or invalid[1] != 0 or upstream_invalid[0] != 0:
+        return
     count = counts[box]
     accepted_counts[box] = count
     selectable = wp.min(count, free_slot_counts[box])
@@ -1952,10 +1976,11 @@ def _convert_staged_nucleation_counts(
     accepted_demand: Any,
     volume: Any,
     device: Any,
-) -> tuple[Any, Any]:
+) -> tuple[Any, Any, Any]:
     """Convert admitted demand to private counts and a shared invalid flag."""
     counts = wp.zeros(accepted_demand.shape[0], dtype=wp.int32, device=device)
     invalid = wp.zeros(2, dtype=wp.int32, device=device)
+    upstream_invalid = wp.zeros(1, dtype=wp.int32, device=device)
     wp.launch(
         _convert_admitted_demand_to_counts,
         dim=accepted_demand.shape[0],
@@ -1966,10 +1991,11 @@ def _convert_staged_nucleation_counts(
             counts,
             invalid,
             1,
+            upstream_invalid,
         ],
         device=device,
     )
-    return counts, invalid
+    return counts, invalid, upstream_invalid
 
 
 def _write_staged_nucleation_diagnostics(
@@ -2048,7 +2074,7 @@ def _stage_nucleation_slots(
     if preflight.n_boxes == 0:
         return
 
-    counts, invalid = _convert_staged_nucleation_counts(
+    counts, invalid, upstream_invalid = _convert_staged_nucleation_counts(
         finalized_demand.accepted_demand,
         preflight.particles.volume,
         preflight.device,
@@ -2090,6 +2116,8 @@ def _stage_nucleation_slots(
             finalized_demand.accepted_counts,
             diagnostics.selected_slot_indices,
             preflight.n_particles,
+            invalid,
+            upstream_invalid,
         ],
         device=preflight.device,
     )
@@ -2110,9 +2138,12 @@ def _validate_p4_handoff(  # noqa: C901
     minimum: wp.array(dtype=wp.float64),
     minimum_volume: wp.array(dtype=wp.float64),
     invalid: wp.array(dtype=wp.int32),
+    upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Validate immutable P2/P3 handoffs and P4 policy inputs per box."""
     box = wp.tid()
+    if upstream_invalid[0] != 0:
+        return
     events = accepted_demand[box] * volume[box]
     if (
         not wp.isfinite(accepted_demand[box])
@@ -2170,9 +2201,14 @@ def _select_p4_policy(
     release: wp.array(dtype=wp.int32),
     scaling: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
+    upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Select all-or-nothing resampling before scaling for one box."""
     box = wp.tid()
+    if invalid[0] != 0 or upstream_invalid[0] != 0:
+        release[box] = 0
+        scaling[box] = 0
+        return
     deficit = wp.max(counts[box] - free_counts[box], 0)
     release[box] = 0
     scaling[box] = 0
@@ -2199,11 +2235,14 @@ def _select_p4_policy(
 
 @wp.kernel
 def _copy_p4_workspace(
-    source: wp.array(dtype=wp.float64), destination: wp.array(dtype=wp.float64)
+    source: wp.array(dtype=wp.float64),
+    destination: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Copy immutable P2 admitted demand into private mutable P4 workspace."""
     box = wp.tid()
-    destination[box] = source[box]
+    if invalid[0] == 0:
+        destination[box] = source[box]
 
 
 @wp.kernel
@@ -2212,9 +2251,12 @@ def _validate_p4_final(  # noqa: C901
     volume: wp.array(dtype=wp.float64),
     free_counts: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
+    upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Validate final P4 counts before finalized diagnostic writes."""
     box = wp.tid()
+    if upstream_invalid[0] != 0:
+        return
     events = demand[box] * volume[box]
     if (
         not wp.isfinite(demand[box])
@@ -2236,9 +2278,13 @@ def _write_p4_final(
     final_demand: wp.array(dtype=wp.float64),
     final_counts: wp.array(dtype=wp.int32),
     final_indices: wp.array2d(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
+    upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Commit finalized P4 demand, counts, and ascending free-slot prefixes."""
     box = wp.tid()
+    if invalid[0] != 0 or upstream_invalid[0] != 0:
+        return
     count = wp.int32(demand[box] * volume[box])
     final_demand[box] = demand[box]
     final_counts[box] = count
@@ -2271,10 +2317,11 @@ def _write_current_p4_diagnostics(
 def _write_unscaled_p4_resolution(
     scaling: wp.array(dtype=wp.int32),
     resolved_scale: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Set the P4 resolved scale to one for unselected policy rows."""
     box = wp.tid()
-    if scaling[box] == 0:
+    if invalid[0] == 0 and scaling[box] == 0:
         resolved_scale[box] = wp.float64(1.0)
 
 
@@ -2285,9 +2332,12 @@ def _write_p4_policy_diagnostics(
     scaling: wp.array(dtype=wp.int32),
     required_release: wp.array(dtype=wp.int32),
     scaling_required: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Commit validated private policy selection to P4 diagnostic sidecars."""
     box = wp.tid()
+    if invalid[0] != 0:
+        return
     required_release[box] = wp.max(counts[box] - free_counts[box], 0)
     scaling_required[box] = scaling[box]
 
@@ -2469,6 +2519,9 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
         device=preflight.device,
     )
     invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
+    upstream_invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
+    upstream_invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
+    upstream_invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
     if preflight.n_particles:
         wp.launch(
             _classify_slots,
@@ -2499,6 +2552,7 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             buffers.minimum_scale,
             buffers.minimum_volume,
             invalid,
+            upstream_invalid,
         ],
         device=preflight.device,
     )
@@ -2524,6 +2578,7 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             release,
             scaling,
             invalid,
+            upstream_invalid,
         ],
         device=preflight.device,
     )
@@ -2546,13 +2601,18 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             scaling,
             buffers.required_release_counts,
             buffers.scaling_required,
+            invalid,
         ],
         device=preflight.device,
     )
     wp.launch(
         _copy_p4_workspace,
         dim=preflight.n_boxes,
-        inputs=[finalized_demand.accepted_demand, buffers.demand_workspace],
+        inputs=[
+            finalized_demand.accepted_demand,
+            buffers.demand_workspace,
+            invalid,
+        ],
         device=preflight.device,
     )
     if status & 2:
@@ -2573,7 +2633,7 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
         wp.launch(
             _write_unscaled_p4_resolution,
             dim=preflight.n_boxes,
-            inputs=[scaling, buffers.resolved_scale],
+            inputs=[scaling, buffers.resolved_scale, invalid],
             device=preflight.device,
         )
     final_invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
@@ -2622,6 +2682,7 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             preflight.particles.volume,
             current_count,
             final_invalid,
+            upstream_invalid,
         ],
         device=preflight.device,
     )
@@ -2637,6 +2698,8 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             buffers.final_demand,
             buffers.final_counts,
             buffers.final_selected_slot_indices,
+            final_invalid,
+            upstream_invalid,
         ],
         device=preflight.device,
     )
@@ -2648,9 +2711,12 @@ def _validate_participating_molecule_counts(
     partitioning: wp.array2d(dtype=wp.int32),
     molecule_counts: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
+    upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Reject positive molecule counts for non-participating gas lanes."""
     box = wp.tid()
+    if upstream_invalid[0] != 0:
+        return
     for species in range(molecule_counts.shape[0]):
         if molecule_counts[species] > 0 and partitioning[box, species] != 1:
             wp.atomic_or(invalid, 0, 1)
@@ -2668,10 +2734,16 @@ def _validate_public_molecule_eligibility(
         device=preflight.device,
     )
     invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
+    upstream_invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
     wp.launch(
         _validate_participating_molecule_counts,
         dim=preflight.n_boxes,
-        inputs=[preflight.gas.partitioning, molecule_counts, invalid],
+        inputs=[
+            preflight.gas.partitioning,
+            molecule_counts,
+            invalid,
+            upstream_invalid,
+        ],
         device=preflight.device,
     )
     if int(invalid.numpy()[0]):
@@ -2694,9 +2766,12 @@ def _validate_p5_handoff(  # noqa: C901
     final_counts: wp.array(dtype=wp.int32),
     selected_indices: wp.array2d(dtype=wp.int32),
     status: wp.array(dtype=wp.int32),
+    upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Validate P4's final handoff before the sole P5 writer launches."""
     box = wp.tid()
+    if upstream_invalid[0] != 0:
+        return
     count = final_counts[box]
     events = final_demand[box] * volume[box]
     invalid = bool(
@@ -2764,9 +2839,13 @@ def _commit_nucleation_p5_kernel(
     final_counts: wp.array(dtype=wp.int32),
     selected_indices: wp.array2d(dtype=wp.int32),
     resolved_scale: wp.array(dtype=wp.float64),
+    status: wp.array(dtype=wp.int32),
+    upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
     """Fuse finalized free-slot activation and matching gas removal."""
     box = wp.tid()
+    if upstream_invalid[0] != 0 or status[0] != 2:
+        return
     for rank in range(final_counts[box]):
         particle = selected_indices[box, rank]
         for species in range(masses.shape[2]):
@@ -2851,6 +2930,7 @@ def _commit_nucleation_p5(
         device=preflight.device,
     )
     status = wp.zeros(1, dtype=wp.int32, device=preflight.device)
+    upstream_invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
     wp.launch(
         _validate_p5_handoff,
         dim=preflight.n_boxes,
@@ -2867,6 +2947,7 @@ def _commit_nucleation_p5(
             buffers.final_counts,
             buffers.final_selected_slot_indices,
             status,
+            upstream_invalid,
         ],
         device=preflight.device,
     )
@@ -2890,6 +2971,8 @@ def _commit_nucleation_p5(
             buffers.final_counts,
             buffers.final_selected_slot_indices,
             buffers.resolved_scale,
+            status,
+            upstream_invalid,
         ],
         device=preflight.device,
     )
@@ -2992,29 +3075,231 @@ def _execute_nucleation_step_gpu(
     return particles, gas
 
 
+@wp.kernel
+def _reset_prepared_nucleation_status(  # noqa: PLR0913
+    p1_status: wp.array(dtype=wp.int32),
+    pipeline_invalid: wp.array(dtype=wp.int32),
+    p2_status: wp.array(dtype=wp.int32),
+    p3_status: wp.array(dtype=wp.int32),
+    molecule_status: wp.array(dtype=wp.int32),
+    p4_status: wp.array(dtype=wp.int32),
+    p4_final_status: wp.array(dtype=wp.int32),
+    p5_status: wp.array(dtype=wp.int32),
+    release: wp.array(dtype=wp.int32),
+    scaling: wp.array(dtype=wp.int32),
+) -> None:
+    """Reset preparation-owned status and policy work on device."""
+    index = wp.tid()
+    if index < p1_status.shape[0]:
+        p1_status[index] = 0
+    if index < release.shape[0]:
+        release[index] = 0
+        scaling[index] = 0
+    if index == 0:
+        pipeline_invalid[0] = 0
+        p2_status[0] = 0
+        p2_status[1] = 0
+        p3_status[0] = 0
+        p3_status[1] = 0
+        molecule_status[0] = 0
+        p4_status[0] = 0
+        p4_final_status[0] = 0
+        p5_status[0] = 0
+
+
+@wp.kernel
+def _validate_prepared_nucleation_p1(  # noqa: C901, PLR0913
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    volume: wp.array(dtype=wp.float64),
+    molar_mass: wp.array(dtype=wp.float64),
+    gas_concentration: wp.array2d(dtype=wp.float64),
+    partitioning: wp.array2d(dtype=wp.int32),
+    temperature: wp.array(dtype=wp.float64),
+    saturation: wp.array2d(dtype=wp.float64),
+    n_boxes: wp.int32,
+    precursor_index: wp.int32,
+    temperature_lower: wp.float64,
+    temperature_upper: wp.float64,
+    coefficient: wp.float64,
+    survival_factor: wp.float64,
+    has_saturation: wp.int32,
+    saturation_upper: wp.float64,
+    precursor_lower: wp.float64,
+    precursor_upper: wp.float64,
+    status: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Validate all live P1 payloads and retain ordered error lanes."""
+    box = wp.tid()
+    if box == 0:
+        for species in range(density.shape[0]):
+            if not wp.isfinite(density[species]) or density[species] <= 0.0:
+                wp.atomic_add(status, 2, 1)
+                wp.atomic_add(invalid, 0, 1)
+            if (
+                not wp.isfinite(molar_mass[species])
+                or molar_mass[species] <= 0.0
+            ):
+                wp.atomic_add(status, 5, 1)
+                wp.atomic_add(invalid, 0, 1)
+    if box >= n_boxes:
+        return
+    active = coefficient != 0.0 and survival_factor != 0.0
+    if not wp.isfinite(volume[box]) or volume[box] <= 0.0:
+        wp.atomic_add(status, 3, 1)
+        wp.atomic_add(invalid, 0, 1)
+    if not wp.isfinite(temperature[box]) or temperature[box] <= 0.0:
+        wp.atomic_add(status, 7, 1)
+        wp.atomic_add(invalid, 0, 1)
+    elif active and (
+        temperature[box] < temperature_lower
+        or temperature[box] > temperature_upper
+    ):
+        wp.atomic_add(status, 8, 1)
+        wp.atomic_add(invalid, 0, 1)
+    for particle in range(concentration.shape[1]):
+        if (
+            not wp.isfinite(concentration[box, particle])
+            or concentration[box, particle] < 0.0
+        ):
+            wp.atomic_add(status, 1, 1)
+            wp.atomic_add(invalid, 0, 1)
+        if not wp.isfinite(charge[box, particle]):
+            wp.atomic_add(status, 4, 1)
+            wp.atomic_add(invalid, 0, 1)
+        for species in range(density.shape[0]):
+            if (
+                not wp.isfinite(masses[box, particle, species])
+                or masses[box, particle, species] < 0.0
+            ):
+                wp.atomic_add(status, 0, 1)
+                wp.atomic_add(invalid, 0, 1)
+    for species in range(molar_mass.shape[0]):
+        if (
+            not wp.isfinite(gas_concentration[box, species])
+            or gas_concentration[box, species] < 0.0
+        ):
+            wp.atomic_add(status, 6, 1)
+            wp.atomic_add(invalid, 0, 1)
+        if active and (
+            partitioning[box, species] != 0 and partitioning[box, species] != 1
+        ):
+            wp.atomic_add(status, 11, 1)
+            wp.atomic_add(invalid, 0, 1)
+        if active and has_saturation != 0:
+            if (
+                not wp.isfinite(saturation[box, species])
+                or saturation[box, species] < 0.0
+            ):
+                wp.atomic_add(status, 9, 1)
+                wp.atomic_add(invalid, 0, 1)
+    if not active:
+        return
+    if (
+        has_saturation != 0
+        and saturation[box, precursor_index] > saturation_upper
+    ):
+        wp.atomic_add(status, 10, 1)
+        wp.atomic_add(invalid, 0, 1)
+    if partitioning[box, precursor_index] != 1:
+        wp.atomic_add(status, 12, 1)
+        wp.atomic_add(invalid, 0, 1)
+    if molar_mass[precursor_index] > 0.0:
+        precursor = (
+            gas_concentration[box, precursor_index]
+            * _AVOGADRO_NUMBER
+            / molar_mass[precursor_index]
+        )
+        if precursor != 0.0 and (
+            precursor < precursor_lower or precursor > precursor_upper
+        ):
+            wp.atomic_add(status, 13, 1)
+            wp.atomic_add(invalid, 0, 1)
+
+
+@wp.kernel
+def _aggregate_prepared_status(
+    status: wp.array(dtype=wp.int32),
+    pipeline_invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Promote any phase-local status lane into the pipeline gate."""
+    for index in range(status.shape[0]):
+        if status[index] != 0:
+            pipeline_invalid[0] = 1
+
+
+@wp.kernel
+def _promote_prepared_invalid_lane(
+    status: wp.array(dtype=wp.int32),
+    lane: wp.int32,
+    pipeline_invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Promote one invalid-only status lane into the pipeline gate."""
+    if status[lane] != 0:
+        pipeline_invalid[0] = 1
+
+
+@wp.kernel
+def _commit_prepared_p3_diagnostics(
+    categories: wp.array2d(dtype=wp.int32),
+    free_indices: wp.array2d(dtype=wp.int32),
+    active_counts: wp.array(dtype=wp.int32),
+    free_counts: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
+    upstream_invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Commit E6-F5 diagnostics only after complete P3 validation."""
+    box = wp.tid()
+    if invalid[0] != 0 or invalid[1] != 0 or upstream_invalid[0] != 0:
+        return
+    active = wp.int32(0)
+    free = wp.int32(0)
+    for particle in range(categories.shape[1]):
+        if categories[box, particle] == 1:
+            active += 1
+        elif categories[box, particle] == 2:
+            free_indices[box, free] = particle
+            free += 1
+    for particle in range(free, categories.shape[1]):
+        free_indices[box, particle] = -1
+    active_counts[box] = active
+    free_counts[box] = free
+
+
 @dataclass(frozen=True)
 class _PreparedNucleationCall:
-    """Pin one private direct-nucleation request for deferred execution.
+    """Pin one allocation-complete P1--P5 nucleation launch sequence."""
 
-    The record retains caller-owned containers, sidecars, controls, and direct
-    environment inputs by identity.  It intentionally owns no payload snapshot:
-    the established direct implementation remains authoritative for reading live
-    device payloads, translating errors, and defining the post-writer rollback
-    boundary.
-    """
-
-    particles: Any
-    gas: Any
-    config: NucleationConfig
-    time_step: Any
-    scratch: NucleationScratchBuffers
-    finalized_demand: NucleationFinalizedDemandBuffers
-    diagnostics: NucleationDiagnosticBuffers
-    exhaustion_controls: NucleationExhaustionControls
-    exhaustion_buffers: NucleationExhaustionBuffers
-    temperature: Any | None
-    saturation: Any | None
-    environment: Any | None
+    result: tuple[Any, Any]
+    particle_arrays: tuple[Any, ...]
+    gas_arrays: tuple[Any, ...]
+    temperature: Any
+    saturation: Any
+    scalar_controls: tuple[Any, ...]
+    policy_controls: tuple[int, int]
+    molecule_counts: Any
+    scratch_arrays: tuple[Any, ...]
+    finalized_arrays: tuple[Any, ...]
+    diagnostic_arrays: tuple[Any, ...]
+    p4_arrays: tuple[Any, ...]
+    p2_work: tuple[Any, ...]
+    p3_work: tuple[Any, ...]
+    p4_work: tuple[Any, ...]
+    p1_status: Any
+    pipeline_invalid: Any
+    p2_status: Any
+    p3_status: Any
+    molecule_status: Any
+    p4_status: Any
+    p4_final_status: Any
+    p5_status: Any
+    resampling: _PreparedResamplingCall | None
+    scaling: _PreparedRepresentativeVolumeScalingCall | None
+    dimensions: tuple[int, int, int]
+    device: Any
 
 
 def _prepare_nucleation_step_gpu(
@@ -3032,15 +3317,7 @@ def _prepare_nucleation_step_gpu(
     saturation: Any | None = None,
     environment: Any | None = None,
 ) -> _PreparedNucleationCall:
-    """Prepare a private nucleation call and pin all supplied references.
-
-    This concrete-only seam deliberately does not create a public API or copy
-    mutable Warp payload values.  The paired enqueue/observe helpers preserve
-    the legacy direct boundary's validation ordering and writer semantics.
-    """
-    if not isinstance(config, NucleationConfig):
-        raise TypeError("config must be a NucleationConfig.")
-    normalized_time_step = _real(time_step, "time_step")
+    """Validate, allocate, and pin one private nucleation invocation."""
     if not isinstance(scratch, NucleationScratchBuffers):
         raise ValueError("scratch must be NucleationScratchBuffers.")
     if not isinstance(finalized_demand, NucleationFinalizedDemandBuffers):
@@ -3049,59 +3326,604 @@ def _prepare_nucleation_step_gpu(
         )
     if not isinstance(diagnostics, NucleationDiagnosticBuffers):
         raise ValueError("diagnostics must be NucleationDiagnosticBuffers.")
-    if not isinstance(exhaustion_controls, NucleationExhaustionControls):
-        raise ValueError("controls must be NucleationExhaustionControls.")
-    exhaustion_controls.__post_init__()
-    if not isinstance(exhaustion_buffers, NucleationExhaustionBuffers):
-        raise ValueError(
-            "exhaustion_buffers must be NucleationExhaustionBuffers."
-        )
-    return _PreparedNucleationCall(
+    preflight = _preflight_nucleation(
         particles,
         gas,
         config,
-        normalized_time_step,
-        scratch,
-        finalized_demand,
-        diagnostics,
-        exhaustion_controls,
-        exhaustion_buffers,
-        temperature,
-        saturation,
-        environment,
+        time_step,
+        temperature=temperature,
+        saturation=saturation,
+        environment=environment,
+        scratch=scratch,
+        finalized_demand=finalized_demand,
+        diagnostics=diagnostics,
+    )
+    _validate_public_p4_inputs(
+        preflight, exhaustion_controls, exhaustion_buffers
+    )
+    b, n, s, device = (
+        preflight.n_boxes,
+        preflight.n_particles,
+        preflight.n_species,
+        preflight.device,
+    )
+    particle_arrays = preflight.particle_arrays
+    gas_arrays = preflight.gas_arrays
+    temperature_work = preflight.temperature
+    if isinstance(temperature_work, float):
+        temperature_work = wp.full(
+            b, temperature_work, dtype=wp.float64, device=device
+        )
+    saturation_work = preflight.saturation
+    if saturation_work is None:
+        saturation_work = wp.zeros((b, s), dtype=wp.float64, device=device)
+    molecule_counts = wp.array(
+        np.asarray(config.molecule_counts, dtype=np.int32),
+        dtype=wp.int32,
+        device=device,
+    )
+    scratch_arrays = (
+        scratch.precursor_number_concentration,
+        scratch.potential_rate,
+        scratch.potential_demand,
+    )
+    finalized_arrays = (
+        finalized_demand.accepted_counts,
+        finalized_demand.accepted_demand,
+        finalized_demand.precursor_mass_change,
+    )
+    diagnostic_arrays = (
+        diagnostics.gate_codes,
+        diagnostics.selected_slot_indices,
+        diagnostics.free_slot_indices,
+        diagnostics.active_slot_counts,
+        diagnostics.free_slot_counts,
+    )
+    p4_storage = _validate_p4_buffers(preflight, exhaustion_buffers)
+    p4_arrays = p4_storage[:11]
+    p2_work = (
+        wp.zeros(b, dtype=wp.float64, device=device),
+        wp.zeros(b, dtype=wp.float64, device=device),
+        wp.zeros(b, dtype=wp.float64, device=device),
+        wp.zeros(b, dtype=wp.float64, device=device),
+        wp.zeros((b, s), dtype=wp.float64, device=device),
+        wp.zeros(b, dtype=wp.int32, device=device),
+    )
+    p3_work = (
+        wp.zeros(b, dtype=wp.int32, device=device),
+        wp.empty((b, n), dtype=wp.int32, device=device),
+    )
+    p4_work = (
+        wp.empty((b, n), dtype=wp.int32, device=device),
+        wp.zeros(b, dtype=wp.int32, device=device),
+        wp.zeros(b, dtype=wp.int32, device=device),
+        wp.empty((b, n), dtype=wp.int32, device=device),
+        wp.empty((b, n), dtype=wp.int32, device=device),
+        wp.empty(b, dtype=wp.int32, device=device),
+    )
+    pipeline_invalid = wp.zeros(1, dtype=wp.int32, device=device)
+    resampling = None
+    scaling_call = None
+    if b and n:
+        resampling = _prepare_resampling_step_gpu(
+            particles,
+            p4_work[1],
+            exhaustion_buffers.resampling_buffers,
+            _upstream_invalid=pipeline_invalid,
+            _validate_payload=False,
+        )
+        scaling_call = _prepare_representative_volume_scaling_step_gpu(
+            particles,
+            p4_arrays[0],
+            p4_work[2],
+            p4_arrays[2],
+            p4_arrays[3],
+            p4_arrays[4],
+            p4_arrays[5],
+            _upstream_invalid=pipeline_invalid,
+            _validate_payload=False,
+        )
+    return _PreparedNucleationCall(
+        result=(particles, gas),
+        particle_arrays=particle_arrays,
+        gas_arrays=gas_arrays,
+        temperature=temperature_work,
+        saturation=saturation_work,
+        scalar_controls=(
+            config.precursor_index,
+            config.temperature_lower,
+            config.temperature_upper,
+            int(preflight.saturation is not None),
+            (
+                config.saturation_lower
+                if config.saturation_lower is not None
+                else 0.0
+            ),
+            (
+                config.saturation_upper
+                if config.saturation_upper is not None
+                else 0.0
+            ),
+            config.precursor_number_concentration_lower,
+            config.precursor_number_concentration_upper,
+            config.coefficient,
+            config.survival_factor,
+            preflight.normalized_time_step,
+            int(config.rate_law == "kinetic"),
+        ),
+        policy_controls=(
+            int(exhaustion_controls.resampling),
+            int(exhaustion_controls.representative_volume_scaling),
+        ),
+        molecule_counts=molecule_counts,
+        scratch_arrays=scratch_arrays,
+        finalized_arrays=finalized_arrays,
+        diagnostic_arrays=diagnostic_arrays,
+        p4_arrays=p4_arrays,
+        p2_work=p2_work,
+        p3_work=p3_work,
+        p4_work=p4_work,
+        p1_status=wp.zeros(14, dtype=wp.int32, device=device),
+        pipeline_invalid=pipeline_invalid,
+        p2_status=wp.zeros(2, dtype=wp.int32, device=device),
+        p3_status=wp.zeros(2, dtype=wp.int32, device=device),
+        molecule_status=wp.zeros(1, dtype=wp.int32, device=device),
+        p4_status=wp.zeros(1, dtype=wp.int32, device=device),
+        p4_final_status=wp.zeros(1, dtype=wp.int32, device=device),
+        p5_status=wp.zeros(1, dtype=wp.int32, device=device),
+        resampling=resampling,
+        scaling=scaling_call,
+        dimensions=(b, n, s),
+        device=device,
     )
 
 
 def _enqueue_prepared_nucleation_call(
     prepared: _PreparedNucleationCall,
 ) -> tuple[Any, Any]:
-    """Run one pinned direct nucleation call against live device payloads.
-
-    The legacy implementation performs the device launches and bounded status
-    observations.  It preserves the existing no-rollback guarantee once an
-    exhaustion primitive or P5 writer may have launched.
-    """
-    return _execute_nucleation_step_gpu(
-        prepared.particles,
-        prepared.gas,
-        prepared.config,
-        prepared.time_step,
-        scratch=prepared.scratch,
-        finalized_demand=prepared.finalized_demand,
-        diagnostics=prepared.diagnostics,
-        exhaustion_controls=prepared.exhaustion_controls,
-        exhaustion_buffers=prepared.exhaustion_buffers,
-        temperature=prepared.temperature,
-        saturation=prepared.saturation,
-        environment=prepared.environment,
+    """Enqueue one fixed P1--P5 sequence using only pinned arrays."""
+    b, n, s = prepared.dimensions
+    particles = prepared.particle_arrays
+    gas = prepared.gas_arrays
+    controls = prepared.scalar_controls
+    scratch = prepared.scratch_arrays
+    finalized = prepared.finalized_arrays
+    diagnostics = prepared.diagnostic_arrays
+    p4 = prepared.p4_arrays
+    p2_work = prepared.p2_work
+    p3_work = prepared.p3_work
+    p4_work = prepared.p4_work
+    wp.launch(
+        _reset_prepared_nucleation_status,
+        dim=max(14, b, 1),
+        inputs=[
+            prepared.p1_status,
+            prepared.pipeline_invalid,
+            prepared.p2_status,
+            prepared.p3_status,
+            prepared.molecule_status,
+            prepared.p4_status,
+            prepared.p4_final_status,
+            prepared.p5_status,
+            p4_work[1],
+            p4_work[2],
+        ],
+        device=prepared.device,
     )
+    wp.launch(
+        _validate_prepared_nucleation_p1,
+        dim=max(b, 1),
+        inputs=[
+            *particles,
+            *gas,
+            prepared.temperature,
+            prepared.saturation,
+            b,
+            controls[0],
+            controls[1],
+            controls[2],
+            controls[8],
+            controls[9],
+            controls[3],
+            controls[5],
+            controls[6],
+            controls[7],
+            prepared.p1_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    if not b:
+        return prepared.result
+    wp.launch(
+        _plan_demand_work,
+        dim=b,
+        inputs=[
+            gas[1],
+            gas[0],
+            prepared.saturation,
+            prepared.molecule_counts,
+            s,
+            controls[0],
+            controls[3],
+            controls[4],
+            controls[8],
+            controls[9],
+            controls[10],
+            controls[11],
+            *p2_work,
+            prepared.p2_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    wp.launch(
+        _aggregate_prepared_status,
+        dim=1,
+        inputs=[prepared.p2_status, prepared.pipeline_invalid],
+        device=prepared.device,
+    )
+    wp.launch(
+        _commit_demand_plan,
+        dim=b,
+        inputs=[
+            *p2_work,
+            s,
+            *scratch,
+            finalized[1],
+            finalized[2],
+            diagnostics[0],
+            prepared.p2_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    wp.launch(
+        _convert_admitted_demand_to_counts,
+        dim=b,
+        inputs=[
+            finalized[1],
+            particles[4],
+            float(np.iinfo(np.int32).max),
+            p3_work[0],
+            prepared.p3_status,
+            1,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    if n:
+        wp.launch(
+            _classify_slots,
+            dim=(b, n),
+            inputs=[
+                particles[0],
+                particles[1],
+                particles[2],
+                p3_work[1],
+                prepared.p3_status,
+            ],
+            device=prepared.device,
+        )
+    wp.launch(
+        _aggregate_prepared_status,
+        dim=1,
+        inputs=[prepared.p3_status, prepared.pipeline_invalid],
+        device=prepared.device,
+    )
+    wp.launch(
+        _commit_prepared_p3_diagnostics,
+        dim=b,
+        inputs=[
+            p3_work[1],
+            diagnostics[2],
+            diagnostics[3],
+            diagnostics[4],
+            prepared.p3_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    wp.launch(
+        _commit_staged_nucleation_slots,
+        dim=b,
+        inputs=[
+            p3_work[0],
+            diagnostics[2],
+            diagnostics[4],
+            finalized[0],
+            diagnostics[1],
+            n,
+            prepared.p3_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    wp.launch(
+        _validate_participating_molecule_counts,
+        dim=b,
+        inputs=[
+            gas[2],
+            prepared.molecule_counts,
+            prepared.molecule_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    wp.launch(
+        _aggregate_prepared_status,
+        dim=1,
+        inputs=[prepared.molecule_status, prepared.pipeline_invalid],
+        device=prepared.device,
+    )
+    if n:
+        wp.launch(
+            _classify_slots,
+            dim=(b, n),
+            inputs=[
+                particles[0],
+                particles[1],
+                particles[2],
+                p4_work[0],
+                prepared.p4_status,
+            ],
+            device=prepared.device,
+        )
+    wp.launch(
+        _validate_p4_handoff,
+        dim=b,
+        inputs=[
+            finalized[1],
+            finalized[0],
+            particles[4],
+            p4_work[0],
+            diagnostics[2],
+            diagnostics[3],
+            diagnostics[4],
+            diagnostics[1],
+            p4[6],
+            p4[2],
+            p4[3],
+            p4[4],
+            prepared.p4_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    wp.launch(
+        _select_p4_policy,
+        dim=b,
+        inputs=[
+            finalized[1],
+            finalized[0],
+            diagnostics[4],
+            p4[6],
+            p4[2],
+            p4[4],
+            particles[4],
+            *prepared.policy_controls,
+            p4_work[1],
+            p4_work[2],
+            prepared.p4_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    wp.launch(
+        _aggregate_prepared_status,
+        dim=1,
+        inputs=[prepared.p4_status, prepared.pipeline_invalid],
+        device=prepared.device,
+    )
+    wp.launch(
+        _write_p4_policy_diagnostics,
+        dim=b,
+        inputs=[
+            finalized[0],
+            diagnostics[4],
+            p4_work[2],
+            p4[7],
+            p4[8],
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    wp.launch(
+        _copy_p4_workspace,
+        dim=b,
+        inputs=[finalized[1], p4[0], prepared.pipeline_invalid],
+        device=prepared.device,
+    )
+    wp.launch(
+        _write_unscaled_p4_resolution,
+        dim=b,
+        inputs=[p4_work[2], p4[5], prepared.pipeline_invalid],
+        device=prepared.device,
+    )
+    if prepared.resampling is not None:
+        _enqueue_prepared_resampling_call(prepared.resampling)
+        wp.launch(
+            _aggregate_prepared_status,
+            dim=1,
+            inputs=[
+                prepared.resampling.invalid,
+                prepared.pipeline_invalid,
+            ],
+            device=prepared.device,
+        )
+        wp.launch(
+            _aggregate_prepared_status,
+            dim=1,
+            inputs=[
+                prepared.resampling.planning_failed,
+                prepared.pipeline_invalid,
+            ],
+            device=prepared.device,
+        )
+    if prepared.scaling is not None:
+        _enqueue_prepared_representative_volume_scaling_call(prepared.scaling)
+        wp.launch(
+            _promote_prepared_invalid_lane,
+            dim=1,
+            inputs=[prepared.scaling.status, 0, prepared.pipeline_invalid],
+            device=prepared.device,
+        )
+    if n:
+        wp.launch(
+            _classify_slots,
+            dim=(b, n),
+            inputs=[
+                particles[0],
+                particles[1],
+                particles[2],
+                p4_work[3],
+                prepared.p4_final_status,
+            ],
+            device=prepared.device,
+        )
+    wp.launch(
+        _write_current_p4_diagnostics,
+        dim=b,
+        inputs=[p4_work[3], p4_work[4], p4_work[5]],
+        device=prepared.device,
+    )
+    wp.launch(
+        _validate_p4_final,
+        dim=b,
+        inputs=[
+            p4[0],
+            particles[4],
+            p4_work[5],
+            prepared.p4_final_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    wp.launch(
+        _aggregate_prepared_status,
+        dim=1,
+        inputs=[prepared.p4_final_status, prepared.pipeline_invalid],
+        device=prepared.device,
+    )
+    wp.launch(
+        _write_p4_final,
+        dim=b,
+        inputs=[
+            p4[0],
+            particles[4],
+            p4_work[4],
+            p4[1],
+            p4[9],
+            p4[10],
+            prepared.p4_final_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    wp.launch(
+        _validate_p5_handoff,
+        dim=b,
+        inputs=[
+            particles[0],
+            particles[1],
+            particles[2],
+            particles[4],
+            gas[1],
+            gas[0],
+            gas[2],
+            prepared.molecule_counts,
+            p4[1],
+            p4[9],
+            p4[10],
+            prepared.p5_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    wp.launch(
+        _commit_nucleation_p5_kernel,
+        dim=b,
+        inputs=[
+            particles[0],
+            particles[1],
+            particles[2],
+            particles[4],
+            gas[1],
+            gas[0],
+            prepared.molecule_counts,
+            p4[1],
+            p4[9],
+            p4[10],
+            p4[5],
+            prepared.p5_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
+    return prepared.result
 
 
-def _observe_prepared_nucleation_call(
-    result: tuple[Any, Any],
+def _observe_prepared_nucleation_call(  # noqa: C901
+    prepared: _PreparedNucleationCall,
 ) -> tuple[Any, Any]:
-    """Return the direct call result after its legacy observer has run."""
-    return result
+    """Interpret bounded device status in legacy phase-error order."""
+    p1 = prepared.p1_status.numpy()
+    p1_errors = (
+        "particles.masses must be finite and nonnegative.",
+        "particles.concentration must be finite and nonnegative.",
+        "particles.density must be positive and finite.",
+        "particles.volume must be positive and finite.",
+        "particles.charge must be finite.",
+        "gas.molar_mass must be positive and finite.",
+        "gas.concentration must be finite and nonnegative.",
+        "temperature must be positive and finite.",
+        "temperature is outside configured bounds.",
+        "saturation must be finite and nonnegative.",
+        "saturation is outside configured bounds.",
+        "gas.partitioning must be binary.",
+        "precursor partitioning must be enabled.",
+        "precursor_number_concentration is outside configured bounds.",
+    )
+    for value, message in zip(p1, p1_errors, strict=True):
+        if int(value):
+            raise ValueError(message)
+    p2 = prepared.p2_status.numpy()
+    if int(p2[0]):
+        raise ValueError(
+            "Derived nucleation demand must be finite and nonnegative."
+        )
+    if int(p2[1]):
+        raise ValueError("Nucleation demand cannot be made inventory-safe.")
+    p3 = prepared.p3_status.numpy()
+    if int(p3[0]):
+        raise ValueError("Invalid particle slot state.")
+    if int(p3[1]):
+        raise ValueError(
+            "accepted_demand times particle volume must be a finite, "
+            "nonnegative integral int32 count."
+        )
+    if int(prepared.molecule_status.numpy()[0]):
+        raise ValueError(
+            "Positive molecule counts require participating gas species."
+        )
+    if int(prepared.p4_status.numpy()[0]):
+        raise ValueError("P4 handoff, policy input, or capacity is invalid.")
+    if prepared.resampling is not None:
+        if int(prepared.resampling.invalid.numpy()[0]):
+            raise ValueError(
+                "particles or required_release_counts have invalid values"
+            )
+        if int(prepared.resampling.planning_failed.numpy()[0]):
+            raise ValueError("resampling diagnostic exceeds bound")
+    if prepared.scaling is not None and int(prepared.scaling.status.numpy()[0]):
+        raise ValueError(
+            "particles or representative scaling sidecars have invalid values"
+        )
+    if int(prepared.p4_final_status.numpy()[0]):
+        raise ValueError("P4 final demand does not fit available capacity.")
+    if int(prepared.p5_status.numpy()[0]) & 1:
+        raise ValueError("P5 finalized nucleation handoff is invalid.")
+    return prepared.result
 
 
 def nucleation_step_gpu(
@@ -3121,24 +3943,47 @@ def nucleation_step_gpu(
 ) -> tuple[Any, Any]:
     """Execute one fixed-capacity direct-Warp nucleation step.
 
-    This public boundary is intentionally the narrow ``prepare → enqueue →
-    observe`` composition.  Its private records remain concrete-module-only.
+    The supported public boundary composes private ``prepare → enqueue →
+    observe`` helpers.  Prepared records pin references rather than payload
+    snapshots, so the direct executor consumes current device data.  Private
+    records and helpers remain concrete-module-only.
+
+    Args:
+        particles: Caller-owned fixed-capacity Warp particle container.
+        gas: Caller-owned same-device Warp gas container.
+        config: Immutable scalar nucleation controls.
+        time_step: Finite nonnegative step duration [s].
+        scratch: Caller-owned P2 planning sidecars.
+        finalized_demand: Caller-owned P2/P3 finalized-demand sidecars.
+        diagnostics: Caller-owned P2/P3 diagnostic sidecars.
+        exhaustion_controls: Concrete P4 resampling and scaling controls.
+        exhaustion_buffers: Caller-owned P4 workspace and diagnostics.
+        temperature: Positive scalar [K] or same-device ``wp.float64 (B,)``.
+        saturation: Configured same-device ``wp.float64 (B, S)`` ratios.
+        environment: Optional same-device owner of temperature and saturation.
+
+    Returns:
+        The identical caller-owned ``(particles, gas)`` containers.
+
+    Raises:
+        TypeError: If a required scalar or configuration has an unsupported
+            type.
+        ValueError: If P1--P5 validation, ownership, physical state, or a
+            finalized handoff is invalid.
     """
-    return _observe_prepared_nucleation_call(
-        _enqueue_prepared_nucleation_call(
-            _prepare_nucleation_step_gpu(
-                particles,
-                gas,
-                config,
-                time_step,
-                scratch=scratch,
-                finalized_demand=finalized_demand,
-                diagnostics=diagnostics,
-                exhaustion_controls=exhaustion_controls,
-                exhaustion_buffers=exhaustion_buffers,
-                temperature=temperature,
-                saturation=saturation,
-                environment=environment,
-            )
-        )
+    prepared = _prepare_nucleation_step_gpu(
+        particles,
+        gas,
+        config,
+        time_step,
+        scratch=scratch,
+        finalized_demand=finalized_demand,
+        diagnostics=diagnostics,
+        exhaustion_controls=exhaustion_controls,
+        exhaustion_buffers=exhaustion_buffers,
+        temperature=temperature,
+        saturation=saturation,
+        environment=environment,
     )
+    _enqueue_prepared_nucleation_call(prepared)
+    return _observe_prepared_nucleation_call(prepared)

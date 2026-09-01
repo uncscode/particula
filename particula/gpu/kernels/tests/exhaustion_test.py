@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from types import SimpleNamespace
-from typing import Any, cast
+from typing import Any
 
 import numpy as np
 import numpy.testing as npt
@@ -13,85 +13,217 @@ import pytest
 pytestmark = [pytest.mark.warp, pytest.mark.gpu_parity]
 
 
-def test_resampling_wrapper_delegates_through_prepared_call(
+def test_resampling_prepared_enqueue_is_setup_free_and_pinned(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """The public resampling wrapper enqueues its exact prepared record."""
+    """Prepared resampling uses pinned arrays without host setup work."""
     from particula.gpu.kernels import exhaustion as exhaustion_module
 
-    particles = object()
-    required_release_counts = object()
-    buffers = object()
-    prepared = object()
-    result = object()
-    calls: list[tuple[tuple[object, ...], dict[str, float]]] = []
-
-    def prepare(*args: object, **kwargs: float) -> object:
-        calls.append((args, kwargs))
-        return prepared
-
-    monkeypatch.setattr(
-        exhaustion_module, "_prepare_resampling_step_gpu", prepare
+    warm_particles, warm_counts, warm_buffers = _state()
+    warm_prepared = exhaustion_module._prepare_resampling_step_gpu(
+        warm_particles, warm_counts, warm_buffers
     )
-    monkeypatch.setattr(
-        exhaustion_module,
-        "_enqueue_prepared_resampling_call",
-        lambda value: result
-        if value is prepared
-        else pytest.fail("wrong call"),
+    exhaustion_module._enqueue_prepared_resampling_call(warm_prepared)
+
+    particles, counts, buffers = _state()
+    prepared = exhaustion_module._prepare_resampling_step_gpu(
+        particles, counts, buffers
     )
+    pinned_concentration = prepared.concentration
+    replacement = _warp().zeros((1, 4), dtype=_warp().float64, device="cpu")
+    particles.concentration = replacement
+
+    def forbidden(*_args: object, **_kwargs: object) -> None:
+        pytest.fail("prepared enqueue performed forbidden host setup")
+
+    with monkeypatch.context() as context:
+        for name in ("zeros", "empty", "array", "full", "synchronize"):
+            context.setattr(exhaustion_module.wp, name, forbidden)
+        context.setattr(
+            exhaustion_module, "_execute_resampling_step_gpu", forbidden
+        )
+        context.setattr(prepared.invalid, "numpy", forbidden)
+        context.setattr(prepared.planning_failed, "numpy", forbidden)
+        assert (
+            exhaustion_module._enqueue_prepared_resampling_call(prepared)
+            is particles
+        )
 
     assert (
-        exhaustion_module.resampling_step_gpu(
+        exhaustion_module._observe_prepared_resampling_call(prepared)
+        is particles
+    )
+    np.testing.assert_array_equal(replacement.numpy(), np.zeros((1, 4)))
+    assert np.count_nonzero(pinned_concentration.numpy()) == 2
+
+
+def test_resampling_prepared_enqueue_gates_live_invalid_counts() -> None:
+    """A post-prepare invalid release count cannot launch the commit writer."""
+    from particula.gpu.kernels import exhaustion as exhaustion_module
+
+    particles, counts, buffers = _state()
+    prepared = exhaustion_module._prepare_resampling_step_gpu(
+        particles, counts, buffers
+    )
+    before = tuple(
+        values.numpy().copy()
+        for values in (
+            prepared.masses,
+            prepared.concentration,
+            prepared.charge,
+        )
+    )
+    _warp().copy(
+        counts,
+        _warp().array([3], dtype=_warp().int32, device="cpu"),
+    )
+
+    exhaustion_module._enqueue_prepared_resampling_call(prepared)
+
+    with pytest.raises(ValueError, match="required_release_counts"):
+        exhaustion_module._observe_prepared_resampling_call(prepared)
+    for expected, values in zip(
+        before,
+        (prepared.masses, prepared.concentration, prepared.charge),
+        strict=True,
+    ):
+        np.testing.assert_array_equal(values.numpy(), expected)
+
+
+def test_scaling_prepared_enqueue_is_setup_free_and_pinned(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Prepared scaling uses pinned arrays without host setup work."""
+    from particula.gpu.kernels import exhaustion as exhaustion_module
+
+    warm_particles, _, _ = _state()
+    wp = _warp()
+    warm_prepared = (
+        exhaustion_module._prepare_representative_volume_scaling_step_gpu(
+            warm_particles,
+            wp.array([2.0], dtype=wp.float64, device="cpu"),
+            wp.array([1], dtype=wp.int32, device="cpu"),
+            wp.array([0.5], dtype=wp.float64, device="cpu"),
+            wp.array([0.1], dtype=wp.float64, device="cpu"),
+            wp.array([0.1], dtype=wp.float64, device="cpu"),
+            wp.zeros(1, dtype=wp.float64, device="cpu"),
+        )
+    )
+    exhaustion_module._enqueue_prepared_representative_volume_scaling_call(
+        warm_prepared
+    )
+
+    particles, _, _ = _state()
+    demand = wp.array([2.0], dtype=wp.float64, device="cpu")
+    required = wp.array([1], dtype=wp.int32, device="cpu")
+    requested = wp.array([0.5], dtype=wp.float64, device="cpu")
+    minimum = wp.array([0.1], dtype=wp.float64, device="cpu")
+    minimum_volume = wp.array([0.1], dtype=wp.float64, device="cpu")
+    resolved = wp.zeros(1, dtype=wp.float64, device="cpu")
+    prepared = (
+        exhaustion_module._prepare_representative_volume_scaling_step_gpu(
             particles,
-            required_release_counts,
-            cast(Any, buffers),
-            radius_cubed_relative_error=0.1,
-            mean_radius_relative_error=0.2,
-            surface_relative_error=0.3,
-            diversity_absolute_error=0.4,
+            demand,
+            required,
+            requested,
+            minimum,
+            minimum_volume,
+            resolved,
         )
-        is result
     )
-    assert calls == [
-        (
-            (particles, required_release_counts, buffers),
-            {
-                "radius_cubed_relative_error": 0.1,
-                "mean_radius_relative_error": 0.2,
-                "surface_relative_error": 0.3,
-                "diversity_absolute_error": 0.4,
-            },
+    pinned_concentration = prepared.concentration
+    replacement = wp.zeros((1, 4), dtype=wp.float64, device="cpu")
+    particles.concentration = replacement
+
+    def forbidden(*_args: object, **_kwargs: object) -> None:
+        pytest.fail("prepared enqueue performed forbidden host setup")
+
+    with monkeypatch.context() as context:
+        for name in ("zeros", "empty", "array", "full", "synchronize"):
+            context.setattr(exhaustion_module.wp, name, forbidden)
+        context.setattr(
+            exhaustion_module,
+            "_execute_representative_volume_scaling_step_gpu",
+            forbidden,
         )
-    ]
+        context.setattr(prepared.status, "numpy", forbidden)
+        result = exhaustion_module._enqueue_prepared_representative_volume_scaling_call(
+            prepared
+        )
+
+    assert result == (particles, demand, resolved)
+    assert (
+        exhaustion_module._observe_prepared_representative_volume_scaling_call(
+            prepared
+        )
+        == result
+    )
+    np.testing.assert_array_equal(replacement.numpy(), np.zeros((1, 4)))
+    np.testing.assert_allclose(
+        pinned_concentration.numpy(), [[1.0, 1.5, 2.5, 0.0]]
+    )
 
 
-def test_representative_scaling_wrapper_delegates_through_prepared_call(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """The public scaling wrapper enqueues its exact prepared record."""
+def test_scaling_prepared_enqueue_gates_live_invalid_sidecar() -> None:
+    """A post-prepare invalid scale prevents every scaling writer."""
     from particula.gpu.kernels import exhaustion as exhaustion_module
 
-    arguments = tuple(object() for _ in range(7))
-    prepared = object()
-    result = (object(), object(), object())
-    monkeypatch.setattr(
-        exhaustion_module,
-        "_prepare_representative_volume_scaling_step_gpu",
-        lambda *args: prepared,
+    wp = _warp()
+    particles, _, _ = _state()
+    demand = wp.array([2.0], dtype=wp.float64, device="cpu")
+    required = wp.array([1], dtype=wp.int32, device="cpu")
+    requested = wp.array([0.5], dtype=wp.float64, device="cpu")
+    minimum = wp.array([0.1], dtype=wp.float64, device="cpu")
+    minimum_volume = wp.array([0.1], dtype=wp.float64, device="cpu")
+    resolved = wp.zeros(1, dtype=wp.float64, device="cpu")
+    prepared = (
+        exhaustion_module._prepare_representative_volume_scaling_step_gpu(
+            particles,
+            demand,
+            required,
+            requested,
+            minimum,
+            minimum_volume,
+            resolved,
+        )
     )
-    monkeypatch.setattr(
-        exhaustion_module,
-        "_enqueue_prepared_representative_volume_scaling_call",
-        lambda value: result
-        if value is prepared
-        else pytest.fail("wrong call"),
+    before = tuple(
+        values.numpy().copy()
+        for values in (
+            prepared.masses,
+            prepared.concentration,
+            prepared.charge,
+            prepared.volume,
+            prepared.provisional_source_demand,
+            prepared.resolved_scale,
+        )
+    )
+    wp.copy(
+        prepared.requested_scale,
+        wp.array([np.nan], dtype=wp.float64, device="cpu"),
     )
 
-    assert (
-        exhaustion_module.representative_volume_scaling_step_gpu(*arguments)
-        is result
+    exhaustion_module._enqueue_prepared_representative_volume_scaling_call(
+        prepared
     )
+
+    with pytest.raises(ValueError, match="representative scaling sidecars"):
+        exhaustion_module._observe_prepared_representative_volume_scaling_call(
+            prepared
+        )
+    for expected, values in zip(
+        before,
+        (
+            prepared.masses,
+            prepared.concentration,
+            prepared.charge,
+            prepared.volume,
+            prepared.provisional_source_demand,
+            prepared.resolved_scale,
+        ),
+        strict=True,
+    ):
+        np.testing.assert_array_equal(values.numpy(), expected)
 
 
 def _warp():
