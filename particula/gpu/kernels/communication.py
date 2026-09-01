@@ -2173,8 +2173,20 @@ def resident_gas_communication_step_gpu(
     """Dispatch acquired closed GAS resources without public P1 validation.
 
     This private resident seam assumes acquisition has already established every
-    schema, identity, alias, and static map invariant.  It intentionally has no
+    schema, identity, alias, and static map invariant. It intentionally has no
     allocations, payload scans, host readback, or synchronization.
+
+    Args:
+        particles: Acquired resident particle container.
+        gas: Acquired resident gas container.
+        configuration: Acquired closed GAS communication configuration.
+        time_step: Validated nonnegative barrier duration in seconds.
+        buffers: Registry-pinned GAS work buffers.
+        invalid: Registry-pinned validation status array.
+        active: Registry-pinned activity status array.
+
+    Returns:
+        The exact ``(particles, gas)`` input containers.
     """
     map_data = configuration.communication_map
     _enqueue_prepared_resident_gas_communication(
@@ -2211,6 +2223,20 @@ def resident_particle_communication_step_gpu(
 
     Acquisition owns payload validation and allocation. This resident-only seam
     uses the registry-pinned planner, status, and snapshot storage by identity.
+
+    Args:
+        particles: Acquired resident particle container.
+        configuration: Acquired closed PARTICLES communication configuration.
+        time_step: Validated nonnegative barrier duration in seconds.
+        buffers: Registry-pinned PARTICLES planning buffers.
+        invalid: Registry-pinned validation status array.
+        demand: Registry-pinned demand status array.
+        initial_masses: Registry-pinned particle mass snapshot.
+        initial_concentration: Registry-pinned concentration snapshot.
+        initial_charge: Registry-pinned charge snapshot.
+
+    Returns:
+        The exact ``particles`` input container.
     """
     map_data = configuration.communication_map
     _enqueue_prepared_resident_particle_communication(
@@ -2247,7 +2273,18 @@ def resident_volume_evolution_step_gpu(
     invalid: Any,
     changed: Any,
 ) -> tuple[Any, Any]:
-    """Apply acquired prescribed volumes without public P1 validation."""
+    """Apply acquired prescribed volumes without public P1 validation.
+
+    Args:
+        particles: Acquired resident particle container.
+        gas: Acquired resident gas container.
+        final_volumes: Registry-pinned prescribed per-box volumes in m^3.
+        invalid: Registry-pinned volume validation status array.
+        changed: Registry-pinned volume-change status array.
+
+    Returns:
+        The exact ``(particles, gas)`` input containers.
+    """
     _enqueue_prepared_resident_volume_evolution(
         particles.volume,
         particles.concentration,
