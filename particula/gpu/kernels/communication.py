@@ -1847,8 +1847,10 @@ def _apply_resident_scaled_concentration(
 
 
 def _enqueue_prepared_resident_gas_communication(
-    particles: Any,
-    gas: Any,
+    volume: Any,
+    concentration: Any,
+    boxes: int,
+    species: int,
     source_boxes: Any,
     destination_boxes: Any,
     enabled: Any,
@@ -1859,17 +1861,19 @@ def _enqueue_prepared_resident_gas_communication(
     buffers: GasCommunicationBuffers,
     invalid: Any,
     active: Any,
-) -> tuple[Any, Any]:
+) -> None:
     """Launch already-bound GAS communication without validation or allocation.
 
-    Caller-owned containers, map arrays, status arrays, and ledgers remain
+    Caller-owned arrays, map arrays, status arrays, and ledgers remain
     resident and are passed directly to the established staged GAS kernels.
     The helper performs no setup work or host inspection; a writer launch has
     no rollback guarantee.
 
     Args:
-        particles: Bound resident particle container supplying box volumes.
-        gas: Bound resident gas container supplying concentrations.
+        volume: Bound resident per-box volume array.
+        concentration: Bound resident gas concentration array.
+        boxes: Setup-frozen resident box count.
+        species: Setup-frozen resident gas species count.
         source_boxes: Bound source endpoint array.
         destination_boxes: Bound destination endpoint array.
         enabled: Bound edge-enable array.
@@ -1882,13 +1886,10 @@ def _enqueue_prepared_resident_gas_communication(
         active: Pinned activity status array.
 
     Returns:
-        The exact resident ``(particles, gas)`` containers.
+        None. The caller retains the bound arrays by identity.
     """
-    concentration = gas.concentration
-    volume = particles.volume
-    boxes, species = concentration.shape
     if boxes == 0 or species == 0 or edge_capacity == 0 or time_step == 0.0:
-        return particles, gas
+        return
     wp.launch(
         _resident_reset_status,
         dim=1,
@@ -1960,11 +1961,18 @@ def _enqueue_prepared_resident_gas_communication(
         ],
         device=device,
     )
-    return particles, gas
+    return
 
 
 def _enqueue_prepared_resident_particle_communication(
-    particles: Any,
+    masses: Any,
+    concentration: Any,
+    charge: Any,
+    density: Any,
+    volume: Any,
+    boxes: int,
+    slots: int,
+    species: int,
     source_boxes: Any,
     destination_boxes: Any,
     enabled: Any,
@@ -1979,7 +1987,7 @@ def _enqueue_prepared_resident_particle_communication(
     initial_masses: Any,
     initial_concentration: Any,
     initial_charge: Any,
-) -> Any:
+) -> None:
     """Launch bound PARTICLES communication without setup or allocation.
 
     The planner, snapshot, and gated commit run against caller-owned resident
@@ -1987,7 +1995,14 @@ def _enqueue_prepared_resident_particle_communication(
     or host inspection, and provides no rollback after a writer launches.
 
     Args:
-        particles: Bound resident particle container.
+        masses: Bound resident particle mass array.
+        concentration: Bound resident particle concentration array.
+        charge: Bound resident particle charge array.
+        density: Bound resident particle density array.
+        volume: Bound resident per-box volume array.
+        boxes: Setup-frozen resident box count.
+        slots: Setup-frozen particle capacity.
+        species: Setup-frozen particle species count.
         source_boxes: Bound source endpoint array.
         destination_boxes: Bound destination endpoint array.
         enabled: Bound edge-enable array.
@@ -2004,12 +2019,8 @@ def _enqueue_prepared_resident_particle_communication(
         initial_charge: Pinned immutable charge snapshot.
 
     Returns:
-        The exact resident ``particles`` container.
+        None. The caller retains the bound arrays by identity.
     """
-    masses = particles.masses
-    concentration = particles.concentration
-    charge = particles.charge
-    boxes, slots, species = masses.shape
     if (
         boxes == 0
         or slots == 0
@@ -2017,7 +2028,7 @@ def _enqueue_prepared_resident_particle_communication(
         or edge_capacity == 0
         or time_step == 0.0
     ):
-        return particles
+        return
     wp.launch(
         _resident_reset_status,
         dim=1,
@@ -2031,8 +2042,8 @@ def _enqueue_prepared_resident_particle_communication(
             masses,
             concentration,
             charge,
-            particles.density,
-            particles.volume,
+            density,
+            volume,
             source_boxes,
             destination_boxes,
             enabled,
@@ -2083,17 +2094,19 @@ def _enqueue_prepared_resident_particle_communication(
         ],
         device=device,
     )
-    return particles
+    return
 
 
 def _enqueue_prepared_resident_volume_evolution(
-    particles: Any,
-    gas: Any,
+    volume: Any,
+    particle_concentration: Any,
+    gas_concentration: Any,
+    boxes: int,
     final_volumes: Any,
     invalid: Any,
     changed: Any,
     device: Any,
-) -> tuple[Any, Any]:
+) -> None:
     """Launch a bound volume barrier with an equal-volume write-free path.
 
     The device-resident status scan leaves status lanes and primary arrays
@@ -2102,22 +2115,20 @@ def _enqueue_prepared_resident_volume_evolution(
     inspection or rollback is provided after a writer launch.
 
     Args:
-        particles: Bound resident particle container.
-        gas: Bound resident gas container.
+        volume: Bound resident per-box volume array.
+        particle_concentration: Bound resident particle concentration array.
+        gas_concentration: Bound resident gas concentration array.
+        boxes: Setup-frozen resident box count.
         final_volumes: Caller-owned bound final volumes in m^3.
         invalid: Pinned volume validation status array.
         changed: Pinned volume-change status array.
         device: Device hosting all bound arrays.
 
     Returns:
-        The exact resident ``(particles, gas)`` containers.
+        None. The caller retains the bound arrays by identity.
     """
-    volume = particles.volume
-    particle_concentration = particles.concentration
-    gas_concentration = gas.concentration
-    boxes = volume.shape[0]
     if boxes == 0:
-        return particles, gas
+        return
     # The status lanes are deliberately untouched unless this device scan finds
     # a differing target volume. A writer has no rollback guarantee after
     # launch.
@@ -2147,7 +2158,7 @@ def _enqueue_prepared_resident_volume_evolution(
         inputs=[volume, final_volumes, invalid],
         device=device,
     )
-    return particles, gas
+    return
 
 
 def resident_gas_communication_step_gpu(
@@ -2166,9 +2177,11 @@ def resident_gas_communication_step_gpu(
     allocations, payload scans, host readback, or synchronization.
     """
     map_data = configuration.communication_map
-    return _enqueue_prepared_resident_gas_communication(
-        particles,
-        gas,
+    _enqueue_prepared_resident_gas_communication(
+        particles.volume,
+        gas.concentration,
+        particles.volume.shape[0],
+        gas.concentration.shape[1],
         map_data.source_boxes,
         map_data.destination_boxes,
         map_data.enabled,
@@ -2180,6 +2193,7 @@ def resident_gas_communication_step_gpu(
         invalid,
         active,
     )
+    return particles, gas
 
 
 def resident_particle_communication_step_gpu(
@@ -2199,8 +2213,15 @@ def resident_particle_communication_step_gpu(
     uses the registry-pinned planner, status, and snapshot storage by identity.
     """
     map_data = configuration.communication_map
-    return _enqueue_prepared_resident_particle_communication(
-        particles,
+    _enqueue_prepared_resident_particle_communication(
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        particles.masses.shape[0],
+        particles.masses.shape[1],
+        particles.masses.shape[2],
         map_data.source_boxes,
         map_data.destination_boxes,
         map_data.enabled,
@@ -2216,6 +2237,7 @@ def resident_particle_communication_step_gpu(
         initial_concentration,
         initial_charge,
     )
+    return particles
 
 
 def resident_volume_evolution_step_gpu(
@@ -2226,6 +2248,14 @@ def resident_volume_evolution_step_gpu(
     changed: Any,
 ) -> tuple[Any, Any]:
     """Apply acquired prescribed volumes without public P1 validation."""
-    return _enqueue_prepared_resident_volume_evolution(
-        particles, gas, final_volumes, invalid, changed, particles.volume.device
+    _enqueue_prepared_resident_volume_evolution(
+        particles.volume,
+        particles.concentration,
+        gas.concentration,
+        particles.volume.shape[0],
+        final_volumes,
+        invalid,
+        changed,
+        particles.volume.device,
     )
+    return particles, gas

@@ -251,10 +251,12 @@ Acquisition pins maps, native work, and an optional final-volume sidecar once.
 Normal steps validate only that identity and metadata: they do not inspect map
 payloads, allocate, transfer, synchronize, restore, or replace resources.
 Standalone direct-kernel empty or disabled maps and unchanged final volumes are
-write-free no-ops. The prepared resident barrier likewise treats a present
-final-volume sidecar equal to resident volumes as write-free, without writing
-primary, ledger, or volume-status arrays; its distinct composition rules retain
-the pre-bound identity and no-host-work requirements. Schema-v1 restart remains
+write-free no-ops; resident barriers instead follow their own composition and
+validation rules. In a prepared resident barrier, a present final-volume sidecar
+equal to resident volumes makes only the optional volume-evolution phase
+write-free: preceding communication may still write primary and ledger arrays.
+Its distinct composition rules retain the pre-bound identity and no-host-work
+requirements. Schema-v1 restart remains
 noncommunication; schema-v2 permits no family
 or one complete closed-map family. Both require an ACTIVE valid record and an
 exact device; explicit restart creates fresh identities and is never automatic,

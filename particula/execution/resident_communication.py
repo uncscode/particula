@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from numbers import Real
-from typing import Any, cast
+from typing import Any, Callable, cast
 
 from particula.execution import _isfinite_real
 from particula.execution.communication import CommunicationTransportMode
@@ -98,14 +98,13 @@ class PreparedResidentCommunicationBinding:
     optional-volume identities after setup-time validation. Enqueue performs no
     lookup, validation, allocation, transfer, readback, synchronization, or
     fallback. Only closed GAS or PARTICLES maps are supported. Equal final
-    volumes are a write-free barrier; after a changed-volume device writer
+    volumes make the optional volume-evolution phase write-free; preceding
+    communication may still write. After a changed-volume device writer
     launches, rollback is not promised.
 
     Attributes:
         prepared_timestep: Exact READY P1 timestep retained by identity.
         request: Validated resident communication request retained by identity.
-        particles: Resident Warp particle container.
-        gas: Resident Warp gas container.
         masses: Resident particle mass array.
         particle_concentration: Resident particle concentration array.
         density: Resident particle density array.
@@ -133,12 +132,14 @@ class PreparedResidentCommunicationBinding:
         initial_concentration: Particle concentration snapshot, when retained.
         initial_charge: Particle charge snapshot, when retained.
         final_volumes: Optional prescribed final-volume array.
+        communication_enqueue: Setup-selected native communication callable.
+        communication_arguments: Setup-frozen native callable arguments.
+        volume_enqueue: Setup-selected native volume or no-op callable.
+        volume_arguments: Setup-frozen native volume callable arguments.
     """
 
     prepared_timestep: PreparedResidentTimestep
     request: ResidentCommunicationRequest
-    particles: object
-    gas: object
     masses: object
     particle_concentration: object
     density: object
@@ -166,6 +167,14 @@ class PreparedResidentCommunicationBinding:
     initial_concentration: object | None
     initial_charge: object | None
     final_volumes: object | None
+    communication_enqueue: Callable[..., object]
+    communication_arguments: tuple[object, ...]
+    volume_enqueue: Callable[..., object]
+    volume_arguments: tuple[object, ...]
+
+
+def _enqueue_prepared_noop() -> None:
+    """Provide the setup-bound write-free path without enqueue branching."""
 
 
 def setup_prepared_resident_communication(  # noqa: C901
@@ -283,11 +292,74 @@ def setup_prepared_resident_communication(  # noqa: C901
             raise ValueError(
                 "particle communication snapshots must be complete."
             )
+    boxes, slots, particle_species = particles.masses.shape
+    gas_species = gas.concentration.shape[1]
+    if mode is CommunicationTransportMode.GAS:
+        communication_enqueue: Callable[..., object] = (
+            _enqueue_prepared_resident_gas_communication
+        )
+        communication_arguments = (
+            particles.volume,
+            gas.concentration,
+            boxes,
+            gas_species,
+            map_data.source_boxes,
+            map_data.destination_boxes,
+            map_data.enabled,
+            map_data.rates,
+            int(map_data.edge_capacity),
+            typed.duration,
+            particles.masses.device,
+            resources.buffers,
+            state.invalid,
+            state.active_or_demand,
+        )
+    else:
+        communication_enqueue = (
+            _enqueue_prepared_resident_particle_communication
+        )
+        communication_arguments = (
+            particles.masses,
+            particles.concentration,
+            particles.charge,
+            particles.density,
+            particles.volume,
+            boxes,
+            slots,
+            particle_species,
+            map_data.source_boxes,
+            map_data.destination_boxes,
+            map_data.enabled,
+            map_data.rates,
+            int(map_data.edge_capacity),
+            int(map_data.form.name == "ONE_DIMENSIONAL"),
+            typed.duration,
+            particles.masses.device,
+            resources.buffers,
+            state.invalid,
+            state.active_or_demand,
+            state.initial_masses,
+            state.initial_concentration,
+            state.initial_charge,
+        )
+    if resources.final_volumes is None:
+        volume_enqueue: Callable[..., object] = _enqueue_prepared_noop
+        volume_arguments: tuple[object, ...] = ()
+    else:
+        volume_enqueue = _enqueue_prepared_resident_volume_evolution
+        volume_arguments = (
+            particles.volume,
+            particles.concentration,
+            gas.concentration,
+            boxes,
+            resources.final_volumes,
+            state.volume_invalid,
+            state.volume_changed,
+            particles.masses.device,
+        )
     return PreparedResidentCommunicationBinding(
         prepared,
         typed,
-        particles,
-        gas,
         particles.masses,
         particles.concentration,
         particles.density,
@@ -315,6 +387,10 @@ def setup_prepared_resident_communication(  # noqa: C901
         state.initial_concentration,
         state.initial_charge,
         resources.final_volumes,
+        communication_enqueue,
+        communication_arguments,
+        volume_enqueue,
+        volume_arguments,
     )
 
 
@@ -335,48 +411,8 @@ def _enqueue_prepared_resident_communication(
         The mode-specific communication result, or ``None`` only when the
         selected native helper reports no result.
     """
-    if binding.mode is CommunicationTransportMode.GAS:
-        result: object = _enqueue_prepared_resident_gas_communication(
-            binding.particles,
-            binding.gas,
-            binding.source_boxes,
-            binding.destination_boxes,
-            binding.enabled,
-            binding.rates,
-            binding.edge_capacity,
-            binding.duration,
-            binding.device,
-            cast(GasCommunicationBuffers, binding.buffers),
-            binding.invalid,
-            binding.active_or_demand,
-        )
-    else:
-        result = _enqueue_prepared_resident_particle_communication(
-            binding.particles,
-            binding.source_boxes,
-            binding.destination_boxes,
-            binding.enabled,
-            binding.rates,
-            binding.edge_capacity,
-            binding.one_dimensional,
-            binding.duration,
-            binding.device,
-            cast(ParticleCommunicationBuffers, binding.buffers),
-            binding.invalid,
-            binding.active_or_demand,
-            binding.initial_masses,
-            binding.initial_concentration,
-            binding.initial_charge,
-        )
-    if binding.final_volumes is not None:
-        _enqueue_prepared_resident_volume_evolution(
-            binding.particles,
-            binding.gas,
-            binding.final_volumes,
-            binding.volume_invalid,
-            binding.volume_changed,
-            binding.device,
-        )
+    result = binding.communication_enqueue(*binding.communication_arguments)
+    binding.volume_enqueue(*binding.volume_arguments)
     return result
 
 

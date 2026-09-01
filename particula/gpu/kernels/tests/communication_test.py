@@ -222,14 +222,18 @@ def test_prepared_resident_equal_volumes_preserve_fields_and_statuses() -> None:
         changed.numpy().copy(),
     )
 
-    returned_particles, returned_gas = (
-        _enqueue_prepared_resident_volume_evolution(
-            particles, gas, final, invalid, changed, particles.volume.device
-        )
+    returned = _enqueue_prepared_resident_volume_evolution(
+        particles.volume,
+        particles.concentration,
+        gas.concentration,
+        1,
+        final,
+        invalid,
+        changed,
+        particles.volume.device,
     )
 
-    assert returned_particles is particles
-    assert returned_gas is gas
+    assert returned is None
     for actual, expected in zip(
         (
             particles.volume.numpy(),
@@ -261,7 +265,14 @@ def test_prepared_resident_changed_volumes_preserve_inventory() -> None:
     changed = wp.array([0], dtype=wp.int32, device="cpu")
 
     _enqueue_prepared_resident_volume_evolution(
-        particles, gas, final, invalid, changed, particles.volume.device
+        particles.volume,
+        particles.concentration,
+        gas.concentration,
+        1,
+        final,
+        invalid,
+        changed,
+        particles.volume.device,
     )
 
     npt.assert_allclose(particles.volume.numpy(), [4.0], rtol=0.0, atol=0.0)
@@ -2178,8 +2189,10 @@ def test_prepared_resident_gas_enqueue_uses_pinned_work_and_status_arrays() -> (
     map_data = configuration.communication_map
 
     returned = _enqueue_prepared_resident_gas_communication(
-        particles,
-        gas,
+        particles.volume,
+        gas.concentration,
+        2,
+        1,
         map_data.source_boxes,
         map_data.destination_boxes,
         map_data.enabled,
@@ -2193,7 +2206,7 @@ def test_prepared_resident_gas_enqueue_uses_pinned_work_and_status_arrays() -> (
     )
     wp.synchronize()
 
-    assert returned == (particles, gas)
+    assert returned is None
     npt.assert_array_equal(invalid.numpy(), [0])
     npt.assert_array_equal(active.numpy(), [1])
     npt.assert_allclose(gas.concentration.numpy(), [[3.0], [2.0]])
@@ -2228,7 +2241,14 @@ def test_prepared_resident_particle_enqueue_uses_pinned_snapshots() -> None:
     map_data = configuration.communication_map
 
     returned = _enqueue_prepared_resident_particle_communication(
-        particles,
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        2,
+        1,
+        2,
         map_data.source_boxes,
         map_data.destination_boxes,
         map_data.enabled,
@@ -2246,7 +2266,7 @@ def test_prepared_resident_particle_enqueue_uses_pinned_snapshots() -> None:
     )
     wp.synchronize()
 
-    assert returned is particles
+    assert returned is None
     npt.assert_array_equal(invalid.numpy(), [0])
     npt.assert_array_equal(demand.numpy(), [1])
     npt.assert_allclose(particles.concentration.numpy(), [[1.0], [1.0]])

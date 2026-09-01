@@ -74,15 +74,6 @@ def test_prepared_binding_retains_p1_resources_and_dispatches_in_order(
     monkeypatch: pytest.MonkeyPatch, mode: CommunicationTransportMode
 ) -> None:
     """Prepared enqueue uses only frozen mode inputs and then final volumes."""
-    request, prepared_timestep = _prepared_request(monkeypatch, mode)
-    binding = setup_prepared_resident_communication(
-        prepared_timestep, request.communication
-    )
-    assert binding.prepared_timestep is prepared_timestep
-    assert binding.request is request.communication
-    assert (
-        binding.final_volumes is request.communication.resources.final_volumes
-    )
     import particula.execution.resident_communication as resident
 
     calls: list[str] = []
@@ -101,6 +92,15 @@ def test_prepared_binding_retains_p1_resources_and_dispatches_in_order(
         "_enqueue_prepared_resident_volume_evolution",
         lambda *_args: calls.append("volume"),
     )
+    request, prepared_timestep = _prepared_request(monkeypatch, mode)
+    binding = setup_prepared_resident_communication(
+        prepared_timestep, request.communication
+    )
+    assert binding.prepared_timestep is prepared_timestep
+    assert binding.request is request.communication
+    assert (
+        binding.final_volumes is request.communication.resources.final_volumes
+    )
 
     _enqueue_prepared_resident_communication(binding)
 
@@ -108,6 +108,61 @@ def test_prepared_binding_retains_p1_resources_and_dispatches_in_order(
     assert calls == [expected] + (
         ["volume"] if binding.final_volumes is not None else []
     )
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "mode",
+    [CommunicationTransportMode.GAS, CommunicationTransportMode.PARTICLES],
+)
+def test_prepared_enqueue_uses_frozen_arrays_without_runtime_dispatch(
+    monkeypatch: pytest.MonkeyPatch, mode: CommunicationTransportMode
+) -> None:
+    """Replacing container fields after setup cannot affect bound enqueue."""
+    import particula.execution.resident_communication as resident
+
+    calls: list[tuple[object, ...]] = []
+
+    def record(*args: object) -> None:
+        """Record only setup-bound communication arguments."""
+        calls.append(args)
+
+    monkeypatch.setattr(
+        resident, "_enqueue_prepared_resident_gas_communication", record
+    )
+    monkeypatch.setattr(
+        resident, "_enqueue_prepared_resident_particle_communication", record
+    )
+    request, prepared_timestep = _prepared_request(monkeypatch, mode)
+    binding = setup_prepared_resident_communication(
+        prepared_timestep, request.communication
+    )
+    monkeypatch.setattr(
+        resident,
+        "_enqueue_prepared_resident_gas_communication",
+        lambda *_args: pytest.fail("prepared enqueue must not resolve GAS"),
+    )
+    monkeypatch.setattr(
+        resident,
+        "_enqueue_prepared_resident_particle_communication",
+        lambda *_args: pytest.fail(
+            "prepared enqueue must not resolve PARTICLES"
+        ),
+    )
+    wp = pytest.importorskip("warp")
+    session_particles = cast(Any, request.session.particles)
+    session_gas = cast(Any, request.session.gas)
+    session_particles.masses = wp.zeros(
+        binding.masses.shape, dtype=wp.float64, device=binding.device
+    )
+    session_gas.concentration = wp.zeros(
+        binding.gas_concentration.shape, dtype=wp.float64, device=binding.device
+    )
+
+    _enqueue_prepared_resident_communication(binding)
+
+    assert calls == [binding.communication_arguments]
+    assert binding.communication_enqueue is record
 
 
 @pytest.mark.warp

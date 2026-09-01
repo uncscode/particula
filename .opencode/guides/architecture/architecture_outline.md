@@ -549,9 +549,11 @@ private helpers for cross-kernel setup.
    scheduling/resident integration, or RNG is provided. P1 remains separately
    owned by `particula.execution.communication`; P3 retains gas-transfer
    admission, P4 retains particle-plan admission, and P5 retains resident
-   binding. Resident composition separately pins only one complete closed GAS
-   or PARTICLES family, dispatches communication using old volumes before
-   optional volume evolution, and rejects direct-only open GAS endpoints. See
+    binding. Resident composition separately pins only one complete closed GAS
+    or PARTICLES family, dispatches communication using old volumes before
+    optional volume evolution, and rejects direct-only open GAS endpoints.
+    Standalone direct-kernel empty/disabled-map and unchanged-volume no-op does
+    not extend to resident barrier composition. See
    [ADR-016](decisions/ADR-016-direct-gpu-volume-evolution-boundary.md) and
    [ADR-017](decisions/ADR-017-direct-gpu-particle-transport-boundary.md), and
    [ADR-018](decisions/ADR-018-resident-communication-integration.md).
