@@ -36,6 +36,7 @@ from particula.execution.scheduler import (
 )
 from particula.gpu.kernels.thermodynamics import (
     ThermodynamicsConfig,
+    _refresh_vapor_pressure_kernel,
     refresh_vapor_pressure_gpu,
 )
 from particula.util.constants import GAS_CONSTANT
@@ -123,7 +124,20 @@ class ResidentThermodynamicUpdateRequest:
 
 @dataclass(frozen=True, eq=False)
 class PreparedResidentThermodynamicBinding:
-    """Retain validated P1-bound thermodynamic writer identities."""
+    """Bind validated P1 thermodynamic writer identities.
+
+    Attributes:
+        request: Exact thermodynamic update request validated during setup.
+        gas: Resident gas container retained for vapor-pressure refresh.
+        gas_concentration: Bound resident gas concentration array.
+        gas_molar_mass: Bound resident gas molar-mass array.
+        gas_vapor_pressure: Bound resident vapor-pressure destination array.
+        environment_temperature: Bound resident temperature array in K.
+        environment_saturation_ratio: Bound saturation-ratio destination array.
+        device: Device shared by all bound writer arrays.
+        dimensions: Exact resident dimensions used for empty-schema checks.
+        thermodynamics: Exact configuration for vapor-pressure refresh.
+    """
 
     request: ResidentThermodynamicUpdateRequest
     gas: object
@@ -139,7 +153,16 @@ class PreparedResidentThermodynamicBinding:
 
 @dataclass(frozen=True, eq=False)
 class PreparedResidentThermodynamicConsumer:
-    """Retain one current coordinator consumer window without mutating it."""
+    """Bind a current consumer refresh window without changing state.
+
+    Attributes:
+        binding: Validated common thermodynamic writer binding.
+        node: Exact consumer node expected at the current cursor.
+        virtual_nodes: Current preceding virtual refresh nodes.
+        refresh_vapor: Whether vapor pressure is stale at preparation time.
+        refresh_saturation: Whether saturation ratio is stale at preparation
+            time.
+    """
 
     binding: PreparedResidentThermodynamicBinding
     node: ProcessNode
@@ -151,7 +174,21 @@ class PreparedResidentThermodynamicConsumer:
 def setup_prepared_thermodynamic_binding(
     prepared_timestep: object, request: object
 ) -> PreparedResidentThermodynamicBinding:
-    """Validate a P1 timestep and bind thermodynamic arrays once."""
+    """Validate a P1 timestep and bind thermodynamic arrays once.
+
+    Args:
+        prepared_timestep: Exact P1 timestep retaining the request
+            configuration.
+        request: Exact thermodynamic update request to validate and bind.
+
+    Returns:
+        Immutable common binding for later current-cursor consumer preparation.
+
+    Raises:
+        TypeError: If either carrier has an unsupported exact type.
+        ValueError: If retained P1 identities, resident ownership, metadata, or
+            primary arrays are invalid.
+    """
     if type(prepared_timestep) is not PreparedResidentTimestep:
         raise TypeError(
             "prepared_timestep must be an exact PreparedResidentTimestep."
@@ -217,20 +254,38 @@ def setup_prepared_thermodynamic_binding(
 def _enqueue_prepared_vapor_pressure(
     prepared: PreparedResidentThermodynamicConsumer,
 ) -> None:
-    """Issue only the already-bound vapor-pressure writer when selected."""
-    if prepared.refresh_vapor:
-        binding = prepared.binding
-        refresh_vapor_pressure_gpu(
-            binding.thermodynamics,
-            cast(Any, binding.gas),
-            cast(Any, binding.environment_temperature),
-        )
+    """Enqueue the selected bound vapor-pressure refresh only.
+
+    Args:
+        prepared: Current consumer binding that selects the vapor refresh.
+    """
+    if not prepared.refresh_vapor:
+        return
+    binding = prepared.binding
+    dimensions = cast(Any, binding.dimensions)
+    if not dimensions.n_boxes or not dimensions.n_species:
+        return
+    wp.launch(
+        _refresh_vapor_pressure_kernel,
+        dim=(dimensions.n_boxes, dimensions.n_species),
+        inputs=[
+            binding.thermodynamics.modes,
+            binding.thermodynamics.parameters,
+            binding.environment_temperature,
+            binding.gas_vapor_pressure,
+        ],
+        device=cast(Any, binding.device),
+    )
 
 
 def _enqueue_prepared_saturation_ratio(
     prepared: PreparedResidentThermodynamicConsumer,
 ) -> None:
-    """Issue only the already-bound saturation writer when selected."""
+    """Enqueue the selected bound saturation-ratio refresh only.
+
+    Args:
+        prepared: Current consumer binding that selects the saturation refresh.
+    """
     if not prepared.refresh_saturation:
         return
     binding = prepared.binding
@@ -541,11 +596,23 @@ class ResidentThermodynamicUpdateCoordinator:
         binding: PreparedResidentThermodynamicBinding,
         node: ProcessNode,
     ) -> PreparedResidentThermodynamicConsumer:
-        """Bind the current consumer window without changing state.
+        """Bind the current consumer window without changing coordinator state.
 
         This P1-consumer seam intentionally reads the coordinator's current
-        state on every call.  It does not execute writers or consume schedule
+        state on every call. It does not execute writers or consume schedule
         entries; the caller must report successful completion separately.
+
+        Args:
+            binding: Exact common P1 binding for this coordinator request.
+            node: Exact expected condensation or diagnostics consumer node.
+
+        Returns:
+            Immutable current-window binding for enqueue-only refresh writers.
+
+        Raises:
+            TypeError: If ``binding`` or ``node`` has an unsupported exact type.
+            ValueError: If the binding drifts, metadata is invalid, or ``node``
+                is not the current supported consumer.
         """
         if type(binding) is not PreparedResidentThermodynamicBinding:
             raise TypeError(

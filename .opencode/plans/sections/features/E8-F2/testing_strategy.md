@@ -14,10 +14,14 @@ Coverage thresholds and the normal collection policy must not be lowered.
   `graph_capture_test.py`, `full_loop_test.py`, and `exports_test.py` provide
   adjacent regression evidence for shared validators, unchanged scheduler
   behavior, and concrete-only exports.
-- **P2:** Extend `state_updates_test.py`, `thermodynamic_updates_test.py`, and
-  `diagnostics_test.py` with validate-once/enqueue-many tests. Spy on `wp.zeros`,
-  `wp.array`, `.numpy()`, synchronization, and registry validation to prove none
-  are called by prepared enqueue; assert exact launch order and empty schemas.
+- **P2 (implemented, #1553):** `state_updates_test.py`,
+  `thermodynamic_updates_test.py`, and `diagnostics_test.py` cover P1-bound
+  setup identity/pinning validation and validate-once/enqueue-only boundaries.
+  They assert state and diagnostics writer order, thermodynamic cursor/freshness
+  behavior, valid empty no-ops, and standalone-path compatibility. Forbidden
+  operation traps cover allocation, host readback/synchronization, binding or
+  registry validation, and schedule/registration/freshness resolution after
+  successful preparation.
 - **P3:** Extend `resident_communication_test.py` and communication kernel tests
   for prepared GAS/PARTICLES/volume calls, mode resolution, no-op behavior,
   stable buffers, and absence of P1 scans or readback during enqueue.

@@ -13,6 +13,12 @@ concrete-only and retain exact caller-owned resident identities.
   `particula/execution/resident_enqueue.py`; extract read-only diagnostics and
   communication validators; and share complete-loop metadata validation with
   the scheduler without executor construction or lifecycle mutation.
+- **Completed P2 (#1553):** add P1-bound prepared setup and enqueue-only seams
+  for resident environment/gas state replacement, thermodynamic vapor-pressure
+  and saturation refresh, and diagnostics. Setup validates exact ownership and
+  identity chains; enqueue consumes pre-bound arrays only while preserving
+  writer order, thermodynamic cursor/freshness semantics, and empty no-ops.
+  Existing standalone executor/coordinator paths remain compatible.
 - Define immutable prepared-enqueue carriers tied to the exact E8-F1 capture
   lifecycle signature and `ResidentSimulationRequest`.
 - Move repeated scheduler metadata checks and executor construction into an

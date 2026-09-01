@@ -171,7 +171,25 @@ class ResidentDiagnosticsPlan:
 
 @dataclass(frozen=True, eq=False)
 class PreparedResidentDiagnostics:
-    """Retain validated diagnostics sources and canonical registrations."""
+    """Bind validated diagnostic sources and registrations for enqueue only.
+
+    Attributes:
+        plan: Exact diagnostics plan validated during setup.
+        particle_masses: Bound resident particle mass array.
+        particle_concentration: Bound resident particle concentration array.
+        particle_volume: Bound resident particle volume array.
+        gas_concentration: Bound resident gas concentration array.
+        saturation_ratio: Bound resident saturation-ratio array.
+        device: Device shared by bound arrays and outputs.
+        dimensions: Exact resident dimensions used for empty-schema checks.
+        registrations: Canonically ordered diagnostic registrations.
+        outputs: Registration outputs in canonical launch order.
+        energy_transfers: Latent-energy inputs aligned with registrations.
+        baseline_total_masses: Residual baselines aligned with registrations.
+        source_ledgers: Residual source ledgers aligned with registrations.
+        sink_ledgers: Residual sink ledgers aligned with registrations.
+        total_mass_output: Bound total-mass output used by the residual writer.
+    """
 
     plan: ResidentDiagnosticsPlan
     particle_masses: object
@@ -507,7 +525,21 @@ class ResidentDiagnosticsExecutor:
 def setup_prepared_resident_diagnostics(
     prepared_timestep: object, plan: object
 ) -> PreparedResidentDiagnostics:
-    """Validate a P1 diagnostics attachment and bind its enqueue identities."""
+    """Validate a P1 diagnostics attachment and bind enqueue identities.
+
+    Args:
+        prepared_timestep: Exact P1 timestep retaining ``plan`` by identity.
+        plan: Exact resident diagnostics plan to validate and bind.
+
+    Returns:
+        Immutable binding that dispatches the canonical registrations without
+        repeating setup validation.
+
+    Raises:
+        TypeError: If either carrier has an unsupported exact type.
+        ValueError: If P1 identities, plan metadata, registrations, or primary
+            arrays are invalid.
+    """
     if type(prepared_timestep) is not PreparedResidentTimestep:
         raise TypeError(
             "prepared_timestep must be an exact PreparedResidentTimestep."
@@ -582,7 +614,14 @@ def setup_prepared_resident_diagnostics(
 def _enqueue_prepared_resident_diagnostics(  # noqa: C901
     prepared: PreparedResidentDiagnostics,
 ) -> None:
-    """Dispatch only registrations retained by prepared diagnostics setup."""
+    """Dispatch only registrations retained by prepared diagnostics setup.
+
+    Args:
+        prepared: Previously validated immutable diagnostics binding.
+
+    Raises:
+        ValueError: If residual dispatch lacks its bound total-mass output.
+    """
     dimensions = cast(Any, prepared.dimensions)
     device = cast(Any, prepared.device)
     if not dimensions.n_boxes:

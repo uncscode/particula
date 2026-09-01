@@ -643,6 +643,13 @@ def test_prepared_state_updates_bind_and_enqueue_prescribed_inputs(
 
     assert environment.request is environment_request
     assert gas.request is gas_request
+    monkeypatch.setattr(
+        updates,
+        "_validate_prepared_binding",
+        lambda *_args, **_kwargs: pytest.fail(
+            "prepared enqueue repeated setup validation"
+        ),
+    )
     assert (
         updates._enqueue_prepared_environment_update(environment)
         is request.session.environment

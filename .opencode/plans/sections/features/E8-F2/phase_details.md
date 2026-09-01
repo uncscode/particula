@@ -22,16 +22,21 @@
     communication, graph-capture, scheduler-loop, and export-boundary regressions
     cover the extracted validators and concrete-only export contract.
 
-- [ ] **E8-F2-P2:** Split state, thermodynamic, and diagnostic setup from device enqueue with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Prepare update arrays, fixed thermodynamic refresh windows, and closed
-    diagnostic registrations once, then enqueue only copies and kernels.
-  - Files: `particula/execution/state_updates.py`,
-    `particula/execution/thermodynamic_updates.py`,
-    `particula/execution/diagnostics.py`, adjacent `tests/*_test.py`
-  - Tests: Setup performs all schema/value/alias checks; enqueue preserves empty
-    no-ops and operation order and performs no allocation, readback,
-    synchronization, binding validation, or host freshness decision.
+- [x] **E8-F2-P2:** Split state, thermodynamic, and diagnostic setup from device enqueue with unit tests
+  - Issue: #1553 | Size: S | Status: Implemented
+  - Delivered: Added concrete-only P1-bound prepared setup and enqueue seams in
+    `state_updates.py`, `thermodynamic_updates.py`, and `diagnostics.py`.
+    Setup validates exact request/plan, session, registry, graph, schedule,
+    primary-array, and pinning identities; standalone executor/coordinator paths
+    remain independent and compatible.
+  - Behavior: State writes retain temperature-then-pressure ordering; valid
+    empty state and diagnostic schemas are write-free. Thermodynamic common
+    binding is immutable while per-consumer preparation reads the coordinator's
+    current cursor/stale state, preserving vapor-then-saturation ordering and
+    established freshness/failure behavior.
+  - Evidence: Added adjacent validate-once/enqueue-only tests that exercise
+    identity/pinning rejection, writer ordering, empty no-ops, and forbidden
+    setup-time operations after successful preparation.
 
 - [ ] **E8-F2-P3:** Add capture-ready communication and volume enqueue paths with unit tests
   - Issue: TBD | Size: S | Status: Not Started

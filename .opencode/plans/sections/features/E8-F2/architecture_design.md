@@ -61,6 +61,23 @@ CAPTURED-only scheduler graph gate. Capture/replay, token entry, resource
 acquisition, payload inspection, transfer, synchronization, lifecycle mutation,
 and device selection remain excluded from P1.
 
+## P2 Implementation Record
+
+Issue #1553 implements the first process-specific prepared seams beside their
+owning executors. `state_updates.py` binds exact P1 environment or gas requests
+and their pinned primary destinations before issuing ordered copy-only writes.
+`thermodynamic_updates.py` binds common P1 metadata once while the existing
+coordinator remains the owner of mutable cursor and stale markers; each
+consumer preparation reads that current state before its vapor or saturation
+enqueue. `diagnostics.py` binds the validated closed registration sequence and
+pre-resolved outputs before dispatch.
+
+All three prepared paths reject identity or pinning drift during setup and keep
+their legacy standalone compatibility paths intact. Their enqueue helpers do
+not perform lookup, binding validation, allocation, host readback, or
+synchronization. Valid empty schemas remain write-free, and the established
+state, thermodynamic, and diagnostics writer ordering is unchanged.
+
 ## Data / API / Workflow Changes
 
 - **Data model:** Add frozen prepared request records for the full timestep and

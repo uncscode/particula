@@ -6,14 +6,19 @@
   focused concrete-only `particula/execution/resident_enqueue.py` module
   (#1552). The READY-only carrier retains metadata by identity and performs no
   executor construction or lifecycle mutation.
-- [ ] Extract fixed state-update copy launches from validation/readback in
-  `particula/execution/state_updates.py`; bind input arrays and validation
-  status during preparation.
-- [ ] Resolve thermodynamic refresh windows once and expose fixed
-  vapor-pressure/saturation enqueue operations in
-  `particula/execution/thermodynamic_updates.py`.
+- [x] Extract fixed state-update copy launches from validation/readback in
+  `particula/execution/state_updates.py`; bind exact P1 input/destination
+  identities during preparation and retain standalone execution compatibility
+  (#1553).
+- [x] Add P1-bound thermodynamic common binding and current-cursor consumer
+  preparation in `particula/execution/thermodynamic_updates.py`; enqueue only
+  bound vapor-pressure/saturation operations while the coordinator retains
+  freshness and cursor ownership (#1553).
 - [x] Extract read-only `ResidentDiagnosticsExecutor` validation into a
   functional seam while retaining the executor compatibility wrapper (#1552).
+- [x] Bind validated diagnostics registrations, arrays, and outputs to a
+  P1-prepared diagnostics carrier with enqueue-only ordered dispatch while
+  retaining the standalone executor path (#1553).
 - [x] Extract read-only resident communication-request validation and reuse it
   through shared scheduler complete-loop metadata validation (#1552).
 - [ ] Refactor `condensation_step_gpu` so its public boundary validates and then
@@ -37,9 +42,10 @@
 - [x] Add P1 setup contract tests for exact bindings, lifecycle/signature and
   schedule gating, second-check drift, and no mutation or forbidden host work
   on preparation rejection (#1552).
-- [ ] Add per-module tests proving prepared enqueue performs no `wp.zeros`,
-  `wp.array`, `.numpy()`, transfer, synchronization, resource acquisition,
-  runtime device selection, or RNG initialization.
+- [x] Add P2 per-module validate-once/enqueue-only tests for state,
+  thermodynamic, and diagnostics seams. They cover identity/pinning rejection,
+  writer order, empty no-ops, and traps for setup-only validation, allocation,
+  readback, synchronization, registry, schedule, and freshness work (#1553).
 - [ ] Run existing direct-kernel test modules to prove public wrappers retain
   validation, atomic preflight, return identity, and numerical behavior.
 - [ ] Add a CUDA-gated capture smoke test using the repository's established

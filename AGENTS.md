@@ -1033,6 +1033,13 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   outputs must not alias primaries, published sidecars, or each other. Canonical
   empty `(0, S)`, `(B, 0)`, and `(0, 0)` outputs are successful write-free
   no-ops. Neither module provides callbacks or package/top-level exports.
+- P1-prepared resident state replacements, thermodynamic refreshes, and
+  diagnostics use an internal two-phase boundary: setup validates and freezes
+  the exact READY binding, then enqueue issues only pre-bound device copies or
+  kernels. Enqueue performs no lookup, validation, allocation, readback, or
+  synchronization; valid empty schemas remain write-free. This does not change
+  public protocols or exports, and legacy standalone executors remain
+  compatible.
 - Resident communication is acquired once through the concrete registry as one
   exact closed-map GAS or PARTICLES configuration, its same-device native work
   record, and optional final `(B,)` `wp.float64` volumes. Normal-step metadata

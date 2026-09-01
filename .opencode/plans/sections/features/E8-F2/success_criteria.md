@@ -46,3 +46,14 @@ E8-F8 own benchmark and profiling evidence.
 - [x] Extracted diagnostics and communication functional validators retain
   executor-wrapper regression coverage, while export tests keep
   `resident_enqueue` and its names absent from package and top-level APIs.
+
+## P2 Completion Evidence (#1553)
+
+- [x] P1-bound state, thermodynamic, and diagnostics setup validates and freezes
+  exact prepared-timestep ownership, identity, and pinning chains before a
+  writer is enqueued.
+- [x] State and diagnostics prepared dispatch retain fixed writer ordering and
+  write-free valid empty schemas; prepared thermodynamics retains the
+  coordinator's established vapor/saturation cursor and freshness semantics.
+- [x] Validate-once/enqueue-only tests prove prepared dispatch does not repeat
+  setup work while legacy standalone executor/coordinator paths remain valid.

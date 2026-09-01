@@ -30,6 +30,19 @@ READY E8-F1 binding after shared complete-loop metadata validation and two
 signature comparisons. P1 performs neither capture nor enqueue/dispatch; later
 E8-F2 phases own device-only process preparation and execution.
 
+## Implemented P2 Boundary
+
+Issue #1553 adds P1-bound, concrete-only setup and enqueue seams in
+`particula.execution.state_updates`,
+`particula.execution.thermodynamic_updates`, and
+`particula.execution.diagnostics`. Setup validates the exact prepared timestep,
+request/plan, graph, schedule, session, registry, primary-array, and pinning
+chains, then freezes the copy or kernel inputs. Enqueue uses only those bound
+records: it preserves state-writer order and empty no-ops, keeps thermodynamic
+vapor/saturation freshness and cursor behavior, and dispatches diagnostics in
+its fixed registration order. The standalone executor/coordinator paths remain
+available and retain their validate-then-execute contracts.
+
 ## User Stories
 
 - As a resident-loop integrator, I want setup to reject incompatible state

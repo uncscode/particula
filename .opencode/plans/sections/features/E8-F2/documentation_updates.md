@@ -16,6 +16,10 @@
   frozen identity metadata and shared read-only validation, and its exclusions.
   They retain `graph_capture` lifecycle ownership and scheduler CAPTURED
   admission/dispatch ownership.
+- Completed for P2 (#1553): no user-facing documentation or export change was
+  required. The concrete-only setup/enqueue contract is recorded in this plan;
+  changed execution modules retain local implementation documentation while
+  standalone APIs preserve their existing contract.
 - Add or update documentation contract assertions under `particula/tests/` or
   `particula/execution/tests/` when user-facing contract text changes.
 - Update all E8-F2 plan sections and parent E8 child/dependency status during

@@ -601,3 +601,135 @@ def test_prepared_thermodynamic_binding_retains_ready_timestep_identities(
         is request.session.environment.temperature
     )
     assert binding.dimensions is request.session.dimensions
+
+
+@pytest.mark.warp
+def test_prepared_vapor_enqueue_launches_bound_kernel_without_public_refresh(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Prepared vapor work bypasses the validated standalone boundary."""
+    import particula.execution.thermodynamic_updates as updates
+    from particula.execution.thermodynamic_updates import (
+        PreparedResidentThermodynamicBinding,
+        PreparedResidentThermodynamicConsumer,
+    )
+
+    ids = frozenset(
+        {
+            "environment_update",
+            "gas_update",
+            "vapor_pressure_refresh",
+            "saturation_refresh",
+            "diagnostics",
+        }
+    )
+    coordinator, nodes, session = _coordinator(ids)
+    request = coordinator._request
+    gas = cast(Any, session.gas)
+    environment = cast(Any, session.environment)
+    binding = PreparedResidentThermodynamicBinding(
+        request,
+        gas,
+        gas.concentration,
+        gas.molar_mass,
+        gas.vapor_pressure,
+        environment.temperature,
+        environment.saturation_ratio,
+        gas.concentration.device,
+        session.dimensions,
+        request.thermodynamics,
+    )
+    prepared = PreparedResidentThermodynamicConsumer(
+        binding, nodes["diagnostics"], (), True, False
+    )
+    launches: list[object] = []
+    original_launch = cast(Any, updates.wp.launch)
+
+    def tracked_launch(
+        kernel: object, *args: object, **kwargs: object
+    ) -> object:
+        launches.append(kernel)
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(
+        updates,
+        "refresh_vapor_pressure_gpu",
+        lambda *_args: pytest.fail("prepared enqueue used public refresh"),
+    )
+    monkeypatch.setattr(updates.wp, "launch", tracked_launch)
+
+    updates._enqueue_prepared_vapor_pressure(prepared)
+
+    assert launches == [updates._refresh_vapor_pressure_kernel]
+    npt.assert_allclose(gas.vapor_pressure.numpy(), [[2.0]])
+
+
+@pytest.mark.warp
+def test_prepared_saturation_enqueue_launches_bound_kernel(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Prepared saturation work writes only its retained resident arrays."""
+    import particula.execution.thermodynamic_updates as updates
+    from particula.execution.thermodynamic_updates import (
+        PreparedResidentThermodynamicBinding,
+        PreparedResidentThermodynamicConsumer,
+    )
+
+    ids = frozenset(
+        {
+            "environment_update",
+            "gas_update",
+            "vapor_pressure_refresh",
+            "saturation_refresh",
+            "diagnostics",
+        }
+    )
+    coordinator, nodes, session = _coordinator(ids)
+    request = coordinator._request
+    gas = cast(Any, session.gas)
+    environment = cast(Any, session.environment)
+    binding = PreparedResidentThermodynamicBinding(
+        request,
+        gas,
+        gas.concentration,
+        gas.molar_mass,
+        gas.vapor_pressure,
+        environment.temperature,
+        environment.saturation_ratio,
+        gas.concentration.device,
+        session.dimensions,
+        request.thermodynamics,
+    )
+    prepared = PreparedResidentThermodynamicConsumer(
+        binding, nodes["diagnostics"], (), False, True
+    )
+    launches: list[object] = []
+    original_launch = cast(Any, updates.wp.launch)
+
+    def tracked_launch(
+        kernel: object, *args: object, **kwargs: object
+    ) -> object:
+        launches.append(kernel)
+        return original_launch(kernel, *args, **kwargs)
+
+    updates.wp.copy(
+        gas.vapor_pressure,
+        updates.wp.full((1, 1), 2.0, dtype=updates.wp.float64, device="cpu"),
+    )
+    updates.wp.copy(
+        gas.concentration,
+        updates.wp.full((1, 1), 3.0, dtype=updates.wp.float64, device="cpu"),
+    )
+    updates.wp.copy(
+        environment.temperature,
+        updates.wp.full((1,), 300.0, dtype=updates.wp.float64, device="cpu"),
+    )
+    monkeypatch.setattr(updates.wp, "launch", tracked_launch)
+    updates._enqueue_prepared_saturation_ratio(prepared)
+
+    assert launches == [updates._refresh_saturation_ratio_kernel]
+    npt.assert_allclose(
+        environment.saturation_ratio.numpy(),
+        [[3.0 * GAS_CONSTANT * 300.0 / 2.0]],
+        rtol=1e-12,
+    )

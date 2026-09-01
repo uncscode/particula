@@ -37,6 +37,7 @@ if TYPE_CHECKING:
 def _scan_positive(
     values: wp.array(dtype=wp.float64), invalid: wp.array(dtype=wp.int32)
 ):
+    """Mark invalid entries that are nonfinite or not strictly positive."""
     index = wp.tid()
     value = values[index]
     if not wp.isfinite(value) or value <= 0.0:
@@ -47,6 +48,7 @@ def _scan_positive(
 def _scan_nonnegative(
     values: wp.array(dtype=wp.float64), invalid: wp.array(dtype=wp.int32)
 ):
+    """Mark invalid entries that are nonfinite or negative."""
     index = wp.tid()
     value = values[index]
     if not wp.isfinite(value) or value < 0.0:
@@ -57,6 +59,7 @@ def _scan_nonnegative(
 def _scan_nonnegative_matrix(
     values: wp.array2d(dtype=wp.float64), invalid: wp.array(dtype=wp.int32)
 ):
+    """Mark invalid matrix entries that are nonfinite or negative."""
     box, species = wp.tid()
     value = values[box, species]
     if not wp.isfinite(value) or value < 0.0:
@@ -153,7 +156,17 @@ class ResidentGasUpdateRequest:
 
 @dataclass(frozen=True, eq=False)
 class PreparedResidentEnvironmentUpdate:
-    """Retain validated environment-copy arrays for an enqueue-only phase."""
+    """Bind validated environment replacement arrays for enqueue only.
+
+    Attributes:
+        request: Exact update request validated during setup.
+        target: Resident environment container updated in place.
+        temperature: Validated caller-owned source temperature array in K.
+        pressure: Validated caller-owned source pressure array in Pa.
+        target_temperature: Bound resident temperature destination array.
+        target_pressure: Bound resident pressure destination array.
+        dimensions: Exact resident dimensions used for the empty-schema check.
+    """
 
     request: ResidentEnvironmentUpdateRequest
     target: object
@@ -166,7 +179,15 @@ class PreparedResidentEnvironmentUpdate:
 
 @dataclass(frozen=True, eq=False)
 class PreparedResidentGasUpdate:
-    """Retain validated gas-copy arrays for an enqueue-only phase."""
+    """Bind validated gas replacement arrays for enqueue only.
+
+    Attributes:
+        request: Exact update request validated during setup.
+        target: Resident gas container updated in place.
+        concentration: Validated caller-owned gas concentration source array.
+        target_concentration: Bound resident concentration destination array.
+        dimensions: Exact resident dimensions used for the empty-schema check.
+    """
 
     request: ResidentGasUpdateRequest
     target: object
@@ -420,7 +441,21 @@ def _validate_prepared_binding(
 def setup_prepared_environment_update(
     prepared_timestep: object, request: object
 ) -> PreparedResidentEnvironmentUpdate:
-    """Validate once and bind an environment replacement for enqueue."""
+    """Validate and bind an environment replacement for later enqueue.
+
+    Args:
+        prepared_timestep: Exact P1 timestep retaining ``request`` by identity.
+        request: Exact environment update request to validate and bind.
+
+    Returns:
+        Immutable copy binding whose enqueue phase copies temperature then
+        pressure without repeating validation.
+
+    Raises:
+        TypeError: If either carrier has an unsupported exact type.
+        ValueError: If P1 identities, source metadata, aliases, or values are
+            invalid.
+    """
     _validate_prepared_binding(prepared_timestep, request, environment=True)
     typed = cast(ResidentEnvironmentUpdateRequest, request)
     dimensions = cast(Any, typed.session.dimensions)
@@ -467,7 +502,21 @@ def setup_prepared_environment_update(
 def setup_prepared_gas_update(
     prepared_timestep: object, request: object
 ) -> PreparedResidentGasUpdate:
-    """Validate once and bind a gas replacement for enqueue."""
+    """Validate and bind a gas replacement for later enqueue.
+
+    Args:
+        prepared_timestep: Exact P1 timestep retaining ``request`` by identity.
+        request: Exact gas update request to validate and bind.
+
+    Returns:
+        Immutable copy binding whose enqueue phase copies concentration without
+        repeating validation.
+
+    Raises:
+        TypeError: If either carrier has an unsupported exact type.
+        ValueError: If P1 identities, source metadata, aliases, or values are
+            invalid.
+    """
     _validate_prepared_binding(prepared_timestep, request, environment=False)
     typed = cast(ResidentGasUpdateRequest, request)
     dimensions = typed.session.dimensions
@@ -495,7 +544,14 @@ def setup_prepared_gas_update(
 def _enqueue_prepared_environment_update(
     prepared: PreparedResidentEnvironmentUpdate,
 ) -> object:
-    """Issue only the bound temperature-then-pressure copies."""
+    """Enqueue the bound temperature-then-pressure copies.
+
+    Args:
+        prepared: Previously validated immutable environment copy binding.
+
+    Returns:
+        The identical resident environment container.
+    """
     dimensions = cast(Any, prepared.dimensions)
     if dimensions.n_boxes:
         wp.copy(
@@ -509,7 +565,14 @@ def _enqueue_prepared_environment_update(
 
 
 def _enqueue_prepared_gas_update(prepared: PreparedResidentGasUpdate) -> object:
-    """Issue only the bound gas-concentration copy."""
+    """Enqueue the bound gas concentration copy.
+
+    Args:
+        prepared: Previously validated immutable gas copy binding.
+
+    Returns:
+        The identical resident gas container.
+    """
     dimensions = cast(Any, prepared.dimensions)
     if dimensions.n_boxes * dimensions.n_species:
         wp.copy(

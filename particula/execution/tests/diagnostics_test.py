@@ -504,7 +504,7 @@ def test_diagnostics_launches_parallel_stages(
         ),
     )
     launches: list[tuple[str, list[object]]] = []
-    original_launch = diagnostics.wp.launch
+    original_launch = cast(Any, diagnostics.wp.launch)
 
     def record_launch(
         kernel: object, *args: object, **kwargs: object
@@ -616,3 +616,41 @@ def test_prepared_diagnostics_retains_validated_plan_and_total_output(
         is request.session.environment.saturation_ratio
     )
     assert prepared.total_mass_output is total_output
+
+
+@pytest.mark.warp
+def test_prepared_diagnostics_enqueues_bound_dispatch_without_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Prepared diagnostics dispatches bound writers without plan lookup."""
+    import particula.execution.diagnostics as diagnostics
+    from particula.execution.diagnostics import (
+        _enqueue_prepared_resident_diagnostics,
+        setup_prepared_resident_diagnostics,
+    )
+    from particula.execution.resident_enqueue import prepare_resident_timestep
+    from particula.execution.tests.resident_enqueue_test import _ready_request
+
+    fixture = _ready_request(monkeypatch)
+    request = fixture.request
+    prepared_timestep = prepare_resident_timestep(request, 0.0)
+    plan = request.diagnostics
+    assert plan is not None
+    prepared = setup_prepared_resident_diagnostics(prepared_timestep, plan)
+    launches: list[object] = []
+    original_launch = diagnostics.wp.launch
+
+    def tracked_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        launches.append(kernel)
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(
+        diagnostics,
+        "validate_resident_diagnostics_plan",
+        lambda *_args: pytest.fail("prepared enqueue repeated plan validation"),
+    )
+    monkeypatch.setattr(diagnostics.wp, "launch", tracked_launch)
+
+    _enqueue_prepared_resident_diagnostics(prepared)
+
+    assert launches
