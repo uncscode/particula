@@ -1724,11 +1724,39 @@ def test_warp_execution_rejects_unsupported_profiles_before_resolution(
 
 
 @pytest.mark.warp
-def test_get_condensation_step_gpu_resolves_the_direct_kernel() -> None:
-    """Test the private lazy resolver returns the supported direct entry point."""
+def test_get_condensation_step_gpu_prepares_then_enqueues_direct_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test the lazy resolver composes prepared direct-kernel phases."""
+    import particula.gpu.kernels.condensation as kernel_module
     from particula.execution.adapters.condensation import (
         _get_condensation_step_gpu,
     )
-    from particula.gpu.kernels import condensation_step_gpu
 
-    assert _get_condensation_step_gpu() is condensation_step_gpu
+    prepared = object()
+    expected = (object(), object())
+    calls: list[tuple[str, tuple[object, ...], dict[str, object] | None]] = []
+
+    def prepare(*args: object, **kwargs: object) -> object:
+        """Record preparation and return its opaque prepared call."""
+        calls.append(("prepare", args, kwargs))
+        return prepared
+
+    def enqueue(value: object) -> tuple[object, object]:
+        """Record enqueue of the exact prepared call."""
+        calls.append(("enqueue", (value,), None))
+        return expected
+
+    monkeypatch.setattr(
+        kernel_module, "_prepare_condensation_step_gpu", prepare
+    )
+    monkeypatch.setattr(
+        kernel_module, "_enqueue_prepared_condensation_call", enqueue
+    )
+
+    resolved = _get_condensation_step_gpu()
+    assert resolved("particles", time_step=1.0) is expected
+    assert calls == [
+        ("prepare", ("particles",), {"time_step": 1.0}),
+        ("enqueue", (prepared,), None),
+    ]

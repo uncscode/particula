@@ -688,17 +688,26 @@ def _require_isothermal(configuration: CondensationConfiguration) -> None:
 
 
 def _get_condensation_step_gpu() -> Any:
-    """Lazily resolve the optional direct Warp kernel after preflight.
+    """Lazily resolve the prepared direct Warp kernel path after preflight.
 
     Returns:
-        The direct ``condensation_step_gpu`` kernel entry point.
+        A direct-call-compatible prepared setup/enqueue delegate.
 
     Raises:
         ImportError: If the optional Warp kernel dependencies are unavailable.
     """
-    from particula.gpu.kernels import condensation_step_gpu
+    from particula.gpu.kernels.condensation import (
+        _enqueue_prepared_condensation_call,
+        _prepare_condensation_step_gpu,
+    )
 
-    return condensation_step_gpu
+    def execute_prepared(*args: Any, **kwargs: Any) -> tuple[Any, Any]:
+        """Prepare one bound call, then issue its device-only enqueue."""
+        return _enqueue_prepared_condensation_call(
+            _prepare_condensation_step_gpu(*args, **kwargs)
+        )
+
+    return execute_prepared
 
 
 class CPUCondensationExecutionAdapter:

@@ -186,6 +186,49 @@ class CondensationScratchBuffers:
     positive_mass_transfer_scale: Any | None = None
 
 
+@dataclass(frozen=True)
+class _PreparedCondensationCall:
+    """Retain validated state and device operations for one enqueue.
+
+    Setup owns validation, normalization, and fallback allocation. The enqueue
+    phase uses only these retained references for its four device substeps.
+    """
+
+    particles: Any
+    gas: Any
+    thermodynamics: Any
+    refresh_vapor_pressure: Any
+    surface_tension: Any
+    mass_accommodation: Any
+    diffusion_coefficient_vapor: Any
+    total_mass_transfer: Any
+    work_mass_transfer: Any
+    demand: Any
+    release: Any
+    scale: Any
+    candidate: Any
+    finalized: Any
+    gas_delta: Any
+    dynamic_viscosity: Any
+    mean_free_path: Any
+    kappas: Any
+    molar_mass_reference: Any
+    activity_enabled: Any
+    activity_mode: Any
+    surface_tension_mode: Any
+    water_species_index: Any
+    effective_surface_tension: Any
+    refresh_temperature: Any
+    kernel_pressure: Any
+    latent_heat: Any
+    latent_heat_values: Any
+    latent_heat_enabled: Any
+    energy_transfer: Any
+    dimensions: tuple[int, int, int]
+    device: Any
+    substep_time_step: Any
+
+
 def _read_float64_array(array: Any) -> np.ndarray:
     """Return a Warp array's values as a float64 NumPy array for validation."""
     return np.asarray(array.numpy(), dtype=np.float64)
@@ -1818,7 +1861,7 @@ def _finalize_inventory_limited_mass_transfer(
     return finalized
 
 
-def condensation_step_gpu(  # noqa: C901
+def _prepare_condensation_step_gpu(  # noqa: C901
     particles: Any,
     gas: Any,
     temperature: float | Any | None,
@@ -1836,8 +1879,8 @@ def condensation_step_gpu(  # noqa: C901
     latent_heat: Any | None = None,
     energy_transfer: Any | None = None,
     thermal_work: Any | None = None,
-) -> tuple[Any, Any]:
-    """Execute a fixed four-substep condensation timestep on the GPU.
+) -> _PreparedCondensationCall:
+    """Validate and bind a fixed four-substep condensation device call.
 
     Args:
         particles: GPU-resident particle data.
@@ -1903,11 +1946,9 @@ def condensation_step_gpu(  # noqa: C901
             this step does not allocate, initialize, modify, or consume it.
 
     Returns:
-        Two-item tuple of the particle data with in-place updated masses and the
-        whole-call accumulated P2-finalized mass transfer [kg].
-        ``energy_transfer``, when supplied, remains caller-owned output rather
-        than a third tuple item. Gas concentration is coupled after each
-        finalized substep transfer.
+        Private prepared call retaining validated inputs, resolved device
+        buffers, and the fixed substep duration. It does not enqueue the
+        condensation sequence.
 
     Raises:
         ValueError: If species counts, array lengths, or devices mismatch.
@@ -2437,158 +2478,247 @@ def condensation_step_gpu(  # noqa: C901
             device=device,
         )
 
+    return _PreparedCondensationCall(
+        particles,
+        gas,
+        thermodynamics,
+        refresh_vapor_pressure_gpu,
+        surface_tension,
+        mass_accommodation,
+        diffusion_coefficient_vapor,
+        total_mass_transfer,
+        work_mass_transfer,
+        demand,
+        release,
+        scale,
+        candidate,
+        finalized,
+        gas_delta,
+        dynamic_viscosity,
+        mean_free_path,
+        kappas,
+        molar_mass_reference,
+        activity_enabled,
+        activity_mode,
+        surface_tension_mode,
+        water_species_index,
+        effective_surface_tension,
+        refresh_temperature,
+        kernel_pressure,
+        latent_heat,
+        latent_heat_values,
+        latent_heat_enabled,
+        energy_transfer,
+        expected_shape,
+        device,
+        wp.float64(time_step / 4.0),
+    )
+
+
+def _enqueue_prepared_condensation_call(
+    prepared: _PreparedCondensationCall,
+) -> tuple[Any, Any]:
+    """Enqueue the bound four-substep device sequence without setup work."""
+    p = prepared
+    n_boxes, n_particles, n_species = p.dimensions
     wp.launch(
         _clear_mass_transfer_kernel,
         dim=(n_boxes, n_particles),
-        inputs=[total_mass_transfer],
-        device=device,
+        inputs=[p.total_mass_transfer],
+        device=p.device,
     )
-    if energy_transfer is not None:
+    if p.energy_transfer is not None:
         wp.launch(
             _clear_energy_transfer_kernel,
             dim=n_boxes,
-            inputs=[energy_transfer],
-            device=device,
+            inputs=[p.energy_transfer],
+            device=p.device,
         )
-    substep_time_step = wp.float64(time_step / 4.0)
     for _ in range(4):
-        if int(surface_tension_mode) == int(
+        if int(p.surface_tension_mode) == int(
             SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED
         ):
             wp.launch(
                 _effective_surface_tension_kernel,
                 dim=(n_boxes, n_particles),
                 inputs=[
-                    particles.masses,
-                    particles.density,
-                    surface_tension,
-                    effective_surface_tension,
+                    p.particles.masses,
+                    p.particles.density,
+                    p.surface_tension,
+                    p.effective_surface_tension,
                 ],
-                device=device,
+                device=p.device,
             )
-        refresh_vapor_pressure_gpu(thermodynamics, gas, refresh_temperature)
+        p.refresh_vapor_pressure(p.thermodynamics, p.gas, p.refresh_temperature)
         wp.launch(
             _prepare_environment_properties_kernel,
             dim=n_boxes,
             inputs=[
-                refresh_temperature,
-                kernel_pressure,
-                dynamic_viscosity,
-                mean_free_path,
+                p.refresh_temperature,
+                p.kernel_pressure,
+                p.dynamic_viscosity,
+                p.mean_free_path,
             ],
-            device=device,
+            device=p.device,
         )
         wp.launch(
             condensation_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
             inputs=[
-                particles.masses,
-                particles.concentration,
-                particles.density,
-                gas.concentration,
-                gas.vapor_pressure,
-                gas.molar_mass,
-                surface_tension,
-                kappas,
-                molar_mass_reference,
-                effective_surface_tension,
-                activity_enabled,
-                activity_mode,
-                surface_tension_mode,
-                water_species_index,
-                mass_accommodation,
-                diffusion_coefficient_vapor,
-                latent_heat_values,
-                latent_heat_enabled,
-                dynamic_viscosity,
-                mean_free_path,
+                p.particles.masses,
+                p.particles.concentration,
+                p.particles.density,
+                p.gas.concentration,
+                p.gas.vapor_pressure,
+                p.gas.molar_mass,
+                p.surface_tension,
+                p.kappas,
+                p.molar_mass_reference,
+                p.effective_surface_tension,
+                p.activity_enabled,
+                p.activity_mode,
+                p.surface_tension_mode,
+                p.water_species_index,
+                p.mass_accommodation,
+                p.diffusion_coefficient_vapor,
+                p.latent_heat_values,
+                p.latent_heat_enabled,
+                p.dynamic_viscosity,
+                p.mean_free_path,
                 wp.float64(constants.GAS_CONSTANT),
                 wp.float64(constants.BOLTZMANN_CONSTANT),
-                refresh_temperature,
-                substep_time_step,
-                work_mass_transfer,
+                p.refresh_temperature,
+                p.substep_time_step,
+                p.work_mass_transfer,
             ],
-            device=device,
+            device=p.device,
         )
         wp.launch(
             _gate_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
             inputs=[
-                gas.partitioning,
-                particles.concentration,
-                work_mass_transfer,
+                p.gas.partitioning,
+                p.particles.concentration,
+                p.work_mass_transfer,
             ],
-            device=device,
+            device=p.device,
         )
-        # Work storage is output-only at entry.  Validate its freshly written
-        # P1-gated proposal before any P2 sidecar, particle, gas, or total
-        # write.
         _validate_p2_proposal_finiteness(
-            work_mass_transfer, expected_shape, device
+            p.work_mass_transfer, p.dimensions, p.device
         )
         wp.launch(
             _bound_evaporation_candidate_kernel,
             dim=(n_boxes, n_particles),
-            inputs=[particles.masses, work_mass_transfer, candidate],
-            device=device,
+            inputs=[p.particles.masses, p.work_mass_transfer, p.candidate],
+            device=p.device,
         )
         wp.launch(
             _reduce_inventory_candidates_kernel,
             dim=(n_boxes, n_species),
-            inputs=[candidate, particles.concentration, demand, release],
-            device=device,
+            inputs=[
+                p.candidate,
+                p.particles.concentration,
+                p.demand,
+                p.release,
+            ],
+            device=p.device,
         )
         wp.launch(
             _scale_inventory_uptake_kernel,
             dim=(n_boxes, n_species),
-            inputs=[gas.concentration, demand, release, scale],
-            device=device,
+            inputs=[p.gas.concentration, p.demand, p.release, p.scale],
+            device=p.device,
         )
         wp.launch(
             _finalize_and_apply_inventory_transfer_kernel,
             dim=(n_boxes, n_particles),
-            inputs=[particles.masses, candidate, scale, finalized],
-            device=device,
+            inputs=[p.particles.masses, p.candidate, p.scale, p.finalized],
+            device=p.device,
         )
         wp.launch(
             _reduce_finalized_transfer_to_gas_kernel,
             dim=(n_boxes, n_species),
-            inputs=[finalized, particles.concentration, gas_delta],
-            device=device,
+            inputs=[p.finalized, p.particles.concentration, p.gas_delta],
+            device=p.device,
         )
-        _validate_finite_gas_delta(gas_delta, device)
+        _validate_finite_gas_delta(p.gas_delta, p.device)
         _validate_p2_commit_values(
-            particles,
-            finalized,
-            total_mass_transfer,
-            gas,
-            gas_delta,
-            device,
+            p.particles,
+            p.finalized,
+            p.total_mass_transfer,
+            p.gas,
+            p.gas_delta,
+            p.device,
         )
         wp.launch(
             apply_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
-            inputs=[particles.masses, finalized],
-            device=device,
+            inputs=[p.particles.masses, p.finalized],
+            device=p.device,
         )
         wp.launch(
             _accumulate_finalized_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
-            inputs=[finalized, total_mass_transfer],
-            device=device,
+            inputs=[p.finalized, p.total_mass_transfer],
+            device=p.device,
         )
         wp.launch(
             _couple_finalized_transfer_to_gas_kernel,
             dim=(n_boxes, n_species),
-            inputs=[gas_delta, gas.concentration],
-            device=device,
+            inputs=[p.gas_delta, p.gas.concentration],
+            device=p.device,
         )
-        if energy_transfer is not None:
+        if p.energy_transfer is not None:
             wp.launch(
                 _accumulate_energy_transfer_kernel,
                 dim=(n_boxes, n_species),
-                inputs=[total_mass_transfer, latent_heat, energy_transfer],
-                device=device,
+                inputs=[
+                    p.total_mass_transfer,
+                    p.latent_heat,
+                    p.energy_transfer,
+                ],
+                device=p.device,
             )
+    return p.particles, p.total_mass_transfer
 
-    return particles, total_mass_transfer
+
+def condensation_step_gpu(
+    particles: Any,
+    gas: Any,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    time_step: float,
+    surface_tension: Any | None = None,
+    mass_accommodation: Any | None = None,
+    diffusion_coefficient_vapor: Any | None = None,
+    mass_transfer: Any | None = None,
+    *,
+    environment: Any | None = None,
+    thermodynamics: ThermodynamicsConfig | Any | None = None,
+    activity_surface: CondensationActivitySurfaceConfig | Any | None = None,
+    scratch_buffers: CondensationScratchBuffers | Any | None = None,
+    latent_heat: Any | None = None,
+    energy_transfer: Any | None = None,
+    thermal_work: Any | None = None,
+) -> tuple[Any, Any]:
+    """Validate a direct call, then enqueue its prepared device sequence."""
+    return _enqueue_prepared_condensation_call(
+        _prepare_condensation_step_gpu(
+            particles,
+            gas,
+            temperature,
+            pressure,
+            time_step,
+            surface_tension,
+            mass_accommodation,
+            diffusion_coefficient_vapor,
+            mass_transfer,
+            environment=environment,
+            thermodynamics=thermodynamics,
+            activity_surface=activity_surface,
+            scratch_buffers=scratch_buffers,
+            latent_heat=latent_heat,
+            energy_transfer=energy_transfer,
+            thermal_work=thermal_work,
+        )
+    )
