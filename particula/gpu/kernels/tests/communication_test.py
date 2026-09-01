@@ -199,6 +199,82 @@ def test_zero_boxes_are_a_write_free_no_op() -> None:
     assert final.shape == (0,)
 
 
+def test_prepared_resident_equal_volumes_preserve_fields_and_statuses() -> None:
+    """The private resident volume seam leaves equal-volume barriers untouched."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        _enqueue_prepared_resident_volume_evolution,
+    )
+
+    particles, gas = _containers(
+        np.array([2.0]),
+        np.array([[3.0, 5.0]]),
+        np.array([[7.0, 11.0]], dtype=np.float64),
+    )
+    final = wp.array([2.0], dtype=wp.float64, device="cpu")
+    invalid = wp.array([1], dtype=wp.int32, device="cpu")
+    changed = wp.array([1], dtype=wp.int32, device="cpu")
+    before = (
+        particles.volume.numpy().copy(),
+        particles.concentration.numpy().copy(),
+        gas.concentration.numpy().copy(),
+        invalid.numpy().copy(),
+        changed.numpy().copy(),
+    )
+
+    returned_particles, returned_gas = (
+        _enqueue_prepared_resident_volume_evolution(
+            particles, gas, final, invalid, changed, particles.volume.device
+        )
+    )
+
+    assert returned_particles is particles
+    assert returned_gas is gas
+    for actual, expected in zip(
+        (
+            particles.volume.numpy(),
+            particles.concentration.numpy(),
+            gas.concentration.numpy(),
+            invalid.numpy(),
+            changed.numpy(),
+        ),
+        before,
+        strict=True,
+    ):
+        npt.assert_array_equal(actual, expected)
+
+
+def test_prepared_resident_changed_volumes_preserve_inventory() -> None:
+    """The private resident volume seam scales changed rows by old/new volume."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        _enqueue_prepared_resident_volume_evolution,
+    )
+
+    particles, gas = _containers(
+        np.array([2.0]),
+        np.array([[3.0, 5.0]]),
+        np.array([[7.0, 11.0]], dtype=np.float64),
+    )
+    final = wp.array([4.0], dtype=wp.float64, device="cpu")
+    invalid = wp.array([1], dtype=wp.int32, device="cpu")
+    changed = wp.array([0], dtype=wp.int32, device="cpu")
+
+    _enqueue_prepared_resident_volume_evolution(
+        particles, gas, final, invalid, changed, particles.volume.device
+    )
+
+    npt.assert_allclose(particles.volume.numpy(), [4.0], rtol=0.0, atol=0.0)
+    npt.assert_allclose(
+        particles.concentration.numpy(), [[1.5, 2.5]], rtol=1e-12, atol=0.0
+    )
+    npt.assert_allclose(
+        gas.concentration.numpy(), [[3.5, 5.5]], rtol=1e-12, atol=0.0
+    )
+    npt.assert_array_equal(invalid.numpy(), [0])
+    npt.assert_array_equal(changed.numpy(), [1])
+
+
 def test_unchanged_volumes_are_write_free(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2074,3 +2150,106 @@ def test_particle_communication_matches_signed_zero_population_keys() -> None:
         particles.concentration.numpy(), [[0.0, 0.0], [5.0, 0.0]]
     )
     npt.assert_array_equal(buffers.assignments.numpy(), [[0, -1]])
+
+
+def test_prepared_resident_gas_enqueue_uses_pinned_work_and_status_arrays() -> (
+    None
+):
+    """Prepared gas dispatch resets its pinned status and commits one transfer."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        GasCommunicationBuffers,
+        _enqueue_prepared_resident_gas_communication,
+    )
+
+    particles, gas = _containers(
+        np.ones(2), np.ones((2, 1)), np.array([[4.0], [1.0]])
+    )
+    configuration = _gas_configuration(
+        np.array([0], dtype=np.int32),
+        np.array([1], dtype=np.int32),
+        np.array([0.25]),
+    )
+    buffers = GasCommunicationBuffers(
+        *(wp.empty((2, 1), dtype=wp.float64, device="cpu") for _ in range(3))
+    )
+    invalid = wp.array([1], dtype=wp.int32, device="cpu")
+    active = wp.array([0], dtype=wp.int32, device="cpu")
+    map_data = configuration.communication_map
+
+    returned = _enqueue_prepared_resident_gas_communication(
+        particles,
+        gas,
+        map_data.source_boxes,
+        map_data.destination_boxes,
+        map_data.enabled,
+        map_data.rates,
+        map_data.edge_capacity,
+        1.0,
+        gas.concentration.device,
+        buffers,
+        invalid,
+        active,
+    )
+    wp.synchronize()
+
+    assert returned == (particles, gas)
+    npt.assert_array_equal(invalid.numpy(), [0])
+    npt.assert_array_equal(active.numpy(), [1])
+    npt.assert_allclose(gas.concentration.numpy(), [[3.0], [2.0]])
+    npt.assert_allclose(buffers.amounts.numpy(), [[4.0], [1.0]])
+
+
+def test_prepared_resident_particle_enqueue_uses_pinned_snapshots() -> None:
+    """Prepared particle dispatch snapshots pre-step fields before commit."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        _enqueue_prepared_resident_particle_communication,
+    )
+
+    particles, _ = _containers(
+        np.ones(2), np.array([[2.0], [0.0]]), np.empty((2, 0))
+    )
+    particles.masses = wp.array(
+        [[[2.0, 3.0]], [[0.0, 0.0]]], dtype=wp.float64, device="cpu"
+    )
+    particles.charge = wp.array([[-4.0], [0.0]], dtype=wp.float64, device="cpu")
+    configuration = _particle_configuration(
+        np.array([0], dtype=np.int32),
+        np.array([1], dtype=np.int32),
+        np.array([0.5]),
+    )
+    buffers = _particle_buffers(2, 1, 1)
+    invalid = wp.array([1], dtype=wp.int32, device="cpu")
+    demand = wp.array([0], dtype=wp.int32, device="cpu")
+    initial_masses = wp.zeros((2, 1, 2), dtype=wp.float64, device="cpu")
+    initial_concentration = wp.zeros((2, 1), dtype=wp.float64, device="cpu")
+    initial_charge = wp.zeros((2, 1), dtype=wp.float64, device="cpu")
+    map_data = configuration.communication_map
+
+    returned = _enqueue_prepared_resident_particle_communication(
+        particles,
+        map_data.source_boxes,
+        map_data.destination_boxes,
+        map_data.enabled,
+        map_data.rates,
+        map_data.edge_capacity,
+        0,
+        1.0,
+        particles.masses.device,
+        buffers,
+        invalid,
+        demand,
+        initial_masses,
+        initial_concentration,
+        initial_charge,
+    )
+    wp.synchronize()
+
+    assert returned is particles
+    npt.assert_array_equal(invalid.numpy(), [0])
+    npt.assert_array_equal(demand.numpy(), [1])
+    npt.assert_allclose(particles.concentration.numpy(), [[1.0], [1.0]])
+    npt.assert_allclose(particles.masses.numpy()[1, 0], [2.0, 3.0])
+    npt.assert_allclose(particles.charge.numpy()[1, 0], -4.0)
+    npt.assert_allclose(initial_concentration.numpy(), [[2.0], [0.0]])

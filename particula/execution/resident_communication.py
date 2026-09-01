@@ -23,9 +23,13 @@ from particula.execution.process_graph import (
     ResolvedProcessGraph,
     _is_resolver_produced_graph,
 )
+from particula.execution.resident_enqueue import PreparedResidentTimestep
 from particula.gpu.kernels.communication import (
     GasCommunicationBuffers,
     ParticleCommunicationBuffers,
+    _enqueue_prepared_resident_gas_communication,
+    _enqueue_prepared_resident_particle_communication,
+    _enqueue_prepared_resident_volume_evolution,
 )
 
 
@@ -80,6 +84,239 @@ class ResidentCommunicationRequest:
         for value, expected, name in exact:
             if type(value) is not expected:
                 raise TypeError(f"{name} must be an exact {expected.__name__}.")
+
+
+@dataclass(frozen=True, eq=False)
+class PreparedResidentCommunicationBinding:
+    """Freeze a validated closed communication barrier for device enqueue.
+
+    This concrete-only carrier retains P1, request, primary, map, work, and
+    optional-volume identities after setup-time validation. Enqueue performs no
+    lookup, validation, allocation, transfer, readback, synchronization, or
+    fallback. Only closed GAS or PARTICLES maps are supported. Equal final
+    volumes are a write-free barrier; after a changed-volume device writer
+    launches, rollback is not promised.
+    """
+
+    prepared_timestep: PreparedResidentTimestep
+    request: ResidentCommunicationRequest
+    particles: object
+    gas: object
+    masses: object
+    particle_concentration: object
+    density: object
+    volume: object
+    charge: object
+    gas_concentration: object
+    source_boxes: object
+    destination_boxes: object
+    enabled: object
+    rates: object
+    configuration: object
+    map_form: object
+    one_dimensional: int
+    mode: CommunicationTransportMode
+    edge_capacity: int
+    duration: float
+    device: object
+    dimensions: object
+    buffers: GasCommunicationBuffers | ParticleCommunicationBuffers
+    invalid: object
+    active_or_demand: object
+    volume_invalid: object
+    volume_changed: object
+    initial_masses: object | None
+    initial_concentration: object | None
+    initial_charge: object | None
+    final_volumes: object | None
+
+
+def setup_prepared_resident_communication(  # noqa: C901
+    prepared_timestep: object, request: object
+) -> PreparedResidentCommunicationBinding:
+    """Validate P1/request identities and freeze a closed native barrier.
+
+    Setup is read-only and may perform registry/request metadata validation. The
+    returned concrete-only binding retains all dispatch inputs by identity for a
+    later enqueue; it neither opens a guard nor launches a native writer.
+
+    Args:
+        prepared_timestep: Exact READY P1 timestep for the complete request.
+        request: Exact resident communication request attached to that P1 input.
+
+    Returns:
+        Frozen identity-semantic prepared communication binding.
+
+    Raises:
+        TypeError: If either supplied carrier has an invalid exact type.
+        ValueError: If P1, resource, graph, primary, or map bindings drift.
+    """
+    if type(prepared_timestep) is not PreparedResidentTimestep:
+        raise TypeError(
+            "prepared_timestep must be an exact PreparedResidentTimestep."
+        )
+    if type(request) is not ResidentCommunicationRequest:
+        raise TypeError(
+            "request must be an exact ResidentCommunicationRequest."
+        )
+    prepared = cast(PreparedResidentTimestep, prepared_timestep)
+    typed = cast(ResidentCommunicationRequest, request)
+    if prepared.request.communication is not typed:
+        raise ValueError(
+            "prepared timestep does not retain the supplied request."
+        )
+    if (
+        prepared.session is not typed.session
+        or prepared.registry is not typed.registry
+        or prepared.graph is not typed.graph
+        or prepared.dimensions is not typed.session.dimensions
+        or prepared.duration != typed.duration
+    ):
+        raise ValueError("prepared timestep identities do not match request.")
+    validate_resident_communication_request(typed)
+    if (
+        typed.communication_node.node_id != "communication"
+        or typed.volume_evolution_node.node_id != "volume_evolution"
+        or "communication" not in prepared.ordered_node_ids
+        or "volume_evolution" not in prepared.ordered_node_ids
+    ):
+        raise ValueError("prepared communication nodes do not match schedule.")
+    particles = cast(Any, typed.session.particles)
+    gas = cast(Any, typed.session.gas)
+    primaries = (
+        particles.masses,
+        particles.concentration,
+        particles.density,
+        particles.volume,
+        particles.charge,
+        gas.molar_mass,
+        gas.concentration,
+        gas.partitioning,
+        gas.vapor_pressure,
+        cast(Any, typed.session.environment).temperature,
+        cast(Any, typed.session.environment).pressure,
+        cast(Any, typed.session.environment).saturation_ratio,
+    )
+    if len(prepared.primary_arrays) != len(primaries) or any(
+        left is not right
+        for left, right in zip(prepared.primary_arrays, primaries, strict=True)
+    ):
+        raise ValueError(
+            "prepared timestep primary arrays do not match session."
+        )
+    if not any(view is typed.resources for view in prepared.resource_views):
+        raise ValueError(
+            "prepared timestep does not retain communication resources."
+        )
+    configuration = typed.resources.configuration
+    map_data = configuration.communication_map
+    mode = map_data.transport_mode
+    if mode not in (
+        CommunicationTransportMode.GAS,
+        CommunicationTransportMode.PARTICLES,
+    ):
+        raise ValueError(
+            "resident communication supports GAS or PARTICLES only."
+        )
+    if map_data.form.name not in {"ONE_DIMENSIONAL", "TWO_DIMENSIONAL"}:
+        raise ValueError("resident communication map form is unsupported.")
+    resources = typed.resources
+    state = resources.execution_state
+    if mode is CommunicationTransportMode.GAS:
+        if type(resources.buffers) is not GasCommunicationBuffers:
+            raise ValueError("communication buffers must match transport mode.")
+    else:
+        if (
+            type(resources.buffers) is not ParticleCommunicationBuffers
+            or state.initial_masses is None
+            or state.initial_concentration is None
+            or state.initial_charge is None
+        ):
+            raise ValueError(
+                "particle communication snapshots must be complete."
+            )
+    return PreparedResidentCommunicationBinding(
+        prepared,
+        typed,
+        particles,
+        gas,
+        particles.masses,
+        particles.concentration,
+        particles.density,
+        particles.volume,
+        particles.charge,
+        gas.concentration,
+        map_data.source_boxes,
+        map_data.destination_boxes,
+        map_data.enabled,
+        map_data.rates,
+        configuration,
+        map_data.form,
+        int(map_data.form.name == "ONE_DIMENSIONAL"),
+        mode,
+        int(map_data.edge_capacity),
+        typed.duration,
+        particles.masses.device,
+        typed.session.dimensions,
+        resources.buffers,
+        state.invalid,
+        state.active_or_demand,
+        state.volume_invalid,
+        state.volume_changed,
+        state.initial_masses,
+        state.initial_concentration,
+        state.initial_charge,
+        resources.final_volumes,
+    )
+
+
+def _enqueue_prepared_resident_communication(
+    binding: PreparedResidentCommunicationBinding,
+) -> object | None:
+    """Enqueue only the communication-then-volume launches retained by setup."""
+    if binding.mode is CommunicationTransportMode.GAS:
+        result: object = _enqueue_prepared_resident_gas_communication(
+            binding.particles,
+            binding.gas,
+            binding.source_boxes,
+            binding.destination_boxes,
+            binding.enabled,
+            binding.rates,
+            binding.edge_capacity,
+            binding.duration,
+            binding.device,
+            cast(GasCommunicationBuffers, binding.buffers),
+            binding.invalid,
+            binding.active_or_demand,
+        )
+    else:
+        result = _enqueue_prepared_resident_particle_communication(
+            binding.particles,
+            binding.source_boxes,
+            binding.destination_boxes,
+            binding.enabled,
+            binding.rates,
+            binding.edge_capacity,
+            binding.one_dimensional,
+            binding.duration,
+            binding.device,
+            cast(ParticleCommunicationBuffers, binding.buffers),
+            binding.invalid,
+            binding.active_or_demand,
+            binding.initial_masses,
+            binding.initial_concentration,
+            binding.initial_charge,
+        )
+    if binding.final_volumes is not None:
+        _enqueue_prepared_resident_volume_evolution(
+            binding.particles,
+            binding.gas,
+            binding.final_volumes,
+            binding.volume_invalid,
+            binding.volume_changed,
+            binding.device,
+        )
+    return result
 
 
 class ResidentCommunicationExecutor:

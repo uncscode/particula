@@ -1802,37 +1802,79 @@ def _resident_reset_status(
         active[0] = active_value
 
 
-def resident_gas_communication_step_gpu(
+@wp.kernel
+def _resident_prepare_volume_status(
+    volume: wp.array(dtype=wp.float64),
+    final_volumes: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+    changed: wp.array(dtype=wp.int32),
+    boxes: int,
+) -> None:
+    """Reset resident volume statuses only when a final volume differs."""
+    if wp.tid() == 0:
+        for box in range(boxes):
+            if volume[box] != final_volumes[box]:
+                invalid[0] = 0
+                changed[0] = 1
+                return
+
+
+@wp.kernel
+def _apply_resident_volume_evolution(
+    volume: wp.array(dtype=wp.float64),
+    final_volumes: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Write only changed resident volume lanes after the bound status scan."""
+    box = wp.tid()
+    if invalid[0] == 0 and volume[box] != final_volumes[box]:
+        volume[box] = final_volumes[box]
+
+
+@wp.kernel
+def _apply_resident_scaled_concentration(
+    concentration: wp.array2d(dtype=wp.float64),
+    old_volumes: wp.array(dtype=wp.float64),
+    final_volumes: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Scale only changed resident rows, preserving equal-volume no-op lanes."""
+    box, column = wp.tid()
+    if invalid[0] == 0 and old_volumes[box] != final_volumes[box]:
+        concentration[box, column] = (
+            concentration[box, column] * old_volumes[box] / final_volumes[box]
+        )
+
+
+def _enqueue_prepared_resident_gas_communication(
     particles: Any,
     gas: Any,
-    configuration: CommunicationConfiguration,
+    source_boxes: Any,
+    destination_boxes: Any,
+    enabled: Any,
+    rates: Any,
+    edge_capacity: int,
     time_step: float,
+    device: Any,
     buffers: GasCommunicationBuffers,
     invalid: Any,
     active: Any,
 ) -> tuple[Any, Any]:
-    """Dispatch acquired closed GAS resources without public P1 validation.
+    """Launch already-bound GAS communication without validation or allocation.
 
-    This private resident seam assumes acquisition has already established every
-    schema, identity, alias, and static map invariant.  It intentionally has no
-    allocations, payload scans, host readback, or synchronization.
+    Caller-owned inputs remain resident; a writer launch has no rollback.
     """
-    map_data = configuration.communication_map
     concentration = gas.concentration
     volume = particles.volume
     boxes, species = concentration.shape
-    edges = int(map_data.edge_capacity)
-    if boxes == 0 or species == 0 or edges == 0 or time_step == 0.0:
+    if boxes == 0 or species == 0 or edge_capacity == 0 or time_step == 0.0:
         return particles, gas
-    device = concentration.device
     wp.launch(
         _resident_reset_status,
         dim=1,
         inputs=[invalid, active, 1],
         device=device,
     )
-    # Closed resident maps never need open-boundary accounting arrays.  The
-    # unused ledger arguments are never dereferenced when their flags are zero.
     wp.launch(
         _communication_clear_and_stage,
         dim=(boxes, species),
@@ -1853,12 +1895,12 @@ def resident_gas_communication_step_gpu(
     )
     wp.launch(
         _communication_propose,
-        dim=(edges, species),
+        dim=(edge_capacity, species),
         inputs=[
-            map_data.source_boxes,
-            map_data.destination_boxes,
-            map_data.enabled,
-            map_data.rates,
+            source_boxes,
+            destination_boxes,
+            enabled,
+            rates,
             time_step,
             buffers.amounts,
             buffers.amount_deltas,
@@ -1901,10 +1943,16 @@ def resident_gas_communication_step_gpu(
     return particles, gas
 
 
-def resident_particle_communication_step_gpu(
+def _enqueue_prepared_resident_particle_communication(
     particles: Any,
-    configuration: CommunicationConfiguration,
+    source_boxes: Any,
+    destination_boxes: Any,
+    enabled: Any,
+    rates: Any,
+    edge_capacity: int,
+    one_dimensional: int,
     time_step: float,
+    device: Any,
     buffers: ParticleCommunicationBuffers,
     invalid: Any,
     demand: Any,
@@ -1912,26 +1960,19 @@ def resident_particle_communication_step_gpu(
     initial_concentration: Any,
     initial_charge: Any,
 ) -> Any:
-    """Dispatch acquired closed PARTICLES resources without public P1 checks.
-
-    Acquisition owns payload validation and allocation. This resident-only seam
-    uses the registry-pinned planner, status, and snapshot storage by identity.
-    """
-    map_data = configuration.communication_map
+    """Launch already-bound PARTICLES communication without setup work."""
     masses = particles.masses
     concentration = particles.concentration
     charge = particles.charge
     boxes, slots, species = masses.shape
-    edges = int(map_data.edge_capacity)
     if (
         boxes == 0
         or slots == 0
         or species == 0
-        or edges == 0
+        or edge_capacity == 0
         or time_step == 0.0
     ):
         return particles
-    device = masses.device
     wp.launch(
         _resident_reset_status,
         dim=1,
@@ -1947,11 +1988,11 @@ def resident_particle_communication_step_gpu(
             charge,
             particles.density,
             particles.volume,
-            map_data.source_boxes,
-            map_data.destination_boxes,
-            map_data.enabled,
-            map_data.rates,
-            int(map_data.form is CommunicationMapForm.ONE_DIMENSIONAL),
+            source_boxes,
+            destination_boxes,
+            enabled,
+            rates,
+            one_dimensional,
             time_step,
             buffers.source_debits,
             buffers.destination_credits,
@@ -1987,8 +2028,8 @@ def resident_particle_communication_step_gpu(
             initial_masses,
             initial_concentration,
             initial_charge,
-            map_data.source_boxes,
-            map_data.destination_boxes,
+            source_boxes,
+            destination_boxes,
             buffers.source_debits,
             buffers.destination_credits,
             buffers.assignments,
@@ -2000,6 +2041,121 @@ def resident_particle_communication_step_gpu(
     return particles
 
 
+def _enqueue_prepared_resident_volume_evolution(
+    particles: Any,
+    gas: Any,
+    final_volumes: Any,
+    invalid: Any,
+    changed: Any,
+    device: Any,
+) -> tuple[Any, Any]:
+    """Launch a bound volume barrier; equal final volumes are write-free."""
+    volume = particles.volume
+    particle_concentration = particles.concentration
+    gas_concentration = gas.concentration
+    boxes = volume.shape[0]
+    if boxes == 0:
+        return particles, gas
+    # The status lanes are deliberately untouched unless this device scan finds
+    # a differing target volume. A writer has no rollback guarantee after
+    # launch.
+    wp.launch(
+        _resident_prepare_volume_status,
+        dim=1,
+        inputs=[volume, final_volumes, invalid, changed, boxes],
+        device=device,
+    )
+    if particle_concentration.shape[1]:
+        wp.launch(
+            _apply_resident_scaled_concentration,
+            dim=particle_concentration.shape,
+            inputs=[particle_concentration, volume, final_volumes, invalid],
+            device=device,
+        )
+    if gas_concentration.shape[1]:
+        wp.launch(
+            _apply_resident_scaled_concentration,
+            dim=gas_concentration.shape,
+            inputs=[gas_concentration, volume, final_volumes, invalid],
+            device=device,
+        )
+    wp.launch(
+        _apply_resident_volume_evolution,
+        dim=boxes,
+        inputs=[volume, final_volumes, invalid],
+        device=device,
+    )
+    return particles, gas
+
+
+def resident_gas_communication_step_gpu(
+    particles: Any,
+    gas: Any,
+    configuration: CommunicationConfiguration,
+    time_step: float,
+    buffers: GasCommunicationBuffers,
+    invalid: Any,
+    active: Any,
+) -> tuple[Any, Any]:
+    """Dispatch acquired closed GAS resources without public P1 validation.
+
+    This private resident seam assumes acquisition has already established every
+    schema, identity, alias, and static map invariant.  It intentionally has no
+    allocations, payload scans, host readback, or synchronization.
+    """
+    map_data = configuration.communication_map
+    return _enqueue_prepared_resident_gas_communication(
+        particles,
+        gas,
+        map_data.source_boxes,
+        map_data.destination_boxes,
+        map_data.enabled,
+        map_data.rates,
+        int(map_data.edge_capacity),
+        time_step,
+        gas.concentration.device,
+        buffers,
+        invalid,
+        active,
+    )
+
+
+def resident_particle_communication_step_gpu(
+    particles: Any,
+    configuration: CommunicationConfiguration,
+    time_step: float,
+    buffers: ParticleCommunicationBuffers,
+    invalid: Any,
+    demand: Any,
+    initial_masses: Any,
+    initial_concentration: Any,
+    initial_charge: Any,
+) -> Any:
+    """Dispatch acquired closed PARTICLES resources without public P1 checks.
+
+    Acquisition owns payload validation and allocation. This resident-only seam
+    uses the registry-pinned planner, status, and snapshot storage by identity.
+    """
+    map_data = configuration.communication_map
+    return _enqueue_prepared_resident_particle_communication(
+        particles,
+        map_data.source_boxes,
+        map_data.destination_boxes,
+        map_data.enabled,
+        map_data.rates,
+        int(map_data.edge_capacity),
+        int(map_data.form is CommunicationMapForm.ONE_DIMENSIONAL),
+        time_step,
+        particles.masses.device,
+        buffers,
+        invalid,
+        demand,
+        initial_masses,
+        initial_concentration,
+        initial_charge,
+    )
+
+
 def resident_volume_evolution_step_gpu(
     particles: Any,
     gas: Any,
@@ -2008,43 +2164,6 @@ def resident_volume_evolution_step_gpu(
     changed: Any,
 ) -> tuple[Any, Any]:
     """Apply acquired prescribed volumes without public P1 validation."""
-    volume = particles.volume
-    particle_concentration = particles.concentration
-    gas_concentration = gas.concentration
-    boxes = volume.shape[0]
-    if boxes == 0:
-        return particles, gas
-    device = volume.device
-    wp.launch(
-        _resident_reset_status,
-        dim=1,
-        inputs=[invalid, changed, 1],
-        device=device,
+    return _enqueue_prepared_resident_volume_evolution(
+        particles, gas, final_volumes, invalid, changed, particles.volume.device
     )
-    if particle_concentration.shape[1]:
-        wp.launch(
-            _apply_scaled_concentration,
-            dim=particle_concentration.shape,
-            inputs=[
-                particle_concentration,
-                volume,
-                final_volumes,
-                invalid,
-                changed,
-            ],
-            device=device,
-        )
-    if gas_concentration.shape[1]:
-        wp.launch(
-            _apply_scaled_concentration,
-            dim=gas_concentration.shape,
-            inputs=[gas_concentration, volume, final_volumes, invalid, changed],
-            device=device,
-        )
-    wp.launch(
-        _apply_volume_evolution,
-        dim=boxes,
-        inputs=[volume, final_volumes, invalid, changed],
-        device=device,
-    )
-    return particles, gas

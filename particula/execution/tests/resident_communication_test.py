@@ -26,8 +26,102 @@ from particula.execution.process_graph import (
 from particula.execution.resident_communication import (
     ResidentCommunicationExecutor,
     ResidentCommunicationRequest,
+    _enqueue_prepared_resident_communication,
+    setup_prepared_resident_communication,
     validate_resident_communication_request,
 )
+
+
+def _prepared_request(
+    monkeypatch: pytest.MonkeyPatch,
+    mode: CommunicationTransportMode,
+) -> tuple[Any, Any]:
+    """Build a production READY request and its P1 carrier for one mode."""
+    from particula.execution.graph_capture import (
+        GraphCaptureAvailability,
+        GraphCaptureCapability,
+        ResidentGraphCaptureBinding,
+        _attach_resident_graph_capture_binding,
+        create_graph_capture_lifecycle,
+        create_resident_graph_capture_signature,
+    )
+    from particula.execution.resident_enqueue import prepare_resident_timestep
+    from particula.execution.tests.full_loop_test import _build_loop_fixture
+
+    fixture = _build_loop_fixture(monkeypatch, mode)
+    request = fixture.request
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            request.session.metadata.device, GraphCaptureAvailability.AVAILABLE
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    _attach_resident_graph_capture_binding(
+        request,
+        ResidentGraphCaptureBinding(
+            request, request.session, request.registry, request.guard, lifecycle
+        ),
+    )
+    return request, prepare_resident_timestep(request, 0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "mode",
+    [CommunicationTransportMode.GAS, CommunicationTransportMode.PARTICLES],
+)
+def test_prepared_binding_retains_p1_resources_and_dispatches_in_order(
+    monkeypatch: pytest.MonkeyPatch, mode: CommunicationTransportMode
+) -> None:
+    """Prepared enqueue uses only frozen mode inputs and then final volumes."""
+    request, prepared_timestep = _prepared_request(monkeypatch, mode)
+    binding = setup_prepared_resident_communication(
+        prepared_timestep, request.communication
+    )
+    assert binding.prepared_timestep is prepared_timestep
+    assert binding.request is request.communication
+    assert (
+        binding.final_volumes is request.communication.resources.final_volumes
+    )
+    import particula.execution.resident_communication as resident
+
+    calls: list[str] = []
+    monkeypatch.setattr(
+        resident,
+        "_enqueue_prepared_resident_gas_communication",
+        lambda *_args: calls.append("gas"),
+    )
+    monkeypatch.setattr(
+        resident,
+        "_enqueue_prepared_resident_particle_communication",
+        lambda *_args: calls.append("particles"),
+    )
+    monkeypatch.setattr(
+        resident,
+        "_enqueue_prepared_resident_volume_evolution",
+        lambda *_args: calls.append("volume"),
+    )
+
+    _enqueue_prepared_resident_communication(binding)
+
+    expected = "gas" if mode is CommunicationTransportMode.GAS else "particles"
+    assert calls == [expected] + (
+        ["volume"] if binding.final_volumes is not None else []
+    )
+
+
+@pytest.mark.warp
+def test_prepared_setup_rejects_request_not_retained_by_p1(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Setup rejects a detached request before it can enter prepared enqueue."""
+    request, prepared_timestep = _prepared_request(
+        monkeypatch, CommunicationTransportMode.GAS
+    )
+    detached = replace(request.communication, duration=0.0)
+
+    with pytest.raises(ValueError, match="does not retain"):
+        setup_prepared_resident_communication(prepared_timestep, detached)
 
 
 def _configuration(
