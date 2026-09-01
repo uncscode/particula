@@ -14,7 +14,7 @@ the authoritative GPU primitive; saturation refresh is a private device writer.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Callable, cast
 
 import warp as wp
@@ -171,6 +171,64 @@ class PreparedResidentThermodynamicConsumer:
     refresh_saturation: bool
 
 
+@dataclass(eq=False)
+class PreparedResidentThermodynamicSequence:
+    """Freeze the two thermodynamic consumer windows for resident enqueue.
+
+    The coordinator is used only while constructing this carrier.  Enqueue uses
+    the retained writer functions and consumer products directly, so it does not
+    validate bindings, resolve nodes, or construct a coordinator.
+    """
+
+    binding: PreparedResidentThermodynamicBinding
+    condensation: PreparedResidentThermodynamicConsumer
+    diagnostics: PreparedResidentThermodynamicConsumer
+    cursor: int = 0
+    stale_states: set[InvalidatedState] = field(
+        default_factory=lambda: {
+            InvalidatedState.VAPOR_PRESSURE,
+            InvalidatedState.SATURATION_RATIO,
+        }
+    )
+
+
+def setup_prepared_thermodynamic_sequence(
+    prepared_timestep: object,
+    request: object,
+    condensation_node: object,
+    diagnostics_node: object,
+) -> PreparedResidentThermodynamicSequence:
+    """Validate and freeze the condensation and diagnostics windows."""
+    binding = setup_prepared_thermodynamic_binding(prepared_timestep, request)
+    if type(condensation_node) is not ProcessNode:
+        raise TypeError("condensation_node must be an exact ProcessNode.")
+    if type(diagnostics_node) is not ProcessNode:
+        raise TypeError("diagnostics_node must be an exact ProcessNode.")
+    nodes = {node.node_id: node for node in binding.request.schedule.nodes}
+    if (
+        condensation_node is not nodes.get("condensation")
+        or diagnostics_node is not nodes.get("diagnostics")
+        or nodes.get("vapor_pressure_refresh") is None
+        or nodes.get("saturation_refresh") is None
+    ):
+        raise ValueError(
+            "thermodynamic nodes do not match the prepared schedule."
+        )
+    condensation = PreparedResidentThermodynamicConsumer(
+        binding,
+        condensation_node,
+        (nodes["vapor_pressure_refresh"], nodes["saturation_refresh"]),
+        True,
+        True,
+    )
+    diagnostics = PreparedResidentThermodynamicConsumer(
+        binding, diagnostics_node, (), False, True
+    )
+    return PreparedResidentThermodynamicSequence(
+        binding, condensation, diagnostics
+    )
+
+
 def setup_prepared_thermodynamic_binding(
     prepared_timestep: object, request: object
 ) -> PreparedResidentThermodynamicBinding:
@@ -304,6 +362,27 @@ def _enqueue_prepared_saturation_ratio(
         ],
         device=cast(Any, binding.device),
     )
+
+
+def record_prepared_thermodynamic_success(
+    sequence: PreparedResidentThermodynamicSequence,
+    node: ProcessNode,
+) -> None:
+    """Advance prepared freshness metadata after one successful node.
+
+    The caller invokes this only after the retained writer or process callable
+    returns. A failed callable consequently leaves the cursor and stale markers
+    unchanged.
+    """
+    if node.node_id == "vapor_pressure_refresh":
+        sequence.stale_states.discard(InvalidatedState.VAPOR_PRESSURE)
+    elif node.node_id == "saturation_refresh":
+        sequence.stale_states.discard(InvalidatedState.SATURATION_RATIO)
+    elif node.node_id == "diagnostics":
+        sequence.stale_states.discard(InvalidatedState.SATURATION_RATIO)
+    else:
+        sequence.stale_states.update(node.invalidates)
+    sequence.cursor += 1
 
 
 _ROLE_SCHEMAS = {

@@ -12,8 +12,9 @@ before the step token is opened.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import partial
 from numbers import Real
-from typing import Any, cast
+from typing import Any, Callable, cast
 
 from particula.execution import _isfinite_real
 from particula.execution.adapters.coagulation import (
@@ -28,6 +29,8 @@ from particula.execution.adapters.condensation import (
 from particula.execution.diagnostics import (
     ResidentDiagnosticsExecutor,
     ResidentDiagnosticsPlan,
+    _enqueue_prepared_resident_diagnostics,
+    setup_prepared_resident_diagnostics,
     validate_resident_diagnostics_plan,
 )
 from particula.execution.gpu_session import (
@@ -59,7 +62,15 @@ from particula.execution.process_graph import (
 from particula.execution.resident_communication import (
     ResidentCommunicationExecutor,
     ResidentCommunicationRequest,
+    _enqueue_prepared_resident_communication_node,
+    _enqueue_prepared_resident_volume_evolution_node,
+    setup_prepared_resident_communication,
     validate_resident_communication_request,
+)
+from particula.execution.resident_enqueue import (
+    PreparedResidentTimestep,
+    _validate_ready_attachment,
+    prepare_resident_timestep,
 )
 from particula.execution.scheduler import (
     ResolvedTimestepSchedule,
@@ -69,10 +80,18 @@ from particula.execution.state_updates import (
     ResidentEnvironmentUpdateRequest,
     ResidentGasUpdateRequest,
     ResidentStateUpdateExecutor,
+    _enqueue_prepared_environment_update,
+    _enqueue_prepared_gas_update,
+    setup_prepared_environment_update,
+    setup_prepared_gas_update,
 )
 from particula.execution.thermodynamic_updates import (
     ResidentThermodynamicUpdateCoordinator,
     ResidentThermodynamicUpdateRequest,
+    _enqueue_prepared_saturation_ratio,
+    _enqueue_prepared_vapor_pressure,
+    record_prepared_thermodynamic_success,
+    setup_prepared_thermodynamic_sequence,
 )
 from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
 
@@ -93,6 +112,52 @@ _COMPLETE_IDS = frozenset(
     }
 )
 _VIRTUAL_IDS = frozenset({"vapor_pressure_refresh", "saturation_refresh"})
+_CANONICAL_IDS = (
+    "communication",
+    "volume_evolution",
+    "environment_update",
+    "gas_update",
+    "vapor_pressure_refresh",
+    "saturation_refresh",
+    "condensation",
+    "brownian_coagulation",
+    "dilution",
+    "wall_loss",
+    "nucleation",
+    "diagnostics",
+)
+
+
+@dataclass(frozen=True, eq=False)
+class PreparedResidentOperation:
+    """Retain one setup-validated resident operation for direct enqueue."""
+
+    node: ProcessNode
+    enqueue: Callable[[], object]
+    product: object
+    writer_capable: bool
+
+
+@dataclass(frozen=True, eq=False)
+class PreparedResidentSimulation:
+    """Freeze all READY-bound products required for one uncaptured timestep."""
+
+    timestep: PreparedResidentTimestep
+    request: ResidentSimulationRequest
+    session: object
+    registry: object
+    guard: object
+    lifecycle: object
+    signature: object
+    graph: object
+    schedule: object
+    ordered_node_ids: tuple[object, ...]
+    primary_arrays: tuple[object, ...]
+    resource_views: tuple[object, ...]
+    nodes: tuple[ProcessNode, ...]
+    thermal: object
+    operations: tuple[PreparedResidentOperation, ...]
+    duration: object
 
 
 def _registry_type() -> type[object]:
@@ -220,6 +285,259 @@ class ResidentSimulationRequest:
             raise TypeError(
                 "graph_capture_binding must be an exact binding or None."
             )
+
+
+def prepare_resident_simulation(
+    request: object, duration: object
+) -> PreparedResidentSimulation:
+    """Prepare all twelve resident operations while the attachment is READY.
+
+    Setup deliberately performs validation and private kernel preparation before
+    the returned carrier exists.  The later enqueue path only invokes the
+    retained callables under one lifecycle token.
+    """
+    prepared = prepare_resident_timestep(request, duration)
+    typed = prepared.request
+    nodes = {node.node_id: node for node in typed.schedule.nodes}
+    communication = setup_prepared_resident_communication(
+        prepared, typed.communication
+    )
+    environment = setup_prepared_environment_update(
+        prepared, typed.environment_update
+    )
+    gas = setup_prepared_gas_update(prepared, typed.gas_update)
+    thermal = setup_prepared_thermodynamic_sequence(
+        prepared,
+        ResidentThermodynamicUpdateRequest(
+            typed.session,
+            typed.registry,
+            typed.graph,
+            typed.schedule,
+            typed.thermodynamics,
+        ),
+        nodes["condensation"],
+        nodes["diagnostics"],
+    )
+    condensation = WarpCondensationExecutionAdapter().prepare(
+        typed.condensation
+    )
+    coagulation = ResidentBrownianCoagulationExecutionAdapter().prepare(
+        typed.coagulation
+    )
+    dilution = ResidentDilutionAdapter().prepare(typed.dilution)
+    wall_loss = ResidentWallLossAdapter().prepare(typed.wall_loss)
+    nucleation = ResidentNucleationAdapter().prepare(typed.nucleation)
+    diagnostics = setup_prepared_resident_diagnostics(
+        prepared, typed.diagnostics
+    )
+    node_sequence = tuple(nodes[node_id] for node_id in _CANONICAL_IDS)
+    operations = (
+        PreparedResidentOperation(
+            nodes["communication"],
+            partial(
+                _enqueue_prepared_resident_communication_node, communication
+            ),
+            communication,
+            True,
+        ),
+        PreparedResidentOperation(
+            nodes["volume_evolution"],
+            partial(
+                _enqueue_prepared_resident_volume_evolution_node, communication
+            ),
+            communication,
+            True,
+        ),
+        PreparedResidentOperation(
+            nodes["environment_update"],
+            partial(_enqueue_prepared_environment_update, environment),
+            environment,
+            True,
+        ),
+        PreparedResidentOperation(
+            nodes["gas_update"],
+            partial(_enqueue_prepared_gas_update, gas),
+            gas,
+            True,
+        ),
+        PreparedResidentOperation(
+            nodes["vapor_pressure_refresh"],
+            partial(_enqueue_prepared_vapor_pressure, thermal.condensation),
+            thermal.condensation,
+            True,
+        ),
+        PreparedResidentOperation(
+            nodes["saturation_refresh"],
+            partial(_enqueue_prepared_saturation_ratio, thermal.condensation),
+            thermal.condensation,
+            True,
+        ),
+        PreparedResidentOperation(
+            nodes["condensation"], condensation.execute, condensation, True
+        ),
+        PreparedResidentOperation(
+            nodes["brownian_coagulation"],
+            coagulation.execute,
+            coagulation,
+            True,
+        ),
+        PreparedResidentOperation(
+            nodes["dilution"], dilution.execute, dilution, True
+        ),
+        PreparedResidentOperation(
+            nodes["wall_loss"], wall_loss.execute, wall_loss, True
+        ),
+        PreparedResidentOperation(
+            nodes["nucleation"], nucleation.execute, nucleation, True
+        ),
+        PreparedResidentOperation(
+            nodes["diagnostics"],
+            partial(
+                _enqueue_prepared_diagnostics_window,
+                thermal.diagnostics,
+                diagnostics,
+            ),
+            diagnostics,
+            True,
+        ),
+    )
+    result = PreparedResidentSimulation(
+        prepared,
+        typed,
+        prepared.session,
+        prepared.registry,
+        prepared.guard,
+        prepared.lifecycle,
+        prepared.signature,
+        prepared.graph,
+        prepared.schedule,
+        _CANONICAL_IDS,
+        prepared.primary_arrays,
+        prepared.resource_views,
+        node_sequence,
+        thermal,
+        operations,
+        duration,
+    )
+    _validate_prepared_resident_simulation(result)
+    return result
+
+
+def _validate_prepared_resident_simulation(prepared: object) -> None:
+    """Perform the READY-only identity and signature gate before token entry."""
+    if type(prepared) is not PreparedResidentSimulation:
+        raise TypeError("prepared must be an exact PreparedResidentSimulation.")
+    typed = cast(PreparedResidentSimulation, prepared)
+    if (
+        typed.timestep.request is not typed.request
+        or typed.request.session is not typed.session
+        or typed.request.registry is not typed.registry
+        or typed.request.guard is not typed.guard
+        or typed.timestep.lifecycle is not typed.lifecycle
+        or typed.timestep.signature is not typed.signature
+        or typed.request.graph is not typed.graph
+        or typed.request.schedule is not typed.schedule
+        or tuple(item.node.node_id for item in typed.operations)
+        != _CANONICAL_IDS
+        or len(typed.nodes) != len(_CANONICAL_IDS)
+        or any(
+            operation.node is not node
+            for operation, node in zip(
+                typed.operations, typed.nodes, strict=True
+            )
+        )
+        or typed.ordered_node_ids != _CANONICAL_IDS
+    ):
+        raise ValueError(
+            "prepared resident simulation identities do not match."
+        )
+    _validate_ready_attachment(
+        typed.request,
+        typed.timestep.binding,
+        typed.lifecycle,
+        typed.signature,
+        typed.session,
+        typed.registry,
+        typed.guard,
+    )
+    from particula.execution.graph_capture import (
+        compare_resident_graph_capture_signature,
+    )
+
+    if not compare_resident_graph_capture_signature(
+        cast(Any, typed.signature), cast(Any, typed.request)
+    ).compatible:
+        raise ValueError("resident graph-capture signature is incompatible.")
+
+
+def enqueue_prepared_resident_simulation(prepared: object) -> None:
+    """Enqueue one prepared READY simulation under exactly one token."""
+    _validate_prepared_resident_simulation(prepared)
+    typed = cast(PreparedResidentSimulation, prepared)
+    token = cast(Any, typed.guard).begin_step(typed.duration)
+    writer_called = False
+    try:
+        for operation in typed.operations:
+            writer_called = writer_called or operation.writer_capable
+            operation.enqueue()
+            record_prepared_thermodynamic_success(
+                cast(Any, typed.thermal), operation.node
+            )
+        cast(Any, typed.guard).complete_step(token)
+    except BaseException as error:
+        _cleanup_resident_execution_failure(
+            typed.request, token, writer_called, error, classify_capture=False
+        )
+
+
+def _cleanup_resident_execution_failure(
+    request: ResidentSimulationRequest,
+    token: object,
+    writer_called: bool,
+    error: BaseException,
+    *,
+    classify_capture: bool,
+) -> None:
+    """Close a failed token and preserve legacy lifecycle classification."""
+    outcome = (
+        _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED
+        if writer_called
+        else _ResidentOperationOutcome.READ_ONLY
+    )
+    try:
+        _handle_failed_resident_operation(
+            request.session,
+            cast(Any, request.registry),
+            request.guard,
+            token,
+            outcome,
+        )
+    except BaseException as cleanup_error:
+        raise error from cleanup_error
+    if (
+        classify_capture
+        and outcome is _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED
+        and request.graph_capture_binding is not None
+    ):
+        try:
+            classify_resident_graph_capture_writer_failure(
+                request.graph_capture_binding
+            )
+        except BaseException as classification_error:
+            _fault_resident_graph_capture_after_classification_failure(
+                request.graph_capture_binding
+            )
+            raise error from classification_error
+    raise error
+
+
+def _enqueue_prepared_diagnostics_window(
+    consumer: object,
+    diagnostics: object,
+) -> None:
+    """Refresh diagnostic saturation then issue its retained copy operation."""
+    _enqueue_prepared_saturation_ratio(cast(Any, consumer))
+    _enqueue_prepared_resident_diagnostics(cast(Any, diagnostics))
 
 
 class ResidentSimulationScheduler:
@@ -406,35 +724,9 @@ class ResidentSimulationScheduler:
             writer_called = True
             request.guard.complete_step(token)
         except BaseException as error:
-            outcome = (
-                _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED
-                if writer_called
-                else _ResidentOperationOutcome.READ_ONLY
+            _cleanup_resident_execution_failure(
+                request, token, writer_called, error, classify_capture=True
             )
-            try:
-                _handle_failed_resident_operation(
-                    request.session,
-                    cast(Any, request.registry),
-                    request.guard,
-                    token,
-                    outcome,
-                )
-            except BaseException as cleanup_error:
-                raise error from cleanup_error
-            if (
-                outcome is _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED
-                and request.graph_capture_binding is not None
-            ):
-                try:
-                    classify_resident_graph_capture_writer_failure(
-                        request.graph_capture_binding
-                    )
-                except BaseException as classification_error:
-                    _fault_resident_graph_capture_after_classification_failure(
-                        request.graph_capture_binding
-                    )
-                    raise error from classification_error
-            raise
 
 
 def _validate_complete_resident_timestep_metadata(

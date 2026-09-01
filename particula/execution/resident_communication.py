@@ -417,6 +417,20 @@ def _enqueue_prepared_resident_communication(
     return result
 
 
+def _enqueue_prepared_resident_communication_node(
+    binding: PreparedResidentCommunicationBinding,
+) -> object | None:
+    """Enqueue only the already-bound communication barrier."""
+    return binding.communication_enqueue(*binding.communication_arguments)
+
+
+def _enqueue_prepared_resident_volume_evolution_node(
+    binding: PreparedResidentCommunicationBinding,
+) -> object | None:
+    """Enqueue only the already-bound optional volume-evolution barrier."""
+    return binding.volume_enqueue(*binding.volume_arguments)
+
+
 class ResidentCommunicationExecutor:
     """Validate metadata and dispatch resident barrier primitives once.
 

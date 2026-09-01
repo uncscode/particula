@@ -82,6 +82,8 @@ from particula.execution.resident_communication import (
 from particula.execution.resident_scheduler import (
     ResidentSimulationRequest,
     ResidentSimulationScheduler,
+    enqueue_prepared_resident_simulation,
+    prepare_resident_simulation,
 )
 from particula.execution.scheduler import (
     EnabledNodeSelection,
@@ -961,6 +963,112 @@ def test_closed_system_inventory_remains_conserved_after_two_dispatches(
         rtol=1e-12,
         atol=1e-30,
     )
+
+
+@pytest.mark.warp
+def test_prepared_ready_simulation_retains_twelve_operations(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """READY preparation freezes dispatch products before the sole token opens."""
+    fixture = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
+    request = fixture.request
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cpu"), GraphCaptureAvailability.AVAILABLE
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, fixture.session, fixture.registry, fixture.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+
+    class PreparedCall:
+        """Provide a write-free retained operation for scheduler preparation."""
+
+        def execute(self) -> None:
+            return None
+
+    class PreparedAdapter:
+        """Replace native adapter setup while retaining the prepare protocol."""
+
+        def prepare(self, _request: object) -> PreparedCall:
+            return PreparedCall()
+
+    module = _scheduler_module()
+    for name in (
+        "WarpCondensationExecutionAdapter",
+        "ResidentBrownianCoagulationExecutionAdapter",
+        "ResidentDilutionAdapter",
+        "ResidentWallLossAdapter",
+        "ResidentNucleationAdapter",
+    ):
+        monkeypatch.setattr(module, name, PreparedAdapter)
+
+    prepared = prepare_resident_simulation(request, 0.0)
+
+    assert type(prepared).__name__ == "PreparedResidentSimulation"
+    assert tuple(item.node.node_id for item in prepared.operations) == _NODE_IDS
+    assert fixture.guard.completed_steps == 0
+    assert lifecycle.state is GraphCaptureLifecycleState.READY
+
+    enqueue_prepared_resident_simulation(prepared)
+
+    assert fixture.guard.completed_steps == 1
+    assert fixture.session.lifecycle is ResidentLifecycle.ACTIVE
+    assert prepared.thermal.cursor == len(_NODE_IDS)
+    assert prepared.thermal.stale_states == set()
+
+
+@pytest.mark.warp
+def test_prepared_simulation_drift_rejects_before_token_entry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A retained-node replacement cannot enter the prepared enqueue window."""
+    fixture = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
+    request = fixture.request
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cpu"), GraphCaptureAvailability.AVAILABLE
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, fixture.session, fixture.registry, fixture.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+
+    class PreparedCall:
+        """Provide a write-free retained operation for scheduler preparation."""
+
+        def execute(self) -> None:
+            return None
+
+    class PreparedAdapter:
+        """Replace native adapter setup while retaining the prepare protocol."""
+
+        def prepare(self, _request: object) -> PreparedCall:
+            return PreparedCall()
+
+    module = _scheduler_module()
+    for name in (
+        "WarpCondensationExecutionAdapter",
+        "ResidentBrownianCoagulationExecutionAdapter",
+        "ResidentDilutionAdapter",
+        "ResidentWallLossAdapter",
+        "ResidentNucleationAdapter",
+    ):
+        monkeypatch.setattr(module, name, PreparedAdapter)
+    prepared = prepare_resident_simulation(request, 0.0)
+    object.__setattr__(prepared, "nodes", ())
+
+    with pytest.raises(ValueError, match="identities do not match"):
+        enqueue_prepared_resident_simulation(prepared)
+
+    assert fixture.trace == []
+    assert fixture.guard.completed_steps == 0
+    fixture.guard.assert_step_closed()
+    assert fixture.session.lifecycle is ResidentLifecycle.ACTIVE
 
 
 @pytest.mark.warp
