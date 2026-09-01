@@ -467,7 +467,7 @@ class ResidentWallLossAdapter:
         self,
         request: ResidentWallLossRequest,
         enabled_logical_boxes: tuple[int, ...],
-    ) -> object:
+    ) -> _PreparedResidentProcessBinding:
         """Prepare the complete private selected-lane launch once.
 
         Selection validation, physical-lane resolution, device allocation, and
@@ -497,7 +497,7 @@ class ResidentWallLossAdapter:
         # Keep dependency injection of the private selected-box seam usable in
         # adapter tests without routing the production path through a wrapper.
         if selected_step is not wall_loss_selected_boxes_step_gpu:
-            prepared = _PreparedSelectedWallLossCall(
+            prepared: Any = _PreparedSelectedWallLossCall(
                 selected_step,
                 request.session.particles,
                 request.time_step,
@@ -516,7 +516,7 @@ class ResidentWallLossAdapter:
             None,
             None,
             request.time_step,
-            config=request.config,
+            config=cast(Any, request.config),
             rng_seed=cast(int, request.rng_seed),
             rng_states=request.resources.rng_states,
             selected_boxes=selected_boxes,

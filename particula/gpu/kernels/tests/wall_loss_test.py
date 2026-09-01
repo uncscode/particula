@@ -88,7 +88,7 @@ def test_prepared_wall_loss_pins_device_without_container_reread(
 
     def record_launch(*args: object, **kwargs: object) -> object:
         launches.append(kwargs["device"])
-        return original_launch(*args, **kwargs)
+        return cast(Any, original_launch)(*args, **kwargs)
 
     monkeypatch.setattr(wall_loss_module.wp, "launch", record_launch)
     particles.masses = object()

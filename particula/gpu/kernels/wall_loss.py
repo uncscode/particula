@@ -1397,9 +1397,26 @@ def wall_loss_step_gpu(
 ) -> Any:
     """Prepare and enqueue one direct neutral or charged wall-loss call.
 
+    Args:
+        particles: Caller-owned fixed-shape Warp particle data.
+        temperature: Scalar or per-box temperature [K].
+        pressure: Scalar or per-box pressure [Pa].
+        time_step: Finite nonnegative duration [s].
+        config: Concrete geometry and wall-loss configuration.
+        rng_seed: Unsigned 32-bit seed for RNG initialization.
+        rng_states: Optional caller-owned per-box RNG state.
+        initialize_rng: Whether to reset supplied RNG state before execution.
+        environment: Optional explicit environment source.
+
     Returns:
         The identical caller-owned particle container after the asynchronous
         wall-loss launch, or immediately for a valid no-op.
+
+    Raises:
+        TypeError: If a scalar configuration or RNG argument has an invalid
+            type.
+        ValueError: If particle, environment, configuration, or RNG inputs do
+            not satisfy the direct-kernel contract.
     """
     return _enqueue_prepared_wall_loss_call(
         _prepare_wall_loss_step_gpu(
@@ -1428,7 +1445,28 @@ def _prepare_selected_wall_loss_call(
     selected_boxes: Any,
     environment: Any | None = None,
 ) -> _PreparedWallLossCall:
-    """Prepare a frozen selected-lane wall-loss launch."""
+    """Prepare a frozen wall-loss launch for selected logical box lanes.
+
+    Args:
+        particles: Caller-owned fixed-shape Warp particle data.
+        temperature: Scalar or per-box temperature [K].
+        pressure: Scalar or per-box pressure [Pa].
+        time_step: Finite nonnegative duration [s].
+        config: Concrete geometry and wall-loss configuration.
+        rng_seed: Unsigned 32-bit seed forwarded to the device kernel.
+        rng_states: Caller-owned per-box RNG state.
+        selected_boxes: Nonempty same-device int32 array of logical box lanes.
+        environment: Optional explicit environment source.
+
+    Returns:
+        A frozen call record containing the selected launch and its inputs.
+
+    Raises:
+        TypeError: If a scalar configuration or RNG argument has an invalid
+            type.
+        ValueError: If selected lanes, particle, environment, configuration,
+            or RNG inputs violate the direct-kernel contract.
+    """
     validated_config = _validate_config(config)
     n_boxes, device = _validate_particle_schema(particles)
     if (
@@ -1482,6 +1520,7 @@ def _prepare_selected_wall_loss_call(
         validated_time_step,
         float(validated_config.wall_eddy_diffusivity),
     )
+    launch_inputs: Any
     if validated_config.mode == "neutral":
         launch_kernel = _wall_loss_remove_selected
         launch_inputs = common + (
@@ -1551,6 +1590,26 @@ def wall_loss_selected_boxes_step_gpu(
     This resident-only seam is deliberately not re-exported.  Its index buffer
     is prevalidated by the caller and maps one writer thread to each selected
     logical box, avoiding repeated direct-boundary preflight and launches.
+
+    Args:
+        particles: Caller-owned fixed-shape Warp particle data.
+        temperature: Scalar or per-box temperature [K].
+        pressure: Scalar or per-box pressure [Pa].
+        time_step: Finite nonnegative duration [s].
+        config: Concrete geometry and wall-loss configuration.
+        rng_seed: Unsigned 32-bit seed forwarded to the device kernel.
+        rng_states: Caller-owned per-box RNG state.
+        selected_boxes: Nonempty same-device int32 array of logical box lanes.
+        environment: Optional explicit environment source.
+
+    Returns:
+        The identical caller-owned particle container.
+
+    Raises:
+        TypeError: If a scalar configuration or RNG argument has an invalid
+            type.
+        ValueError: If selected lanes, particle, environment, configuration,
+            or RNG inputs violate the direct-kernel contract.
     """
     validated_config = _validate_config(config)
     n_boxes, device = _validate_particle_schema(particles)

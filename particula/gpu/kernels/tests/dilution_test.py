@@ -34,7 +34,7 @@ def test_public_dilution_wrapper_delegates_through_prepared_call(
         else pytest.fail("wrong call"),
     )
 
-    assert dilution_module.dilution_step_gpu(*arguments) is result
+    assert cast(Any, dilution_module.dilution_step_gpu)(*arguments) is result
 
 
 def _warp():
