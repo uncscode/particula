@@ -348,13 +348,11 @@ class ResidentDilutionAdapter:
             raise TypeError("request must be an exact ResidentDilutionRequest.")
         request.registry.validate_pinned_session(request.session)
         if request.resources is not None:
+            resources = cast(Any, request.resources)
             request.registry.validate_dilution_resources(
-                request.session, cast(Any, request.resources)
+                request.session, resources
             )
-            if (
-                request.coefficient
-                is not request.resources.normalized_coefficient
-            ):
+            if request.coefficient is not resources.normalized_coefficient:
                 raise ValueError(
                     "resident dilution coefficient must match resources."
                 )
