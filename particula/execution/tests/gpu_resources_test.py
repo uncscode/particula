@@ -3,7 +3,7 @@
 import os
 import subprocess
 import sys
-from dataclasses import fields
+from dataclasses import FrozenInstanceError, fields
 from pathlib import Path
 from typing import Any, cast
 
@@ -23,6 +23,7 @@ from particula.execution.diagnostics import (
 from particula.execution.gpu_resources import (
     GPUResourceRegistry,
     ManifestEntry,
+    ResourceInventoryCapacities,
     _item_size,
 )
 from particula.execution.gpu_session import (
@@ -912,10 +913,29 @@ def test_manifest_helpers_reject_unsupported_dtype_and_size() -> None:
         registry._checked_product(2**63, 2)
     with pytest.raises(ValueError, match="exceeds supported range"):
         registry._checked_product(1, -1)
+    with pytest.raises(ValueError, match="exceeds supported range"):
+        registry._checked_product(2**62, 2)
     entry = ManifestEntry("pairs", "coagulation", object(), "bc2")
     registry._session = _session()
     with pytest.raises(ValueError, match="collision capacity"):
         registry._shape(entry)
+
+
+def test_array_range_rejects_stride_overflow_before_pointer_access() -> None:
+    """Test centralized stride arithmetic rejects overflow before range use."""
+    array = type(
+        "array",
+        (),
+        {
+            "dtype": gpu_resources.wp.float64,
+            "shape": (2**62, 2),
+            "strides": (16, 8),
+            "ptr": 8,
+            "capacity": 16,
+        },
+    )()
+    with pytest.raises(ValueError, match="exceeds supported range"):
+        GPUResourceRegistry._array_range(array)
 
 
 def test_registry_requires_exact_active_session() -> None:
@@ -946,6 +966,171 @@ def test_registry_requires_active_session_and_exposes_all_manifests() -> None:
         for manifest in manifests
         for entry in manifest.entries
     )
+
+
+@pytest.mark.warp
+def test_logical_resource_report_resolves_manifest_schemas_without_acquisition() -> (
+    None
+):
+    """Test inventory reports use only logical manifest schemas and capacities."""
+    registry = GPUResourceRegistry(_session(2, 3, 4))
+    capacities = ResourceInventoryCapacities(5, 6, 7)
+    report = registry.logical_resource_report(capacities)
+
+    assert tuple(family.family for family in report.families) == (
+        "condensation",
+        "coagulation",
+        "wall_loss",
+        "nucleation",
+        "communication_gas",
+        "communication_particles",
+    )
+    assert registry._bindings == {}
+    assert registry._views == {}
+    by_family = {family.family: family for family in report.families}
+    condensation = by_family["condensation"].roles[0]
+    pairs = by_family["coagulation"].roles[0]
+    gas_edge = by_family["communication_gas"].roles[0]
+    particle_edges = by_family["communication_particles"].roles[6]
+    assert (condensation.entry.shape, condensation.element_count) == (
+        (2, 3, 4),
+        24,
+    )
+    assert condensation.logical_byte_count == 192
+    assert (
+        pairs.entry.shape,
+        pairs.element_count,
+        pairs.logical_byte_count,
+    ) == (
+        (2, 5, 2),
+        20,
+        80,
+    )
+    assert (gas_edge.entry.shape, gas_edge.entry.capacity_source) == (
+        (6,),
+        "gas_edge_capacity",
+    )
+    assert particle_edges.entry.shape == (7, 3)
+    assert particle_edges.entry.capacity_source == "particle_edge_capacity"
+    assert gas_edge.entry.ownership == "caller_configuration"
+    assert pairs.entry.ownership == "registry_or_caller_sidecar"
+    assert report.logical_byte_count == sum(
+        family.logical_byte_count for family in report.families
+    )
+    assert all(
+        family.logical_byte_count
+        == sum(role.logical_byte_count for role in family.roles)
+        for family in report.families
+    )
+    assert report == registry.logical_resource_report(capacities)
+
+    registry.acquire_condensation()
+    bindings = registry._bindings.copy()
+    views = registry._views.copy()
+    assert registry.logical_resource_report(capacities) == report
+    assert registry._bindings == bindings
+    assert registry._views == views
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("capacities", ((0, 0, 0), (0, 2, 0)))
+def test_logical_resource_report_retains_zero_extent_roles(
+    capacities: tuple[int, int, int],
+) -> None:
+    """Test valid zero capacities remain present with zero logical bytes."""
+    report = GPUResourceRegistry(_session(0, 3, 0)).logical_resource_report(
+        ResourceInventoryCapacities(*capacities)
+    )
+    roles = tuple(role for family in report.families for role in family.roles)
+    assert any(role.entry.shape == (0, 0, 2) for role in roles)
+    assert any(role.entry.shape == (0,) for role in roles)
+    assert any(
+        role.entry.capacity_source == "collision_capacity"
+        and role.logical_byte_count == 0
+        for role in roles
+    )
+    assert any(
+        role.entry.capacity_source == "particle_edge_capacity"
+        and role.logical_byte_count == 0
+        for role in roles
+    )
+    assert report.logical_byte_count > 0
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "capacities",
+    (
+        (-1, 1, 1),
+        (True, 1, 1),
+        (1.5, 1, 1),
+        (1, -1, 1),
+        (1, True, 1),
+        (1, 1.5, 1),
+        (1, 1, -1),
+        (1, 1, True),
+        (1, 1, 1.5),
+    ),
+)
+def test_logical_resource_report_rejects_invalid_capacities_before_mutation(
+    capacities: tuple[Any, Any, Any],
+) -> None:
+    """Test invalid logical capacities reject without publishing resources."""
+    registry = GPUResourceRegistry(_session())
+    with pytest.raises(ValueError, match="non-boolean nonnegative integers"):
+        registry.logical_resource_report(
+            ResourceInventoryCapacities(*capacities)
+        )
+    with pytest.raises(TypeError, match="exact ResourceInventoryCapacities"):
+        registry.logical_resource_report((1, 1, 1))  # type: ignore[arg-type]
+    assert registry._bindings == {}
+    assert registry._views == {}
+    assert registry._capacities == {}
+
+
+@pytest.mark.warp
+def test_logical_resource_report_rejects_closed_session_before_reporting() -> (
+    None
+):
+    """Test inventory validates the pinned session before resolving schemas."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    object.__setattr__(session, "lifecycle", ResidentLifecycle.CLOSED)
+
+    with pytest.raises(ValueError, match="ACTIVE"):
+        registry.logical_resource_report(ResourceInventoryCapacities(1, 1, 1))
+
+    assert registry._bindings == {}
+    assert registry._views == {}
+    assert registry._capacities == {}
+
+
+@pytest.mark.warp
+def test_logical_resource_report_carriers_are_frozen_and_concrete_only() -> (
+    None
+):
+    """Test reports are immutable and remain absent from package exports."""
+    report = GPUResourceRegistry(_session()).logical_resource_report(
+        ResourceInventoryCapacities(1, 1, 1)
+    )
+    with pytest.raises(FrozenInstanceError):
+        report.logical_byte_count = 0  # type: ignore[misc]
+    with pytest.raises(FrozenInstanceError):
+        report.families[0].roles[0].entry.shape = ()  # type: ignore[misc]
+    import particula
+    import particula.execution as execution
+
+    inventory_names = (
+        "ResourceInventoryCapacities",
+        "ResolvedResourceInventoryEntry",
+        "LogicalResourceRoleReport",
+        "LogicalResourceFamilyReport",
+        "LogicalResourceReport",
+    )
+    for name in inventory_names:
+        assert hasattr(gpu_resources, name)
+        assert not hasattr(execution, name)
+        assert not hasattr(particula, name)
 
 
 @pytest.mark.warp

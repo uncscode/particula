@@ -70,6 +70,11 @@ from particula.gpu.kernels.nucleation import (
 __all__ = [
     "ManifestEntry",
     "ResourceManifest",
+    "ResourceInventoryCapacities",
+    "ResolvedResourceInventoryEntry",
+    "LogicalResourceRoleReport",
+    "LogicalResourceFamilyReport",
+    "LogicalResourceReport",
     "PublishedStreamManifest",
     "GPUResourceRegistry",
     "CondensationResources",
@@ -113,6 +118,78 @@ class ResourceManifest:
 
     family: str
     entries: tuple[ManifestEntry, ...]
+
+
+@dataclass(frozen=True)
+class ResourceInventoryCapacities:
+    """Hold immutable logical capacities for direct-module inventory reports.
+
+    These values resolve manifest schemas only; they neither acquire resources
+    nor inspect device payloads or allocator capacity.
+    """
+
+    collision_capacity: int
+    gas_edge_capacity: int
+    particle_edge_capacity: int
+
+
+@dataclass(frozen=True)
+class ResolvedResourceInventoryEntry:
+    """Describe one immutable, direct-module-only resolved manifest role.
+
+    The entry contains schema metadata only and has no device pointer, payload,
+    acquisition, or allocator-capacity information.
+    """
+
+    family: str
+    role: str
+    dtype: Any
+    shape: tuple[int, ...]
+    capacity_source: Literal[
+        "fixed",
+        "collision_capacity",
+        "gas_edge_capacity",
+        "particle_edge_capacity",
+    ]
+    ownership: Literal["registry_or_caller_sidecar", "caller_configuration"]
+
+
+@dataclass(frozen=True)
+class LogicalResourceRoleReport:
+    """Report immutable logical bytes for one direct-module manifest role.
+
+    Counts are schema bytes rather than allocator-reserved bytes, and report
+    construction does not acquire resources or inspect device payloads.
+    """
+
+    entry: ResolvedResourceInventoryEntry
+    element_count: int
+    logical_byte_count: int
+
+
+@dataclass(frozen=True)
+class LogicalResourceFamilyReport:
+    """Report immutable logical bytes for one direct-module manifest family.
+
+    Counts cover manifest-defined roles only, without acquisition or payload
+    inspection, and are not allocator-reserved bytes.
+    """
+
+    family: str
+    roles: tuple[LogicalResourceRoleReport, ...]
+    logical_byte_count: int
+
+
+@dataclass(frozen=True)
+class LogicalResourceReport:
+    """Report immutable aggregate logical bytes for direct-module manifests.
+
+    The report is pointer-free, covers manifest-defined roles only, and neither
+    acquires sidecars nor inspects payloads or allocator-reserved bytes.
+    """
+
+    families: tuple[LogicalResourceFamilyReport, ...]
+    logical_byte_count: int
 
 
 @dataclass(frozen=True)
@@ -464,6 +541,44 @@ _PARTICLE_COMMUNICATION = ResourceManifest(
 )
 
 
+_CALLER_CONFIGURATION_ROLES = frozenset(
+    (family, role)
+    for family in ("communication_gas", "communication_particles")
+    for role in ("source_boxes", "destination_boxes", "enabled", "rates")
+)
+
+
+def _inventory_metadata(
+    entry: ManifestEntry,
+) -> tuple[
+    Literal[
+        "fixed",
+        "collision_capacity",
+        "gas_edge_capacity",
+        "particle_edge_capacity",
+    ],
+    Literal["registry_or_caller_sidecar", "caller_configuration"],
+]:
+    """Return declaration-only capacity and ownership metadata for one role."""
+    if entry.family == "coagulation" and entry.role == "collision_pairs":
+        capacity_source = "collision_capacity"
+    elif entry.family == "communication_gas" and entry.shape_kind == "e":
+        capacity_source = "gas_edge_capacity"
+    elif entry.family == "communication_particles" and entry.shape_kind in (
+        "e",
+        "en",
+    ):
+        capacity_source = "particle_edge_capacity"
+    else:
+        capacity_source = "fixed"
+    ownership = (
+        "caller_configuration"
+        if (entry.family, entry.role) in _CALLER_CONFIGURATION_ROLES
+        else "registry_or_caller_sidecar"
+    )
+    return capacity_source, ownership
+
+
 def _primary_arrays(session: ResidentSession) -> tuple[Any, ...]:
     """Return the protected resident primary arrays in canonical order."""
     particles = cast(Any, session.particles)
@@ -492,6 +607,65 @@ def _item_size(dtype: Any) -> int:
     if dtype == wp.int32 or dtype == wp.uint32:
         return 4
     raise ValueError("Unsupported manifest dtype.")
+
+
+def _validated_extent(value: Any) -> int:
+    """Return one nonnegative non-boolean integral shape extent."""
+    if isinstance(value, bool) or not isinstance(value, Integral) or value < 0:
+        raise ValueError(
+            "Resource shape extents must be non-boolean nonnegative integers."
+        )
+    return int(value)
+
+
+def _checked_product(left: int, right: Any) -> int:
+    """Multiply validated resource extents without exceeding ``_MAX_SIZE``."""
+    if (
+        isinstance(left, bool)
+        or isinstance(right, bool)
+        or not isinstance(left, Integral)
+        or not isinstance(right, Integral)
+        or left < 0
+        or right < 0
+    ):
+        raise ValueError("Resource allocation size exceeds supported range.")
+    left = int(left)
+    right = int(right)
+    if left > _MAX_SIZE // max(right, 1):
+        raise ValueError("Resource allocation size exceeds supported range.")
+    return left * right
+
+
+def _shape_element_count(shape: tuple[int, ...]) -> int:
+    """Return the checked logical element count for one resource shape."""
+    count = 1
+    for extent in shape:
+        count = _checked_product(count, _validated_extent(extent))
+    return count
+
+
+def _logical_byte_count(shape: tuple[int, ...], dtype: Any) -> int:
+    """Return checked logical schema bytes for one resource shape and dtype."""
+    return _checked_product(_shape_element_count(shape), _item_size(dtype))
+
+
+def _checked_sum(values: tuple[int, ...] | list[int]) -> int:
+    """Return a checked sum of logical resource counts."""
+    total = 0
+    for value in values:
+        total = _checked_product(1, total + _validated_extent(value))
+    return total
+
+
+def _contiguous_strides(shape: tuple[int, ...], dtype: Any) -> tuple[int, ...]:
+    """Return checked canonical contiguous byte strides for one shape."""
+    stride = _item_size(dtype)
+    expected: list[int] = []
+    for extent in reversed(shape):
+        extent = _validated_extent(extent)
+        expected.insert(0, stride)
+        stride = _checked_product(stride, extent)
+    return tuple(expected)
 
 
 class GPUResourceRegistry:
@@ -554,6 +728,75 @@ class GPUResourceRegistry:
             _NUCLEATION,
             _GAS_COMMUNICATION,
             _PARTICLE_COMMUNICATION,
+        )
+
+    def logical_resource_report(
+        self, capacities: ResourceInventoryCapacities
+    ) -> LogicalResourceReport:
+        """Return immutable logical-byte accounting without acquisition.
+
+        This direct-module-only accessor resolves every canonical manifest role
+        from pinned dimensions and supplied capacities. It does not inspect
+        payloads, pointers, bindings, or allocator-reserved bytes.
+
+        Args:
+            capacities: Exact logical collision and communication capacities.
+
+        Returns:
+            Pointer-free manifest reports in canonical declaration order.
+
+        Raises:
+            TypeError: If ``capacities`` is not the exact inventory carrier.
+            ValueError: If capacities or pinned session metadata are invalid.
+        """
+        self.validate_pinned_session(self._session)
+        if type(capacities) is not ResourceInventoryCapacities:
+            raise TypeError(
+                "capacities must be an exact ResourceInventoryCapacities."
+            )
+        collision_capacity = _validated_extent(capacities.collision_capacity)
+        gas_edge_capacity = _validated_extent(capacities.gas_edge_capacity)
+        particle_edge_capacity = _validated_extent(
+            capacities.particle_edge_capacity
+        )
+        capacity_by_source = {
+            "collision_capacity": collision_capacity,
+            "gas_edge_capacity": gas_edge_capacity,
+            "particle_edge_capacity": particle_edge_capacity,
+        }
+        family_reports: list[LogicalResourceFamilyReport] = []
+        for manifest in self.manifests:
+            roles: list[LogicalResourceRoleReport] = []
+            for manifest_entry in manifest.entries:
+                capacity_source, ownership = _inventory_metadata(manifest_entry)
+                capacity = capacity_by_source.get(capacity_source)
+                shape = self._shape(manifest_entry, capacity)
+                resolved_entry = ResolvedResourceInventoryEntry(
+                    manifest_entry.family,
+                    manifest_entry.role,
+                    manifest_entry.dtype,
+                    shape,
+                    capacity_source,
+                    ownership,
+                )
+                roles.append(
+                    LogicalResourceRoleReport(
+                        resolved_entry,
+                        _shape_element_count(shape),
+                        _logical_byte_count(shape, manifest_entry.dtype),
+                    )
+                )
+            family_reports.append(
+                LogicalResourceFamilyReport(
+                    manifest.family,
+                    tuple(roles),
+                    _checked_sum([role.logical_byte_count for role in roles]),
+                )
+            )
+        families = tuple(family_reports)
+        return LogicalResourceReport(
+            families,
+            _checked_sum([family.logical_byte_count for family in families]),
         )
 
     def _session_signature(self) -> tuple[Any, ...]:
@@ -1258,15 +1501,15 @@ class GPUResourceRegistry:
         if entry.shape_kind == "bc2":
             if capacity is None:
                 raise ValueError("collision capacity is required.")
-            return (dimensions.n_boxes, capacity, 2)
+            return (dimensions.n_boxes, _validated_extent(capacity), 2)
         if entry.shape_kind == "e":
             if capacity is None:
                 raise ValueError("communication edge capacity is required.")
-            return (capacity,)
+            return (_validated_extent(capacity),)
         if entry.shape_kind == "en":
             if capacity is None:
                 raise ValueError("communication edge capacity is required.")
-            return (capacity, dimensions.n_particles)
+            return (_validated_extent(capacity), dimensions.n_particles)
         return shapes[entry.shape_kind]
 
     def _validate_array(
@@ -1314,16 +1557,9 @@ class GPUResourceRegistry:
         if not isinstance(strides, tuple) or len(strides) != len(shape):
             raise ValueError(f"{role} must have contiguous strides.")
         item_size = _item_size(dtype)
-        expected: list[int] = []
-        stride = item_size
-        for length in reversed(shape):
-            expected.insert(0, stride)
-            stride *= length
-        if strides != tuple(expected):
+        if strides != _contiguous_strides(shape, dtype):
             raise ValueError(f"{role} must be contiguous.")
-        count = 1
-        for length in shape:
-            count = self._checked_product(count, length)
+        count = _shape_element_count(shape)
         if count == 0:
             return None
         pointer = getattr(value, "ptr", None)
@@ -1334,7 +1570,7 @@ class GPUResourceRegistry:
                 f"{role} pointer must be {item_size}-byte aligned."
             )
         capacity = getattr(value, "capacity", None)
-        required = count * item_size
+        required = _logical_byte_count(shape, dtype)
         if (
             isinstance(capacity, bool)
             or not isinstance(capacity, Integral)
@@ -1348,11 +1584,8 @@ class GPUResourceRegistry:
 
     @staticmethod
     def _checked_product(left: int, right: int) -> int:
-        if right < 0 or left > _MAX_SIZE // max(right, 1):
-            raise ValueError(
-                "Resource allocation size exceeds supported range."
-            )
-        return left * right
+        """Multiply resource extents with central checked arithmetic."""
+        return _checked_product(left, right)
 
     def _allocate(self, entry: ManifestEntry, capacity: int | None) -> Any:
         """Allocate one manifest-conforming sidecar on the pinned device.
@@ -1370,10 +1603,7 @@ class GPUResourceRegistry:
                 exceeds the supported range.
         """
         shape = self._shape(entry, capacity)
-        count = 1
-        for length in shape:
-            count = self._checked_product(count, length)
-        self._checked_product(count, _item_size(entry.dtype))
+        _logical_byte_count(shape, entry.dtype)
         return wp.zeros(shape, dtype=entry.dtype, device=self._signature[2])
 
     @staticmethod
@@ -1473,16 +1703,10 @@ class GPUResourceRegistry:
         if not isinstance(strides, tuple) or len(strides) != len(array.shape):
             raise ValueError("Registry arrays must have contiguous strides.")
         item_size = _item_size(array.dtype)
-        expected: list[int] = []
-        stride = item_size
-        for length in reversed(array.shape):
-            expected.insert(0, stride)
-            stride *= length
-        if strides != tuple(expected):
+        shape = tuple(array.shape)
+        if strides != _contiguous_strides(shape, array.dtype):
             raise ValueError("Registry arrays must be contiguous.")
-        count = 1
-        for length in array.shape:
-            count *= length
+        count = _shape_element_count(shape)
         if count == 0:
             return None
         pointer = getattr(array, "ptr", None)
@@ -1493,7 +1717,7 @@ class GPUResourceRegistry:
                 "Registry array pointers must be element-size aligned."
             )
         capacity = getattr(array, "capacity", None)
-        required = count * item_size
+        required = _logical_byte_count(shape, array.dtype)
         if (
             isinstance(capacity, bool)
             or not isinstance(capacity, Integral)
