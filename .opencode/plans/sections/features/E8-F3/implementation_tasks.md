@@ -2,13 +2,13 @@
 
 ## Backend
 
-- [ ] Extend `ManifestEntry`/`ResourceManifest` in
-  `particula/execution/gpu_resources.py` with enough immutable metadata to
-  enumerate capture-required roles and capacity sources deterministically.
-- [ ] Add checked element-count and logical-byte helpers shared by allocation
-  validation and accounting; preserve zero-dimension semantics.
-- [ ] Add frozen per-role, per-family, and aggregate byte report records that
-  contain no pointers or payload data.
+- [x] Add a separate immutable declaration-metadata layer and direct-module-only
+  inventory carriers in `particula/execution/gpu_resources.py`; existing
+  `ManifestEntry`/`ResourceManifest` declarations and ordering remain unchanged.
+- [x] Add checked shape, stride, element-count, and logical-byte helpers shared
+  by allocation, range validation, and reporting, preserving zero dimensions.
+- [x] Add frozen pointer-free per-role, per-family, and aggregate logical-byte
+  report records plus the read-only `logical_resource_report()` accessor.
 - [ ] Inventory E8-F2 prepared operations and add missing fixed-shape process,
   control, selected-lane, and validation/status sidecars to canonical manifests.
 - [ ] Represent diagnostic outputs/accounting work as closed capture resources
@@ -27,9 +27,9 @@
 
 ## Tooling / Tests
 
-- [ ] Extend `particula/execution/tests/gpu_resources_test.py` with manifest,
-  byte-formula, overflow, transactional publication, identity, and no-allocation
-  tests for each phase.
+- [x] Extend `particula/execution/tests/gpu_resources_test.py` with P1 manifest
+  order, independent byte-formula, zero-extent, invalid input, overflow,
+  immutability, export-boundary, and read-only reporting tests.
 - [ ] Add focused prepared-timestep integration tests under
   `particula/execution/tests/` with allocator/acquisition/readback spies.
 - [ ] Cover one/multi-box, zero particle/species dimensions, both communication

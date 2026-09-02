@@ -12,8 +12,11 @@ from :mod:`particula.execution`.
 
 The registry retains array identities and performs metadata-only schema and
 nonaliasing checks. It does not establish allocator provenance, execute a
-kernel, or change session lifecycle. Explicit lifecycle methods may inspect
-frozen stream metadata or reset selected published lanes without hidden
+kernel, or change session lifecycle. Its direct-module-only logical inventory
+reports immutable manifest schema metadata and logical bytes, not
+allocator-reserved bytes. Inventory reporting neither inspects payloads nor
+acquires, allocates, binds, or mutates sidecars. Explicit lifecycle methods may
+inspect frozen stream metadata or reset selected published lanes without hidden
 transfer or synchronization.
 ``validate_pinned_session`` is the narrow direct-module-only integration seam
 for resident timestep guards. It requires the exact retained session, then
@@ -122,10 +125,16 @@ class ResourceManifest:
 
 @dataclass(frozen=True)
 class ResourceInventoryCapacities:
-    """Hold immutable logical capacities for direct-module inventory reports.
+    """Hold frozen capacities for direct-module-only inventory reports.
 
-    These values resolve manifest schemas only; they neither acquire resources
-    nor inspect device payloads or allocator capacity.
+    The carrier resolves declared manifest shapes only. It contains no device
+    payload or allocator-capacity data, and using it neither acquires nor
+    allocates resources.
+
+    Attributes:
+        collision_capacity: Logical collision-sidecar capacity.
+        gas_edge_capacity: Logical gas-communication edge capacity.
+        particle_edge_capacity: Logical particle-communication edge capacity.
     """
 
     collision_capacity: int
@@ -135,10 +144,19 @@ class ResourceInventoryCapacities:
 
 @dataclass(frozen=True)
 class ResolvedResourceInventoryEntry:
-    """Describe one immutable, direct-module-only resolved manifest role.
+    """Describe one frozen direct-module-only resolved manifest role.
 
-    The entry contains schema metadata only and has no device pointer, payload,
-    acquisition, or allocator-capacity information.
+    The pointer-free entry contains declaration-resolved schema metadata only.
+    It has no device payload, acquisition state, or allocator-capacity
+    information.
+
+    Attributes:
+        family: Canonical manifest family containing the role.
+        role: Canonical role name within ``family``.
+        dtype: Declared Warp dtype for the logical role.
+        shape: Resolved logical shape.
+        capacity_source: Input that resolved any dynamic shape extent.
+        ownership: Declared owner category for the role.
     """
 
     family: str
@@ -156,10 +174,16 @@ class ResolvedResourceInventoryEntry:
 
 @dataclass(frozen=True)
 class LogicalResourceRoleReport:
-    """Report immutable logical bytes for one direct-module manifest role.
+    """Report frozen logical accounting for one direct-module-only role.
 
-    Counts are schema bytes rather than allocator-reserved bytes, and report
-    construction does not acquire resources or inspect device payloads.
+    Counts describe the resolved schema, not allocator-reserved bytes. Report
+    construction is read-only: it neither inspects device payloads nor acquires,
+    allocates, binds, or mutates resources.
+
+    Attributes:
+        entry: Pointer-free resolved metadata for the manifest role.
+        element_count: Logical element count of ``entry.shape``.
+        logical_byte_count: Logical schema bytes, excluding allocator overhead.
     """
 
     entry: ResolvedResourceInventoryEntry
@@ -169,10 +193,15 @@ class LogicalResourceRoleReport:
 
 @dataclass(frozen=True)
 class LogicalResourceFamilyReport:
-    """Report immutable logical bytes for one direct-module manifest family.
+    """Report frozen logical accounting for one direct-module-only family.
 
-    Counts cover manifest-defined roles only, without acquisition or payload
-    inspection, and are not allocator-reserved bytes.
+    Counts cover manifest-defined roles only, not allocator-reserved bytes.
+    Constructing the report does not inspect payloads or acquire resources.
+
+    Attributes:
+        family: Canonical manifest family name.
+        roles: Ordered frozen reports for the family's declared roles.
+        logical_byte_count: Sum of role logical schema bytes.
     """
 
     family: str
@@ -182,10 +211,16 @@ class LogicalResourceFamilyReport:
 
 @dataclass(frozen=True)
 class LogicalResourceReport:
-    """Report immutable aggregate logical bytes for direct-module manifests.
+    """Report frozen aggregate accounting for direct-module-only manifests.
 
-    The report is pointer-free, covers manifest-defined roles only, and neither
-    acquires sidecars nor inspects payloads or allocator-reserved bytes.
+    The pointer-free report covers manifest-defined roles only and reports
+    logical schema bytes, not allocator-reserved bytes. Its read-only creation
+    neither inspects payloads nor acquires, allocates, binds, or mutates
+    sidecars.
+
+    Attributes:
+        families: Ordered frozen reports for all canonical manifest families.
+        logical_byte_count: Sum of family logical schema bytes.
     """
 
     families: tuple[LogicalResourceFamilyReport, ...]
@@ -624,6 +659,8 @@ def _validated_extent(value: Any) -> int:
         raise ValueError(
             "Resource shape extents must be non-boolean nonnegative integers."
         )
+    if value > _MAX_SIZE:
+        raise ValueError("Resource allocation size exceeds supported range.")
     return int(value)
 
 
@@ -742,21 +779,27 @@ class GPUResourceRegistry:
     def logical_resource_report(
         self, capacities: ResourceInventoryCapacities
     ) -> LogicalResourceReport:
-        """Return immutable logical-byte accounting without acquisition.
+        """Return a frozen direct-module-only logical resource report.
 
-        This direct-module-only accessor resolves every canonical manifest role
-        from pinned dimensions and supplied capacities. It does not inspect
-        payloads, pointers, bindings, or allocator-reserved bytes.
+        Resolves every canonical manifest role, including both communication
+        families, from pinned dimensions and explicit capacities. The result
+        reports logical schema bytes rather than allocator-reserved bytes. This
+        read-only accessor does not inspect payloads or pointers, or acquire,
+        allocate, bind, or mutate resources.
 
         Args:
-            capacities: Exact logical collision and communication capacities.
+            capacities: Exact frozen carrier of logical collision, gas-edge,
+                and particle-edge capacities.
 
         Returns:
-            Pointer-free manifest reports in canonical declaration order.
+            Pointer-free frozen family and role reports in canonical declaration
+            order.
 
         Raises:
-            TypeError: If ``capacities`` is not the exact inventory carrier.
-            ValueError: If capacities or pinned session metadata are invalid.
+            TypeError: If ``capacities`` is not an exact
+                ``ResourceInventoryCapacities`` carrier.
+            ValueError: If a capacity, checked logical-byte calculation, or
+                pinned session metadata is invalid.
         """
         self.validate_pinned_session(self._session)
         if type(capacities) is not ResourceInventoryCapacities:
@@ -1589,7 +1632,10 @@ class GPUResourceRegistry:
             raise ValueError(
                 f"{role} must have sufficient integral storage capacity."
             )
-        return int(pointer), int(pointer) + required
+        pointer_value = int(pointer)
+        if pointer_value > _MAX_SIZE - required:
+            raise ValueError(f"{role} byte range exceeds supported range.")
+        return pointer_value, pointer_value + required
 
     @staticmethod
     def _checked_product(left: int, right: int) -> int:
@@ -1749,7 +1795,12 @@ class GPUResourceRegistry:
                 "Registry arrays must have sufficient integral "
                 "storage capacity."
             )
-        return int(pointer), int(pointer) + required
+        pointer_value = int(pointer)
+        if pointer_value > _MAX_SIZE - required:
+            raise ValueError(
+                "Registry array byte range exceeds supported range."
+            )
+        return pointer_value, pointer_value + required
 
     def _acquire(  # noqa: C901
         self,

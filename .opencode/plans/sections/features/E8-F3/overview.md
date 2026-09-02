@@ -10,6 +10,17 @@ temporaries must not fall back to per-call allocation. The capture lifecycle
 also needs a deterministic way to prove that the same arrays are reused and to
 report their logical byte cost without reading device payloads.
 
+## Current Increment
+
+E8-F3-P1 shipped in issue #1561. `GPUResourceRegistry` now exposes a
+direct-module-only immutable logical inventory/report for the six existing
+canonical manifests. It resolves declared shapes, dtype, capacity provenance,
+ownership, elements, and logical bytes without allocating, acquiring a resource
+family, inspecting payloads, or changing bindings/configuration state. Checked
+shape, stride, element, and byte arithmetic is shared by reporting, allocation,
+and range validation; focused registry tests pass. Package and top-level exports
+remain unchanged.
+
 ## Value Proposition
 
 E8-F3 makes the registry the single concrete owner of capture-lifetime reusable

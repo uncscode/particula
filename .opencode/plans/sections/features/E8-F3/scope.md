@@ -6,6 +6,11 @@ timestep. It covers process, communication, diagnostic, control, validation,
 and RNG sidecars; exact identity reuse; atomic publication; and overflow-safe
 logical byte accounting.
 
+P1 is complete: it delivered inventory/reporting for the six existing manifests
+and centralized checked arithmetic only. It did not acquire or preallocate any
+new resource, alter configuration payload handling, or implement the later
+whole-set preparation work.
+
 ## In Scope
 
 - Define canonical capture-resource roles, shapes, dtypes, capacities, and
@@ -35,3 +40,5 @@ logical byte accounting.
 - Runtime resizing, compaction, automatic recapture, fallback, migration,
   allocator-pool tuning, or claims about allocator overhead/reserved bytes.
 - New public package exports or changes to direct-kernel ownership contracts.
+- Treating optional `CommunicationResources.final_volumes` as a manifest role;
+  it remains a configuration binding outside P1 inventory reporting.

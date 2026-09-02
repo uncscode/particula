@@ -1,5 +1,17 @@
 # Success Criteria
 
+## P1 Completion
+
+- [x] The unchanged six canonical manifests resolve into immutable,
+  direct-module-only logical reports in manifest order, including both
+  communication families.
+- [x] Reports are read-only and independent of acquisition, bindings,
+  configuration payloads, device payload inspection, and allocator reservation.
+- [x] Checked arithmetic now protects shape, stride, element, and byte
+  calculations used by reporting, allocation, and range validation.
+- [x] Focused registry tests for the P1 inventory/reporting contract pass with
+  no package or top-level export changes.
+
 - [ ] One setup-only operation resolves and publishes every reusable array
   required by the selected E8-F2 prepared timestep before READY/capture.
 - [ ] The inventory covers process scratch/output, normalized controls,

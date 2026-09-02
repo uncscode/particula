@@ -1041,6 +1041,14 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   retains fixed dimensions and resident identities; ordered gas names remain
   CPU metadata. The registry pins fixed-shape, same-device, nonaliasing sidecars
   and does not execute, transfer, synchronize, or initialize RNG streams.
+- `GPUResourceRegistry.logical_resource_report(capacities)` is a
+  direct-module-only planning seam. Its immutable report resolves all six
+  manifest families, including both communication families regardless of later
+  acquisition, from pinned dimensions and explicit collision, gas-edge, and
+  particle-edge capacities. It reports logical schema bytes only, not
+  allocator-reserved bytes, and does not inspect payloads, allocate, acquire,
+  bind, or mutate resources. Its carriers remain absent from
+  `particula.execution` and top-level exports.
 - Checkpoint, finalize, close, and discard require an exact session/registry/
   closed-guard binding. Normal guard bookkeeping has no bulk synchronization.
   Read-only failures can remain ACTIVE after token release; writer failures can

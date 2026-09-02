@@ -1,5 +1,12 @@
 # Documentation Updates
 
+## P1 Status
+
+No user-facing documentation changed for issue #1561. The immutable inventory
+and `logical_resource_report()` remain direct-module-only in
+`particula.execution.gpu_resources`; package and top-level exports are unchanged.
+The focused contract is covered in `particula/execution/tests/gpu_resources_test.py`.
+
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` Epic H sections with the
   implemented registry-owned capture resource inventory, setup/reuse boundary,
   persistent RNG handling, and deterministic logical-byte accounting semantics.
@@ -17,4 +24,5 @@
 - Do not add a user-facing example in this track; E8-F8 owns the complete graph
   capture example and limitation guide.
 - Promote phase statuses and update this plan's change log after each shipped
-  increment. Validate all links with `mkdocs build --strict`.
+  increment. Validate all links with `mkdocs build --strict` when documentation
+  changes.

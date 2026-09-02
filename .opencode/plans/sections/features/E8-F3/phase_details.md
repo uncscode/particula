@@ -1,13 +1,18 @@
 # Phase Details
 
-- [ ] **E8-F3-P1:** Canonical capture resource inventory and byte formulas with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Represent every capture-lifetime role with stable family/role order,
-    shape, dtype, capacity source, ownership, and overflow-safe logical bytes.
+- [x] **E8-F3-P1:** Canonical capture resource inventory and byte formulas with unit tests
+  - Issue: #1561 | Size: S | Status: Shipped
+  - Delivered: Immutable direct-module-only reports resolve all six existing
+    manifests in stable order, including both communication families, with
+    shape, dtype, capacity source, ownership, element counts, and logical bytes.
+    The accessor is read-only and independent of acquisition/configuration
+    payloads; checked arithmetic is shared with allocation/range validation.
   - Files: `particula/execution/gpu_resources.py`,
     `particula/execution/tests/gpu_resources_test.py`
-  - Tests: Exact manifest order, formulas for normal/zero dimensions, dynamic
-    collision/edge capacities, dtype sizes, checked overflow, and stable totals.
+  - Tests: Focused passing coverage for manifest order, normal/zero shapes,
+    dynamic collision/edge capacities, dtype sizes, checked overflow, stable
+    totals, frozen carriers, direct-module-only exports, and no mutation before
+    or after unrelated acquisition.
 
 - [ ] **E8-F3-P2:** Complete process and control sidecar preallocation with unit tests
   - Issue: TBD | Size: S | Status: Not Started

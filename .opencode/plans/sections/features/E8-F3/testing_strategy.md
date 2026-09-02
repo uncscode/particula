@@ -7,9 +7,11 @@ never lowered.
 
 ## Per-Phase Coverage
 
-- **P1:** Unit-test canonical family/role order, shape formulas, dtype item
-  sizes, collision/edge capacities, zero dimensions, checked overflow, and
-  exact per-role/per-family/total logical-byte sums.
+- **P1 (shipped):** `particula/execution/tests/gpu_resources_test.py` covers
+  canonical family/role order, independent shape/byte formulas, dtype item
+  sizes, collision/edge capacities, zero dimensions, checked overflow, frozen
+  carriers, concrete-only exports, closed-session rejection, and unchanged
+  registry state before and after unrelated acquisition. Focused tests pass.
 - **P2:** Unit-test every process/control family for complete native records,
   exact schemas/devices, nonaliasing, caller-supplied identity retention,
   omitted allocation, stable reacquisition, and transactional failure.
@@ -34,7 +36,7 @@ never lowered.
 - Focused development checks are coverage-disabled assertion checks:
 
   ```bash
-  pytest particula/execution/tests/gpu_resources_test.py -q
+  pytest particula/execution/tests/gpu_resources_test.py -q --no-cov
   pytest particula/execution/tests/ -q -k "resource or prepared or capture"
   ```
 

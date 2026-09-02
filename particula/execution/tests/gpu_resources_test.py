@@ -21,6 +21,7 @@ from particula.execution.diagnostics import (
     ResidentDiagnosticsPlan,
 )
 from particula.execution.gpu_resources import (
+    _MAX_SIZE,
     GPUResourceRegistry,
     ManifestEntry,
     ResourceInventoryCapacities,
@@ -938,6 +939,40 @@ def test_array_range_rejects_stride_overflow_before_pointer_access() -> None:
         GPUResourceRegistry._array_range(array)
 
 
+@pytest.mark.warp
+def test_byte_range_endpoint_overflow_rejects_supplied_and_registered_arrays() -> (
+    None
+):
+    """Test range endpoints reject overflow before alias comparisons."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    device = cast(Any, session.particles).masses.device
+    array = type(
+        "array",
+        (),
+        {
+            "dtype": gpu_resources.wp.float64,
+            "shape": (1,),
+            "strides": (8,),
+            "device": device,
+            "ptr": _MAX_SIZE - 7,
+            "capacity": 8,
+        },
+    )()
+    type(array).__module__ = "warp"
+
+    with pytest.raises(ValueError, match="byte range exceeds supported range"):
+        registry._contiguous_range(
+            array, (1,), gpu_resources.wp.float64, "supplied"
+        )
+    with pytest.raises(ValueError, match="byte range exceeds supported range"):
+        GPUResourceRegistry._array_range(array)
+
+    assert registry._bindings == {}
+    assert registry._views == {}
+    assert registry._capacities == {}
+
+
 def test_registry_requires_exact_active_session() -> None:
     """Test construction rejects values outside the exact active boundary."""
     with pytest.raises(TypeError, match="exact ResidentSession"):
@@ -1086,6 +1121,188 @@ def test_logical_resource_report_rejects_invalid_capacities_before_mutation(
     assert registry._bindings == {}
     assert registry._views == {}
     assert registry._capacities == {}
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("dimensions", "capacities"),
+    (
+        ((0, 3, 2), (_MAX_SIZE + 1, 0, 0)),
+        ((0, 3, 2), (0, _MAX_SIZE + 1, 0)),
+        ((2, 0, 2), (0, 0, _MAX_SIZE + 1)),
+    ),
+)
+def test_logical_resource_report_rejects_oversized_capacity_before_mutation(
+    dimensions: tuple[int, int, int],
+    capacities: tuple[int, int, int],
+) -> None:
+    """Test zero dimensions cannot mask an oversized dynamic capacity."""
+    registry = GPUResourceRegistry(_session(*dimensions))
+
+    with pytest.raises(ValueError, match="exceeds supported range"):
+        registry.logical_resource_report(
+            ResourceInventoryCapacities(*capacities)
+        )
+
+    assert registry._bindings == {}
+    assert registry._views == {}
+    assert registry._capacities == {}
+
+
+@pytest.mark.warp
+def test_logical_resource_report_lists_complete_canonical_inventory() -> None:
+    """Test every canonical role has independently expected report metadata."""
+    report = GPUResourceRegistry(_session(2, 3, 4)).logical_resource_report(
+        ResourceInventoryCapacities(5, 6, 7)
+    )
+    expected = (
+        (
+            "condensation",
+            (
+                ("work_mass_transfer", (2, 3, 4), 8),
+                ("total_mass_transfer", (2, 3, 4), 8),
+                ("dynamic_viscosity", (2,), 8),
+                ("mean_free_path", (2,), 8),
+                ("positive_mass_transfer_demand", (2, 4), 8),
+                ("negative_mass_transfer_release", (2, 4), 8),
+                ("positive_mass_transfer_scale", (2, 4), 8),
+            ),
+        ),
+        (
+            "coagulation",
+            (
+                ("collision_pairs", (2, 5, 2), 4),
+                ("n_collisions", (2,), 4),
+                ("rng_states", (2,), 4),
+            ),
+        ),
+        ("wall_loss", (("rng_states", (2,), 4),)),
+        (
+            "nucleation",
+            (
+                ("precursor_number_concentration", (2,), 8),
+                ("potential_rate", (2,), 8),
+                ("potential_demand", (2,), 8),
+                ("accepted_counts", (2,), 4),
+                ("accepted_demand", (2,), 8),
+                ("precursor_mass_change", (2, 4), 8),
+                ("gate_codes", (2,), 4),
+                ("selected_slot_indices", (2, 3), 4),
+                ("free_slot_indices", (2, 3), 4),
+                ("active_slot_counts", (2,), 4),
+                ("free_slot_counts", (2,), 4),
+                ("retained_counts", (2,), 4),
+                ("released_counts", (2,), 4),
+                ("retained_indices", (2, 3), 4),
+                ("released_indices", (2, 3), 4),
+                ("sorted_indices", (2, 3), 4),
+                ("replacement_masses", (2, 3, 4), 8),
+                ("replacement_concentration", (2, 3), 8),
+                ("replacement_charge", (2, 3), 8),
+                ("source_radii", (2, 3), 8),
+                ("radius_cubed_relative_error", (2,), 8),
+                ("mean_radius_relative_error", (2,), 8),
+                ("surface_relative_error", (2,), 8),
+                ("diversity_absolute_error", (2,), 8),
+                ("planning_status", (2,), 4),
+                ("demand_workspace", (2,), 8),
+                ("final_demand", (2,), 8),
+                ("requested_scale", (2,), 8),
+                ("minimum_scale", (2,), 8),
+                ("minimum_volume", (2,), 8),
+                ("resolved_scale", (2,), 8),
+                ("resampling_releasable_counts", (2,), 4),
+                ("required_release_counts", (2,), 4),
+                ("scaling_required", (2,), 4),
+                ("final_counts", (2,), 4),
+                ("final_selected_slot_indices", (2, 3), 4),
+            ),
+        ),
+        (
+            "communication_gas",
+            (
+                ("source_boxes", (6,), 4),
+                ("destination_boxes", (6,), 4),
+                ("enabled", (6,), 4),
+                ("rates", (6,), 8),
+                ("amounts", (2, 4), 8),
+                ("amount_deltas", (2, 4), 8),
+                ("outbound_amounts", (2, 4), 8),
+                ("invalid", (1,), 4),
+                ("active_or_demand", (1,), 4),
+                ("volume_invalid", (1,), 4),
+                ("volume_changed", (1,), 4),
+            ),
+        ),
+        (
+            "communication_particles",
+            (
+                ("source_boxes", (7,), 4),
+                ("destination_boxes", (7,), 4),
+                ("enabled", (7,), 4),
+                ("rates", (7,), 8),
+                ("source_debits", (2, 3), 8),
+                ("destination_credits", (2, 3), 8),
+                ("assignments", (7, 3), 4),
+                ("request_concentrations", (7, 3), 8),
+                ("invalid", (1,), 4),
+                ("active_or_demand", (1,), 4),
+                ("volume_invalid", (1,), 4),
+                ("volume_changed", (1,), 4),
+                ("initial_masses", (2, 3, 4), 8),
+                ("initial_concentration", (2, 3), 8),
+                ("initial_charge", (2, 3), 8),
+            ),
+        ),
+    )
+    expected_total = 0
+    assert tuple(family.family for family in report.families) == tuple(
+        family for family, _ in expected
+    )
+    for actual_family, (family_name, expected_roles) in zip(
+        report.families, expected, strict=True
+    ):
+        expected_family_total = 0
+        assert actual_family.family == family_name
+        assert tuple(role.entry.role for role in actual_family.roles) == tuple(
+            role for role, _, _ in expected_roles
+        )
+        for actual_role, (role, shape, item_size) in zip(
+            actual_family.roles, expected_roles, strict=True
+        ):
+            element_count = 1
+            for extent in shape:
+                element_count *= extent
+            expected_bytes = element_count * item_size
+            expected_family_total += expected_bytes
+            is_configuration = family_name.startswith(
+                "communication_"
+            ) and role in {
+                "source_boxes",
+                "destination_boxes",
+                "enabled",
+                "rates",
+            }
+            assert actual_role.entry.shape == shape
+            assert actual_role.element_count == element_count
+            assert actual_role.logical_byte_count == expected_bytes
+            assert actual_role.entry.ownership == (
+                "caller_configuration"
+                if is_configuration
+                else "registry_or_caller_sidecar"
+            )
+            assert actual_role.entry.capacity_source == (
+                "collision_capacity"
+                if role == "collision_pairs"
+                else "gas_edge_capacity"
+                if family_name == "communication_gas" and shape[0] == 6
+                else "particle_edge_capacity"
+                if family_name == "communication_particles" and shape[0] == 7
+                else "fixed"
+            )
+        assert actual_family.logical_byte_count == expected_family_total
+        expected_total += expected_family_total
+    assert report.logical_byte_count == expected_total
 
 
 @pytest.mark.warp

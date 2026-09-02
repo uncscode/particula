@@ -2,6 +2,18 @@
 
 ## High-Level Design
 
+### Implemented P1 reporting seam
+
+`GPUResourceRegistry.logical_resource_report()` is now the read-only,
+direct-module-only inventory seam. Given explicit collision, GAS-edge, and
+PARTICLES-edge capacities, it resolves every role in the existing six manifests
+(including both communication families) into frozen pointer-free role, family,
+and aggregate reports. It uses pinned dimensions, declaration metadata,
+`_shape()`, and shared checked accounting helpers only; it neither allocates nor
+acquires resources, reads payloads, consults bindings/configurations, or mutates
+the registry. Logical bytes are schema bytes rather than allocator-reserved
+bytes. The symbolic manifests and package/top-level exports are unchanged.
+
 The existing registry remains the sole storage authority. E8-F2 supplies a
 closed requirement description; E8-F3 resolves it against canonical manifests,
 stages every array and native view, validates the whole candidate for session
@@ -40,10 +52,11 @@ array replacement fail closed before replay.
 
 ## Data / API / Workflow Changes
 
-- **Data model:** Extend manifest metadata only as needed to identify capacity
-  sources and ownership. Add frozen concrete-only capture inventory and byte
-  report records. Byte counts are logical bytes (`product(shape) * item_size`),
-  not observed allocator reservation, and use checked integer arithmetic.
+- **Data model:** P1 added separate frozen concrete-only inventory and byte
+  report records keyed to the unchanged manifests, with declaration-level
+  capacity-source and ownership metadata. Byte counts are logical bytes
+  (`product(shape) * item_size`), not observed allocator reservation, and use
+  checked integer arithmetic. Whole capture-set carriers remain future work.
 - **API surface:** Add setup-only and validation/accessor methods on
   `GPUResourceRegistry`. Keep them direct-import-only; do not alter
   `particula.execution.__all__`, `particula.gpu.kernels.__all__`, or top-level
