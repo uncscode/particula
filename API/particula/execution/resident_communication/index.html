@@ -14,7 +14,7 @@
         <link rel="prev" href="../process_graph/">
       
       
-        <link rel="next" href="../resident_scheduler/">
+        <link rel="next" href="../resident_enqueue/">
       
       
         
@@ -4244,6 +4244,8 @@
       
         
       
+        
+      
     
     
     
@@ -4707,6 +4709,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#particula.execution.resident_communication.PreparedResidentCommunicationBinding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;PreparedResidentCommunicationBinding
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.execution.resident_communication.ResidentCommunicationExecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4784,6 +4797,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#particula.execution.resident_communication.setup_prepared_resident_communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;setup_prepared_resident_communication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.execution.resident_communication.validate_resident_communication_request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;validate_resident_communication_request
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -4796,6 +4831,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resident_enqueue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_enqueue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -5023,10 +5086,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_22" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_21" id="__nav_2_3_19_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_22" id="__nav_2_3_19_22_label" tabindex="0">
             
   
   
@@ -5044,8 +5107,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_21">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_22">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16054,6 +16117,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#particula.execution.resident_communication.PreparedResidentCommunicationBinding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;PreparedResidentCommunicationBinding
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.execution.resident_communication.ResidentCommunicationExecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -16131,6 +16205,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#particula.execution.resident_communication.setup_prepared_resident_communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;setup_prepared_resident_communication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.execution.resident_communication.validate_resident_communication_request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;validate_resident_communication_request
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -16175,9 +16271,17 @@
     <div class="doc doc-contents first">
 
         <p>Compose pinned communication resources into resident barrier calls.</p>
-<p>This concrete-only module dispatches already acquired closed-map communication
-and optional volume evolution.  It never performs P1 validation, acquisition,
-host conversion, synchronization, fallback, or recovery.</p>
+<p>This concrete-only module validates and freezes a READY P1 binding for
+already-acquired closed-map communication and optional volume evolution. Its
+prepared enqueue dispatches only those retained device barriers, without
+repeated host/setup metadata validation, acquisition, host conversion,
+synchronization, fallback, or recovery. The shared validator remains a
+read-only metadata seam for legacy execution. Prepared enqueue is
+retained-reference dispatch only: it does no host payload readback, allocation,
+transfer, synchronization, lookup, resource replacement, fallback, or
+rebinding. Retained native barriers still perform device-side status and
+physical-state validation. Setup rejection occurs before a barrier writer;
+rollback is not promised after one launches.</p>
 
 
 
@@ -16197,6 +16301,355 @@ host conversion, synchronization, fallback, or recovery.</p>
 
 
 
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="particula.execution.resident_communication.PreparedResidentCommunicationBinding" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">PreparedResidentCommunicationBinding</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#particula.execution.resident_communication.PreparedResidentCommunicationBinding" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">PreparedResidentCommunicationBinding</span><span class="p">(</span><span class="n">prepared_timestep</span><span class="p">:</span> <span class="n">PreparedResidentTimestep</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ResidentCommunicationRequest</span><span class="p">,</span> <span class="n">masses</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">particle_concentration</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">density</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">volume</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">charge</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">gas_concentration</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">source_boxes</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">destination_boxes</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">enabled</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">rates</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">map_form</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">one_dimensional</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">CommunicationTransportMode</span><span class="p">,</span> <span class="n">edge_capacity</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">buffers</span><span class="p">:</span> <span class="n">GasCommunicationBuffers</span> <span class="o">|</span> <span class="n">ParticleCommunicationBuffers</span><span class="p">,</span> <span class="n">invalid</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">active_or_demand</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">volume_invalid</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">volume_changed</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">initial_masses</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">initial_concentration</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">initial_charge</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">final_volumes</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">communication_enqueue</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span> <span class="n">communication_arguments</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">volume_enqueue</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span> <span class="n">volume_arguments</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Freeze a validated closed communication barrier for device enqueue.</p>
+<p>This concrete-only carrier retains P1, request, primary, map, work, and
+optional-volume identities after setup-time validation. Enqueue repeats no
+host/setup metadata validation and performs no lookup, allocation, transfer,
+host readback, synchronization, or fallback. Retained native barriers still
+perform device-side status and physical-state validation. Only closed GAS or
+PARTICLES maps are supported. Equal final
+volumes make the optional volume-evolution phase write-free; preceding
+communication may still write. After a changed-volume device writer
+launches, rollback is not promised.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.prepared_timestep">prepared_timestep</span></code></b>
+              (<code><a class="autorefs autorefs-internal" title="            PreparedResidentTimestep
+
+
+  
+      dataclass
+   (particula.execution.resident_enqueue.PreparedResidentTimestep)" href="../resident_enqueue/#particula.execution.resident_enqueue.PreparedResidentTimestep">PreparedResidentTimestep</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Exact READY P1 timestep retained by identity.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.request">request</span></code></b>
+              (<code><a class="autorefs autorefs-internal" title="            ResidentCommunicationRequest
+
+
+  
+      dataclass
+   (particula.execution.resident_communication.ResidentCommunicationRequest)" href="#particula.execution.resident_communication.ResidentCommunicationRequest">ResidentCommunicationRequest</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Validated resident communication request retained by identity.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.masses">masses</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Resident particle mass array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.particle_concentration">particle_concentration</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Resident particle concentration array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.density">density</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Resident particle density array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.volume">volume</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Resident per-box volume array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.charge">charge</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Resident particle charge array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.gas_concentration">gas_concentration</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Resident gas concentration array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.source_boxes">source_boxes</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Closed-map source endpoint array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.destination_boxes">destination_boxes</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Closed-map destination endpoint array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.enabled">enabled</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Communication edge enablement array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.rates">rates</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Communication edge-rate array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.configuration">configuration</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Validated communication configuration.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.map_form">map_form</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Communication map dimensionality declaration.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.one_dimensional">one_dimensional</span></code></b>
+              (<code><span title="int">int</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Integer flag for one-dimensional planning.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.mode">mode</span></code></b>
+              (<code><a class="autorefs autorefs-internal" title="            CommunicationTransportMode (particula.execution.communication.CommunicationTransportMode)" href="../communication/#particula.execution.communication.CommunicationTransportMode">CommunicationTransportMode</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>GAS or PARTICLES transport mode.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.edge_capacity">edge_capacity</span></code></b>
+              (<code><span title="int">int</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Number of retained map edge slots.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.duration">duration</span></code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Nonnegative resident barrier duration in seconds.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.device">device</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Device hosting all retained Warp arrays.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.dimensions">dimensions</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Fixed resident particle and gas dimensions.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.buffers">buffers</span></code></b>
+              (<code><a class="autorefs autorefs-internal" title="            GasCommunicationBuffers
+
+
+  
+      dataclass
+   (particula.gpu.kernels.communication.GasCommunicationBuffers)" href="../../gpu/kernels/communication/#particula.gpu.kernels.communication.GasCommunicationBuffers">GasCommunicationBuffers</a> | <a class="autorefs autorefs-internal" title="            ParticleCommunicationBuffers
+
+
+  
+      dataclass
+   (particula.gpu.kernels.communication.ParticleCommunicationBuffers)" href="../../gpu/kernels/communication/#particula.gpu.kernels.communication.ParticleCommunicationBuffers">ParticleCommunicationBuffers</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Mode-specific caller-owned work buffers.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.invalid">invalid</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned validation status array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.active_or_demand">active_or_demand</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned activity or demand status array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.volume_invalid">volume_invalid</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned volume validation status array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.volume_changed">volume_changed</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned volume-change status array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.initial_masses">initial_masses</span></code></b>
+              (<code><span title="object">object</span> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>Particle commit snapshot, when retained.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.initial_concentration">initial_concentration</span></code></b>
+              (<code><span title="object">object</span> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>Particle concentration snapshot, when retained.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.initial_charge">initial_charge</span></code></b>
+              (<code><span title="object">object</span> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>Particle charge snapshot, when retained.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.final_volumes">final_volumes</span></code></b>
+              (<code><span title="object">object</span> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>Optional prescribed final-volume array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.communication_enqueue">communication_enqueue</span></code></b>
+              (<code><span title="typing.Callable">Callable</span>[..., <span title="object">object</span>]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Setup-selected native communication callable.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.communication_arguments">communication_arguments</span></code></b>
+              (<code><span title="tuple">tuple</span>[<span title="object">object</span>, ...]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Setup-frozen native callable arguments.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.volume_enqueue">volume_enqueue</span></code></b>
+              (<code><span title="typing.Callable">Callable</span>[..., <span title="object">object</span>]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Setup-selected native volume or no-op callable.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_communication.PreparedResidentCommunicationBinding.volume_arguments">volume_arguments</span></code></b>
+              (<code><span title="tuple">tuple</span>[<span title="object">object</span>, ...]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Setup-frozen native volume callable arguments.</p>
+          </div>
+        </li>
+    </ul>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-class">
 
@@ -16262,21 +16715,21 @@ native writer failure.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/execution/resident_communication.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ResidentCommunicationRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">483</span>
+<span class="normal">484</span>
+<span class="normal">485</span>
+<span class="normal">486</span>
+<span class="normal">487</span>
+<span class="normal">488</span>
+<span class="normal">489</span>
+<span class="normal">490</span>
+<span class="normal">491</span>
+<span class="normal">492</span>
+<span class="normal">493</span>
+<span class="normal">494</span>
+<span class="normal">495</span>
+<span class="normal">496</span>
+<span class="normal">497</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ResidentCommunicationRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Retain one exact communication request.</span>
 
 <span class="sd">    Args:</span>
@@ -16369,58 +16822,58 @@ native errors propagate unchanged.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_communication.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span>
-<span class="normal">196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">514</span>
+<span class="normal">515</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Dispatch exactly one native communication primitive by mode.</span>
 
 <span class="sd">    The selected GAS or PARTICLES primitive receives resident containers,</span>
@@ -16546,39 +16999,39 @@ rollback after launch.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_communication.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute_volume_evolution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute_volume_evolution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Apply the optional prescribed-volume writer without replacement.</span>
 
 <span class="sd">    If present, final volumes and resident particle and gas containers are</span>
@@ -16659,42 +17112,20 @@ barrier-node identity and kind are invalid.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_communication.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">499</span>
+<span class="normal">500</span>
+<span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span>
+<span class="normal">511</span>
+<span class="normal">512</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate identity and metadata without P1 scans or allocation.</span>
 
 <span class="sd">    Validation delegates only to the registry's metadata seam and verifies</span>
@@ -16707,29 +17138,7 @@ barrier-node identity and kind are invalid.</p>
 <span class="sd">        ValueError: If duration, registry binding, graph provenance, or</span>
 <span class="sd">            barrier-node identity and kind are invalid.</span>
 <span class="sd">    """</span>
-    <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
-        <span class="n">request</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">Real</span>
-    <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"duration must be a non-boolean real."</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_isfinite_real</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span> <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">duration</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"duration must be finite and nonnegative."</span><span class="p">)</span>
-    <span class="n">registry</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span>
-    <span class="n">registry</span><span class="o">.</span><span class="n">validate_communication_resources</span><span class="p">(</span>
-        <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">resources</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_resolver_produced_graph</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">graph</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"graph must be produced by plan resolution."</span><span class="p">)</span>
-    <span class="n">nodes</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="o">.</span><span class="n">node_id</span><span class="p">:</span> <span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="n">nodes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"communication"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">communication_node</span>
-        <span class="ow">or</span> <span class="n">nodes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"volume_evolution"</span><span class="p">)</span>
-        <span class="ow">is</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">volume_evolution_node</span>
-        <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">communication_node</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NodeKind</span><span class="o">.</span><span class="n">COMMUNICATION</span>
-        <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">volume_evolution_node</span><span class="o">.</span><span class="n">kind</span>
-        <span class="ow">is</span> <span class="ow">not</span> <span class="n">NodeKind</span><span class="o">.</span><span class="n">VOLUME_EVOLUTION</span>
-    <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"communication barrier nodes do not match graph."</span><span class="p">)</span>
+    <span class="n">validate_resident_communication_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16895,19 +17304,19 @@ synchronize, or mutate resident state at construction.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_communication.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate exact carrier types only."""</span>
     <span class="n">exact</span> <span class="o">=</span> <span class="p">(</span>
         <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="s2">"session"</span><span class="p">),</span>
@@ -16934,6 +17343,684 @@ synchronize, or mutate resident state at construction.</p>
 
 </div>
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="particula.execution.resident_communication.setup_prepared_resident_communication" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">setup_prepared_resident_communication</span>
+
+
+<a href="#particula.execution.resident_communication.setup_prepared_resident_communication" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">setup_prepared_resident_communication</span><span class="p">(</span><span class="n">prepared_timestep</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PreparedResidentCommunicationBinding</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Validate P1/request identities and freeze a closed native barrier.</p>
+<p>Setup is read-only and may perform registry/request metadata validation. The
+returned concrete-only binding retains all dispatch inputs by identity for a
+later enqueue; it neither opens a guard nor launches a native writer.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>prepared_timestep</code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Exact READY P1 timestep for the complete request.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>request</code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Exact resident communication request attached to that P1 input.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><a class="autorefs autorefs-internal" title="            PreparedResidentCommunicationBinding
+
+
+  
+      dataclass
+   (particula.execution.resident_communication.PreparedResidentCommunicationBinding)" href="#particula.execution.resident_communication.PreparedResidentCommunicationBinding">PreparedResidentCommunicationBinding</a></code>
+          –
+          <div class="doc-md-description">
+            <p>Frozen identity-semantic prepared communication binding.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="TypeError">TypeError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If either supplied carrier has an invalid exact type.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If P1, resource, graph, primary, or map bindings drift.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/execution/resident_communication.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">setup_prepared_resident_communication</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+    <span class="n">prepared_timestep</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PreparedResidentCommunicationBinding</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Validate P1/request identities and freeze a closed native barrier.</span>
+
+<span class="sd">    Setup is read-only and may perform registry/request metadata validation. The</span>
+<span class="sd">    returned concrete-only binding retains all dispatch inputs by identity for a</span>
+<span class="sd">    later enqueue; it neither opens a guard nor launches a native writer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prepared_timestep: Exact READY P1 timestep for the complete request.</span>
+<span class="sd">        request: Exact resident communication request attached to that P1 input.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Frozen identity-semantic prepared communication binding.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If either supplied carrier has an invalid exact type.</span>
+<span class="sd">        ValueError: If P1, resource, graph, primary, or map bindings drift.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">prepared_timestep</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">PreparedResidentTimestep</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">"prepared_timestep must be an exact PreparedResidentTimestep."</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentCommunicationRequest</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">"request must be an exact ResidentCommunicationRequest."</span>
+        <span class="p">)</span>
+    <span class="n">prepared</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">PreparedResidentTimestep</span><span class="p">,</span> <span class="n">prepared_timestep</span><span class="p">)</span>
+    <span class="n">typed</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ResidentCommunicationRequest</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+    <span class="n">_validate_ready_attachment</span><span class="p">(</span>
+        <span class="n">prepared</span><span class="o">.</span><span class="n">request</span><span class="p">,</span>
+        <span class="n">prepared</span><span class="o">.</span><span class="n">binding</span><span class="p">,</span>
+        <span class="n">prepared</span><span class="o">.</span><span class="n">lifecycle</span><span class="p">,</span>
+        <span class="n">prepared</span><span class="o">.</span><span class="n">signature</span><span class="p">,</span>
+        <span class="n">prepared</span><span class="o">.</span><span class="n">session</span><span class="p">,</span>
+        <span class="n">prepared</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="n">prepared</span><span class="o">.</span><span class="n">guard</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">prepared</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">communication</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">typed</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"prepared timestep does not retain the supplied request."</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">prepared</span><span class="o">.</span><span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">typed</span><span class="o">.</span><span class="n">session</span>
+        <span class="ow">or</span> <span class="n">prepared</span><span class="o">.</span><span class="n">registry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">typed</span><span class="o">.</span><span class="n">registry</span>
+        <span class="ow">or</span> <span class="n">prepared</span><span class="o">.</span><span class="n">graph</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">typed</span><span class="o">.</span><span class="n">graph</span>
+        <span class="ow">or</span> <span class="n">prepared</span><span class="o">.</span><span class="n">dimensions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">typed</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">dimensions</span>
+        <span class="ow">or</span> <span class="n">prepared</span><span class="o">.</span><span class="n">duration</span> <span class="o">!=</span> <span class="n">typed</span><span class="o">.</span><span class="n">duration</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"prepared timestep identities do not match request."</span><span class="p">)</span>
+    <span class="n">validate_resident_communication_request</span><span class="p">(</span><span class="n">typed</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">typed</span><span class="o">.</span><span class="n">communication_node</span><span class="o">.</span><span class="n">node_id</span> <span class="o">!=</span> <span class="s2">"communication"</span>
+        <span class="ow">or</span> <span class="n">typed</span><span class="o">.</span><span class="n">volume_evolution_node</span><span class="o">.</span><span class="n">node_id</span> <span class="o">!=</span> <span class="s2">"volume_evolution"</span>
+        <span class="ow">or</span> <span class="s2">"communication"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">prepared</span><span class="o">.</span><span class="n">ordered_node_ids</span>
+        <span class="ow">or</span> <span class="s2">"volume_evolution"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">prepared</span><span class="o">.</span><span class="n">ordered_node_ids</span>
+        <span class="ow">or</span> <span class="n">prepared</span><span class="o">.</span><span class="n">ordered_node_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"communication"</span><span class="p">)</span>
+        <span class="o">&gt;=</span> <span class="n">prepared</span><span class="o">.</span><span class="n">ordered_node_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"volume_evolution"</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"prepared communication nodes do not match schedule."</span><span class="p">)</span>
+    <span class="n">particles</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">typed</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">particles</span><span class="p">)</span>
+    <span class="n">gas</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">typed</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">gas</span><span class="p">)</span>
+    <span class="n">primaries</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+        <span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>
+        <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+        <span class="n">gas</span><span class="o">.</span><span class="n">partitioning</span><span class="p">,</span>
+        <span class="n">gas</span><span class="o">.</span><span class="n">vapor_pressure</span><span class="p">,</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">typed</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">environment</span><span class="p">)</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">typed</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">environment</span><span class="p">)</span><span class="o">.</span><span class="n">pressure</span><span class="p">,</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">typed</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">environment</span><span class="p">)</span><span class="o">.</span><span class="n">saturation_ratio</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prepared</span><span class="o">.</span><span class="n">primary_arrays</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">primaries</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
+        <span class="n">left</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">right</span>
+        <span class="k">for</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">prepared</span><span class="o">.</span><span class="n">primary_arrays</span><span class="p">,</span> <span class="n">primaries</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"prepared timestep primary arrays do not match session."</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">view</span> <span class="ow">is</span> <span class="n">typed</span><span class="o">.</span><span class="n">resources</span> <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">prepared</span><span class="o">.</span><span class="n">resource_views</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"prepared timestep does not retain communication resources."</span>
+        <span class="p">)</span>
+    <span class="n">configuration</span> <span class="o">=</span> <span class="n">typed</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">configuration</span>
+    <span class="n">map_data</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="n">map_data</span><span class="o">.</span><span class="n">transport_mode</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span>
+        <span class="n">CommunicationTransportMode</span><span class="o">.</span><span class="n">GAS</span><span class="p">,</span>
+        <span class="n">CommunicationTransportMode</span><span class="o">.</span><span class="n">PARTICLES</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"resident communication supports GAS or PARTICLES only."</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">map_data</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"ONE_DIMENSIONAL"</span><span class="p">,</span> <span class="s2">"TWO_DIMENSIONAL"</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resident communication map form is unsupported."</span><span class="p">)</span>
+    <span class="n">resources</span> <span class="o">=</span> <span class="n">typed</span><span class="o">.</span><span class="n">resources</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">resources</span><span class="o">.</span><span class="n">execution_state</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">CommunicationTransportMode</span><span class="o">.</span><span class="n">GAS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">buffers</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">GasCommunicationBuffers</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"communication buffers must match transport mode."</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">type</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">buffers</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ParticleCommunicationBuffers</span>
+            <span class="ow">or</span> <span class="n">state</span><span class="o">.</span><span class="n">initial_masses</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="n">state</span><span class="o">.</span><span class="n">initial_concentration</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="n">state</span><span class="o">.</span><span class="n">initial_charge</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"particle communication snapshots must be complete."</span>
+            <span class="p">)</span>
+    <span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">,</span> <span class="n">particle_species</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">gas_species</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">communication_arguments</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">CommunicationTransportMode</span><span class="o">.</span><span class="n">GAS</span><span class="p">:</span>
+        <span class="n">communication_enqueue</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_enqueue_prepared_resident_gas_communication</span>
+        <span class="p">)</span>
+        <span class="n">communication_arguments</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+            <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+            <span class="n">boxes</span><span class="p">,</span>
+            <span class="n">gas_species</span><span class="p">,</span>
+            <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
+            <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
+            <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
+            <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">),</span>
+            <span class="n">typed</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">resources</span><span class="o">.</span><span class="n">buffers</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">invalid</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">active_or_demand</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">communication_enqueue</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_enqueue_prepared_resident_particle_communication</span>
+        <span class="p">)</span>
+        <span class="n">communication_arguments</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+            <span class="n">boxes</span><span class="p">,</span>
+            <span class="n">slots</span><span class="p">,</span>
+            <span class="n">particle_species</span><span class="p">,</span>
+            <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
+            <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
+            <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
+            <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"ONE_DIMENSIONAL"</span><span class="p">),</span>
+            <span class="n">typed</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">resources</span><span class="o">.</span><span class="n">buffers</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">invalid</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">active_or_demand</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">initial_masses</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">initial_concentration</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">initial_charge</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">resources</span><span class="o">.</span><span class="n">final_volumes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">volume_enqueue</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="n">_enqueue_prepared_noop</span>
+        <span class="n">volume_arguments</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">volume_enqueue</span> <span class="o">=</span> <span class="n">_enqueue_prepared_resident_volume_evolution</span>
+        <span class="n">volume_arguments</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+            <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+            <span class="n">boxes</span><span class="p">,</span>
+            <span class="n">resources</span><span class="o">.</span><span class="n">final_volumes</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">volume_invalid</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">volume_changed</span><span class="p">,</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">PreparedResidentCommunicationBinding</span><span class="p">(</span>
+        <span class="n">prepared</span><span class="p">,</span>
+        <span class="n">typed</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+        <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">form</span><span class="p">,</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"ONE_DIMENSIONAL"</span><span class="p">),</span>
+        <span class="n">mode</span><span class="p">,</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">),</span>
+        <span class="n">typed</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="n">typed</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">dimensions</span><span class="p">,</span>
+        <span class="n">resources</span><span class="o">.</span><span class="n">buffers</span><span class="p">,</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">invalid</span><span class="p">,</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">active_or_demand</span><span class="p">,</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">volume_invalid</span><span class="p">,</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">volume_changed</span><span class="p">,</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">initial_masses</span><span class="p">,</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">initial_concentration</span><span class="p">,</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">initial_charge</span><span class="p">,</span>
+        <span class="n">resources</span><span class="o">.</span><span class="n">final_volumes</span><span class="p">,</span>
+        <span class="n">communication_enqueue</span><span class="p">,</span>
+        <span class="n">communication_arguments</span><span class="p">,</span>
+        <span class="n">volume_enqueue</span><span class="p">,</span>
+        <span class="n">volume_arguments</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="particula.execution.resident_communication.validate_resident_communication_request" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">validate_resident_communication_request</span>
+
+
+<a href="#particula.execution.resident_communication.validate_resident_communication_request" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">validate_resident_communication_request</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResidentCommunicationRequest</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Validate one resident communication request without an executor.</p>
+<p>This read-only shared validation seam performs no resource acquisition,
+payload inspection, primitive dispatch, transfer, synchronization, or
+resident-state mutation.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>request</code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Candidate exact resident communication request.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><a class="autorefs autorefs-internal" title="            ResidentCommunicationRequest
+
+
+  
+      dataclass
+   (particula.execution.resident_communication.ResidentCommunicationRequest)" href="#particula.execution.resident_communication.ResidentCommunicationRequest">ResidentCommunicationRequest</a></code>
+          –
+          <div class="doc-md-description">
+            <p>The unchanged validated request.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="TypeError">TypeError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If the request or its duration has an invalid type.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If metadata, duration, or barrier nodes are invalid.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/execution/resident_communication.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span>
+<span class="normal">633</span>
+<span class="normal">634</span>
+<span class="normal">635</span>
+<span class="normal">636</span>
+<span class="normal">637</span>
+<span class="normal">638</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_resident_communication_request</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResidentCommunicationRequest</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Validate one resident communication request without an executor.</span>
+
+<span class="sd">    This read-only shared validation seam performs no resource acquisition,</span>
+<span class="sd">    payload inspection, primitive dispatch, transfer, synchronization, or</span>
+<span class="sd">    resident-state mutation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request: Candidate exact resident communication request.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The unchanged validated request.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If the request or its duration has an invalid type.</span>
+<span class="sd">        ValueError: If metadata, duration, or barrier nodes are invalid.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentCommunicationRequest</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">"request must be an exact ResidentCommunicationRequest."</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">Real</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"duration must be a non-boolean real."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_isfinite_real</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span> <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">duration</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"duration must be finite and nonnegative."</span><span class="p">)</span>
+    <span class="n">registry</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span>
+    <span class="n">registry</span><span class="o">.</span><span class="n">validate_communication_resources</span><span class="p">(</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">resources</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_resolver_produced_graph</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">graph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"graph must be produced by plan resolution."</span><span class="p">)</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="o">.</span><span class="n">node_id</span><span class="p">:</span> <span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">nodes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"communication"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">communication_node</span>
+        <span class="ow">or</span> <span class="n">nodes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"volume_evolution"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">volume_evolution_node</span>
+        <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">communication_node</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NodeKind</span><span class="o">.</span><span class="n">COMMUNICATION</span>
+        <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">volume_evolution_node</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NodeKind</span><span class="o">.</span><span class="n">VOLUME_EVOLUTION</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"communication barrier nodes do not match graph."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">request</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 
 

@@ -4232,6 +4232,8 @@
       
         
       
+        
+      
     
     
     
@@ -4648,6 +4650,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../API/particula/execution/resident_enqueue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_enqueue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../API/particula/execution/resident_scheduler/" class="md-nav__link">
         
   
@@ -4863,10 +4893,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_22" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_21" id="__nav_2_3_19_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_22" id="__nav_2_3_19_22_label" tabindex="0">
             
   
   
@@ -4884,8 +4914,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_21">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_22">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12801,6 +12831,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="GPU-resident deterministic timestep">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resident-prepared-enqueue-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resident prepared enqueue boundary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -16398,6 +16445,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="GPU-resident deterministic timestep">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resident-prepared-enqueue-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resident prepared enqueue boundary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -17019,6 +17083,35 @@ a device, provide fallback, or guarantee rollback after an asynchronous writer
 launches. See
 <a href="../gpu_resident_checkpoints/">GPU resident checkpoints</a>.</p>
 <h3 id="gpu-resident-deterministic-timestep">GPU-resident deterministic timestep<a class="headerlink" href="#gpu-resident-deterministic-timestep" title="Permanent link">&para;</a></h3>
+<h4 id="resident-prepared-enqueue-boundary">Resident prepared enqueue boundary<a class="headerlink" href="#resident-prepared-enqueue-boundary" title="Permanent link">&para;</a></h4>
+<p><code>particula.execution.resident_enqueue</code> and
+<code>particula.execution.resident_scheduler</code> are concrete-only direct-import seams;
+prepared records and enqueue helpers are not <code>particula.execution</code> or top-level
+imports. READY setup validates, normalizes, performs established private fallback
+allocation, binds exact identities, and freezes control and operation selection.
+Private prepared bindings then retain references and issue only frozen device or
+write-free no-op callables: they perform no payload validation or readback,
+allocation, transfer, synchronization, resource acquisition/replacement, device
+selection/fallback, dynamic policy or schedule resolution, mutable-carrier lookup or
+rebinding, or RNG initialization/reset. Direct wrappers may retain their
+established bounded device-status observation after a prepared call; resident
+prepared bindings are observation-free.</p>
+<p><code>prepare_resident_timestep()</code> retains an exact READY session, registry, guard,
+request, signature, primaries, views, schedule, and duration by identity, but
+does not authorize capture, token entry, or dispatch. The composed
+<code>enqueue_prepared_resident_simulation()</code> is separate from an individual binding:
+it first applies its retained structural/lifecycle identity gate before token
+entry and a fresh signature comparison, opens exactly one token only after that
+gate, and dispatches the twelve
+frozen operations in canonical order. Empty or no-work bindings are write-free;
+live pinned payload changes are permitted, while structural identities and frozen
+scalar controls require a new prepared record. E8-F1 owns lifecycle,
+compatibility, CAPTURED admission, invalidation, and FAULTED classification; the
+registry owns sidecars. A writer-capable failure retains the no-rollback, no-retry,
+and no-fallback recovery boundary. E8-F3 owns resource work; E8-F4 native
+capture/replay and captured parity remain downstream; E8-F5--E8-F7 own later
+parity/performance/memory/profiling evidence; E8-F8 owns the example,
+limitations, and closeout.</p>
 <p><code>particula.execution.resident_scheduler</code> and
 <code>particula.execution.diagnostics</code> are concrete-only direct-import seams. They
 are not exported by <code>particula.execution</code> or the top-level package. The

@@ -4242,6 +4242,8 @@
       
         
       
+        
+      
     
     
     
@@ -4658,6 +4660,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../execution/resident_enqueue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_enqueue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../execution/resident_scheduler/" class="md-nav__link">
         
   
@@ -4873,10 +4903,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_22" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_21" id="__nav_2_3_19_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_22" id="__nav_2_3_19_22_label" tabindex="0">
             
   
   
@@ -4894,8 +4924,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_21">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_22">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16263,6 +16293,11 @@ shapes. Frozen records prevent rebinding their fields but do not copy, freeze,
 or otherwise transfer their caller-owned arrays. Only <code>nucleation_step_gpu</code>
 is lazily exported through <code>particula.gpu.kernels</code>; all records and helpers
 remain concrete-module-only.</p>
+<p>Prepared private execution retains legacy validation ordering, normalized
+controls, and established workspace allocation. Retained-reference enqueue
+performs no validation, readback, allocation, transfer, synchronization,
+lookup, rebinding, or policy resolution; recovery is not promised after a
+writer-capable launch.</p>
 
 
 
@@ -16476,19 +16511,7 @@ bound. Must be paired with <code>saturation_lower</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/nucleation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">183</span>
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span>
@@ -16531,7 +16554,19 @@ bound. Must be paired with <code>saturation_lower</code>.</p>
 <span class="normal">223</span>
 <span class="normal">224</span>
 <span class="normal">225</span>
-<span class="normal">226</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate scalar-only configuration consistency.</span>
 
 <span class="sd">    Raises:</span>
@@ -16969,14 +17004,14 @@ exhausted rows not selected for resampling.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/nucleation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">339</span>
-<span class="normal">340</span>
-<span class="normal">341</span>
-<span class="normal">342</span>
-<span class="normal">343</span>
-<span class="normal">344</span>
-<span class="normal">345</span>
-<span class="normal">346</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Reject non-exact Boolean policy controls."""</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resampling</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"resampling must be an exact Python bool."</span><span class="p">)</span>
@@ -17183,20 +17218,10 @@ this field.</p>
     <div class="doc doc-contents ">
 
         <p>Execute one fixed-capacity direct-Warp nucleation step.</p>
-<p>This direct-device boundary sequences P1 preflight, P2 inventory admission,
-P3 slot staging, and P4 resampling-first/scaling-fallback resolution before
-one fused P5 writer activates finalized free slots and removes matching gas
-mass. The caller owns fixed-capacity, fixed-shape, contiguous same-device
-Warp particle, gas, input, and sidecar storage, and must synchronize the
-active Warp device before observing successful asynchronous writes.</p>
-<p>Public validation rejections before P4 primitive entry leave particle and
-gas state unchanged. P2--P4 may write their documented caller-owned
-sidecars before a later phase rejects. Once a P4 primitive begins, its
-documented no-rollback boundary applies; P5 likewise has no rollback after
-its writer launches. Successful calls return the identical <code>(particles,
-gas)</code> objects. CPU fallback, host/device transfer helpers, resizing,
-compaction, a Runnable API, backend selection, E6-F9 integration, graph
-capture, autodiff, and performance guarantees are deliberately deferred.</p>
+<p>The supported public boundary composes private <code>prepare → enqueue →
+observe</code> helpers.  Prepared records pin references rather than payload
+snapshots, so the direct executor consumes current device data.  Private
+records and helpers remain concrete-module-only.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -17214,7 +17239,7 @@ capture, autodiff, and performance guarantees are deliberately deferred.</p>
               (<code><span title="typing.Any">Any</span></code>)
           –
           <div class="doc-md-description">
-            <p>Caller-owned Warp gas container on the particle-data device.</p>
+            <p>Caller-owned same-device Warp gas container.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -17274,7 +17299,7 @@ capture, autodiff, and performance guarantees are deliberately deferred.</p>
    (particula.gpu.kernels.nucleation.NucleationDiagnosticBuffers)" href="#particula.gpu.kernels.nucleation.NucleationDiagnosticBuffers">NucleationDiagnosticBuffers</a></code>)
           –
           <div class="doc-md-description">
-            <p>Caller-owned P2/P3 slot and gate diagnostic sidecars.</p>
+            <p>Caller-owned P2/P3 diagnostic sidecars.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -17287,7 +17312,7 @@ capture, autodiff, and performance guarantees are deliberately deferred.</p>
    (particula.gpu.kernels.nucleation.NucleationExhaustionControls)" href="#particula.gpu.kernels.nucleation.NucleationExhaustionControls">NucleationExhaustionControls</a></code>)
           –
           <div class="doc-md-description">
-            <p>Concrete P4 resampling and scaling policy controls.</p>
+            <p>Concrete P4 resampling and scaling controls.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -17300,7 +17325,7 @@ capture, autodiff, and performance guarantees are deliberately deferred.</p>
    (particula.gpu.kernels.nucleation.NucleationExhaustionBuffers)" href="#particula.gpu.kernels.nucleation.NucleationExhaustionBuffers">NucleationExhaustionBuffers</a></code>)
           –
           <div class="doc-md-description">
-            <p>Caller-owned P4 workspace and finalized diagnostics.</p>
+            <p>Caller-owned P4 workspace and diagnostics.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -17320,7 +17345,7 @@ capture, autodiff, and performance guarantees are deliberately deferred.</p>
 )
           –
           <div class="doc-md-description">
-            <p>Configured same-device dimensionless <code>wp.float64 (B, S)</code>.</p>
+            <p>Configured same-device <code>wp.float64 (B, S)</code> ratios.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -17354,15 +17379,16 @@ capture, autodiff, and performance guarantees are deliberately deferred.</p>
               <code><span title="TypeError">TypeError</span></code>
             –
           <div class="doc-md-description">
-            <p>If a direct scalar input has an unsupported type.</p>
+            <p>If a required scalar or configuration has an unsupported
+type.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
               <code><span title="ValueError">ValueError</span></code>
             –
           <div class="doc-md-description">
-            <p>If P1--P5 validation, storage ownership, physical state, or
-finalized handoff validation fails.</p>
+            <p>If P1--P5 validation, ownership, physical state, or a
+finalized handoff is invalid.</p>
           </div>
         </li>
     </ul>
@@ -17370,100 +17396,67 @@ finalized handoff validation fails.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/nucleation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2899</span>
-<span class="normal">2900</span>
-<span class="normal">2901</span>
-<span class="normal">2902</span>
-<span class="normal">2903</span>
-<span class="normal">2904</span>
-<span class="normal">2905</span>
-<span class="normal">2906</span>
-<span class="normal">2907</span>
-<span class="normal">2908</span>
-<span class="normal">2909</span>
-<span class="normal">2910</span>
-<span class="normal">2911</span>
-<span class="normal">2912</span>
-<span class="normal">2913</span>
-<span class="normal">2914</span>
-<span class="normal">2915</span>
-<span class="normal">2916</span>
-<span class="normal">2917</span>
-<span class="normal">2918</span>
-<span class="normal">2919</span>
-<span class="normal">2920</span>
-<span class="normal">2921</span>
-<span class="normal">2922</span>
-<span class="normal">2923</span>
-<span class="normal">2924</span>
-<span class="normal">2925</span>
-<span class="normal">2926</span>
-<span class="normal">2927</span>
-<span class="normal">2928</span>
-<span class="normal">2929</span>
-<span class="normal">2930</span>
-<span class="normal">2931</span>
-<span class="normal">2932</span>
-<span class="normal">2933</span>
-<span class="normal">2934</span>
-<span class="normal">2935</span>
-<span class="normal">2936</span>
-<span class="normal">2937</span>
-<span class="normal">2938</span>
-<span class="normal">2939</span>
-<span class="normal">2940</span>
-<span class="normal">2941</span>
-<span class="normal">2942</span>
-<span class="normal">2943</span>
-<span class="normal">2944</span>
-<span class="normal">2945</span>
-<span class="normal">2946</span>
-<span class="normal">2947</span>
-<span class="normal">2948</span>
-<span class="normal">2949</span>
-<span class="normal">2950</span>
-<span class="normal">2951</span>
-<span class="normal">2952</span>
-<span class="normal">2953</span>
-<span class="normal">2954</span>
-<span class="normal">2955</span>
-<span class="normal">2956</span>
-<span class="normal">2957</span>
-<span class="normal">2958</span>
-<span class="normal">2959</span>
-<span class="normal">2960</span>
-<span class="normal">2961</span>
-<span class="normal">2962</span>
-<span class="normal">2963</span>
-<span class="normal">2964</span>
-<span class="normal">2965</span>
-<span class="normal">2966</span>
-<span class="normal">2967</span>
-<span class="normal">2968</span>
-<span class="normal">2969</span>
-<span class="normal">2970</span>
-<span class="normal">2971</span>
-<span class="normal">2972</span>
-<span class="normal">2973</span>
-<span class="normal">2974</span>
-<span class="normal">2975</span>
-<span class="normal">2976</span>
-<span class="normal">2977</span>
-<span class="normal">2978</span>
-<span class="normal">2979</span>
-<span class="normal">2980</span>
-<span class="normal">2981</span>
-<span class="normal">2982</span>
-<span class="normal">2983</span>
-<span class="normal">2984</span>
-<span class="normal">2985</span>
-<span class="normal">2986</span>
-<span class="normal">2987</span>
-<span class="normal">2988</span>
-<span class="normal">2989</span>
-<span class="normal">2990</span>
-<span class="normal">2991</span>
-<span class="normal">2992</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">nucleation_step_gpu</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4051</span>
+<span class="normal">4052</span>
+<span class="normal">4053</span>
+<span class="normal">4054</span>
+<span class="normal">4055</span>
+<span class="normal">4056</span>
+<span class="normal">4057</span>
+<span class="normal">4058</span>
+<span class="normal">4059</span>
+<span class="normal">4060</span>
+<span class="normal">4061</span>
+<span class="normal">4062</span>
+<span class="normal">4063</span>
+<span class="normal">4064</span>
+<span class="normal">4065</span>
+<span class="normal">4066</span>
+<span class="normal">4067</span>
+<span class="normal">4068</span>
+<span class="normal">4069</span>
+<span class="normal">4070</span>
+<span class="normal">4071</span>
+<span class="normal">4072</span>
+<span class="normal">4073</span>
+<span class="normal">4074</span>
+<span class="normal">4075</span>
+<span class="normal">4076</span>
+<span class="normal">4077</span>
+<span class="normal">4078</span>
+<span class="normal">4079</span>
+<span class="normal">4080</span>
+<span class="normal">4081</span>
+<span class="normal">4082</span>
+<span class="normal">4083</span>
+<span class="normal">4084</span>
+<span class="normal">4085</span>
+<span class="normal">4086</span>
+<span class="normal">4087</span>
+<span class="normal">4088</span>
+<span class="normal">4089</span>
+<span class="normal">4090</span>
+<span class="normal">4091</span>
+<span class="normal">4092</span>
+<span class="normal">4093</span>
+<span class="normal">4094</span>
+<span class="normal">4095</span>
+<span class="normal">4096</span>
+<span class="normal">4097</span>
+<span class="normal">4098</span>
+<span class="normal">4099</span>
+<span class="normal">4100</span>
+<span class="normal">4101</span>
+<span class="normal">4102</span>
+<span class="normal">4103</span>
+<span class="normal">4104</span>
+<span class="normal">4105</span>
+<span class="normal">4106</span>
+<span class="normal">4107</span>
+<span class="normal">4108</span>
+<span class="normal">4109</span>
+<span class="normal">4110</span>
+<span class="normal">4111</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">nucleation_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">NucleationConfig</span><span class="p">,</span>
@@ -17480,83 +17473,50 @@ finalized handoff validation fails.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Execute one fixed-capacity direct-Warp nucleation step.</span>
 
-<span class="sd">    This direct-device boundary sequences P1 preflight, P2 inventory admission,</span>
-<span class="sd">    P3 slot staging, and P4 resampling-first/scaling-fallback resolution before</span>
-<span class="sd">    one fused P5 writer activates finalized free slots and removes matching gas</span>
-<span class="sd">    mass. The caller owns fixed-capacity, fixed-shape, contiguous same-device</span>
-<span class="sd">    Warp particle, gas, input, and sidecar storage, and must synchronize the</span>
-<span class="sd">    active Warp device before observing successful asynchronous writes.</span>
-
-<span class="sd">    Public validation rejections before P4 primitive entry leave particle and</span>
-<span class="sd">    gas state unchanged. P2--P4 may write their documented caller-owned</span>
-<span class="sd">    sidecars before a later phase rejects. Once a P4 primitive begins, its</span>
-<span class="sd">    documented no-rollback boundary applies; P5 likewise has no rollback after</span>
-<span class="sd">    its writer launches. Successful calls return the identical ``(particles,</span>
-<span class="sd">    gas)`` objects. CPU fallback, host/device transfer helpers, resizing,</span>
-<span class="sd">    compaction, a Runnable API, backend selection, E6-F9 integration, graph</span>
-<span class="sd">    capture, autodiff, and performance guarantees are deliberately deferred.</span>
+<span class="sd">    The supported public boundary composes private ``prepare → enqueue →</span>
+<span class="sd">    observe`` helpers.  Prepared records pin references rather than payload</span>
+<span class="sd">    snapshots, so the direct executor consumes current device data.  Private</span>
+<span class="sd">    records and helpers remain concrete-module-only.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        particles: Caller-owned fixed-capacity Warp particle container.</span>
-<span class="sd">        gas: Caller-owned Warp gas container on the particle-data device.</span>
+<span class="sd">        gas: Caller-owned same-device Warp gas container.</span>
 <span class="sd">        config: Immutable scalar nucleation controls.</span>
 <span class="sd">        time_step: Finite nonnegative step duration [s].</span>
 <span class="sd">        scratch: Caller-owned P2 planning sidecars.</span>
 <span class="sd">        finalized_demand: Caller-owned P2/P3 finalized-demand sidecars.</span>
-<span class="sd">        diagnostics: Caller-owned P2/P3 slot and gate diagnostic sidecars.</span>
-<span class="sd">        exhaustion_controls: Concrete P4 resampling and scaling policy controls.</span>
-<span class="sd">        exhaustion_buffers: Caller-owned P4 workspace and finalized diagnostics.</span>
+<span class="sd">        diagnostics: Caller-owned P2/P3 diagnostic sidecars.</span>
+<span class="sd">        exhaustion_controls: Concrete P4 resampling and scaling controls.</span>
+<span class="sd">        exhaustion_buffers: Caller-owned P4 workspace and diagnostics.</span>
 <span class="sd">        temperature: Positive scalar [K] or same-device ``wp.float64 (B,)``.</span>
-<span class="sd">        saturation: Configured same-device dimensionless ``wp.float64 (B, S)``.</span>
+<span class="sd">        saturation: Configured same-device ``wp.float64 (B, S)`` ratios.</span>
 <span class="sd">        environment: Optional same-device owner of temperature and saturation.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The identical caller-owned ``(particles, gas)`` containers.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        TypeError: If a direct scalar input has an unsupported type.</span>
-<span class="sd">        ValueError: If P1--P5 validation, storage ownership, physical state, or</span>
-<span class="sd">            finalized handoff validation fails.</span>
+<span class="sd">        TypeError: If a required scalar or configuration has an unsupported</span>
+<span class="sd">            type.</span>
+<span class="sd">        ValueError: If P1--P5 validation, ownership, physical state, or a</span>
+<span class="sd">            finalized handoff is invalid.</span>
 <span class="sd">    """</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scratch</span><span class="p">,</span> <span class="n">NucleationScratchBuffers</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"scratch must be NucleationScratchBuffers."</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">finalized_demand</span><span class="p">,</span> <span class="n">NucleationFinalizedDemandBuffers</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"finalized_demand must be NucleationFinalizedDemandBuffers."</span>
-        <span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">diagnostics</span><span class="p">,</span> <span class="n">NucleationDiagnosticBuffers</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"diagnostics must be NucleationDiagnosticBuffers."</span><span class="p">)</span>
-    <span class="n">preflight</span> <span class="o">=</span> <span class="n">_preflight_nucleation</span><span class="p">(</span>
+    <span class="n">prepared</span> <span class="o">=</span> <span class="n">_prepare_nucleation_step_gpu</span><span class="p">(</span>
         <span class="n">particles</span><span class="p">,</span>
         <span class="n">gas</span><span class="p">,</span>
         <span class="n">config</span><span class="p">,</span>
         <span class="n">time_step</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-        <span class="n">saturation</span><span class="o">=</span><span class="n">saturation</span><span class="p">,</span>
-        <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
         <span class="n">scratch</span><span class="o">=</span><span class="n">scratch</span><span class="p">,</span>
         <span class="n">finalized_demand</span><span class="o">=</span><span class="n">finalized_demand</span><span class="p">,</span>
         <span class="n">diagnostics</span><span class="o">=</span><span class="n">diagnostics</span><span class="p">,</span>
+        <span class="n">exhaustion_controls</span><span class="o">=</span><span class="n">exhaustion_controls</span><span class="p">,</span>
+        <span class="n">exhaustion_buffers</span><span class="o">=</span><span class="n">exhaustion_buffers</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="n">saturation</span><span class="o">=</span><span class="n">saturation</span><span class="p">,</span>
+        <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">_validate_public_p4_inputs</span><span class="p">(</span>
-        <span class="n">preflight</span><span class="p">,</span> <span class="n">exhaustion_controls</span><span class="p">,</span> <span class="n">exhaustion_buffers</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">preflight</span><span class="o">.</span><span class="n">n_boxes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">particles</span><span class="p">,</span> <span class="n">gas</span>
-    <span class="n">_plan_nucleation_demand_from_preflight</span><span class="p">(</span>
-        <span class="n">preflight</span><span class="p">,</span> <span class="n">scratch</span><span class="p">,</span> <span class="n">finalized_demand</span><span class="p">,</span> <span class="n">diagnostics</span>
-    <span class="p">)</span>
-    <span class="n">_stage_nucleation_slots</span><span class="p">(</span><span class="n">preflight</span><span class="p">,</span> <span class="n">finalized_demand</span><span class="p">,</span> <span class="n">diagnostics</span><span class="p">)</span>
-    <span class="n">_validate_public_molecule_eligibility</span><span class="p">(</span><span class="n">preflight</span><span class="p">)</span>
-    <span class="n">p4_storage</span> <span class="o">=</span> <span class="n">_orchestrate_nucleation_exhaustion</span><span class="p">(</span>
-        <span class="n">preflight</span><span class="p">,</span>
-        <span class="n">finalized_demand</span><span class="p">,</span>
-        <span class="n">diagnostics</span><span class="p">,</span>
-        <span class="n">exhaustion_controls</span><span class="p">,</span>
-        <span class="n">exhaustion_buffers</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">_commit_nucleation_p5</span><span class="p">(</span><span class="n">preflight</span><span class="p">,</span> <span class="n">exhaustion_buffers</span><span class="p">,</span> <span class="n">p4_storage</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">particles</span><span class="p">,</span> <span class="n">gas</span>
+    <span class="n">_enqueue_prepared_nucleation_call</span><span class="p">(</span><span class="n">prepared</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_observe_prepared_nucleation_call</span><span class="p">(</span><span class="n">prepared</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

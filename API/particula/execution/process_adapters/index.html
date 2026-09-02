@@ -4244,6 +4244,8 @@
       
         
       
+        
+      
     
     
     
@@ -4673,6 +4675,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#particula.execution.process_adapters.ResidentDilutionAdapter.prepare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;prepare
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -4729,6 +4742,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#particula.execution.process_adapters.ResidentNucleationAdapter.prepare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;prepare
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -4779,6 +4803,17 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;execute
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.execution.process_adapters.ResidentWallLossAdapter.prepare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;prepare
       
     </span>
   </a>
@@ -4889,6 +4924,34 @@
     
   
     particula.execution.resident_communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resident_enqueue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_enqueue
   
 
     
@@ -5124,10 +5187,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_22" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_21" id="__nav_2_3_19_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_22" id="__nav_2_3_19_22_label" tabindex="0">
             
   
   
@@ -5145,8 +5208,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_21">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_22">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16177,6 +16240,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#particula.execution.process_adapters.ResidentDilutionAdapter.prepare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;prepare
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -16233,6 +16307,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#particula.execution.process_adapters.ResidentNucleationAdapter.prepare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;prepare
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -16283,6 +16368,17 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;execute
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.execution.process_adapters.ResidentWallLossAdapter.prepare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;prepare
       
     </span>
   </a>
@@ -16380,7 +16476,11 @@
 <p>This direct-import-only module retains resident sessions, registries, and
 published resource views by identity. Its adapters perform metadata-only
 preflight and call one supported direct GPU kernel without transfers,
-synchronization, acquisition, fallback, retry, rollback, or physics. These
+synchronization, acquisition, fallback, retry, rollback, or physics. Prepared
+bindings freeze selected controls and delegate only retained device calls, with
+no enqueue-time validation, readback, allocation, lookup, rebinding, or RNG
+initialization/reset. Setup rejection is pre-writer; direct-kernel writer
+failures retain their no-rollback boundary. These
 concrete names are deliberately not exported from :mod:<code>particula.execution</code>.</p>
 
 
@@ -16509,34 +16609,25 @@ rollback, recovery, transfer, or synchronization.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/process_adapters.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
-<span class="normal">267</span>
-<span class="normal">268</span>
-<span class="normal">269</span>
-<span class="normal">270</span>
-<span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span>
-<span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate and delegate one dilution request.</span>
 
 <span class="sd">    Args:</span>
@@ -16554,15 +16645,158 @@ rollback, recovery, transfer, or synchronization.</p>
 <span class="sd">    Direct-kernel exceptions and mutations propagate without adapter retry,</span>
 <span class="sd">    rollback, recovery, transfer, or synchronization.</span>
 <span class="sd">    """</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.execution.process_adapters.ResidentDilutionAdapter.prepare" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">prepare</span>
+
+
+<a href="#particula.execution.process_adapters.ResidentDilutionAdapter.prepare" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">prepare</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PreparedResidentProcessBinding</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Validate resident ownership and prepare one pinned dilution call.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>request</code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Exact resident dilution request to validate and bind.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="particula.execution.process_adapters._PreparedResidentProcessBinding">_PreparedResidentProcessBinding</span></code>
+          –
+          <div class="doc-md-description">
+            <p>A binding whose execution reuses the validated direct-kernel state.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="TypeError">TypeError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If <code>request</code> is not the exact request carrier.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If the request session is not pinned by its registry or
+direct-kernel preparation rejects its inputs.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/execution/process_adapters.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PreparedResidentProcessBinding</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Validate resident ownership and prepare one pinned dilution call.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request: Exact resident dilution request to validate and bind.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A binding whose execution reuses the validated direct-kernel state.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If ``request`` is not the exact request carrier.</span>
+<span class="sd">        ValueError: If the request session is not pinned by its registry or</span>
+<span class="sd">            direct-kernel preparation rejects its inputs.</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentDilutionRequest</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"request must be an exact ResidentDilutionRequest."</span><span class="p">)</span>
     <span class="n">request</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">validate_pinned_session</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">)</span>
-    <span class="n">step</span> <span class="o">=</span> <span class="n">_get_dilution_step_gpu</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">step</span><span class="p">(</span>
+    <span class="n">dilution_step_gpu</span> <span class="o">=</span> <span class="n">_get_dilution_step_gpu</span><span class="p">()</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">dilution_step_gpu</span> <span class="k">as</span> <span class="n">supported_step</span>
+
+    <span class="n">call_args</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
         <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">gas</span><span class="p">,</span>
-        <span class="n">request</span><span class="o">.</span><span class="n">coefficient</span><span class="p">,</span>
-        <span class="n">request</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">coefficient</span><span class="p">),</span>
+        <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">time_step</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">dilution_step_gpu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">supported_step</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_PreparedResidentProcessBinding</span><span class="p">(</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">dilution_step_gpu</span><span class="p">(</span><span class="o">*</span><span class="n">call_args</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.dilution</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">_enqueue_prepared_dilution_call</span><span class="p">,</span>
+        <span class="n">_prepare_dilution_step_gpu</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_PreparedResidentProcessBinding</span><span class="p">(</span>
+        <span class="n">_prepare_dilution_step_gpu</span><span class="p">(</span>
+            <span class="o">*</span><span class="n">call_args</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">_enqueue_prepared_dilution_call</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16699,18 +16933,18 @@ concrete type.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/process_adapters.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">64</span>
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
 <span class="normal">70</span>
-<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate exact resident dependency types without kernel imports.</span>
 
 <span class="sd">    Raises:</span>
@@ -16752,9 +16986,11 @@ concrete type.</p>
 
 
         <p>Delegate one nucleation request through its exact published view.</p>
-<p>This concrete-only adapter resolves one supported direct kernel after
-metadata-only preflight. It preserves container and sidecar identity and
-provides no acquisition, transfer, synchronization, or recovery.</p>
+<p>This concrete-only adapter validates the exact resident publication before
+resolving the private prepare/enqueue seam.  It pins container and sidecar
+identity, while mutable device payload values remain the direct kernel's
+live authority.  It provides no acquisition, transfer, synchronization,
+scheduler-token entry, caching, recovery, or rollback.</p>
 
 
 
@@ -16838,54 +17074,38 @@ registry-pinned publication.</p>
           </div>
         </li>
     </ul>
-        <p>Direct-kernel exceptions and mutations propagate without adapter retry,
-rollback, recovery, transfer, or synchronization.</p>
+        <p>This is a fresh <code>prepare(request).execute()</code> delegation and does not
+cache a convenience binding. Direct-kernel exceptions, including any
+observer error, and mutations propagate without adapter retry, rollback,
+recovery, transfer, or synchronization. A writer-capable direct-kernel
+failure therefore retains that kernel's no-rollback boundary.</p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/process_adapters.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">371</span>
-<span class="normal">372</span>
-<span class="normal">373</span>
-<span class="normal">374</span>
-<span class="normal">375</span>
-<span class="normal">376</span>
-<span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
-<span class="normal">383</span>
-<span class="normal">384</span>
-<span class="normal">385</span>
-<span class="normal">386</span>
-<span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
-<span class="normal">391</span>
-<span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
-<span class="normal">395</span>
-<span class="normal">396</span>
-<span class="normal">397</span>
-<span class="normal">398</span>
-<span class="normal">399</span>
-<span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">661</span>
+<span class="normal">662</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate and delegate one nucleation request without altering result.</span>
 
 <span class="sd">    Args:</span>
@@ -16901,8 +17121,186 @@ rollback, recovery, transfer, or synchronization.</p>
 <span class="sd">        ValueError: If the session or resource view is no longer the active</span>
 <span class="sd">            registry-pinned publication.</span>
 
-<span class="sd">    Direct-kernel exceptions and mutations propagate without adapter retry,</span>
-<span class="sd">    rollback, recovery, transfer, or synchronization.</span>
+<span class="sd">    This is a fresh ``prepare(request).execute()`` delegation and does not</span>
+<span class="sd">    cache a convenience binding. Direct-kernel exceptions, including any</span>
+<span class="sd">    observer error, and mutations propagate without adapter retry, rollback,</span>
+<span class="sd">    recovery, transfer, or synchronization. A writer-capable direct-kernel</span>
+<span class="sd">    failure therefore retains that kernel's no-rollback boundary.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.execution.process_adapters.ResidentNucleationAdapter.prepare" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">prepare</span>
+
+
+<a href="#particula.execution.process_adapters.ResidentNucleationAdapter.prepare" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">prepare</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PreparedResidentProcessBinding</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Pin an exact resident nucleation request before its one launch.</p>
+<p>This concrete-only boundary validates resident and published-resource
+identity before resolving a kernel.  Identity drift rejects before a
+resolver call or device launch.  It neither enters a scheduler token nor
+acquires, replaces, transfers, synchronizes, caches scheduler state, or
+inspects payload state.  Production delegates to nucleation's private
+prepare/enqueue seam; a replaced public resolver remains a one-call
+compatibility path for dependency-injection tests.  The returned record
+pins identities, not mutable payload values.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>request</code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Exact resident nucleation request to validate and bind.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="particula.execution.process_adapters._PreparedResidentProcessBinding">_PreparedResidentProcessBinding</span></code>
+          –
+          <div class="doc-md-description">
+            <p>A frozen binding whose execution issues the already prepared call.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="TypeError">TypeError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If <code>request</code> is not the exact request carrier.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If session or published-resource identity has drifted.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/execution/process_adapters.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span>
+<span class="normal">633</span>
+<span class="normal">634</span>
+<span class="normal">635</span>
+<span class="normal">636</span>
+<span class="normal">637</span>
+<span class="normal">638</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span>
+<span class="normal">653</span>
+<span class="normal">654</span>
+<span class="normal">655</span>
+<span class="normal">656</span>
+<span class="normal">657</span>
+<span class="normal">658</span>
+<span class="normal">659</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PreparedResidentProcessBinding</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Pin an exact resident nucleation request before its one launch.</span>
+
+<span class="sd">    This concrete-only boundary validates resident and published-resource</span>
+<span class="sd">    identity before resolving a kernel.  Identity drift rejects before a</span>
+<span class="sd">    resolver call or device launch.  It neither enters a scheduler token nor</span>
+<span class="sd">    acquires, replaces, transfers, synchronizes, caches scheduler state, or</span>
+<span class="sd">    inspects payload state.  Production delegates to nucleation's private</span>
+<span class="sd">    prepare/enqueue seam; a replaced public resolver remains a one-call</span>
+<span class="sd">    compatibility path for dependency-injection tests.  The returned record</span>
+<span class="sd">    pins identities, not mutable payload values.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request: Exact resident nucleation request to validate and bind.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A frozen binding whose execution issues the already prepared call.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If ``request`` is not the exact request carrier.</span>
+<span class="sd">        ValueError: If session or published-resource identity has drifted.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentNucleationRequest</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -16913,11 +17311,9 @@ rollback, recovery, transfer, or synchronization.</p>
         <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">resources</span>
     <span class="p">)</span>
     <span class="n">step</span> <span class="o">=</span> <span class="n">_get_nucleation_step_gpu</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">step</span><span class="p">(</span>
-        <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
-        <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">gas</span><span class="p">,</span>
-        <span class="n">request</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
-        <span class="n">request</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">nucleation_step_gpu</span> <span class="k">as</span> <span class="n">supported_step</span>
+
+    <span class="n">call_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
         <span class="n">scratch</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">scratch</span><span class="p">,</span>
         <span class="n">finalized_demand</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">finalized_demand</span><span class="p">,</span>
         <span class="n">diagnostics</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">,</span>
@@ -16926,6 +17322,40 @@ rollback, recovery, transfer, or synchronization.</p>
         <span class="n">temperature</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">saturation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">environment</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">environment</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">call_args</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">gas</span><span class="p">,</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">supported_step</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_PreparedResidentProcessBinding</span><span class="p">(</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">step</span><span class="p">(</span><span class="o">*</span><span class="n">call_args</span><span class="p">,</span> <span class="o">**</span><span class="n">call_kwargs</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.nucleation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">_enqueue_prepared_nucleation_call</span><span class="p">,</span>
+        <span class="n">_prepare_nucleation_step_gpu</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">prepared</span> <span class="o">=</span> <span class="n">_prepare_nucleation_step_gpu</span><span class="p">(</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+        <span class="n">scratch</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_kwargs</span><span class="p">[</span><span class="s2">"scratch"</span><span class="p">]),</span>
+        <span class="n">finalized_demand</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_kwargs</span><span class="p">[</span><span class="s2">"finalized_demand"</span><span class="p">]),</span>
+        <span class="n">diagnostics</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_kwargs</span><span class="p">[</span><span class="s2">"diagnostics"</span><span class="p">]),</span>
+        <span class="n">exhaustion_controls</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_kwargs</span><span class="p">[</span><span class="s2">"exhaustion_controls"</span><span class="p">]),</span>
+        <span class="n">exhaustion_buffers</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_kwargs</span><span class="p">[</span><span class="s2">"exhaustion_buffers"</span><span class="p">]),</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_kwargs</span><span class="p">[</span><span class="s2">"temperature"</span><span class="p">]),</span>
+        <span class="n">saturation</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_kwargs</span><span class="p">[</span><span class="s2">"saturation"</span><span class="p">]),</span>
+        <span class="n">environment</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">call_kwargs</span><span class="p">[</span><span class="s2">"environment"</span><span class="p">]),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_PreparedResidentProcessBinding</span><span class="p">(</span>
+        <span class="n">prepared</span><span class="p">,</span>
+        <span class="n">_enqueue_prepared_nucleation_call</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17084,11 +17514,7 @@ exact required concrete type.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/process_adapters.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">200</span>
 <span class="normal">201</span>
 <span class="normal">202</span>
 <span class="normal">203</span>
@@ -17097,7 +17523,11 @@ exact required concrete type.</p>
 <span class="normal">206</span>
 <span class="normal">207</span>
 <span class="normal">208</span>
-<span class="normal">209</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate exact dependencies without inspecting kernel arguments.</span>
 
 <span class="sd">    Raises:</span>
@@ -17232,82 +17662,37 @@ registry-pinned publication.</p>
         </li>
     </ul>
         <p>An empty selection returns without resolving the kernel. For a partial
-selection, direct dispatch receives a private selected-box launch set.
+selection, preparation freezes a private selected-box launch set. The
+retained binding executes only its already-resolved delegate.
 Direct-kernel exceptions and mutations propagate without adapter retry,
 rollback, recovery, transfer, or synchronization.</p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/process_adapters.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span>
-<span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span>
-<span class="normal">337</span>
-<span class="normal">338</span>
-<span class="normal">339</span>
-<span class="normal">340</span>
-<span class="normal">341</span>
-<span class="normal">342</span>
-<span class="normal">343</span>
-<span class="normal">344</span>
-<span class="normal">345</span>
-<span class="normal">346</span>
-<span class="normal">347</span>
-<span class="normal">348</span>
-<span class="normal">349</span>
-<span class="normal">350</span>
-<span class="normal">351</span>
-<span class="normal">352</span>
-<span class="normal">353</span>
-<span class="normal">354</span>
-<span class="normal">355</span>
-<span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span>
-<span class="normal">359</span>
-<span class="normal">360</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate and delegate one wall-loss request.</span>
 
 <span class="sd">    Args:</span>
@@ -17324,9 +17709,177 @@ rollback, recovery, transfer, or synchronization.</p>
 <span class="sd">            registry-pinned publication.</span>
 
 <span class="sd">    An empty selection returns without resolving the kernel. For a partial</span>
-<span class="sd">    selection, direct dispatch receives a private selected-box launch set.</span>
+<span class="sd">    selection, preparation freezes a private selected-box launch set. The</span>
+<span class="sd">    retained binding executes only its already-resolved delegate.</span>
 <span class="sd">    Direct-kernel exceptions and mutations propagate without adapter retry,</span>
 <span class="sd">    rollback, recovery, transfer, or synchronization.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.execution.process_adapters.ResidentWallLossAdapter.prepare" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">prepare</span>
+
+
+<a href="#particula.execution.process_adapters.ResidentWallLossAdapter.prepare" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">prepare</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PreparedResidentProcessBinding</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Preflight resident ownership and prepare one wall-loss call.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>request</code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Exact resident wall-loss request to validate and bind.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="particula.execution.process_adapters._PreparedResidentProcessBinding">_PreparedResidentProcessBinding</span></code>
+          –
+          <div class="doc-md-description">
+            <p>A binding for the selected, all-box, or valid empty dispatch.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="TypeError">TypeError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If <code>request</code> is not the exact request carrier.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If the session or resource publication is stale, or
+selection validation fails.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/execution/process_adapters.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span>
+<span class="normal">479</span>
+<span class="normal">480</span>
+<span class="normal">481</span>
+<span class="normal">482</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PreparedResidentProcessBinding</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Preflight resident ownership and prepare one wall-loss call.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request: Exact resident wall-loss request to validate and bind.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A binding for the selected, all-box, or valid empty dispatch.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If ``request`` is not the exact request carrier.</span>
+<span class="sd">        ValueError: If the session or resource publication is stale, or</span>
+<span class="sd">            selection validation fails.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentWallLossRequest</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"request must be an exact ResidentWallLossRequest."</span><span class="p">)</span>
@@ -17336,45 +17889,67 @@ rollback, recovery, transfer, or synchronization.</p>
     <span class="p">)</span>
     <span class="n">enabled_logical_boxes</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">validate_enabled_box_indices</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">enabled_logical_boxes</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">particles</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">enabled_logical_boxes</span><span class="p">)</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">:</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">warp</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">wp</span>
-
-        <span class="n">stream</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">stream</span>
-        <span class="n">enabled_physical_lanes</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">enabled_logical_boxes</span>
-            <span class="k">if</span> <span class="n">stream</span><span class="o">.</span><span class="n">n_boxes</span> <span class="o">==</span> <span class="mi">0</span>
-            <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span>
-                <span class="n">stream</span><span class="o">.</span><span class="n">lanes</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">enabled_logical_boxes</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">selected_boxes</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="n">enabled_physical_lanes</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">rng_states</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">_get_wall_loss_selected_boxes_step_gpu</span><span class="p">()(</span>
+        <span class="k">return</span> <span class="n">_PreparedResidentProcessBinding</span><span class="p">(</span>
             <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
-            <span class="kc">None</span><span class="p">,</span>
-            <span class="kc">None</span><span class="p">,</span>
-            <span class="n">request</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
-            <span class="n">rng_seed</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">rng_seed</span><span class="p">,</span>
-            <span class="n">rng_states</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">rng_states</span><span class="p">,</span>
-            <span class="n">selected_boxes</span><span class="o">=</span><span class="n">selected_boxes</span><span class="p">,</span>
-            <span class="n">environment</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">environment</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">particles</span><span class="p">:</span> <span class="n">particles</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="n">step</span> <span class="o">=</span> <span class="n">_get_wall_loss_step_gpu</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">step</span><span class="p">(</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">enabled_logical_boxes</span><span class="p">)</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_selected</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">enabled_logical_boxes</span><span class="p">)</span>
+
+    <span class="n">wall_loss_step_gpu</span> <span class="o">=</span> <span class="n">_get_wall_loss_step_gpu</span><span class="p">()</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.wall_loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeutralWallLossConfig</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">NeutralWallLossConfig</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_PreparedResidentProcessBinding</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">prepared</span><span class="p">:</span> <span class="n">wall_loss_step_gpu</span><span class="p">(</span>
+                <span class="n">prepared</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
+                <span class="kc">None</span><span class="p">,</span>
+                <span class="kc">None</span><span class="p">,</span>
+                <span class="n">prepared</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span>
+                <span class="n">config</span><span class="o">=</span><span class="n">prepared</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                <span class="n">rng_seed</span><span class="o">=</span><span class="n">prepared</span><span class="o">.</span><span class="n">rng_seed</span><span class="p">,</span>
+                <span class="n">rng_states</span><span class="o">=</span><span class="n">prepared</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">rng_states</span><span class="p">,</span>
+                <span class="n">initialize_rng</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">environment</span><span class="o">=</span><span class="n">prepared</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">environment</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">wall_loss_step_gpu</span> <span class="k">as</span> <span class="n">supported_step</span>
+
+    <span class="k">if</span> <span class="n">wall_loss_step_gpu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">supported_step</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_PreparedResidentProcessBinding</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">prepared</span><span class="p">:</span> <span class="n">wall_loss_step_gpu</span><span class="p">(</span>
+                <span class="n">prepared</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
+                <span class="kc">None</span><span class="p">,</span>
+                <span class="kc">None</span><span class="p">,</span>
+                <span class="n">prepared</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span>
+                <span class="n">config</span><span class="o">=</span><span class="n">prepared</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                <span class="n">rng_seed</span><span class="o">=</span><span class="n">prepared</span><span class="o">.</span><span class="n">rng_seed</span><span class="p">,</span>
+                <span class="n">rng_states</span><span class="o">=</span><span class="n">prepared</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">rng_states</span><span class="p">,</span>
+                <span class="n">initialize_rng</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">environment</span><span class="o">=</span><span class="n">prepared</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">environment</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.wall_loss</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">_enqueue_prepared_wall_loss_call</span><span class="p">,</span>
+        <span class="n">_prepare_wall_loss_step_gpu</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">prepared</span> <span class="o">=</span> <span class="n">_prepare_wall_loss_step_gpu</span><span class="p">(</span>
         <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
         <span class="kc">None</span><span class="p">,</span>
         <span class="kc">None</span><span class="p">,</span>
         <span class="n">request</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span>
         <span class="n">config</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
-        <span class="n">rng_seed</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">rng_seed</span><span class="p">,</span>
+        <span class="n">rng_seed</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">rng_seed</span><span class="p">),</span>
         <span class="n">rng_states</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">rng_states</span><span class="p">,</span>
         <span class="n">initialize_rng</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">environment</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">environment</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_PreparedResidentProcessBinding</span><span class="p">(</span>
+        <span class="n">prepared</span><span class="p">,</span>
+        <span class="n">_enqueue_prepared_wall_loss_call</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17553,11 +18128,7 @@ exact required concrete type.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/process_adapters.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
@@ -17569,7 +18140,11 @@ exact required concrete type.</p>
 <span class="normal">122</span>
 <span class="normal">123</span>
 <span class="normal">124</span>
-<span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate exact dependencies without inspecting kernel arguments.</span>
 
 <span class="sd">    Raises:</span>
@@ -17654,11 +18229,7 @@ outside the resident box range.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/process_adapters.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span>
 <span class="normal">134</span>
@@ -17693,7 +18264,11 @@ outside the resident box range.</p>
 <span class="normal">163</span>
 <span class="normal">164</span>
 <span class="normal">165</span>
-<span class="normal">166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_enabled_box_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_enabled_box_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Validate and return the scheduler-owned wall-loss launch set.</span>
 
 <span class="sd">    ``None`` selects every logical box in ascending order. An explicit tuple</span>

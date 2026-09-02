@@ -4242,6 +4242,8 @@
       
         
       
+        
+      
     
     
     
@@ -4658,6 +4660,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../execution/resident_enqueue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_enqueue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../execution/resident_scheduler/" class="md-nav__link">
         
   
@@ -4873,10 +4903,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_22" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_21" id="__nav_2_3_19_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_22" id="__nav_2_3_19_22_label" tabindex="0">
             
   
   
@@ -4894,8 +4924,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_21">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_22">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16206,6 +16236,11 @@ exported by <code>particula.gpu.kernels</code>, <code>particula.gpu</code>, or t
 package. The module performs no hidden host transfer, synchronization,
 resizing, conversion, or CPU fallback. Callers synchronize explicitly before
 inspecting asynchronous device results.</p>
+<p>Private prepared calls preserve legacy validation and fallback allocation in
+setup, then enqueue retained device work without validation, allocation,
+readback, transfer, synchronization, lookup, rebinding, or recovery. Empty or
+no-work calls are write-free. Rejection is pre-writer; rollback is not promised
+after a writer launches.</p>
 
 
 
@@ -16602,13 +16637,7 @@ primary commit kernel launches.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/communication.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1159</span>
-<span class="normal">1160</span>
-<span class="normal">1161</span>
-<span class="normal">1162</span>
-<span class="normal">1163</span>
-<span class="normal">1164</span>
-<span class="normal">1165</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1165</span>
 <span class="normal">1166</span>
 <span class="normal">1167</span>
 <span class="normal">1168</span>
@@ -16960,7 +16989,13 @@ primary commit kernel launches.</p>
 <span class="normal">1514</span>
 <span class="normal">1515</span>
 <span class="normal">1516</span>
-<span class="normal">1517</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">gas_communication_step_gpu</span><span class="p">(</span>
+<span class="normal">1517</span>
+<span class="normal">1518</span>
+<span class="normal">1519</span>
+<span class="normal">1520</span>
+<span class="normal">1521</span>
+<span class="normal">1522</span>
+<span class="normal">1523</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">gas_communication_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
@@ -17438,13 +17473,7 @@ metadata are invalid.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/communication.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1520</span>
-<span class="normal">1521</span>
-<span class="normal">1522</span>
-<span class="normal">1523</span>
-<span class="normal">1524</span>
-<span class="normal">1525</span>
-<span class="normal">1526</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1526</span>
 <span class="normal">1527</span>
 <span class="normal">1528</span>
 <span class="normal">1529</span>
@@ -17708,7 +17737,13 @@ metadata are invalid.</p>
 <span class="normal">1787</span>
 <span class="normal">1788</span>
 <span class="normal">1789</span>
-<span class="normal">1790</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">particle_communication_step_gpu</span><span class="p">(</span>
+<span class="normal">1790</span>
+<span class="normal">1791</span>
+<span class="normal">1792</span>
+<span class="normal">1793</span>
+<span class="normal">1794</span>
+<span class="normal">1795</span>
+<span class="normal">1796</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">particle_communication_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
@@ -18000,109 +18035,140 @@ metadata are invalid.</p>
 
         <p>Dispatch acquired closed GAS resources without public P1 validation.</p>
 <p>This private resident seam assumes acquisition has already established every
-schema, identity, alias, and static map invariant.  It intentionally has no
+schema, identity, alias, and static map invariant. It intentionally has no
 allocations, payload scans, host readback, or synchronization.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>particles</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Acquired resident particle container.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>gas</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Acquired resident gas container.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>configuration</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            CommunicationConfiguration
+
+
+  
+      dataclass
+   (particula.execution.communication.CommunicationConfiguration)" href="../../../execution/communication/#particula.execution.communication.CommunicationConfiguration">CommunicationConfiguration</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Acquired closed GAS communication configuration.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>time_step</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Validated nonnegative barrier duration in seconds.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>buffers</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            GasCommunicationBuffers
+
+
+  
+      dataclass
+   (particula.gpu.kernels.communication.GasCommunicationBuffers)" href="#particula.gpu.kernels.communication.GasCommunicationBuffers">GasCommunicationBuffers</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned GAS work buffers.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>invalid</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned validation status array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>active</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned activity status array.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="tuple">tuple</span>[<span title="typing.Any">Any</span>, <span title="typing.Any">Any</span>]</code>
+          –
+          <div class="doc-md-description">
+            <p>The exact <code>(particles, gas)</code> input containers.</p>
+          </div>
+        </li>
+    </ul>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/communication.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1805</span>
-<span class="normal">1806</span>
-<span class="normal">1807</span>
-<span class="normal">1808</span>
-<span class="normal">1809</span>
-<span class="normal">1810</span>
-<span class="normal">1811</span>
-<span class="normal">1812</span>
-<span class="normal">1813</span>
-<span class="normal">1814</span>
-<span class="normal">1815</span>
-<span class="normal">1816</span>
-<span class="normal">1817</span>
-<span class="normal">1818</span>
-<span class="normal">1819</span>
-<span class="normal">1820</span>
-<span class="normal">1821</span>
-<span class="normal">1822</span>
-<span class="normal">1823</span>
-<span class="normal">1824</span>
-<span class="normal">1825</span>
-<span class="normal">1826</span>
-<span class="normal">1827</span>
-<span class="normal">1828</span>
-<span class="normal">1829</span>
-<span class="normal">1830</span>
-<span class="normal">1831</span>
-<span class="normal">1832</span>
-<span class="normal">1833</span>
-<span class="normal">1834</span>
-<span class="normal">1835</span>
-<span class="normal">1836</span>
-<span class="normal">1837</span>
-<span class="normal">1838</span>
-<span class="normal">1839</span>
-<span class="normal">1840</span>
-<span class="normal">1841</span>
-<span class="normal">1842</span>
-<span class="normal">1843</span>
-<span class="normal">1844</span>
-<span class="normal">1845</span>
-<span class="normal">1846</span>
-<span class="normal">1847</span>
-<span class="normal">1848</span>
-<span class="normal">1849</span>
-<span class="normal">1850</span>
-<span class="normal">1851</span>
-<span class="normal">1852</span>
-<span class="normal">1853</span>
-<span class="normal">1854</span>
-<span class="normal">1855</span>
-<span class="normal">1856</span>
-<span class="normal">1857</span>
-<span class="normal">1858</span>
-<span class="normal">1859</span>
-<span class="normal">1860</span>
-<span class="normal">1861</span>
-<span class="normal">1862</span>
-<span class="normal">1863</span>
-<span class="normal">1864</span>
-<span class="normal">1865</span>
-<span class="normal">1866</span>
-<span class="normal">1867</span>
-<span class="normal">1868</span>
-<span class="normal">1869</span>
-<span class="normal">1870</span>
-<span class="normal">1871</span>
-<span class="normal">1872</span>
-<span class="normal">1873</span>
-<span class="normal">1874</span>
-<span class="normal">1875</span>
-<span class="normal">1876</span>
-<span class="normal">1877</span>
-<span class="normal">1878</span>
-<span class="normal">1879</span>
-<span class="normal">1880</span>
-<span class="normal">1881</span>
-<span class="normal">1882</span>
-<span class="normal">1883</span>
-<span class="normal">1884</span>
-<span class="normal">1885</span>
-<span class="normal">1886</span>
-<span class="normal">1887</span>
-<span class="normal">1888</span>
-<span class="normal">1889</span>
-<span class="normal">1890</span>
-<span class="normal">1891</span>
-<span class="normal">1892</span>
-<span class="normal">1893</span>
-<span class="normal">1894</span>
-<span class="normal">1895</span>
-<span class="normal">1896</span>
-<span class="normal">1897</span>
-<span class="normal">1898</span>
-<span class="normal">1899</span>
-<span class="normal">1900</span>
-<span class="normal">1901</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resident_gas_communication_step_gpu</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2173</span>
+<span class="normal">2174</span>
+<span class="normal">2175</span>
+<span class="normal">2176</span>
+<span class="normal">2177</span>
+<span class="normal">2178</span>
+<span class="normal">2179</span>
+<span class="normal">2180</span>
+<span class="normal">2181</span>
+<span class="normal">2182</span>
+<span class="normal">2183</span>
+<span class="normal">2184</span>
+<span class="normal">2185</span>
+<span class="normal">2186</span>
+<span class="normal">2187</span>
+<span class="normal">2188</span>
+<span class="normal">2189</span>
+<span class="normal">2190</span>
+<span class="normal">2191</span>
+<span class="normal">2192</span>
+<span class="normal">2193</span>
+<span class="normal">2194</span>
+<span class="normal">2195</span>
+<span class="normal">2196</span>
+<span class="normal">2197</span>
+<span class="normal">2198</span>
+<span class="normal">2199</span>
+<span class="normal">2200</span>
+<span class="normal">2201</span>
+<span class="normal">2202</span>
+<span class="normal">2203</span>
+<span class="normal">2204</span>
+<span class="normal">2205</span>
+<span class="normal">2206</span>
+<span class="normal">2207</span>
+<span class="normal">2208</span>
+<span class="normal">2209</span>
+<span class="normal">2210</span>
+<span class="normal">2211</span>
+<span class="normal">2212</span>
+<span class="normal">2213</span>
+<span class="normal">2214</span>
+<span class="normal">2215</span>
+<span class="normal">2216</span>
+<span class="normal">2217</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resident_gas_communication_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="n">CommunicationConfiguration</span><span class="p">,</span>
@@ -18114,89 +18180,37 @@ allocations, payload scans, host readback, or synchronization.</p>
 <span class="w">    </span><span class="sd">"""Dispatch acquired closed GAS resources without public P1 validation.</span>
 
 <span class="sd">    This private resident seam assumes acquisition has already established every</span>
-<span class="sd">    schema, identity, alias, and static map invariant.  It intentionally has no</span>
+<span class="sd">    schema, identity, alias, and static map invariant. It intentionally has no</span>
 <span class="sd">    allocations, payload scans, host readback, or synchronization.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        particles: Acquired resident particle container.</span>
+<span class="sd">        gas: Acquired resident gas container.</span>
+<span class="sd">        configuration: Acquired closed GAS communication configuration.</span>
+<span class="sd">        time_step: Validated nonnegative barrier duration in seconds.</span>
+<span class="sd">        buffers: Registry-pinned GAS work buffers.</span>
+<span class="sd">        invalid: Registry-pinned validation status array.</span>
+<span class="sd">        active: Registry-pinned activity status array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The exact ``(particles, gas)`` input containers.</span>
 <span class="sd">    """</span>
     <span class="n">map_data</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span>
-    <span class="n">concentration</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span>
-    <span class="n">volume</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">volume</span>
-    <span class="n">boxes</span><span class="p">,</span> <span class="n">species</span> <span class="o">=</span> <span class="n">concentration</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">edges</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">boxes</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">species</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">edges</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">time_step</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">particles</span><span class="p">,</span> <span class="n">gas</span>
-    <span class="n">device</span> <span class="o">=</span> <span class="n">concentration</span><span class="o">.</span><span class="n">device</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_resident_reset_status</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">invalid</span><span class="p">,</span> <span class="n">active</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="c1"># Closed resident maps never need open-boundary accounting arrays.  The</span>
-    <span class="c1"># unused ledger arguments are never dereferenced when their flags are zero.</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_communication_clear_and_stage</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">concentration</span><span class="p">,</span>
-            <span class="n">volume</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amounts</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amount_deltas</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">outbound_amounts</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amounts</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amounts</span><span class="p">,</span>
-            <span class="mi">0</span><span class="p">,</span>
-            <span class="mi">0</span><span class="p">,</span>
-            <span class="n">active</span><span class="p">,</span>
-            <span class="n">invalid</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_communication_propose</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
-            <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
-            <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
-            <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span>
-            <span class="n">time_step</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amounts</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amount_deltas</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">outbound_amounts</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amounts</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amounts</span><span class="p">,</span>
-            <span class="mi">0</span><span class="p">,</span>
-            <span class="mi">0</span><span class="p">,</span>
-            <span class="n">active</span><span class="p">,</span>
-            <span class="n">invalid</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_communication_validate_final</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amounts</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amount_deltas</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">outbound_amounts</span><span class="p">,</span>
-            <span class="n">volume</span><span class="p">,</span>
-            <span class="n">active</span><span class="p">,</span>
-            <span class="n">invalid</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_communication_commit</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">concentration</span><span class="p">,</span>
-            <span class="n">volume</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amounts</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">amount_deltas</span><span class="p">,</span>
-            <span class="n">active</span><span class="p">,</span>
-            <span class="n">invalid</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+    <span class="n">_enqueue_prepared_resident_gas_communication</span><span class="p">(</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+        <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">),</span>
+        <span class="n">time_step</span><span class="p">,</span>
+        <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="n">buffers</span><span class="p">,</span>
+        <span class="n">invalid</span><span class="p">,</span>
+        <span class="n">active</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">particles</span><span class="p">,</span> <span class="n">gas</span>
 </code></pre></div></td></tr></table></div>
@@ -18223,105 +18237,163 @@ allocations, payload scans, host readback, or synchronization.</p>
 uses the registry-pinned planner, status, and snapshot storage by identity.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>particles</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Acquired resident particle container.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>configuration</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            CommunicationConfiguration
+
+
+  
+      dataclass
+   (particula.execution.communication.CommunicationConfiguration)" href="../../../execution/communication/#particula.execution.communication.CommunicationConfiguration">CommunicationConfiguration</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Acquired closed PARTICLES communication configuration.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>time_step</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Validated nonnegative barrier duration in seconds.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>buffers</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            ParticleCommunicationBuffers
+
+
+  
+      dataclass
+   (particula.gpu.kernels.communication.ParticleCommunicationBuffers)" href="#particula.gpu.kernels.communication.ParticleCommunicationBuffers">ParticleCommunicationBuffers</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned PARTICLES planning buffers.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>invalid</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned validation status array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>demand</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned demand status array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>initial_masses</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned particle mass snapshot.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>initial_concentration</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned concentration snapshot.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>initial_charge</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned charge snapshot.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="typing.Any">Any</span></code>
+          –
+          <div class="doc-md-description">
+            <p>The exact <code>particles</code> input container.</p>
+          </div>
+        </li>
+    </ul>
+
+
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/communication.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1904</span>
-<span class="normal">1905</span>
-<span class="normal">1906</span>
-<span class="normal">1907</span>
-<span class="normal">1908</span>
-<span class="normal">1909</span>
-<span class="normal">1910</span>
-<span class="normal">1911</span>
-<span class="normal">1912</span>
-<span class="normal">1913</span>
-<span class="normal">1914</span>
-<span class="normal">1915</span>
-<span class="normal">1916</span>
-<span class="normal">1917</span>
-<span class="normal">1918</span>
-<span class="normal">1919</span>
-<span class="normal">1920</span>
-<span class="normal">1921</span>
-<span class="normal">1922</span>
-<span class="normal">1923</span>
-<span class="normal">1924</span>
-<span class="normal">1925</span>
-<span class="normal">1926</span>
-<span class="normal">1927</span>
-<span class="normal">1928</span>
-<span class="normal">1929</span>
-<span class="normal">1930</span>
-<span class="normal">1931</span>
-<span class="normal">1932</span>
-<span class="normal">1933</span>
-<span class="normal">1934</span>
-<span class="normal">1935</span>
-<span class="normal">1936</span>
-<span class="normal">1937</span>
-<span class="normal">1938</span>
-<span class="normal">1939</span>
-<span class="normal">1940</span>
-<span class="normal">1941</span>
-<span class="normal">1942</span>
-<span class="normal">1943</span>
-<span class="normal">1944</span>
-<span class="normal">1945</span>
-<span class="normal">1946</span>
-<span class="normal">1947</span>
-<span class="normal">1948</span>
-<span class="normal">1949</span>
-<span class="normal">1950</span>
-<span class="normal">1951</span>
-<span class="normal">1952</span>
-<span class="normal">1953</span>
-<span class="normal">1954</span>
-<span class="normal">1955</span>
-<span class="normal">1956</span>
-<span class="normal">1957</span>
-<span class="normal">1958</span>
-<span class="normal">1959</span>
-<span class="normal">1960</span>
-<span class="normal">1961</span>
-<span class="normal">1962</span>
-<span class="normal">1963</span>
-<span class="normal">1964</span>
-<span class="normal">1965</span>
-<span class="normal">1966</span>
-<span class="normal">1967</span>
-<span class="normal">1968</span>
-<span class="normal">1969</span>
-<span class="normal">1970</span>
-<span class="normal">1971</span>
-<span class="normal">1972</span>
-<span class="normal">1973</span>
-<span class="normal">1974</span>
-<span class="normal">1975</span>
-<span class="normal">1976</span>
-<span class="normal">1977</span>
-<span class="normal">1978</span>
-<span class="normal">1979</span>
-<span class="normal">1980</span>
-<span class="normal">1981</span>
-<span class="normal">1982</span>
-<span class="normal">1983</span>
-<span class="normal">1984</span>
-<span class="normal">1985</span>
-<span class="normal">1986</span>
-<span class="normal">1987</span>
-<span class="normal">1988</span>
-<span class="normal">1989</span>
-<span class="normal">1990</span>
-<span class="normal">1991</span>
-<span class="normal">1992</span>
-<span class="normal">1993</span>
-<span class="normal">1994</span>
-<span class="normal">1995</span>
-<span class="normal">1996</span>
-<span class="normal">1997</span>
-<span class="normal">1998</span>
-<span class="normal">1999</span>
-<span class="normal">2000</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resident_particle_communication_step_gpu</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2220</span>
+<span class="normal">2221</span>
+<span class="normal">2222</span>
+<span class="normal">2223</span>
+<span class="normal">2224</span>
+<span class="normal">2225</span>
+<span class="normal">2226</span>
+<span class="normal">2227</span>
+<span class="normal">2228</span>
+<span class="normal">2229</span>
+<span class="normal">2230</span>
+<span class="normal">2231</span>
+<span class="normal">2232</span>
+<span class="normal">2233</span>
+<span class="normal">2234</span>
+<span class="normal">2235</span>
+<span class="normal">2236</span>
+<span class="normal">2237</span>
+<span class="normal">2238</span>
+<span class="normal">2239</span>
+<span class="normal">2240</span>
+<span class="normal">2241</span>
+<span class="normal">2242</span>
+<span class="normal">2243</span>
+<span class="normal">2244</span>
+<span class="normal">2245</span>
+<span class="normal">2246</span>
+<span class="normal">2247</span>
+<span class="normal">2248</span>
+<span class="normal">2249</span>
+<span class="normal">2250</span>
+<span class="normal">2251</span>
+<span class="normal">2252</span>
+<span class="normal">2253</span>
+<span class="normal">2254</span>
+<span class="normal">2255</span>
+<span class="normal">2256</span>
+<span class="normal">2257</span>
+<span class="normal">2258</span>
+<span class="normal">2259</span>
+<span class="normal">2260</span>
+<span class="normal">2261</span>
+<span class="normal">2262</span>
+<span class="normal">2263</span>
+<span class="normal">2264</span>
+<span class="normal">2265</span>
+<span class="normal">2266</span>
+<span class="normal">2267</span>
+<span class="normal">2268</span>
+<span class="normal">2269</span>
+<span class="normal">2270</span>
+<span class="normal">2271</span>
+<span class="normal">2272</span>
+<span class="normal">2273</span>
+<span class="normal">2274</span>
+<span class="normal">2275</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resident_particle_communication_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="n">CommunicationConfiguration</span><span class="p">,</span>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -18336,86 +18408,45 @@ uses the registry-pinned planner, status, and snapshot storage by identity.</p>
 
 <span class="sd">    Acquisition owns payload validation and allocation. This resident-only seam</span>
 <span class="sd">    uses the registry-pinned planner, status, and snapshot storage by identity.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        particles: Acquired resident particle container.</span>
+<span class="sd">        configuration: Acquired closed PARTICLES communication configuration.</span>
+<span class="sd">        time_step: Validated nonnegative barrier duration in seconds.</span>
+<span class="sd">        buffers: Registry-pinned PARTICLES planning buffers.</span>
+<span class="sd">        invalid: Registry-pinned validation status array.</span>
+<span class="sd">        demand: Registry-pinned demand status array.</span>
+<span class="sd">        initial_masses: Registry-pinned particle mass snapshot.</span>
+<span class="sd">        initial_concentration: Registry-pinned concentration snapshot.</span>
+<span class="sd">        initial_charge: Registry-pinned charge snapshot.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The exact ``particles`` input container.</span>
 <span class="sd">    """</span>
     <span class="n">map_data</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">communication_map</span>
-    <span class="n">masses</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span>
-    <span class="n">concentration</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span>
-    <span class="n">charge</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">charge</span>
-    <span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">,</span> <span class="n">species</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">edges</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="n">boxes</span> <span class="o">==</span> <span class="mi">0</span>
-        <span class="ow">or</span> <span class="n">slots</span> <span class="o">==</span> <span class="mi">0</span>
-        <span class="ow">or</span> <span class="n">species</span> <span class="o">==</span> <span class="mi">0</span>
-        <span class="ow">or</span> <span class="n">edges</span> <span class="o">==</span> <span class="mi">0</span>
-        <span class="ow">or</span> <span class="n">time_step</span> <span class="o">==</span> <span class="mf">0.0</span>
-    <span class="p">):</span>
-        <span class="k">return</span> <span class="n">particles</span>
-    <span class="n">device</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">device</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_resident_reset_status</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">invalid</span><span class="p">,</span> <span class="n">demand</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_particle_communication_plan</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">masses</span><span class="p">,</span>
-            <span class="n">concentration</span><span class="p">,</span>
-            <span class="n">charge</span><span class="p">,</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
-            <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
-            <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
-            <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
-            <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span>
-            <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">form</span> <span class="ow">is</span> <span class="n">CommunicationMapForm</span><span class="o">.</span><span class="n">ONE_DIMENSIONAL</span><span class="p">),</span>
-            <span class="n">time_step</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">source_debits</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">destination_credits</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">assignments</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">request_concentrations</span><span class="p">,</span>
-            <span class="n">invalid</span><span class="p">,</span>
-            <span class="n">demand</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_snapshot_particle_communication_fields</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">),</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">masses</span><span class="p">,</span>
-            <span class="n">concentration</span><span class="p">,</span>
-            <span class="n">charge</span><span class="p">,</span>
-            <span class="n">initial_masses</span><span class="p">,</span>
-            <span class="n">initial_concentration</span><span class="p">,</span>
-            <span class="n">initial_charge</span><span class="p">,</span>
-            <span class="n">invalid</span><span class="p">,</span>
-            <span class="n">demand</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_particle_communication_commit</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">slots</span><span class="p">),</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">masses</span><span class="p">,</span>
-            <span class="n">concentration</span><span class="p">,</span>
-            <span class="n">charge</span><span class="p">,</span>
-            <span class="n">initial_masses</span><span class="p">,</span>
-            <span class="n">initial_concentration</span><span class="p">,</span>
-            <span class="n">initial_charge</span><span class="p">,</span>
-            <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
-            <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">source_debits</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">destination_credits</span><span class="p">,</span>
-            <span class="n">buffers</span><span class="o">.</span><span class="n">assignments</span><span class="p">,</span>
-            <span class="n">invalid</span><span class="p">,</span>
-            <span class="n">demand</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+    <span class="n">_enqueue_prepared_resident_particle_communication</span><span class="p">(</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">source_boxes</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">destination_boxes</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
+        <span class="n">map_data</span><span class="o">.</span><span class="n">rates</span><span class="p">,</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">edge_capacity</span><span class="p">),</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">map_data</span><span class="o">.</span><span class="n">form</span> <span class="ow">is</span> <span class="n">CommunicationMapForm</span><span class="o">.</span><span class="n">ONE_DIMENSIONAL</span><span class="p">),</span>
+        <span class="n">time_step</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="n">buffers</span><span class="p">,</span>
+        <span class="n">invalid</span><span class="p">,</span>
+        <span class="n">demand</span><span class="p">,</span>
+        <span class="n">initial_masses</span><span class="p">,</span>
+        <span class="n">initial_concentration</span><span class="p">,</span>
+        <span class="n">initial_charge</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">particles</span>
 </code></pre></div></td></tr></table></div>
@@ -18440,101 +18471,122 @@ uses the registry-pinned planner, status, and snapshot storage by identity.</p>
         <p>Apply acquired prescribed volumes without public P1 validation.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>particles</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Acquired resident particle container.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>gas</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Acquired resident gas container.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>final_volumes</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned prescribed per-box volumes in m^3.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>invalid</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned volume validation status array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>changed</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Registry-pinned volume-change status array.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="tuple">tuple</span>[<span title="typing.Any">Any</span>, <span title="typing.Any">Any</span>]</code>
+          –
+          <div class="doc-md-description">
+            <p>The exact <code>(particles, gas)</code> input containers.</p>
+          </div>
+        </li>
+    </ul>
+
+
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/communication.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2003</span>
-<span class="normal">2004</span>
-<span class="normal">2005</span>
-<span class="normal">2006</span>
-<span class="normal">2007</span>
-<span class="normal">2008</span>
-<span class="normal">2009</span>
-<span class="normal">2010</span>
-<span class="normal">2011</span>
-<span class="normal">2012</span>
-<span class="normal">2013</span>
-<span class="normal">2014</span>
-<span class="normal">2015</span>
-<span class="normal">2016</span>
-<span class="normal">2017</span>
-<span class="normal">2018</span>
-<span class="normal">2019</span>
-<span class="normal">2020</span>
-<span class="normal">2021</span>
-<span class="normal">2022</span>
-<span class="normal">2023</span>
-<span class="normal">2024</span>
-<span class="normal">2025</span>
-<span class="normal">2026</span>
-<span class="normal">2027</span>
-<span class="normal">2028</span>
-<span class="normal">2029</span>
-<span class="normal">2030</span>
-<span class="normal">2031</span>
-<span class="normal">2032</span>
-<span class="normal">2033</span>
-<span class="normal">2034</span>
-<span class="normal">2035</span>
-<span class="normal">2036</span>
-<span class="normal">2037</span>
-<span class="normal">2038</span>
-<span class="normal">2039</span>
-<span class="normal">2040</span>
-<span class="normal">2041</span>
-<span class="normal">2042</span>
-<span class="normal">2043</span>
-<span class="normal">2044</span>
-<span class="normal">2045</span>
-<span class="normal">2046</span>
-<span class="normal">2047</span>
-<span class="normal">2048</span>
-<span class="normal">2049</span>
-<span class="normal">2050</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resident_volume_evolution_step_gpu</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2278</span>
+<span class="normal">2279</span>
+<span class="normal">2280</span>
+<span class="normal">2281</span>
+<span class="normal">2282</span>
+<span class="normal">2283</span>
+<span class="normal">2284</span>
+<span class="normal">2285</span>
+<span class="normal">2286</span>
+<span class="normal">2287</span>
+<span class="normal">2288</span>
+<span class="normal">2289</span>
+<span class="normal">2290</span>
+<span class="normal">2291</span>
+<span class="normal">2292</span>
+<span class="normal">2293</span>
+<span class="normal">2294</span>
+<span class="normal">2295</span>
+<span class="normal">2296</span>
+<span class="normal">2297</span>
+<span class="normal">2298</span>
+<span class="normal">2299</span>
+<span class="normal">2300</span>
+<span class="normal">2301</span>
+<span class="normal">2302</span>
+<span class="normal">2303</span>
+<span class="normal">2304</span>
+<span class="normal">2305</span>
+<span class="normal">2306</span>
+<span class="normal">2307</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resident_volume_evolution_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">final_volumes</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">invalid</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">changed</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""Apply acquired prescribed volumes without public P1 validation."""</span>
-    <span class="n">volume</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">volume</span>
-    <span class="n">particle_concentration</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span>
-    <span class="n">gas_concentration</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span>
-    <span class="n">boxes</span> <span class="o">=</span> <span class="n">volume</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">boxes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">particles</span><span class="p">,</span> <span class="n">gas</span>
-    <span class="n">device</span> <span class="o">=</span> <span class="n">volume</span><span class="o">.</span><span class="n">device</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_resident_reset_status</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">invalid</span><span class="p">,</span> <span class="n">changed</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">particle_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-            <span class="n">_apply_scaled_concentration</span><span class="p">,</span>
-            <span class="n">dim</span><span class="o">=</span><span class="n">particle_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-                <span class="n">particle_concentration</span><span class="p">,</span>
-                <span class="n">volume</span><span class="p">,</span>
-                <span class="n">final_volumes</span><span class="p">,</span>
-                <span class="n">invalid</span><span class="p">,</span>
-                <span class="n">changed</span><span class="p">,</span>
-            <span class="p">],</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">if</span> <span class="n">gas_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-            <span class="n">_apply_scaled_concentration</span><span class="p">,</span>
-            <span class="n">dim</span><span class="o">=</span><span class="n">gas_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">gas_concentration</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">final_volumes</span><span class="p">,</span> <span class="n">invalid</span><span class="p">,</span> <span class="n">changed</span><span class="p">],</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_apply_volume_evolution</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">volume</span><span class="p">,</span> <span class="n">final_volumes</span><span class="p">,</span> <span class="n">invalid</span><span class="p">,</span> <span class="n">changed</span><span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+<span class="w">    </span><span class="sd">"""Apply acquired prescribed volumes without public P1 validation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        particles: Acquired resident particle container.</span>
+<span class="sd">        gas: Acquired resident gas container.</span>
+<span class="sd">        final_volumes: Registry-pinned prescribed per-box volumes in m^3.</span>
+<span class="sd">        invalid: Registry-pinned volume validation status array.</span>
+<span class="sd">        changed: Registry-pinned volume-change status array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The exact ``(particles, gas)`` input containers.</span>
+<span class="sd">    """</span>
+    <span class="n">_enqueue_prepared_resident_volume_evolution</span><span class="p">(</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+        <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">final_volumes</span><span class="p">,</span>
+        <span class="n">invalid</span><span class="p">,</span>
+        <span class="n">changed</span><span class="p">,</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">particles</span><span class="p">,</span> <span class="n">gas</span>
 </code></pre></div></td></tr></table></div>
@@ -18641,13 +18693,7 @@ launches.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/communication.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
-<span class="normal">538</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">538</span>
 <span class="normal">539</span>
 <span class="normal">540</span>
 <span class="normal">541</span>
@@ -18862,7 +18908,13 @@ launches.</p>
 <span class="normal">750</span>
 <span class="normal">751</span>
 <span class="normal">752</span>
-<span class="normal">753</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">volume_evolution_step_gpu</span><span class="p">(</span>
+<span class="normal">753</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span>
+<span class="normal">759</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">volume_evolution_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">final_volumes</span><span class="p">:</span> <span class="nb">object</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Apply prescribed final volumes while preserving extensive inventories.</span>

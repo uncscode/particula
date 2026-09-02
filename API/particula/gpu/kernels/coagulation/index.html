@@ -4242,6 +4242,8 @@
       
         
       
+        
+      
     
     
     
@@ -4658,6 +4660,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../execution/resident_enqueue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_enqueue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../execution/resident_scheduler/" class="md-nav__link">
         
   
@@ -4873,10 +4903,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_22" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_21" id="__nav_2_3_19_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_22" id="__nav_2_3_19_22_label" tabindex="0">
             
   
   
@@ -4894,8 +4924,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_21">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_22">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16130,9 +16160,14 @@ Entry-point validation accepts scalar direct inputs, explicit
 <code>(n_boxes,)</code> Warp arrays, or a <code>WarpEnvironmentData</code> container. Particle
 metadata and device checks run before normalizing environment inputs, setting up
 volume, initializing RNG state, or executing Brownian work. An explicit opt-in
-finite-charge validation scan is available for Brownian callers; every mode
-containing charged hard-sphere physics or exact SP2016 sedimentation always
-validates finite charge before resource allocation or mutation. The kernels
+finite-charge validation scan is available for Brownian callers; every mode</p>
+<p>Modes containing charged hard-sphere physics or exact SP2016 sedimentation
+always validate finite charge before resource allocation or mutation. Private
+prepared calls freeze the selected mechanism and pinned arrays after legacy
+setup. Their enqueue performs retained device work only, with no validation,
+allocation, readback, transfer, synchronization, lookup, rebinding, or RNG
+initialization/reset. Rejection is pre-writer; rollback is not promised after a
+writer launches. The kernels
 operate on GPU-resident particle data and produce collision pairs that are
 applied in place: recipient particles receive donor mass and charge, while
 donor mass, concentration, and charge are cleared.</p>
@@ -16245,14 +16280,7 @@ and then cleared.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1343</span>
-<span class="normal">1344</span>
-<span class="normal">1345</span>
-<span class="normal">1346</span>
-<span class="normal">1347</span>
-<span class="normal">1348</span>
-<span class="normal">1349</span>
-<span class="normal">1350</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1350</span>
 <span class="normal">1351</span>
 <span class="normal">1352</span>
 <span class="normal">1353</span>
@@ -16314,7 +16342,14 @@ and then cleared.</p>
 <span class="normal">1409</span>
 <span class="normal">1410</span>
 <span class="normal">1411</span>
-<span class="normal">1412</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
+<span class="normal">1412</span>
+<span class="normal">1413</span>
+<span class="normal">1414</span>
+<span class="normal">1415</span>
+<span class="normal">1416</span>
+<span class="normal">1417</span>
+<span class="normal">1418</span>
+<span class="normal">1419</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
 <span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_coagulation_kernel</span><span class="p">(</span>
@@ -16678,14 +16713,7 @@ two-way, and four-way approved masks are executable.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 928</span>
-<span class="normal"> 929</span>
-<span class="normal"> 930</span>
-<span class="normal"> 931</span>
-<span class="normal"> 932</span>
-<span class="normal"> 933</span>
-<span class="normal"> 934</span>
-<span class="normal"> 935</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 935</span>
 <span class="normal"> 936</span>
 <span class="normal"> 937</span>
 <span class="normal"> 938</span>
@@ -17090,7 +17118,14 @@ two-way, and four-way approved masks are executable.</p>
 <span class="normal">1337</span>
 <span class="normal">1338</span>
 <span class="normal">1339</span>
-<span class="normal">1340</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
+<span class="normal">1340</span>
+<span class="normal">1341</span>
+<span class="normal">1342</span>
+<span class="normal">1343</span>
+<span class="normal">1344</span>
+<span class="normal">1345</span>
+<span class="normal">1346</span>
+<span class="normal">1347</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
 <span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">brownian_coagulation_kernel</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
@@ -17522,273 +17557,10 @@ two-way, and four-way approved masks are executable.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Execute one direct, particle-resolved Warp coagulation timestep.</p>
-<p>This low-level API is not a CPU strategy-composition or <code>Runnable</code> API.
-It supports only <code>"particle_resolved"</code> execution: omission selects
-Brownian; the executable singleton masks are <code>1</code>, <code>2</code>, <code>4</code>, and <code>8</code>;
-unordered two-way masks are <code>3</code>, <code>5</code>, <code>6</code>, <code>9</code>, <code>10</code>, and <code>12</code>;
-and the four-way mask is <code>15</code>. Supported mechanism tuples normalize to
-Brownian, charged hard-sphere, SP2016 sedimentation, and ST1956 turbulent
-shear. Mask <code>7</code> raises the stable deferred error at capability preflight,
-before particle metadata or enabled-term validation. Turbulent masks <code>11</code>,
-<code>13</code>, and <code>14</code> validate particle metadata and enabled terms before
-raising that error, without downstream work.
-<code>mechanism_config</code> is immutable, keyword-only host metadata and is
-structurally preflighted before any runtime input access, allocation,
-normalization, RNG work, or launch. Enabled fp64 pair-rate components are
-sanitized and summed. A component-majorant sum is safe but can be
-conservative because component maxima can occur on different pairs;
-production selection obtains the majorant by scanning the summed active-pair
-rates. Every approved mask uses one candidate stream, acceptance stream,
-collision-buffer set, RNG stream, and apply pass. Its active-pair work is
-O(A²), while
-collision and selector buffers are O(A), for active count A; this is bounded
-implementation scope, not a throughput or scaling claim. Malformed,
-duplicate, unknown, and unsupported-distribution combinations reject before
-particle state is accessed. A structurally valid turbulent-shear request
-reaches a later P2 boundary after particle metadata and device checks.
-Turbulent-shear-enabled executable masks normalize their explicit per-box
-inputs and calculate ST1956 rates. After particle metadata and device
-checks, direct temperature and pressure inputs are validated and normalized
-before volume setup or selector launches.
-<code>particles</code> and supplied <code>collision_pairs</code>, <code>n_collisions</code>,
-and <code>rng_states</code> are caller-owned same-device Warp resources; the step
-mutates them in place as applicable. The three-item return tuple contains
-no RNG state: supplied collision buffers are returned by identity, while
-<code>rng_states</code> remains caller-owned. Caller-owned RNG buffers are reset only
-when <code>initialize_rng=True</code> explicitly opts in.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>particles</code></b>
-              (<code><span title="typing.Any">Any</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>Caller-owned, Warp-resident particle data. All required Warp
-arrays, including <code>charge</code>, must be on the same device. <code>charge</code>
-must be <code>wp.float64</code> with shape <code>(n_boxes, n_particles)</code>.
-Charged-containing calls scan it for finite values before output
-validation or allocation, RNG setup, or selector/apply work.
-Exact SP2016 sedimentation calls scan mass and concentration for
-finite nonnegative values and density for finite positive values
-before time-step, environment, output-buffer, or RNG work.
-Accepted collisions mutate mass, concentration, and charge in place:
-recipient particles receive donor mass and charge, and donor mass,
-concentration, and charge are cleared.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>temperature</code></b>
-              (<code><span title="float">float</span> | <span title="typing.Any">Any</span> | None</code>)
-          –
-          <div class="doc-md-description">
-            <p>Direct gas temperature as either a scalar or a Warp array
-with shape <code>(n_boxes,)</code>. Use <code>None</code> only with
-<code>environment=...</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>pressure</code></b>
-              (<code><span title="float">float</span> | <span title="typing.Any">Any</span> | None</code>)
-          –
-          <div class="doc-md-description">
-            <p>Direct gas pressure as either a scalar or a Warp array with
-shape <code>(n_boxes,)</code>. Use <code>None</code> only with <code>environment=...</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>time_step</code></b>
-              (<code><span title="object">object</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>Coagulation time step in seconds.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>volume</code></b>
-              (<code><span title="float">float</span> | <span title="typing.Any">Any</span> | None</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Per-box volume [m^3]. If None, uses <code>particles.volume</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>max_collisions</code></b>
-              (<code><span title="object">object</span></code>, default:
-                  <code>256</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Maximum number of collisions per box.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>rng_seed</code></b>
-              (<code><span title="int">int</span></code>, default:
-                  <code>0</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Seed used whenever this call initializes Warp RNG states.
-This always applies to the omitted-<code>rng_states</code> convenience path.
-For caller-owned persistent buffers, the seed is only consumed when
-<code>initialize_rng=True</code> explicitly requests a reset.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>collision_pairs</code></b>
-              (<code><span title="typing.Any">Any</span> | None</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Optional caller-owned, same-device Warp collision
-output buffer. The buffer is written in place. When omitted, the
-function allocates a call-local convenience buffer for this call.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>n_collisions</code></b>
-              (<code><span title="typing.Any">Any</span> | None</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Optional caller-owned, same-device Warp per-box collision
-count output buffer. The buffer is written in place. When omitted,
-the function allocates a call-local convenience buffer for this
-call.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>rng_states</code></b>
-              (<code><span title="typing.Any">Any</span> | None</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Optional caller-owned, same-device Warp RNG state buffer.
-The buffer is mutated in place. When omitted, this function
-allocates a call-local same-device <code>(n_boxes,)</code> buffer, seeds it
-from <code>rng_seed</code>, and uses it only for the current call. When
-provided, the caller owns the persistent GPU-resident sidecar
-buffer and it is reused as-is across repeated calls unless
-<code>initialize_rng=True</code> explicitly requests a reset from
- <code>rng_seed</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>mechanism_config</code></b>
-              (<code><a class="autorefs autorefs-internal" title="            CoagulationMechanismConfig
-
-
-  
-      dataclass
-   (particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig)" href="../_coagulation_config/#particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig">CoagulationMechanismConfig</a> | None</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Optional immutable host-side
-<code>CoagulationMechanismConfig</code> imported from
-<code>particula.gpu.kernels.coagulation</code>; it is not re-exported by
-<code>particula.gpu.kernels</code>. This keyword-only configuration does not
-transfer, synchronize, or own Warp state. Omission selects
-Brownian, particle-resolved execution. The executable masks are
-<code>1</code>, <code>2</code>, <code>4</code>, <code>8</code>, <code>3</code>, <code>5</code>, <code>6</code>, <code>9</code>, <code>10</code>,
-<code>12</code>, and <code>15</code>. Malformed configurations, unsupported
-distributions, and unrecognized mechanism combinations fail before
-particle state is accessed or mutated. Deferred mask <code>7</code> rejects
-at capability preflight before particle metadata or enabled-term
-validation. Turbulent masks <code>11</code>, <code>13</code>, and <code>14</code> validate
-particle metadata and enabled terms before rejecting. A wrong type
-raises exactly
-<code>ValueError</code>
-with the message
-<code>"mechanism_config must be a CoagulationMechanismConfig."</code>;
-other errors are delegated to the resolver and capability gate.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>initialize_rng</code></b>
-              (<code><span title="bool">bool</span></code>, default:
-                  <code>False</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Explicit reset flag for caller-provided
-<code>rng_states</code>. The default <code>False</code> path validates the buffer and
-reuses its existing state without reseeding, even if <code>rng_seed</code>
-matches an earlier call. Set <code>True</code> to launch
-<code>_initialize_rng_states</code> after validation and reset the
-persistent buffer from <code>rng_seed</code>. This argument does not affect
-omitted <code>rng_states</code> convenience allocation, which always
-initializes the internal buffer for the current call.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>environment</code></b>
-              (<code><span title="typing.Any">Any</span> | None</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Optional <code>WarpEnvironmentData</code> with <code>(n_boxes,)</code>
-temperature and pressure arrays on the same device as <code>particles</code>.
-This mode is supported when both direct inputs are <code>None</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>validate_charge_finite</code></b>
-              (<code><span title="bool">bool</span></code>, default:
-                  <code>False</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>When True, explicitly scan charge on device and
-synchronize for host-visible rejection of NaN or infinity. The
-default False avoids per-step allocation, synchronization, and host
-readback for Brownian execution. Every charged-containing mode
-performs this scan before caller output or RNG mutation.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>turbulent_dissipation</code></b>
-              (<code><span title="float">float</span> | <span title="typing.Any">Any</span> | None</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Explicit turbulent kinetic-energy dissipation
-rate [m<sup>2/s</sup>3] for the turbulent-shear P2 boundary. For a
-structurally valid ST1956 turbulent request, accepts a positive
-finite Python or NumPy floating scalar, or a positive finite,
-active-device <code>wp.float64</code> Warp array with shape <code>(n_boxes,)</code>.
-Supplied arrays retain identity; scalar broadcasts use private
-helper-owned storage.
-This input is not inferred from shared containers and is ignored by
-non-turbulent masks.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>fluid_density</code></b>
-              (<code><span title="float">float</span> | <span title="typing.Any">Any</span> | None</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Explicit carrier-fluid density [kg/m^3] for the
-turbulent-shear P2 boundary. It has the same conditional scalar and
-active-device <code>wp.float64</code> <code>(n_boxes,)</code> Warp-array contract as
-<code>turbulent_dissipation</code>, is not inferred from shared containers,
-and is ignored by non-turbulent masks.</p>
-          </div>
-        </li>
-    </ul>
+        <p>Prepare and enqueue one direct particle-resolved coagulation step.</p>
+<p>This public wrapper preserves the direct API while keeping all validation,
+allocation, and optional RNG initialization in the private preparation
+phase. The enqueue phase uses only the resulting frozen call record.</p>
 
 
 <p><span class="doc-section-title">Returns:</span></p>
@@ -17797,676 +17569,70 @@ and is ignored by non-turbulent masks.</p>
               <code><span title="typing.Any">Any</span></code>
           –
           <div class="doc-md-description">
-            <p>Tuple containing <code>particles</code> after in-place coagulation, the</p>
+            <p>The particle container, collision-pair output, and per-box collision</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
               <code><span title="typing.Any">Any</span></code>
           –
           <div class="doc-md-description">
-            <p><code>collision_pairs</code> buffer for the step, and the <code>n_collisions</code></p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="typing.Any">Any</span></code>
-          –
-          <div class="doc-md-description">
-            <p>buffer with per-box accepted collision counts.</p>
+            <p>counts returned by the direct kernel.</p>
           </div>
         </li>
     </ul>
 
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If array shapes or devices mismatch expectations.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If direct <code>temperature</code> or <code>pressure</code> inputs are mixed
-with <code>environment</code>.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If direct inputs are missing when <code>environment</code> is
-omitted.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If environment arrays do not match <code>(n_boxes,)</code> or the
-caller device.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If mechanism_config has the wrong type, is malformed, or
-requests an unsupported distribution or unrecognized mechanism
-combination.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If an additive mechanism configuration is unsupported.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If a structurally valid turbulent-shear request omits
-either explicit turbulent input or supplies an input with an
-unsupported type, shape, device, <code>wp.float64</code> dtype, or value
-domain. Deferred turbulent three-way combinations reject after this
-P2 boundary.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If particle charge does not have shape
-<code>(n_boxes, n_particles)</code>, dtype <code>wp.float64</code>, or the particle
-device. Charged-containing and exact SP2016 sedimentation
-execution, and Brownian with <code>validate_charge_finite=True</code>, also
-raise for NaN or infinity.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If charged-containing masses or concentrations are
-non-finite or negative, species density is non-finite or
-nonpositive, or a box exceeds
-<code>MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX</code> active particles.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If SP2016 sedimentation masses or concentrations are
-non-finite or negative, positive concentrations differ within a
-box, species density is non-finite or nonpositive, or a box exceeds
-<code>MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX</code> active particles.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<details class="notes" open>
-  <summary>Notes</summary>
-  <p>Accepted environment sources are scalar direct inputs, direct
-<code>(n_boxes,)</code> Warp arrays, hybrid scalar-plus-Warp-array direct
-inputs, or keyword-only <code>environment=...</code> execution.</p>
-<p><code>mechanism_config</code>, <code>initialize_rng</code>, <code>environment</code>,
-<code>validate_charge_finite</code>, <code>turbulent_dissipation</code>, and
-<code>fluid_density</code> remain keyword-only so existing positional scalar
-callers stay source-compatible. Structural configuration preflight
-occurs before all runtime input access, allocation, normalization, RNG
-work, and launches. Deferred turbulent three-way masks validate their
-explicit P2 inputs after particle schema/device metadata, but cannot
-reach downstream simulation, selector, apply launches, allocation,
-normalization, RNG work, or caller-owned mutation. It does not make
-unrelated later validation failures atomic.</p>
-<p>Structurally valid turbulent-shear requests require explicit
-<code>turbulent_dissipation</code> and <code>fluid_density</code> only after structural
-configuration resolution and particle schema/device metadata validation.
-Deferred turbulent three-way combinations then reject before
-normalization, allocation, rate dispatch, sampling, majorant
-construction, RNG work, or mutation. Executable turbulent masks
-normalize both inputs and use their active-device values for ST1956
-execution. Non-turbulent masks do not inspect or validate either input.</p>
-<p>Validation runs before volume normalization, RNG setup, and Brownian or
-apply launches so invalid <code>time_step</code>, shape, dtype, or device
-combinations fail without mutating particle state or allocating
-downstream work. The normalized environment arrays are forwarded
-directly into the launch path.</p>
-<p>Charged-containing execution read-only-validates finite/nonnegative
-masses and concentrations, finite/positive density, its bounded active
-count, and finite charge before time-step or environment normalization.
-The active bound caps its exact compact-active O(A²) majorant at 32,640
-pairs per box. Brownian validates charge only with
-<code>validate_charge_finite=True</code> and otherwise avoids this scan,
-allocation, synchronization, and host readback.</p>
-<p>Exact SP2016 sedimentation read-only-validates finite charge,
-finite/nonnegative masses and concentrations, finite/positive density,
-compatible positive concentrations, and its bounded active count before
-time-step, environment, output, or RNG work. Its exact compact-active
-O(A²) majorant is capped at 32,640 pairs per box. Zero masses and
-concentrations remain valid inactive-slot state; this mode does not
-impose charged-only constraints.</p>
-<p>A successful call allocates private, call-local selector scratch,
-including a <code>wp.float64</code> <code>(n_boxes, n_particles)</code> total-mass array.
-Sedimentation-enabled masks allocate a separate zero-initialized
-settling-velocity array; non-sedimentation paths alias that storage to
-radii. The selector clears its own scratch slots and sums each active
-particle's species masses once for charged pair rates and their
-compact-active majorant. It derives radii for ST1956 turbulent-shear
-rates and populates settling velocities for valid active slots whenever
-sedimentation is enabled, including mixed masks.
-This scratch is not a caller-owned output, is not returned, and is
-allocated only after caller-resource preflight succeeds.</p>
-<p>Supported RNG setup cases are:</p>
-<ul>
-<li>Omitted <code>rng_states</code>: allocate a call-local internal buffer and
-  initialize it from <code>rng_seed</code> for this call.</li>
-<li>Provided <code>rng_states</code> with <code>initialize_rng=False</code>: validate the
-  caller-owned persistent buffer and reuse it without resetting.</li>
-<li>Provided <code>rng_states</code> with <code>initialize_rng=True</code>: validate the
-  caller-owned persistent buffer, then reset it from <code>rng_seed</code>.</li>
-<li>Validation failure: raise before RNG initialization or other Warp
-  launches mutate state.</li>
-</ul>
-<p>Reusing the same <code>rng_seed</code> alongside a persistent <code>rng_states</code>
-buffer does not reseed that buffer on later calls unless
-<code>initialize_rng=True</code> is passed. Initialize caller-owned buffers once
-before repeated timesteps, then reuse them without hidden per-step
-resets. Graph-capture support remains deferred.</p>
-<p>After a successful preflight, this is an in-place asynchronous Warp API.
-A device-launch or runtime failure has no rollback guarantee for
-particles, collision outputs, or RNG state. Callers must synchronize and
-check Warp errors, then restore or discard their own snapshots before
-retrying.</p>
-</details>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2102</span>
-<span class="normal">2103</span>
-<span class="normal">2104</span>
-<span class="normal">2105</span>
-<span class="normal">2106</span>
-<span class="normal">2107</span>
-<span class="normal">2108</span>
-<span class="normal">2109</span>
-<span class="normal">2110</span>
-<span class="normal">2111</span>
-<span class="normal">2112</span>
-<span class="normal">2113</span>
-<span class="normal">2114</span>
-<span class="normal">2115</span>
-<span class="normal">2116</span>
-<span class="normal">2117</span>
-<span class="normal">2118</span>
-<span class="normal">2119</span>
-<span class="normal">2120</span>
-<span class="normal">2121</span>
-<span class="normal">2122</span>
-<span class="normal">2123</span>
-<span class="normal">2124</span>
-<span class="normal">2125</span>
-<span class="normal">2126</span>
-<span class="normal">2127</span>
-<span class="normal">2128</span>
-<span class="normal">2129</span>
-<span class="normal">2130</span>
-<span class="normal">2131</span>
-<span class="normal">2132</span>
-<span class="normal">2133</span>
-<span class="normal">2134</span>
-<span class="normal">2135</span>
-<span class="normal">2136</span>
-<span class="normal">2137</span>
-<span class="normal">2138</span>
-<span class="normal">2139</span>
-<span class="normal">2140</span>
-<span class="normal">2141</span>
-<span class="normal">2142</span>
-<span class="normal">2143</span>
-<span class="normal">2144</span>
-<span class="normal">2145</span>
-<span class="normal">2146</span>
-<span class="normal">2147</span>
-<span class="normal">2148</span>
-<span class="normal">2149</span>
-<span class="normal">2150</span>
-<span class="normal">2151</span>
-<span class="normal">2152</span>
-<span class="normal">2153</span>
-<span class="normal">2154</span>
-<span class="normal">2155</span>
-<span class="normal">2156</span>
-<span class="normal">2157</span>
-<span class="normal">2158</span>
-<span class="normal">2159</span>
-<span class="normal">2160</span>
-<span class="normal">2161</span>
-<span class="normal">2162</span>
-<span class="normal">2163</span>
-<span class="normal">2164</span>
-<span class="normal">2165</span>
-<span class="normal">2166</span>
-<span class="normal">2167</span>
-<span class="normal">2168</span>
-<span class="normal">2169</span>
-<span class="normal">2170</span>
-<span class="normal">2171</span>
-<span class="normal">2172</span>
-<span class="normal">2173</span>
-<span class="normal">2174</span>
-<span class="normal">2175</span>
-<span class="normal">2176</span>
-<span class="normal">2177</span>
-<span class="normal">2178</span>
-<span class="normal">2179</span>
-<span class="normal">2180</span>
-<span class="normal">2181</span>
-<span class="normal">2182</span>
-<span class="normal">2183</span>
-<span class="normal">2184</span>
-<span class="normal">2185</span>
-<span class="normal">2186</span>
-<span class="normal">2187</span>
-<span class="normal">2188</span>
-<span class="normal">2189</span>
-<span class="normal">2190</span>
-<span class="normal">2191</span>
-<span class="normal">2192</span>
-<span class="normal">2193</span>
-<span class="normal">2194</span>
-<span class="normal">2195</span>
-<span class="normal">2196</span>
-<span class="normal">2197</span>
-<span class="normal">2198</span>
-<span class="normal">2199</span>
-<span class="normal">2200</span>
-<span class="normal">2201</span>
-<span class="normal">2202</span>
-<span class="normal">2203</span>
-<span class="normal">2204</span>
-<span class="normal">2205</span>
-<span class="normal">2206</span>
-<span class="normal">2207</span>
-<span class="normal">2208</span>
-<span class="normal">2209</span>
-<span class="normal">2210</span>
-<span class="normal">2211</span>
-<span class="normal">2212</span>
-<span class="normal">2213</span>
-<span class="normal">2214</span>
-<span class="normal">2215</span>
-<span class="normal">2216</span>
-<span class="normal">2217</span>
-<span class="normal">2218</span>
-<span class="normal">2219</span>
-<span class="normal">2220</span>
-<span class="normal">2221</span>
-<span class="normal">2222</span>
-<span class="normal">2223</span>
-<span class="normal">2224</span>
-<span class="normal">2225</span>
-<span class="normal">2226</span>
-<span class="normal">2227</span>
-<span class="normal">2228</span>
-<span class="normal">2229</span>
-<span class="normal">2230</span>
-<span class="normal">2231</span>
-<span class="normal">2232</span>
-<span class="normal">2233</span>
-<span class="normal">2234</span>
-<span class="normal">2235</span>
-<span class="normal">2236</span>
-<span class="normal">2237</span>
-<span class="normal">2238</span>
-<span class="normal">2239</span>
-<span class="normal">2240</span>
-<span class="normal">2241</span>
-<span class="normal">2242</span>
-<span class="normal">2243</span>
-<span class="normal">2244</span>
-<span class="normal">2245</span>
-<span class="normal">2246</span>
-<span class="normal">2247</span>
-<span class="normal">2248</span>
-<span class="normal">2249</span>
-<span class="normal">2250</span>
-<span class="normal">2251</span>
-<span class="normal">2252</span>
-<span class="normal">2253</span>
-<span class="normal">2254</span>
-<span class="normal">2255</span>
-<span class="normal">2256</span>
-<span class="normal">2257</span>
-<span class="normal">2258</span>
-<span class="normal">2259</span>
-<span class="normal">2260</span>
-<span class="normal">2261</span>
-<span class="normal">2262</span>
-<span class="normal">2263</span>
-<span class="normal">2264</span>
-<span class="normal">2265</span>
-<span class="normal">2266</span>
-<span class="normal">2267</span>
-<span class="normal">2268</span>
-<span class="normal">2269</span>
-<span class="normal">2270</span>
-<span class="normal">2271</span>
-<span class="normal">2272</span>
-<span class="normal">2273</span>
-<span class="normal">2274</span>
-<span class="normal">2275</span>
-<span class="normal">2276</span>
-<span class="normal">2277</span>
-<span class="normal">2278</span>
-<span class="normal">2279</span>
-<span class="normal">2280</span>
-<span class="normal">2281</span>
-<span class="normal">2282</span>
-<span class="normal">2283</span>
-<span class="normal">2284</span>
-<span class="normal">2285</span>
-<span class="normal">2286</span>
-<span class="normal">2287</span>
-<span class="normal">2288</span>
-<span class="normal">2289</span>
-<span class="normal">2290</span>
-<span class="normal">2291</span>
-<span class="normal">2292</span>
-<span class="normal">2293</span>
-<span class="normal">2294</span>
-<span class="normal">2295</span>
-<span class="normal">2296</span>
-<span class="normal">2297</span>
-<span class="normal">2298</span>
-<span class="normal">2299</span>
-<span class="normal">2300</span>
-<span class="normal">2301</span>
-<span class="normal">2302</span>
-<span class="normal">2303</span>
-<span class="normal">2304</span>
-<span class="normal">2305</span>
-<span class="normal">2306</span>
-<span class="normal">2307</span>
-<span class="normal">2308</span>
-<span class="normal">2309</span>
-<span class="normal">2310</span>
-<span class="normal">2311</span>
-<span class="normal">2312</span>
-<span class="normal">2313</span>
-<span class="normal">2314</span>
-<span class="normal">2315</span>
-<span class="normal">2316</span>
-<span class="normal">2317</span>
-<span class="normal">2318</span>
-<span class="normal">2319</span>
-<span class="normal">2320</span>
-<span class="normal">2321</span>
-<span class="normal">2322</span>
-<span class="normal">2323</span>
-<span class="normal">2324</span>
-<span class="normal">2325</span>
-<span class="normal">2326</span>
-<span class="normal">2327</span>
-<span class="normal">2328</span>
-<span class="normal">2329</span>
-<span class="normal">2330</span>
-<span class="normal">2331</span>
-<span class="normal">2332</span>
-<span class="normal">2333</span>
-<span class="normal">2334</span>
-<span class="normal">2335</span>
-<span class="normal">2336</span>
-<span class="normal">2337</span>
-<span class="normal">2338</span>
-<span class="normal">2339</span>
-<span class="normal">2340</span>
-<span class="normal">2341</span>
-<span class="normal">2342</span>
-<span class="normal">2343</span>
-<span class="normal">2344</span>
-<span class="normal">2345</span>
-<span class="normal">2346</span>
-<span class="normal">2347</span>
-<span class="normal">2348</span>
-<span class="normal">2349</span>
-<span class="normal">2350</span>
-<span class="normal">2351</span>
-<span class="normal">2352</span>
-<span class="normal">2353</span>
-<span class="normal">2354</span>
-<span class="normal">2355</span>
-<span class="normal">2356</span>
-<span class="normal">2357</span>
-<span class="normal">2358</span>
-<span class="normal">2359</span>
-<span class="normal">2360</span>
-<span class="normal">2361</span>
-<span class="normal">2362</span>
-<span class="normal">2363</span>
-<span class="normal">2364</span>
-<span class="normal">2365</span>
-<span class="normal">2366</span>
-<span class="normal">2367</span>
-<span class="normal">2368</span>
-<span class="normal">2369</span>
-<span class="normal">2370</span>
-<span class="normal">2371</span>
-<span class="normal">2372</span>
-<span class="normal">2373</span>
-<span class="normal">2374</span>
-<span class="normal">2375</span>
-<span class="normal">2376</span>
-<span class="normal">2377</span>
-<span class="normal">2378</span>
-<span class="normal">2379</span>
-<span class="normal">2380</span>
-<span class="normal">2381</span>
-<span class="normal">2382</span>
-<span class="normal">2383</span>
-<span class="normal">2384</span>
-<span class="normal">2385</span>
-<span class="normal">2386</span>
-<span class="normal">2387</span>
-<span class="normal">2388</span>
-<span class="normal">2389</span>
-<span class="normal">2390</span>
-<span class="normal">2391</span>
-<span class="normal">2392</span>
-<span class="normal">2393</span>
-<span class="normal">2394</span>
-<span class="normal">2395</span>
-<span class="normal">2396</span>
-<span class="normal">2397</span>
-<span class="normal">2398</span>
-<span class="normal">2399</span>
-<span class="normal">2400</span>
-<span class="normal">2401</span>
-<span class="normal">2402</span>
-<span class="normal">2403</span>
-<span class="normal">2404</span>
-<span class="normal">2405</span>
-<span class="normal">2406</span>
-<span class="normal">2407</span>
-<span class="normal">2408</span>
-<span class="normal">2409</span>
-<span class="normal">2410</span>
-<span class="normal">2411</span>
-<span class="normal">2412</span>
-<span class="normal">2413</span>
-<span class="normal">2414</span>
-<span class="normal">2415</span>
-<span class="normal">2416</span>
-<span class="normal">2417</span>
-<span class="normal">2418</span>
-<span class="normal">2419</span>
-<span class="normal">2420</span>
-<span class="normal">2421</span>
-<span class="normal">2422</span>
-<span class="normal">2423</span>
-<span class="normal">2424</span>
-<span class="normal">2425</span>
-<span class="normal">2426</span>
-<span class="normal">2427</span>
-<span class="normal">2428</span>
-<span class="normal">2429</span>
-<span class="normal">2430</span>
-<span class="normal">2431</span>
-<span class="normal">2432</span>
-<span class="normal">2433</span>
-<span class="normal">2434</span>
-<span class="normal">2435</span>
-<span class="normal">2436</span>
-<span class="normal">2437</span>
-<span class="normal">2438</span>
-<span class="normal">2439</span>
-<span class="normal">2440</span>
-<span class="normal">2441</span>
-<span class="normal">2442</span>
-<span class="normal">2443</span>
-<span class="normal">2444</span>
-<span class="normal">2445</span>
-<span class="normal">2446</span>
-<span class="normal">2447</span>
-<span class="normal">2448</span>
-<span class="normal">2449</span>
-<span class="normal">2450</span>
-<span class="normal">2451</span>
-<span class="normal">2452</span>
-<span class="normal">2453</span>
-<span class="normal">2454</span>
-<span class="normal">2455</span>
-<span class="normal">2456</span>
-<span class="normal">2457</span>
-<span class="normal">2458</span>
-<span class="normal">2459</span>
-<span class="normal">2460</span>
-<span class="normal">2461</span>
-<span class="normal">2462</span>
-<span class="normal">2463</span>
-<span class="normal">2464</span>
-<span class="normal">2465</span>
-<span class="normal">2466</span>
-<span class="normal">2467</span>
-<span class="normal">2468</span>
-<span class="normal">2469</span>
-<span class="normal">2470</span>
-<span class="normal">2471</span>
-<span class="normal">2472</span>
-<span class="normal">2473</span>
-<span class="normal">2474</span>
-<span class="normal">2475</span>
-<span class="normal">2476</span>
-<span class="normal">2477</span>
-<span class="normal">2478</span>
-<span class="normal">2479</span>
-<span class="normal">2480</span>
-<span class="normal">2481</span>
-<span class="normal">2482</span>
-<span class="normal">2483</span>
-<span class="normal">2484</span>
-<span class="normal">2485</span>
-<span class="normal">2486</span>
-<span class="normal">2487</span>
-<span class="normal">2488</span>
-<span class="normal">2489</span>
-<span class="normal">2490</span>
-<span class="normal">2491</span>
-<span class="normal">2492</span>
-<span class="normal">2493</span>
-<span class="normal">2494</span>
-<span class="normal">2495</span>
-<span class="normal">2496</span>
-<span class="normal">2497</span>
-<span class="normal">2498</span>
-<span class="normal">2499</span>
-<span class="normal">2500</span>
-<span class="normal">2501</span>
-<span class="normal">2502</span>
-<span class="normal">2503</span>
-<span class="normal">2504</span>
-<span class="normal">2505</span>
-<span class="normal">2506</span>
-<span class="normal">2507</span>
-<span class="normal">2508</span>
-<span class="normal">2509</span>
-<span class="normal">2510</span>
-<span class="normal">2511</span>
-<span class="normal">2512</span>
-<span class="normal">2513</span>
-<span class="normal">2514</span>
-<span class="normal">2515</span>
-<span class="normal">2516</span>
-<span class="normal">2517</span>
-<span class="normal">2518</span>
-<span class="normal">2519</span>
-<span class="normal">2520</span>
-<span class="normal">2521</span>
-<span class="normal">2522</span>
-<span class="normal">2523</span>
-<span class="normal">2524</span>
-<span class="normal">2525</span>
-<span class="normal">2526</span>
-<span class="normal">2527</span>
-<span class="normal">2528</span>
-<span class="normal">2529</span>
-<span class="normal">2530</span>
-<span class="normal">2531</span>
-<span class="normal">2532</span>
-<span class="normal">2533</span>
-<span class="normal">2534</span>
-<span class="normal">2535</span>
-<span class="normal">2536</span>
-<span class="normal">2537</span>
-<span class="normal">2538</span>
-<span class="normal">2539</span>
-<span class="normal">2540</span>
-<span class="normal">2541</span>
-<span class="normal">2542</span>
-<span class="normal">2543</span>
-<span class="normal">2544</span>
-<span class="normal">2545</span>
-<span class="normal">2546</span>
-<span class="normal">2547</span>
-<span class="normal">2548</span>
-<span class="normal">2549</span>
-<span class="normal">2550</span>
-<span class="normal">2551</span>
-<span class="normal">2552</span>
-<span class="normal">2553</span>
-<span class="normal">2554</span>
-<span class="normal">2555</span>
-<span class="normal">2556</span>
-<span class="normal">2557</span>
-<span class="normal">2558</span>
-<span class="normal">2559</span>
-<span class="normal">2560</span>
-<span class="normal">2561</span>
-<span class="normal">2562</span>
-<span class="normal">2563</span>
-<span class="normal">2564</span>
-<span class="normal">2565</span>
-<span class="normal">2566</span>
-<span class="normal">2567</span>
-<span class="normal">2568</span>
-<span class="normal">2569</span>
-<span class="normal">2570</span>
-<span class="normal">2571</span>
-<span class="normal">2572</span>
-<span class="normal">2573</span>
-<span class="normal">2574</span>
-<span class="normal">2575</span>
-<span class="normal">2576</span>
-<span class="normal">2577</span>
-<span class="normal">2578</span>
-<span class="normal">2579</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coagulation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2655</span>
+<span class="normal">2656</span>
+<span class="normal">2657</span>
+<span class="normal">2658</span>
+<span class="normal">2659</span>
+<span class="normal">2660</span>
+<span class="normal">2661</span>
+<span class="normal">2662</span>
+<span class="normal">2663</span>
+<span class="normal">2664</span>
+<span class="normal">2665</span>
+<span class="normal">2666</span>
+<span class="normal">2667</span>
+<span class="normal">2668</span>
+<span class="normal">2669</span>
+<span class="normal">2670</span>
+<span class="normal">2671</span>
+<span class="normal">2672</span>
+<span class="normal">2673</span>
+<span class="normal">2674</span>
+<span class="normal">2675</span>
+<span class="normal">2676</span>
+<span class="normal">2677</span>
+<span class="normal">2678</span>
+<span class="normal">2679</span>
+<span class="normal">2680</span>
+<span class="normal">2681</span>
+<span class="normal">2682</span>
+<span class="normal">2683</span>
+<span class="normal">2684</span>
+<span class="normal">2685</span>
+<span class="normal">2686</span>
+<span class="normal">2687</span>
+<span class="normal">2688</span>
+<span class="normal">2689</span>
+<span class="normal">2690</span>
+<span class="normal">2691</span>
+<span class="normal">2692</span>
+<span class="normal">2693</span>
+<span class="normal">2694</span>
+<span class="normal">2695</span>
+<span class="normal">2696</span>
+<span class="normal">2697</span>
+<span class="normal">2698</span>
+<span class="normal">2699</span>
+<span class="normal">2700</span>
+<span class="normal">2701</span>
+<span class="normal">2702</span>
+<span class="normal">2703</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coagulation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -18485,465 +17651,36 @@ retrying.</p>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""Execute one direct, particle-resolved Warp coagulation timestep.</span>
+<span class="w">    </span><span class="sd">"""Prepare and enqueue one direct particle-resolved coagulation step.</span>
 
-<span class="sd">    This low-level API is not a CPU strategy-composition or ``Runnable`` API.</span>
-<span class="sd">    It supports only ``"particle_resolved"`` execution: omission selects</span>
-<span class="sd">    Brownian; the executable singleton masks are ``1``, ``2``, ``4``, and ``8``;</span>
-<span class="sd">    unordered two-way masks are ``3``, ``5``, ``6``, ``9``, ``10``, and ``12``;</span>
-<span class="sd">    and the four-way mask is ``15``. Supported mechanism tuples normalize to</span>
-<span class="sd">    Brownian, charged hard-sphere, SP2016 sedimentation, and ST1956 turbulent</span>
-<span class="sd">    shear. Mask ``7`` raises the stable deferred error at capability preflight,</span>
-<span class="sd">    before particle metadata or enabled-term validation. Turbulent masks ``11``,</span>
-<span class="sd">    ``13``, and ``14`` validate particle metadata and enabled terms before</span>
-<span class="sd">    raising that error, without downstream work.</span>
-<span class="sd">    ``mechanism_config`` is immutable, keyword-only host metadata and is</span>
-<span class="sd">    structurally preflighted before any runtime input access, allocation,</span>
-<span class="sd">    normalization, RNG work, or launch. Enabled fp64 pair-rate components are</span>
-<span class="sd">    sanitized and summed. A component-majorant sum is safe but can be</span>
-<span class="sd">    conservative because component maxima can occur on different pairs;</span>
-<span class="sd">    production selection obtains the majorant by scanning the summed active-pair</span>
-<span class="sd">    rates. Every approved mask uses one candidate stream, acceptance stream,</span>
-<span class="sd">    collision-buffer set, RNG stream, and apply pass. Its active-pair work is</span>
-<span class="sd">    O(A²), while</span>
-<span class="sd">    collision and selector buffers are O(A), for active count A; this is bounded</span>
-<span class="sd">    implementation scope, not a throughput or scaling claim. Malformed,</span>
-<span class="sd">    duplicate, unknown, and unsupported-distribution combinations reject before</span>
-<span class="sd">    particle state is accessed. A structurally valid turbulent-shear request</span>
-<span class="sd">    reaches a later P2 boundary after particle metadata and device checks.</span>
-<span class="sd">    Turbulent-shear-enabled executable masks normalize their explicit per-box</span>
-<span class="sd">    inputs and calculate ST1956 rates. After particle metadata and device</span>
-<span class="sd">    checks, direct temperature and pressure inputs are validated and normalized</span>
-<span class="sd">    before volume setup or selector launches.</span>
-<span class="sd">    ``particles`` and supplied ``collision_pairs``, ``n_collisions``,</span>
-<span class="sd">    and ``rng_states`` are caller-owned same-device Warp resources; the step</span>
-<span class="sd">    mutates them in place as applicable. The three-item return tuple contains</span>
-<span class="sd">    no RNG state: supplied collision buffers are returned by identity, while</span>
-<span class="sd">    ``rng_states`` remains caller-owned. Caller-owned RNG buffers are reset only</span>
-<span class="sd">    when ``initialize_rng=True`` explicitly opts in.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        particles: Caller-owned, Warp-resident particle data. All required Warp</span>
-<span class="sd">            arrays, including ``charge``, must be on the same device. ``charge``</span>
-<span class="sd">            must be ``wp.float64`` with shape ``(n_boxes, n_particles)``.</span>
-<span class="sd">            Charged-containing calls scan it for finite values before output</span>
-<span class="sd">            validation or allocation, RNG setup, or selector/apply work.</span>
-<span class="sd">            Exact SP2016 sedimentation calls scan mass and concentration for</span>
-<span class="sd">            finite nonnegative values and density for finite positive values</span>
-<span class="sd">            before time-step, environment, output-buffer, or RNG work.</span>
-<span class="sd">            Accepted collisions mutate mass, concentration, and charge in place:</span>
-<span class="sd">            recipient particles receive donor mass and charge, and donor mass,</span>
-<span class="sd">            concentration, and charge are cleared.</span>
-<span class="sd">        temperature: Direct gas temperature as either a scalar or a Warp array</span>
-<span class="sd">            with shape ``(n_boxes,)``. Use ``None`` only with</span>
-<span class="sd">            ``environment=...``.</span>
-<span class="sd">        pressure: Direct gas pressure as either a scalar or a Warp array with</span>
-<span class="sd">            shape ``(n_boxes,)``. Use ``None`` only with ``environment=...``.</span>
-<span class="sd">        time_step: Coagulation time step in seconds.</span>
-<span class="sd">        volume: Per-box volume [m^3]. If None, uses ``particles.volume``.</span>
-<span class="sd">        max_collisions: Maximum number of collisions per box.</span>
-<span class="sd">        rng_seed: Seed used whenever this call initializes Warp RNG states.</span>
-<span class="sd">            This always applies to the omitted-``rng_states`` convenience path.</span>
-<span class="sd">            For caller-owned persistent buffers, the seed is only consumed when</span>
-<span class="sd">            ``initialize_rng=True`` explicitly requests a reset.</span>
-<span class="sd">        collision_pairs: Optional caller-owned, same-device Warp collision</span>
-<span class="sd">            output buffer. The buffer is written in place. When omitted, the</span>
-<span class="sd">            function allocates a call-local convenience buffer for this call.</span>
-<span class="sd">        n_collisions: Optional caller-owned, same-device Warp per-box collision</span>
-<span class="sd">            count output buffer. The buffer is written in place. When omitted,</span>
-<span class="sd">            the function allocates a call-local convenience buffer for this</span>
-<span class="sd">            call.</span>
-<span class="sd">        rng_states: Optional caller-owned, same-device Warp RNG state buffer.</span>
-<span class="sd">            The buffer is mutated in place. When omitted, this function</span>
-<span class="sd">            allocates a call-local same-device ``(n_boxes,)`` buffer, seeds it</span>
-<span class="sd">            from ``rng_seed``, and uses it only for the current call. When</span>
-<span class="sd">            provided, the caller owns the persistent GPU-resident sidecar</span>
-<span class="sd">            buffer and it is reused as-is across repeated calls unless</span>
-<span class="sd">            ``initialize_rng=True`` explicitly requests a reset from</span>
-<span class="sd">             ``rng_seed``.</span>
-<span class="sd">        mechanism_config: Optional immutable host-side</span>
-<span class="sd">            ``CoagulationMechanismConfig`` imported from</span>
-<span class="sd">            ``particula.gpu.kernels.coagulation``; it is not re-exported by</span>
-<span class="sd">            ``particula.gpu.kernels``. This keyword-only configuration does not</span>
-<span class="sd">            transfer, synchronize, or own Warp state. Omission selects</span>
-<span class="sd">            Brownian, particle-resolved execution. The executable masks are</span>
-<span class="sd">            ``1``, ``2``, ``4``, ``8``, ``3``, ``5``, ``6``, ``9``, ``10``,</span>
-<span class="sd">            ``12``, and ``15``. Malformed configurations, unsupported</span>
-<span class="sd">            distributions, and unrecognized mechanism combinations fail before</span>
-<span class="sd">            particle state is accessed or mutated. Deferred mask ``7`` rejects</span>
-<span class="sd">            at capability preflight before particle metadata or enabled-term</span>
-<span class="sd">            validation. Turbulent masks ``11``, ``13``, and ``14`` validate</span>
-<span class="sd">            particle metadata and enabled terms before rejecting. A wrong type</span>
-<span class="sd">            raises exactly</span>
-<span class="sd">            ``ValueError``</span>
-<span class="sd">            with the message</span>
-<span class="sd">            ``"mechanism_config must be a CoagulationMechanismConfig."``;</span>
-<span class="sd">            other errors are delegated to the resolver and capability gate.</span>
-<span class="sd">        initialize_rng: Explicit reset flag for caller-provided</span>
-<span class="sd">            ``rng_states``. The default ``False`` path validates the buffer and</span>
-<span class="sd">            reuses its existing state without reseeding, even if ``rng_seed``</span>
-<span class="sd">            matches an earlier call. Set ``True`` to launch</span>
-<span class="sd">            ``_initialize_rng_states`` after validation and reset the</span>
-<span class="sd">            persistent buffer from ``rng_seed``. This argument does not affect</span>
-<span class="sd">            omitted ``rng_states`` convenience allocation, which always</span>
-<span class="sd">            initializes the internal buffer for the current call.</span>
-<span class="sd">        environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``</span>
-<span class="sd">            temperature and pressure arrays on the same device as ``particles``.</span>
-<span class="sd">            This mode is supported when both direct inputs are ``None``.</span>
-<span class="sd">        validate_charge_finite: When True, explicitly scan charge on device and</span>
-<span class="sd">            synchronize for host-visible rejection of NaN or infinity. The</span>
-<span class="sd">            default False avoids per-step allocation, synchronization, and host</span>
-<span class="sd">            readback for Brownian execution. Every charged-containing mode</span>
-<span class="sd">            performs this scan before caller output or RNG mutation.</span>
-<span class="sd">        turbulent_dissipation: Explicit turbulent kinetic-energy dissipation</span>
-<span class="sd">            rate [m^2/s^3] for the turbulent-shear P2 boundary. For a</span>
-<span class="sd">            structurally valid ST1956 turbulent request, accepts a positive</span>
-<span class="sd">            finite Python or NumPy floating scalar, or a positive finite,</span>
-<span class="sd">            active-device ``wp.float64`` Warp array with shape ``(n_boxes,)``.</span>
-<span class="sd">            Supplied arrays retain identity; scalar broadcasts use private</span>
-<span class="sd">            helper-owned storage.</span>
-<span class="sd">            This input is not inferred from shared containers and is ignored by</span>
-<span class="sd">            non-turbulent masks.</span>
-<span class="sd">        fluid_density: Explicit carrier-fluid density [kg/m^3] for the</span>
-<span class="sd">            turbulent-shear P2 boundary. It has the same conditional scalar and</span>
-<span class="sd">            active-device ``wp.float64`` ``(n_boxes,)`` Warp-array contract as</span>
-<span class="sd">            ``turbulent_dissipation``, is not inferred from shared containers,</span>
-<span class="sd">            and is ignored by non-turbulent masks.</span>
+<span class="sd">    This public wrapper preserves the direct API while keeping all validation,</span>
+<span class="sd">    allocation, and optional RNG initialization in the private preparation</span>
+<span class="sd">    phase. The enqueue phase uses only the resulting frozen call record.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tuple containing ``particles`` after in-place coagulation, the</span>
-<span class="sd">        ``collision_pairs`` buffer for the step, and the ``n_collisions``</span>
-<span class="sd">        buffer with per-box accepted collision counts.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If array shapes or devices mismatch expectations.</span>
-<span class="sd">        ValueError: If direct ``temperature`` or ``pressure`` inputs are mixed</span>
-<span class="sd">            with ``environment``.</span>
-<span class="sd">        ValueError: If direct inputs are missing when ``environment`` is</span>
-<span class="sd">            omitted.</span>
-<span class="sd">        ValueError: If environment arrays do not match ``(n_boxes,)`` or the</span>
-<span class="sd">            caller device.</span>
-<span class="sd">        ValueError: If mechanism_config has the wrong type, is malformed, or</span>
-<span class="sd">            requests an unsupported distribution or unrecognized mechanism</span>
-<span class="sd">            combination.</span>
-<span class="sd">        ValueError: If an additive mechanism configuration is unsupported.</span>
-<span class="sd">        ValueError: If a structurally valid turbulent-shear request omits</span>
-<span class="sd">            either explicit turbulent input or supplies an input with an</span>
-<span class="sd">            unsupported type, shape, device, ``wp.float64`` dtype, or value</span>
-<span class="sd">            domain. Deferred turbulent three-way combinations reject after this</span>
-<span class="sd">            P2 boundary.</span>
-<span class="sd">        ValueError: If particle charge does not have shape</span>
-<span class="sd">            ``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle</span>
-<span class="sd">            device. Charged-containing and exact SP2016 sedimentation</span>
-<span class="sd">            execution, and Brownian with ``validate_charge_finite=True``, also</span>
-<span class="sd">            raise for NaN or infinity.</span>
-<span class="sd">        ValueError: If charged-containing masses or concentrations are</span>
-<span class="sd">            non-finite or negative, species density is non-finite or</span>
-<span class="sd">            nonpositive, or a box exceeds</span>
-<span class="sd">            ``MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX`` active particles.</span>
-<span class="sd">        ValueError: If SP2016 sedimentation masses or concentrations are</span>
-<span class="sd">            non-finite or negative, positive concentrations differ within a</span>
-<span class="sd">            box, species density is non-finite or nonpositive, or a box exceeds</span>
-<span class="sd">            ``MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX`` active particles.</span>
-
-<span class="sd">    Notes:</span>
-<span class="sd">        Accepted environment sources are scalar direct inputs, direct</span>
-<span class="sd">        ``(n_boxes,)`` Warp arrays, hybrid scalar-plus-Warp-array direct</span>
-<span class="sd">        inputs, or keyword-only ``environment=...`` execution.</span>
-
-<span class="sd">        ``mechanism_config``, ``initialize_rng``, ``environment``,</span>
-<span class="sd">        ``validate_charge_finite``, ``turbulent_dissipation``, and</span>
-<span class="sd">        ``fluid_density`` remain keyword-only so existing positional scalar</span>
-<span class="sd">        callers stay source-compatible. Structural configuration preflight</span>
-<span class="sd">        occurs before all runtime input access, allocation, normalization, RNG</span>
-<span class="sd">        work, and launches. Deferred turbulent three-way masks validate their</span>
-<span class="sd">        explicit P2 inputs after particle schema/device metadata, but cannot</span>
-<span class="sd">        reach downstream simulation, selector, apply launches, allocation,</span>
-<span class="sd">        normalization, RNG work, or caller-owned mutation. It does not make</span>
-<span class="sd">        unrelated later validation failures atomic.</span>
-
-<span class="sd">        Structurally valid turbulent-shear requests require explicit</span>
-<span class="sd">        ``turbulent_dissipation`` and ``fluid_density`` only after structural</span>
-<span class="sd">        configuration resolution and particle schema/device metadata validation.</span>
-<span class="sd">        Deferred turbulent three-way combinations then reject before</span>
-<span class="sd">        normalization, allocation, rate dispatch, sampling, majorant</span>
-<span class="sd">        construction, RNG work, or mutation. Executable turbulent masks</span>
-<span class="sd">        normalize both inputs and use their active-device values for ST1956</span>
-<span class="sd">        execution. Non-turbulent masks do not inspect or validate either input.</span>
-
-<span class="sd">        Validation runs before volume normalization, RNG setup, and Brownian or</span>
-<span class="sd">        apply launches so invalid ``time_step``, shape, dtype, or device</span>
-<span class="sd">        combinations fail without mutating particle state or allocating</span>
-<span class="sd">        downstream work. The normalized environment arrays are forwarded</span>
-<span class="sd">        directly into the launch path.</span>
-
-<span class="sd">        Charged-containing execution read-only-validates finite/nonnegative</span>
-<span class="sd">        masses and concentrations, finite/positive density, its bounded active</span>
-<span class="sd">        count, and finite charge before time-step or environment normalization.</span>
-<span class="sd">        The active bound caps its exact compact-active O(A²) majorant at 32,640</span>
-<span class="sd">        pairs per box. Brownian validates charge only with</span>
-<span class="sd">        ``validate_charge_finite=True`` and otherwise avoids this scan,</span>
-<span class="sd">        allocation, synchronization, and host readback.</span>
-
-<span class="sd">        Exact SP2016 sedimentation read-only-validates finite charge,</span>
-<span class="sd">        finite/nonnegative masses and concentrations, finite/positive density,</span>
-<span class="sd">        compatible positive concentrations, and its bounded active count before</span>
-<span class="sd">        time-step, environment, output, or RNG work. Its exact compact-active</span>
-<span class="sd">        O(A²) majorant is capped at 32,640 pairs per box. Zero masses and</span>
-<span class="sd">        concentrations remain valid inactive-slot state; this mode does not</span>
-<span class="sd">        impose charged-only constraints.</span>
-
-<span class="sd">        A successful call allocates private, call-local selector scratch,</span>
-<span class="sd">        including a ``wp.float64`` ``(n_boxes, n_particles)`` total-mass array.</span>
-<span class="sd">        Sedimentation-enabled masks allocate a separate zero-initialized</span>
-<span class="sd">        settling-velocity array; non-sedimentation paths alias that storage to</span>
-<span class="sd">        radii. The selector clears its own scratch slots and sums each active</span>
-<span class="sd">        particle's species masses once for charged pair rates and their</span>
-<span class="sd">        compact-active majorant. It derives radii for ST1956 turbulent-shear</span>
-<span class="sd">        rates and populates settling velocities for valid active slots whenever</span>
-<span class="sd">        sedimentation is enabled, including mixed masks.</span>
-<span class="sd">        This scratch is not a caller-owned output, is not returned, and is</span>
-<span class="sd">        allocated only after caller-resource preflight succeeds.</span>
-
-<span class="sd">        Supported RNG setup cases are:</span>
-
-<span class="sd">        - Omitted ``rng_states``: allocate a call-local internal buffer and</span>
-<span class="sd">          initialize it from ``rng_seed`` for this call.</span>
-<span class="sd">        - Provided ``rng_states`` with ``initialize_rng=False``: validate the</span>
-<span class="sd">          caller-owned persistent buffer and reuse it without resetting.</span>
-<span class="sd">        - Provided ``rng_states`` with ``initialize_rng=True``: validate the</span>
-<span class="sd">          caller-owned persistent buffer, then reset it from ``rng_seed``.</span>
-<span class="sd">        - Validation failure: raise before RNG initialization or other Warp</span>
-<span class="sd">          launches mutate state.</span>
-
-<span class="sd">        Reusing the same ``rng_seed`` alongside a persistent ``rng_states``</span>
-<span class="sd">        buffer does not reseed that buffer on later calls unless</span>
-<span class="sd">        ``initialize_rng=True`` is passed. Initialize caller-owned buffers once</span>
-<span class="sd">        before repeated timesteps, then reuse them without hidden per-step</span>
-<span class="sd">        resets. Graph-capture support remains deferred.</span>
-
-<span class="sd">        After a successful preflight, this is an in-place asynchronous Warp API.</span>
-<span class="sd">        A device-launch or runtime failure has no rollback guarantee for</span>
-<span class="sd">        particles, collision outputs, or RNG state. Callers must synchronize and</span>
-<span class="sd">        check Warp errors, then restore or discard their own snapshots before</span>
-<span class="sd">        retrying.</span>
+<span class="sd">        The particle container, collision-pair output, and per-box collision</span>
+<span class="sd">        counts returned by the direct kernel.</span>
 <span class="sd">    """</span>
-    <span class="k">if</span> <span class="n">mechanism_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">mechanism_config</span> <span class="o">=</span> <span class="n">CoagulationMechanismConfig</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mechanism_config</span><span class="p">,</span> <span class="n">CoagulationMechanismConfig</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"mechanism_config must be a CoagulationMechanismConfig."</span>
-        <span class="p">)</span>
-    <span class="n">resolved_mechanism_config</span> <span class="o">=</span> <span class="n">resolve_coagulation_mechanism_config</span><span class="p">(</span>
-        <span class="n">mechanism_config</span>
-    <span class="p">)</span>
-    <span class="n">turbulent_requested</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span>
-        <span class="n">resolved_mechanism_config</span><span class="o">.</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">TURBULENT_SHEAR_ST1956_MECHANISM_FLAG</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">turbulent_requested</span><span class="p">:</span>
-        <span class="n">validate_coagulation_mechanism_capabilities</span><span class="p">(</span><span class="n">resolved_mechanism_config</span><span class="p">)</span>
-
-    <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">_validate_particle_arrays</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)</span>
-
-    <span class="n">device</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">device</span>
-    <span class="n">_validate_device_arrays</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-    <span class="n">_preflight_enabled_coagulation_terms</span><span class="p">(</span>
-        <span class="n">resolved_mechanism_config</span><span class="p">,</span>
-        <span class="n">particles</span><span class="p">,</span>
-        <span class="n">n_boxes</span><span class="p">,</span>
-        <span class="n">n_particles</span><span class="p">,</span>
-        <span class="n">device</span><span class="p">,</span>
-        <span class="n">turbulent_dissipation</span><span class="p">,</span>
-        <span class="n">fluid_density</span><span class="p">,</span>
-        <span class="n">validate_charge_finite</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">turbulent_requested</span><span class="p">:</span>
-        <span class="n">validate_coagulation_mechanism_capabilities</span><span class="p">(</span><span class="n">resolved_mechanism_config</span><span class="p">)</span>
-
-    <span class="n">turbulent_enabled</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span>
-        <span class="n">resolved_mechanism_config</span><span class="o">.</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">TURBULENT_SHEAR_ST1956_MECHANISM_FLAG</span>
-    <span class="p">)</span>
-    <span class="n">normalized_turbulent_dissipation</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">normalized_fluid_density</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">turbulent_enabled</span><span class="p">:</span>
-        <span class="n">normalized_turbulent_dissipation</span> <span class="o">=</span> <span class="n">_normalize_turbulent_input_array</span><span class="p">(</span>
-            <span class="n">turbulent_dissipation</span><span class="p">,</span>
-            <span class="n">n_boxes</span><span class="p">,</span>
-            <span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">normalized_fluid_density</span> <span class="o">=</span> <span class="n">_normalize_turbulent_input_array</span><span class="p">(</span>
-            <span class="n">fluid_density</span><span class="p">,</span>
-            <span class="n">n_boxes</span><span class="p">,</span>
-            <span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="n">time_step_value</span> <span class="o">=</span> <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span>
-    <span class="n">max_collisions_value</span> <span class="o">=</span> <span class="n">_resolve_collision_capacity</span><span class="p">(</span>
-        <span class="n">max_collisions</span><span class="o">=</span><span class="n">max_collisions</span><span class="p">,</span>
-        <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
-        <span class="n">n_particles</span><span class="o">=</span><span class="n">n_particles</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">expected_counts_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,)</span>
-    <span class="n">initialize_rng_states_for_call</span> <span class="o">=</span> <span class="n">rng_states</span> <span class="ow">is</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">rng_states</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">_validate_rng_states</span><span class="p">(</span><span class="n">rng_states</span><span class="p">,</span> <span class="n">expected_counts_shape</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-        <span class="n">initialize_rng_states_for_call</span> <span class="o">=</span> <span class="n">initialize_rng</span>
-    <span class="n">temperature_array</span><span class="p">,</span> <span class="n">pressure_array</span> <span class="o">=</span> <span class="n">_ensure_environment_arrays</span><span class="p">(</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-        <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span>
-        <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
-        <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-        <span class="n">caller_name</span><span class="o">=</span><span class="s2">"coagulation_step_gpu"</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">volume</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">volume</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">volume</span>
-    <span class="n">volume_array</span> <span class="o">=</span> <span class="n">_ensure_volume_array</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-
-    <span class="n">expected_pairs_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">max_collisions_value</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">collision_pairs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">collision_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_boxes</span> <span class="ow">or</span> <span class="n">collision_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"collision_pairs shape must match (n_boxes, *, 2)"</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">collision_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">max_collisions_value</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">"collision_pairs capacity is smaller than the effective "</span>
-                <span class="s2">"max_collisions bound"</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">collision_pairs</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"collision_pairs buffer must use dtype int32"</span><span class="p">)</span>
-        <span class="n">_validate_device_match</span><span class="p">(</span>
-            <span class="s2">"collision_pairs buffer"</span><span class="p">,</span> <span class="n">collision_pairs</span><span class="p">,</span> <span class="n">device</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">n_collisions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">_validate_collision_counts</span><span class="p">(</span><span class="n">n_collisions</span><span class="p">,</span> <span class="n">expected_counts_shape</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">collision_pairs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">collision_pairs</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="n">expected_pairs_shape</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">if</span> <span class="n">n_collisions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">n_collisions</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="n">expected_counts_shape</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">rng_states</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">rng_states</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="n">expected_counts_shape</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="n">radii</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">diffusivities</span> <span class="o">=</span> <span class="n">radii</span>
-    <span class="n">g_terms</span> <span class="o">=</span> <span class="n">radii</span>
-    <span class="n">speeds</span> <span class="o">=</span> <span class="n">radii</span>
-    <span class="n">brownian_enabled</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span>
-        <span class="n">resolved_mechanism_config</span><span class="o">.</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">BROWNIAN_MECHANISM_FLAG</span>
-    <span class="p">)</span>
-    <span class="n">sedimentation_enabled</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span>
-        <span class="n">resolved_mechanism_config</span><span class="o">.</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">SEDIMENTATION_SP2016_MECHANISM_FLAG</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">brownian_enabled</span><span class="p">:</span>
-        <span class="n">diffusivities</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
-        <span class="n">g_terms</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
-        <span class="n">speeds</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
-    <span class="c1"># Sedimentation storage begins zeroed, so its kernel does not need a</span>
-    <span class="c1"># redundant full-capacity clear.</span>
-    <span class="n">settling_velocities</span> <span class="o">=</span> <span class="n">radii</span>
-    <span class="k">if</span> <span class="n">sedimentation_enabled</span><span class="p">:</span>
-        <span class="n">settling_velocities</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
-    <span class="k">if</span> <span class="n">turbulent_enabled</span><span class="p">:</span>
-        <span class="n">turbulent_dissipation_array</span> <span class="o">=</span> <span class="n">normalized_turbulent_dissipation</span>
-        <span class="n">fluid_density_array</span> <span class="o">=</span> <span class="n">normalized_fluid_density</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">turbulent_dissipation_array</span> <span class="o">=</span> <span class="n">temperature_array</span>
-        <span class="n">fluid_density_array</span> <span class="o">=</span> <span class="n">pressure_array</span>
-    <span class="n">total_masses</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-        <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-    <span class="p">)</span>
-    <span class="n">active_indices</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-        <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-    <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">initialize_rng_states_for_call</span><span class="p">:</span>
-        <span class="n">initialize_coagulation_rng_states</span><span class="p">(</span>
-            <span class="n">rng_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">,</span>
-            <span class="n">rng_states</span><span class="o">=</span><span class="n">rng_states</span><span class="p">,</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">brownian_coagulation_kernel</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,),</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
-            <span class="n">volume_array</span><span class="p">,</span>
-            <span class="n">temperature_array</span><span class="p">,</span>
-            <span class="n">pressure_array</span><span class="p">,</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">GAS_CONSTANT</span><span class="p">),</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">BOLTZMANN_CONSTANT</span><span class="p">),</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">MOLECULAR_WEIGHT_AIR</span><span class="p">),</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">REF_VISCOSITY_AIR_STP</span><span class="p">),</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">REF_TEMPERATURE_STP</span><span class="p">),</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">SUTHERLAND_CONSTANT</span><span class="p">),</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">ELEMENTARY_CHARGE_VALUE</span><span class="p">),</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">ELECTRIC_PERMITTIVITY</span><span class="p">),</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">time_step_value</span><span class="p">),</span>
-            <span class="n">radii</span><span class="p">,</span>
-            <span class="n">diffusivities</span><span class="p">,</span>
-            <span class="n">g_terms</span><span class="p">,</span>
-            <span class="n">speeds</span><span class="p">,</span>
-            <span class="n">settling_velocities</span><span class="p">,</span>
-            <span class="n">turbulent_dissipation_array</span><span class="p">,</span>
-            <span class="n">fluid_density_array</span><span class="p">,</span>
-            <span class="n">total_masses</span><span class="p">,</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
-            <span class="n">active_indices</span><span class="p">,</span>
+    <span class="k">return</span> <span class="n">_enqueue_prepared_coagulation_call</span><span class="p">(</span>
+        <span class="n">_prepare_coagulation_step_gpu</span><span class="p">(</span>
+            <span class="n">particles</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="p">,</span>
+            <span class="n">time_step</span><span class="p">,</span>
+            <span class="n">volume</span><span class="p">,</span>
+            <span class="n">max_collisions</span><span class="p">,</span>
+            <span class="n">rng_seed</span><span class="p">,</span>
             <span class="n">collision_pairs</span><span class="p">,</span>
             <span class="n">n_collisions</span><span class="p">,</span>
             <span class="n">rng_states</span><span class="p">,</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">resolved_mechanism_config</span><span class="o">.</span><span class="n">mask</span><span class="p">),</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">max_collisions_value</span><span class="p">),</span>
-        <span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">mechanism_config</span><span class="o">=</span><span class="n">mechanism_config</span><span class="p">,</span>
+            <span class="n">initialize_rng</span><span class="o">=</span><span class="n">initialize_rng</span><span class="p">,</span>
+            <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
+            <span class="n">validate_charge_finite</span><span class="o">=</span><span class="n">validate_charge_finite</span><span class="p">,</span>
+            <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="n">turbulent_dissipation</span><span class="p">,</span>
+            <span class="n">fluid_density</span><span class="o">=</span><span class="n">fluid_density</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="p">)</span>
-
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">apply_coagulation_kernel</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">max_collisions_value</span><span class="p">),</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
-            <span class="n">collision_pairs</span><span class="p">,</span>
-            <span class="n">n_collisions</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_compact_applied_collision_pairs_kernel</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,),</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">collision_pairs</span><span class="p">,</span> <span class="n">n_collisions</span><span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">particles</span><span class="p">,</span> <span class="n">collision_pairs</span><span class="p">,</span> <span class="n">n_collisions</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -19025,14 +17762,7 @@ buffer or if the provided device mismatches the buffer device.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1930</span>
-<span class="normal">1931</span>
-<span class="normal">1932</span>
-<span class="normal">1933</span>
-<span class="normal">1934</span>
-<span class="normal">1935</span>
-<span class="normal">1936</span>
-<span class="normal">1937</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1937</span>
 <span class="normal">1938</span>
 <span class="normal">1939</span>
 <span class="normal">1940</span>
@@ -19065,7 +17795,14 @@ buffer or if the provided device mismatches the buffer device.</p>
 <span class="normal">1967</span>
 <span class="normal">1968</span>
 <span class="normal">1969</span>
-<span class="normal">1970</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize_coagulation_rng_states</span><span class="p">(</span>
+<span class="normal">1970</span>
+<span class="normal">1971</span>
+<span class="normal">1972</span>
+<span class="normal">1973</span>
+<span class="normal">1974</span>
+<span class="normal">1975</span>
+<span class="normal">1976</span>
+<span class="normal">1977</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize_coagulation_rng_states</span><span class="p">(</span>
     <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">rng_states</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>

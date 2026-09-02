@@ -4232,6 +4232,8 @@
       
         
       
+        
+      
     
     
     
@@ -4648,6 +4650,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../API/particula/execution/resident_enqueue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_enqueue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../API/particula/execution/resident_scheduler/" class="md-nav__link">
         
   
@@ -4863,10 +4893,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_22" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_21" id="__nav_2_3_19_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_22" id="__nav_2_3_19_22_label" tabindex="0">
             
   
   
@@ -4884,8 +4914,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_21">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_22">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13562,6 +13592,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#e8-f2-prepared-enqueue-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F2 prepared enqueue contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#warp-graph-capture" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -16987,6 +17028,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#e8-f2-prepared-enqueue-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F2 prepared enqueue contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#warp-graph-capture" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -19393,8 +19445,9 @@ Native graph capture/replay beyond E8-F1 host admission, performance profiling
 and targets, memory-budget evidence, distributed execution, and autodiff remain
 deferred to the later Epic H tracks and Epic I.</p>
 <h2 id="epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance<a class="headerlink" href="#epic-h-graph-capture-and-performance" title="Permanent link">&para;</a></h2>
-<p>Status: active. E8-F1 is shipped; E8-F2--E8-F8 remain the scheduled deferred
-feature tracks for native capture/replay and its later evidence.</p>
+<p>Status: active. E8-F1 and E8-F2 P1--P6/P8 are shipped. E8-F2 P7 and
+E8-F3--E8-F8 remain pending; native capture/replay and its evidence have not
+shipped.</p>
 <h3 id="e8-f1-shipped-contract">E8-F1 shipped contract<a class="headerlink" href="#e8-f1-shipped-contract" title="Permanent link">&para;</a></h3>
 <p>E8-F1 ships host metadata and scheduler admission only. Its concrete-only
 direct-import boundary is <code>particula.execution.graph_capture</code>; its carriers and
@@ -19429,9 +19482,40 @@ metadata with no retry or rollback guarantee.</p>
 retries, rollback, CPU fallback/emulation, hidden allocation/transfer/
 synchronization, checkpointed native graph handles, cross-device replay,
 captured numerical parity, benchmark/profiling/memory claims, root-README
-changes, and user examples. E8-F2--E8-F8 own capture-ready enqueue, resource
-preparation, native capture/replay, parity, benchmarks, profiling, memory
-evidence, and examples.</p>
+changes, and user examples. E8-F2 owns the shipped concrete prepared enqueue
+seams; E8-F3 owns resource work, E8-F4 native capture/replay and captured
+parity, E8-F5--E8-F7 parity/performance/memory/profiling, and E8-F8 the
+example, limitations, and closeout.</p>
+<h3 id="e8-f2-prepared-enqueue-contract">E8-F2 prepared enqueue contract<a class="headerlink" href="#e8-f2-prepared-enqueue-contract" title="Permanent link">&para;</a></h3>
+<p>E8-F2 P1--P6/P8 ship a developer-only, concrete-module prepared path. Setup
+validates, normalizes, allocates established private fallback storage, binds
+identities, freezes the operation selection, and may retain established bounded
+direct-wrapper device-status observation and translation. The resulting private
+prepared-operation bindings retain references and dispatch frozen device or
+write-free no-op callables only. Individual binding dispatch performs no payload
+validation or readback, allocation, transfer, synchronization, resource
+acquisition or replacement, device selection or fallback, dynamic policy or
+schedule resolution, mutable-carrier lookup or rebinding, or RNG initialization
+or reset.</p>
+<p><code>prepare_resident_timestep()</code> retains the exact READY session, registry, guard,
+request, signature, primaries, views, schedule, and duration by identity. It
+does not authorize capture, token entry, or dispatch. The separate composed
+<code>enqueue_prepared_resident_simulation()</code> first runs its retained structural and
+lifecycle identity gate before token entry plus a fresh signature comparison,
+then opens exactly one token and
+dispatches the twelve frozen operations in canonical order. That gate is not
+device-only enqueue work; after it passes, dispatch has the same prohibited-work
+boundary as individual bindings. Empty or no-work bindings are write-free.
+Payload changes in pinned arrays remain live, but structural identities or frozen
+scalar controls require a new prepared record.</p>
+<p>E8-F1 remains the owner of capability qualification, lifecycle, compatibility,
+invalidation, FAULTED classification, and CAPTURED admission; the registry owns
+sidecars. Structural, lifecycle, or signature drift rejects before token entry. A
+writer-capable failure preserves the E8-F1 FAULTED, no-rollback, no-retry, and
+no-fallback recovery limit. Warp CPU is uncaptured implementation validation
+only; CUDA is optional pass-or-clean-skip evidence only. This documentation does
+not claim native capture/replay, captured parity, performance or memory evidence,
+or an end-user capture example.</p>
 <p>Reduce launch overhead with graph capture and establish performance and memory
 targets aligned with the multi-box scaling goal.</p>
 <p>Planned features:</p>
