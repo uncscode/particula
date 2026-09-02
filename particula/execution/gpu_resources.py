@@ -86,6 +86,8 @@ __all__ = [
     "SelectedResourceRole",
     "SelectedResourceFamilyReport",
     "SelectedResourceInventory",
+    "CaptureResourceRequirements",
+    "CaptureResourceSet",
     "PublishedStreamManifest",
     "GPUResourceRegistry",
     "CondensationResources",
@@ -500,6 +502,138 @@ class PreparedResourceViews:
     dilution: DilutionResources | None = None
     wall_loss: WallLossResources | None = None
     nucleation: NucleationResources | None = None
+
+
+@dataclass(frozen=True, eq=False)
+class CaptureResourceRequirements:
+    """Describe the complete setup-only resource request for one capture set.
+
+    The carrier retains all supplied objects by exact identity.  It is host
+    metadata only: registry-dependent schema, alias, and publication checks are
+    deliberately performed by
+    :meth:`GPUResourceRegistry.prepare_capture_resources`.
+    ``None`` for an enabled allocatable family requests private allocation.
+
+    Attributes:
+        session: Exact resident session pinned by the target registry.
+        capacities: Exact immutable logical inventory capacities.
+        inventory: Exact P3 selected resource inventory.
+        prepared_views: Canonical process views required by preparation.
+        communication_resources: Exact selected communication view, if present.
+        condensation: Supplied condensation record or an allocation request.
+        coagulation: Supplied coagulation view or an allocation request.
+        wall_loss: Supplied wall-loss view or an allocation request.
+        nucleation: Supplied nucleation view or an allocation request.
+    """
+
+    session: ResidentSession
+    capacities: ResourceInventoryCapacities
+    inventory: SelectedResourceInventory
+    prepared_views: PreparedResourceViews
+    communication_resources: CommunicationResources | None
+    condensation: CondensationScratchBuffers | None = None
+    coagulation: CoagulationResources | None = None
+    wall_loss: WallLossResources | None = None
+    nucleation: NucleationResources | None = None
+    family_order: tuple[str, ...] = (
+        "condensation",
+        "coagulation",
+        "wall_loss",
+        "nucleation",
+        "communication_gas",
+        "communication_particles",
+        "dilution",
+    )
+
+    def __post_init__(self) -> None:
+        """Reject incomplete or noncanonical host-only request metadata."""
+        exact = (
+            (self.session, ResidentSession, "session"),
+            (self.capacities, ResourceInventoryCapacities, "capacities"),
+            (self.inventory, SelectedResourceInventory, "inventory"),
+            (self.prepared_views, PreparedResourceViews, "prepared_views"),
+        )
+        for value, expected, name in exact:
+            if type(value) is not expected:
+                raise TypeError(f"{name} must be an exact {expected.__name__}.")
+        if (
+            self.communication_resources is not None
+            and type(self.communication_resources) is not CommunicationResources
+        ):
+            raise TypeError("communication_resources must be exact or None.")
+        if (
+            self.inventory.communication_resources
+            is not self.communication_resources
+        ):
+            raise ValueError(
+                "communication_resources must match the P3 inventory."
+            )
+        if type(self.family_order) is not tuple or self.family_order != (
+            "condensation",
+            "coagulation",
+            "wall_loss",
+            "nucleation",
+            "communication_gas",
+            "communication_particles",
+            "dilution",
+        ):
+            raise ValueError("Capture resource family order is not canonical.")
+        expected = (
+            (self.condensation, CondensationScratchBuffers, "condensation"),
+            (self.coagulation, CoagulationResources, "coagulation"),
+            (self.wall_loss, WallLossResources, "wall_loss"),
+            (self.nucleation, NucleationResources, "nucleation"),
+        )
+        views = (
+            self.prepared_views.condensation,
+            self.prepared_views.coagulation,
+            self.prepared_views.wall_loss,
+            self.prepared_views.nucleation,
+        )
+        for (value, expected_type, name), _view in zip(
+            expected, views, strict=True
+        ):
+            if value is not None and type(value) is not expected_type:
+                raise TypeError(f"{name} request has an invalid exact type.")
+        if self.condensation is not None and any(
+            getattr(self.condensation, field.name) is None
+            for field in fields(CondensationScratchBuffers)
+        ):
+            raise ValueError("condensation request must be complete.")
+        if self.nucleation is not None and any(
+            getattr(self.nucleation, name) is None
+            for name in (
+                "scratch",
+                "finalized_demand",
+                "diagnostics",
+                "exhaustion",
+            )
+        ):
+            raise ValueError("nucleation request must be complete.")
+
+
+@dataclass(frozen=True, eq=False)
+class CaptureResourceSet:
+    """Retain one atomically published capture resource set by exact identity.
+
+    This setup-only carrier owns no payload copies, bytes, RNG words, or
+    accounting.  It exposes retained metadata and views solely for later
+    identity validation; callers cannot use it to acquire, execute, transfer,
+    synchronize, or mutate resource bindings.
+    """
+
+    requirements: CaptureResourceRequirements
+    capacities: ResourceInventoryCapacities
+    inventory: SelectedResourceInventory
+    report: LogicalResourceReport
+    prepared_views: PreparedResourceViews
+    communication_resources: CommunicationResources | None
+    condensation: CondensationResources | None
+    coagulation: CoagulationResources | None
+    wall_loss: WallLossResources | None
+    nucleation: NucleationResources | None
+    coagulation_stream_registry: _PublishedStreamRegistry | None
+    wall_loss_stream_registry: _PublishedStreamRegistry | None
 
 
 class _RestoredStreamRegistry:
@@ -946,6 +1080,8 @@ class GPUResourceRegistry:
         )
         self._wall_loss_stream_registry: _PublishedStreamRegistry | None = None
         self._capture_inventory: SelectedResourceInventory | None = None
+        self._capture_resource_set: CaptureResourceSet | None = None
+        self._capture_resource_fingerprint: tuple[Any, ...] | None = None
 
     @property
     def manifests(self) -> tuple[ResourceManifest, ...]:
@@ -1058,6 +1194,444 @@ class GPUResourceRegistry:
         if self._capture_inventory is None:
             raise ValueError("Capture resources have not been registered.")
         return self._capture_inventory
+
+    def _capture_fingerprint(
+        self, requirements: CaptureResourceRequirements
+    ) -> tuple[Any, ...]:
+        """Return immutable capture identity and capacity data."""
+        views = requirements.prepared_views
+        return (
+            id(requirements.session),
+            id(requirements.capacities),
+            id(requirements.inventory),
+            id(requirements.prepared_views),
+            id(requirements.communication_resources),
+            tuple(
+                id(value)
+                for value in (
+                    requirements.condensation,
+                    requirements.coagulation,
+                    requirements.wall_loss,
+                    requirements.nucleation,
+                    views.condensation,
+                    views.coagulation,
+                    views.dilution,
+                    views.wall_loss,
+                    views.nucleation,
+                )
+            ),
+            requirements.capacities.collision_capacity,
+            requirements.capacities.gas_edge_capacity,
+            requirements.capacities.particle_edge_capacity,
+        )
+
+    def _validate_capture_requirements(
+        self, requirements: CaptureResourceRequirements
+    ) -> None:
+        """Validate capture request identities before allocation or staging."""
+        if type(requirements) is not CaptureResourceRequirements:
+            raise TypeError(
+                "requirements must be an exact CaptureResourceRequirements."
+            )
+        self.validate_pinned_session(requirements.session)
+        if requirements.inventory is not self.selected_resource_report():
+            raise ValueError("requirements must retain the exact P3 inventory.")
+        if (
+            requirements.communication_resources
+            is not self.get_communication_resources()
+        ):
+            raise ValueError("capture communication resource identity changed.")
+        communication = requirements.communication_resources
+        if communication is not None:
+            map_data = communication.configuration.communication_map
+            capacity = int(map_data.edge_capacity)
+            supplied_capacity = (
+                requirements.capacities.gas_edge_capacity
+                if map_data.transport_mode is CommunicationTransportMode.GAS
+                else requirements.capacities.particle_edge_capacity
+            )
+            if supplied_capacity != capacity:
+                raise ValueError(
+                    "capture communication capacity must match its P3 resource."
+                )
+
+    def _capture_set_matches(
+        self, requirements: CaptureResourceRequirements
+    ) -> bool:
+        """Return whether a request retains every published capture identity."""
+        capture_set = self._capture_resource_set
+        if capture_set is None:
+            return False
+        return (
+            requirements is capture_set.requirements
+            and self._capture_resource_fingerprint
+            == self._capture_fingerprint(requirements)
+            and requirements.inventory is capture_set.inventory
+            and requirements.capacities is capture_set.capacities
+            and requirements.communication_resources
+            is capture_set.communication_resources
+        )
+
+    def validate_capture_resource_set(
+        self, requirements: CaptureResourceRequirements
+    ) -> CaptureResourceSet:
+        """Return the retained matching capture set without resource work.
+
+        The accessor is metadata-only.  It neither constructs reports nor
+        acquires, allocates, initializes, reads, transfers, synchronizes, or
+        mutates any resource binding.
+        """
+        if type(requirements) is not CaptureResourceRequirements:
+            raise TypeError(
+                "requirements must be an exact CaptureResourceRequirements."
+            )
+        self.validate_pinned_session(requirements.session)
+        if not self._capture_set_matches(requirements):
+            raise ValueError(
+                "Capture resource set identities are incompatible."
+            )
+        capture_set = self._capture_resource_set
+        if capture_set is None:
+            raise ValueError("Capture resources have not been prepared.")
+        return capture_set
+
+    def _validate_staged_nonalias(
+        self,
+        bindings: dict[str, Any],
+        entries: tuple[ManifestEntry, ...],
+        capacity: int | None,
+        staged: tuple[dict[str, Any], ...],
+    ) -> None:
+        """Validate a private family against published and staged sidecars."""
+        ranges = [
+            self._validate_array(entry, bindings[entry.role], capacity)
+            for entry in entries
+        ]
+        values = [bindings[entry.role] for entry in entries]
+        other_values = [
+            value for family in staged for value in family.values()
+        ] + [
+            value
+            for family in self._bindings.values()
+            for value in family.values()
+        ]
+        self._reject_shared_identities(values, other_values)
+        self._reject_primary_aliases(values)
+        other_ranges = [self._array_range(value) for value in other_values]
+        for index, byte_range in enumerate(ranges):
+            if any(
+                self._ranges_overlap(byte_range, other)
+                for other in ranges[index + 1 :] + other_ranges
+            ):
+                raise ValueError("Sidecar byte ranges must not overlap.")
+
+    def _stage_family(
+        self,
+        manifest: ResourceManifest,
+        supplied: dict[str, Any],
+        capacity: int | None,
+        staged: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        """Build one unpublished family after complete supplied preflight."""
+        existing = self._bindings.get(manifest.family)
+        if existing is not None:
+            if (
+                capacity is not None
+                and self._capacities.get(manifest.family) != capacity
+            ):
+                raise ValueError("Capture resource capacity changed.")
+            if any(
+                supplied[entry.role] is not None
+                and supplied[entry.role] is not existing[entry.role]
+                for entry in manifest.entries
+            ):
+                raise ValueError("Established sidecars cannot be replaced.")
+            return existing
+        candidate = dict(supplied)
+        for entry in manifest.entries:
+            value = candidate[entry.role]
+            if value is not None:
+                self._validate_array(entry, value, capacity)
+        self._validate_supplied_nonalias(candidate, manifest.entries)
+        for entry in manifest.entries:
+            if candidate[entry.role] is None:
+                candidate[entry.role] = self._allocate(entry, capacity)
+        self._validate_staged_nonalias(
+            candidate, manifest.entries, capacity, tuple(staged)
+        )
+        staged.append(candidate)
+        return candidate
+
+    def _new_stream_registry(
+        self, process_id: str, state: Any, other_state: Any
+    ) -> _PublishedStreamRegistry:
+        """Create and initialize exactly one unpublished resident stream."""
+        root_seed, logical_box_ids, lanes = self._stream_metadata()
+        initialize_all = other_state is None
+        if other_state is None:
+            other_state = wp.zeros(
+                self._shape(
+                    _WALL_LOSS.entries[0]
+                    if process_id == "coagulation"
+                    else _COAGULATION.entries[2]
+                ),
+                dtype=wp.uint32,
+                device=self._signature[2],
+            )
+        pairs = (
+            (
+                "coagulation",
+                state if process_id == "coagulation" else other_state,
+            ),
+            ("wall_loss", state if process_id == "wall_loss" else other_state),
+        )
+        registry = StreamRegistry(
+            root_seed,
+            self._session.dimensions.n_boxes,
+            logical_box_ids,
+            lanes,
+            pairs,
+        )
+        if initialize_all:
+            registry.initialize()
+        else:
+            registry.initialize_process(process_id)
+        return registry
+
+    def prepare_capture_resources(  # noqa: C901
+        self, requirements: CaptureResourceRequirements
+    ) -> CaptureResourceSet:
+        """Atomically stage and publish the complete frozen capture set.
+
+        A compatible exact repeat returns the original outer set. All allocator,
+        schema, alias, view, report, and stream-initialization work remains
+        private until the final non-fallible publication assignments.
+        """
+        if type(requirements) is not CaptureResourceRequirements:
+            raise TypeError(
+                "requirements must be an exact CaptureResourceRequirements."
+            )
+        self.validate_pinned_session(requirements.session)
+        if self._capture_resource_set is not None:
+            if self._capture_set_matches(requirements):
+                return self._capture_resource_set
+            raise ValueError(
+                "Capture resource set identities are incompatible."
+            )
+        self._validate_capture_requirements(requirements)
+        report = self.logical_resource_report(requirements.capacities)
+        views = requirements.prepared_views
+        staged: list[dict[str, Any]] = []
+        staged_families: dict[str, dict[str, Any]] = {}
+
+        def stage(
+            enabled: bool,
+            manifest: ResourceManifest,
+            supplied: dict[str, Any],
+            capacity: int | None = None,
+        ) -> dict[str, Any] | None:
+            """Stage only requested process families in canonical order."""
+            if not enabled:
+                return None
+            result = self._stage_family(manifest, supplied, capacity, staged)
+            if manifest.family not in self._bindings:
+                staged_families[manifest.family] = result
+            return result
+
+        condensation_bindings = stage(
+            views.condensation is not None
+            or requirements.condensation is not None,
+            _CONDENSATION,
+            {
+                entry.role: None
+                if requirements.condensation is None
+                else getattr(requirements.condensation, entry.role)
+                for entry in _CONDENSATION.entries
+            },
+        )
+        collision_capacity = _validated_extent(
+            requirements.capacities.collision_capacity
+        )
+        if (
+            views.coagulation is not None
+            or requirements.coagulation is not None
+        ) and collision_capacity <= 0:
+            raise ValueError(
+                "collision_capacity must be positive for coagulation."
+            )
+        coagulation_bindings = stage(
+            views.coagulation is not None
+            or requirements.coagulation is not None,
+            _COAGULATION,
+            {
+                entry.role: None
+                if requirements.coagulation is None
+                else getattr(requirements.coagulation, entry.role)
+                for entry in _COAGULATION.entries
+            },
+            collision_capacity,
+        )
+        wall_loss_bindings = stage(
+            views.wall_loss is not None or requirements.wall_loss is not None,
+            _WALL_LOSS,
+            {
+                "rng_states": None
+                if requirements.wall_loss is None
+                else requirements.wall_loss.rng_states
+            },
+        )
+        nucleation_bindings = stage(
+            views.nucleation is not None or requirements.nucleation is not None,
+            _NUCLEATION,
+            (
+                {entry.role: None for entry in _NUCLEATION.entries}
+                if requirements.nucleation is None
+                else self._nucleation_supplied_bindings(
+                    requirements.nucleation.scratch,
+                    requirements.nucleation.finalized_demand,
+                    requirements.nucleation.diagnostics,
+                    requirements.nucleation.exhaustion,
+                )
+            ),
+        )
+        if views.dilution is not None:
+            self.validate_dilution_resources(
+                requirements.session, views.dilution
+            )
+
+        condensation_view = (
+            None
+            if condensation_bindings is None
+            else self._views.get(
+                "condensation",
+                CondensationResources(
+                    CondensationScratchBuffers(**condensation_bindings)
+                ),
+            )
+        )
+        coagulation_view = (
+            None
+            if coagulation_bindings is None
+            else self._views.get(
+                "coagulation",
+                CoagulationResources(
+                    collision_capacity, **coagulation_bindings
+                ),
+            )
+        )
+        wall_loss_view = (
+            None
+            if wall_loss_bindings is None
+            else self._views.get(
+                "wall_loss", WallLossResources(**wall_loss_bindings)
+            )
+        )
+        nucleation_view = (
+            None
+            if nucleation_bindings is None
+            else self._views.get(
+                "nucleation", self._nucleation_view(nucleation_bindings)
+            )
+        )
+        for required, supplied, created, name in (
+            (
+                views.condensation,
+                requirements.condensation,
+                condensation_view,
+                "condensation",
+            ),
+            (
+                views.coagulation,
+                requirements.coagulation,
+                coagulation_view,
+                "coagulation",
+            ),
+            (
+                views.wall_loss,
+                requirements.wall_loss,
+                wall_loss_view,
+                "wall_loss",
+            ),
+            (
+                views.nucleation,
+                requirements.nucleation,
+                nucleation_view,
+                "nucleation",
+            ),
+        ):
+            if supplied is not None and required is not created:
+                raise ValueError(f"prepared {name} view identity changed.")
+
+        coagulation_stream = self._coagulation_stream_registry
+        wall_loss_stream = self._wall_loss_stream_registry
+        if "coagulation" in staged_families:
+            other = (
+                wall_loss_bindings["rng_states"]
+                if wall_loss_bindings is not None
+                else None
+            )
+            coagulation_stream = self._new_stream_registry(
+                "coagulation", coagulation_bindings["rng_states"], other
+            )
+        if "wall_loss" in staged_families:
+            other = (
+                coagulation_bindings["rng_states"]
+                if coagulation_bindings is not None
+                else None
+            )
+            wall_loss_stream = self._new_stream_registry(
+                "wall_loss", wall_loss_bindings["rng_states"], other
+            )
+        # Allocation requests have no established view in the requirements.
+        # Retain one complete canonical carrier containing the resolved staged
+        # or established views, rather than exposing an input placeholder.
+        prepared = PreparedResourceViews(
+            condensation_view,
+            coagulation_view,
+            views.dilution,
+            wall_loss_view,
+            nucleation_view,
+        )
+        candidate = CaptureResourceSet(
+            requirements,
+            requirements.capacities,
+            requirements.inventory,
+            report,
+            prepared,
+            requirements.communication_resources,
+            condensation_view,
+            coagulation_view,
+            wall_loss_view,
+            nucleation_view,
+            coagulation_stream,
+            wall_loss_stream,
+        )
+        # All preceding operations can fail. Publication is assignment-only.
+        self._bindings.update(staged_families)
+        if "coagulation" in staged_families:
+            self._capacities["coagulation"] = collision_capacity
+        if condensation_view is not None:
+            self._views["condensation"] = condensation_view
+        if coagulation_view is not None:
+            self._views["coagulation"] = coagulation_view
+        if wall_loss_view is not None:
+            self._views["wall_loss"] = wall_loss_view
+        if nucleation_view is not None:
+            self._views["nucleation"] = nucleation_view
+            self._nucleation_records = (
+                nucleation_view.scratch,
+                nucleation_view.finalized_demand,
+                nucleation_view.diagnostics,
+                nucleation_view.exhaustion,
+                nucleation_view.exhaustion.resampling_buffers,
+            )
+        self._coagulation_stream_registry = coagulation_stream
+        self._wall_loss_stream_registry = wall_loss_stream
+        self._capture_resource_fingerprint = self._capture_fingerprint(
+            requirements
+        )
+        self._capture_resource_set = candidate
+        return candidate
 
     def _selected_role(
         self,

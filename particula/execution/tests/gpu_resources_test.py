@@ -31,6 +31,7 @@ from particula.execution.diagnostics import (
 )
 from particula.execution.gpu_resources import (
     _MAX_SIZE,
+    CaptureResourceRequirements,
     DilutionResources,
     GPUResourceRegistry,
     ManifestEntry,
@@ -1035,6 +1036,133 @@ def test_registry_rejects_incomplete_and_inexact_nucleation_records() -> None:
         registry.acquire_nucleation(diagnostics=source.diagnostics)
     with pytest.raises(TypeError, match="exact native types"):
         registry.acquire_nucleation(diagnostics=object())  # type: ignore[arg-type]
+
+
+@pytest.mark.warp
+def test_capture_resource_set_reuses_exact_p3_and_family_identities() -> None:
+    """A compatible P4 request publishes and returns one exact frozen set."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    condensation = registry.acquire_condensation()
+    coagulation = registry.acquire_coagulation(1)
+    wall_loss = registry.acquire_wall_loss()
+    nucleation = registry.acquire_nucleation()
+    inventory = registry.register_capture_resources(session, None, ())
+    views = PreparedResourceViews(
+        condensation,
+        coagulation,
+        None,
+        wall_loss,
+        nucleation,
+    )
+    requirements = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(1, 0, 0),
+        inventory,
+        views,
+        None,
+        condensation.scratch_buffers,
+        coagulation,
+        wall_loss,
+        nucleation,
+    )
+
+    capture_set = registry.prepare_capture_resources(requirements)
+
+    assert capture_set.requirements is requirements
+    assert capture_set.inventory is inventory
+    assert capture_set.prepared_views is not views
+    assert capture_set.prepared_views.condensation is condensation
+    assert capture_set.prepared_views.coagulation is coagulation
+    assert capture_set.prepared_views.wall_loss is wall_loss
+    assert capture_set.prepared_views.nucleation is nucleation
+    assert capture_set.condensation is condensation
+    assert capture_set.coagulation is coagulation
+    assert capture_set.wall_loss is wall_loss
+    assert capture_set.nucleation is nucleation
+    assert registry.validate_capture_resource_set(requirements) is capture_set
+    assert registry.prepare_capture_resources(requirements) is capture_set
+
+
+@pytest.mark.warp
+def test_capture_resource_set_rejects_distinct_requirements_without_work(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A value-equal but distinct request cannot replace a published set."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    condensation = registry.acquire_condensation()
+    inventory = registry.register_capture_resources(session, None, ())
+    views = PreparedResourceViews(condensation=condensation)
+    requirements = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(0, 0, 0),
+        inventory,
+        views,
+        None,
+        condensation.scratch_buffers,
+    )
+    capture_set = registry.prepare_capture_resources(requirements)
+    distinct = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(0, 0, 0),
+        inventory,
+        views,
+        None,
+        condensation.scratch_buffers,
+    )
+    monkeypatch.setattr(
+        registry,
+        "logical_resource_report",
+        lambda *_args: pytest.fail("repeat must not build a report"),
+    )
+
+    with pytest.raises(ValueError, match="identities are incompatible"):
+        registry.prepare_capture_resources(distinct)
+    with pytest.raises(ValueError, match="identities are incompatible"):
+        registry.validate_capture_resource_set(distinct)
+    assert registry.validate_capture_resource_set(requirements) is capture_set
+
+
+@pytest.mark.warp
+def test_capture_resource_transaction_failure_does_not_publish_partial_state(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A private allocation failure leaves P3 and ordinary publication intact."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    inventory = registry.register_capture_resources(session, None, ())
+    placeholder = gpu_resources.CondensationResources(
+        gpu_resources.CondensationScratchBuffers(
+            None, None, None, None, None, None, None
+        )
+    )
+    requirements = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(0, 0, 0),
+        inventory,
+        PreparedResourceViews(condensation=placeholder),
+        None,
+    )
+    original_allocate = registry._allocate
+    monkeypatch.setattr(
+        registry,
+        "_allocate",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            RuntimeError("allocation failed")
+        ),
+    )
+
+    with pytest.raises(RuntimeError, match="allocation failed"):
+        registry.prepare_capture_resources(requirements)
+
+    assert registry._capture_resource_set is None
+    assert registry.selected_resource_report() is inventory
+    assert registry._bindings == {}
+    monkeypatch.setattr(registry, "_allocate", original_allocate)
+    capture_set = registry.prepare_capture_resources(requirements)
+    assert capture_set.condensation is not None
+    assert capture_set.prepared_views.condensation is capture_set.condensation
 
 
 def test_execution_package_remains_dependency_neutral() -> None:
