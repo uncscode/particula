@@ -54,12 +54,16 @@ class ResidentDilutionRequest:
             binding to ``session``.
         coefficient: Opaque dilution coefficient for the direct kernel.
         time_step: Opaque duration for the direct kernel.
+        resources: Optional complete descriptor-only dilution view. When
+            supplied, its normalized coefficient must be ``coefficient`` by
+            identity and the prepared binding retains both sidecars.
     """
 
     session: ResidentSession
     registry: GPUResourceRegistry
     coefficient: object
     time_step: object
+    resources: object | None = None
 
     def __post_init__(self) -> None:
         """Validate exact resident dependency types without kernel imports.
@@ -73,6 +77,11 @@ class ResidentDilutionRequest:
         registry_type, _, _ = _resource_types()
         if type(self.registry) is not registry_type:
             raise TypeError("registry must be an exact GPUResourceRegistry.")
+        if self.resources is not None:
+            from particula.execution.gpu_resources import DilutionResources
+
+            if type(self.resources) is not DilutionResources:
+                raise TypeError("resources must be an exact DilutionResources.")
 
 
 @dataclass(frozen=True, eq=False)
@@ -264,6 +273,7 @@ class _PreparedResidentProcessBinding:
 
     prepared: Any
     enqueue: Callable[[Any], object]
+    retained_resources: Any | None = None
 
     def execute(self) -> object:
         """Invoke the pinned delegate without repeating adapter setup.
@@ -337,6 +347,17 @@ class ResidentDilutionAdapter:
         if type(request) is not ResidentDilutionRequest:
             raise TypeError("request must be an exact ResidentDilutionRequest.")
         request.registry.validate_pinned_session(request.session)
+        if request.resources is not None:
+            request.registry.validate_dilution_resources(
+                request.session, cast(Any, request.resources)
+            )
+            if (
+                request.coefficient
+                is not request.resources.normalized_coefficient
+            ):
+                raise ValueError(
+                    "resident dilution coefficient must match resources."
+                )
         dilution_step_gpu = _get_dilution_step_gpu()
         from particula.gpu.kernels import dilution_step_gpu as supported_step
 
@@ -350,6 +371,7 @@ class ResidentDilutionAdapter:
             return _PreparedResidentProcessBinding(
                 None,
                 lambda _: dilution_step_gpu(*call_args),
+                request.resources,
             )
         from particula.gpu.kernels.dilution import (
             _enqueue_prepared_dilution_call,
@@ -361,6 +383,7 @@ class ResidentDilutionAdapter:
                 *call_args,
             ),
             _enqueue_prepared_dilution_call,
+            request.resources,
         )
 
     def execute(self, request: object) -> object:
@@ -421,6 +444,7 @@ class ResidentWallLossAdapter:
             return _PreparedResidentProcessBinding(
                 request.session.particles,
                 lambda particles: particles,
+                request.resources,
             )
         if len(enabled_logical_boxes) != request.session.dimensions.n_boxes:
             return self._prepare_selected(request, enabled_logical_boxes)
@@ -442,6 +466,7 @@ class ResidentWallLossAdapter:
                     initialize_rng=False,
                     environment=prepared.session.environment,
                 ),
+                request.resources,
             )
         from particula.gpu.kernels import wall_loss_step_gpu as supported_step
 
@@ -459,6 +484,7 @@ class ResidentWallLossAdapter:
                     initialize_rng=False,
                     environment=prepared.session.environment,
                 ),
+                request.resources,
             )
         from particula.gpu.kernels.wall_loss import (
             _enqueue_prepared_wall_loss_call,
@@ -479,6 +505,7 @@ class ResidentWallLossAdapter:
         return _PreparedResidentProcessBinding(
             prepared,
             _enqueue_prepared_wall_loss_call,
+            request.resources,
         )
 
     def _prepare_selected(
@@ -528,6 +555,7 @@ class ResidentWallLossAdapter:
             return _PreparedResidentProcessBinding(
                 prepared,
                 lambda call: call.enqueue(),
+                request.resources,
             )
         prepared = _prepare_selected_wall_loss_call(
             request.session.particles,
@@ -543,6 +571,7 @@ class ResidentWallLossAdapter:
         return _PreparedResidentProcessBinding(
             prepared,
             _enqueue_prepared_wall_loss_call,
+            request.resources,
         )
 
     def execute(self, request: object) -> object:
@@ -633,6 +662,7 @@ class ResidentNucleationAdapter:
             return _PreparedResidentProcessBinding(
                 None,
                 lambda _: step(*call_args, **call_kwargs),
+                request.resources,
             )
         from particula.gpu.kernels.nucleation import (
             _enqueue_prepared_nucleation_call,
@@ -656,6 +686,7 @@ class ResidentNucleationAdapter:
         return _PreparedResidentProcessBinding(
             prepared,
             _enqueue_prepared_nucleation_call,
+            request.resources,
         )
 
     def execute(self, request: object) -> object:

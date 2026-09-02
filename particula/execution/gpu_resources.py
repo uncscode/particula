@@ -82,8 +82,10 @@ __all__ = [
     "GPUResourceRegistry",
     "CondensationResources",
     "CoagulationResources",
+    "DilutionResources",
     "WallLossResources",
     "NucleationResources",
+    "PreparedResourceViews",
     "CommunicationResources",
 ]
 
@@ -288,6 +290,20 @@ class CoagulationResources:
 
 
 @dataclass(frozen=True, eq=False)
+class DilutionResources:
+    """Expose complete caller-owned dilution preparation sidecars.
+
+    This descriptor-only record is deliberately not acquired or published by
+    the registry.  It gives prepared callers a concrete schema carrier for the
+    normalized per-box coefficient and its corresponding factors while keeping
+    the direct kernel's normal fallback allocation unchanged.
+    """
+
+    normalized_coefficient: Any
+    factors: Any
+
+
+@dataclass(frozen=True, eq=False)
 class WallLossResources:
     """Expose one independently initialized wall-loss RNG sidecar.
 
@@ -363,6 +379,21 @@ class ResidentCommunicationState:
     initial_masses: Any | None = None
     initial_concentration: Any | None = None
     initial_charge: Any | None = None
+
+
+@dataclass(frozen=True, eq=False)
+class PreparedResourceViews:
+    """Carry optional complete prepared-process views by exact identity.
+
+    This private concrete carrier is schema-only.  Constructing or validating
+    it never acquires, publishes, allocates, or initializes resource state.
+    """
+
+    condensation: CondensationResources | None = None
+    coagulation: CoagulationResources | None = None
+    dilution: DilutionResources | None = None
+    wall_loss: WallLossResources | None = None
+    nucleation: NucleationResources | None = None
 
 
 class _RestoredStreamRegistry:
@@ -515,6 +546,13 @@ _COAGULATION = ResourceManifest(
         _entry("collision_pairs", "coagulation", wp.int32, "bc2"),
         _entry("n_collisions", "coagulation", wp.int32, "b"),
         _entry("rng_states", "coagulation", wp.uint32, "b"),
+    ),
+)
+_DILUTION = ResourceManifest(
+    "dilution",
+    (
+        _entry("normalized_coefficient", "dilution", wp.float64, "b"),
+        _entry("factors", "dilution", wp.float64, "b"),
     ),
 )
 _WALL_LOSS = ResourceManifest(
@@ -812,6 +850,7 @@ class GPUResourceRegistry:
             _NUCLEATION,
             _GAS_COMMUNICATION,
             _PARTICLE_COMMUNICATION,
+            _DILUTION,
         )
 
     def logical_resource_report(
@@ -1359,6 +1398,49 @@ class GPUResourceRegistry:
             ):
                 raise ValueError("nucleation resource bindings changed.")
             self._validate_array(entry, bindings[entry.role], capacity=None)
+
+    def validate_dilution_resources(
+        self, session: ResidentSession, resources: DilutionResources
+    ) -> None:
+        """Validate one complete unbound dilution view without publishing it.
+
+        Dilution is descriptor-only in this phase, so this validation accepts a
+        caller-owned complete view but deliberately does not retain it in the
+        registry.  It performs only metadata and nonaliasing checks.
+        """
+        self.validate_pinned_session(session)
+        if type(resources) is not DilutionResources:
+            raise TypeError("resources must be an exact DilutionResources.")
+        bindings = {
+            "normalized_coefficient": resources.normalized_coefficient,
+            "factors": resources.factors,
+        }
+        self._validate_nonalias(bindings, _DILUTION.entries, capacity=None)
+
+    def validate_prepared_resource_views(
+        self, session: ResidentSession, views: PreparedResourceViews
+    ) -> None:
+        """Validate a complete private prepared-view carrier read-only.
+
+        Bound family views must be the exact established publication.  The
+        descriptor-only dilution view is checked against the same protected and
+        established storage, but is not acquired or retained.  This method is a
+        setup-only seam; enqueue paths retain the validated references and do
+        not call it again.
+        """
+        self.validate_pinned_session(session)
+        if type(views) is not PreparedResourceViews:
+            raise TypeError("views must be an exact PreparedResourceViews.")
+        if views.condensation is not None:
+            self.validate_condensation_resources(session, views.condensation)
+        if views.coagulation is not None:
+            self.validate_coagulation_resources(session, views.coagulation)
+        if views.dilution is not None:
+            self.validate_dilution_resources(session, views.dilution)
+        if views.wall_loss is not None:
+            self.validate_wall_loss_resources(session, views.wall_loss)
+        if views.nucleation is not None:
+            self.validate_nucleation_resources(session, views.nucleation)
 
     def _enumerate_resources(
         self,

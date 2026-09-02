@@ -22,8 +22,10 @@ from particula.execution.diagnostics import (
 )
 from particula.execution.gpu_resources import (
     _MAX_SIZE,
+    DilutionResources,
     GPUResourceRegistry,
     ManifestEntry,
+    PreparedResourceViews,
     ResourceInventoryCapacities,
     _item_size,
 )
@@ -995,6 +997,7 @@ def test_registry_requires_active_session_and_exposes_all_manifests() -> None:
         "nucleation",
         "communication_gas",
         "communication_particles",
+        "dilution",
     )
     assert all(
         entry.role and entry.dtype
@@ -1019,6 +1022,7 @@ def test_logical_resource_report_resolves_manifest_schemas_without_acquisition()
         "nucleation",
         "communication_gas",
         "communication_particles",
+        "dilution",
     )
     assert registry._bindings == {}
     assert registry._views == {}
@@ -1049,6 +1053,12 @@ def test_logical_resource_report_resolves_manifest_schemas_without_acquisition()
     assert particle_edges.entry.capacity_source == "particle_edge_capacity"
     assert gas_edge.entry.ownership == "caller_configuration"
     assert pairs.entry.ownership == "registry_or_caller_sidecar"
+    dilution = by_family["dilution"].roles
+    assert [role.entry.role for role in dilution] == [
+        "normalized_coefficient",
+        "factors",
+    ]
+    assert all(role.entry.shape == (2,) for role in dilution)
     assert report.logical_byte_count == sum(
         family.logical_byte_count for family in report.families
     )
@@ -1065,6 +1075,32 @@ def test_logical_resource_report_resolves_manifest_schemas_without_acquisition()
     assert registry.logical_resource_report(capacities) == report
     assert registry._bindings == bindings
     assert registry._views == views
+
+
+@pytest.mark.warp
+def test_descriptor_only_dilution_view_validates_without_publication() -> None:
+    """Test prepared dilution schemas do not create registry bindings."""
+    wp = pytest.importorskip("warp")
+    session = _session(boxes=2)
+    registry = GPUResourceRegistry(session)
+    view = DilutionResources(
+        wp.zeros(2, dtype=wp.float64, device="cpu"),
+        wp.zeros(2, dtype=wp.float64, device="cpu"),
+    )
+
+    registry.validate_prepared_resource_views(
+        session, PreparedResourceViews(dilution=view)
+    )
+
+    assert registry._bindings == {}
+    assert registry._views == {}
+    with pytest.raises(ValueError, match="share identity"):
+        registry.validate_dilution_resources(
+            session,
+            DilutionResources(
+                view.normalized_coefficient, view.normalized_coefficient
+            ),
+        )
 
 
 @pytest.mark.warp
@@ -1252,6 +1288,13 @@ def test_logical_resource_report_lists_complete_canonical_inventory() -> None:
                 ("initial_masses", (2, 3, 4), 8),
                 ("initial_concentration", (2, 3), 8),
                 ("initial_charge", (2, 3), 8),
+            ),
+        ),
+        (
+            "dilution",
+            (
+                ("normalized_coefficient", (2,), 8),
+                ("factors", (2,), 8),
             ),
         ),
     )

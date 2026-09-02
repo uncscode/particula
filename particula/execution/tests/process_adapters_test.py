@@ -12,6 +12,7 @@ import pytest
 
 import particula.execution.process_adapters as process_adapters
 from particula.execution.gpu_resources import (
+    DilutionResources,
     GPUResourceRegistry,
     NucleationResources,
     WallLossResources,
@@ -180,6 +181,71 @@ def test_dilution_adapter_delegates_exactly_once(
 
 
 @pytest.mark.warp
+def test_dilution_adapter_retains_validated_prepared_resources(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a supplied descriptor-only dilution view remains identity-bound."""
+    wp = pytest.importorskip("warp")
+    session = _session()
+    registry = _registry(session)
+    coefficient = wp.zeros(1, dtype=wp.float64, device="cpu")
+    resources = DilutionResources(
+        coefficient,
+        wp.zeros(1, dtype=wp.float64, device="cpu"),
+    )
+    request = ResidentDilutionRequest(
+        session, registry, coefficient, 1.0, resources
+    )
+    monkeypatch.setattr(
+        process_adapters,
+        "_get_dilution_step_gpu",
+        lambda: lambda *_args: session.particles,
+    )
+
+    binding = ResidentDilutionAdapter().prepare(request)
+
+    assert binding.retained_resources is resources
+    assert binding.execute() is session.particles
+
+
+@pytest.mark.warp
+def test_dilution_adapter_rejects_mismatched_resource_coefficient_before_resolution(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A prepared dilution view must own the coefficient passed to the kernel."""
+    wp = pytest.importorskip("warp")
+    session = _session()
+    registry = _registry(session)
+    resources = DilutionResources(
+        wp.zeros(1, dtype=wp.float64, device="cpu"),
+        wp.zeros(1, dtype=wp.float64, device="cpu"),
+    )
+    request = ResidentDilutionRequest(
+        session,
+        registry,
+        wp.zeros(1, dtype=wp.float64, device="cpu"),
+        1.0,
+        resources,
+    )
+    resolver_calls = 0
+
+    def resolver() -> object:
+        """Record any unexpected kernel resolution after preflight rejection."""
+        nonlocal resolver_calls
+        resolver_calls += 1
+        return object()
+
+    monkeypatch.setattr(process_adapters, "_get_dilution_step_gpu", resolver)
+
+    with pytest.raises(ValueError, match="coefficient must match resources"):
+        ResidentDilutionAdapter().prepare(request)
+
+    assert resolver_calls == 0
+    assert registry._bindings == {}
+    assert registry._views == {}
+
+
+@pytest.mark.warp
 def test_dilution_adapter_prepares_then_enqueues_supported_kernel_once(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -237,6 +303,7 @@ def test_wall_loss_adapter_exposes_prepared_binding_after_preflight() -> None:
     prepared = ResidentWallLossAdapter().prepare(request)
 
     assert prepared is not None
+    assert prepared.retained_resources is resources
 
 
 @pytest.mark.warp
@@ -423,6 +490,7 @@ def test_wall_loss_partial_binding_does_no_setup_work_at_enqueue(
         process_adapters, "_get_wall_loss_selected_boxes_step_gpu", lambda: step
     )
     binding = ResidentWallLossAdapter().prepare(request)
+    assert binding.retained_resources is resources
     monkeypatch.setattr(
         process_adapters,
         "_get_wall_loss_selected_boxes_step_gpu",
@@ -551,6 +619,7 @@ def test_nucleation_adapter_prepare_uses_private_prepared_seam(
 
     binding = ResidentNucleationAdapter().prepare(request)
     assert calls == [("prepare", session.particles)]
+    assert binding.retained_resources is resources
     assert binding.execute() is session.particles
     assert calls == [("prepare", session.particles), ("enqueue", prepared)]
 
