@@ -625,6 +625,20 @@ class CaptureResourceSet:
     accounting.  It exposes retained metadata and views solely for later
     identity validation; callers cannot use it to acquire, execute, transfer,
     synchronize, or mutate resource bindings.
+
+    Attributes:
+        requirements: Exact setup request retained by identity.
+        capacities: Exact logical inventory capacities from the request.
+        inventory: Exact P3-selected resource inventory.
+        report: Immutable logical resource report for the published set.
+        prepared_views: Canonical process views retained for preparation.
+        communication_resources: Selected communication view, if present.
+        condensation: Published condensation resources, if requested.
+        coagulation: Published coagulation resources, if requested.
+        wall_loss: Published wall-loss resources, if requested.
+        nucleation: Published nucleation resources, if requested.
+        coagulation_stream_registry: Persistent coagulation stream metadata.
+        wall_loss_stream_registry: Persistent wall-loss stream metadata.
     """
 
     requirements: CaptureResourceRequirements
@@ -1285,6 +1299,17 @@ class GPUResourceRegistry:
         The accessor is metadata-only.  It neither constructs reports nor
         acquires, allocates, initializes, reads, transfers, synchronizes, or
         mutates any resource binding.
+
+        Args:
+            requirements: Exact request previously used to publish the set.
+
+        Returns:
+            The retained capture set, returned by object identity.
+
+        Raises:
+            TypeError: If ``requirements`` is not an exact request carrier.
+            ValueError: If the request or pinned session has drifted, or no set
+                has been published.
         """
         if type(requirements) is not CaptureResourceRequirements:
             raise TypeError(
@@ -1411,6 +1436,19 @@ class GPUResourceRegistry:
         A compatible exact repeat returns the original outer set. All allocator,
         schema, alias, view, report, and stream-initialization work remains
         private until the final non-fallible publication assignments.
+
+        Args:
+            requirements: Exact setup-only request describing required resource
+                families and any caller-supplied sidecars.
+
+        Returns:
+            The newly published capture set, or the existing set for an exact
+            compatible repeat.
+
+        Raises:
+            TypeError: If ``requirements`` is not an exact request carrier.
+            ValueError: If session, inventory, capacities, schemas, identities,
+                or alias constraints are incompatible.
         """
         if type(requirements) is not CaptureResourceRequirements:
             raise TypeError(
