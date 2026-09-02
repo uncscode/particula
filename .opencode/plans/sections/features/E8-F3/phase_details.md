@@ -14,15 +14,18 @@
     totals, frozen carriers, direct-module-only exports, and no mutation before
     or after unrelated acquisition.
 
-- [ ] **E8-F3-P2:** Complete process and control sidecar preallocation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add missing fixed-shape process, normalized-control, selected-lane,
-    and validation/status storage required by E8-F2 without changing public
-    direct-kernel APIs.
-  - Files: `particula/execution/gpu_resources.py`, prepared process adapters,
-    `particula/execution/tests/gpu_resources_test.py`
-  - Tests: Complete records, device/schema/nonalias checks, zero-size forms,
-    repeated identity, and no allocation after first publication.
+- [x] **E8-F3-P2:** Complete process and control sidecar preallocation with unit tests
+  - Issue: #1562 | Size: S | Status: Shipped
+  - Delivered: Added the descriptor-only dilution family with `(B,)`
+    `wp.float64` normalized-coefficient and factors roles, concrete-only
+    `PreparedResourceViews`, read-only supplied-view validation, and prepared
+    adapter retention of supplied resource identities. No allocation,
+    publication, reacquisition, RNG change, or public export was added.
+  - Files: `particula/execution/gpu_resources.py`, prepared dilution/resource
+    adapter seams, adjacent execution tests
+  - Validation: Supplied prepared views are schema-validated read-only before
+    adapter use; accepted resources retain exact identity and rejected views do
+    not mutate supplied arrays.
 
 - [ ] **E8-F3-P3:** Communication and diagnostic resource pinning with unit tests
   - Issue: TBD | Size: S | Status: Not Started

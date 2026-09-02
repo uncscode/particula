@@ -12,6 +12,16 @@
 - [x] Focused registry tests for the P1 inventory/reporting contract pass with
   no package or top-level export changes.
 
+## P2 Completion
+
+- [x] The concrete-only dilution descriptor family defines `(B,)` `wp.float64`
+  normalized-coefficient and factors roles.
+- [x] `PreparedResourceViews` supports read-only validation of supplied views
+  before prepared-adapter use, and accepted supplied resources are retained by
+  exact identity.
+- [x] P2 introduces no allocation, publication, reacquisition, RNG lifecycle
+  change, or public export.
+
 - [ ] One setup-only operation resolves and publishes every reusable array
   required by the selected E8-F2 prepared timestep before READY/capture.
 - [ ] The inventory covers process scratch/output, normalized controls,

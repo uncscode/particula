@@ -12,9 +12,12 @@ never lowered.
   sizes, collision/edge capacities, zero dimensions, checked overflow, frozen
   carriers, concrete-only exports, closed-session rejection, and unchanged
   registry state before and after unrelated acquisition. Focused tests pass.
-- **P2:** Unit-test every process/control family for complete native records,
-  exact schemas/devices, nonaliasing, caller-supplied identity retention,
-  omitted allocation, stable reacquisition, and transactional failure.
+- **P2 (shipped):** Adjacent execution coverage validates the descriptor-only
+  dilution normalized-coefficient/factors family, concrete
+  `PreparedResourceViews`, read-only rejection before adapter use, and exact
+  retention of supplied prepared-resource identities. Allocation, publication,
+  reacquisition, transactional setup, and RNG behavior are deliberately not
+  P2 validation targets.
 - **P3:** Unit-test absent/GAS/PARTICLES communication inventories, immutable
   map/configuration identity, diagnostic selections/accounting arrays,
   cross-family overlap rejection, and byte totals.
@@ -59,7 +62,7 @@ never lowered.
 
 ## Coverage Impact
 
-New accounting, acquisition, rollback, and validation branches increase the
+New accounting, prepared-view validation, acquisition, and rollback branches increase the
 surface of `particula.execution.gpu_resources`. Each production phase therefore
 ships branch-focused tests in the same change. Existing checkpoint, RNG,
 communication, diagnostics, resident-scheduler, and export tests remain

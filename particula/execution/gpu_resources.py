@@ -293,10 +293,18 @@ class CoagulationResources:
 class DilutionResources:
     """Expose complete caller-owned dilution preparation sidecars.
 
-    This descriptor-only record is deliberately not acquired or published by
-    the registry.  It gives prepared callers a concrete schema carrier for the
-    normalized per-box coefficient and its corresponding factors while keeping
-    the direct kernel's normal fallback allocation unchanged.
+    This descriptor-only record is deliberately neither acquired nor published
+    by the registry. Prepared callers may retain both validated sidecars by
+    identity. The registry read-only validates their exact ``float64``
+    ``(B,)`` schemas, device, contiguity, and nonaliasing before preparation;
+    it does not allocate, bind, or mutate them. Direct dilution calls retain
+    their existing fallback-allocation behavior when no record is supplied.
+
+    Attributes:
+        normalized_coefficient: Caller-owned normalized per-box dilution
+            coefficient sidecar with shape ``(B,)``.
+        factors: Caller-owned per-box dilution factor sidecar with shape
+            ``(B,)``.
     """
 
     normalized_coefficient: Any
@@ -385,8 +393,19 @@ class ResidentCommunicationState:
 class PreparedResourceViews:
     """Carry optional complete prepared-process views by exact identity.
 
-    This private concrete carrier is schema-only.  Constructing or validating
-    it never acquires, publishes, allocates, or initializes resource state.
+    This private concrete carrier groups independently optional resource views
+    for prepared process adapters. Validation requires exact view carriers and
+    validates every supplied family read-only against the pinned active session;
+    established families must be their published views, while dilution remains
+    descriptor-only. Constructing or validating this carrier never acquires,
+    publishes, allocates, initializes, or mutates resource state.
+
+    Attributes:
+        condensation: Optional established condensation resource view.
+        coagulation: Optional established coagulation resource view.
+        dilution: Optional complete caller-owned dilution descriptor view.
+        wall_loss: Optional established wall-loss resource view.
+        nucleation: Optional established nucleation resource view.
     """
 
     condensation: CondensationResources | None = None
@@ -1406,7 +1425,19 @@ class GPUResourceRegistry:
 
         Dilution is descriptor-only in this phase, so this validation accepts a
         caller-owned complete view but deliberately does not retain it in the
-        registry.  It performs only metadata and nonaliasing checks.
+        registry. It performs metadata-only exact-schema, device, contiguity,
+        primary-alias, role-reuse, and cross-family nonaliasing checks without
+        allocating, publishing, initializing, or mutating sidecars.
+
+        Args:
+            session: Exact active session pinned by this registry.
+            resources: Complete caller-owned dilution descriptor view.
+
+        Raises:
+            TypeError: If ``resources`` is not an exact ``DilutionResources``
+                carrier or either sidecar is not a Warp array.
+            ValueError: If the pinned session, sidecar schema, device,
+                contiguity, identity, or byte-range nonaliasing is invalid.
         """
         self.validate_pinned_session(session)
         if type(resources) is not DilutionResources:
@@ -1422,11 +1453,22 @@ class GPUResourceRegistry:
     ) -> None:
         """Validate a complete private prepared-view carrier read-only.
 
-        Bound family views must be the exact established publication.  The
+        Bound family views must be the exact established publication. The
         descriptor-only dilution view is checked against the same protected and
-        established storage, but is not acquired or retained.  This method is a
+        established storage, but is not acquired or retained. This method is a
         setup-only seam; enqueue paths retain the validated references and do
-        not call it again.
+        not call it again. It does not inspect payloads, acquire, allocate,
+        publish, initialize, transfer, synchronize, or mutate state.
+
+        Args:
+            session: Exact active session pinned by this registry.
+            views: Exact optional-family carrier to validate.
+
+        Raises:
+            TypeError: If ``views`` or a supplied nested resource carrier has
+                the wrong exact type.
+            ValueError: If session, publication identity, sidecar schema, or
+                nonaliasing validation fails for a supplied family.
         """
         self.validate_pinned_session(session)
         if type(views) is not PreparedResourceViews:

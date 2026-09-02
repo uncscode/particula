@@ -21,14 +21,20 @@ shape, stride, element, and byte arithmetic is shared by reporting, allocation,
 and range validation; focused registry tests pass. Package and top-level exports
 remain unchanged.
 
+E8-F3-P2 shipped in issue #1562. The registry now defines the concrete-only
+dilution descriptor family: `(B,)` `wp.float64` normalized-coefficient and
+factor roles. `PreparedResourceViews` carries supplied prepared resources, and
+registry validation read-only checks those views before use. Prepared adapters
+retain the supplied resource identities exactly. This increment adds neither
+allocation, publication, reacquisition, nor RNG behavior, and it adds no public
+exports.
+
 ## Value Proposition
 
-E8-F3 makes the registry the single concrete owner of capture-lifetime reusable
-storage. One setup transaction preallocates the resources selected by the E8-F2
-prepared timestep, pins exact identities and capacities, and publishes an
-immutable inventory with deterministic per-role, per-family, and total byte
-accounting. Repeated preparation and replay can then reject drift before launch
-and perform zero allocation or replacement.
+E8-F3 incrementally makes the registry the concrete authority for
+capture-lifetime reusable storage. P1 supplies the inventory; P2 adds the
+dilution descriptor/view validation seam and exact prepared-adapter retention.
+Later phases own whole-set allocation, publication, and compatible reuse.
 
 ## User Stories
 

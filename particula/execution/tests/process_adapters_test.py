@@ -287,6 +287,62 @@ def test_dilution_adapter_prepares_then_enqueues_supported_kernel_once(
 
 
 @pytest.mark.warp
+def test_dilution_adapter_forwards_supplied_factors_to_prepared_kernel(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A validated prepared view supplies its exact factor storage to setup."""
+    wp = pytest.importorskip("warp")
+    from particula.gpu.kernels import dilution as dilution_kernel
+    from particula.gpu.kernels import dilution_step_gpu
+
+    session = _session()
+    registry = _registry(session)
+    coefficient = wp.zeros(1, dtype=wp.float64, device="cpu")
+    factors = wp.full(1, 17.0, dtype=wp.float64, device="cpu")
+    request = ResidentDilutionRequest(
+        session,
+        registry,
+        coefficient,
+        1.0,
+        DilutionResources(coefficient, factors),
+    )
+    prepared = object()
+    prepare_calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
+
+    def prepare(*args: object, **kwargs: object) -> object:
+        """Record setup without allocating or revalidating factor storage."""
+        prepare_calls.append((args, kwargs))
+        return prepared
+
+    monkeypatch.setattr(
+        process_adapters, "_get_dilution_step_gpu", lambda: dilution_step_gpu
+    )
+    monkeypatch.setattr(dilution_kernel, "_prepare_dilution_step_gpu", prepare)
+    monkeypatch.setattr(
+        dilution_kernel,
+        "_enqueue_prepared_dilution_call",
+        lambda value: (
+            session.particles if value is prepared else pytest.fail("bad")
+        ),
+    )
+
+    binding = ResidentDilutionAdapter().prepare(request)
+    monkeypatch.setattr(
+        registry,
+        "validate_dilution_resources",
+        lambda *_args: pytest.fail("enqueue must not revalidate resources"),
+    )
+
+    assert binding.execute() is session.particles
+    assert prepare_calls == [
+        (
+            (session.particles, session.gas, coefficient, 1.0),
+            {"factors": factors},
+        )
+    ]
+
+
+@pytest.mark.warp
 def test_wall_loss_adapter_exposes_prepared_binding_after_preflight() -> None:
     """Resident wall loss prepares its validated binding before device enqueue."""
     session = _session()

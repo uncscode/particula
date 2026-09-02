@@ -2,7 +2,7 @@
 
 ## High-Level Design
 
-### Implemented P1 reporting seam
+### Implemented P1/P2 seams
 
 `GPUResourceRegistry.logical_resource_report()` is now the read-only,
 direct-module-only inventory seam. Given explicit collision, GAS-edge, and
@@ -14,10 +14,17 @@ acquires resources, reads payloads, consults bindings/configurations, or mutates
 the registry. Logical bytes are schema bytes rather than allocator-reserved
 bytes. The symbolic manifests and package/top-level exports are unchanged.
 
-The existing registry remains the sole storage authority. E8-F2 supplies a
-closed requirement description; E8-F3 resolves it against canonical manifests,
-stages every array and native view, validates the whole candidate for session
-ownership and nonaliasing, and publishes one immutable capture resource set.
+The registry remains the intended sole storage authority. E8-F2 supplies a
+closed requirement description; P4 will resolve it against canonical manifests,
+stage every array and native view, validate the whole candidate for session
+ownership and nonaliasing, and publish one immutable capture resource set.
+
+P2 adds `PreparedResourceViews` as the concrete prepared-consumer carrier.
+The descriptor-only dilution family resolves two `(B,)` `wp.float64` roles:
+normalized coefficient and factors. Before a prepared adapter uses a supplied
+view, registry schema validation reads metadata only and rejects incompatible
+views. A valid adapter retains each supplied resource identity; it does not
+allocate, publish, replace, reacquire, or initialize/reset RNG state.
 
 ```text
 exact ACTIVE ResidentSession + E8-F2 prepared requirements
@@ -44,11 +51,12 @@ exact views only                exact signature only
 no acquire/allocate             no replacement/resize
 ```
 
-Candidate allocation may happen before publication, so failure cannot leave a
-partially usable capture set. Once published, all compatible accessors return
-the same set and nested views by identity. Incompatible requirements,
-capacities, communication modes/maps, diagnostic bindings, session drift, or
-array replacement fail closed before replay.
+The diagram describes the deferred P4 whole-set path. Candidate allocation may
+happen before publication, so failure cannot leave a partially usable capture
+set. Once published, all compatible accessors will return the same set and
+nested views by identity. Incompatible requirements, capacities,
+communication modes/maps, diagnostic bindings, session drift, or array
+replacement will fail closed before replay.
 
 ## Data / API / Workflow Changes
 
@@ -56,8 +64,11 @@ array replacement fail closed before replay.
   report records keyed to the unchanged manifests, with declaration-level
   capacity-source and ownership metadata. Byte counts are logical bytes
   (`product(shape) * item_size`), not observed allocator reservation, and use
-  checked integer arithmetic. Whole capture-set carriers remain future work.
-- **API surface:** Add setup-only and validation/accessor methods on
+  checked integer arithmetic. P2 adds concrete-only `PreparedResourceViews`
+  and dilution normalized-control/factor descriptors; whole capture-set
+  carriers remain future work.
+- **API surface:** P2 adds private/concrete prepared-view validation and
+  retention plumbing. Later phases add setup-only and validation/accessor methods on
   `GPUResourceRegistry`. Keep them direct-import-only; do not alter
   `particula.execution.__all__`, `particula.gpu.kernels.__all__`, or top-level
   exports. Existing family acquisition and checkpoint enumeration stay valid.
@@ -69,10 +80,9 @@ array replacement fail closed before replay.
   lifetime. Accepted caller-supplied arrays remain caller-owned but are pinned
   by exact identity and may not be replaced. Diagnostic arrays become part of
   the capture set only when selected by the closed prepared plan.
-- **Failure model:** Setup validation/allocation failures publish nothing and
-  are retryable while the session remains active. RNG initialization follows
-  existing writer-failure semantics. No rollback is promised after a device
-  writer launches; replay failure handling remains owned by E8-F1/E8-F2.
+- **Failure model:** P2 supplied-view validation is read-only and rejects before
+  prepared adapter use; rejected views leave supplied arrays unchanged. Whole-set
+  setup/allocation failure and RNG writer semantics remain future-phase work.
 
 ## Security & Compliance
 

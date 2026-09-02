@@ -341,6 +341,7 @@ class _PreparedDilutionCall:
         n_particles: Number of particle slots per box.
         n_gas_species: Number of gas species per box.
         device: Active Warp device for the launches.
+        no_op: Whether validation completed for a write-free call.
     """
 
     particles: Any
@@ -354,6 +355,7 @@ class _PreparedDilutionCall:
     n_particles: int
     n_gas_species: int
     device: Any
+    no_op: bool
 
 
 def _prepare_dilution_step_gpu(
@@ -361,6 +363,8 @@ def _prepare_dilution_step_gpu(
     gas: Any,
     coefficient: float | Any,
     time_step: float,
+    *,
+    factors: Any | None = None,
 ) -> _PreparedDilutionCall:
     """Privately prepare GPU dilution after complete entry-point preflight.
 
@@ -398,6 +402,9 @@ def _prepare_dilution_step_gpu(
         gas: Gas container with fixed-shape concentration storage.
         coefficient: Dilution coefficient [s^-1], scalar or per-box Warp array.
         time_step: Finite, nonnegative duration [s].
+        factors: Optional caller-owned prepared factor storage. This private
+            argument is supplied only by a validated resident resource view;
+            direct calls omit it and retain fallback allocation behavior.
 
     Returns:
         A private frozen call record for the matching enqueue helper.
@@ -462,15 +469,16 @@ def _prepare_dilution_step_gpu(
         return _PreparedDilutionCall(
             particles,
             gas,
-            None,
+            validated_coefficient if is_per_box_coefficient else None,
             normalized_time_step,
             particle_concentration,
             gas_concentration,
-            None,
+            factors,
             n_boxes,
             n_particles,
             gas_concentration.shape[1],
             device,
+            True,
         )
 
     if not is_per_box_coefficient:
@@ -480,7 +488,8 @@ def _prepare_dilution_step_gpu(
             device,
         )
 
-    factors = wp.empty(n_boxes, dtype=wp.float64, device=device)
+    if factors is None:
+        factors = wp.empty(n_boxes, dtype=wp.float64, device=device)
     return _PreparedDilutionCall(
         particles,
         gas,
@@ -493,6 +502,7 @@ def _prepare_dilution_step_gpu(
         n_particles,
         gas_concentration.shape[1],
         device,
+        False,
     )
 
 
@@ -513,7 +523,7 @@ def _enqueue_prepared_dilution_call(
     Returns:
         The pinned particle and gas containers, unchanged in identity.
     """
-    if prepared.factors is None:
+    if prepared.no_op:
         return prepared.particles, prepared.gas
     wp.launch(
         _dilution_factors,

@@ -7,6 +7,9 @@ and `logical_resource_report()` remain direct-module-only in
 `particula.execution.gpu_resources`; package and top-level exports are unchanged.
 The focused contract is covered in `particula/execution/tests/gpu_resources_test.py`.
 
+Issue #1562 likewise adds no user-facing documentation: the dilution descriptor
+family and `PreparedResourceViews` remain concrete-only, with no public export.
+
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` Epic H sections with the
   implemented registry-owned capture resource inventory, setup/reuse boundary,
   persistent RNG handling, and deterministic logical-byte accounting semantics.

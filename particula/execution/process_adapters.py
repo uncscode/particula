@@ -44,8 +44,11 @@ class ResidentDilutionRequest:
     """Retain one dilution call's resident binding and opaque kernel inputs.
 
     This concrete-only carrier retains references without inspecting physical
-    values. The direct dilution kernel owns all numerical validation and writer
-    failure semantics. It neither copies nor recovers the retained state.
+    values. When present, its descriptor-only resource view supplies complete
+    caller-owned prepared sidecars that the adapter validates read-only through
+    the registry and retains by identity. The direct dilution kernel owns all
+    numerical validation and writer failure semantics. The carrier neither
+    copies, publishes, allocates, nor recovers retained state.
 
     Attributes:
         session: Exact concrete resident-session reference. Execution validates
@@ -55,8 +58,9 @@ class ResidentDilutionRequest:
         coefficient: Opaque dilution coefficient for the direct kernel.
         time_step: Opaque duration for the direct kernel.
         resources: Optional complete descriptor-only dilution view. When
-            supplied, its normalized coefficient must be ``coefficient`` by
-            identity and the prepared binding retains both sidecars.
+            supplied, the registry read-only validates both ``(B,)`` sidecars;
+            its normalized coefficient must be ``coefficient`` by identity,
+            and the prepared binding retains the view and both sidecars.
     """
 
     session: ResidentSession
@@ -333,6 +337,13 @@ class ResidentDilutionAdapter:
     def prepare(self, request: object) -> _PreparedResidentProcessBinding:
         """Validate resident ownership and prepare one pinned dilution call.
 
+        An optional descriptor-only dilution view is schema-validated before
+        resolving the direct step. Its normalized coefficient must be the
+        request coefficient by identity, and the returned binding retains the
+        complete view without acquiring, publishing, allocating, or replacing
+        resources. Omitting the view preserves the direct kernel's normal
+        fallback behavior.
+
         Args:
             request: Exact resident dilution request to validate and bind.
 
@@ -341,8 +352,9 @@ class ResidentDilutionAdapter:
 
         Raises:
             TypeError: If ``request`` is not the exact request carrier.
-            ValueError: If the request session is not pinned by its registry or
-                direct-kernel preparation rejects its inputs.
+            ValueError: If the request session is not pinned, an optional
+                descriptor view is invalid or mismatched, or direct-kernel
+                preparation rejects its inputs.
         """
         if type(request) is not ResidentDilutionRequest:
             raise TypeError("request must be an exact ResidentDilutionRequest.")
@@ -376,10 +388,15 @@ class ResidentDilutionAdapter:
             _prepare_dilution_step_gpu,
         )
 
-        return _PreparedResidentProcessBinding(
-            _prepare_dilution_step_gpu(
+        if request.resources is None:
+            prepared = _prepare_dilution_step_gpu(*call_args)
+        else:
+            prepared = _prepare_dilution_step_gpu(
                 *call_args,
-            ),
+                factors=cast(Any, request.resources).factors,
+            )
+        return _PreparedResidentProcessBinding(
+            prepared,
             _enqueue_prepared_dilution_call,
             request.resources,
         )

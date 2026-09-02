@@ -11,11 +11,16 @@ and centralized checked arithmetic only. It did not acquire or preallocate any
 new resource, alter configuration payload handling, or implement the later
 whole-set preparation work.
 
+P2 is complete: it adds only the descriptor-only dilution family and prepared
+view validation/identity-retention plumbing. Its two `(B,)` `wp.float64` roles
+are normalized coefficient and factors. It does not preallocate, publish,
+reacquire, or initialize/reset RNG resources.
+
 ## In Scope
 
 - Define canonical capture-resource roles, shapes, dtypes, capacities, and
   deterministic manifest order in `particula/execution/gpu_resources.py`.
-- Fill gaps in registry-owned preallocation for prepared process controls,
+- Fill remaining gaps in registry-owned preallocation for prepared process controls,
   validation/status work, selected-lane work, diagnostics, communication, and
   persistent RNG state required by the fixed prepared sequence.
 - Add one setup-only capture-set acquisition operation that validates all
@@ -40,5 +45,8 @@ whole-set preparation work.
 - Runtime resizing, compaction, automatic recapture, fallback, migration,
   allocator-pool tuning, or claims about allocator overhead/reserved bytes.
 - New public package exports or changes to direct-kernel ownership contracts.
+- Treating P2's supplied `PreparedResourceViews` as an acquisition or
+  publication API; it is a concrete-only, read-only validation and identity
+  retention seam.
 - Treating optional `CommunicationResources.final_volumes` as a manifest role;
   it remains a configuration binding outside P1 inventory reporting.

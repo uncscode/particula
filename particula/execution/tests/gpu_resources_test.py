@@ -1104,6 +1104,140 @@ def test_descriptor_only_dilution_view_validates_without_publication() -> None:
 
 
 @pytest.mark.warp
+def test_dilution_resources_accept_canonical_empty_factors_without_mutation() -> (
+    None
+):
+    """An empty resident layout accepts both canonical empty dilution sidecars."""
+    wp = pytest.importorskip("warp")
+    session = _session(boxes=0)
+    registry = GPUResourceRegistry(session)
+    coefficient = wp.zeros(0, dtype=wp.float64, device="cpu")
+    factors = wp.zeros(0, dtype=wp.float64, device="cpu")
+
+    registry.validate_dilution_resources(
+        session, DilutionResources(coefficient, factors)
+    )
+
+    assert coefficient.shape == (0,)
+    assert factors.shape == (0,)
+    assert registry._bindings == {}
+    assert registry._views == {}
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("kind", "match"),
+    (
+        ("carrier", "exact DilutionResources"),
+        ("type", "normalized_coefficient must be a Warp array"),
+        ("dtype", "normalized_coefficient has incompatible schema"),
+        ("shape", "normalized_coefficient has incompatible schema"),
+        ("self", "must not share identity"),
+        ("primary", "must not alias session primaries"),
+        ("established", "must not share identity"),
+    ),
+)
+def test_dilution_resource_validation_rejects_invalid_views_without_mutation(
+    kind: str, match: str
+) -> None:
+    """Invalid dilution views reject before changing primaries or publications."""
+    wp = pytest.importorskip("warp")
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    coefficient = wp.full(1, 11.0, dtype=wp.float64, device="cpu")
+    factors = wp.full(1, 13.0, dtype=wp.float64, device="cpu")
+    candidate: Any = DilutionResources(coefficient, factors)
+    established = None
+    if kind == "carrier":
+        candidate = object()
+    elif kind == "type":
+        candidate = DilutionResources(object(), factors)
+    elif kind == "dtype":
+        candidate = DilutionResources(
+            wp.zeros(1, dtype=wp.float32, device="cpu"), factors
+        )
+    elif kind == "shape":
+        candidate = DilutionResources(
+            wp.zeros((1, 1), dtype=wp.float64, device="cpu"), factors
+        )
+    elif kind == "self":
+        candidate = DilutionResources(coefficient, coefficient)
+    elif kind == "primary":
+        candidate = DilutionResources(
+            cast(Any, session.environment).temperature, factors
+        )
+    elif kind == "established":
+        established = (
+            registry.acquire_condensation().scratch_buffers.dynamic_viscosity
+        )
+        candidate = DilutionResources(coefficient, established)
+    primaries_before = tuple(
+        array.numpy().copy()
+        for array in (
+            cast(Any, session.particles).masses,
+            cast(Any, session.particles).concentration,
+            cast(Any, session.gas).concentration,
+        )
+    )
+    candidate_before = (coefficient.numpy().copy(), factors.numpy().copy())
+    bindings = registry._bindings.copy()
+    views = registry._views.copy()
+
+    with pytest.raises((TypeError, ValueError), match=match):
+        registry.validate_dilution_resources(session, candidate)
+
+    np.testing.assert_array_equal(coefficient.numpy(), candidate_before[0])
+    np.testing.assert_array_equal(factors.numpy(), candidate_before[1])
+    for current, before in zip(
+        (
+            cast(Any, session.particles).masses,
+            cast(Any, session.particles).concentration,
+            cast(Any, session.gas).concentration,
+        ),
+        primaries_before,
+        strict=True,
+    ):
+        np.testing.assert_array_equal(current.numpy(), before)
+    assert registry._bindings == bindings
+    assert registry._views == views
+    if established is not None:
+        np.testing.assert_array_equal(established.numpy(), np.zeros(1))
+
+
+@pytest.mark.warp
+def test_dilution_resource_validation_rejects_overlapping_nonempty_ranges(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Distinct valid sidecars with overlapping ranges reject before mutation."""
+    wp = pytest.importorskip("warp")
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    coefficient = wp.full(1, 11.0, dtype=wp.float64, device="cpu")
+    factors = wp.full(1, 13.0, dtype=wp.float64, device="cpu")
+    original_validate = registry._validate_array
+
+    def overlapping_ranges(
+        entry: ManifestEntry, value: Any, capacity: int | None
+    ) -> tuple[int, int] | None:
+        """Preserve schema checks while modeling overlapping supplied storage."""
+        original_validate(entry, value, capacity)
+        return (8, 16)
+
+    monkeypatch.setattr(registry, "_validate_array", overlapping_ranges)
+    before = (coefficient.numpy().copy(), factors.numpy().copy())
+
+    with pytest.raises(ValueError, match="byte ranges must not overlap"):
+        registry.validate_dilution_resources(
+            session, DilutionResources(coefficient, factors)
+        )
+
+    np.testing.assert_array_equal(coefficient.numpy(), before[0])
+    np.testing.assert_array_equal(factors.numpy(), before[1])
+    assert registry._bindings == {}
+    assert registry._views == {}
+
+
+@pytest.mark.warp
 @pytest.mark.parametrize("capacities", ((0, 0, 0), (0, 2, 0)))
 def test_logical_resource_report_retains_zero_extent_roles(
     capacities: tuple[int, int, int],

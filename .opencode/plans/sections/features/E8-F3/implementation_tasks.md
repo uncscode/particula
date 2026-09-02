@@ -9,8 +9,12 @@
   by allocation, range validation, and reporting, preserving zero dimensions.
 - [x] Add frozen pointer-free per-role, per-family, and aggregate logical-byte
   report records plus the read-only `logical_resource_report()` accessor.
-- [ ] Inventory E8-F2 prepared operations and add missing fixed-shape process,
-  control, selected-lane, and validation/status sidecars to canonical manifests.
+- [x] Add the descriptor-only dilution normalized-coefficient and factors roles
+  and concrete `PreparedResourceViews` plumbing; validate supplied views
+  read-only and retain accepted resource identities in prepared adapters.
+- [ ] Inventory the remaining E8-F2 prepared operations and add missing
+  fixed-shape process, control, selected-lane, and validation/status sidecars
+  to canonical manifests.
 - [ ] Represent diagnostic outputs/accounting work as closed capture resources
   while preserving existing direct diagnostics validation behavior.
 - [ ] Preserve mutually exclusive GAS/PARTICLES communication families and pin
@@ -30,6 +34,8 @@
 - [x] Extend `particula/execution/tests/gpu_resources_test.py` with P1 manifest
   order, independent byte-formula, zero-extent, invalid input, overflow,
   immutability, export-boundary, and read-only reporting tests.
+- [x] Add adjacent P2 prepared-view validation and exact identity-retention
+  coverage without introducing allocation/publication/reacquisition behavior.
 - [ ] Add focused prepared-timestep integration tests under
   `particula/execution/tests/` with allocator/acquisition/readback spies.
 - [ ] Cover one/multi-box, zero particle/species dimensions, both communication

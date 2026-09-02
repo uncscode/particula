@@ -261,6 +261,57 @@ def test_prepared_dilution_enqueue_uses_frozen_concentration_fields() -> None:
     npt.assert_array_equal(replacement_gas.numpy(), 19.0)
 
 
+def test_prepared_dilution_uses_supplied_factor_storage_without_allocation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Private preparation retains validated prepared factor storage by identity."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution as dilution_module
+
+    particles, gas = _containers(n_boxes=1)
+    coefficient = wp.full(1, 0.5, dtype=wp.float64, device="cpu")
+    factors = wp.full(1, 17.0, dtype=wp.float64, device="cpu")
+    monkeypatch.setattr(
+        dilution_module.wp,
+        "empty",
+        lambda *_args, **_kwargs: pytest.fail(
+            "supplied factors must prevent fallback allocation"
+        ),
+    )
+
+    prepared = dilution_module._prepare_dilution_step_gpu(
+        particles,
+        gas,
+        coefficient,
+        1.0,
+        factors=factors,
+    )
+
+    assert prepared.factors is factors
+
+
+def test_prepared_dilution_retains_supplied_storage_for_no_op() -> None:
+    """Validated supplied sidecars remain pinned on write-free preparation."""
+    wp = _warp()
+    from particula.gpu.kernels.dilution import _prepare_dilution_step_gpu
+
+    particles, gas = _containers(n_boxes=1)
+    coefficient = wp.full(1, 0.5, dtype=wp.float64, device="cpu")
+    factors = wp.full(1, 17.0, dtype=wp.float64, device="cpu")
+
+    prepared = _prepare_dilution_step_gpu(
+        particles,
+        gas,
+        coefficient,
+        0.0,
+        factors=factors,
+    )
+
+    assert prepared.coefficient is coefficient
+    assert prepared.factors is factors
+    assert prepared.no_op is True
+
+
 @dataclass(frozen=True)
 class P4DilutionCase:
     """Immutable finite-step fixture for deterministic P4 parity coverage."""
