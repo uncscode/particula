@@ -252,6 +252,16 @@ class SelectedResourceRole:
     This concrete-only carrier retains a caller or registry array by identity
     for the lifetime of one capture selection.  It records metadata only and
     is neither checkpoint authority nor an ownership transfer.
+
+    Attributes:
+        canonical_name: Deterministic name for the selected role.
+        family: Resource family containing the role.
+        dtype: Warp dtype of the retained array.
+        shape: Resolved fixed-shape schema.
+        value: Retained array reference, preserved by identity.
+        element_count: Number of logical elements in ``shape``.
+        logical_byte_count: Logical bytes required by the role.
+        read_only: Whether the role is a read-only accounting input.
     """
 
     canonical_name: str
@@ -266,7 +276,13 @@ class SelectedResourceRole:
 
 @dataclass(frozen=True, eq=False)
 class SelectedResourceFamilyReport:
-    """Report the ordered metadata-only roles selected from one family."""
+    """Report the ordered metadata-only roles selected from one family.
+
+    Attributes:
+        family: Canonical name of the selected resource family.
+        roles: Ordered identity-pinned role records in the family.
+        logical_byte_count: Checked sum of the roles' logical byte counts.
+    """
 
     family: str
     roles: tuple[SelectedResourceRole, ...]
@@ -281,6 +297,12 @@ class SelectedResourceInventory:
     their callers or registry.  Re-registration succeeds only for this exact
     retained identity selection; no device data is copied, inspected, or made
     checkpoint-visible.
+
+    Attributes:
+        communication_resources: Selected closed communication view, if present.
+        registrations: Exact ordered diagnostic-registration tuple.
+        families: Deterministic selected-family reports.
+        logical_byte_count: Checked total of all selected role bytes.
     """
 
     communication_resources: "CommunicationResources | None"
@@ -1014,6 +1036,9 @@ class GPUResourceRegistry:
         Raises:
             ValueError: If no capture selection has been registered or the
                 pinned session has drifted.
+
+        Returns:
+            The immutable inventory retained during registration.
         """
         self.validate_pinned_session(self._session)
         if self._capture_inventory is None:
@@ -1268,6 +1293,23 @@ class GPUResourceRegistry:
         later exact repeat returns it; all other repeats reject without changing
         the retained inventory.  This method performs no allocation, device
         dispatch, synchronization, transfer, or payload inspection.
+
+        Args:
+            session: Exact active session pinned by this registry.
+            communication_resources: Optional published closed communication
+                view to include in the selection.
+            registrations: Exact ordered tuple of diagnostic registrations.
+
+        Returns:
+            The newly retained inventory, or the same inventory for an exact
+            repeat registration.
+
+        Raises:
+            TypeError: If a carrier or registration tuple has the wrong exact
+                type.
+            ValueError: If session identity, publication identity, schemas,
+                or nonaliasing constraints are invalid, or a different
+                selection was already registered.
         """
         self.validate_pinned_session(session)
         if communication_resources is not None:
