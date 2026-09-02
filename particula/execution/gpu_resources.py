@@ -26,7 +26,7 @@ published lanes without hidden transfer or synchronization.
 for resident timestep guards. It requires the exact retained session, then
 revalidates its active lifecycle, pinned container and primary-array identities,
 and schema metadata without inspecting payloads, acquiring sidecars, allocating,
- transferring, or synchronizing.
+transferring, or synchronizing.
 
 For concrete checkpointing, the private deterministic enumeration seam exposes
 established live sidecars only after the same active pinned-session validation.
