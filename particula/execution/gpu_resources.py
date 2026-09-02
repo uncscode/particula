@@ -281,6 +281,12 @@ class CoagulationResources:
     readback, transfer, or synchronization. The sidecar has no wall-loss,
     public checkpoint, reset, or inspection API. Schema-v3 checkpoint restart
     can privately restore fresh bindings from captured current words.
+
+    Attributes:
+        collision_capacity: Fixed maximum number of collision pairs per box.
+        collision_pairs: Caller- or registry-owned ``int32`` pair storage.
+        n_collisions: Per-box ``int32`` collision-count storage.
+        rng_states: Persistent per-box ``uint32`` RNG state.
     """
 
     collision_capacity: int
@@ -321,6 +327,9 @@ class WallLossResources:
     allocation or reseeding. The sidecar is distinct from coagulation state and
     has no public reset or inspection API. Schema-v3 checkpoint restart can
     privately restore fresh bindings from captured current words.
+
+    Attributes:
+        rng_states: Persistent per-box ``uint32`` wall-loss RNG state.
     """
 
     rng_states: Any
@@ -1313,6 +1322,14 @@ class GPUResourceRegistry:
     ) -> None:
         """Require the exact established condensation view.
 
+        Args:
+            session: Exact active session pinned by this registry.
+            resources: Exact published condensation resource view.
+
+        Raises:
+            TypeError: If ``resources`` is not an exact condensation view.
+            ValueError: If the view or any pinned sidecar binding has changed.
+
         This does not acquire a new resource binding.
         """
         self.validate_pinned_session(session)
@@ -1332,6 +1349,14 @@ class GPUResourceRegistry:
         self, session: ResidentSession, resources: CoagulationResources
     ) -> None:
         """Require the exact established coagulation view.
+
+        Args:
+            session: Exact active session pinned by this registry.
+            resources: Exact published coagulation resource view.
+
+        Raises:
+            TypeError: If ``resources`` is not an exact coagulation view.
+            ValueError: If capacity, view identity, or sidecar bindings changed.
 
         This does not acquire a new resource binding.
         """
@@ -1766,7 +1791,22 @@ class GPUResourceRegistry:
         dtype: Any,
         role: str,
     ) -> tuple[int, int] | None:
-        """Validate contiguous metadata and return a nonempty byte range."""
+        """Validate contiguous metadata and return a nonempty byte range.
+
+        Args:
+            value: Warp array whose storage metadata is checked.
+            shape: Expected logical shape of the array.
+            dtype: Expected Warp dtype.
+            role: Role name used in validation errors.
+
+        Returns:
+            Half-open byte range for nonempty storage, or ``None`` for an empty
+            logical array.
+
+        Raises:
+            ValueError: If strides, pointer alignment, or storage capacity is
+                invalid.
+        """
         strides = getattr(value, "strides", None)
         if not isinstance(strides, tuple) or len(strides) != len(shape):
             raise ValueError(f"{role} must have contiguous strides.")

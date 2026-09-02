@@ -49,7 +49,13 @@ def _dilution_factors(
     time_step: wp.float64,
     factors: wp.array(dtype=wp.float64),
 ) -> None:
-    """Calculate one dilution factor for each simulation box."""
+    """Calculate one exponential dilution factor for each simulation box.
+
+    Args:
+        coefficient: Per-box dilution coefficients in inverse seconds.
+        time_step: Duration of the dilution step in seconds.
+        factors: Output array receiving ``exp(-coefficient × time_step)``.
+    """
     box = wp.tid()
     factors[box] = wp.exp(-coefficient[box] * time_step)
 
@@ -60,7 +66,13 @@ def _apply_particle_dilution(
     coefficient: wp.array(dtype=wp.float64),
     factors: wp.array(dtype=wp.float64),
 ) -> None:
-    """Apply precomputed per-box dilution factors to particle concentration."""
+    """Apply precomputed factors to particle concentration in place.
+
+    Args:
+        concentration: Per-box, per-particle concentration array.
+        coefficient: Per-box coefficients used to skip zero-coefficient boxes.
+        factors: Precomputed per-box exponential dilution factors.
+    """
     box, particle = wp.tid()
     if coefficient[box] != 0.0:
         concentration[box, particle] = (
@@ -74,7 +86,13 @@ def _apply_gas_dilution(
     coefficient: wp.array(dtype=wp.float64),
     factors: wp.array(dtype=wp.float64),
 ) -> None:
-    """Apply precomputed per-box dilution factors to gas concentration."""
+    """Apply precomputed factors to gas concentration in place.
+
+    Args:
+        concentration: Per-box, per-species concentration array.
+        coefficient: Per-box coefficients used to skip zero-coefficient boxes.
+        factors: Precomputed per-box exponential dilution factors.
+    """
     box, species = wp.tid()
     if coefficient[box] != 0.0:
         concentration[box, species] = concentration[box, species] * factors[box]
@@ -564,8 +582,23 @@ def dilution_step_gpu(
 ) -> tuple[Any, Any]:
     """Prepare and enqueue GPU dilution after complete entry-point preflight.
 
-    This public wrapper preserves the direct API while the private prepared
-    record isolates validation and allocation from device enqueue.
+    The wrapper preserves the direct API while the private prepared record
+    isolates validation and allocation from device enqueue.
+
+    Args:
+        particles: Caller-owned particle container with Warp concentration
+            storage.
+        gas: Caller-owned gas container with Warp concentration storage.
+        coefficient: Nonnegative dilution coefficient in ``s^-1``, either a
+            scalar or a per-box ``wp.float64`` array.
+        time_step: Nonnegative dilution duration in seconds.
+
+    Returns:
+        The original ``particles`` and ``gas`` containers, in that order.
+
+    Raises:
+        TypeError: If a scalar input has an unsupported type.
+        ValueError: If schemas, devices, values, or storage overlap are invalid.
     """
     return _enqueue_prepared_dilution_call(
         _prepare_dilution_step_gpu(particles, gas, coefficient, time_step)

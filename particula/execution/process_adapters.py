@@ -29,7 +29,12 @@ if TYPE_CHECKING:
 
 
 def _resource_types() -> tuple[type[object], type[object], type[object]]:
-    """Import concrete resource types only when a carrier needs them."""
+    """Import concrete resource types only when a carrier needs them.
+
+    Returns:
+        The exact registry, wall-loss resource, and nucleation resource types,
+        in that order.
+    """
     from particula.execution.gpu_resources import (
         GPUResourceRegistry,
         NucleationResources,
@@ -533,6 +538,16 @@ class ResidentWallLossAdapter:
         Selection validation, physical-lane resolution, device allocation, and
         direct-boundary lookup all occur before the retained binding is
         returned. Its execution is strictly enqueue-only.
+
+        Args:
+            request: Validated resident wall-loss request to prepare.
+            enabled_logical_boxes: Ascending logical boxes selected for launch.
+
+        Returns:
+            A binding that dispatches only the selected physical lanes.
+
+        Raises:
+            ValueError: If selected boxes cannot be mapped to resident lanes.
         """
         import warp as wp
 
