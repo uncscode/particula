@@ -18,6 +18,10 @@ state before writing its diagnostic or scaling selected rows. It writes the
 resolved requested factor for selected rows and ``1.0`` otherwise. It has no
 package export, policy, transfer, resizing, or runnable integration; callers
 own device placement and explicitly synchronize before observing results.
+
+Private prepared records preserve legacy validation and workspace allocation in
+setup. Enqueue dispatches retained device work only, without validation,
+readback, allocation, transfer, synchronization, lookup, rebinding, or recovery.
 """
 
 # mypy: disable-error-code="valid-type, misc, operator"

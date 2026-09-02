@@ -5,7 +5,9 @@ already-acquired closed-map communication and optional volume evolution. Its
 prepared enqueue dispatches only those retained device barriers, without
 validation, acquisition, host conversion, synchronization, fallback, or
 recovery. The shared validator remains a read-only metadata seam for legacy
-execution.
+execution. Prepared enqueue is retained-reference dispatch only: it does no
+payload validation/readback, allocation, transfer, synchronization, lookup,
+resource replacement, or fallback.
 """
 
 from __future__ import annotations

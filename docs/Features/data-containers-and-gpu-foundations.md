@@ -293,6 +293,37 @@ launches. See
 
 ### GPU-resident deterministic timestep
 
+### Resident prepared enqueue boundary
+
+`particula.execution.resident_enqueue` and
+`particula.execution.resident_scheduler` are concrete-only direct-import seams;
+prepared records and enqueue helpers are not `particula.execution` or top-level
+imports. READY setup validates, normalizes, performs established private fallback
+allocation, binds exact identities, and freezes control and operation selection.
+Private prepared bindings then retain references and issue only frozen device or
+write-free no-op callables: they perform no payload validation or readback,
+allocation, transfer, synchronization, resource acquisition/replacement, device
+selection/fallback, dynamic policy or schedule resolution, mutable-carrier lookup or
+rebinding, or RNG initialization/reset. Direct wrappers may retain their
+established bounded device-status observation after a prepared call; resident
+prepared bindings are observation-free.
+
+`prepare_resident_timestep()` retains an exact READY session, registry, guard,
+request, signature, primaries, views, schedule, and duration by identity, but
+does not authorize capture, token entry, or dispatch. The composed
+`enqueue_prepared_resident_simulation()` is separate from an individual binding:
+it first applies its retained structural/lifecycle identity gate before token
+entry, opens exactly one token only after that gate, and dispatches the twelve
+frozen operations in canonical order. Empty or no-work bindings are write-free;
+live pinned payload changes are permitted, while structural identities and frozen
+scalar controls require a new prepared record. E8-F1 owns lifecycle,
+compatibility, CAPTURED admission, invalidation, and FAULTED classification; the
+registry owns sidecars. A writer-capable failure retains the no-rollback, no-retry,
+and no-fallback recovery boundary. E8-F3 owns resource work; E8-F4 native
+capture/replay and captured parity remain downstream; E8-F5--E8-F7 own later
+parity/performance/memory/profiling evidence; E8-F8 owns the example,
+limitations, and closeout.
+
 `particula.execution.resident_scheduler` and
 `particula.execution.diagnostics` are concrete-only direct-import seams. They
 are not exported by `particula.execution` or the top-level package. The

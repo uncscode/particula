@@ -15,6 +15,10 @@ scalar coefficients are broadcast into private active-device ``wp.float64``
 storage only after preflight. Zero scalar coefficients and zero time steps are
 write-free no-ops only after full preflight. Rollback after a successfully
 launched kernel failure is not promised.
+
+Prepared private execution preserves this validation and scalar-allocation
+ordering; retained-reference enqueue performs no validation, allocation,
+readback, transfer, synchronization, lookup, rebinding, or recovery.
 """
 
 # mypy: disable-error-code="valid-type, misc"

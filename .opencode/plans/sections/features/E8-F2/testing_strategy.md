@@ -1,5 +1,13 @@
 # Testing Strategy
 
+## P8 closeout evidence
+
+- Focused documentation assertions passed: 22 passed in 0.09s using
+  `pytest particula/execution/tests/graph_capture_docs_test.py
+  particula/tests/execution_selection_docs_test.py -q --no-cov`.
+- `mkdocs build --strict` passed with exit 0 in 14.67s.
+- This documentation-only phase has no targeted coverage gate.
+
 Every production phase ships co-located `*_test.py` coverage in the same PR.
 Coverage thresholds and the normal collection policy must not be lowered.
 

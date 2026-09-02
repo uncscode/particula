@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-08-30",
+  "last_updated": "2026-09-01",
   "dependencies": [],
   "section_files": {
     "appendix": ".opencode/plans/sections/epics/E8/appendix.md",
@@ -30,6 +30,10 @@
   "child_plans": [
     {
       "id": "E8-F1",
+      "type": "feature"
+    },
+    {
+      "id": "E8-F2",
       "type": "feature"
     }
   ],

@@ -1,5 +1,13 @@
 # Change Log
 
+## 2026-09-01 — E8-F2-P8 shipped (#1559)
+
+- Published the concrete-only prepared enqueue developer contract and source
+  docstrings without changing runtime behavior or exports.
+- Recorded focused assertions: 22 passed in 0.09s; `mkdocs build --strict`:
+  exit 0 in 14.67s.
+- P7 remains Not Started; E8-F3--E8-F8 remain pending.
+
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-08-30 | Created first-pass E8-F2 plan with eight phases for validated setup, process-specific prepared enqueue paths, full resident composition, tests, and documentation | plan-feature-drafter |

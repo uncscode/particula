@@ -11,6 +11,10 @@ number generation for eligible fixed slots.
 An omitted RNG sidecar is private and seeded for each successful positive-time
 call. A supplied ``uint32`` Warp sidecar remains caller-owned, advances in
 place only for eligible slots, and resets only when explicitly requested.
+
+Private prepared calls retain validated arrays and frozen selection after setup.
+Their enqueue dispatches only retained device work, without validation,
+allocation, readback, transfer, synchronization, lookup, or RNG reset.
 """
 
 # mypy: disable-error-code="valid-type, misc, operator"

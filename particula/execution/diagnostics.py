@@ -16,7 +16,9 @@ source and sink ledgers are nonnegative accumulated extensive-mass inputs.
 Execution validates caller-owned same-device bindings without host readback,
 synchronization, transfer, allocation, or physics mutation. Empty matrix
 operations are write-free for ``B == 0`` or ``S == 0``; particle number is
-write-free only for ``B == 0``.
+write-free only for ``B == 0``. Prepared setup binds the closed plan; its
+observation-free enqueue uses retained device copies without validation,
+allocation, readback, transfer, synchronization, or lookup.
 """
 
 from __future__ import annotations

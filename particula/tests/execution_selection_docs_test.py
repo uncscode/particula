@@ -265,6 +265,25 @@ def test_backend_selection_guide_closes_reason_and_retry_outcomes() -> None:
     assert "does not change native result metadata" in normalized
 
 
+def test_prepared_enqueue_names_remain_outside_execution_public_surface() -> (
+    None
+):
+    """Test concrete prepared names are absent from frozen execution exports."""
+    import particula.execution as execution
+
+    foundations = FEATURE_PATH.read_text(encoding="utf-8")
+    prepared_names = (
+        "PreparedResidentTimestep",
+        "PreparedResidentSimulation",
+        "prepare_resident_timestep",
+        "prepare_resident_simulation",
+        "enqueue_prepared_resident_simulation",
+    )
+    assert all(name not in execution.__all__ for name in prepared_names)
+    assert "from particula.execution import Prepared" not in foundations
+    assert "from particula import Prepared" not in foundations
+
+
 def test_backend_selection_guide_states_exact_resolver_and_no_movement() -> (
     None
 ):

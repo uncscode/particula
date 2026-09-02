@@ -5,7 +5,9 @@ resident session, resource registry, resolved graph, and graph node. It uses
 temporary device scalar validation storage before copying only the designated
 resident arrays in place. Canonical empty schemas are intentional write-free
 no-ops. It neither schedules, refreshes derived state, transfers host data,
-acquires resources, changes lifecycle state, nor provides a fallback.
+acquires resources, changes lifecycle state, nor provides a fallback. Prepared
+setup owns validation and binding; retained-reference enqueue performs no
+payload validation, allocation, readback, transfer, synchronization, or lookup.
 """
 
 # mypy: disable-error-code="valid-type, misc"

@@ -1,5 +1,6 @@
 """Regression tests for the graph-capture developer documentation contract."""
 
+import ast
 import json
 from pathlib import Path
 
@@ -63,16 +64,9 @@ def test_developer_documents_preserve_graph_capture_contract_and_order() -> (
         "payload-only compatibility",
         "complete_resident_graph_capture()",
         "explicit retirement then renewal",
-        "E8-F2--E8-F8",
-        "no automatic recapture",
         "cross-device replay",
         "hidden allocation/transfer/",
         "no retry or rollback guarantee",
-        "checkpointed native graph handles",
-        "native/full-loop capture or replay",
-        "captured numerical parity",
-        "benchmark/profiling/memory",
-        "user examples",
     )
     for path, document in documents.items():
         _require_statements(document, path, required)
@@ -193,7 +187,10 @@ def test_planning_records_preserve_p4_validation_block_and_handoff_boundary() ->
         phase["status"] == "Shipped" for phase in feature_record["phases"]
     )
     assert epic_record["status"] == "In Progress"
-    assert {child["id"] for child in epic_record["child_plans"]} == {"E8-F1"}
+    assert {child["id"] for child in epic_record["child_plans"]} == {
+        "E8-F1",
+        "E8-F2",
+    }
     assert epic_record["milestones"] == [
         {
             "name": "Capture lifecycle established",
@@ -202,3 +199,134 @@ def test_planning_records_preserve_p4_validation_block_and_handoff_boundary() ->
             "status": "Shipped",
         }
     ]
+
+
+def test_prepared_enqueue_docs_preserve_private_ready_contract() -> None:
+    """Test developer docs distinguish setup, enqueue, and scheduler gating."""
+    roadmap = _read("docs/Features/Roadmap/data-oriented-gpu.md")
+    foundations = _read("docs/Features/data-containers-and-gpu-foundations.md")
+    agents = _read("AGENTS.md")
+    phrases = (
+        "concrete-only",
+        "READY",
+        "validation",
+        "dynamic",
+        "RNG",
+        "identity gate before token entry",
+        "exactly one token",
+        "twelve frozen operations in canonical order",
+        "Empty or no-work bindings are write-free",
+        "E8-F1",
+        "writer",
+        "E8-F3 owns resource work",
+        "E8-F4 native capture/replay",
+    )
+    for path, document in (
+        ("roadmap", roadmap),
+        ("foundations", foundations),
+        ("AGENTS.md", agents),
+    ):
+        _require_statements(document, path, phrases)
+    assert "from particula.execution import Prepared" not in foundations
+    assert "from particula import Prepared" not in foundations
+
+
+def test_e8_f2_records_reconcile_shipped_phases_and_p8_evidence() -> None:
+    """Test E8-F2 records retain P8 completion only with literal evidence."""
+    feature = json.loads(_read(".opencode/plans/features/E8-F2.json"))
+    phase_status = {phase["id"]: phase for phase in feature["phases"]}
+    assert feature["status"] == "In Progress"
+    assert feature["lifecycle"] == "active"
+    for phase_number in range(1, 7):
+        phase = phase_status[f"E8-F2-P{phase_number}"]
+        assert phase["status"] == "Shipped"
+    assert phase_status["E8-F2-P6"]["completion_date"] == "2026-09-01"
+    assert phase_status["E8-F2-P7"]["status"] == "Not Started"
+    assert phase_status["E8-F2-P8"]["status"] == "Shipped"
+    assert phase_status["E8-F2-P8"]["issue_number"] == 1559
+    assert phase_status["E8-F2-P8"]["completion_date"] == "2026-09-01"
+    assert "22 passed" in phase_status["E8-F2-P8"]["notes_ref"]
+    assert "mkdocs build --strict" in phase_status["E8-F2-P8"]["notes_ref"]
+    for path in (
+        "docs/Features/Roadmap/data-oriented-gpu.md",
+        ".opencode/plans/sections/epics/E8/child_plans.md",
+        ".opencode/plans/sections/epics/E8/milestones_timeline.md",
+    ):
+        document = _read(path)
+        normalized_document = " ".join(document.split())
+        assert (
+            "P1--P6/P8" in normalized_document
+            and "shipped" in normalized_document
+        ), f"Missing final P8 reconciliation in {path}."
+        assert (
+            "P7" in normalized_document and "pending" in normalized_document
+        ), f"P7 must remain pending in {path}."
+
+
+def test_prepared_source_docstrings_state_setup_dispatch_boundary() -> None:
+    """Test concrete E8-F2 modules document retained-reference enqueue work."""
+    modules = (
+        "particula/execution/resident_enqueue.py",
+        "particula/execution/resident_scheduler.py",
+        "particula/execution/state_updates.py",
+        "particula/execution/thermodynamic_updates.py",
+        "particula/execution/diagnostics.py",
+        "particula/execution/resident_communication.py",
+        "particula/execution/adapters/condensation.py",
+        "particula/execution/adapters/coagulation.py",
+        "particula/execution/process_adapters.py",
+        "particula/gpu/kernels/communication.py",
+        "particula/gpu/kernels/condensation.py",
+        "particula/gpu/kernels/coagulation.py",
+        "particula/gpu/kernels/dilution.py",
+        "particula/gpu/kernels/wall_loss.py",
+        "particula/gpu/kernels/nucleation.py",
+        "particula/gpu/kernels/exhaustion.py",
+    )
+    for relative_path in modules:
+        tree = ast.parse(_read(relative_path))
+        docstring = ast.get_docstring(tree)
+        assert docstring is not None, (
+            f"Missing module docstring in {relative_path}."
+        )
+        normalized = " ".join(docstring.split()).lower()
+        assert "prepared" in normalized, (
+            f"Missing prepared setup/dispatch contract in {relative_path}."
+        )
+        assert "validation" in normalized, (
+            f"Missing setup validation boundary in {relative_path}."
+        )
+        assert "allocation" in normalized, (
+            f"Missing allocation boundary in {relative_path}."
+        )
+
+        prepared_seams = (
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, (ast.ClassDef, ast.FunctionDef))
+            and (
+                node.name.startswith("Prepared")
+                or node.name.startswith("setup_prepared_")
+                or node.name.startswith("_prepare_")
+                or node.name.startswith("_enqueue_prepared_")
+            )
+        )
+        for seam in prepared_seams:
+            seam_docstring = ast.get_docstring(seam)
+            assert seam_docstring is not None, (
+                f"Missing prepared-seam docstring for {seam.name} in "
+                f"{relative_path}."
+            )
+
+    scheduler = ast.parse(_read("particula/execution/resident_scheduler.py"))
+    enqueue = next(
+        node
+        for node in scheduler.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "enqueue_prepared_resident_simulation"
+    )
+    docstring = ast.get_docstring(enqueue)
+    assert docstring is not None
+    normalized = " ".join(docstring.split()).lower()
+    assert "pre-token gate" in normalized
+    assert "exactly one token" in normalized

@@ -24,6 +24,10 @@ buffer for refresh. Latent heat, when supplied, corrects each fixed substep.
 An optional caller-owned energy-transfer output records signed whole-call
 finalized-transfer energy on the active device, while thermal-work remains
 validated caller-owned state reserved for later work.
+
+Private prepared calls preserve this validation ordering, normalization, and
+fallback allocation during setup; retained-reference enqueue performs no
+validation, allocation, readback, transfer, synchronization, lookup, or reset.
 """
 
 # pyright: basic

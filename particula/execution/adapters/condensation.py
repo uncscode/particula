@@ -11,6 +11,9 @@ enqueue. Frozen fields prevent rebinding only; retained resources remain
 mutable and caller-owned. Native calls may mutate particle masses, gas
 concentration or vapor pressure, and writable sidecars. Callers own resource
 lifetime, synchronization, concurrency, and any post-launch recovery limits.
+Setup preserves legacy validation ordering, normalization, and private fallback
+allocation; prepared enqueue uses retained references only and has no recovery
+after a writer-capable failure.
 """
 
 from dataclasses import dataclass

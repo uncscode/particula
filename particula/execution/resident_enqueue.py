@@ -3,7 +3,10 @@
 This concrete direct-import-only P1 boundary validates and freezes READY-state
 identity metadata only. It does not construct executors, capture, enqueue,
 dispatch, acquire resources, inspect payloads, transfer, synchronize, mutate a
-lifecycle, or fall back.
+lifecycle, or fall back. Preparation performs validation and retains the exact
+READY binding but does not authorize token entry or dispatch; identity or
+lifecycle drift requires a new prepared record and rejects before token entry.
+It performs no allocation.
 """
 
 from __future__ import annotations

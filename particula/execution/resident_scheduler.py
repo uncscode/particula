@@ -8,7 +8,9 @@ Legacy scheduler execution gates an attached graph-capture binding by its exact
 resident identities, capability, lifecycle, and structural signature before the
 step token is opened. The prepared path is concrete-only, READY, and
 uncaptured; it retains setup-validated operation callables and rechecks only
-its attachment and structural signature before opening its token.
+its attachment and structural signature before opening its token. After this
+mandatory pre-token gate, prepared dispatch performs no validation, readback,
+allocation, transfer, synchronization, lookup, rebinding, or RNG reset.
 """
 
 from __future__ import annotations
@@ -716,7 +718,7 @@ def _enqueue_prepared_diagnostics_window(
     consumer: object,
     diagnostics: object,
 ) -> None:
-    """Issue the retained diagnostic saturation refresh and copy operations."""
+    """Enqueue retained diagnostic saturation-refresh and copy operations."""
     _enqueue_prepared_saturation_ratio(cast(Any, consumer))
     _enqueue_prepared_resident_diagnostics(cast(Any, diagnostics))
 

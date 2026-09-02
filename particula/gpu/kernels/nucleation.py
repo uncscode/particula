@@ -21,6 +21,12 @@ shapes. Frozen records prevent rebinding their fields but do not copy, freeze,
 or otherwise transfer their caller-owned arrays. Only ``nucleation_step_gpu``
 is lazily exported through ``particula.gpu.kernels``; all records and helpers
 remain concrete-module-only.
+
+Prepared private execution retains legacy validation ordering, normalized
+controls, and established workspace allocation. Retained-reference enqueue
+performs no validation, readback, allocation, transfer, synchronization,
+lookup, rebinding, or policy resolution; recovery is not promised after a
+writer-capable launch.
 """
 
 # mypy: disable-error-code="valid-type, misc, operator"

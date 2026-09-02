@@ -1682,8 +1682,9 @@ deferred to the later Epic H tracks and Epic I.
 
 ## Epic H: Graph Capture and Performance
 
-Status: active. E8-F1 is shipped; E8-F2--E8-F8 remain the scheduled deferred
-feature tracks for native capture/replay and its later evidence.
+Status: active. E8-F1 and E8-F2 P1--P6/P8 are shipped. E8-F2 P7 and
+E8-F3--E8-F8 remain pending; native capture/replay and its evidence have not
+shipped.
 
 ### E8-F1 shipped contract
 
@@ -1725,9 +1726,43 @@ Excluded from E8-F1 are native/full-loop capture or replay, no automatic recaptu
 retries, rollback, CPU fallback/emulation, hidden allocation/transfer/
 synchronization, checkpointed native graph handles, cross-device replay,
 captured numerical parity, benchmark/profiling/memory claims, root-README
-changes, and user examples. E8-F2--E8-F8 own capture-ready enqueue, resource
-preparation, native capture/replay, parity, benchmarks, profiling, memory
-evidence, and examples.
+changes, and user examples. E8-F2 owns the shipped concrete prepared enqueue
+seams; E8-F3 owns resource work, E8-F4 native capture/replay and captured
+parity, E8-F5--E8-F7 parity/performance/memory/profiling, and E8-F8 the
+example, limitations, and closeout.
+
+### E8-F2 prepared enqueue contract
+
+E8-F2 P1--P6 ship a developer-only, concrete-module prepared path. Setup
+validates, normalizes, allocates established private fallback storage, binds
+identities, freezes the operation selection, and may retain established bounded
+direct-wrapper device-status observation and translation. The resulting private
+prepared-operation bindings retain references and dispatch frozen device or
+write-free no-op callables only. Individual binding dispatch performs no payload
+validation or readback, allocation, transfer, synchronization, resource
+acquisition or replacement, device selection or fallback, dynamic policy or
+schedule resolution, mutable-carrier lookup or rebinding, or RNG initialization
+or reset.
+
+`prepare_resident_timestep()` retains the exact READY session, registry, guard,
+request, signature, primaries, views, schedule, and duration by identity. It
+does not authorize capture, token entry, or dispatch. The separate composed
+`enqueue_prepared_resident_simulation()` first runs its retained structural and
+lifecycle identity gate before token entry, then opens exactly one token and
+dispatches the twelve frozen operations in canonical order. That gate is not
+device-only enqueue work; after it passes, dispatch has the same prohibited-work
+boundary as individual bindings. Empty or no-work bindings are write-free.
+Payload changes in pinned arrays remain live, but structural identities or frozen
+scalar controls require a new prepared record.
+
+E8-F1 remains the owner of capability qualification, lifecycle, compatibility,
+invalidation, FAULTED classification, and CAPTURED admission; the registry owns
+sidecars. Structural or lifecycle drift rejects before token entry. A
+writer-capable failure preserves the E8-F1 FAULTED, no-rollback, no-retry, and
+no-fallback recovery limit. Warp CPU is uncaptured implementation validation
+only; CUDA is optional pass-or-clean-skip evidence only. This documentation does
+not claim native capture/replay, captured parity, performance or memory evidence,
+or an end-user capture example.
 
 Reduce launch overhead with graph capture and establish performance and memory
 targets aligned with the multi-box scaling goal.

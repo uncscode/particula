@@ -104,7 +104,7 @@
     seam documentation records ownership and failure boundaries.
 
 - [x] **E8-F2-P6:** Add prepared nucleation and exhaustion enqueue path with unit tests
-  - Issue: #1557 | Size: M | Status: Implemented
+  - Issue: #1557 | Size: M | Status: Shipped | Delivered: 2026-09-01
   - Delivery: Added allocation-complete prepared resampling, representative-
     volume scaling, and nucleation records. Preparation retains legacy public
     validation precedence, pins all launch arrays, freezes controls, and owns
@@ -141,11 +141,18 @@
     regression on Warp CPU, lifecycle completion/fault behavior, forbidden host
     calls, and CUDA capture pass-or-clean-skip smoke evidence.
 
-- [ ] **E8-F2-P8:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E8-F2-P8:** Update development documentation
+  - Issue: #1559 | Size: XS | Status: Shipped | Delivered: 2026-09-01
   - Goal: Publish the implemented setup/enqueue boundary and handoffs without
     claiming E8-F4 parity or E8-F8 performance closeout.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Features/data-containers-and-gpu-foundations.md`, `AGENTS.md`, E8 plan
     sections
-  - Tests: Documentation contract assertions and `mkdocs build --strict`.
+  - Tests: `pytest particula/execution/tests/graph_capture_docs_test.py
+    particula/tests/execution_selection_docs_test.py -q --no-cov` passed: 22
+    passed in 0.09s. `mkdocs build --strict` passed: exit 0 in 14.67s.
+  - Contract: Documents concrete-only READY preparation, retained-reference
+    device/no-op enqueue, the scheduler's mandatory pre-token identity/lifecycle
+    gate, one-token canonical dispatch, write-free empty paths, and the
+    writer-capable no-rollback/no-retry/no-fallback recovery limit. No public
+    prepared imports, native replay, captured parity, or performance claim added.

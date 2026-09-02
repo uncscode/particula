@@ -987,10 +987,32 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   request/session/registry/closed-guard binding, an `ACTIVE` pinned session,
   available qualified non-CPU Warp capability, `CAPTURED` lifecycle, and a
   compatible signature.
-  E8-F2--E8-F8 own native/full-loop capture or replay, no automatic recapture,
-  hidden allocation/transfer/synchronization, checkpointed native graph handles,
-  cross-device replay, captured numerical parity, benchmark/profiling/memory
-  evidence, and user examples.
+  E8-F2 P1--P6 ship the concrete-only prepared enqueue boundary: setup validates,
+  normalizes, binds identities, and may allocate established private fallback
+  storage; individual retained bindings dispatch frozen device/no-op callables
+  without validation/readback, allocation, transfer, synchronization, resource
+  acquisition/replacement, device selection/fallback, dynamic schedule/policy
+  resolution, mutable-carrier lookup/rebinding, or RNG initialization/reset.
+  `prepare_resident_timestep()` retains READY identities but authorizes neither
+  token entry nor dispatch. `enqueue_prepared_resident_simulation()` separately
+  applies its retained structural/lifecycle identity gate before token entry, then opens
+  exactly one token and dispatches twelve frozen operations in canonical order.
+  Empty or no-work bindings are write-free; identity or frozen-control drift requires
+  new preparation and rejects before token entry. Writer-capable failure retains
+  E8-F1 FAULTED/no-rollback/no-retry/no-fallback recovery limits. E8-F3 owns
+  resource work; E8-F4 native capture/replay and captured parity; E8-F5--F7
+  parity/performance/memory/profiling; and E8-F8 example/limitations/closeout.
+  No automatic recapture, native/full-loop capture or replay, hidden allocation/transfer/
+  synchronization, or user example
+  is claimed by this prepared-path contract.
+  Warp CPU is uncaptured implementation validation; CUDA is optional
+  pass-or-clean-skip evidence. Validate this contract with:
+
+  ```bash
+  pytest particula/execution/tests/graph_capture_docs_test.py \
+    particula/tests/execution_selection_docs_test.py -q --no-cov
+  mkdocs build --strict
+  ```
 
 ### GPU-resident session lifecycle
 

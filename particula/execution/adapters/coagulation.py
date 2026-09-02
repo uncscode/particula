@@ -11,8 +11,11 @@ seed it only when ``initialize_rng`` is true; otherwise it reuses the supplied
 sidecar, including when the seed is unchanged. Callers own synchronization and
 recovery after a kernel launch.
 
-CPU and resident-Warp calls have independent stochastic trajectories. This
-concrete boundary provides no seed-by-seed cross-backend trajectory comparison.
+Prepared bindings freeze operation selection and dispatch retained references
+without validation, allocation, readback, transfer, synchronization, lookup, or
+RNG initialization/reset. CPU and resident-Warp calls have independent
+stochastic trajectories. This concrete boundary provides no seed-by-seed
+cross-backend trajectory comparison.
 """
 
 from dataclasses import dataclass

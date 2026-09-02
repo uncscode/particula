@@ -3,7 +3,10 @@
 This direct-import-only module retains resident sessions, registries, and
 published resource views by identity. Its adapters perform metadata-only
 preflight and call one supported direct GPU kernel without transfers,
-synchronization, acquisition, fallback, retry, rollback, or physics. These
+synchronization, acquisition, fallback, retry, rollback, or physics. Prepared
+bindings freeze selected controls and delegate only retained device calls, with
+no enqueue-time validation, readback, allocation, lookup, rebinding, or RNG
+initialization/reset. These
 concrete names are deliberately not exported from :mod:`particula.execution`.
 """
 

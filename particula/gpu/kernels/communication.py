@@ -9,6 +9,10 @@ exported by ``particula.gpu.kernels``, ``particula.gpu``, or the top-level
 package. The module performs no hidden host transfer, synchronization,
 resizing, conversion, or CPU fallback. Callers synchronize explicitly before
 inspecting asynchronous device results.
+
+Private prepared calls preserve legacy validation and fallback allocation in
+setup, then enqueue retained device work without validation, allocation,
+readback, transfer, synchronization, lookup, rebinding, or recovery.
 """
 
 # mypy: ignore-errors

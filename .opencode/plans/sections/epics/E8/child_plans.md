@@ -8,7 +8,7 @@ must ship its own co-located unit and contract tests.
 | ID | Feature Plan | Status | Notes |
 |----|--------------|--------|-------|
 | E8-F1 | Graph-Capture Capability and Lifecycle Contracts | Shipped | P1--P4 delivered; #1550 focused checks passed (2 graph-document tests and 16 export tests), the untargeted runner passed (6382 passed, 9 skipped, 94% coverage), and `mkdocs build --strict` passed (exit 0). This is a host-side contract handoff only: no native capture/replay or user example shipped. |
-| E8-F2 | Capture-Ready Device Enqueue Paths | Draft | Separate validated setup from capture-ready device enqueue paths |
+| E8-F2 | Capture-Ready Device Enqueue Paths | In Progress | P1--P6/P8 shipped; P7 composition remains pending. |
 | E8-F3 | Registry Preallocation, Identity Reuse, and Byte Accounting | Draft | Preallocate and pin process, communication, diagnostic, and RNG sidecars |
 | E8-F4 | Resident Graph Capture and Guarded Replay Lifecycle | Draft | Capture the fixed-order resident loop and provide guarded replay and invalidation |
 | E8-F5 | Captured Full-Loop Parity and Lifecycle Validation | Draft | Compare CPU, uncaptured GPU, and captured GPU process sequences |

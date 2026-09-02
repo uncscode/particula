@@ -10,8 +10,11 @@ Communication and volume-evolution barriers invalidate saturation ratio
 without invalidating or refreshing vapor pressure.
 
 It does not own lifecycle, resource acquisition, scheduling, transfers,
-fallbacks, or general process dispatch. Refreshing vapor pressure delegates to
-the authoritative GPU primitive; saturation refresh is a private device writer.
+fallbacks, or general process dispatch. Prepared setup freezes the consumer
+windows and enqueue uses retained writers without validation, allocation,
+readback, transfer, synchronization, or mutable-carrier lookup. Refreshing
+vapor pressure delegates to the authoritative GPU primitive; saturation refresh
+is a private device writer.
 """
 
 from __future__ import annotations
