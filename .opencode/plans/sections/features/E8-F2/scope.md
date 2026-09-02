@@ -49,8 +49,13 @@ concrete-only and retain exact caller-owned resident identities.
   lookup, or legacy/public delegation. Resampling-first and scaling-fallback
   behavior, P1--P5 errors, physics, identities, and no-admission primary no-op
   semantics remain intact. `ResidentNucleationAdapter` retains an exact
-  observation-free prepared binding without scheduler composition. Public APIs,
-  exports, scheduler behavior, and resource/checkpoint schemas are unchanged.
+   observation-free prepared binding without scheduler composition. Public APIs,
+   exports, scheduler behavior, and resource/checkpoint schemas are unchanged.
+- **Completed P8 (#1559):** document the shipped concrete-only prepared enqueue
+  contract in the roadmap, foundations guide, and `AGENTS.md`, and reconcile the
+  E8-F2 and E8 historical plan records. Focused assertions passed (22 passed in
+  0.09s); `mkdocs build --strict` passed (exit 0 in 14.67s). No runtime behavior,
+  exports, tests, or user-facing capture API changed.
 - Define immutable prepared-enqueue carriers tied to the exact E8-F1 capture
   lifecycle signature and `ResidentSimulationRequest`.
 - Move repeated scheduler metadata checks and executor construction into an
@@ -65,6 +70,9 @@ concrete-only and retain exact caller-owned resident identities.
   wrappers; prepared resident paths remain private/concrete-only.
 - Add CPU/Warp-CPU contract tests for setup and enqueue structure, plus
   CUDA-gated capture smoke evidence that skips cleanly when unavailable.
+- P1--P6/P8 are shipped; P7 remains pending: compose the complete prepared
+  resident sequence with its integration tests. E8-F3--E8-F8 remain pending
+  downstream work.
 
 ## Out of Scope
 

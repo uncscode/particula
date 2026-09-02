@@ -24,12 +24,13 @@ metadata and device checks run before normalizing environment inputs, setting up
 volume, initializing RNG state, or executing Brownian work. An explicit opt-in
 finite-charge validation scan is available for Brownian callers; every mode
 
-Private prepared calls freeze the selected mechanism and pinned arrays after
-legacy setup. Their enqueue performs retained device work only, with no
-validation, allocation, readback, transfer, synchronization, lookup, or RNG
-initialization/reset.
-containing charged hard-sphere physics or exact SP2016 sedimentation always
-validates finite charge before resource allocation or mutation. The kernels
+Modes containing charged hard-sphere physics or exact SP2016 sedimentation
+always validate finite charge before resource allocation or mutation. Private
+prepared calls freeze the selected mechanism and pinned arrays after legacy
+setup. Their enqueue performs retained device work only, with no validation,
+allocation, readback, transfer, synchronization, lookup, rebinding, or RNG
+initialization/reset. Rejection is pre-writer; rollback is not promised after a
+writer launches. The kernels
 operate on GPU-resident particle data and produce collision pairs that are
 applied in place: recipient particles receive donor mass and charge, while
 donor mass, concentration, and charge are cleared.

@@ -12,8 +12,10 @@ mutable and caller-owned. Native calls may mutate particle masses, gas
 concentration or vapor pressure, and writable sidecars. Callers own resource
 lifetime, synchronization, concurrency, and any post-launch recovery limits.
 Setup preserves legacy validation ordering, normalization, and private fallback
-allocation; prepared enqueue uses retained references only and has no recovery
-after a writer-capable failure.
+allocation; prepared enqueue uses retained references only and performs no
+validation, readback, allocation, transfer, synchronization, lookup, rebinding,
+or reset. Rejection is pre-writer; no recovery or rollback is promised after a
+writer-capable failure.
 """
 
 from dataclasses import dataclass
@@ -670,7 +672,9 @@ class _PreparedWarpCondensationBinding:
     caller-owned resident resources. It is concrete-module-only. Construction
     delegates validation and any fallback resolution to kernel preparation;
     ``execute()`` delegates to the retained enqueue callable without repeating
-    adapter setup, allocation, transfer, or synchronization.
+    adapter setup, validation, allocation, transfer, synchronization, lookup,
+    or rebinding. Rejection before launch is pre-writer; post-launch rollback is
+    not provided.
 
     Attributes:
         state: Exact selected Warp execution state retained by identity.

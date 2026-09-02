@@ -46,6 +46,7 @@ from particula.execution.gpu_session import (
 from particula.execution.graph_capture import (
     _fault_resident_graph_capture_after_classification_failure,
     classify_resident_graph_capture_writer_failure,
+    compare_resident_graph_capture_signature,
     gate_resident_graph_capture,
 )
 from particula.execution.process_adapters import (
@@ -635,15 +636,25 @@ def _validate_prepared_resident_simulation(prepared: object) -> None:
         typed.registry,
         typed.guard,
     )
+    compatibility = compare_resident_graph_capture_signature(
+        cast(Any, typed.signature), typed.request
+    )
+    if not compatibility.compatible:
+        raise ValueError("resident graph-capture signature is incompatible.")
 
 
 def enqueue_prepared_resident_simulation(prepared: object) -> None:
     """Enqueue one prepared READY simulation under exactly one token.
 
-    The pre-token gate checks only retained lifecycle and identity metadata.
-    After admission, the function invokes the twelve setup-bound operations in
-    canonical order and closes the token exactly once. A failure after a writer
-    may have launched follows the resident fault-classification policy.
+    This composed scheduler boundary is distinct from an individual prepared
+    binding: its mandatory pre-token gate rechecks retained READY lifecycle,
+    attachment, and structural identities before opening the token. After
+    admission, it invokes the twelve setup-bound operations in canonical order
+    without validation, readback, allocation, transfer, synchronization,
+    lookup, rebinding, or RNG reset, then closes the token exactly once.
+    Rejection before a writer-capable invocation preserves the active session;
+    a later failure follows the FAULTED no-rollback, no-retry, and no-fallback
+    resident recovery boundary.
 
     Args:
         prepared: Exact prepared simulation carrier returned by
@@ -651,8 +662,9 @@ def enqueue_prepared_resident_simulation(prepared: object) -> None:
 
     Raises:
         TypeError: If ``prepared`` is not an exact prepared simulation carrier.
-        ValueError: If retained identities, lifecycle, or signature metadata
-            have drifted before token entry.
+        ValueError: If retained identities or lifecycle metadata have drifted,
+            or a fresh signature comparison detects structural drift before
+            token entry.
         BaseException: Propagates an operation failure after lifecycle cleanup.
     """
     _validate_prepared_resident_simulation(prepared)

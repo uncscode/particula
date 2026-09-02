@@ -12,7 +12,9 @@ inspecting asynchronous device results.
 
 Private prepared calls preserve legacy validation and fallback allocation in
 setup, then enqueue retained device work without validation, allocation,
-readback, transfer, synchronization, lookup, rebinding, or recovery.
+readback, transfer, synchronization, lookup, rebinding, or recovery. Empty or
+no-work calls are write-free. Rejection is pre-writer; rollback is not promised
+after a writer launches.
 """
 
 # mypy: ignore-errors
@@ -1870,7 +1872,8 @@ def _enqueue_prepared_resident_gas_communication(
 
     Caller-owned arrays, map arrays, status arrays, and ledgers remain
     resident and are passed directly to the established staged GAS kernels.
-    The helper performs no setup work or host inspection; a writer launch has
+    The helper performs no setup work, host inspection, lookup, rebinding, or
+    synchronization; empty/no-work inputs are write-free. A writer launch has
     no rollback guarantee.
 
     Args:
@@ -1995,8 +1998,9 @@ def _enqueue_prepared_resident_particle_communication(
     """Launch bound PARTICLES communication without setup or allocation.
 
     The planner, snapshot, and gated commit run against caller-owned resident
-    arrays. This seam performs no validation, lookup, transfer, synchronization,
-    or host inspection, and provides no rollback after a writer launches.
+    arrays. This seam performs no validation, lookup, rebinding, transfer,
+    synchronization, or host inspection. Empty/no-work inputs are write-free;
+    rollback is not promised after a writer launches.
 
     Args:
         masses: Bound resident particle mass array.
@@ -2115,8 +2119,9 @@ def _enqueue_prepared_resident_volume_evolution(
 
     The device-resident status scan leaves status lanes and primary arrays
     untouched when every final volume equals its current value. Changed values
-    use the established concentration scaling and volume writer. No host
-    inspection or rollback is provided after a writer launch.
+    use the established concentration scaling and volume writer. This retained
+    seam does no host inspection, lookup, rebinding, or recovery; rollback is
+    not promised after a writer launch.
 
     Args:
         volume: Bound resident per-box volume array.

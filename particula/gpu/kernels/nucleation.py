@@ -3304,8 +3304,10 @@ class _PreparedNucleationCall:
 
     Preparation fixes container-array identities, dimensions, device, scalar
     controls, immutable policy controls, and private workspace allocations.
-    Pinned arrays retain live device payload authority; enqueue validates their
-    current values and observation performs the sole bounded status readback.
+    Pinned arrays retain live device payload authority. Enqueue runs the
+    established device-side dynamic validation and writers using those retained
+    references; observation performs the sole bounded status readback. This is
+    concrete-module-only implementation state, not a public enqueue protocol.
 
     Attributes:
         result: Original particle and gas containers returned by the public
@@ -3386,8 +3388,9 @@ def _prepare_nucleation_step_gpu(
 
     Pinned arrays retain live payload authority: setup validates fixed schemas,
     identities, and scalar controls without scanning mutable device values.
-    Enqueue owns dynamic validation and writers, while observation is the sole
-    bounded status readback.
+    Enqueue owns the established device-side dynamic validation and writers,
+    while observation is the sole bounded status readback. Setup rejection is
+    pre-writer; rollback is not promised after a writer-capable launch.
 
     Args:
         particles: Caller-owned fixed-capacity Warp particle container.

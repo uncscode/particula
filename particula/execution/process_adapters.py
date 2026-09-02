@@ -6,7 +6,8 @@ preflight and call one supported direct GPU kernel without transfers,
 synchronization, acquisition, fallback, retry, rollback, or physics. Prepared
 bindings freeze selected controls and delegate only retained device calls, with
 no enqueue-time validation, readback, allocation, lookup, rebinding, or RNG
-initialization/reset. These
+initialization/reset. Setup rejection is pre-writer; direct-kernel writer
+failures retain their no-rollback boundary. These
 concrete names are deliberately not exported from :mod:`particula.execution`.
 """
 
@@ -252,7 +253,8 @@ class _PreparedResidentProcessBinding:
     or RNG setup.  The direct-kernel record pins object identity, not a snapshot
     of mutable device payloads; the delegate's live inputs remain authoritative.
     Any direct-kernel status observation and writer rollback boundary remain
-    with that delegate rather than this resident adapter.
+    with that delegate rather than this resident adapter. This is a
+    concrete-only seam, not a scheduler gate or public execution protocol.
 
     Attributes:
         prepared: Frozen direct-kernel preparation record, or adapter-local
@@ -270,8 +272,9 @@ class _PreparedResidentProcessBinding:
             Result returned by the retained direct-kernel delegate.
 
         The binding does not enter a scheduler token, inspect payloads, acquire
-        resources, synchronize, or provide rollback.  Delegate exceptions and
-        any observer readback propagate unchanged.
+        resources, synchronize, or provide rollback. Delegate exceptions and
+        any observer readback propagate unchanged; a writer-capable failure has
+        no rollback guarantee.
         """
         return self.enqueue(self.prepared)
 

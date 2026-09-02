@@ -52,6 +52,9 @@
   prepared nucleation enqueue delegate without scheduler composition, resource
   changes, token entry, payload inspection, transfer, synchronization, or cache
   retention (#1557).
+- [x] Publish the concrete-only prepared-enqueue developer contract and source
+  docstring reconciliation, then record focused documentation assertions (22
+  passed in 0.09s) and `mkdocs build --strict` (exit 0 in 14.67s) (#1559).
 - [ ] Compose all prepared operations in canonical schedule order without
   per-node dictionary lookup, executor construction, allocation, validation,
   import resolution, host readback, or synchronization during enqueue.

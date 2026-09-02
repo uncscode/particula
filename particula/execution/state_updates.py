@@ -7,7 +7,9 @@ resident arrays in place. Canonical empty schemas are intentional write-free
 no-ops. It neither schedules, refreshes derived state, transfers host data,
 acquires resources, changes lifecycle state, nor provides a fallback. Prepared
 setup owns validation and binding; retained-reference enqueue performs no
-payload validation, allocation, readback, transfer, synchronization, or lookup.
+payload validation, allocation, readback, transfer, synchronization, lookup,
+rebinding, or recovery. Setup rejection occurs before a copy writer; rollback
+is not promised after a copy writer launches.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -160,6 +162,10 @@ class ResidentGasUpdateRequest:
 class PreparedResidentEnvironmentUpdate:
     """Bind validated environment replacement arrays for enqueue only.
 
+    This concrete-only record pins sources and destinations by identity. Its
+    enqueue path issues only the retained copies, with no validation, lookup,
+    rebinding, allocation, readback, transfer, or synchronization.
+
     Attributes:
         request: Exact update request validated during setup.
         target: Resident environment container updated in place.
@@ -182,6 +188,10 @@ class PreparedResidentEnvironmentUpdate:
 @dataclass(frozen=True, eq=False)
 class PreparedResidentGasUpdate:
     """Bind validated gas replacement arrays for enqueue only.
+
+    This concrete-only record pins sources and destinations by identity. Its
+    enqueue path issues only the retained copy, with no validation, lookup,
+    rebinding, allocation, readback, transfer, or synchronization.
 
     Attributes:
         request: Exact update request validated during setup.
@@ -546,7 +556,12 @@ def setup_prepared_gas_update(
 def _enqueue_prepared_environment_update(
     prepared: PreparedResidentEnvironmentUpdate,
 ) -> object:
-    """Enqueue the bound temperature-then-pressure copies.
+    """Enqueue the bound temperature-then-pressure copies only.
+
+    The setup-validated binding is retained by identity. This concrete private
+    seam performs neither payload validation nor allocation, readback, transfer,
+    synchronization, lookup, or rebinding. Empty schemas are write-free;
+    rollback is not promised after a copy writer launches.
 
     Args:
         prepared: Previously validated immutable environment copy binding.
@@ -567,7 +582,12 @@ def _enqueue_prepared_environment_update(
 
 
 def _enqueue_prepared_gas_update(prepared: PreparedResidentGasUpdate) -> object:
-    """Enqueue the bound gas concentration copy.
+    """Enqueue the bound gas concentration copy only.
+
+    The setup-validated binding is retained by identity. This concrete private
+    seam performs neither payload validation nor allocation, readback, transfer,
+    synchronization, lookup, or rebinding. Empty schemas are write-free;
+    rollback is not promised after a copy writer launches.
 
     Args:
         prepared: Previously validated immutable gas copy binding.

@@ -987,7 +987,8 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   request/session/registry/closed-guard binding, an `ACTIVE` pinned session,
   available qualified non-CPU Warp capability, `CAPTURED` lifecycle, and a
   compatible signature.
-  E8-F2 P1--P6 ship the concrete-only prepared enqueue boundary: setup validates,
+  E8-F2 P1--P6/P8 ship the concrete-only prepared enqueue boundary: setup
+  validates,
   normalizes, binds identities, and may allocate established private fallback
   storage; individual retained bindings dispatch frozen device/no-op callables
   without validation/readback, allocation, transfer, synchronization, resource
@@ -995,16 +996,19 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   resolution, mutable-carrier lookup/rebinding, or RNG initialization/reset.
   `prepare_resident_timestep()` retains READY identities but authorizes neither
   token entry nor dispatch. `enqueue_prepared_resident_simulation()` separately
-  applies its retained structural/lifecycle identity gate before token entry, then opens
-  exactly one token and dispatches twelve frozen operations in canonical order.
-  Empty or no-work bindings are write-free; identity or frozen-control drift requires
-  new preparation and rejects before token entry. Writer-capable failure retains
+  applies its retained structural/lifecycle identity gate before token entry and
+  a fresh signature comparison, then
+  opens exactly one token and dispatches twelve frozen operations in canonical
+  order. Its post-gate dispatch has the same prohibited-work boundary as an
+  individual binding. Empty or no-work bindings are write-free; identity or
+  frozen-control drift requires new preparation and rejects before token entry.
+  Writer-capable failure retains
   E8-F1 FAULTED/no-rollback/no-retry/no-fallback recovery limits. E8-F3 owns
   resource work; E8-F4 native capture/replay and captured parity; E8-F5--F7
   parity/performance/memory/profiling; and E8-F8 example/limitations/closeout.
-  No automatic recapture, native/full-loop capture or replay, hidden allocation/transfer/
-  synchronization, or user example
-  is claimed by this prepared-path contract.
+  No automatic recapture, native/full-loop capture or replay, hidden
+  allocation/transfer/synchronization, or user example is claimed by this
+  prepared-path contract.
   Warp CPU is uncaptured implementation validation; CUDA is optional
   pass-or-clean-skip evidence. Validate this contract with:
 
@@ -1077,8 +1081,9 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   virtual refresh nodes run vapor-pressure then saturation immediately before
   condensation and diagnostics. Alongside legacy CAPTURED execution admission,
   the concrete scheduler composes a READY-only, uncaptured prepared path:
-  setup freezes validated operations, then enqueue rechecks structural and
-  lifecycle drift before opening one token and dispatching the retained order.
+  setup freezes validated operations, then enqueue rechecks structural,
+  lifecycle, and signature drift before opening one token and dispatching the
+  retained order.
   It neither captures nor replays graphs, and does not create a public API.
   Both paths retain one exact active session, pinned registry, and closed guard
   by identity; they perform no transfer, restore, synchronization,

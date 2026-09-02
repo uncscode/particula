@@ -12,9 +12,10 @@ without invalidating or refreshing vapor pressure.
 It does not own lifecycle, resource acquisition, scheduling, transfers,
 fallbacks, or general process dispatch. Prepared setup freezes the consumer
 windows and enqueue uses retained writers without validation, allocation,
-readback, transfer, synchronization, or mutable-carrier lookup. Refreshing
-vapor pressure delegates to the authoritative GPU primitive; saturation refresh
-is a private device writer.
+readback, transfer, synchronization, mutable-carrier lookup, or rebinding.
+Setup rejection is pre-writer; rollback is not promised after a refresh writer
+launches. Refreshing vapor pressure delegates to the authoritative GPU
+primitive; saturation refresh is a private device writer.
 """
 
 from __future__ import annotations
@@ -134,6 +135,10 @@ class ResidentThermodynamicUpdateRequest:
 @dataclass(frozen=True, eq=False)
 class PreparedResidentThermodynamicBinding:
     """Bind validated P1 thermodynamic writer identities.
+
+    This concrete-only record retains the exact arrays and configuration
+    selected during setup. Enqueue uses those references only and does not
+    rediscover resident containers or resolve another refresh policy.
 
     Attributes:
         request: Exact thermodynamic update request validated during setup.
@@ -346,6 +351,10 @@ def _enqueue_prepared_vapor_pressure(
 ) -> None:
     """Enqueue the selected bound vapor-pressure refresh only.
 
+    This private retained-reference seam does no validation, allocation,
+    readback, transfer, synchronization, lookup, or rebinding. An empty window
+    is write-free; rollback is not promised after its writer launches.
+
     Args:
         prepared: Current consumer binding that selects the vapor refresh.
     """
@@ -372,6 +381,10 @@ def _enqueue_prepared_saturation_ratio(
     prepared: PreparedResidentThermodynamicConsumer,
 ) -> None:
     """Enqueue the selected bound saturation-ratio refresh only.
+
+    This private retained-reference seam does no validation, allocation,
+    readback, transfer, synchronization, lookup, or rebinding. An empty window
+    is write-free; rollback is not promised after its writer launches.
 
     Args:
         prepared: Current consumer binding that selects the saturation refresh.

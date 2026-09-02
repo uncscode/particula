@@ -18,7 +18,8 @@ launched kernel failure is not promised.
 
 Prepared private execution preserves this validation and scalar-allocation
 ordering; retained-reference enqueue performs no validation, allocation,
-readback, transfer, synchronization, lookup, rebinding, or recovery.
+readback, transfer, synchronization, lookup, rebinding, or recovery. Rejection
+is pre-writer; rollback is not promised after an update writer launches.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -323,7 +324,10 @@ class _PreparedDilutionCall:
 
     Enqueue uses only these pinned field references; replacing a container
     attribute after preparation therefore cannot redirect a writer. Validation,
-    normalization, and private allocation are complete before enqueue.
+    normalization, and private allocation are complete before enqueue, which
+    performs no readback, transfer, synchronization, lookup, rebinding, or
+    recovery. The no-op path is write-free; rollback is not promised after a
+    writer launches.
 
     Attributes:
         particles: Caller-owned particle container returned by the operation.
@@ -498,7 +502,9 @@ def _enqueue_prepared_dilution_call(
     """Issue only the frozen dilution launches for one prepared call.
 
     This private enqueue boundary performs no validation, allocation,
-    normalization, or resource lookup.
+    normalization, readback, transfer, synchronization, lookup, rebinding, or
+    recovery. Its no-op path is write-free; rollback is not promised after a
+    writer launches.
 
     Args:
         prepared: Validated dilution record produced by

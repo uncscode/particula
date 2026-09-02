@@ -68,7 +68,9 @@ Coverage thresholds and the normal collection policy must not be lowered.
   writer-fault handling. CUDA graph capture is optional pass-or-clean-skip
   evidence; Warp CPU validates the uncaptured contract and must never masquerade
   as captured execution.
-- **P8:** Run documentation contract tests and `mkdocs build --strict`.
+- **P8 (shipped, #1559):** documentation contract assertions passed (22 passed
+  in 0.09s) and `mkdocs build --strict` passed (exit 0 in 14.67s). This remains
+  assertion-only evidence with no targeted coverage gate.
 
 ## Validation and Coverage Policy
 

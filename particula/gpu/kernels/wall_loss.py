@@ -1166,7 +1166,10 @@ class _PreparedWallLossCall:
     Launch arguments and device retain exact references established during
     preparation, so later container-attribute rebinding cannot redirect a
     writer. Validation, normalization, RNG setup, and allocation precede
-    enqueue; enqueue never rereads container attributes.
+    enqueue; enqueue never rereads container attributes, validates payloads,
+    allocates, transfers, synchronizes, looks up resources, or resets RNG state.
+    The no-op path is write-free; rollback is not promised after a writer
+    launches.
 
     Attributes:
         particles: Caller-owned particle container returned by the operation.
@@ -1367,8 +1370,10 @@ def _prepare_wall_loss_step_gpu(
 def _enqueue_prepared_wall_loss_call(prepared: _PreparedWallLossCall) -> Any:
     """Issue only the frozen wall-loss launch, without setup or validation.
 
-    This private enqueue boundary performs no allocation, normalization, RNG
-    initialization, or resource lookup.
+    This private enqueue boundary performs no validation, allocation,
+    normalization, readback, transfer, synchronization, lookup, rebinding, or
+    RNG initialization. The selected no-op is write-free; rollback is not
+    promised after a writer launches.
 
     Args:
         prepared: Validated call record produced by

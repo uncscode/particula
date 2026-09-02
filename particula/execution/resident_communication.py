@@ -7,7 +7,8 @@ validation, acquisition, host conversion, synchronization, fallback, or
 recovery. The shared validator remains a read-only metadata seam for legacy
 execution. Prepared enqueue is retained-reference dispatch only: it does no
 payload validation/readback, allocation, transfer, synchronization, lookup,
-resource replacement, or fallback.
+resource replacement, fallback, or rebinding. Setup rejection occurs before a
+barrier writer; rollback is not promised after one launches.
 """
 
 from __future__ import annotations
@@ -429,6 +430,10 @@ def _enqueue_prepared_resident_communication_node(
 ) -> object | None:
     """Enqueue only the already-bound communication barrier.
 
+    The private concrete seam uses its retained callable and arguments without
+    validation, allocation, readback, transfer, synchronization, lookup, or
+    rebinding. A writer launch has no rollback guarantee.
+
     Args:
         binding: Setup-validated communication inputs and native callable.
 
@@ -442,6 +447,11 @@ def _enqueue_prepared_resident_volume_evolution_node(
     binding: PreparedResidentCommunicationBinding,
 ) -> object | None:
     """Enqueue only the already-bound optional volume-evolution barrier.
+
+    The private concrete seam uses its retained callable and arguments without
+    validation, allocation, readback, transfer, synchronization, lookup, or
+    rebinding. The selected no-op is write-free; a writer launch has no rollback
+    guarantee.
 
     Args:
         binding: Setup-validated volume inputs and native or no-op callable.

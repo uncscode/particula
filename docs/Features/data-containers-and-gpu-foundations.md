@@ -293,7 +293,7 @@ launches. See
 
 ### GPU-resident deterministic timestep
 
-### Resident prepared enqueue boundary
+#### Resident prepared enqueue boundary
 
 `particula.execution.resident_enqueue` and
 `particula.execution.resident_scheduler` are concrete-only direct-import seams;
@@ -313,7 +313,8 @@ request, signature, primaries, views, schedule, and duration by identity, but
 does not authorize capture, token entry, or dispatch. The composed
 `enqueue_prepared_resident_simulation()` is separate from an individual binding:
 it first applies its retained structural/lifecycle identity gate before token
-entry, opens exactly one token only after that gate, and dispatches the twelve
+entry and a fresh signature comparison, opens exactly one token only after that
+gate, and dispatches the twelve
 frozen operations in canonical order. Empty or no-work bindings are write-free;
 live pinned payload changes are permitted, while structural identities and frozen
 scalar controls require a new prepared record. E8-F1 owns lifecycle,

@@ -18,7 +18,9 @@ synchronization, transfer, allocation, or physics mutation. Empty matrix
 operations are write-free for ``B == 0`` or ``S == 0``; particle number is
 write-free only for ``B == 0``. Prepared setup binds the closed plan; its
 observation-free enqueue uses retained device copies without validation,
-allocation, readback, transfer, synchronization, or lookup.
+allocation, readback, transfer, synchronization, lookup, or rebinding. Setup
+rejection is pre-writer; rollback is not promised after a diagnostic writer
+launches.
 """
 
 from __future__ import annotations
@@ -174,6 +176,10 @@ class ResidentDiagnosticsPlan:
 @dataclass(frozen=True, eq=False)
 class PreparedResidentDiagnostics:
     """Bind validated diagnostic sources and registrations for enqueue only.
+
+    This concrete-only record retains every source, output, and operation by
+    identity. Its observation-free enqueue dispatches those retained writers
+    only; it does not revalidate or rediscover the plan.
 
     Attributes:
         plan: Exact diagnostics plan validated during setup.
@@ -617,6 +623,10 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
     prepared: PreparedResidentDiagnostics,
 ) -> None:
     """Dispatch only registrations retained by prepared diagnostics setup.
+
+    This private retained-reference seam performs no validation, allocation,
+    readback, transfer, synchronization, lookup, or rebinding. Empty matrix
+    schemas remain write-free; rollback is not promised after a writer launches.
 
     Args:
         prepared: Previously validated immutable diagnostics binding.

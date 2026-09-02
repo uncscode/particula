@@ -32,7 +32,9 @@
 
 P1 defines the common prepared-record invariants. P2 and P3 adapt non-physics
 resident operations. P4 through P6 refactor process launches in dependency
-order while preserving their public wrappers. P7 may compose the full sequence
-only after all nodes have prepared enqueue seams. P8 updates development
-documentation last. Tests remain co-located with every implementation phase;
-there is no standalone testing phase.
+order while preserving their public wrappers. P8 shipped the resulting
+development documentation for issue #1559 after focused assertions (22 passed
+in 0.09s) and `mkdocs build --strict` (exit 0 in 14.67s). P7 remains pending and
+may compose the full sequence only after all nodes have prepared enqueue seams.
+Tests remain co-located with every implementation phase; there is no standalone
+testing phase.

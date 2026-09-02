@@ -13,9 +13,10 @@ recovery after a kernel launch.
 
 Prepared bindings freeze operation selection and dispatch retained references
 without validation, allocation, readback, transfer, synchronization, lookup, or
-RNG initialization/reset. CPU and resident-Warp calls have independent
-stochastic trajectories. This concrete boundary provides no seed-by-seed
-cross-backend trajectory comparison.
+rebinding or RNG initialization/reset. Rejection is pre-writer; no rollback is
+promised after a writer-capable call. CPU and resident-Warp calls have
+independent stochastic trajectories. This concrete boundary provides no
+seed-by-seed cross-backend trajectory comparison.
 """
 
 from dataclasses import dataclass
@@ -780,7 +781,9 @@ class _PreparedResidentBrownianCoagulationBinding:
 
     The prepared record freezes direct-kernel references after resident binding
     preflight. ``execute`` only invokes the retained enqueue delegate; it does
-    not repeat validation, allocation, normalization, lookup, or RNG setup.
+    not repeat validation, allocation, normalization, lookup, rebinding, or RNG
+    setup. It is concrete-only and retains the direct writer's no-rollback
+    boundary.
 
     Attributes:
         state: Resident request and resource binding validated during setup.

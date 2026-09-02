@@ -251,6 +251,8 @@ def test_e8_f2_records_reconcile_shipped_phases_and_p8_evidence() -> None:
         "docs/Features/Roadmap/data-oriented-gpu.md",
         ".opencode/plans/sections/epics/E8/child_plans.md",
         ".opencode/plans/sections/epics/E8/milestones_timeline.md",
+        ".opencode/plans/sections/features/E8-F2/scope.md",
+        ".opencode/plans/sections/features/E8-F2/phase_details.md",
     ):
         document = _read(path)
         normalized_document = " ".join(document.split())
@@ -330,3 +332,4 @@ def test_prepared_source_docstrings_state_setup_dispatch_boundary() -> None:
     normalized = " ".join(docstring.split()).lower()
     assert "pre-token gate" in normalized
     assert "exactly one token" in normalized
+    assert "fresh signature comparison" in normalized

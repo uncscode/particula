@@ -116,6 +116,20 @@ composition, registry/checkpoint schema, or nucleation/exhaustion physics
 changed. No-admission calls remain write-free for particle and gas primaries;
 documented diagnostic sidecars may still record the completed P2--P4 path.
 
+## P8 Development Documentation
+
+Issue #1559 shipped the developer documentation for the implemented prepared
+enqueue boundary. The documentation records concrete-only READY preparation,
+retained-reference device/no-op enqueue, the scheduler's separate pre-token
+identity/lifecycle gate, canonical one-token dispatch, write-free empty paths,
+and the writer-capable no-rollback/no-retry/no-fallback recovery limit. It does
+not claim public prepared imports, native capture/replay, captured parity, or
+performance evidence. Focused assertions passed (22 passed in 0.09s), and
+`mkdocs build --strict` passed (exit 0 in 14.67s).
+
+P1--P6 and P8 are shipped. P7 composition remains pending; E8-F3--E8-F8 remain
+pending downstream work.
+
 ## User Stories
 
 - As a resident-loop integrator, I want setup to reject incompatible state

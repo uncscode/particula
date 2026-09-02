@@ -156,3 +156,5 @@
     gate, one-token canonical dispatch, write-free empty paths, and the
     writer-capable no-rollback/no-retry/no-fallback recovery limit. No public
     prepared imports, native replay, captured parity, or performance claim added.
+  - Reconciliation: P1--P6/P8 are shipped; P7 remains pending for complete
+    prepared-sequence composition and its integration tests.

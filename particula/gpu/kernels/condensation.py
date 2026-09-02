@@ -27,7 +27,9 @@ validated caller-owned state reserved for later work.
 
 Private prepared calls preserve this validation ordering, normalization, and
 fallback allocation during setup; retained-reference enqueue performs no
-validation, allocation, readback, transfer, synchronization, lookup, or reset.
+validation, allocation, readback, transfer, synchronization, lookup, rebinding,
+or reset. Rejection is pre-writer; rollback is not promised after a writer
+launches.
 """
 
 # pyright: basic
@@ -197,9 +199,12 @@ class _PreparedCondensationCall:
     """Retain validated state and device operations for one enqueue.
 
     Setup owns validation, normalization, and fallback allocation. The enqueue
-    phase reuses these retained references for its four device substeps. The
-    record is private because it captures implementation-specific Warp
-    callables and scratch layouts rather than a public execution protocol.
+    phase reuses these retained references for its four device substeps without
+    validation, allocation, readback, transfer, synchronization, lookup,
+    rebinding, or reset. The record is private because it captures
+    implementation-specific Warp callables and scratch layouts rather than a
+    public execution protocol. Rejection is pre-writer; rollback is not promised
+    after a writer launches.
 
     Attributes:
         particles: Validated resident Warp particle container returned by

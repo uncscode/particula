@@ -1733,7 +1733,7 @@ example, limitations, and closeout.
 
 ### E8-F2 prepared enqueue contract
 
-E8-F2 P1--P6 ship a developer-only, concrete-module prepared path. Setup
+E8-F2 P1--P6/P8 ship a developer-only, concrete-module prepared path. Setup
 validates, normalizes, allocates established private fallback storage, binds
 identities, freezes the operation selection, and may retain established bounded
 direct-wrapper device-status observation and translation. The resulting private
@@ -1748,7 +1748,8 @@ or reset.
 request, signature, primaries, views, schedule, and duration by identity. It
 does not authorize capture, token entry, or dispatch. The separate composed
 `enqueue_prepared_resident_simulation()` first runs its retained structural and
-lifecycle identity gate before token entry, then opens exactly one token and
+lifecycle identity gate before token entry plus a fresh signature comparison,
+then opens exactly one token and
 dispatches the twelve frozen operations in canonical order. That gate is not
 device-only enqueue work; after it passes, dispatch has the same prohibited-work
 boundary as individual bindings. Empty or no-work bindings are write-free.
@@ -1757,7 +1758,7 @@ scalar controls require a new prepared record.
 
 E8-F1 remains the owner of capability qualification, lifecycle, compatibility,
 invalidation, FAULTED classification, and CAPTURED admission; the registry owns
-sidecars. Structural or lifecycle drift rejects before token entry. A
+sidecars. Structural, lifecycle, or signature drift rejects before token entry. A
 writer-capable failure preserves the E8-F1 FAULTED, no-rollback, no-retry, and
 no-fallback recovery limit. Warp CPU is uncaptured implementation validation
 only; CUDA is optional pass-or-clean-skip evidence only. This documentation does

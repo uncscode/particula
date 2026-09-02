@@ -20,8 +20,11 @@ package export, policy, transfer, resizing, or runnable integration; callers
 own device placement and explicitly synchronize before observing results.
 
 Private prepared records preserve legacy validation and workspace allocation in
-setup. Enqueue dispatches retained device work only, without validation,
-readback, allocation, transfer, synchronization, lookup, rebinding, or recovery.
+setup. Enqueue dispatches retained device work only, without repeated host
+metadata validation, readback, allocation, transfer, synchronization, lookup,
+rebinding, or recovery. Its established device-side dynamic validation runs
+against retained references. Rejection is pre-writer; rollback is not promised
+after a writer launches.
 """
 
 # mypy: disable-error-code="valid-type, misc, operator"
@@ -1426,7 +1429,15 @@ def _execute_representative_volume_scaling_step_gpu(  # noqa: C901, PLR0913
 
 @dataclass(frozen=True)
 class _PreparedResamplingCall:
-    """Pin one allocation-complete resampling launch sequence."""
+    """Pin one allocation-complete resampling launch sequence.
+
+    Setup freezes metadata, arrays, controls, and workspace allocation by
+    identity. Enqueue uses these retained references for device-side validation,
+    planning, and commit only; it performs no host readback, allocation,
+    transfer, synchronization, lookup, rebinding, or recovery. This private
+    record is concrete-module-only. Rejection before commit is pre-writer;
+    rollback is not promised after a commit writer launches.
+    """
 
     result: Any
     masses: Any
@@ -1446,7 +1457,15 @@ class _PreparedResamplingCall:
 
 @dataclass(frozen=True)
 class _PreparedRepresentativeVolumeScalingCall:
-    """Pin one allocation-complete representative-scaling sequence."""
+    """Pin one allocation-complete representative-scaling sequence.
+
+    Setup freezes metadata, arrays, controls, and workspace allocation by
+    identity. Enqueue uses these retained references for device-side validation,
+    selection, and scaling only; it performs no host readback, allocation,
+    transfer, synchronization, lookup, rebinding, or recovery. This private
+    record is concrete-module-only. Rejection before scaling is pre-writer;
+    rollback is not promised after a scaling writer launches.
+    """
 
     result: tuple[Any, Any, Any]
     masses: Any
