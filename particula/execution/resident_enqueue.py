@@ -251,8 +251,9 @@ class PreparedResidentTimestep:
             self.capture_requirements
             is not self.request.capture_resource_requirements
             or self.capture_set is None
-            or self.capture_set.requirements is not self.capture_requirements
-            or self.capture_set.report is not self.capture_report
+            or cast(Any, self.capture_set).requirements
+            is not self.capture_requirements
+            or cast(Any, self.capture_set).report is not self.capture_report
             or self.signature.configurations[-3:]
             != (
                 self.capture_requirements,
@@ -377,5 +378,5 @@ def prepare_resident_timestep(  # noqa: C901
         resource_views=signature.resource_views,
         capture_requirements=request_any.capture_resource_requirements,
         capture_set=capture_set,
-        capture_report=capture_set.report,
+        capture_report=cast(Any, capture_set).report,
     )

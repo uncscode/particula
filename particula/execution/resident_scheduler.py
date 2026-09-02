@@ -653,7 +653,7 @@ def _validate_prepared_resident_simulation(prepared: object) -> None:
         or typed.capture_set is not typed.timestep.capture_set
         or typed.capture_report is not typed.timestep.capture_report
         or typed.capture_report is None
-        or typed.capture_set.report is not typed.capture_report
+        or cast(Any, typed.capture_set).report is not typed.capture_report
         or typed.duration != typed.timestep.duration
     ):
         raise ValueError(

@@ -14,7 +14,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import TYPE_CHECKING, Any, Protocol, cast
 
 from particula.execution import Backend, Device
 
@@ -332,8 +332,9 @@ def validate_resident_capture_resources(request: object) -> object:
     request_type = _resident_request_type()
     if type(request) is not request_type:
         raise TypeError("request must be an exact ResidentSimulationRequest.")
-    typed = cast("ResidentSimulationRequest", request)
-    capture_set = typed.registry.validate_capture_resource_set(
+    typed = cast(Any, request)
+    registry = typed.registry
+    capture_set = cast(Any, registry).validate_capture_resource_set(
         typed.capture_resource_requirements
     )
     if (
@@ -548,7 +549,7 @@ def create_resident_graph_capture_signature(
             request.gas_update,
             request.capture_resource_requirements,
             capture_set,
-            capture_set.report,
+            cast(Any, capture_set).report,
         ),
         rng_resources=_identity_tuple(
             coagulation.resources.rng_states,

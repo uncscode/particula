@@ -1058,7 +1058,7 @@ def test_prepared_ready_simulation_retains_twelve_operations(
     )
     assert prepared.capture_set is capture_set
     assert prepared.capture_report is capture_set.report
-    assert prepared.signature.configurations[-3:] == (
+    assert cast(Any, prepared.signature).configurations[-3:] == (
         request.capture_resource_requirements,
         capture_set,
         capture_set.report,
