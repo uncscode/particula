@@ -18,9 +18,14 @@ never lowered.
   retention of supplied prepared-resource identities. Allocation, publication,
   reacquisition, transactional setup, and RNG behavior are deliberately not
   P2 validation targets.
-- **P3:** Unit-test absent/GAS/PARTICLES communication inventories, immutable
-  map/configuration identity, diagnostic selections/accounting arrays,
-  cross-family overlap rejection, and byte totals.
+- **P3 (shipped):** `gpu_resources_test.py` plus adjacent diagnostics and
+  resident-communication tests cover absent/GAS/PARTICLES registration,
+  exact identity retention and repeat reuse, deterministic role/family/total
+  logical-byte reports, transactional rejection, diagnostic ordering, duplicate
+  and forbidden-overlap rejection (including the permitted read-only accounting
+  alias), zero extents, and no device I/O. Regression tests confirm registration
+  does not alter diagnostics validation, communication setup, checkpoint
+  enumeration, scheduler behavior, or public exports.
 - **P4:** Unit-test whole-set atomicity under injected failures at early/middle/
   late allocation and RNG initialization, clean retry, exact nested identity
   reuse, capacity/requirement mismatch, and session/resource drift rejection

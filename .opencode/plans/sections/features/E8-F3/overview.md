@@ -29,12 +29,22 @@ retain the supplied resource identities exactly. This increment adds neither
 allocation, publication, reacquisition, nor RNG behavior, and it adds no public
 exports.
 
+E8-F3-P3 shipped in issue #1563. `GPUResourceRegistry` now registers one
+concrete-only capture selection: absent communication or one exact,
+already-published closed GAS/PARTICLES view, plus ordered diagnostic
+registrations. The retained inventory contains exact references and
+deterministic schema/logical-byte reports. Registration is transactional and
+host-metadata-only; its O(R log R) byte-interval sweep rejects forbidden
+overlaps without payload I/O. Checkpoint enumeration, scheduler behavior, and
+public exports are unchanged.
+
 ## Value Proposition
 
 E8-F3 incrementally makes the registry the concrete authority for
-capture-lifetime reusable storage. P1 supplies the inventory; P2 adds the
-dilution descriptor/view validation seam and exact prepared-adapter retention.
-Later phases own whole-set allocation, publication, and compatible reuse.
+capture-lifetime reusable storage. P1 supplies the inventory, P2 adds the
+dilution descriptor/view validation seam, and P3 pins selected communication
+and diagnostic resources. Later phases own whole-set allocation, publication,
+and prepared-path integration.
 
 ## User Stories
 

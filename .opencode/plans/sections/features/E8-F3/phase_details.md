@@ -27,15 +27,18 @@
     adapter use; accepted resources retain exact identity and rejected views do
     not mutate supplied arrays.
 
-- [ ] **E8-F3-P3:** Communication and diagnostic resource pinning with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Bind the selected closed communication family and complete diagnostic
-    outputs/accounting work as capture-lifetime resources with exact identities.
+- [x] **E8-F3-P3:** Communication and diagnostic resource pinning with unit tests
+  - Issue: #1563 | Size: S | Status: Shipped
+  - Delivered: `GPUResourceRegistry` registers one absent or exact
+    already-published closed GAS/PARTICLES communication view and ordered
+    diagnostic registrations. It retains exact references plus deterministic
+    schemas/logical-byte reports, validates transactionally on the host, and
+    detects forbidden overlaps with an O(R log R) interval sweep.
   - Files: `particula/execution/gpu_resources.py`,
-    `particula/execution/diagnostics.py`,
-    `particula/execution/resident_communication.py`, adjacent tests
-  - Tests: Mode-specific inventories, immutable map/configuration identity,
-    diagnostic role uniqueness, alias rejection, and deterministic accounting.
+    `particula/execution/tests/gpu_resources_test.py`, adjacent diagnostics and
+    resident-communication tests
+  - Boundaries: No device I/O, allocation, public export, checkpoint-enumeration,
+    or scheduler-behavior change; exact repeats reuse the retained inventory.
 
 - [ ] **E8-F3-P4:** Atomic capture-set preparation and exact identity reuse with unit tests
   - Issue: TBD | Size: S | Status: Not Started

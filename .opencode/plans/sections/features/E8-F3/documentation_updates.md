@@ -10,6 +10,12 @@ The focused contract is covered in `particula/execution/tests/gpu_resources_test
 Issue #1562 likewise adds no user-facing documentation: the dilution descriptor
 family and `PreparedResourceViews` remain concrete-only, with no public export.
 
+Issue #1563 likewise changes no user-facing documentation. Capture registration
+and selected-resource reporting remain concrete-only in
+`particula.execution.gpu_resources`; no public export, scheduler workflow, or
+checkpoint contract changed. Module docstrings and execution tests record the
+identity, metadata-only, and reporting boundary.
+
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` Epic H sections with the
   implemented registry-owned capture resource inventory, setup/reuse boundary,
   persistent RNG handling, and deterministic logical-byte accounting semantics.

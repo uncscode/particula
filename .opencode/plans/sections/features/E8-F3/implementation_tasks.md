@@ -15,11 +15,11 @@
 - [ ] Inventory the remaining E8-F2 prepared operations and add missing
   fixed-shape process, control, selected-lane, and validation/status sidecars
   to canonical manifests.
-- [ ] Represent diagnostic outputs/accounting work as closed capture resources
-  while preserving existing direct diagnostics validation behavior.
-- [ ] Preserve mutually exclusive GAS/PARTICLES communication families and pin
-  configuration, map arrays, work records, status, snapshots, and optional
-  final volumes by identity.
+- [x] Register ordered diagnostic outputs/accounting work as concrete-only
+  selected capture resources while preserving direct diagnostics validation.
+- [x] Preserve mutually exclusive GAS/PARTICLES communication families and pin
+  one selected already-published view, including configuration, maps, work
+  records, status, snapshots, and optional final volumes, by identity.
 - [ ] Implement whole-set preflight, candidate allocation, cross-family
   nonalias validation, explicit RNG initialization, and atomic publication.
 - [ ] Add exact capture-set validation and accessors that cannot allocate,
@@ -36,10 +36,10 @@
   immutability, export-boundary, and read-only reporting tests.
 - [x] Add adjacent P2 prepared-view validation and exact identity-retention
   coverage without introducing allocation/publication/reacquisition behavior.
-- [ ] Add focused prepared-timestep integration tests under
-  `particula/execution/tests/` with allocator/acquisition/readback spies.
-- [ ] Cover one/multi-box, zero particle/species dimensions, both communication
-  modes, absent communication, diagnostics selections, and capacity boundaries.
+- [x] Add focused registry/diagnostics/communication tests for registration,
+  report reuse, host-only metadata behavior, and transactional rejection.
+- [x] Cover both communication modes, absent communication, ordered diagnostic
+  selections, zero extents, exact identities, and overlap boundaries.
 - [ ] Assert repeated compatible preparation returns the exact outer view,
   native records, arrays, capacities, and byte report.
 - [ ] Run focused coverage-disabled assertions first, then the untargeted

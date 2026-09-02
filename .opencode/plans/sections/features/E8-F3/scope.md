@@ -16,6 +16,12 @@ view validation/identity-retention plumbing. Its two `(B,)` `wp.float64` roles
 are normalized coefficient and factors. It does not preallocate, publish,
 reacquire, or initialize/reset RNG resources.
 
+P3 is complete: it registers, rather than acquires, one exact absent/closed
+communication selection and ordered diagnostic registrations. It retains their
+references and resolved metadata/reports after transactional host-only
+validation, including O(R log R) overlap detection. It does not change
+checkpoint enumeration, scheduler behavior, allocation, or exports.
+
 ## In Scope
 
 - Define canonical capture-resource roles, shapes, dtypes, capacities, and

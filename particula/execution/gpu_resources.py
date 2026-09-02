@@ -1,7 +1,8 @@
 """Allocate concrete reusable Warp sidecars for one active resident session.
 
 This direct-import-only, Warp-dependent boundary pins complete fixed-shape
-native sidecar families to one exact ``ACTIVE`` :class:`ResidentSession`.
+native sidecar families and one capture resource selection to one exact
+``ACTIVE`` :class:`ResidentSession`.
 It allocates and validates resources only: it neither executes a process,
 transfers, synchronizes, nor resizes. Coagulation and wall-loss acquisition
 initialize distinct P1-derived persistent RNG streams exactly once before
@@ -14,10 +15,13 @@ The registry retains array identities and performs metadata-only schema and
 nonaliasing checks. It does not establish allocator provenance, execute a
 kernel, or change session lifecycle. Its direct-module-only logical inventory
 reports immutable manifest schema metadata and logical bytes, not
-allocator-reserved bytes. Inventory reporting neither inspects payloads nor
-acquires, allocates, binds, or mutates sidecars. Explicit lifecycle methods may
-inspect frozen stream metadata or reset selected published lanes without hidden
-transfer or synchronization.
+allocator-reserved bytes. Capture registration retains one exact closed
+communication view, if selected, and an ordered diagnostic registration tuple.
+It validates schemas and byte-range nonaliasing on the host without inspecting
+payloads; reports reuse that retained metadata. Inventory reporting neither
+inspects payloads nor acquires, allocates, binds, or mutates sidecars. Explicit
+lifecycle methods may inspect frozen stream metadata or reset selected
+published lanes without hidden transfer or synchronization.
 ``validate_pinned_session`` is the narrow direct-module-only integration seam
 for resident timestep guards. It requires the exact retained session, then
 revalidates its active lifecycle, pinned container and primary-array identities,
@@ -249,9 +253,10 @@ class LogicalResourceReport:
 class SelectedResourceRole:
     """Describe one identity-pinned capture resource role.
 
-    This concrete-only carrier retains a caller or registry array by identity
-    for the lifetime of one capture selection.  It records metadata only and
-    is neither checkpoint authority nor an ownership transfer.
+    This concrete-only carrier retains a caller- or registry-owned array by
+    identity for the lifetime of one capture selection. It records schema and
+    logical-byte metadata only; it neither transfers ownership nor becomes
+    checkpoint authority.
 
     Attributes:
         canonical_name: Deterministic name for the selected role.
@@ -276,7 +281,10 @@ class SelectedResourceRole:
 
 @dataclass(frozen=True, eq=False)
 class SelectedResourceFamilyReport:
-    """Report the ordered metadata-only roles selected from one family.
+    """Report ordered metadata-only roles selected from one capture family.
+
+    Reports retain zero-extent roles in deterministic order even though those
+    roles do not participate in byte-range overlap checks.
 
     Attributes:
         family: Canonical name of the selected resource family.
@@ -293,10 +301,10 @@ class SelectedResourceFamilyReport:
 class SelectedResourceInventory:
     """Retain one exact concrete capture resource selection.
 
-    The optional communication view and diagnostic registrations remain owned by
-    their callers or registry.  Re-registration succeeds only for this exact
-    retained identity selection; no device data is copied, inspected, or made
-    checkpoint-visible.
+    The optional communication view is one already-published, closed GAS or
+    PARTICLES view; diagnostic registrations remain caller-owned.
+    Re-registration succeeds only for this exact retained identity selection.
+    No device data is copied, inspected, or made checkpoint-visible.
 
     Attributes:
         communication_resources: Selected closed communication view, if present.
@@ -902,6 +910,12 @@ class GPUResourceRegistry:
     manifest order and published RNG bindings in canonical process order,
     without changing ownership or creating host copies. Checkpoint restart may
     privately publish prevalidated fresh RNG bindings without reseeding.
+
+    Capture registration is a separate concrete-only host-metadata seam. It
+    pins one optional published closed communication view and one ordered
+    diagnostic registration tuple by identity after complete schema and
+    nonaliasing validation. It neither changes normal resource enumeration nor
+    participates in checkpoint or restart state.
     """
 
     def __init__(self, session: ResidentSession) -> None:
@@ -1029,16 +1043,16 @@ class GPUResourceRegistry:
     def selected_resource_report(self) -> SelectedResourceInventory:
         """Return the one previously registered concrete capture inventory.
 
-        The retained report is returned by identity.  This accessor validates
+        The retained report is returned by identity. This accessor validates
         only the pinned active session and does not rescan arrays, allocate,
         synchronize, transfer, inspect payloads, or rebuild role metadata.
+
+        Returns:
+            The immutable inventory retained during registration.
 
         Raises:
             ValueError: If no capture selection has been registered or the
                 pinned session has drifted.
-
-        Returns:
-            The immutable inventory retained during registration.
         """
         self.validate_pinned_session(self._session)
         if self._capture_inventory is None:
@@ -1081,7 +1095,13 @@ class GPUResourceRegistry:
         tuple[SelectedResourceRole, ...],
         tuple[tuple[int, int] | None, ...],
     ]:
-        """Build ordered selected-role metadata before inventory publication."""
+        """Build deterministic selected-role metadata before publication.
+
+        The caller has already validated the selection's exact session,
+        communication view, and diagnostic registrations. This helper resolves
+        each selected schema and byte range once; it does not perform device I/O
+        or mutate the capture inventory.
+        """
         grouped: dict[str, list[SelectedResourceRole]] = {}
         ranges: list[tuple[int, int] | None] = []
 
@@ -1221,7 +1241,7 @@ class GPUResourceRegistry:
         ranges: tuple[tuple[int, int] | None, ...],
         selected_published: set[int],
     ) -> None:
-        """Reject capture overlap using one sorted interval sweep.
+        """Reject capture overlap using one host-only sorted interval sweep.
 
         Read-only diagnostic accounting inputs may share one another.  Every
         other selected, primary, or established-sidecar overlap is forbidden.
@@ -1238,6 +1258,13 @@ class GPUResourceRegistry:
             for value in bindings.values()
             if id(value) not in selected_published
         ]
+        protected.extend(
+            view.final_volumes
+            for view in self._views.values()
+            if type(view) is CommunicationResources
+            and view.final_volumes is not None
+            and id(view.final_volumes) not in selected_published
+        )
         intervals: list[tuple[int, int, int, bool, str]] = []
         published_seen: set[int] = set()
         for index, (role, byte_range) in enumerate(
@@ -1245,7 +1272,10 @@ class GPUResourceRegistry:
         ):
             if byte_range is not None:
                 value_id = id(role.value)
-                if value_id in selected_published:
+                if (
+                    value_id in selected_published
+                    and role.family != "diagnostics"
+                ):
                     if value_id in published_seen:
                         continue
                     published_seen.add(value_id)
@@ -1289,10 +1319,13 @@ class GPUResourceRegistry:
     ) -> SelectedResourceInventory:
         """Pin one exact metadata-only communication and diagnostics selection.
 
-        The first successful call retains an immutable identity inventory.  A
+        The first successful call retains an immutable identity inventory. A
         later exact repeat returns it; all other repeats reject without changing
-        the retained inventory.  This method performs no allocation, device
-        dispatch, synchronization, transfer, or payload inspection.
+        the retained inventory. A communication view, when supplied, must be
+        an already-published closed GAS or PARTICLES view. Candidate metadata
+        and nonaliasing are completely validated before first publication. This
+        method performs no allocation, device dispatch, synchronization,
+        transfer, or payload inspection.
 
         Args:
             session: Exact active session pinned by this registry.
@@ -1312,6 +1345,14 @@ class GPUResourceRegistry:
                 selection was already registered.
         """
         self.validate_pinned_session(session)
+        inventory = self._capture_inventory
+        if inventory is not None:
+            if (
+                communication_resources is inventory.communication_resources
+                and registrations is inventory.registrations
+            ):
+                return inventory
+            raise ValueError("Capture resources have already been registered.")
         if communication_resources is not None:
             if type(communication_resources) is not CommunicationResources:
                 raise TypeError(
@@ -1336,14 +1377,6 @@ class GPUResourceRegistry:
                 "ResidentDiagnosticRegistration tuple."
             )
         self.validate_diagnostic_registrations(session, registrations)
-        inventory = self._capture_inventory
-        if inventory is not None:
-            if (
-                communication_resources is inventory.communication_resources
-                and registrations is inventory.registrations
-            ):
-                return inventory
-            raise ValueError("Capture resources have already been registered.")
         families, roles, ranges = self._capture_candidate_roles(
             communication_resources, registrations
         )
@@ -1366,6 +1399,7 @@ class GPUResourceRegistry:
                     communication_resources.execution_state.initial_masses,
                     communication_resources.execution_state.initial_concentration,
                     communication_resources.execution_state.initial_charge,
+                    communication_resources.final_volumes,
                 )
                 if value is not None
             )
@@ -1665,7 +1699,7 @@ class GPUResourceRegistry:
                     )
         return outputs, output_entries, inputs, input_entries
 
-    def _validate_diagnostic_binding_nonalias(
+    def _validate_diagnostic_binding_nonalias(  # noqa: C901
         self,
         outputs: list[Any],
         output_ranges: list[tuple[int, int] | None],
@@ -1674,33 +1708,56 @@ class GPUResourceRegistry:
         protected: list[Any],
         protected_ranges: list[tuple[int, int] | None],
     ) -> None:
-        """Reject diagnostic bindings that overlap protected/output storage."""
+        """Reject diagnostic bindings that overlap protected/output storage.
+
+        This metadata-only sorted sweep permits only accounting-input aliases;
+        it avoids pairwise work for large diagnostic selections.
+        """
         bindings = outputs + inputs
         ranges = output_ranges + input_ranges
-        for index, (value, byte_range) in enumerate(
-            zip(bindings, ranges, strict=True)
+        intervals: list[tuple[int, int, int, bool, bool]] = []
+        for index, byte_range in enumerate(ranges):
+            if byte_range is not None:
+                intervals.append(
+                    (
+                        byte_range[0],
+                        byte_range[1],
+                        index,
+                        index >= len(outputs),
+                        False,
+                    )
+                )
+        for index, byte_range in enumerate(
+            protected_ranges, start=len(bindings)
         ):
-            if any(value is protected_value for protected_value in protected):
-                raise ValueError(
-                    "Diagnostic bindings must not alias resident resources."
+            if byte_range is not None:
+                intervals.append(
+                    (byte_range[0], byte_range[1], index, False, True)
                 )
-            if any(
-                self._ranges_overlap(byte_range, item)
-                for item in protected_ranges
-            ):
+        intervals.sort(key=lambda item: (item[0], item[1], item[2]))
+        active: list[int] = []
+        writable_active: list[int] = []
+        protected_active: list[int] = []
+        for start, end, _, read_only, is_protected in intervals:
+            while active and active[0] <= start:
+                heappop(active)
+            while writable_active and writable_active[0] <= start:
+                heappop(writable_active)
+            while protected_active and protected_active[0] <= start:
+                heappop(protected_active)
+            if active and (not read_only or writable_active):
+                if is_protected or protected_active:
+                    raise ValueError(
+                        "Diagnostic bindings must not alias resident resources."
+                    )
                 raise ValueError(
-                    "Diagnostic binding byte ranges must not overlap."
+                    "Diagnostic outputs must not overlap bindings."
                 )
-            if index < len(outputs):
-                for other, other_range in zip(
-                    bindings[index + 1 :], ranges[index + 1 :], strict=True
-                ):
-                    if value is other or self._ranges_overlap(
-                        byte_range, other_range
-                    ):
-                        raise ValueError(
-                            "Diagnostic outputs must not overlap bindings."
-                        )
+            heappush(active, end)
+            if not read_only:
+                heappush(writable_active, end)
+            if is_protected:
+                heappush(protected_active, end)
 
     def validate_wall_loss_resources(
         self, session: ResidentSession, resources: WallLossResources

@@ -1041,6 +1041,14 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   retains fixed dimensions and resident identities; ordered gas names remain
   CPU metadata. The registry pins fixed-shape, same-device, nonaliasing sidecars
   and does not execute, transfer, synchronize, or initialize RNG streams.
+- The registry's concrete-only capture registration can pin exactly one
+  metadata-only selection: absent communication or one already-published closed
+  GAS/PARTICLES communication view, plus an ordered diagnostic-registration
+  tuple. It retains identities and resolved schemas/logical bytes only; it does
+  not inspect payloads, allocate, dispatch, transfer, synchronize, or become
+  checkpoint authority. First-registration failures leave no selection, and
+  only an exact identity repeat returns the retained inventory. This is not a
+  `particula.execution` or top-level API and provides no user workflow.
 - `GPUResourceRegistry.logical_resource_report(capacities)` is a
   direct-module-only planning seam. Its immutable report resolves all six
   manifest families, including both communication families regardless of later

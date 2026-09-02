@@ -14,6 +14,15 @@ pytest.importorskip("warp")
 
 import particula.execution.gpu_resources as gpu_resources
 from particula.execution import Backend, Device
+from particula.execution.communication import (
+    CommunicationConfiguration,
+    CommunicationMap,
+    CommunicationMapForm,
+    CommunicationResourceShape,
+    CommunicationShapeKind,
+    CommunicationTransportMode,
+    PrescribedVolumeUpdate,
+)
 from particula.execution.diagnostics import (
     ResidentDiagnosticOperation,
     ResidentDiagnosticRegistration,
@@ -225,6 +234,109 @@ def test_capture_registration_without_communication_retains_exact_report() -> (
             session, None, tuple([*plan.registrations])
         )
     assert registry.selected_resource_report() is inventory
+
+
+@pytest.mark.warp
+def test_capture_registration_repeat_bypasses_candidate_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test retained repeats use only pinned-session and identity checks."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    wp = pytest.importorskip("warp")
+    plan = _diagnostics_plan(
+        session,
+        registry,
+        tuple(
+            wp.zeros((1, 1), dtype=wp.float64, device="cpu") for _ in range(2)
+        ),
+    )
+    inventory = registry.register_capture_resources(
+        session, None, plan.registrations
+    )
+
+    def fail(*_args: Any, **_kwargs: Any) -> None:
+        """Fail if a repeat attempts candidate construction or validation."""
+        pytest.fail("retained repeat must not validate or build candidates")
+
+    monkeypatch.setattr(registry, "_capture_candidate_roles", fail)
+    monkeypatch.setattr(registry, "validate_diagnostic_registrations", fail)
+
+    assert (
+        registry.register_capture_resources(session, None, plan.registrations)
+        is inventory
+    )
+    with pytest.raises(ValueError, match="already been registered"):
+        registry.register_capture_resources(
+            session, None, tuple([*plan.registrations])
+        )
+    assert registry.selected_resource_report() is inventory
+
+
+def _communication_with_final_volumes(
+    registry: GPUResourceRegistry,
+    final_volumes: Any,
+    mode: CommunicationTransportMode = CommunicationTransportMode.GAS,
+) -> Any:
+    """Acquire a minimal closed communication view with final volumes."""
+    wp = pytest.importorskip("warp")
+    configuration = CommunicationConfiguration(
+        CommunicationMap(
+            CommunicationMapForm.ONE_DIMENSIONAL,
+            mode,
+            1,
+            wp.array([0], dtype=wp.int32, device="cpu"),
+            wp.array([1], dtype=wp.int32, device="cpu"),
+            wp.array([1], dtype=wp.int32, device="cpu"),
+            wp.array([0.1], dtype=wp.float64, device="cpu"),
+        ),
+        PrescribedVolumeUpdate(final_volumes),
+        (
+            CommunicationResourceShape(
+                "edge_rates", wp.float64, CommunicationShapeKind.E
+            ),
+        ),
+    )
+    return registry.acquire_communication(configuration)
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("mode", "family"),
+    (
+        (CommunicationTransportMode.GAS, "communication_gas"),
+        (CommunicationTransportMode.PARTICLES, "communication_particles"),
+    ),
+)
+def test_capture_registration_protects_unselected_final_volumes(
+    mode: CommunicationTransportMode, family: str
+) -> None:
+    """Test either published communication mode protects final volumes."""
+    wp = pytest.importorskip("warp")
+    session = _session(boxes=3)
+    registry = GPUResourceRegistry(session)
+    final_volumes = wp.ones(3, dtype=wp.float64, device="cpu")
+    resources = _communication_with_final_volumes(registry, final_volumes, mode)
+    aliased = ResidentDiagnosticRegistration(
+        ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
+        final_volumes,
+    )
+
+    with pytest.raises(ValueError, match="byte ranges must not overlap"):
+        registry.register_capture_resources(session, None, (aliased,))
+    assert registry._capture_inventory is None
+
+    output = wp.zeros(3, dtype=wp.float64, device="cpu")
+    valid = ResidentDiagnosticRegistration(
+        ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
+        output,
+    )
+    inventory = registry.register_capture_resources(
+        session, resources, (valid,)
+    )
+
+    assert inventory.communication_resources is resources
+    assert inventory.families[0].family == family
 
 
 @pytest.mark.warp

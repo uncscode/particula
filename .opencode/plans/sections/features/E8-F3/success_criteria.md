@@ -22,6 +22,19 @@
 - [x] P2 introduces no allocation, publication, reacquisition, RNG lifecycle
   change, or public export.
 
+## P3 Completion
+
+- [x] One concrete-only registration pins absent communication or one exact
+  already-published closed GAS/PARTICLES view plus ordered diagnostic
+  registrations by identity.
+- [x] Selected-resource reports retain deterministic resolved schema and logical
+  byte metadata, including zero extents, without payload inspection.
+- [x] Candidate validation is transactional, exact repeats reuse the retained
+  inventory, and forbidden overlaps are detected in O(R log R) host metadata
+  work while permitted read-only accounting aliases remain allowed.
+- [x] Diagnostics validation, communication setup, checkpoint enumeration,
+  scheduler behavior, and public exports remain unchanged.
+
 - [ ] One setup-only operation resolves and publishes every reusable array
   required by the selected E8-F2 prepared timestep before READY/capture.
 - [ ] The inventory covers process scratch/output, normalized controls,
