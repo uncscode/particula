@@ -107,7 +107,14 @@ def _scan_diagnostic_accounting(
 
 @dataclass(frozen=True)
 class ManifestEntry:
-    """Describe one fixed-shape concrete sidecar role."""
+    """Describe one fixed-shape concrete sidecar role.
+
+    Attributes:
+        role: Name of the sidecar within its resource family.
+        family: Canonical resource family that owns the role.
+        dtype: Warp dtype declared for the sidecar.
+        shape_kind: Symbolic shape formula resolved by the registry.
+    """
 
     role: str
     family: str
@@ -117,7 +124,12 @@ class ManifestEntry:
 
 @dataclass(frozen=True)
 class ResourceManifest:
-    """Declare immutable sidecar schemas for one resource family."""
+    """Declare immutable sidecar schemas for one resource family.
+
+    Attributes:
+        family: Canonical name of the resource family.
+        entries: Ordered role declarations comprising the family schema.
+    """
 
     family: str
     entries: tuple[ManifestEntry, ...]
@@ -233,6 +245,11 @@ class PublishedStreamManifest:
 
     No live device arrays, pointers, device values, or current stream words are
     exposed by this inspection carrier.
+
+    Attributes:
+        stream: Frozen stream identity and descriptor metadata.
+        published_process_ids: Processes with currently published streams.
+        sidecar_roles: Published process and sidecar-role pairs.
     """
 
     stream: StreamManifest
@@ -242,7 +259,11 @@ class PublishedStreamManifest:
 
 @dataclass(frozen=True, eq=False)
 class CondensationResources:
-    """Expose a complete native condensation scratch record."""
+    """Expose a complete native condensation scratch record.
+
+    Attributes:
+        scratch_buffers: Pinned native scratch arrays for condensation steps.
+    """
 
     scratch_buffers: CondensationScratchBuffers
 
@@ -283,7 +304,14 @@ class WallLossResources:
 
 @dataclass(frozen=True, eq=False)
 class NucleationResources:
-    """Expose complete native nucleation sidecar records."""
+    """Expose complete native nucleation sidecar records.
+
+    Attributes:
+        scratch: Pinned working arrays for nucleation planning.
+        finalized_demand: Pinned finalized-demand arrays.
+        diagnostics: Pinned diagnostic arrays.
+        exhaustion: Pinned exhaustion and resampling arrays.
+    """
 
     scratch: NucleationScratchBuffers
     finalized_demand: NucleationFinalizedDemandBuffers
@@ -316,7 +344,17 @@ class CommunicationResources:
 
 @dataclass(frozen=True, eq=False)
 class ResidentCommunicationState:
-    """Expose registry-pinned status and snapshot storage for barriers."""
+    """Expose registry-pinned status and snapshot storage for barriers.
+
+    Attributes:
+        invalid: Device status lane for invalid communication state.
+        active_or_demand: Device status lane for active or demanded work.
+        volume_invalid: Device status lane for invalid volume state.
+        volume_changed: Device status lane for volume-change detection.
+        initial_masses: Optional particle-mass snapshot storage.
+        initial_concentration: Optional particle-concentration snapshot.
+        initial_charge: Optional particle-charge snapshot.
+    """
 
     invalid: Any
     active_or_demand: Any
