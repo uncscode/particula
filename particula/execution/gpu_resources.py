@@ -560,6 +560,12 @@ def _inventory_metadata(
     Literal["registry_or_caller_sidecar", "caller_configuration"],
 ]:
     """Return declaration-only capacity and ownership metadata for one role."""
+    capacity_source: Literal[
+        "fixed",
+        "collision_capacity",
+        "gas_edge_capacity",
+        "particle_edge_capacity",
+    ]
     if entry.family == "coagulation" and entry.role == "collision_pairs":
         capacity_source = "collision_capacity"
     elif entry.family == "communication_gas" and entry.shape_kind == "e":
@@ -571,7 +577,10 @@ def _inventory_metadata(
         capacity_source = "particle_edge_capacity"
     else:
         capacity_source = "fixed"
-    ownership = (
+    ownership: Literal[
+        "registry_or_caller_sidecar",
+        "caller_configuration",
+    ] = (
         "caller_configuration"
         if (entry.family, entry.role) in _CALLER_CONFIGURATION_ROLES
         else "registry_or_caller_sidecar"
