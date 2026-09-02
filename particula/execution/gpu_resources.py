@@ -35,6 +35,7 @@ after launched device work.
 from __future__ import annotations
 
 from dataclasses import dataclass, fields
+from heapq import heappop, heappush
 from numbers import Integral
 from typing import Any, Literal, cast
 
@@ -78,6 +79,9 @@ __all__ = [
     "LogicalResourceRoleReport",
     "LogicalResourceFamilyReport",
     "LogicalResourceReport",
+    "SelectedResourceRole",
+    "SelectedResourceFamilyReport",
+    "SelectedResourceInventory",
     "PublishedStreamManifest",
     "GPUResourceRegistry",
     "CondensationResources",
@@ -238,6 +242,50 @@ class LogicalResourceReport:
     """
 
     families: tuple[LogicalResourceFamilyReport, ...]
+    logical_byte_count: int
+
+
+@dataclass(frozen=True, eq=False)
+class SelectedResourceRole:
+    """Describe one identity-pinned capture resource role.
+
+    This concrete-only carrier retains a caller or registry array by identity
+    for the lifetime of one capture selection.  It records metadata only and
+    is neither checkpoint authority nor an ownership transfer.
+    """
+
+    canonical_name: str
+    family: str
+    dtype: Any
+    shape: tuple[int, ...]
+    value: Any
+    element_count: int
+    logical_byte_count: int
+    read_only: bool = False
+
+
+@dataclass(frozen=True, eq=False)
+class SelectedResourceFamilyReport:
+    """Report the ordered metadata-only roles selected from one family."""
+
+    family: str
+    roles: tuple[SelectedResourceRole, ...]
+    logical_byte_count: int
+
+
+@dataclass(frozen=True, eq=False)
+class SelectedResourceInventory:
+    """Retain one exact concrete capture resource selection.
+
+    The optional communication view and diagnostic registrations remain owned by
+    their callers or registry.  Re-registration succeeds only for this exact
+    retained identity selection; no device data is copied, inspected, or made
+    checkpoint-visible.
+    """
+
+    communication_resources: "CommunicationResources | None"
+    registrations: tuple[Any, ...]
+    families: tuple[SelectedResourceFamilyReport, ...]
     logical_byte_count: int
 
 
@@ -861,7 +909,7 @@ class GPUResourceRegistry:
             None
         )
         self._wall_loss_stream_registry: _PublishedStreamRegistry | None = None
-        self._validated_diagnostic_registrations: tuple[Any, ...] | None = None
+        self._capture_inventory: SelectedResourceInventory | None = None
 
     @property
     def manifests(self) -> tuple[ResourceManifest, ...]:
@@ -955,6 +1003,305 @@ class GPUResourceRegistry:
             families,
             _checked_sum([family.logical_byte_count for family in families]),
         )
+
+    def selected_resource_report(self) -> SelectedResourceInventory:
+        """Return the one previously registered concrete capture inventory.
+
+        The retained report is returned by identity.  This accessor validates
+        only the pinned active session and does not rescan arrays, allocate,
+        synchronize, transfer, inspect payloads, or rebuild role metadata.
+
+        Raises:
+            ValueError: If no capture selection has been registered or the
+                pinned session has drifted.
+        """
+        self.validate_pinned_session(self._session)
+        if self._capture_inventory is None:
+            raise ValueError("Capture resources have not been registered.")
+        return self._capture_inventory
+
+    def _selected_role(
+        self,
+        canonical_name: str,
+        family: str,
+        entry: ManifestEntry,
+        value: Any,
+        capacity: int | None,
+        *,
+        read_only: bool = False,
+    ) -> tuple[SelectedResourceRole, tuple[int, int] | None]:
+        """Resolve selected-role metadata once without inspecting payloads."""
+        byte_range = self._validate_array(entry, value, capacity)
+        shape = self._shape(entry, capacity)
+        return (
+            SelectedResourceRole(
+                canonical_name,
+                family,
+                entry.dtype,
+                shape,
+                value,
+                _shape_element_count(shape),
+                _logical_byte_count(shape, entry.dtype),
+                read_only,
+            ),
+            byte_range,
+        )
+
+    def _capture_candidate_roles(
+        self,
+        communication_resources: CommunicationResources | None,
+        registrations: tuple[Any, ...],
+    ) -> tuple[
+        tuple[SelectedResourceFamilyReport, ...],
+        tuple[SelectedResourceRole, ...],
+        tuple[tuple[int, int] | None, ...],
+    ]:
+        """Build ordered selected-role metadata before inventory publication."""
+        grouped: dict[str, list[SelectedResourceRole]] = {}
+        ranges: list[tuple[int, int] | None] = []
+
+        def add(
+            canonical_name: str,
+            family: str,
+            entry: ManifestEntry,
+            value: Any,
+            capacity: int | None = None,
+            *,
+            read_only: bool = False,
+        ) -> None:
+            role, byte_range = self._selected_role(
+                canonical_name,
+                family,
+                entry,
+                value,
+                capacity,
+                read_only=read_only,
+            )
+            grouped.setdefault(family, []).append(role)
+            ranges.append(byte_range)
+
+        if communication_resources is not None:
+            configuration = communication_resources.configuration
+            map_data = configuration.communication_map
+            mode = map_data.transport_mode
+            manifest = (
+                _GAS_COMMUNICATION
+                if mode is CommunicationTransportMode.GAS
+                else _PARTICLE_COMMUNICATION
+            )
+            family = manifest.family
+            values = {
+                "source_boxes": map_data.source_boxes,
+                "destination_boxes": map_data.destination_boxes,
+                "enabled": map_data.enabled,
+                "rates": map_data.rates,
+                **self._record_bindings(communication_resources.buffers),
+                "invalid": communication_resources.execution_state.invalid,
+                "active_or_demand": (
+                    communication_resources.execution_state.active_or_demand
+                ),
+                "volume_invalid": (
+                    communication_resources.execution_state.volume_invalid
+                ),
+                "volume_changed": (
+                    communication_resources.execution_state.volume_changed
+                ),
+                "initial_masses": (
+                    communication_resources.execution_state.initial_masses
+                ),
+                "initial_concentration": (
+                    communication_resources.execution_state.initial_concentration
+                ),
+                "initial_charge": (
+                    communication_resources.execution_state.initial_charge
+                ),
+            }
+            for entry in manifest.entries:
+                add(
+                    f"{family}:{entry.role}",
+                    family,
+                    entry,
+                    values[entry.role],
+                    int(map_data.edge_capacity),
+                )
+            if communication_resources.final_volumes is not None:
+                entry = ManifestEntry("final_volumes", family, wp.float64, "b")
+                add(
+                    f"{family}:final_volumes",
+                    family,
+                    entry,
+                    communication_resources.final_volumes,
+                )
+
+        from particula.execution.diagnostics import (
+            ResidentDiagnosticOperation,
+        )
+
+        for index, registration in enumerate(registrations):
+            operation = registration.operation
+            shape_kind: Literal["b", "bs"] = (
+                "b"
+                if operation
+                is ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION
+                else "bs"
+            )
+            prefix = f"diagnostics:{index}:{operation.value}"
+            add(
+                f"{prefix}:output",
+                "diagnostics",
+                ManifestEntry(
+                    "diagnostic output",
+                    "diagnostics",
+                    wp.float64,
+                    shape_kind,
+                ),
+                registration.output,
+            )
+            for name in (
+                "energy_transfer",
+                "baseline_total_mass",
+                "source_ledger",
+                "sink_ledger",
+            ):
+                value = getattr(registration, name)
+                if value is not None:
+                    add(
+                        f"{prefix}:{name}",
+                        "diagnostics",
+                        ManifestEntry(
+                            "diagnostic accounting input",
+                            "diagnostics",
+                            wp.float64,
+                            "bs",
+                        ),
+                        value,
+                        read_only=True,
+                    )
+        families = tuple(
+            SelectedResourceFamilyReport(
+                family,
+                tuple(roles),
+                _checked_sum([role.logical_byte_count for role in roles]),
+            )
+            for family, roles in grouped.items()
+        )
+        roles = tuple(role for family in families for role in family.roles)
+        if len(roles) != len(set(role.canonical_name for role in roles)):
+            raise ValueError("Selected capture roles must be unique.")
+        return families, roles, tuple(ranges)
+
+    def _validate_capture_nonalias(
+        self,
+        roles: tuple[SelectedResourceRole, ...],
+        ranges: tuple[tuple[int, int] | None, ...],
+    ) -> None:
+        """Reject capture overlap using one sorted interval sweep.
+
+        Read-only diagnostic accounting inputs may share one another.  Every
+        other selected, primary, or established-sidecar overlap is forbidden.
+        """
+        selected_values = {id(role.value) for role in roles}
+        protected = list(_primary_arrays(self._session)) + [
+            value
+            for bindings in self._bindings.values()
+            for value in bindings.values()
+            if id(value) not in selected_values
+        ]
+        intervals: list[tuple[int, int, int, bool, str]] = []
+        for index, (role, byte_range) in enumerate(
+            zip(roles, ranges, strict=True)
+        ):
+            if byte_range is not None:
+                intervals.append(
+                    (
+                        byte_range[0],
+                        byte_range[1],
+                        index,
+                        role.read_only,
+                        role.canonical_name,
+                    )
+                )
+        for index, value in enumerate(protected, start=len(roles)):
+            byte_range = self._array_range(value)
+            if byte_range is not None:
+                intervals.append(
+                    (byte_range[0], byte_range[1], index, False, "protected")
+                )
+        intervals.sort(key=lambda item: (item[0], item[1], item[2]))
+        active: list[int] = []
+        writable_active: list[int] = []
+        for interval in intervals:
+            start = interval[0]
+            while active and active[0] <= start:
+                heappop(active)
+            while writable_active and writable_active[0] <= start:
+                heappop(writable_active)
+            if active and (not interval[3] or writable_active):
+                raise ValueError(
+                    "Selected capture resource byte ranges must not overlap."
+                )
+            heappush(active, interval[1])
+            if not interval[3]:
+                heappush(writable_active, interval[1])
+
+    def register_capture_resources(
+        self,
+        session: ResidentSession,
+        communication_resources: CommunicationResources | None,
+        registrations: tuple[Any, ...],
+    ) -> SelectedResourceInventory:
+        """Pin one exact metadata-only communication and diagnostics selection.
+
+        The first successful call retains an immutable identity inventory.  A
+        later exact repeat returns it; all other repeats reject without changing
+        the retained inventory.  This method performs no allocation, device
+        dispatch, synchronization, transfer, or payload inspection.
+        """
+        self.validate_pinned_session(session)
+        if communication_resources is not None:
+            if type(communication_resources) is not CommunicationResources:
+                raise TypeError(
+                    "communication_resources must be CommunicationResources "
+                    "or None."
+                )
+            self.validate_communication_resources(
+                session, communication_resources
+            )
+        if type(registrations) is not tuple:
+            raise TypeError("registrations must be an exact tuple.")
+        from particula.execution.diagnostics import (
+            ResidentDiagnosticRegistration,
+        )
+
+        if not all(
+            type(item) is ResidentDiagnosticRegistration
+            for item in registrations
+        ):
+            raise TypeError(
+                "registrations must be exact "
+                "ResidentDiagnosticRegistration tuple."
+            )
+        self.validate_diagnostic_registrations(session, registrations)
+        inventory = self._capture_inventory
+        if inventory is not None:
+            if (
+                communication_resources is inventory.communication_resources
+                and registrations is inventory.registrations
+            ):
+                return inventory
+            raise ValueError("Capture resources have already been registered.")
+        families, roles, ranges = self._capture_candidate_roles(
+            communication_resources, registrations
+        )
+        self._validate_capture_nonalias(roles, ranges)
+        candidate = SelectedResourceInventory(
+            communication_resources,
+            registrations,
+            families,
+            _checked_sum([family.logical_byte_count for family in families]),
+        )
+        self._capture_inventory = candidate
+        return candidate
 
     def _session_signature(self) -> tuple[Any, ...]:
         """Build the pinned lifecycle, dimension, device, and identity
@@ -1176,8 +1523,6 @@ class GPUResourceRegistry:
         self.validate_pinned_session(session)
         if type(registrations) is not tuple:
             raise TypeError("registrations must be an exact tuple.")
-        if registrations is self._validated_diagnostic_registrations:
-            return
         outputs, output_entries, inputs, input_entries = (
             self._diagnostic_binding_entries(registrations)
         )
@@ -1203,7 +1548,6 @@ class GPUResourceRegistry:
             protected,
             protected_ranges,
         )
-        self._validated_diagnostic_registrations = registrations
 
     @staticmethod
     def _diagnostic_binding_entries(

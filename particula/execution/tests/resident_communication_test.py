@@ -259,6 +259,45 @@ def _request(
     "mode",
     [CommunicationTransportMode.GAS, CommunicationTransportMode.PARTICLES],
 )
+def test_capture_registration_retains_one_closed_communication_view(
+    mode: CommunicationTransportMode,
+) -> None:
+    """Test capture registration retains the selected closed family by identity."""
+    from particula.execution.tests.gpu_resources_test import _diagnostics_plan
+
+    request = _request(mode)
+    registry = request.registry
+    wp = pytest.importorskip("warp")
+    outputs = tuple(
+        wp.zeros((3, 1), dtype=wp.float64, device="cpu") for _ in range(2)
+    )
+    plan = _diagnostics_plan(request.session, registry, outputs)
+
+    assert registry._capture_inventory is None
+    inventory = registry.register_capture_resources(
+        request.session, request.resources, plan.registrations
+    )
+
+    assert inventory.communication_resources is request.resources
+    assert inventory.registrations is plan.registrations
+    family = f"communication_{mode.value}"
+    assert inventory.families[0].family == family
+    assert [role.canonical_name for role in inventory.families[0].roles][
+        :4
+    ] == [
+        f"{family}:source_boxes",
+        f"{family}:destination_boxes",
+        f"{family}:enabled",
+        f"{family}:rates",
+    ]
+    assert registry.selected_resource_report() is inventory
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "mode",
+    [CommunicationTransportMode.GAS, CommunicationTransportMode.PARTICLES],
+)
 def test_executor_dispatches_only_the_selected_native_primitive(
     monkeypatch: pytest.MonkeyPatch, mode: CommunicationTransportMode
 ) -> None:

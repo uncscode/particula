@@ -113,6 +113,7 @@ def _diagnostics_plan(
         "saturation_refresh",
         "diagnostics",
     )
+
     nodes = tuple(
         ProcessNode(
             schema.node_id,
@@ -183,6 +184,47 @@ def _diagnostics_plan(
             ),
         ),
     )
+
+
+@pytest.mark.warp
+def test_capture_registration_without_communication_retains_exact_report() -> (
+    None
+):
+    """Test absent communication registration returns its exact pinned report."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    wp = pytest.importorskip("warp")
+    outputs = tuple(
+        wp.zeros((1, 1), dtype=wp.float64, device="cpu") for _ in range(2)
+    )
+    plan = _diagnostics_plan(session, registry, outputs)
+
+    with pytest.raises(ValueError, match="have not been registered"):
+        registry.selected_resource_report()
+    inventory = registry.register_capture_resources(
+        session, None, plan.registrations
+    )
+
+    assert registry.selected_resource_report() is inventory
+    assert (
+        registry.register_capture_resources(session, None, plan.registrations)
+        is inventory
+    )
+    assert inventory.communication_resources is None
+    assert inventory.registrations is plan.registrations
+    assert inventory.families[0].family == "diagnostics"
+    assert [role.shape for role in inventory.families[0].roles][:4] == [
+        (1, 1),
+        (1, 1),
+        (1, 1),
+        (1,),
+    ]
+
+    with pytest.raises(ValueError, match="already been registered"):
+        registry.register_capture_resources(
+            session, None, tuple([*plan.registrations])
+        )
+    assert registry.selected_resource_report() is inventory
 
 
 @pytest.mark.warp
