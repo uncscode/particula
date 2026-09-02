@@ -11,11 +11,12 @@ without invalidating or refreshing vapor pressure.
 
 It does not own lifecycle, resource acquisition, scheduling, transfers,
 fallbacks, or general process dispatch. Prepared setup freezes the consumer
-windows and enqueue uses retained writers without validation, allocation,
-readback, transfer, synchronization, mutable-carrier lookup, or rebinding.
-Setup rejection is pre-writer; rollback is not promised after a refresh writer
-launches. Refreshing vapor pressure delegates to the authoritative GPU
-primitive; saturation refresh is a private device writer.
+windows and enqueue repeats no host/setup metadata validation or performs
+allocation, host readback, transfer, synchronization, mutable-carrier lookup,
+or rebinding. Retained refresh writers still perform device-side status and
+physical-state validation. Setup rejection is pre-writer; rollback is not
+promised after a refresh writer launches. Refreshing vapor pressure delegates to
+the authoritative GPU primitive; saturation refresh is a private device writer.
 """
 
 from __future__ import annotations

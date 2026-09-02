@@ -12,10 +12,12 @@ sidecar, including when the seed is unchanged. Callers own synchronization and
 recovery after a kernel launch.
 
 Prepared bindings freeze operation selection and dispatch retained references
-without validation, allocation, readback, transfer, synchronization, lookup, or
-rebinding or RNG initialization/reset. Rejection is pre-writer; no rollback is
-promised after a writer-capable call. CPU and resident-Warp calls have
-independent stochastic trajectories. This concrete boundary provides no
+without repeating host/setup metadata validation or performing allocation, host
+readback, transfer, synchronization, lookup, or rebinding or RNG
+initialization/reset. Retained resident-Warp operations still perform
+device-side status and physical-state validation. Rejection is pre-writer; no
+rollback is promised after a writer-capable call. CPU and resident-Warp calls
+have independent stochastic trajectories. This concrete boundary provides no
 seed-by-seed cross-backend trajectory comparison.
 """
 

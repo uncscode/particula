@@ -96,6 +96,7 @@ def _validate_ready_attachment(
     ):
         raise ValueError("graph-capture binding identities do not match.")
     guard_any.assert_step_closed()
+    registry_any.assert_step_closed()
     registry_any.validate_pinned_session(session_any)
     if session_any.lifecycle.name != "ACTIVE":
         raise ValueError("resident session must be ACTIVE.")

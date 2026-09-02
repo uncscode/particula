@@ -17,10 +17,11 @@ Execution validates caller-owned same-device bindings without host readback,
 synchronization, transfer, allocation, or physics mutation. Empty matrix
 operations are write-free for ``B == 0`` or ``S == 0``; particle number is
 write-free only for ``B == 0``. Prepared setup binds the closed plan; its
-observation-free enqueue uses retained device copies without validation,
-allocation, readback, transfer, synchronization, lookup, or rebinding. Setup
-rejection is pre-writer; rollback is not promised after a diagnostic writer
-launches.
+observation-free enqueue repeats no host/setup metadata validation and performs
+no allocation, host readback, transfer, synchronization, lookup, or rebinding.
+Retained diagnostic writers still perform device-side status and physical-state
+validation. Setup rejection is pre-writer; rollback is not promised after a
+diagnostic writer launches.
 """
 
 from __future__ import annotations

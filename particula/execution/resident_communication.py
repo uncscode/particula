@@ -3,12 +3,14 @@
 This concrete-only module validates and freezes a READY P1 binding for
 already-acquired closed-map communication and optional volume evolution. Its
 prepared enqueue dispatches only those retained device barriers, without
-validation, acquisition, host conversion, synchronization, fallback, or
-recovery. The shared validator remains a read-only metadata seam for legacy
-execution. Prepared enqueue is retained-reference dispatch only: it does no
-payload validation/readback, allocation, transfer, synchronization, lookup,
-resource replacement, fallback, or rebinding. Setup rejection occurs before a
-barrier writer; rollback is not promised after one launches.
+repeated host/setup metadata validation, acquisition, host conversion,
+synchronization, fallback, or recovery. The shared validator remains a
+read-only metadata seam for legacy execution. Prepared enqueue is
+retained-reference dispatch only: it does no host payload readback, allocation,
+transfer, synchronization, lookup, resource replacement, fallback, or
+rebinding. Retained native barriers still perform device-side status and
+physical-state validation. Setup rejection occurs before a barrier writer;
+rollback is not promised after one launches.
 """
 
 from __future__ import annotations
@@ -98,9 +100,11 @@ class PreparedResidentCommunicationBinding:
     """Freeze a validated closed communication barrier for device enqueue.
 
     This concrete-only carrier retains P1, request, primary, map, work, and
-    optional-volume identities after setup-time validation. Enqueue performs no
-    lookup, validation, allocation, transfer, readback, synchronization, or
-    fallback. Only closed GAS or PARTICLES maps are supported. Equal final
+    optional-volume identities after setup-time validation. Enqueue repeats no
+    host/setup metadata validation and performs no lookup, allocation, transfer,
+    host readback, synchronization, or fallback. Retained native barriers still
+    perform device-side status and physical-state validation. Only closed GAS or
+    PARTICLES maps are supported. Equal final
     volumes make the optional volume-evolution phase write-free; preceding
     communication may still write. After a changed-volume device writer
     launches, rollback is not promised.
@@ -410,8 +414,10 @@ def _enqueue_prepared_resident_communication(
 
     The binding is assumed to have passed setup validation. This function only
     dispatches the already-bound native helpers in communication-first order;
-    it performs no lookup, allocation, validation, transfer, synchronization,
-    or host inspection. A device writer has no rollback guarantee.
+    it performs no lookup, allocation, repeated host/setup metadata validation,
+    transfer, synchronization, or host inspection. Native device-side status
+    and physical-state validation remains in force. A device writer has no
+    rollback guarantee.
 
     Args:
         binding: Frozen resident communication inputs and caller-owned buffers.
@@ -431,8 +437,10 @@ def _enqueue_prepared_resident_communication_node(
     """Enqueue only the already-bound communication barrier.
 
     The private concrete seam uses its retained callable and arguments without
-    validation, allocation, readback, transfer, synchronization, lookup, or
-    rebinding. A writer launch has no rollback guarantee.
+    repeated host/setup metadata validation, allocation, host readback,
+    transfer, synchronization, lookup, or rebinding. Native device-side status
+    and physical-state validation remains in force. A writer launch has no
+    rollback guarantee.
 
     Args:
         binding: Setup-validated communication inputs and native callable.
@@ -449,9 +457,10 @@ def _enqueue_prepared_resident_volume_evolution_node(
     """Enqueue only the already-bound optional volume-evolution barrier.
 
     The private concrete seam uses its retained callable and arguments without
-    validation, allocation, readback, transfer, synchronization, lookup, or
-    rebinding. The selected no-op is write-free; a writer launch has no rollback
-    guarantee.
+    repeated host/setup metadata validation, allocation, host readback,
+    transfer, synchronization, lookup, or rebinding. Native device-side status
+    and physical-state validation remains in force. The selected no-op is
+    write-free; a writer launch has no rollback guarantee.
 
     Args:
         binding: Setup-validated volume inputs and native or no-op callable.

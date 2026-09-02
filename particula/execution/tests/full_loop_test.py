@@ -1091,6 +1091,59 @@ def test_prepared_simulation_drift_rejects_before_token_entry(
 
 
 @pytest.mark.warp
+def test_prepared_writer_classification_drift_rejects_before_token_entry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A tampered writer classification cannot weaken failure recovery."""
+    fixture = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
+    request = fixture.request
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cpu"), GraphCaptureAvailability.AVAILABLE
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, fixture.session, fixture.registry, fixture.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+
+    class PreparedCall:
+        """Provide a write-free retained operation for scheduler preparation."""
+
+        def execute(self) -> None:
+            return None
+
+    class PreparedAdapter:
+        """Replace native adapter setup while retaining the prepare protocol."""
+
+        def prepare(self, _request: object) -> PreparedCall:
+            return PreparedCall()
+
+    module = _scheduler_module()
+    for name in (
+        "WarpCondensationExecutionAdapter",
+        "ResidentBrownianCoagulationExecutionAdapter",
+        "ResidentDilutionAdapter",
+        "ResidentWallLossAdapter",
+        "ResidentNucleationAdapter",
+    ):
+        monkeypatch.setattr(module, name, PreparedAdapter)
+    prepared = prepare_resident_simulation(request, 0.0)
+    object.__setattr__(prepared.operations[0], "writer_capable", False)
+
+    with pytest.raises(ValueError, match="products do not match"):
+        enqueue_prepared_resident_simulation(prepared)
+
+    assert fixture.trace == []
+    assert fixture.guard.completed_steps == 0
+    fixture.guard.assert_step_closed()
+    fixture.registry.assert_step_closed()
+    assert fixture.session.lifecycle is ResidentLifecycle.ACTIVE
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
+
+
+@pytest.mark.warp
 def test_prepared_signature_drift_rejects_before_token_entry(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

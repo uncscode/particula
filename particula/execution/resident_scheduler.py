@@ -9,8 +9,10 @@ resident identities, capability, lifecycle, and structural signature before the
 step token is opened. The prepared path is concrete-only, READY, and
 uncaptured; it retains setup-validated operation callables and rechecks only
 its attachment and structural signature before opening its token. After this
-mandatory pre-token gate, prepared dispatch performs no validation, readback,
-allocation, transfer, synchronization, lookup, rebinding, or RNG reset.
+mandatory pre-token gate, prepared dispatch repeats no host/setup metadata
+validation and performs no host readback, allocation, transfer, synchronization,
+lookup, rebinding, or RNG reset. Retained native operations still perform their
+device-side status and physical-state validation.
 """
 
 from __future__ import annotations
@@ -133,6 +135,7 @@ _CANONICAL_IDS = (
     "nucleation",
     "diagnostics",
 )
+_CANONICAL_WRITER_CAPABLE = (True,) * len(_CANONICAL_IDS)
 
 
 @dataclass(frozen=True, eq=False)
@@ -603,6 +606,7 @@ def _validate_prepared_resident_simulation(prepared: object) -> None:
     if any(
         operation.product is not product
         or operation.handler is not handler
+        or operation.writer_capable is not writer_capable
         or len(operation.arguments) != len(arguments)
         or any(
             argument is not expected
@@ -610,11 +614,12 @@ def _validate_prepared_resident_simulation(prepared: object) -> None:
                 operation.arguments, arguments, strict=True
             )
         )
-        for operation, product, handler, arguments in zip(
+        for operation, product, handler, arguments, writer_capable in zip(
             typed.operations,
             expected_products,
             expected_handlers,
             expected_arguments,
+            _CANONICAL_WRITER_CAPABLE,
             strict=True,
         )
     ):
@@ -650,8 +655,10 @@ def enqueue_prepared_resident_simulation(prepared: object) -> None:
     binding: its mandatory pre-token gate rechecks retained READY lifecycle,
     attachment, and structural identities before opening the token. After
     admission, it invokes the twelve setup-bound operations in canonical order
-    without validation, readback, allocation, transfer, synchronization,
-    lookup, rebinding, or RNG reset, then closes the token exactly once.
+    without repeating host/setup metadata validation or performing host
+    readback, allocation, transfer, synchronization, lookup, rebinding, or RNG
+    reset. Retained native operations still perform device-side status and
+    physical-state validation. The scheduler then closes the token exactly once.
     Rejection before a writer-capable invocation preserves the active session;
     a later failure follows the FAULTED no-rollback, no-retry, and no-fallback
     resident recovery boundary.
@@ -672,8 +679,10 @@ def enqueue_prepared_resident_simulation(prepared: object) -> None:
     token = cast(Any, typed.guard).begin_step(typed.duration)
     writer_called = False
     try:
-        for operation in typed.operations:
-            writer_called = writer_called or operation.writer_capable
+        for operation, writer_capable in zip(
+            typed.operations, _CANONICAL_WRITER_CAPABLE, strict=True
+        ):
+            writer_called = writer_called or writer_capable
             operation.handler(*operation.arguments)
             record_prepared_thermodynamic_success(
                 cast(Any, typed.thermal), operation.node

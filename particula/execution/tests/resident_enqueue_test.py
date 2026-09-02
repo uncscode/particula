@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 
 from particula.execution import Backend, Device
+from particula.execution.gpu_session import ResidentStepGuard
 from particula.execution.graph_capture import (
     GraphCaptureAvailability,
     GraphCaptureCapability,
@@ -167,6 +168,30 @@ def test_prepare_rechecks_signature_after_metadata_validation(
     assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
     assert request.graph_capture_binding is binding
     assert request.guard.completed_steps == 0
+
+
+@pytest.mark.warp
+def test_prepare_rejects_open_step_owned_by_another_guard(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A registry-wide open step blocks preparation through a closed guard."""
+    fixture = _ready_request(monkeypatch)
+    request = fixture.request
+    binding = request.graph_capture_binding
+    assert binding is not None
+    other_guard = ResidentStepGuard(request.session, request.registry)
+    token = other_guard.begin_step(0.0)
+
+    with pytest.raises(RuntimeError, match="resident timestep is open"):
+        prepare_resident_timestep(request, 0.0)
+
+    assert request.guard._open_token is None
+    assert request.guard.completed_steps == 0
+    assert other_guard._open_token is token
+    assert request.registry._open_step_token is token
+    assert fixture.trace == []
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
+    other_guard.complete_step(token)
 
 
 @pytest.mark.warp
