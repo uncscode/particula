@@ -1190,28 +1190,40 @@ class GPUResourceRegistry:
             raise ValueError("Selected capture roles must be unique.")
         return families, roles, tuple(ranges)
 
-    def _validate_capture_nonalias(
+    def _validate_capture_nonalias(  # noqa: C901
         self,
         roles: tuple[SelectedResourceRole, ...],
         ranges: tuple[tuple[int, int] | None, ...],
+        selected_published: set[int],
     ) -> None:
         """Reject capture overlap using one sorted interval sweep.
 
         Read-only diagnostic accounting inputs may share one another.  Every
         other selected, primary, or established-sidecar overlap is forbidden.
         """
-        selected_values = {id(role.value) for role in roles}
+        # A selected communication view necessarily repeats its already
+        # published native sidecars in ``_bindings``.  Exclude only those
+        # published values from the protected set.  Do not exclude every
+        # selected value: a communication map or final-volume array may have
+        # been illicitly reused as an unrelated established sidecar, and that
+        # alias must still be rejected.
         protected = list(_primary_arrays(self._session)) + [
             value
             for bindings in self._bindings.values()
             for value in bindings.values()
-            if id(value) not in selected_values
+            if id(value) not in selected_published
         ]
         intervals: list[tuple[int, int, int, bool, str]] = []
+        published_seen: set[int] = set()
         for index, (role, byte_range) in enumerate(
             zip(roles, ranges, strict=True)
         ):
             if byte_range is not None:
+                value_id = id(role.value)
+                if value_id in selected_published:
+                    if value_id in published_seen:
+                        continue
+                    published_seen.add(value_id)
                 intervals.append(
                     (
                         byte_range[0],
@@ -1293,7 +1305,29 @@ class GPUResourceRegistry:
         families, roles, ranges = self._capture_candidate_roles(
             communication_resources, registrations
         )
-        self._validate_capture_nonalias(roles, ranges)
+        selected_published: set[int] = set()
+        if communication_resources is not None:
+            selected_published.update(
+                id(value)
+                for value in (
+                    communication_resources.configuration.communication_map.source_boxes,
+                    communication_resources.configuration.communication_map.destination_boxes,
+                    communication_resources.configuration.communication_map.enabled,
+                    communication_resources.configuration.communication_map.rates,
+                    *self._record_bindings(
+                        communication_resources.buffers
+                    ).values(),
+                    communication_resources.execution_state.invalid,
+                    communication_resources.execution_state.active_or_demand,
+                    communication_resources.execution_state.volume_invalid,
+                    communication_resources.execution_state.volume_changed,
+                    communication_resources.execution_state.initial_masses,
+                    communication_resources.execution_state.initial_concentration,
+                    communication_resources.execution_state.initial_charge,
+                )
+                if value is not None
+            )
+        self._validate_capture_nonalias(roles, ranges, selected_published)
         candidate = SelectedResourceInventory(
             communication_resources,
             registrations,
