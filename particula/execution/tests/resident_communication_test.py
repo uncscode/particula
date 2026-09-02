@@ -266,7 +266,7 @@ def test_capture_registration_retains_one_closed_communication_view(
     from particula.execution.tests.gpu_resources_test import _diagnostics_plan
 
     request = _request(mode)
-    registry = request.registry
+    registry = cast(GPUResourceRegistry, request.registry)
     wp = pytest.importorskip("warp")
     outputs = tuple(
         wp.zeros((3, 1), dtype=wp.float64, device="cpu") for _ in range(2)
