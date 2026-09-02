@@ -553,9 +553,11 @@ class CaptureResourceRequirements:
             (self.inventory, SelectedResourceInventory, "inventory"),
             (self.prepared_views, PreparedResourceViews, "prepared_views"),
         )
-        for value, expected, name in exact:
-            if type(value) is not expected:
-                raise TypeError(f"{name} must be an exact {expected.__name__}.")
+        for value, expected_type, name in exact:
+            if type(value) is not expected_type:
+                raise TypeError(
+                    f"{name} must be an exact {expected_type.__name__}."
+                )
         if (
             self.communication_resources is not None
             and type(self.communication_resources) is not CommunicationResources
@@ -578,7 +580,7 @@ class CaptureResourceRequirements:
             "dilution",
         ):
             raise ValueError("Capture resource family order is not canonical.")
-        expected = (
+        expected_resources = (
             (self.condensation, CondensationScratchBuffers, "condensation"),
             (self.coagulation, CoagulationResources, "coagulation"),
             (self.wall_loss, WallLossResources, "wall_loss"),
@@ -590,10 +592,13 @@ class CaptureResourceRequirements:
             self.prepared_views.wall_loss,
             self.prepared_views.nucleation,
         )
-        for (value, expected_type, name), _view in zip(
-            expected, views, strict=True
+        for (resource_value, resource_type, name), _view in zip(
+            expected_resources, views, strict=True
         ):
-            if value is not None and type(value) is not expected_type:
+            if (
+                resource_value is not None
+                and type(resource_value) is not resource_type
+            ):
                 raise TypeError(f"{name} request has an invalid exact type.")
         if self.condensation is not None and any(
             getattr(self.condensation, field.name) is None
@@ -1565,6 +1570,8 @@ class GPUResourceRegistry:
         coagulation_stream = self._coagulation_stream_registry
         wall_loss_stream = self._wall_loss_stream_registry
         if "coagulation" in staged_families:
+            if coagulation_bindings is None:
+                raise RuntimeError("Coagulation bindings were not staged.")
             other = (
                 wall_loss_bindings["rng_states"]
                 if wall_loss_bindings is not None
@@ -1574,6 +1581,8 @@ class GPUResourceRegistry:
                 "coagulation", coagulation_bindings["rng_states"], other
             )
         if "wall_loss" in staged_families:
+            if wall_loss_bindings is None:
+                raise RuntimeError("Wall-loss bindings were not staged.")
             other = (
                 coagulation_bindings["rng_states"]
                 if coagulation_bindings is not None
