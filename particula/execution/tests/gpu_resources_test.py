@@ -1125,10 +1125,10 @@ def test_capture_resource_set_rejects_distinct_requirements_without_work(
 
 
 @pytest.mark.warp
-def test_capture_resource_transaction_failure_does_not_publish_partial_state(
+def test_capture_resource_view_drift_rejects_before_allocation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A private allocation failure leaves P3 and ordinary publication intact."""
+    """A nonpublished prepared view cannot trigger candidate allocation."""
     session = _session()
     registry = GPUResourceRegistry(session)
     inventory = registry.register_capture_resources(session, None, ())
@@ -1144,25 +1144,97 @@ def test_capture_resource_transaction_failure_does_not_publish_partial_state(
         PreparedResourceViews(condensation=placeholder),
         None,
     )
-    original_allocate = registry._allocate
     monkeypatch.setattr(
         registry,
         "_allocate",
-        lambda *_args, **_kwargs: (_ for _ in ()).throw(
-            RuntimeError("allocation failed")
-        ),
+        lambda *_args, **_kwargs: pytest.fail("drift must not allocate"),
     )
 
-    with pytest.raises(RuntimeError, match="allocation failed"):
+    with pytest.raises(ValueError, match="view identity changed"):
         registry.prepare_capture_resources(requirements)
 
     assert registry._capture_resource_set is None
     assert registry.selected_resource_report() is inventory
     assert registry._bindings == {}
-    monkeypatch.setattr(registry, "_allocate", original_allocate)
-    capture_set = registry.prepare_capture_resources(requirements)
-    assert capture_set.condensation is not None
-    assert capture_set.prepared_views.condensation is capture_set.condensation
+
+
+@pytest.mark.warp
+def test_capture_resource_capacity_rejects_before_allocation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """P4 reuses ordinary collision bounds before any candidate work."""
+    session = _session(particle_count=2)
+    registry = GPUResourceRegistry(session)
+    inventory = registry.register_capture_resources(session, None, ())
+    placeholder = gpu_resources.CoagulationResources(0, None, None, None)
+    requirements = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(5, 0, 0),
+        inventory,
+        PreparedResourceViews(coagulation=placeholder),
+        None,
+    )
+    monkeypatch.setattr(
+        registry,
+        "_allocate",
+        lambda *_args, **_kwargs: pytest.fail(
+            "invalid capacity must not allocate"
+        ),
+    )
+
+    with pytest.raises(ValueError, match="fixed-capacity bounds"):
+        registry.prepare_capture_resources(requirements)
+
+    assert registry._bindings == {}
+
+
+@pytest.mark.warp
+def test_capture_resource_rejects_inventory_alias_before_allocation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """P4 protects retained diagnostic inventory storage from staged aliases."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    wp = pytest.importorskip("warp")
+    output = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    plan = _diagnostics_plan(
+        session,
+        registry,
+        (output, wp.zeros((1, 1), dtype=wp.float64, device="cpu")),
+    )
+    inventory = registry.register_capture_resources(
+        session, None, plan.registrations
+    )
+    source = GPUResourceRegistry(session).acquire_condensation().scratch_buffers
+    supplied = gpu_resources.CondensationScratchBuffers(
+        source.work_mass_transfer,
+        source.total_mass_transfer,
+        source.dynamic_viscosity,
+        source.mean_free_path,
+        output,
+        source.negative_mass_transfer_release,
+        source.positive_mass_transfer_scale,
+    )
+    requirements = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(0, 0, 0),
+        inventory,
+        PreparedResourceViews(),
+        None,
+        condensation=supplied,
+    )
+    monkeypatch.setattr(
+        registry,
+        "_allocate",
+        lambda *_args, **_kwargs: pytest.fail(
+            "inventory alias must not allocate"
+        ),
+    )
+
+    with pytest.raises(ValueError, match="Sidecar"):
+        registry.prepare_capture_resources(requirements)
+
+    assert registry._bindings == {}
 
 
 def test_execution_package_remains_dependency_neutral() -> None:

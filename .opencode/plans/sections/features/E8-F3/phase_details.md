@@ -40,15 +40,20 @@
   - Boundaries: No device I/O, allocation, public export, checkpoint-enumeration,
     or scheduler-behavior change; exact repeats reuse the retained inventory.
 
-- [ ] **E8-F3-P4:** Atomic capture-set preparation and exact identity reuse with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Preflight and stage the whole E8-F2 requirement set before atomic
-    publication, then validate/retrieve that exact set without allocation.
-  - Files: `particula/execution/gpu_resources.py`, E8-F2 preparation module,
+- [x] **E8-F3-P4:** Atomic capture-set preparation and exact identity reuse with unit tests
+  - Issue: #1564 | Size: S | Status: Shipped
+  - Delivered: Added direct-module-only `CaptureResourceRequirements` and
+    `CaptureResourceSet`, atomic nonpublishing staging, metadata-only exact-set
+    validation, and final publication only after candidate validation succeeds.
+    Compatible repeats retain the original set/views by identity; candidate
+    failure preserves existing publications and permits retry. Only new resident
+    RNG stream sidecars initialize before publication.
+  - Files: `particula/execution/gpu_resources.py`, narrowed optional
+    resident-enqueue integration seam,
     `particula/execution/tests/gpu_resources_test.py`
-  - Tests: Mid-allocation failure leaves no capture set, retry succeeds,
-    compatible reacquisition preserves every identity, and all drift/replacement
-    forms reject before allocator or writer calls.
+  - Boundaries: The optional enqueue reference only retains/validates exact P4
+    identities. It adds no absent-set error, READY/capture admission, token, or
+    dispatch behavior; public exports and checkpoint enumeration remain unchanged.
 
 - [ ] **E8-F3-P5:** Prepared-timestep integration, accounting validation, and documentation
   - Issue: TBD | Size: S | Status: Not Started

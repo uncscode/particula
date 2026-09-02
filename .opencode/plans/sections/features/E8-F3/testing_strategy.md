@@ -26,10 +26,13 @@ never lowered.
   alias), zero extents, and no device I/O. Regression tests confirm registration
   does not alter diagnostics validation, communication setup, checkpoint
   enumeration, scheduler behavior, or public exports.
-- **P4:** Unit-test whole-set atomicity under injected failures at early/middle/
-  late allocation and RNG initialization, clean retry, exact nested identity
-  reuse, capacity/requirement mismatch, and session/resource drift rejection
-  before allocation or launch.
+- **P4 (shipped):** `gpu_resources_test.py` covers first preparation,
+  metadata-only retained-set validation, compatible exact-identity reuse, and
+  rejection of value-equal-but-distinct requirements and invalid supplied
+  schemas before publication. It also covers failed staging with no published
+  capture set followed by a successful clean retry. The implementation preserves
+  prior ordinary registry publications; broader P5 prepared-enqueue/no-work
+  evidence remains deferred.
 - **P5:** Integration-test E8-F2 preparation and repeated uncaptured enqueue with
   the exact set. Spy on `wp.zeros`, `wp.empty`, `wp.array`, registry acquisition,
   payload readback, and synchronization to prove none occur after setup. CUDA

@@ -35,26 +35,29 @@
 - [x] Diagnostics validation, communication setup, checkpoint enumeration,
   scheduler behavior, and public exports remain unchanged.
 
-- [ ] One setup-only operation resolves and publishes every reusable array
-  required by the selected E8-F2 prepared timestep before READY/capture.
-- [ ] The inventory covers process scratch/output, normalized controls,
-  validation/status and selected-lane work, the selected communication family,
-  diagnostics/accounting, and coagulation/wall-loss RNG state.
-- [ ] Compatible reacquisition returns the exact capture set, native records,
-  arrays, capacities, configuration, and byte report by identity.
+- [x] One setup-only operation resolves, stages, and atomically publishes the
+  selected reusable capture resources without changing READY/capture admission.
+- [x] The P4 set retains the selected process/control, communication,
+  diagnostics/accounting, and applicable coagulation/wall-loss RNG resources by
+  exact identity.
+- [x] Compatible preparation and metadata-only validation return the exact
+  capture set, requirements, native records, arrays, capacities, configuration,
+  and byte report by identity.
 - [ ] After first successful setup, prepared enqueue/replay performs zero
   allocation, resource acquisition, RNG initialization, payload readback,
   transfer, synchronization, or storage replacement.
-- [ ] Whole-set setup is fail-closed: validation/allocation failure publishes no
-  partial capture set, and a clean retry can succeed while the session is active.
-- [ ] Session, primary, sidecar, capacity, communication-map, diagnostic, or
-  requirement drift rejects before allocator or writer activity.
+- [x] Whole-set setup is fail-closed: candidate failure publishes no partial
+  capture set, preserves prior publication, and permits a clean retry.
+- [x] Exact requirements, pinned session, P3 inventory, capacities, schemas,
+  retained views/records, communication/diagnostic bindings, and stream-resource
+  identity are validated before candidate resource work.
 - [ ] Byte accounting is deterministic, overflow-safe, and exact for logical
   manifest bytes, including canonical zero dimensions and dynamic capacities.
 - [ ] Reports expose no pointers, payload values, or RNG words and explicitly do
   not claim allocator reservation/fragmentation, checkpoint copies, or tape.
-- [ ] Existing family acquisition, checkpoint/restart, RNG, diagnostics,
-  communication, resident execution, and export contracts remain compatible.
+- [x] Existing family acquisition, checkpoint/restart, diagnostics,
+  communication, resident execution, and direct-only export contracts remain
+  compatible; P4 preserves existing RNG sidecars and initializes only new ones.
 - [ ] Focused resident tests, full applicable execution tests, untargeted
   repository coverage, linters, and strict documentation validation pass
   without lowering thresholds or changing default collection.

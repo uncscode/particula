@@ -22,6 +22,14 @@ references and resolved metadata/reports after transactional host-only
 validation, including O(R log R) overlap detection. It does not change
 checkpoint enumeration, scheduler behavior, allocation, or exports.
 
+P4 is complete: it adds concrete-only `CaptureResourceRequirements` and
+`CaptureResourceSet`, atomic nonpublishing staging and publication, and a
+metadata-only exact-identity retained-set validator. It initializes only newly
+created resident RNG stream sidecars before publication, preserves existing
+published stream state, and permits clean retry after candidate failures. Its
+optional resident-enqueue reference is validation/retention only; it does not
+impose a capture-set prerequisite or change READY, token, or dispatch policy.
+
 ## In Scope
 
 - Define canonical capture-resource roles, shapes, dtypes, capacities, and
@@ -30,12 +38,13 @@ checkpoint enumeration, scheduler behavior, allocation, or exports.
   validation/status work, selected-lane work, diagnostics, communication, and
   persistent RNG state required by the fixed prepared sequence.
 - Add one setup-only capture-set acquisition operation that validates all
-  supplied storage, allocates omitted storage, and publishes only a complete
-  nonaliasing set.
+  supplied storage, stages omitted storage, and publishes only a complete
+  nonaliasing set. **Shipped in P4.**
 - Pin the exact session, resource views, native records, arrays, optional
   communication map, capacities, and prepared-resource signature.
 - Return established views and arrays by identity on compatible reacquisition,
   with no allocation, reseeding, transfer, synchronization, or payload read.
+  **Shipped in P4.**
 - Compute deterministic logical bytes from checked shape products and manifest
   dtype sizes, with per-role, per-family, and total summaries.
 - Add co-located unit and integration tests, plus developer-facing contract

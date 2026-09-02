@@ -1,8 +1,8 @@
 """Allocate concrete reusable Warp sidecars for one active resident session.
 
 This direct-import-only, Warp-dependent boundary pins complete fixed-shape
-native sidecar families and one capture resource selection to one exact
-``ACTIVE`` :class:`ResidentSession`.
+native sidecar families, one capture resource selection, and one atomically
+prepared capture resource set to one exact ``ACTIVE`` :class:`ResidentSession`.
 It allocates and validates resources only: it neither executes a process,
 transfers, synchronizes, nor resizes. Coagulation and wall-loss acquisition
 initialize distinct P1-derived persistent RNG streams exactly once before
@@ -22,6 +22,15 @@ payloads; reports reuse that retained metadata. Inventory reporting neither
 inspects payloads nor acquires, allocates, binds, or mutates sidecars. Explicit
 lifecycle methods may inspect frozen stream metadata or reset selected
 published lanes without hidden transfer or synchronization.
+
+Capture-set preparation is setup-only. It stages all requested sidecars,
+validates metadata and nonaliasing, and initializes only newly created resident
+RNG streams before one final publication. Compatible repeats return the exact
+published set; failed candidates do not publish staged bindings. Its matching
+accessor is metadata-only and neither allocates, initializes, executes,
+transfers, synchronizes, nor inspects payloads. These carriers and seams are
+available only from this module, not from :mod:`particula.execution` or the
+top-level package.
 ``validate_pinned_session`` is the narrow direct-module-only integration seam
 for resident timestep guards. It requires the exact retained session, then
 revalidates its active lifecycle, pinned container and primary-array identities,
@@ -508,9 +517,9 @@ class PreparedResourceViews:
 class CaptureResourceRequirements:
     """Describe the complete setup-only resource request for one capture set.
 
-    The carrier retains all supplied objects by exact identity.  It is host
-    metadata only: registry-dependent schema, alias, and publication checks are
-    deliberately performed by
+    This direct-module-only carrier retains all supplied objects by exact
+    identity for setup. It is host metadata only: registry-dependent schema,
+    alias, and publication checks are deliberately performed by
     :meth:`GPUResourceRegistry.prepare_capture_resources`.
     ``None`` for an enabled allocatable family requests private allocation.
 
@@ -524,6 +533,8 @@ class CaptureResourceRequirements:
         coagulation: Supplied coagulation view or an allocation request.
         wall_loss: Supplied wall-loss view or an allocation request.
         nucleation: Supplied nucleation view or an allocation request.
+        family_order: Required canonical order for all capture resource
+            families.
     """
 
     session: ResidentSession
@@ -545,8 +556,15 @@ class CaptureResourceRequirements:
         "dilution",
     )
 
-    def __post_init__(self) -> None:
-        """Reject incomplete or noncanonical host-only request metadata."""
+    def __post_init__(self) -> None:  # noqa: C901
+        """Reject incomplete or noncanonical host-only request metadata.
+
+        Raises:
+            TypeError: If a required carrier or optional resource has an invalid
+                exact type.
+            ValueError: If communication identity, canonical family order, or
+                required supplied-record completeness is invalid.
+        """
         exact = (
             (self.session, ResidentSession, "session"),
             (self.capacities, ResourceInventoryCapacities, "capacities"),
@@ -589,11 +607,27 @@ class CaptureResourceRequirements:
         views = (
             self.prepared_views.condensation,
             self.prepared_views.coagulation,
+            self.prepared_views.dilution,
             self.prepared_views.wall_loss,
             self.prepared_views.nucleation,
         )
+        view_types = (
+            CondensationResources,
+            CoagulationResources,
+            DilutionResources,
+            WallLossResources,
+            NucleationResources,
+        )
+        for view, view_type in zip(views, view_types, strict=True):
+            if view is not None and type(view) is not view_type:
+                raise TypeError(
+                    "prepared view must be an exact "
+                    f"{view_type.__name__} or None."
+                )
         for (resource_value, resource_type, name), _view in zip(
-            expected_resources, views, strict=True
+            expected_resources,
+            (views[0], views[1], views[3], views[4]),
+            strict=True,
         ):
             if (
                 resource_value is not None
@@ -621,10 +655,13 @@ class CaptureResourceRequirements:
 class CaptureResourceSet:
     """Retain one atomically published capture resource set by exact identity.
 
-    This setup-only carrier owns no payload copies, bytes, RNG words, or
-    accounting.  It exposes retained metadata and views solely for later
-    identity validation; callers cannot use it to acquire, execute, transfer,
-    synchronize, or mutate resource bindings.
+    This direct-module-only, setup-only carrier is published only after complete
+    staging and transactional initialization of newly created resident RNG
+    streams. It owns no payload copies, bytes, RNG words, or accounting. It
+    exposes retained metadata and views solely for later identity validation;
+    callers cannot use it to acquire, execute, transfer, synchronize, or mutate
+    resource bindings. It is not exported from :mod:`particula.execution` or
+    the top-level package.
 
     Attributes:
         requirements: Exact setup request retained by identity.
@@ -1069,6 +1106,15 @@ class GPUResourceRegistry:
     diagnostic registration tuple by identity after complete schema and
     nonaliasing validation. It neither changes normal resource enumeration nor
     participates in checkpoint or restart state.
+
+    :meth:`prepare_capture_resources` is a separate direct-module-only,
+    setup-only transaction. It reuses exact compatible publications, stages a
+    complete resource set privately, initializes only new coagulation or
+    wall-loss streams, and assigns the set only after validation succeeds.
+    :meth:`validate_capture_resource_set` only verifies retained identities and
+    returns the published set; it performs no allocation, initialization,
+    payload inspection, transfer, synchronization, or execution. Neither seam
+    is re-exported from :mod:`particula.execution` or the top-level package.
     """
 
     def __init__(self, session: ResidentSession) -> None:
@@ -1217,7 +1263,12 @@ class GPUResourceRegistry:
     def _capture_fingerprint(
         self, requirements: CaptureResourceRequirements
     ) -> tuple[Any, ...]:
-        """Return immutable capture identity and capacity data."""
+        """Return immutable identity and capacity metadata for one request.
+
+        The private fingerprint compares only retained host identities,
+        presence, and logical capacities. It neither reads payloads nor
+        performs resource work.
+        """
         views = requirements.prepared_views
         return (
             id(requirements.session),
@@ -1247,7 +1298,12 @@ class GPUResourceRegistry:
     def _validate_capture_requirements(
         self, requirements: CaptureResourceRequirements
     ) -> None:
-        """Validate capture request identities before allocation or staging."""
+        """Validate request identities before capture allocation or staging.
+
+        This setup-only helper checks only the existing pinned session and P3
+        selection relationships. Schema, alias, and candidate-resource checks
+        remain in the preparation transaction.
+        """
         if type(requirements) is not CaptureResourceRequirements:
             raise TypeError(
                 "requirements must be an exact CaptureResourceRequirements."
@@ -1277,7 +1333,11 @@ class GPUResourceRegistry:
     def _capture_set_matches(
         self, requirements: CaptureResourceRequirements
     ) -> bool:
-        """Return whether a request retains every published capture identity."""
+        """Return whether a request retains every published capture identity.
+
+        This is an identity-and-metadata comparison only. It does not allocate,
+        initialize streams, inspect payloads, or mutate registry state.
+        """
         capture_set = self._capture_resource_set
         if capture_set is None:
             return False
@@ -1291,14 +1351,52 @@ class GPUResourceRegistry:
             is capture_set.communication_resources
         )
 
+    def _capture_inventory_values(self) -> list[Any]:
+        """Return all arrays retained by the selected capture inventory.
+
+        Inventory roles are protected storage just like ordinary published
+        sidecars.  This includes diagnostic accounting arrays and optional
+        communication final volumes, which do not necessarily appear in
+        ``_bindings``.
+        """
+        inventory = self._capture_inventory
+        if inventory is None:
+            return []
+        return [
+            role.value for family in inventory.families for role in family.roles
+        ]
+
+    def _validate_capture_collision_capacity(self, capacity: Any) -> int:
+        """Validate P4 collision capacity using ordinary acquisition bounds."""
+        if isinstance(capacity, bool) or not isinstance(capacity, Integral):
+            raise TypeError(
+                "collision_capacity must be a non-boolean integral."
+            )
+        maximum_capacity = max(
+            1,
+            min(
+                _INT32_MAX,
+                _MAX_SIZE // max(1, self._session.dimensions.n_boxes * 2 * 4),
+                self._session.dimensions.n_particles**2,
+            ),
+        )
+        if capacity <= 0 or capacity > maximum_capacity:
+            raise ValueError(
+                "collision_capacity must be positive and within resident "
+                "fixed-capacity bounds."
+            )
+        return int(capacity)
+
     def validate_capture_resource_set(
         self, requirements: CaptureResourceRequirements
     ) -> CaptureResourceSet:
         """Return the retained matching capture set without resource work.
 
-        The accessor is metadata-only.  It neither constructs reports nor
-        acquires, allocates, initializes, reads, transfers, synchronizes, or
-        mutates any resource binding.
+        This direct-module-only accessor is metadata-only. It returns the exact
+        set and nested views retained by setup; it neither constructs reports
+        nor acquires, allocates, initializes, reads, transfers, synchronizes,
+        executes, or mutates any resource binding. It is not a broad package or
+        top-level API.
 
         Args:
             requirements: Exact request previously used to publish the set.
@@ -1332,19 +1430,25 @@ class GPUResourceRegistry:
         capacity: int | None,
         staged: tuple[dict[str, Any], ...],
     ) -> None:
-        """Validate a private family against published and staged sidecars."""
+        """Validate one private candidate family against protected sidecars.
+
+        Candidate ranges remain transaction-local until capture-set publication.
+        This metadata-only check does not inspect sidecar payloads.
+        """
         ranges = [
             self._validate_array(entry, bindings[entry.role], capacity)
             for entry in entries
         ]
         values = [bindings[entry.role] for entry in entries]
-        other_values = [
-            value for family in staged for value in family.values()
-        ] + [
-            value
-            for family in self._bindings.values()
-            for value in family.values()
-        ]
+        other_values = (
+            [value for family in staged for value in family.values()]
+            + [
+                value
+                for family in self._bindings.values()
+                for value in family.values()
+            ]
+            + self._capture_inventory_values()
+        )
         self._reject_shared_identities(values, other_values)
         self._reject_primary_aliases(values)
         other_ranges = [self._array_range(value) for value in other_values]
@@ -1362,7 +1466,12 @@ class GPUResourceRegistry:
         capacity: int | None,
         staged: list[dict[str, Any]],
     ) -> dict[str, Any]:
-        """Build one unpublished family after complete supplied preflight."""
+        """Build one unpublished family after complete supplied preflight.
+
+        Existing compatible bindings are reused by identity. Newly allocated
+        bindings remain private to capture-set setup until the transaction's
+        final publication assignments.
+        """
         existing = self._bindings.get(manifest.family)
         if existing is not None:
             if (
@@ -1392,10 +1501,68 @@ class GPUResourceRegistry:
         staged.append(candidate)
         return candidate
 
+    def _preflight_capture_family(
+        self,
+        manifest: ResourceManifest,
+        supplied: dict[str, Any],
+        capacity: int | None,
+    ) -> None:
+        """Validate one requested P4 family without allocating or publishing."""
+        existing = self._bindings.get(manifest.family)
+        if existing is not None:
+            if (
+                capacity is not None
+                and self._capacities.get(manifest.family) != capacity
+            ):
+                raise ValueError("Capture resource capacity changed.")
+            if any(
+                supplied[entry.role] is not None
+                and supplied[entry.role] is not existing[entry.role]
+                for entry in manifest.entries
+            ):
+                raise ValueError("Established sidecars cannot be replaced.")
+            return
+        for entry in manifest.entries:
+            value = supplied[entry.role]
+            if value is not None:
+                self._validate_array(entry, value, capacity)
+        self._validate_supplied_nonalias(supplied, manifest.entries)
+
+    def _validate_capture_supplied_families(
+        self,
+        supplied_families: tuple[dict[str, Any], ...],
+    ) -> None:
+        """Reject cross-family supplied aliases before any P4 allocation."""
+        values = [
+            value
+            for family in supplied_families
+            for value in family.values()
+            if value is not None
+        ]
+        protected = [
+            value
+            for bindings in self._bindings.values()
+            for value in bindings.values()
+        ] + self._capture_inventory_values()
+        self._reject_shared_identities(values, protected)
+        self._reject_primary_aliases(values)
+        ranges = [self._array_range(value) for value in values]
+        protected_ranges = [self._array_range(value) for value in protected]
+        for index, byte_range in enumerate(ranges):
+            if any(
+                self._ranges_overlap(byte_range, other)
+                for other in ranges[index + 1 :] + protected_ranges
+            ):
+                raise ValueError("Sidecar byte ranges must not overlap.")
+
     def _new_stream_registry(
         self, process_id: str, state: Any, other_state: Any
     ) -> _PublishedStreamRegistry:
-        """Create and initialize exactly one unpublished resident stream."""
+        """Create and initialize exactly one unpublished resident RNG stream.
+
+        The stream remains private to capture-set setup until publication, so
+        only a newly staged coagulation or wall-loss sidecar is initialized.
+        """
         root_seed, logical_box_ids, lanes = self._stream_metadata()
         initialize_all = other_state is None
         if other_state is None:
@@ -1433,9 +1600,12 @@ class GPUResourceRegistry:
     ) -> CaptureResourceSet:
         """Atomically stage and publish the complete frozen capture set.
 
-        A compatible exact repeat returns the original outer set. All allocator,
-        schema, alias, view, report, and stream-initialization work remains
-        private until the final non-fallible publication assignments.
+        This direct-module-only, setup-only transaction reuses an exact
+        compatible publication by identity. Otherwise, all allocator, schema,
+        alias, view, report, and new-stream initialization work remains private
+        until the final non-fallible publication assignments. It does not
+        capture or replay graphs, admit execution, transfer, synchronize, or
+        provide a broad package or top-level API.
 
         Args:
             requirements: Exact setup-only request describing required resource
@@ -1449,6 +1619,7 @@ class GPUResourceRegistry:
             TypeError: If ``requirements`` is not an exact request carrier.
             ValueError: If session, inventory, capacities, schemas, identities,
                 or alias constraints are incompatible.
+            RuntimeError: If an internal staged family is unexpectedly missing.
         """
         if type(requirements) is not CaptureResourceRequirements:
             raise TypeError(
@@ -1464,6 +1635,101 @@ class GPUResourceRegistry:
         self._validate_capture_requirements(requirements)
         report = self.logical_resource_report(requirements.capacities)
         views = requirements.prepared_views
+        condensation_supplied = {
+            entry.role: None
+            if requirements.condensation is None
+            else getattr(requirements.condensation, entry.role)
+            for entry in _CONDENSATION.entries
+        }
+        coagulation_supplied = {
+            entry.role: None
+            if requirements.coagulation is None
+            else getattr(requirements.coagulation, entry.role)
+            for entry in _COAGULATION.entries
+        }
+        wall_loss_supplied = {
+            "rng_states": None
+            if requirements.wall_loss is None
+            else requirements.wall_loss.rng_states
+        }
+        nucleation_supplied = (
+            {entry.role: None for entry in _NUCLEATION.entries}
+            if requirements.nucleation is None
+            else self._nucleation_supplied_bindings(
+                requirements.nucleation.scratch,
+                requirements.nucleation.finalized_demand,
+                requirements.nucleation.diagnostics,
+                requirements.nucleation.exhaustion,
+            )
+        )
+        enabled = {
+            "condensation": views.condensation is not None
+            or requirements.condensation is not None,
+            "coagulation": views.coagulation is not None
+            or requirements.coagulation is not None,
+            "wall_loss": views.wall_loss is not None
+            or requirements.wall_loss is not None,
+            "nucleation": views.nucleation is not None
+            or requirements.nucleation is not None,
+        }
+        collision_capacity = _validated_extent(
+            requirements.capacities.collision_capacity
+        )
+        if enabled["coagulation"]:
+            collision_capacity = self._validate_capture_collision_capacity(
+                requirements.capacities.collision_capacity
+            )
+        if views.dilution is not None:
+            self.validate_dilution_resources(
+                requirements.session, views.dilution
+            )
+        for family, manifest, supplied, capacity, view in (
+            (
+                "condensation",
+                _CONDENSATION,
+                condensation_supplied,
+                None,
+                views.condensation,
+            ),
+            (
+                "coagulation",
+                _COAGULATION,
+                coagulation_supplied,
+                collision_capacity,
+                views.coagulation,
+            ),
+            (
+                "wall_loss",
+                _WALL_LOSS,
+                wall_loss_supplied,
+                None,
+                views.wall_loss,
+            ),
+            (
+                "nucleation",
+                _NUCLEATION,
+                nucleation_supplied,
+                None,
+                views.nucleation,
+            ),
+        ):
+            if not enabled[family]:
+                continue
+            self._preflight_capture_family(manifest, supplied, capacity)
+            if view is not None and self._views.get(family) is not view:
+                raise ValueError(f"prepared {family} view identity changed.")
+        self._validate_capture_supplied_families(
+            tuple(
+                supplied
+                for family, supplied in (
+                    ("condensation", condensation_supplied),
+                    ("coagulation", coagulation_supplied),
+                    ("wall_loss", wall_loss_supplied),
+                    ("nucleation", nucleation_supplied),
+                )
+                if enabled[family] and family not in self._bindings
+            )
+        )
         staged: list[dict[str, Any]] = []
         staged_families: dict[str, dict[str, Any]] = {}
 
@@ -1482,65 +1748,26 @@ class GPUResourceRegistry:
             return result
 
         condensation_bindings = stage(
-            views.condensation is not None
-            or requirements.condensation is not None,
+            enabled["condensation"],
             _CONDENSATION,
-            {
-                entry.role: None
-                if requirements.condensation is None
-                else getattr(requirements.condensation, entry.role)
-                for entry in _CONDENSATION.entries
-            },
+            condensation_supplied,
         )
-        collision_capacity = _validated_extent(
-            requirements.capacities.collision_capacity
-        )
-        if (
-            views.coagulation is not None
-            or requirements.coagulation is not None
-        ) and collision_capacity <= 0:
-            raise ValueError(
-                "collision_capacity must be positive for coagulation."
-            )
         coagulation_bindings = stage(
-            views.coagulation is not None
-            or requirements.coagulation is not None,
+            enabled["coagulation"],
             _COAGULATION,
-            {
-                entry.role: None
-                if requirements.coagulation is None
-                else getattr(requirements.coagulation, entry.role)
-                for entry in _COAGULATION.entries
-            },
+            coagulation_supplied,
             collision_capacity,
         )
         wall_loss_bindings = stage(
-            views.wall_loss is not None or requirements.wall_loss is not None,
+            enabled["wall_loss"],
             _WALL_LOSS,
-            {
-                "rng_states": None
-                if requirements.wall_loss is None
-                else requirements.wall_loss.rng_states
-            },
+            wall_loss_supplied,
         )
         nucleation_bindings = stage(
-            views.nucleation is not None or requirements.nucleation is not None,
+            enabled["nucleation"],
             _NUCLEATION,
-            (
-                {entry.role: None for entry in _NUCLEATION.entries}
-                if requirements.nucleation is None
-                else self._nucleation_supplied_bindings(
-                    requirements.nucleation.scratch,
-                    requirements.nucleation.finalized_demand,
-                    requirements.nucleation.diagnostics,
-                    requirements.nucleation.exhaustion,
-                )
-            ),
+            nucleation_supplied,
         )
-        if views.dilution is not None:
-            self.validate_dilution_resources(
-                requirements.session, views.dilution
-            )
 
         condensation_view = (
             None
@@ -1576,7 +1803,7 @@ class GPUResourceRegistry:
                 "nucleation", self._nucleation_view(nucleation_bindings)
             )
         )
-        for required, supplied, created, name in (
+        view_identity_checks: tuple[tuple[Any, Any, Any, str], ...] = (
             (
                 views.condensation,
                 requirements.condensation,
@@ -1601,7 +1828,8 @@ class GPUResourceRegistry:
                 nucleation_view,
                 "nucleation",
             ),
-        ):
+        )
+        for required, supplied, created, name in view_identity_checks:
             if supplied is not None and required is not created:
                 raise ValueError(f"prepared {name} view identity changed.")
 
@@ -3028,7 +3256,7 @@ class GPUResourceRegistry:
             value
             for family_bindings in self._bindings.values()
             for value in family_bindings.values()
-        ]
+        ] + self._capture_inventory_values()
         registered_ranges = [self._array_range(value) for value in registered]
         self._reject_shared_identities(values, registered)
         self._reject_primary_aliases(values)
@@ -3051,7 +3279,7 @@ class GPUResourceRegistry:
             value
             for family_bindings in self._bindings.values()
             for value in family_bindings.values()
-        ]
+        ] + self._capture_inventory_values()
         registered_ranges = [self._array_range(value) for value in registered]
         self._reject_shared_identities(values, registered)
         self._reject_primary_aliases(values)

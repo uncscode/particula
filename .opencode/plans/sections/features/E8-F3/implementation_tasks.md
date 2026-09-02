@@ -20,12 +20,13 @@
 - [x] Preserve mutually exclusive GAS/PARTICLES communication families and pin
   one selected already-published view, including configuration, maps, work
   records, status, snapshots, and optional final volumes, by identity.
-- [ ] Implement whole-set preflight, candidate allocation, cross-family
-  nonalias validation, explicit RNG initialization, and atomic publication.
-- [ ] Add exact capture-set validation and accessors that cannot allocate,
-  acquire, reseed, transfer, synchronize, inspect payloads, or mutate bindings.
-- [ ] Integrate the exact capture resource set with E8-F2 prepared records and
-  E8-F1 compatibility/READY checks.
+- [x] Implement whole-set preflight, nonpublishing candidate allocation,
+  cross-family nonalias validation, newly-created RNG initialization, and atomic
+  publication in `particula/execution/gpu_resources.py`.
+- [x] Add exact capture-set validation/accessors that cannot allocate, acquire,
+  reseed, transfer, synchronize, inspect payloads, or mutate bindings.
+- [x] Add narrowed optional E8-F2 prepared-record retention/validation of an
+  exact capture set and prepared views; READY/capture admission remains P5.
 - [ ] Preserve checkpoint resource enumeration and restart compatibility; add
   new continuation resources only when their semantics require checkpointing.
 
@@ -40,8 +41,9 @@
   report reuse, host-only metadata behavior, and transactional rejection.
 - [x] Cover both communication modes, absent communication, ordered diagnostic
   selections, zero extents, exact identities, and overlap boundaries.
-- [ ] Assert repeated compatible preparation returns the exact outer view,
-  native records, arrays, capacities, and byte report.
+- [x] Assert repeated compatible preparation returns the exact outer view,
+  native records, arrays, capacities, and byte report, and that distinct but
+  value-equal requirements reject.
 - [ ] Run focused coverage-disabled assertions first, then the untargeted
   repository runner for full-package coverage; run strict MkDocs validation
   when documentation changes.

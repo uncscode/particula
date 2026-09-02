@@ -38,13 +38,23 @@ host-metadata-only; its O(R log R) byte-interval sweep rejects forbidden
 overlaps without payload I/O. Checkpoint enumeration, scheduler behavior, and
 public exports are unchanged.
 
+E8-F3-P4 shipped in issue #1564. `GPUResourceRegistry` now atomically stages
+and publishes one concrete-only `CaptureResourceSet` from exact
+`CaptureResourceRequirements`. The setup transaction validates metadata and
+identities, stages omitted resources without publication, protects existing
+bindings on failure, and returns the original set by identity on a compatible
+repeat. `validate_capture_resource_set()` is a metadata-only retained-set
+accessor. The narrowed optional resident-enqueue seam can retain and validate
+the exact set/views, without adding READY admission or changing token/dispatch
+behavior.
+
 ## Value Proposition
 
 E8-F3 incrementally makes the registry the concrete authority for
 capture-lifetime reusable storage. P1 supplies the inventory, P2 adds the
-dilution descriptor/view validation seam, and P3 pins selected communication
-and diagnostic resources. Later phases own whole-set allocation, publication,
-and prepared-path integration.
+dilution descriptor/view validation seam, P3 pins selected communication and
+diagnostic resources, and P4 supplies atomic whole-set preparation and exact
+identity reuse. P5 retains broader admission and prepared-path policy work.
 
 ## User Stories
 

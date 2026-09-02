@@ -16,6 +16,14 @@ and selected-resource reporting remain concrete-only in
 checkpoint contract changed. Module docstrings and execution tests record the
 identity, metadata-only, and reporting boundary.
 
+Issue #1564 likewise changes no user-facing documentation. P4's
+`CaptureResourceRequirements`, `CaptureResourceSet`, preparation transaction,
+and metadata-only validator remain direct-module-only in
+`particula.execution.gpu_resources`. The optional resident-enqueue reference
+does not create a user workflow or change READY/capture behavior. Module
+docstrings and execution tests record the atomicity, identity-reuse, and retry
+boundary.
+
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` Epic H sections with the
   implemented registry-owned capture resource inventory, setup/reuse boundary,
   persistent RNG handling, and deterministic logical-byte accounting semantics.

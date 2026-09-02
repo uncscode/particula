@@ -2,7 +2,7 @@
 
 ## High-Level Design
 
-### Implemented P1/P2/P3 seams
+### Implemented P1--P4 seams
 
 `GPUResourceRegistry.logical_resource_report()` is now the read-only,
 direct-module-only inventory seam. Given explicit collision, GAS-edge, and
@@ -14,10 +14,11 @@ acquires resources, reads payloads, consults bindings/configurations, or mutates
 the registry. Logical bytes are schema bytes rather than allocator-reserved
 bytes. The symbolic manifests and package/top-level exports are unchanged.
 
-The registry remains the intended sole storage authority. E8-F2 supplies a
-closed requirement description; P4 will resolve it against canonical manifests,
-stage every array and native view, validate the whole candidate for session
-ownership and nonaliasing, and publish one immutable capture resource set.
+The registry remains the intended sole storage authority. P4 resolves the
+closed E8-F2 requirement description against canonical manifests, stages every
+array and native view privately, validates the candidate for session ownership
+and nonaliasing, and publishes one immutable capture resource set only after
+successful completion.
 
 P2 adds `PreparedResourceViews` as the concrete prepared-consumer carrier.
 The descriptor-only dilution family resolves two `(B,)` `wp.float64` roles:
@@ -62,10 +63,12 @@ exact views only                exact signature only
 no acquire/allocate             no replacement/resize
 ```
 
-The diagram describes the deferred P4 whole-set path. Candidate allocation may
-happen before publication, so failure cannot leave a partially usable capture
-set. Once published, all compatible accessors will return the same set and
-nested views by identity. Incompatible requirements, capacities,
+P4 implements this whole-set path. Candidate allocation happens before
+publication, so a candidate failure leaves no partially usable capture set and
+preserves prior registry/P3/ordinary-publication identities; a clean retry is
+permitted. Once published, `validate_capture_resource_set()` and compatible
+preparation return the same set and nested views by identity without resource
+work. Incompatible requirements, capacities,
 communication modes/maps, diagnostic bindings, session drift, or array
 replacement will fail closed before replay.
 
@@ -78,10 +81,14 @@ replacement will fail closed before replay.
   checked integer arithmetic. P2 adds concrete-only `PreparedResourceViews`
   and dilution normalized-control/factor descriptors. P3 adds a selected
   communication/diagnostic inventory that retains references plus resolved
-  metadata only; whole capture-set carriers remain future work.
-- **API surface:** P2 adds private/concrete prepared-view validation and
-  retention plumbing; P3 adds direct-module-only registration/reporting methods
-  on `GPUResourceRegistry`. Keep them direct-import-only; do not alter
+   metadata only. P4 adds frozen direct-module-only
+   `CaptureResourceRequirements` and `CaptureResourceSet` carriers, retained
+   by exact identity and without payload/RNG-word copies.
+- **API surface:** P4 adds direct-module-only
+   `prepare_capture_resources()` and `validate_capture_resource_set()` to
+   `GPUResourceRegistry`. The latter is metadata-only; both preserve exact
+   retained identities. The optional E8-F2 seam retains/compares a supplied P4
+   set and prepared views only. Keep all of these direct-import-only; do not alter
   `particula.execution.__all__`, `particula.gpu.kernels.__all__`, or top-level
   exports. Existing family acquisition and checkpoint enumeration stay valid.
 - **Workflow hooks:** E8-F2 preparation must declare complete requirements and
@@ -96,7 +103,10 @@ replacement will fail closed before replay.
   prepared adapter use. P3 candidate construction and rejection are
   transactional: the first inventory is assigned only after all validation and
   metadata work succeeds, and nonexact repeats retain the existing inventory.
-  Whole-set setup/allocation and RNG writer semantics remain future-phase work.
+   P4 candidate construction is transactional: nonpublishing staged resources
+   and only newly created RNG streams are initialized before a final, nonfallible
+   publication. Rollback after an unexpected launched device writer remains
+   outside the guarantee.
 
 ## Security & Compliance
 
