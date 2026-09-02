@@ -1661,6 +1661,18 @@ class GPUResourceRegistry:
         entries: tuple[ManifestEntry, ...],
         capacity: int | None,
     ) -> None:
+        """Reject overlaps among candidate, registered, and primary arrays.
+
+        Args:
+            bindings: Candidate role-to-array bindings to validate.
+            entries: Manifest entries defining the candidate schemas.
+            capacity: Dynamic capacity required by the manifest, if any.
+
+        Raises:
+            TypeError: If a candidate binding is not a Warp array.
+            ValueError: If a binding has invalid metadata or overlaps protected
+                storage.
+        """
         ranges = [
             self._validate_array(entry, bindings[entry.role], capacity)
             for entry in entries
@@ -2349,6 +2361,7 @@ class GPUResourceRegistry:
         """Construct complete native nucleation records from pinned bindings."""
 
         def build(record_type: Any) -> Any:
+            """Build one native record from its corresponding role bindings."""
             return record_type(
                 **{
                     field.name: bindings[field.name]
