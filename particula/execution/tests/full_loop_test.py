@@ -49,7 +49,12 @@ from particula.execution.diagnostics import (
     ResidentDiagnosticsExecutor,
     ResidentDiagnosticsPlan,
 )
-from particula.execution.gpu_resources import GPUResourceRegistry
+from particula.execution.gpu_resources import (
+    CaptureResourceRequirements,
+    GPUResourceRegistry,
+    PreparedResourceViews,
+    ResourceInventoryCapacities,
+)
 from particula.execution.gpu_session import (
     ResidentLifecycle,
     ResidentStepGuard,
@@ -602,6 +607,36 @@ def _build_loop_fixture(  # noqa: C901
     diagnostics_plan, outputs = _build_diagnostics_plan(
         session, registry, graph, schedule, by_id, wp
     )
+    inventory = registry.register_capture_resources(
+        session, communication, diagnostics_plan.registrations
+    )
+    capacities = ResourceInventoryCapacities(
+        coagulation.resources.collision_capacity,
+        communication.configuration.communication_map.edge_capacity
+        if communication_family is CommunicationTransportMode.GAS
+        else 0,
+        communication.configuration.communication_map.edge_capacity
+        if communication_family is CommunicationTransportMode.PARTICLES
+        else 0,
+    )
+    capture_requirements = CaptureResourceRequirements(
+        session,
+        capacities,
+        inventory,
+        PreparedResourceViews(
+            condensation_resources,
+            coagulation.resources,
+            None,
+            wall_loss_resources,
+            nucleation_resources,
+        ),
+        communication,
+        condensation_resources.scratch_buffers,
+        coagulation.resources,
+        wall_loss_resources,
+        nucleation_resources,
+    )
+    registry.prepare_capture_resources(capture_requirements)
 
     request = ResidentSimulationRequest(
         session,
@@ -619,6 +654,7 @@ def _build_loop_fixture(  # noqa: C901
         environment_update,
         gas_update,
         communication_request,
+        capture_requirements,
     )
     scheduler = ResidentSimulationScheduler(request)
 
@@ -1014,6 +1050,19 @@ def test_prepared_ready_simulation_retains_twelve_operations(
 
     assert type(prepared).__name__ == "PreparedResidentSimulation"
     assert tuple(item.node.node_id for item in prepared.operations) == _NODE_IDS
+    capture_set = fixture.registry.validate_capture_resource_set(
+        request.capture_resource_requirements
+    )
+    assert (
+        prepared.capture_requirements is request.capture_resource_requirements
+    )
+    assert prepared.capture_set is capture_set
+    assert prepared.capture_report is capture_set.report
+    assert prepared.signature.configurations[-3:] == (
+        request.capture_resource_requirements,
+        capture_set,
+        capture_set.report,
+    )
     assert fixture.guard.completed_steps == 0
     assert lifecycle.state is GraphCaptureLifecycleState.READY
 

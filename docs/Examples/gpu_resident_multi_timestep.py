@@ -511,6 +511,39 @@ def _request(
         nodes,
         initial_total_mass,
     )
+    inventory = registry.register_capture_resources(
+        session, communication_view, diagnostics.registrations
+    )
+    map_data = communication_view.configuration.communication_map
+    capacities = runtime.gpu_resources.ResourceInventoryCapacities(
+        coagulation_view.collision_capacity,
+        map_data.edge_capacity
+        if map_data.transport_mode
+        is runtime.communication.CommunicationTransportMode.GAS
+        else 0,
+        map_data.edge_capacity
+        if map_data.transport_mode
+        is runtime.communication.CommunicationTransportMode.PARTICLES
+        else 0,
+    )
+    capture_requirements = runtime.gpu_resources.CaptureResourceRequirements(
+        session,
+        capacities,
+        inventory,
+        runtime.gpu_resources.PreparedResourceViews(
+            condensation_view,
+            coagulation_view,
+            None,
+            wall_loss_view,
+            nucleation_view,
+        ),
+        communication_view,
+        condensation_view.scratch_buffers,
+        coagulation_view,
+        wall_loss_view,
+        nucleation_view,
+    )
+    registry.prepare_capture_resources(capture_requirements)
     request = runtime.resident_scheduler.ResidentSimulationRequest(
         session,
         registry,
@@ -579,6 +612,7 @@ def _request(
             nodes["volume_evolution"],
             duration,
         ),
+        capture_requirements,
     )
     return request, gas_snapshot, saturation_snapshot
 

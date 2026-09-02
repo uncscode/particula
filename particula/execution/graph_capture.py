@@ -322,6 +322,35 @@ def _nested_sidecar_identities(value: object) -> tuple[object, ...]:
     return tuple(identities)
 
 
+def validate_resident_capture_resources(request: object) -> object:
+    """Resolve one published capture set with fixed identity checks only.
+
+    This lazy concrete helper is deliberately metadata-only.  It performs the
+    registry's cached requirements lookup and confirms that the published set
+    still describes the request-bound resident resources.
+    """
+    request_type = _resident_request_type()
+    if type(request) is not request_type:
+        raise TypeError("request must be an exact ResidentSimulationRequest.")
+    typed = cast("ResidentSimulationRequest", request)
+    capture_set = typed.registry.validate_capture_resource_set(
+        typed.capture_resource_requirements
+    )
+    if (
+        capture_set.requirements is not typed.capture_resource_requirements
+        or typed.capture_resource_requirements.session is not typed.session
+        or capture_set.capacities
+        is not typed.capture_resource_requirements.capacities
+        or capture_set.inventory
+        is not typed.capture_resource_requirements.inventory
+        or capture_set.communication_resources
+        is not typed.capture_resource_requirements.communication_resources
+        or capture_set.report is None
+    ):
+        raise ValueError("Capture resource set identities are incompatible.")
+    return capture_set
+
+
 def create_resident_graph_capture_signature(
     request: object,
 ) -> ResidentGraphCaptureSignature:
@@ -353,6 +382,8 @@ def create_resident_graph_capture_signature(
     if type(request) is not request_type:
         raise TypeError("request must be an exact ResidentSimulationRequest.")
     request = cast("ResidentSimulationRequest", request)
+
+    capture_set = validate_resident_capture_resources(request)
 
     session = request.session
     particles = cast("WarpParticleData", session.particles)
@@ -515,6 +546,9 @@ def create_resident_graph_capture_signature(
             nucleation.exhaustion_controls,
             request.environment_update,
             request.gas_update,
+            request.capture_resource_requirements,
+            capture_set,
+            capture_set.report,
         ),
         rng_resources=_identity_tuple(
             coagulation.resources.rng_states,
@@ -1147,6 +1181,7 @@ def gate_resident_graph_capture(binding: object) -> None:
         raise ValueError("request graph-capture attachment does not match.")
     guard.assert_step_closed()
     registry.validate_pinned_session(session)
+    validate_resident_capture_resources(request)
     if session.lifecycle.name != "ACTIVE":
         raise ValueError("resident session must be ACTIVE.")
     capability = binding._lifecycle.capability

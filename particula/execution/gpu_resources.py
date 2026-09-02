@@ -1341,15 +1341,10 @@ class GPUResourceRegistry:
         capture_set = self._capture_resource_set
         if capture_set is None:
             return False
-        return (
-            requirements is capture_set.requirements
-            and self._capture_resource_fingerprint
-            == self._capture_fingerprint(requirements)
-            and requirements.inventory is capture_set.inventory
-            and requirements.capacities is capture_set.capacities
-            and requirements.communication_resources
-            is capture_set.communication_resources
-        )
+        # Publication binds one exact requirements carrier.  This makes the
+        # normal validation path a constant-time identity lookup rather than a
+        # reconstruction of inventory or accounting metadata.
+        return requirements is capture_set.requirements
 
     def _capture_inventory_values(self) -> list[Any]:
         """Return all arrays retained by the selected capture inventory.
@@ -1413,7 +1408,6 @@ class GPUResourceRegistry:
             raise TypeError(
                 "requirements must be an exact CaptureResourceRequirements."
             )
-        self.validate_pinned_session(requirements.session)
         if not self._capture_set_matches(requirements):
             raise ValueError(
                 "Capture resource set identities are incompatible."
@@ -1421,6 +1415,17 @@ class GPUResourceRegistry:
         capture_set = self._capture_resource_set
         if capture_set is None:
             raise ValueError("Capture resources have not been prepared.")
+        if (
+            requirements.session is not self._session
+            or capture_set.capacities is not requirements.capacities
+            or capture_set.inventory is not requirements.inventory
+            or capture_set.communication_resources
+            is not requirements.communication_resources
+            or capture_set.report is None
+        ):
+            raise ValueError(
+                "Capture resource set identities are incompatible."
+            )
         return capture_set
 
     def _validate_staged_nonalias(

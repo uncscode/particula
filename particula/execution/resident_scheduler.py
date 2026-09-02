@@ -207,6 +207,9 @@ class PreparedResidentSimulation:
     ordered_node_ids: tuple[object, ...]
     primary_arrays: tuple[object, ...]
     resource_views: tuple[object, ...]
+    capture_requirements: object
+    capture_set: object
+    capture_report: object
     nodes: tuple[ProcessNode, ...]
     thermal: PreparedResidentThermodynamicSequence
     communication: PreparedResidentCommunicationBinding
@@ -238,6 +241,13 @@ def _graph_capture_binding_type() -> type[object]:
     from particula.execution.graph_capture import ResidentGraphCaptureBinding
 
     return ResidentGraphCaptureBinding
+
+
+def _capture_resource_requirements_type() -> type[object]:
+    """Return the concrete capture requirements type without an import cycle."""
+    from particula.execution.gpu_resources import CaptureResourceRequirements
+
+    return CaptureResourceRequirements
 
 
 @dataclass(frozen=True, eq=False)
@@ -286,9 +296,10 @@ class ResidentSimulationRequest:
     wall_loss: ResidentWallLossRequest
     nucleation: ResidentNucleationRequest
     diagnostics: ResidentDiagnosticsPlan
-    environment_update: ResidentEnvironmentUpdateRequest | None = None
-    gas_update: ResidentGasUpdateRequest | None = None
-    communication: ResidentCommunicationRequest | None = None
+    environment_update: ResidentEnvironmentUpdateRequest | None
+    gas_update: ResidentGasUpdateRequest | None
+    communication: ResidentCommunicationRequest | None
+    capture_resource_requirements: object
     graph_capture_binding: object | None = None
 
     def __post_init__(self) -> None:
@@ -317,6 +328,11 @@ class ResidentSimulationRequest:
             (self.wall_loss, ResidentWallLossRequest, "wall_loss"),
             (self.nucleation, ResidentNucleationRequest, "nucleation"),
             (self.diagnostics, ResidentDiagnosticsPlan, "diagnostics"),
+            (
+                self.capture_resource_requirements,
+                _capture_resource_requirements_type(),
+                "capture_resource_requirements",
+            ),
         )
         for value, expected, name in exact:
             if type(value) is not expected:
@@ -505,6 +521,9 @@ def prepare_resident_simulation(
         _CANONICAL_IDS,
         prepared.primary_arrays,
         prepared.resource_views,
+        prepared.capture_requirements,
+        prepared.capture_set,
+        prepared.capture_report,
         node_sequence,
         thermal,
         communication,
@@ -627,6 +646,14 @@ def _validate_prepared_resident_simulation(prepared: object) -> None:
     if (
         typed.primary_arrays is not typed.timestep.primary_arrays
         or typed.resource_views is not typed.timestep.resource_views
+        or typed.capture_requirements
+        is not typed.request.capture_resource_requirements
+        or typed.capture_requirements is not typed.timestep.capture_requirements
+        or typed.capture_set is None
+        or typed.capture_set is not typed.timestep.capture_set
+        or typed.capture_report is not typed.timestep.capture_report
+        or typed.capture_report is None
+        or typed.capture_set.report is not typed.capture_report
         or typed.duration != typed.timestep.duration
     ):
         raise ValueError(
@@ -641,6 +668,15 @@ def _validate_prepared_resident_simulation(prepared: object) -> None:
         typed.registry,
         typed.guard,
     )
+    from particula.execution.graph_capture import (
+        validate_resident_capture_resources,
+    )
+
+    if (
+        validate_resident_capture_resources(typed.request)
+        is not typed.capture_set
+    ):
+        raise ValueError("prepared capture resource set does not match.")
     compatibility = compare_resident_graph_capture_signature(
         cast(Any, typed.signature), typed.request
     )
@@ -964,6 +1000,11 @@ def _validate_complete_resident_timestep_metadata(
         ValueError: If graph, schedule, request bindings, metadata, or duration
             agreement is invalid.
     """
+    from particula.execution.graph_capture import (
+        validate_resident_capture_resources,
+    )
+
+    validate_resident_capture_resources(request)
     if not _is_resolver_produced_graph(request.graph):
         raise ValueError("graph must be produced by plan resolution.")
     if not is_resolver_produced_schedule(request.schedule, request.graph):

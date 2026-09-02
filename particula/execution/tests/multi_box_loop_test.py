@@ -52,7 +52,12 @@ from particula.execution.diagnostics import (
     ResidentDiagnosticRegistration,
     ResidentDiagnosticsPlan,
 )
-from particula.execution.gpu_resources import GPUResourceRegistry
+from particula.execution.gpu_resources import (
+    CaptureResourceRequirements,
+    GPUResourceRegistry,
+    PreparedResourceViews,
+    ResourceInventoryCapacities,
+)
 from particula.execution.gpu_session import (
     ResidentStepGuard,
     setup_resident_session,
@@ -574,6 +579,34 @@ def _scheduler_request(
         by_id["gas_update"],
         wp.array(cpu_gas.concentration, dtype=wp.float64, device=device),
     )
+    diagnostics = _diagnostics_plan(
+        session, registry, graph, schedule, by_id, wp
+    )
+    inventory = registry.register_capture_resources(
+        session, communication, diagnostics.registrations
+    )
+    capture_requirements = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(
+            coagulation_resources.collision_capacity,
+            0,
+            communication.configuration.communication_map.edge_capacity,
+        ),
+        inventory,
+        PreparedResourceViews(
+            condensation_resources,
+            coagulation_resources,
+            None,
+            wall_loss_resources,
+            nucleation_resources,
+        ),
+        communication,
+        condensation_resources.scratch_buffers,
+        coagulation_resources,
+        wall_loss_resources,
+        nucleation_resources,
+    )
+    registry.prepare_capture_resources(capture_requirements)
     request = ResidentSimulationRequest(
         session,
         registry,
@@ -600,7 +633,7 @@ def _scheduler_request(
             duration,
             object(),
         ),
-        _diagnostics_plan(session, registry, graph, schedule, by_id, wp),
+        diagnostics,
         environment_update,
         gas_update,
         ResidentCommunicationRequest(
@@ -612,6 +645,7 @@ def _scheduler_request(
             by_id["volume_evolution"],
             duration,
         ),
+        capture_requirements,
     )
     return request, wall_loss_resources, coagulation_resources
 

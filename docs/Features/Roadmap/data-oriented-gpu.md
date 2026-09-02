@@ -1733,6 +1733,23 @@ example, limitations, and closeout.
 
 ### E8-F2 prepared enqueue contract
 
+### E8-F3-P5 capture-resource accounting integration
+
+Before final `ResidentSimulationRequest` construction, callers register the
+complete inventory, build exact views and capacities, construct one exact
+`CaptureResourceRequirements`, and publish it once through
+`GPUResourceRegistry.prepare_capture_resources()`. The request retains the
+requirements only. E8-F1 CAPTURED admission and E8-F2 READY preparation resolve
+the already-published set and its immutable report through cached,
+metadata-only validation; they perform no resource preparation, acquisition,
+allocation, payload inspection, synchronization, or stream lifecycle work.
+
+The requirements, published set, and report occupy the existing
+`configurations` signature group in that order without changing E8-F1 drift
+ordering. Accounting reports manifest shape/dtype logical bytes only. They
+exclude allocator-reserved bytes, pointers or payload reads, checkpoint-copy
+costs, and future autodiff-tape totals.
+
 E8-F2 P1--P6/P8 ship a developer-only, concrete-module prepared path. Setup
 validates, normalizes, allocates established private fallback storage, binds
 identities, freezes the operation selection, and may retain established bounded

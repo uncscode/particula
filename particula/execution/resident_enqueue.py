@@ -130,6 +130,9 @@ class PreparedResidentTimestep:
         duration: Original finite, nonnegative timestep duration.
         primary_arrays: Exact signature primary-array tuple.
         resource_views: Exact signature published-resource tuple.
+        capture_requirements: Exact request requirements retained by identity.
+        capture_set: Exact registry-published capture set.
+        capture_report: Exact immutable logical-byte report from the set.
     """
 
     request: "ResidentSimulationRequest"
@@ -147,6 +150,9 @@ class PreparedResidentTimestep:
     duration: object
     primary_arrays: tuple[object, ...]
     resource_views: tuple[object, ...]
+    capture_requirements: object = None
+    capture_set: object = None
+    capture_report: object = None
 
     def __post_init__(self) -> None:  # noqa: C901
         """Validate exact carriers, READY state, and retained identities.
@@ -241,6 +247,20 @@ class PreparedResidentTimestep:
             self.registry,
             self.guard,
         )
+        if (
+            self.capture_requirements
+            is not self.request.capture_resource_requirements
+            or self.capture_set is None
+            or self.capture_set.requirements is not self.capture_requirements
+            or self.capture_set.report is not self.capture_report
+            or self.signature.configurations[-3:]
+            != (
+                self.capture_requirements,
+                self.capture_set,
+                self.capture_report,
+            )
+        ):
+            raise ValueError("prepared capture resources do not match.")
 
 
 def prepare_resident_timestep(  # noqa: C901
@@ -303,6 +323,7 @@ def prepare_resident_timestep(  # noqa: C901
     signature: Any = signature_value
     from particula.execution.graph_capture import (
         compare_resident_graph_capture_signature,
+        validate_resident_capture_resources,
     )
     from particula.execution.resident_scheduler import (
         _validate_complete_resident_timestep_metadata,
@@ -317,6 +338,7 @@ def prepare_resident_timestep(  # noqa: C901
         request_any.registry,
         request_any.guard,
     )
+    capture_set = validate_resident_capture_resources(request_any)
     compatibility = compare_resident_graph_capture_signature(
         cast(Any, signature), cast(Any, request_any)
     )
@@ -353,4 +375,7 @@ def prepare_resident_timestep(  # noqa: C901
         duration=duration,
         primary_arrays=signature.primary_arrays,
         resource_views=signature.resource_views,
+        capture_requirements=request_any.capture_resource_requirements,
+        capture_set=capture_set,
+        capture_report=capture_set.report,
     )
