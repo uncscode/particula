@@ -19,12 +19,19 @@ from typing import TYPE_CHECKING, Any, Protocol, cast
 from particula.execution import Backend, Device
 
 if TYPE_CHECKING:
-    from particula.execution.gpu_resources import GPUResourceRegistry
+    from particula.execution.gpu_resources import (
+        CaptureResourceSet,
+        GPUResourceRegistry,
+    )
     from particula.execution.gpu_session import (
         ResidentSession,
         ResidentStepGuard,
     )
-    from particula.execution.resident_scheduler import ResidentSimulationRequest
+    from particula.execution.resident_enqueue import PreparedResidentTimestep
+    from particula.execution.resident_scheduler import (
+        PreparedResidentSimulation,
+        ResidentSimulationRequest,
+    )
     from particula.gpu.warp_types import (
         WarpEnvironmentData,
         WarpGasData,
@@ -1636,15 +1643,15 @@ def qualify_prepared_resident_graph_capture(  # noqa: C901
         "CaptureResourceSet",
         _capture_resource_set_type,
     )
-    prepared_any = cast(Any, prepared)
-    capture_set_any = cast(Any, capture_set)
+    prepared_any = cast("PreparedResidentSimulation", prepared)
+    capture_set_any = cast("CaptureResourceSet", capture_set)
     request = cast("ResidentSimulationRequest", binding._request)
     session = cast("ResidentSession", binding._session)
     registry = cast("GPUResourceRegistry", binding._registry)
     guard = cast("ResidentStepGuard", binding._guard)
     lifecycle = binding._lifecycle
     signature = lifecycle.signature
-    timestep = prepared_any.timestep
+    timestep = cast("PreparedResidentTimestep", prepared_any.timestep)
     if type(timestep) is not _prepared_resident_timestep_type():
         raise TypeError("timestep must be an exact PreparedResidentTimestep.")
     requirements = prepared_any.capture_requirements

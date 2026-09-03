@@ -49,7 +49,10 @@ from particula.execution.graph_capture import (
 )
 
 if TYPE_CHECKING:
-    from particula.execution.gpu_resources import GPUResourceRegistry
+    from particula.execution.gpu_resources import (
+        CaptureResourceRequirements,
+        GPUResourceRegistry,
+    )
     from particula.execution.graph_capture import GraphCaptureRuntimeProbe
     from particula.execution.resident_communication import (
         ResidentCommunicationRequest,
@@ -1912,9 +1915,15 @@ def test_qualification_rejects_warp_cpu_without_native_activity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Qualification fails closed before probing or acting on Warp CPU."""
+    from particula.execution.resident_communication import (
+        PreparedResidentCommunicationBinding,
+    )
     from particula.execution.resident_enqueue import prepare_resident_timestep
     from particula.execution.resident_scheduler import (
         PreparedResidentSimulation,
+    )
+    from particula.execution.thermodynamic_updates import (
+        PreparedResidentThermodynamicSequence,
     )
 
     request = cast("ResidentSimulationRequest", resident_request)
@@ -1929,8 +1938,12 @@ def test_qualification_rejects_warp_cpu_without_native_activity(
     )
     _attach_resident_graph_capture_binding(request, binding)
     timestep = prepare_resident_timestep(request, 0.0)
-    capture_set = request.registry.validate_capture_resource_set(
-        request.capture_resource_requirements
+    registry = cast("GPUResourceRegistry", request.registry)
+    capture_set = registry.validate_capture_resource_set(
+        cast(
+            "CaptureResourceRequirements",
+            request.capture_resource_requirements,
+        )
     )
     prepared = PreparedResidentSimulation(
         timestep=timestep,
@@ -1949,8 +1962,8 @@ def test_qualification_rejects_warp_cpu_without_native_activity(
         capture_set=capture_set,
         capture_report=capture_set.report,
         nodes=(),
-        thermal=object(),
-        communication=object(),
+        thermal=cast("PreparedResidentThermodynamicSequence", object()),
+        communication=cast("PreparedResidentCommunicationBinding", object()),
         environment=object(),
         gas=object(),
         condensation=object(),
@@ -1974,7 +1987,7 @@ def test_qualification_rejects_warp_cpu_without_native_activity(
             binding,
             prepared,
             capture_set,
-            cast("GraphCaptureRuntimeProbe", AttributeTrapProbe()),
+            cast("GraphCaptureRuntimeAdapter", AttributeTrapProbe()),
         )
 
     assert request.guard.completed_steps == 0
