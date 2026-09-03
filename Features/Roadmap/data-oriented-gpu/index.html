@@ -13603,6 +13603,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#e8-f3-p5-capture-resource-accounting-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F3-P5 capture-resource accounting integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#warp-graph-capture" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -17039,6 +17050,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#e8-f3-p5-capture-resource-accounting-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F3-P5 capture-resource accounting integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#warp-graph-capture" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -19487,6 +19509,20 @@ seams; E8-F3 owns resource work, E8-F4 native capture/replay and captured
 parity, E8-F5--E8-F7 parity/performance/memory/profiling, and E8-F8 the
 example, limitations, and closeout.</p>
 <h3 id="e8-f2-prepared-enqueue-contract">E8-F2 prepared enqueue contract<a class="headerlink" href="#e8-f2-prepared-enqueue-contract" title="Permanent link">&para;</a></h3>
+<h3 id="e8-f3-p5-capture-resource-accounting-integration">E8-F3-P5 capture-resource accounting integration<a class="headerlink" href="#e8-f3-p5-capture-resource-accounting-integration" title="Permanent link">&para;</a></h3>
+<p>Before final <code>ResidentSimulationRequest</code> construction, callers register the
+complete inventory, build exact views and capacities, construct one exact
+<code>CaptureResourceRequirements</code>, and publish it once through
+<code>GPUResourceRegistry.prepare_capture_resources()</code>. The request retains the
+requirements only. E8-F1 CAPTURED admission and E8-F2 READY preparation resolve
+the already-published set and its immutable report through cached,
+metadata-only validation; they perform no resource preparation, acquisition,
+allocation, payload inspection, synchronization, or stream lifecycle work.</p>
+<p>The requirements, published set, and report occupy the existing
+<code>configurations</code> signature group in that order without changing E8-F1 drift
+ordering. Accounting reports manifest shape/dtype logical bytes only. They
+exclude allocator-reserved bytes, pointers or payload reads, checkpoint-copy
+costs, and future autodiff-tape totals.</p>
 <p>E8-F2 P1--P6/P8 ship a developer-only, concrete-module prepared path. Setup
 validates, normalizes, allocates established private fallback storage, binds
 identities, freezes the operation selection, and may retain established bounded

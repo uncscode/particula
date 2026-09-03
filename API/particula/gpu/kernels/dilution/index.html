@@ -16126,26 +16126,111 @@ is pre-writer; rollback is not promised after an update writer launches.</p>
     <div class="doc doc-contents ">
 
         <p>Prepare and enqueue GPU dilution after complete entry-point preflight.</p>
-<p>This public wrapper preserves the direct API while the private prepared
-record isolates validation and allocation from device enqueue.</p>
+<p>The wrapper preserves the direct API while the private prepared record
+isolates validation and allocation from device enqueue.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>particles</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Caller-owned particle container with Warp concentration
+storage.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>gas</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Caller-owned gas container with Warp concentration storage.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>coefficient</code></b>
+              (<code><span title="float">float</span> | <span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Nonnegative dilution coefficient in <code>s^-1</code>, either a
+scalar or a per-box <code>wp.float64</code> array.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>time_step</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Nonnegative dilution duration in seconds.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="tuple">tuple</span>[<span title="typing.Any">Any</span>, <span title="typing.Any">Any</span>]</code>
+          –
+          <div class="doc-md-description">
+            <p>The original <code>particles</code> and <code>gas</code> containers, in that order.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="TypeError">TypeError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If a scalar input has an unsupported type.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If schemas, devices, values, or storage overlap are invalid.</p>
+          </div>
+        </li>
+    </ul>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/dilution.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">549</span>
-<span class="normal">550</span>
-<span class="normal">551</span>
-<span class="normal">552</span>
-<span class="normal">553</span>
-<span class="normal">554</span>
-<span class="normal">555</span>
-<span class="normal">556</span>
-<span class="normal">557</span>
-<span class="normal">558</span>
-<span class="normal">559</span>
-<span class="normal">560</span>
-<span class="normal">561</span>
-<span class="normal">562</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dilution_step_gpu</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dilution_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span><span class="p">,</span>
@@ -16153,8 +16238,23 @@ record isolates validation and allocation from device enqueue.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Prepare and enqueue GPU dilution after complete entry-point preflight.</span>
 
-<span class="sd">    This public wrapper preserves the direct API while the private prepared</span>
-<span class="sd">    record isolates validation and allocation from device enqueue.</span>
+<span class="sd">    The wrapper preserves the direct API while the private prepared record</span>
+<span class="sd">    isolates validation and allocation from device enqueue.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        particles: Caller-owned particle container with Warp concentration</span>
+<span class="sd">            storage.</span>
+<span class="sd">        gas: Caller-owned gas container with Warp concentration storage.</span>
+<span class="sd">        coefficient: Nonnegative dilution coefficient in ``s^-1``, either a</span>
+<span class="sd">            scalar or a per-box ``wp.float64`` array.</span>
+<span class="sd">        time_step: Nonnegative dilution duration in seconds.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The original ``particles`` and ``gas`` containers, in that order.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If a scalar input has an unsupported type.</span>
+<span class="sd">        ValueError: If schemas, devices, values, or storage overlap are invalid.</span>
 <span class="sd">    """</span>
     <span class="k">return</span> <span class="n">_enqueue_prepared_dilution_call</span><span class="p">(</span>
         <span class="n">_prepare_dilution_step_gpu</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="p">,</span> <span class="n">coefficient</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>

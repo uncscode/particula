@@ -16127,10 +16127,12 @@
     <div class="doc doc-contents first">
 
         <p>Prepare READY resident graph metadata for later enqueue phases.</p>
-<p>This concrete direct-import-only P1 boundary validates and freezes READY-state
-identity metadata only. It does not construct executors, capture, enqueue,
-dispatch, acquire resources, inspect payloads, transfer, synchronize, mutate a
-lifecycle, or fall back. Preparation performs validation and retains the exact
+<p>This concrete direct-import-only P1 boundary performs validation and freezes
+READY-state identity metadata only. It resolves the registry's
+already-published capture resource set and cached report by identity, but does
+not construct executors,
+capture, enqueue, dispatch, acquire resources, inspect payloads, transfer,
+synchronize, mutate a lifecycle, or fall back. Preparation retains the exact
 READY binding but does not authorize token entry or dispatch; identity or
 lifecycle drift requires a new prepared record and rejects before token entry.
 It performs no allocation.</p>
@@ -16167,7 +16169,7 @@ It performs no allocation.</p>
   </span>
 
 <a href="#particula.execution.resident_enqueue.PreparedResidentTimestep" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">PreparedResidentTimestep</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="s1">'ResidentSimulationRequest'</span><span class="p">,</span> <span class="n">binding</span><span class="p">:</span> <span class="s1">'ResidentGraphCaptureBinding'</span><span class="p">,</span> <span class="n">lifecycle</span><span class="p">:</span> <span class="s1">'GraphCaptureLifecycle'</span><span class="p">,</span> <span class="n">signature</span><span class="p">:</span> <span class="s1">'ResidentGraphCaptureSignature'</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">schedule</span><span class="p">:</span> <span class="s1">'ResolvedTimestepSchedule'</span><span class="p">,</span> <span class="n">ordered_node_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">primary_arrays</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">resource_views</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">PreparedResidentTimestep</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="s1">'ResidentSimulationRequest'</span><span class="p">,</span> <span class="n">binding</span><span class="p">:</span> <span class="s1">'ResidentGraphCaptureBinding'</span><span class="p">,</span> <span class="n">lifecycle</span><span class="p">:</span> <span class="s1">'GraphCaptureLifecycle'</span><span class="p">,</span> <span class="n">signature</span><span class="p">:</span> <span class="s1">'ResidentGraphCaptureSignature'</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">schedule</span><span class="p">:</span> <span class="s1">'ResolvedTimestepSchedule'</span><span class="p">,</span> <span class="n">ordered_node_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">primary_arrays</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">resource_views</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">capture_requirements</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_set</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_report</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16302,6 +16304,30 @@ acquiring them, and it does not authorize capture, enqueue, or dispatch.</p>
             <p>Exact signature published-resource tuple.</p>
           </div>
         </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_enqueue.PreparedResidentTimestep.capture_requirements">capture_requirements</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Exact request requirements retained by identity.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_enqueue.PreparedResidentTimestep.capture_set">capture_set</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Exact registry-published capture set.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.resident_enqueue.PreparedResidentTimestep.capture_report">capture_report</span></code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Exact immutable logical-byte report from the set.</p>
+          </div>
+        </li>
     </ul>
 
 
@@ -16363,15 +16389,7 @@ state is not READY.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_enqueue.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
 <span class="normal">160</span>
 <span class="normal">161</span>
 <span class="normal">162</span>
@@ -16455,7 +16473,28 @@ state is not READY.</p>
 <span class="normal">240</span>
 <span class="normal">241</span>
 <span class="normal">242</span>
-<span class="normal">243</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">    </span><span class="sd">"""Validate exact carriers, READY state, and retained identities.</span>
 
 <span class="sd">    Raises:</span>
@@ -16548,6 +16587,19 @@ state is not READY.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">guard</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capture_requirements</span>
+        <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">capture_resource_requirements</span>
+        <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_set</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="ow">or</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_set</span><span class="p">)</span><span class="o">.</span><span class="n">requirements</span>
+        <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_requirements</span>
+        <span class="ow">or</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_set</span><span class="p">)</span><span class="o">.</span><span class="n">report</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_report</span>
+        <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="o">.</span><span class="n">configurations</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+        <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_requirements</span>
+        <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="o">.</span><span class="n">configurations</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_set</span>
+        <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="o">.</span><span class="n">configurations</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_report</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"prepared capture resources do not match."</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16578,10 +16630,10 @@ state is not READY.</p>
 
         <p>Validate and freeze one READY resident timestep without side effects.</p>
 <p>The direct-only preparation boundary performs shared read-only metadata
-validation and retains identities in a frozen carrier. It does not construct
-executors, open a guard token, acquire resources, inspect payloads, capture,
-enqueue, dispatch, transfer, synchronize, mutate lifecycle state, or fall
-back.</p>
+    validation, cached capture-publication lookup, and identity retention in
+    a frozen carrier. It does not construct executors, open a guard token,
+    acquire resources, inspect payloads, capture, enqueue, dispatch,
+    transfer, synchronize, mutate lifecycle state, or fall back.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -16645,28 +16697,7 @@ complete-loop metadata is invalid.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_enqueue.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
-<span class="normal">267</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">267</span>
 <span class="normal">268</span>
 <span class="normal">269</span>
 <span class="normal">270</span>
@@ -16755,16 +16786,54 @@ complete-loop metadata is invalid.</p>
 <span class="normal">353</span>
 <span class="normal">354</span>
 <span class="normal">355</span>
-<span class="normal">356</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prepare_resident_timestep</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prepare_resident_timestep</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PreparedResidentTimestep</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate and freeze one READY resident timestep without side effects.</span>
 
 <span class="sd">    The direct-only preparation boundary performs shared read-only metadata</span>
-<span class="sd">    validation and retains identities in a frozen carrier. It does not construct</span>
-<span class="sd">    executors, open a guard token, acquire resources, inspect payloads, capture,</span>
-<span class="sd">    enqueue, dispatch, transfer, synchronize, mutate lifecycle state, or fall</span>
-<span class="sd">    back.</span>
+<span class="sd">        validation, cached capture-publication lookup, and identity retention in</span>
+<span class="sd">        a frozen carrier. It does not construct executors, open a guard token,</span>
+<span class="sd">        acquire resources, inspect payloads, capture, enqueue, dispatch,</span>
+<span class="sd">        transfer, synchronize, mutate lifecycle state, or fall back.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        request: Exact attached resident simulation request.</span>
@@ -16815,6 +16884,7 @@ complete-loop metadata is invalid.</p>
     <span class="n">signature</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">signature_value</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.graph_capture</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">compare_resident_graph_capture_signature</span><span class="p">,</span>
+        <span class="n">validate_resident_capture_resources</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.resident_scheduler</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">_validate_complete_resident_timestep_metadata</span><span class="p">,</span>
@@ -16829,14 +16899,27 @@ complete-loop metadata is invalid.</p>
         <span class="n">request_any</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
         <span class="n">request_any</span><span class="o">.</span><span class="n">guard</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="c1"># The publication triple belongs to the ordered configurations group.  A</span>
+    <span class="c1"># replacement must be rejected as signature drift before asking the</span>
+    <span class="c1"># registry to resolve the replacement publication.</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">signature</span><span class="o">.</span><span class="n">configurations</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+        <span class="ow">is</span> <span class="ow">not</span> <span class="n">request_any</span><span class="o">.</span><span class="n">capture_resource_requirements</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resident graph-capture signature is incompatible."</span><span class="p">)</span>
+    <span class="n">capture_set</span> <span class="o">=</span> <span class="n">validate_resident_capture_resources</span><span class="p">(</span><span class="n">request_any</span><span class="p">)</span>
     <span class="n">compatibility</span> <span class="o">=</span> <span class="n">compare_resident_graph_capture_signature</span><span class="p">(</span>
-        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">signature</span><span class="p">),</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">request_any</span><span class="p">)</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">signature</span><span class="p">),</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">request_any</span><span class="p">),</span>
+        <span class="n">admission_token</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">signature</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">compatibility</span><span class="o">.</span><span class="n">compatible</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resident graph-capture signature is incompatible."</span><span class="p">)</span>
     <span class="n">_validate_complete_resident_timestep_metadata</span><span class="p">(</span><span class="n">request_any</span><span class="p">,</span> <span class="n">duration</span><span class="p">)</span>
     <span class="n">compatibility</span> <span class="o">=</span> <span class="n">compare_resident_graph_capture_signature</span><span class="p">(</span>
-        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">signature</span><span class="p">),</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">request_any</span><span class="p">)</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">signature</span><span class="p">),</span>
+        <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">request_any</span><span class="p">),</span>
+        <span class="n">admission_token</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">signature</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">compatibility</span><span class="o">.</span><span class="n">compatible</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"resident graph-capture signature is incompatible."</span><span class="p">)</span>
@@ -16865,6 +16948,9 @@ complete-loop metadata is invalid.</p>
         <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
         <span class="n">primary_arrays</span><span class="o">=</span><span class="n">signature</span><span class="o">.</span><span class="n">primary_arrays</span><span class="p">,</span>
         <span class="n">resource_views</span><span class="o">=</span><span class="n">signature</span><span class="o">.</span><span class="n">resource_views</span><span class="p">,</span>
+        <span class="n">capture_requirements</span><span class="o">=</span><span class="n">request_any</span><span class="o">.</span><span class="n">capture_resource_requirements</span><span class="p">,</span>
+        <span class="n">capture_set</span><span class="o">=</span><span class="n">capture_set</span><span class="p">,</span>
+        <span class="n">capture_report</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">capture_set</span><span class="p">)</span><span class="o">.</span><span class="n">report</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
