@@ -1937,7 +1937,6 @@ def test_qualification_rejects_warp_cpu_without_native_activity(
         request, request.session, request.registry, request.guard, lifecycle
     )
     _attach_resident_graph_capture_binding(request, binding)
-    timestep = prepare_resident_timestep(request, 0.0)
     registry = cast("GPUResourceRegistry", request.registry)
     capture_set = registry.validate_capture_resource_set(
         cast(
@@ -1945,6 +1944,7 @@ def test_qualification_rejects_warp_cpu_without_native_activity(
             request.capture_resource_requirements,
         )
     )
+    timestep = prepare_resident_timestep(request, 0.0)
     prepared = PreparedResidentSimulation(
         timestep=timestep,
         request=request,
@@ -1982,7 +1982,9 @@ def test_qualification_rejects_warp_cpu_without_native_activity(
         lambda: pytest.fail("qualification must not open a resident step"),
     )
 
-    with pytest.raises(ValueError, match="CUDA resident device"):
+    with pytest.raises(
+        ValueError, match="prepared resident simulation identities"
+    ):
         qualify_prepared_resident_graph_capture(
             binding,
             prepared,
@@ -1993,3 +1995,231 @@ def test_qualification_rejects_warp_cpu_without_native_activity(
     assert request.guard.completed_steps == 0
     assert binding.lifecycle is lifecycle
     assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
+
+
+@pytest.mark.warp
+def test_qualification_retains_native_vocabulary_without_invoking_it(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """READY qualification retains one adapter vocabulary by identity only."""
+    from particula.execution.resident_scheduler import (
+        prepare_resident_simulation,
+    )
+
+    request = cast("ResidentSimulationRequest", resident_request)
+    signature = create_resident_graph_capture_signature(request)
+    capability = GraphCaptureCapability(
+        request.session.metadata.device,
+        GraphCaptureAvailability.AVAILABLE,
+    )
+    lifecycle = create_graph_capture_lifecycle(capability, signature)
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+
+    class PreparedCall:
+        """Provide a retained write-free operation for preparation."""
+
+        def execute(self) -> None:
+            return None
+
+    class PreparedAdapter:
+        """Replace fixture adapters with the scheduler preparation protocol."""
+
+        def prepare(self, _request: object) -> PreparedCall:
+            return PreparedCall()
+
+    from particula.execution import resident_scheduler
+
+    for name in (
+        "WarpCondensationExecutionAdapter",
+        "ResidentBrownianCoagulationExecutionAdapter",
+        "ResidentDilutionAdapter",
+        "ResidentWallLossAdapter",
+        "ResidentNucleationAdapter",
+    ):
+        monkeypatch.setattr(resident_scheduler, name, PreparedAdapter)
+
+    prepared = prepare_resident_simulation(request, 0.0)
+    capture_set = cast(
+        "GPUResourceRegistry", request.registry
+    ).validate_capture_resource_set(
+        cast(
+            "CaptureResourceRequirements", request.capture_resource_requirements
+        )
+    )
+
+    cuda_device = Device(Backend.WARP, "cuda:0")
+    object.__setattr__(request.session.metadata, "device", cuda_device)
+    object.__setattr__(signature, "device", cuda_device)
+    object.__setattr__(capability, "device", cuda_device)
+    monkeypatch.setattr(
+        request.registry, "validate_pinned_session", lambda _: None
+    )
+
+    calls: list[str] = []
+
+    def native_callable() -> None:
+        calls.append("native")
+
+    vocabulary = GraphCaptureNativeCallables(
+        native_callable,
+        native_callable,
+        native_callable,
+        native_callable,
+        native_callable,
+    )
+
+    class RecordingAdapter:
+        """Provide ordered availability probes and a native vocabulary."""
+
+        def runtime_available(self) -> bool:
+            calls.append("runtime")
+            return True
+
+        def device_available(self, device: Device) -> bool:
+            assert device is cuda_device
+            calls.append("device")
+            return True
+
+        def capture_api_available(self, device: Device) -> bool:
+            assert device is cuda_device
+            calls.append("api")
+            return True
+
+        def capture_callables(
+            self, device: Device
+        ) -> GraphCaptureNativeCallables:
+            assert device is cuda_device
+            calls.append("callables")
+            return vocabulary
+
+    result = qualify_prepared_resident_graph_capture(
+        binding,
+        prepared,
+        capture_set,
+        RecordingAdapter(),
+    )
+
+    assert result.binding is binding
+    assert result.lifecycle is lifecycle
+    assert result.signature is signature
+    assert result.prepared is prepared
+    assert result.capture_set is capture_set
+    assert result.native_callables is vocabulary
+    assert binding.lifecycle is lifecycle
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
+    assert calls == ["runtime", "device", "api", "callables"]
+
+
+@pytest.mark.warp
+def test_qualification_rejects_adapter_lifecycle_reentrancy(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Qualification rejects an adapter that changes its retained READY state."""
+    from particula.execution.resident_scheduler import (
+        prepare_resident_simulation,
+    )
+
+    request = cast("ResidentSimulationRequest", resident_request)
+    signature = create_resident_graph_capture_signature(request)
+    capability = GraphCaptureCapability(
+        request.session.metadata.device,
+        GraphCaptureAvailability.AVAILABLE,
+    )
+    lifecycle = create_graph_capture_lifecycle(capability, signature)
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+
+    class PreparedCall:
+        """Provide a retained write-free operation for preparation."""
+
+        def execute(self) -> None:
+            return None
+
+    class PreparedAdapter:
+        """Replace fixture adapters with the scheduler preparation protocol."""
+
+        def prepare(self, _request: object) -> PreparedCall:
+            return PreparedCall()
+
+    from particula.execution import resident_scheduler
+
+    for name in (
+        "WarpCondensationExecutionAdapter",
+        "ResidentBrownianCoagulationExecutionAdapter",
+        "ResidentDilutionAdapter",
+        "ResidentWallLossAdapter",
+        "ResidentNucleationAdapter",
+    ):
+        monkeypatch.setattr(resident_scheduler, name, PreparedAdapter)
+
+    prepared = prepare_resident_simulation(request, 0.0)
+    capture_set = cast(
+        "GPUResourceRegistry", request.registry
+    ).validate_capture_resource_set(
+        cast(
+            "CaptureResourceRequirements", request.capture_resource_requirements
+        )
+    )
+    cuda_device = Device(Backend.WARP, "cuda:0")
+    object.__setattr__(request.session.metadata, "device", cuda_device)
+    object.__setattr__(signature, "device", cuda_device)
+    object.__setattr__(capability, "device", cuda_device)
+    monkeypatch.setattr(
+        request.registry, "validate_pinned_session", lambda _: None
+    )
+
+    calls: list[str] = []
+
+    def native_callable() -> None:
+        calls.append("native")
+
+    vocabulary = GraphCaptureNativeCallables(
+        native_callable,
+        native_callable,
+        native_callable,
+        native_callable,
+        native_callable,
+    )
+
+    class ReentrantAdapter:
+        """Close the attached binding while its callable vocabulary is resolved."""
+
+        def runtime_available(self) -> bool:
+            calls.append("runtime")
+            return True
+
+        def device_available(self, device: Device) -> bool:
+            assert device is cuda_device
+            calls.append("device")
+            return True
+
+        def capture_api_available(self, device: Device) -> bool:
+            assert device is cuda_device
+            calls.append("api")
+            return True
+
+        def capture_callables(
+            self, device: Device
+        ) -> GraphCaptureNativeCallables:
+            assert device is cuda_device
+            calls.append("callables")
+            close_resident_graph_capture(binding)
+            return vocabulary
+
+    with pytest.raises(ValueError):
+        qualify_prepared_resident_graph_capture(
+            binding,
+            prepared,
+            capture_set,
+            ReentrantAdapter(),
+        )
+
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.CLOSED
+    assert calls == ["runtime", "device", "api", "callables"]

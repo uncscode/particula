@@ -1733,6 +1733,7 @@ def qualify_prepared_resident_graph_capture(  # noqa: C901
         raise TypeError(
             "capture_requirements must be an exact CaptureResourceRequirements."
         )
+    duration_is_identity = prepared_any.duration is timestep.duration
     if (
         prepared_any.request is not request
         or prepared_any.session is not session
@@ -1749,8 +1750,6 @@ def qualify_prepared_resident_graph_capture(  # noqa: C901
         or timestep.guard is not guard
         or prepared_any.graph is not request.graph
         or prepared_any.schedule is not request.schedule
-        or prepared_any.ordered_node_ids
-        is not request.schedule.ordered_node_ids
         or prepared_any.primary_arrays is not signature.primary_arrays
         or prepared_any.resource_views is not signature.resource_views
         or prepared_any.capture_requirements is not requirements
@@ -1765,9 +1764,16 @@ def qualify_prepared_resident_graph_capture(  # noqa: C901
         or signature.configurations[-1] is not capture_set_any.report
     ):
         raise ValueError("prepared graph-capture identities do not match.")
-    duration_is_identity = prepared_any.duration is timestep.duration
     if not duration_is_identity and prepared_any.duration != timestep.duration:
         raise ValueError("prepared graph-capture durations do not match.")
+    from particula.execution.resident_scheduler import (
+        _validate_prepared_resident_simulation,
+    )
+
+    # Qualification accepts only a scheduler-authoritative prepared record.
+    # This shared validation covers every E8-F2 operation/product link before
+    # any adapter member is read.
+    _validate_prepared_resident_simulation(prepared)
     guard.assert_step_closed()
     registry.assert_step_closed()
     registry.validate_pinned_session(session)
@@ -1808,6 +1814,46 @@ def qualify_prepared_resident_graph_capture(  # noqa: C901
             "adapter.capture_callables() must return an exact "
             "GraphCaptureNativeCallables."
         )
+    # Adapter code is caller-owned and may reenter resident metadata. Recheck
+    # the complete prepared contract and the qualification snapshots before
+    # retaining a callable vocabulary from a stale READY binding.
+    _validate_prepared_resident_simulation(prepared)
+    binding = _require_attached_resident_binding(binding)
+    if (
+        binding._request is not request
+        or binding._session is not session
+        or binding._registry is not registry
+        or binding._guard is not guard
+        or binding._lifecycle is not lifecycle
+        or lifecycle.signature is not signature
+        or binding._lifecycle.state is not GraphCaptureLifecycleState.READY
+        or lifecycle.capability is not capability
+    ):
+        raise ValueError(
+            "graph-capture qualification state changed during adapter callback."
+        )
+    guard.assert_step_closed()
+    registry.validate_pinned_session(session)
+    if session.lifecycle.name != "ACTIVE":
+        raise ValueError("resident session must be ACTIVE.")
+    if (
+        capability.device != session.metadata.device
+        or capability.availability is not GraphCaptureAvailability.AVAILABLE
+        or capability.device.backend is not Backend.WARP
+        or capability.device.native == "cpu"
+    ):
+        raise ValueError(
+            "graph-capture qualification state changed during adapter callback."
+        )
+    compatibility = compare_resident_graph_capture_signature(
+        signature,
+        request,
+        admission_token=signature,
+    )
+    if not compatibility.compatible:
+        raise ValueError("resident graph-capture signature is incompatible.")
+    if validate_resident_capture_resources(request) is not capture_set:
+        raise ValueError("prepared capture resource set does not match.")
     return PreparedGraphCaptureQualification(
         binding=binding,
         lifecycle=lifecycle,

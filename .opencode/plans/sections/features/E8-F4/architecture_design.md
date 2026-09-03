@@ -61,11 +61,10 @@ CapturedResidentPlan(REPLAYABLE, exact binding + graph)
   new READY record -> explicit recapture
 ```
 
-P1 supplies an internal runtime adapter and frozen native callable vocabulary so
-hardware-independent tests can assert qualification order. Future production
-capture will use the retained callable vocabulary for `capture_begin`,
-`capture_end`, and `capture_launch`; handle publication and cleanup are not part
-of the delivered qualification record.
+P1 accepts a caller-injected runtime adapter and retains its frozen native
+callable vocabulary so hardware-independent tests can assert qualification
+order. P2/P3 native capture, handle publication, release/cleanup, and execution
+remain design-only/deferred; the P1 qualification record does not own them.
 
 Replay compares metadata before token entry and launch. Mutable payloads and RNG
 words are intentionally not compared: they advance in the exact pinned arrays.
