@@ -85,13 +85,20 @@ class GraphCaptureRuntimeProbe(Protocol):
     """
 
     def runtime_available(self) -> bool:
-        """Return whether the optional runtime is available."""
+        """Return whether the optional graph-capture runtime is available.
+
+        Returns:
+            ``True`` when the runtime can be queried for graph-capture support.
+        """
 
     def device_available(self, device: Device) -> bool:
         """Return whether a declared device is available.
 
         Args:
             device: Exact device declaration to assess.
+
+        Returns:
+            ``True`` when the declared device is available to the runtime.
         """
 
     def capture_api_available(self, device: Device) -> bool:
@@ -99,12 +106,23 @@ class GraphCaptureRuntimeProbe(Protocol):
 
         Args:
             device: Exact device declaration to assess.
+
+        Returns:
+            ``True`` when the device exposes the required capture API.
         """
 
 
 @dataclass(frozen=True, eq=False)
 class GraphCaptureNativeCallables:
-    """Retain native vocabulary without a native handle or cleanup callback."""
+    """Retain native vocabulary without a native handle or cleanup callback.
+
+    Attributes:
+        capture_begin: Callable that begins native graph capture.
+        capture_end: Callable that ends native graph capture.
+        capture_instantiate: Callable that instantiates a captured graph.
+        capture_launch: Callable that launches an instantiated graph.
+        capture_release: Callable that releases a native graph resource.
+    """
 
     capture_begin: Callable[..., object]
     capture_end: Callable[..., object]
@@ -126,10 +144,22 @@ class GraphCaptureNativeCallables:
 
 
 class GraphCaptureRuntimeAdapter(GraphCaptureRuntimeProbe, Protocol):
-    """Declare lazy runtime probes and callable resolution for P1."""
+    """Declare lazy runtime probes and callable resolution for P1.
+
+    The adapter owns runtime-specific behavior. This module only invokes its
+    probes after earlier checks succeed and retains the returned callables by
+    identity.
+    """
 
     def capture_callables(self, device: Device) -> GraphCaptureNativeCallables:
-        """Return native callable vocabulary for one exact device."""
+        """Return native callable vocabulary for one exact device.
+
+        Args:
+            device: Exact device declaration whose capture API was qualified.
+
+        Returns:
+            Exact callable vocabulary for the later native capture phase.
+        """
 
 
 def _require_probe_method(probe: object, name: str) -> Callable[..., object]:
@@ -474,6 +504,10 @@ def create_resident_graph_capture_signature(
 
     Args:
         request: Exact ``ResidentSimulationRequest`` to describe.
+        validate_capture_resources: Whether to validate the published resource
+            set before creating the signature.
+        cached_capture_set: Previously validated resource set used when
+            ``validate_capture_resources`` is ``False``.
 
     Returns:
         Immutable identity metadata grouped in comparison precedence order.
@@ -1542,6 +1576,31 @@ class PreparedGraphCaptureQualification:
     and native callable vocabulary by identity. It creates no graph/exec handle
     and owns no cleanup callback. Successful qualification preserves READY;
     P2/P3 alone own native capture, handles, release, and cleanup.
+
+    Attributes:
+        binding: Attached resident graph-capture binding being qualified.
+        lifecycle: READY lifecycle retained by the binding.
+        signature: Structural identity signature for the request.
+        request: Exact resident simulation request.
+        session: Exact resident session attached to the request.
+        registry: Exact resource registry pinned to the session.
+        guard: Exact closed step guard attached to the session.
+        prepared: Exact prepared resident simulation.
+        timestep: Exact prepared timestep metadata.
+        capture_requirements: Published capture-resource requirements.
+        capture_set: Published capture-resource set.
+        capture_report: Cached logical-byte report for the capture set.
+        device: Exact non-CPU Warp device qualified for capture.
+        dimensions: Resident dimensions retained by the session.
+        graph: Prepared graph declaration.
+        schedule: Prepared schedule declaration.
+        ordered_node_ids: Ordered schedule-node identifiers.
+        duration: Prepared timestep duration.
+        duration_is_identity: Whether prepared and timestep durations are the
+            same object rather than merely equal values.
+        primary_arrays: Identity tuple of resident primary arrays.
+        resource_views: Identity tuple of resident resource views.
+        native_callables: Adapter-provided callable vocabulary for later use.
     """
 
     binding: ResidentGraphCaptureBinding
