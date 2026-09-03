@@ -117,6 +117,10 @@ DENIED_PUBLIC_NAMES = (
     "ResidentGraphCaptureBinding",
     "PreparedResidentTimestep",
     "prepare_resident_timestep",
+    "GraphCaptureRuntimeAdapter",
+    "GraphCaptureNativeCallables",
+    "PreparedGraphCaptureQualification",
+    "qualify_prepared_resident_graph_capture",
 )
 
 GRAPH_CAPTURE_NAMES = DENIED_PUBLIC_NAMES[48:]

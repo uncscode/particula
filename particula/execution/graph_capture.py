@@ -95,6 +95,36 @@ class GraphCaptureRuntimeProbe(Protocol):
         """
 
 
+@dataclass(frozen=True, eq=False)
+class GraphCaptureNativeCallables:
+    """Retain native vocabulary without a native handle or cleanup callback."""
+
+    capture_begin: Callable[..., object]
+    capture_end: Callable[..., object]
+    capture_instantiate: Callable[..., object]
+    capture_launch: Callable[..., object]
+    capture_release: Callable[..., object]
+
+    def __post_init__(self) -> None:
+        """Require every native vocabulary member to be callable."""
+        for name in (
+            "capture_begin",
+            "capture_end",
+            "capture_instantiate",
+            "capture_launch",
+            "capture_release",
+        ):
+            if not callable(getattr(self, name)):
+                raise TypeError(f"{name} must be callable.")
+
+
+class GraphCaptureRuntimeAdapter(GraphCaptureRuntimeProbe, Protocol):
+    """Declare lazy runtime probes and callable resolution for P1."""
+
+    def capture_callables(self, device: Device) -> GraphCaptureNativeCallables:
+        """Return native callable vocabulary for one exact device."""
+
+
 def _require_probe_method(probe: object, name: str) -> Callable[..., object]:
     """Return one callable probe method or raise a deterministic error."""
     method = getattr(probe, name, None)
@@ -306,6 +336,36 @@ def _registry_type() -> type[object]:
     from particula.execution.gpu_resources import GPUResourceRegistry
 
     return GPUResourceRegistry
+
+
+def _prepared_resident_simulation_type() -> type[object]:
+    """Lazily return the exact prepared resident simulation carrier type."""
+    from particula.execution.resident_scheduler import (
+        PreparedResidentSimulation,
+    )
+
+    return PreparedResidentSimulation
+
+
+def _prepared_resident_timestep_type() -> type[object]:
+    """Lazily return the exact prepared resident timestep carrier type."""
+    from particula.execution.resident_enqueue import PreparedResidentTimestep
+
+    return PreparedResidentTimestep
+
+
+def _capture_resource_requirements_type() -> type[object]:
+    """Lazily return exact capture-resource requirements carrier type."""
+    from particula.execution.gpu_resources import CaptureResourceRequirements
+
+    return CaptureResourceRequirements
+
+
+def _capture_resource_set_type() -> type[object]:
+    """Lazily return exact published capture-resource set carrier type."""
+    from particula.execution.gpu_resources import CaptureResourceSet
+
+    return CaptureResourceSet
 
 
 def _identity_tuple(*values: object) -> tuple[object, ...]:
@@ -1465,6 +1525,232 @@ def complete_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
     binding = _require_attached_resident_binding(binding)
     binding._lifecycle = complete_graph_capture(binding._lifecycle)
     return binding._lifecycle
+
+
+@dataclass(frozen=True, eq=False)
+class PreparedGraphCaptureQualification:
+    """Retain one READY qualification without a native handle or cleanup.
+
+    P1 retains the exact prepared resident binding, published capture resources,
+    and native callable vocabulary by identity. It creates no graph/exec handle
+    and owns no cleanup callback. Successful qualification preserves READY;
+    P2/P3 alone own native capture, handles, release, and cleanup.
+    """
+
+    binding: ResidentGraphCaptureBinding
+    lifecycle: GraphCaptureLifecycle
+    signature: ResidentGraphCaptureSignature
+    request: object
+    session: object
+    registry: object
+    guard: object
+    prepared: object
+    timestep: object
+    capture_requirements: object
+    capture_set: object
+    capture_report: object
+    device: Device
+    dimensions: object
+    graph: object
+    schedule: object
+    ordered_node_ids: tuple[object, ...]
+    duration: object
+    duration_is_identity: bool
+    primary_arrays: tuple[object, ...]
+    resource_views: tuple[object, ...]
+    native_callables: GraphCaptureNativeCallables
+
+
+def _require_adapter_method(
+    adapter: object, name: str
+) -> Callable[..., object]:
+    """Return one callable adapter method without invoking it."""
+    method = getattr(adapter, name, None)
+    if not callable(method):
+        raise TypeError(f"adapter.{name} must be callable.")
+    return method
+
+
+def _raise_unavailable_qualification(
+    capability: GraphCaptureCapability,
+) -> None:
+    """Map a resolved unavailable capability to a deterministic error."""
+    messages = {
+        GraphCaptureAvailability.UNSUPPORTED_CPU: (
+            "graph capture requires a CUDA resident device."
+        ),
+        GraphCaptureAvailability.UNSUPPORTED_WARP_CPU: (
+            "graph capture requires a CUDA resident device."
+        ),
+        GraphCaptureAvailability.UNAVAILABLE_RUNTIME: (
+            "graph capture runtime is unavailable."
+        ),
+        GraphCaptureAvailability.UNAVAILABLE_DEVICE: (
+            "graph capture device is unavailable."
+        ),
+        GraphCaptureAvailability.UNSUPPORTED_API: (
+            "graph capture API is unsupported."
+        ),
+    }
+    if capability.availability is not GraphCaptureAvailability.AVAILABLE:
+        raise ValueError(messages[capability.availability])
+
+
+def qualify_prepared_resident_graph_capture(  # noqa: C901
+    binding: object,
+    prepared: object,
+    capture_set: object,
+    adapter: GraphCaptureRuntimeAdapter,
+) -> PreparedGraphCaptureQualification:
+    """Qualify one prepared READY binding for a later native capture phase.
+
+    This metadata-only P1 boundary validates existing exact identities, resolves
+    the adapter vocabulary lazily, and returns a fresh frozen record. It does
+    not open a guard token, invoke native callables, capture, enqueue, allocate,
+    synchronize, transfer, mutate lifecycle state, or release native resources.
+
+    Args:
+        binding: Exact attached READY resident graph-capture binding.
+        prepared: Exact E8-F2 prepared resident simulation.
+        capture_set: Exact E8-F3 published capture resource set.
+        adapter: Caller-owned lazy native runtime adapter.
+
+    Returns:
+        A fresh qualification retaining only existing metadata identities.
+
+    Raises:
+        TypeError: If a carrier, adapter member, probe result, or callable
+            record has an invalid exact type.
+        ValueError: If READY binding metadata or capability qualification fails.
+    """
+    binding = _require_attached_resident_binding(binding)
+    prepared = _require_exact_resident_carrier(
+        prepared,
+        "prepared",
+        "PreparedResidentSimulation",
+        _prepared_resident_simulation_type,
+    )
+    capture_set = _require_exact_resident_carrier(
+        capture_set,
+        "capture_set",
+        "CaptureResourceSet",
+        _capture_resource_set_type,
+    )
+    prepared_any = cast(Any, prepared)
+    capture_set_any = cast(Any, capture_set)
+    request = cast("ResidentSimulationRequest", binding._request)
+    session = cast("ResidentSession", binding._session)
+    registry = cast("GPUResourceRegistry", binding._registry)
+    guard = cast("ResidentStepGuard", binding._guard)
+    lifecycle = binding._lifecycle
+    signature = lifecycle.signature
+    timestep = prepared_any.timestep
+    if type(timestep) is not _prepared_resident_timestep_type():
+        raise TypeError("timestep must be an exact PreparedResidentTimestep.")
+    requirements = prepared_any.capture_requirements
+    if type(requirements) is not _capture_resource_requirements_type():
+        raise TypeError(
+            "capture_requirements must be an exact CaptureResourceRequirements."
+        )
+    if (
+        prepared_any.request is not request
+        or prepared_any.session is not session
+        or prepared_any.registry is not registry
+        or prepared_any.guard is not guard
+        or prepared_any.lifecycle is not lifecycle
+        or prepared_any.signature is not signature
+        or timestep.request is not request
+        or timestep.binding is not binding
+        or timestep.lifecycle is not lifecycle
+        or timestep.signature is not signature
+        or timestep.session is not session
+        or timestep.registry is not registry
+        or timestep.guard is not guard
+        or prepared_any.graph is not request.graph
+        or prepared_any.schedule is not request.schedule
+        or prepared_any.ordered_node_ids
+        is not request.schedule.ordered_node_ids
+        or prepared_any.primary_arrays is not signature.primary_arrays
+        or prepared_any.resource_views is not signature.resource_views
+        or prepared_any.capture_requirements is not requirements
+        or requirements is not request.capture_resource_requirements
+        or prepared_any.capture_set is not capture_set
+        or timestep.capture_set is not capture_set
+        or prepared_any.capture_report is not capture_set_any.report
+        or timestep.capture_report is not capture_set_any.report
+        or capture_set_any.requirements is not requirements
+        or signature.configurations[-3] is not requirements
+        or signature.configurations[-2] is not capture_set
+        or signature.configurations[-1] is not capture_set_any.report
+    ):
+        raise ValueError("prepared graph-capture identities do not match.")
+    duration_is_identity = prepared_any.duration is timestep.duration
+    if not duration_is_identity and prepared_any.duration != timestep.duration:
+        raise ValueError("prepared graph-capture durations do not match.")
+    guard.assert_step_closed()
+    registry.assert_step_closed()
+    registry.validate_pinned_session(session)
+    if session.lifecycle.name != "ACTIVE":
+        raise ValueError("resident session must be ACTIVE.")
+    capability = lifecycle.capability
+    if capability.device != session.metadata.device:
+        raise ValueError(
+            "graph-capture capability device does not match session."
+        )
+    if capability.availability is not GraphCaptureAvailability.AVAILABLE:
+        raise ValueError("graph capture capability must be available.")
+    if (
+        capability.device.backend is not Backend.WARP
+        or capability.device.native == "cpu"
+    ):
+        raise ValueError("graph capture requires a CUDA resident device.")
+    if lifecycle.state is not GraphCaptureLifecycleState.READY:
+        raise ValueError("graph capture lifecycle must be ready.")
+    compatibility = compare_resident_graph_capture_signature(
+        signature,
+        request,
+        admission_token=signature,
+    )
+    if not compatibility.compatible:
+        raise ValueError("resident graph-capture signature is incompatible.")
+    if validate_resident_capture_resources(request) is not capture_set:
+        raise ValueError("prepared capture resource set does not match.")
+    resolved = resolve_graph_capture_capability(
+        session.metadata.device, adapter
+    )
+    _raise_unavailable_qualification(resolved)
+    callables = _require_adapter_method(adapter, "capture_callables")(
+        session.metadata.device
+    )
+    if type(callables) is not GraphCaptureNativeCallables:
+        raise TypeError(
+            "adapter.capture_callables() must return an exact "
+            "GraphCaptureNativeCallables."
+        )
+    return PreparedGraphCaptureQualification(
+        binding=binding,
+        lifecycle=lifecycle,
+        signature=signature,
+        request=request,
+        session=session,
+        registry=registry,
+        guard=guard,
+        prepared=prepared,
+        timestep=timestep,
+        capture_requirements=requirements,
+        capture_set=capture_set,
+        capture_report=capture_set_any.report,
+        device=session.metadata.device,
+        dimensions=session.dimensions,
+        graph=request.graph,
+        schedule=request.schedule,
+        ordered_node_ids=request.schedule.ordered_node_ids,
+        duration=prepared_any.duration,
+        duration_is_identity=duration_is_identity,
+        primary_arrays=signature.primary_arrays,
+        resource_views=signature.resource_views,
+        native_callables=callables,
+    )
 
 
 def gate_resident_graph_capture(binding: object) -> None:

@@ -6,7 +6,7 @@ import copy
 import subprocess
 import sys
 import textwrap
-from dataclasses import fields, is_dataclass, replace
+from dataclasses import FrozenInstanceError, fields, is_dataclass, replace
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
@@ -24,6 +24,8 @@ from particula.execution.graph_capture import (
     GraphCaptureFailureClassification,
     GraphCaptureLifecycle,
     GraphCaptureLifecycleState,
+    GraphCaptureNativeCallables,
+    GraphCaptureRuntimeAdapter,
     ResidentGraphCaptureBinding,
     ResidentGraphCaptureSignature,
     _attach_resident_graph_capture_binding,
@@ -38,6 +40,7 @@ from particula.execution.graph_capture import (
     create_resident_graph_capture_signature,
     gate_resident_graph_capture,
     invalidate_graph_capture,
+    qualify_prepared_resident_graph_capture,
     renew_resident_graph_capture,
     renew_retired_graph_capture,
     resolve_graph_capture_capability,
@@ -94,6 +97,76 @@ class AttributeTrapProbe:
     def __getattribute__(self, name: str) -> object:
         """Reject every attempted probe attribute access."""
         raise AssertionError(f"unsupported resolution read probe.{name}")
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "capture_begin",
+        "capture_end",
+        "capture_instantiate",
+        "capture_launch",
+        "capture_release",
+    ),
+)
+def test_native_callables_reject_noncallable_fields(field: str) -> None:
+    """Native vocabulary validates each callable independently."""
+
+    def callback() -> None:
+        """Provide a valid callback."""
+
+    values: dict[str, object] = {
+        "capture_begin": callback,
+        "capture_end": callback,
+        "capture_instantiate": callback,
+        "capture_launch": callback,
+        "capture_release": callback,
+    }
+    values[field] = object()
+
+    with pytest.raises(TypeError, match=f"{field} must be callable"):
+        GraphCaptureNativeCallables(**values)  # type: ignore[arg-type]
+
+
+def test_native_callables_retain_distinct_callable_identities() -> None:
+    """P1 vocabulary retains callables without a native handle or cleanup."""
+
+    def begin() -> None:
+        """Provide one capture-begin callable."""
+
+    def end() -> None:
+        """Provide one capture-end callable."""
+
+    def instantiate() -> None:
+        """Provide one capture-instantiate callable."""
+
+    def launch() -> None:
+        """Provide one capture-launch callable."""
+
+    def release() -> None:
+        """Provide one capture-release callable."""
+
+    callables = GraphCaptureNativeCallables(
+        begin, end, instantiate, launch, release
+    )
+
+    assert callables.capture_begin is begin
+    assert callables.capture_end is end
+    assert callables.capture_instantiate is instantiate
+    assert callables.capture_launch is launch
+    assert callables.capture_release is release
+    assert not hasattr(callables, "native_handle")
+    assert not hasattr(callables, "cleanup")
+    assert callables != GraphCaptureNativeCallables(
+        begin, end, instantiate, launch, release
+    )
+    with pytest.raises(FrozenInstanceError):
+        callables.capture_begin = end  # type: ignore[misc]
+
+
+def test_runtime_adapter_is_direct_import_only_protocol() -> None:
+    """The concrete adapter protocol remains directly importable."""
+    assert GraphCaptureRuntimeAdapter.__module__ == graph_capture.__name__
 
 
 @pytest.fixture
@@ -1831,3 +1904,79 @@ def test_binding_renews_only_after_explicit_retirement(
     assert complete_resident_graph_capture(binding).state is (
         GraphCaptureLifecycleState.CAPTURED
     )
+
+
+@pytest.mark.warp
+def test_qualification_rejects_warp_cpu_without_native_activity(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Qualification fails closed before probing or acting on Warp CPU."""
+    from particula.execution.resident_enqueue import prepare_resident_timestep
+    from particula.execution.resident_scheduler import (
+        PreparedResidentSimulation,
+    )
+
+    request = cast("ResidentSimulationRequest", resident_request)
+    signature = create_resident_graph_capture_signature(request)
+    capability = GraphCaptureCapability(
+        request.session.metadata.device,
+        GraphCaptureAvailability.AVAILABLE,
+    )
+    lifecycle = create_graph_capture_lifecycle(capability, signature)
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    timestep = prepare_resident_timestep(request, 0.0)
+    capture_set = request.registry.validate_capture_resource_set(
+        request.capture_resource_requirements
+    )
+    prepared = PreparedResidentSimulation(
+        timestep=timestep,
+        request=request,
+        session=request.session,
+        registry=request.registry,
+        guard=request.guard,
+        lifecycle=lifecycle,
+        signature=signature,
+        graph=request.graph,
+        schedule=request.schedule,
+        ordered_node_ids=request.schedule.ordered_node_ids,
+        primary_arrays=signature.primary_arrays,
+        resource_views=signature.resource_views,
+        capture_requirements=request.capture_resource_requirements,
+        capture_set=capture_set,
+        capture_report=capture_set.report,
+        nodes=(),
+        thermal=object(),
+        communication=object(),
+        environment=object(),
+        gas=object(),
+        condensation=object(),
+        coagulation=object(),
+        dilution=object(),
+        wall_loss=object(),
+        nucleation=object(),
+        diagnostics=object(),
+        operations=(),
+        duration=timestep.duration,
+    )
+
+    monkeypatch.setattr(
+        request.guard,
+        "begin_step",
+        lambda: pytest.fail("qualification must not open a resident step"),
+    )
+
+    with pytest.raises(ValueError, match="CUDA resident device"):
+        qualify_prepared_resident_graph_capture(
+            binding,
+            prepared,
+            capture_set,
+            cast("GraphCaptureRuntimeProbe", AttributeTrapProbe()),
+        )
+
+    assert request.guard.completed_steps == 0
+    assert binding.lifecycle is lifecycle
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
