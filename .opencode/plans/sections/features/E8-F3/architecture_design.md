@@ -2,7 +2,7 @@
 
 ## High-Level Design
 
-### Implemented P1--P4 seams
+### Implemented P1--P5 seams
 
 `GPUResourceRegistry.logical_resource_report()` is now the read-only,
 direct-module-only inventory seam. Given explicit collision, GAS-edge, and
@@ -72,6 +72,17 @@ work. Incompatible requirements, capacities,
 communication modes/maps, diagnostic bindings, session drift, or array
 replacement will fail closed before replay.
 
+P5 makes publication a precondition rather than an optional enqueue seam.
+Callers register inventory, construct exact views/capacities and requirements,
+publish once, and only then construct `ResidentSimulationRequest`. Capture and
+READY validation use the cached registry association and fixed identity checks;
+they retain the same requirements, set, and immutable report in signatures and
+prepared carriers. Missing, partial, stale, or identity-distinct publication
+rejects before token entry or dispatch. A changed valid publication is
+`CONFIGURATIONS` drift for CAPTURED admission and a READY rejection without a
+lifecycle transition. Repeated compatible use does not recompute reports or
+inventory, acquire/prepare resources, read payloads, synchronize, or alter RNG.
+
 ## Data / API / Workflow Changes
 
 - **Data model:** P1 added separate frozen concrete-only inventory and byte
@@ -92,8 +103,10 @@ replacement will fail closed before replay.
   `particula.execution.__all__`, `particula.gpu.kernels.__all__`, or top-level
   exports. Existing family acquisition and checkpoint enumeration stay valid.
 - **Workflow hooks:** E8-F2 preparation must declare complete requirements and
-  consume the published set. E8-F1 READY/capture transition requires its exact
-  identity/signature. E8-F4 validates behavior; E8-F5 and E8-F6 consume the
+   consume the published set before final request construction. E8-F1 CAPTURED
+   admission and E8-F2 READY preparation require its exact identity/signature,
+   including `(requirements, set, report)` in `configurations`. E8-F4 validates
+   behavior; E8-F5 and E8-F6 consume the
   canonical inventory and byte report rather than rebuilding formulas.
 - **Ownership:** Registry-allocated arrays live for the registry/capture
   lifetime. Accepted caller-supplied arrays remain caller-owned but are pinned

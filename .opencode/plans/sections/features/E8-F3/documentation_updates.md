@@ -24,14 +24,19 @@ does not create a user workflow or change READY/capture behavior. Module
 docstrings and execution tests record the atomicity, identity-reuse, and retry
 boundary.
 
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` Epic H sections with the
-  implemented registry-owned capture resource inventory, setup/reuse boundary,
-  persistent RNG handling, and deterministic logical-byte accounting semantics.
-- Update `docs/Features/data-containers-and-gpu-foundations.md` if the concrete
-  resident ownership table needs process/control/diagnostic resource details;
-  keep all new APIs direct-import-only.
-- Update `AGENTS.md` only after implementation to summarize validated
-  preallocation, identity pinning, and focused/full validation commands.
+Issue #1565 updated `docs/Features/Roadmap/data-oriented-gpu.md` and
+`AGENTS.md`. The durable contract now requires callers to publish the complete
+set before final resident-request construction; E8-F1 CAPTURED admission and
+E8-F2 READY preparation then perform cached metadata-only validation and freeze
+the exact requirements/set/report identities in `configurations`. It also
+records the logical-byte exclusions (allocator-reserved bytes, pointers/payload
+reads, checkpoint copies, and future autodiff tapes). The runnable resident
+example was updated to follow the required setup order. No public exports or
+native capture/replay user workflow were added.
+
+- [x] Updated `docs/Features/Roadmap/data-oriented-gpu.md` and `AGENTS.md` with
+  the implemented publication, cached-validation, identity-pinning, and
+  logical-byte-accounting contract.
 - Update `.opencode/guides/testing_guide.md` only if new canonical resident
   test or coverage commands are introduced; do not restate transient phase
   commands as permanent policy.
@@ -40,6 +45,5 @@ boundary.
   checkpoint-copy, or future autodiff-tape totals.
 - Do not add a user-facing example in this track; E8-F8 owns the complete graph
   capture example and limitation guide.
-- Promote phase statuses and update this plan's change log after each shipped
-  increment. Validate all links with `mkdocs build --strict` when documentation
-  changes.
+- [x] Updated the real resident example and its documentation coverage for the
+  pre-publication setup order; no public user workflow was added.

@@ -1,5 +1,6 @@
 """Contract tests for READY-only resident enqueue preparation."""
 
+import copy
 from dataclasses import FrozenInstanceError, replace
 from typing import Any
 
@@ -84,6 +85,14 @@ def test_prepare_retains_ready_metadata_without_opening_a_step(
     assert prepared.ordered_node_ids is request.schedule.ordered_node_ids
     assert prepared.primary_arrays is binding.lifecycle.signature.primary_arrays
     assert prepared.resource_views is binding.lifecycle.signature.resource_views
+    capture_set = request.registry.validate_capture_resource_set(
+        request.capture_resource_requirements
+    )
+    assert (
+        prepared.capture_requirements is request.capture_resource_requirements
+    )
+    assert prepared.capture_set is capture_set
+    assert prepared.capture_report is capture_set.report
     assert all(
         actual is expected
         for actual, expected in zip(
@@ -107,6 +116,41 @@ def test_prepare_retains_ready_metadata_without_opening_a_step(
     with pytest.raises(FrozenInstanceError):
         prepared.duration = 1.0  # type: ignore[assignment, misc]
     assert prepare_resident_timestep(request, 0.0) != prepared
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "field_name",
+    ("capture_requirements", "capture_set", "capture_report"),
+)
+def test_prepared_timestep_rejects_swapped_capture_metadata_before_step(
+    monkeypatch: pytest.MonkeyPatch,
+    field_name: str,
+) -> None:
+    """Each frozen publication identity is required before token entry."""
+    fixture = _ready_request(monkeypatch)
+    request = fixture.request
+    binding = request.graph_capture_binding
+    assert binding is not None
+    prepared = prepare_resident_timestep(request, 0.0)
+    begin_calls: list[object] = []
+
+    def reject_step(*args: object, **kwargs: object) -> None:
+        """Record forbidden token entry during carrier validation."""
+        begin_calls.append((args, kwargs))
+        raise AssertionError("validation must not open a resident step")
+
+    monkeypatch.setattr(request.guard, "begin_step", reject_step)
+
+    replacement = copy.copy(getattr(prepared, field_name))
+    assert replacement is not getattr(prepared, field_name)
+    with pytest.raises(ValueError, match="capture resources do not match"):
+        replace(prepared, **{field_name: replacement})
+
+    assert begin_calls == []
+    assert request.guard.completed_steps == 0
+    assert fixture.trace == []
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.READY
 
 
 @pytest.mark.warp
@@ -142,10 +186,13 @@ def test_prepare_rechecks_signature_after_metadata_validation(
     calls: list[object] = []
 
     def compare_after_validation(
-        signature: object, candidate: object
+        signature: object,
+        candidate: object,
+        *,
+        admission_token: object = None,
     ) -> object:
         """Accept the first comparison and report drift at the return guard."""
-        calls.append((signature, candidate))
+        calls.append((signature, candidate, admission_token))
         return GraphCaptureCompatibility(
             compatible=len(calls) == 1,
             reason=(

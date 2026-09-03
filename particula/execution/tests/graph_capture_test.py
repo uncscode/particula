@@ -6,7 +6,7 @@ import copy
 import subprocess
 import sys
 import textwrap
-from dataclasses import fields, is_dataclass
+from dataclasses import fields, is_dataclass, replace
 from typing import TYPE_CHECKING, cast
 
 import numpy as np
@@ -106,6 +106,53 @@ def resident_request(monkeypatch: pytest.MonkeyPatch) -> object:
     return _build_loop_fixture(
         monkeypatch, CommunicationTransportMode.GAS
     ).request
+
+
+@pytest.mark.warp
+def test_resident_request_requires_exact_capture_requirements_without_lookup(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Request construction validates only the exact requirements carrier."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    registry = cast("GPUResourceRegistry", request.registry)
+    monkeypatch.setattr(
+        registry,
+        "validate_capture_resource_set",
+        lambda *_args: pytest.fail("request construction must not look up"),
+    )
+
+    class InexactRequirements(type(request.capture_resource_requirements)):
+        """Provide an inexact carrier without running inherited setup."""
+
+    invalid_values = (
+        None,
+        object(),
+        object.__new__(InexactRequirements),
+    )
+    for value in invalid_values:
+        with pytest.raises(
+            TypeError,
+            match="capture_resource_requirements must be an exact",
+        ):
+            replace(request, capture_resource_requirements=value)
+
+
+@pytest.mark.warp
+def test_resident_signature_retains_capture_publication_triple(
+    resident_request: object,
+) -> None:
+    """The configurations group ends with requirements, set, and report."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    capture_set = request.registry.validate_capture_resource_set(
+        request.capture_resource_requirements
+    )
+
+    signature = create_resident_graph_capture_signature(request)
+
+    assert signature.configurations[-3] is request.capture_resource_requirements
+    assert signature.configurations[-2] is capture_set
+    assert signature.configurations[-1] is capture_set.report
 
 
 @pytest.mark.parametrize(
@@ -353,6 +400,42 @@ def test_resident_signature_accepts_real_request_by_identity(
 
     assert compatible.compatible is True
     assert compatible.reason is None
+
+
+@pytest.mark.warp
+def test_admission_token_reuses_signature_without_reconstruction(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Repeated compatible admission uses the exact frozen signature token."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    signature = create_resident_graph_capture_signature(request)
+
+    def reject_reconstruction(*_args: object, **_kwargs: object) -> object:
+        """Fail if the compatible admission path rebuilds a signature."""
+        raise AssertionError("admission must reuse the retained signature")
+
+    monkeypatch.setattr(
+        graph_capture,
+        "create_resident_graph_capture_signature",
+        reject_reconstruction,
+    )
+
+    for _ in range(2):
+        result = compare_resident_graph_capture_signature(
+            signature,
+            request,
+            admission_token=signature,
+        )
+        assert result.compatible is True
+        assert result.reason is None
+
+    with pytest.raises(ValueError, match="retained signature"):
+        compare_resident_graph_capture_signature(
+            signature,
+            request,
+            admission_token=copy.copy(signature),
+        )
 
 
 @pytest.mark.warp

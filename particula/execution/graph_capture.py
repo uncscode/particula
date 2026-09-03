@@ -237,7 +237,9 @@ class ResidentGraphCaptureSignature:
         schedule_order: Resolved ordered schedule-node identifiers.
         diagnostics: Diagnostic plan, registrations, and output identities.
         communication: Optional communication declaration and view identities.
-        configurations: Request-bound process configuration identities.
+        configurations: Request-bound process configurations followed by the
+            exact capture requirements, published resource set, and cached
+            logical-byte report identities.
         rng_resources: Coagulation and wall-loss RNG array identities.
     """
 
@@ -325,9 +327,23 @@ def _nested_sidecar_identities(value: object) -> tuple[object, ...]:
 def validate_resident_capture_resources(request: object) -> object:
     """Resolve one published capture set with fixed identity checks only.
 
-    This lazy concrete helper is deliberately metadata-only.  It performs the
+    This lazy concrete helper is deliberately metadata-only. It performs the
     registry's cached requirements lookup and confirms that the published set
-    still describes the request-bound resident resources.
+    and cached immutable report still describe the request-bound resident
+    resources. It does not prepare or acquire resources, rebuild accounting,
+    inspect payloads, or synchronize.
+
+    Args:
+        request: Exact resident simulation request retaining published
+            requirements.
+
+    Returns:
+        The exact registry-published capture resource set.
+
+    Raises:
+        TypeError: If ``request`` is not an exact resident simulation request.
+        ValueError: If publication is absent, stale, or incompatible with the
+            request-bound capture resources.
     """
     request_type = _resident_request_type()
     if type(request) is not request_type:
@@ -354,6 +370,9 @@ def validate_resident_capture_resources(request: object) -> object:
 
 def create_resident_graph_capture_signature(
     request: object,
+    *,
+    validate_capture_resources: bool = True,
+    cached_capture_set: object | None = None,
 ) -> ResidentGraphCaptureSignature:
     """Create an identity-only structural signature for an exact request.
 
@@ -384,7 +403,16 @@ def create_resident_graph_capture_signature(
         raise TypeError("request must be an exact ResidentSimulationRequest.")
     request = cast("ResidentSimulationRequest", request)
 
-    capture_set = validate_resident_capture_resources(request)
+    if validate_capture_resources:
+        capture_set = validate_resident_capture_resources(request)
+    else:
+        # Signature comparison must diagnose earlier structural drift before a
+        # stale registry binding is validated.  The retained capture set is
+        # identity metadata only; the caller performs the authoritative
+        # publication validation after ordered comparison succeeds.
+        if cached_capture_set is None:
+            raise ValueError("cached capture set is required for comparison.")
+        capture_set = cached_capture_set
 
     session = request.session
     particles = cast("WarpParticleData", session.particles)
@@ -567,17 +595,177 @@ def _same_identity(left: object, right: object) -> bool:
     return left is right
 
 
+def _compare_cached_admission_signature(  # noqa: C901
+    signature: ResidentGraphCaptureSignature,
+    request: object,
+) -> GraphCaptureCompatibility:
+    """Compare fixed admission identities without rebuilding a signature.
+
+    The registry and publication gates separately validate pinned arrays and
+    capture resources. This fast path checks the request-owned structural
+    carriers that supported preparation retains by identity. The exhaustive
+    public comparison remains the drift-diagnostic fallback.
+    """
+    if request is not signature.request:
+        return GraphCaptureCompatibility(False, GraphCaptureDriftReason.REQUEST)
+    typed = cast(Any, request)
+    if typed.session is not signature.session:
+        return GraphCaptureCompatibility(False, GraphCaptureDriftReason.SESSION)
+    if typed.session.metadata.device is not signature.device:
+        return GraphCaptureCompatibility(False, GraphCaptureDriftReason.DEVICE)
+    if typed.session.dimensions is not signature.dimensions:
+        return GraphCaptureCompatibility(
+            False, GraphCaptureDriftReason.DIMENSIONS
+        )
+    particles = typed.session.particles
+    gas = typed.session.gas
+    environment = typed.session.environment
+    if (
+        particles is not signature.primary_containers[0]
+        or gas is not signature.primary_containers[1]
+        or environment is not signature.primary_containers[2]
+    ):
+        return GraphCaptureCompatibility(
+            False, GraphCaptureDriftReason.PRIMARY_CONTAINERS
+        )
+    expected_views = signature.resource_views
+    view_index = 0
+
+    def matches(value: object) -> bool:
+        """Consume and compare one retained resource-view identity."""
+        nonlocal view_index
+        if (
+            view_index >= len(expected_views)
+            or value is not expected_views[view_index]
+        ):
+            return False
+        view_index += 1
+        return True
+
+    def matches_nested(value: object) -> bool:
+        """Compare dataclass leaves without constructing an identity tuple."""
+        fields = getattr(type(value), "__dataclass_fields__", None)
+        if type(fields) is not dict:
+            return matches(value)
+        return all(matches_nested(getattr(value, name)) for name in fields)
+
+    condensation = typed.condensation
+    coagulation = typed.coagulation
+    wall_loss = typed.wall_loss
+    nucleation = typed.nucleation
+    communication = typed.communication
+    communication_resources = (
+        None if communication is None else communication.resources
+    )
+    if not (
+        matches(condensation.state.scratch_buffers)
+        and matches_nested(condensation.state.scratch_buffers)
+        and matches(coagulation.resources)
+        and matches(coagulation.resources.collision_pairs)
+        and matches(coagulation.resources.n_collisions)
+        and matches(wall_loss.resources)
+        and matches(nucleation.resources)
+        and matches(nucleation.resources.scratch)
+        and matches(nucleation.resources.finalized_demand)
+        and matches(nucleation.resources.diagnostics)
+        and matches(nucleation.resources.exhaustion)
+        and matches_nested(nucleation.resources.scratch)
+        and matches_nested(nucleation.resources.finalized_demand)
+        and matches_nested(nucleation.resources.diagnostics)
+        and matches_nested(nucleation.resources.exhaustion)
+        and matches(communication_resources)
+        and matches(
+            None
+            if communication_resources is None
+            else communication_resources.buffers
+        )
+        and matches(
+            None
+            if communication_resources is None
+            else communication_resources.execution_state
+        )
+        and matches(
+            None
+            if communication_resources is None
+            else communication_resources.final_volumes
+        )
+        and (
+            communication_resources is None
+            or (
+                matches_nested(communication_resources.buffers)
+                and matches_nested(communication_resources.execution_state)
+            )
+        )
+        and view_index == len(expected_views)
+    ):
+        return GraphCaptureCompatibility(
+            False, GraphCaptureDriftReason.RESOURCE_VIEWS
+        )
+    if (
+        typed.graph is not signature.graph[0]
+        or typed.graph.nodes is not signature.graph[1]
+        or typed.graph.dependencies is not signature.graph[2]
+    ):
+        return GraphCaptureCompatibility(False, GraphCaptureDriftReason.GRAPH)
+    if (
+        typed.schedule is not signature.schedule[0]
+        or typed.schedule.nodes is not signature.schedule[1]
+        or typed.schedule.dependencies is not signature.schedule[2]
+    ):
+        return GraphCaptureCompatibility(
+            False, GraphCaptureDriftReason.SCHEDULE
+        )
+    if typed.schedule.ordered_node_ids is not signature.schedule_order[0]:
+        return GraphCaptureCompatibility(
+            False, GraphCaptureDriftReason.SCHEDULE_ORDER
+        )
+    if typed.diagnostics is not signature.diagnostics[0]:
+        return GraphCaptureCompatibility(
+            False, GraphCaptureDriftReason.DIAGNOSTICS
+        )
+    if typed.communication is not signature.communication[0]:
+        return GraphCaptureCompatibility(
+            False, GraphCaptureDriftReason.COMMUNICATION
+        )
+    configurations = signature.configurations
+    if (
+        typed.registry is not configurations[0]
+        or typed.guard is not configurations[1]
+        or typed.thermodynamics is not configurations[2]
+        or typed.condensation is not configurations[3]
+        or typed.coagulation is not configurations[7]
+        or typed.dilution is not configurations[10]
+        or typed.wall_loss is not configurations[11]
+        or typed.nucleation is not configurations[13]
+        or typed.environment_update is not configurations[16]
+        or typed.gas_update is not configurations[17]
+        or typed.capture_resource_requirements is not configurations[18]
+    ):
+        return GraphCaptureCompatibility(
+            False, GraphCaptureDriftReason.CONFIGURATIONS
+        )
+    return GraphCaptureCompatibility(True, None)
+
+
 def compare_resident_graph_capture_signature(
-    signature: ResidentGraphCaptureSignature, request: object
+    signature: ResidentGraphCaptureSignature,
+    request: object,
+    *,
+    admission_token: ResidentGraphCaptureSignature | None = None,
 ) -> GraphCaptureCompatibility:
     """Compare a request with a signature and return its first identity drift.
 
-    A fresh metadata-only signature is created without recapturing, mutating,
-    inspecting payload values, or replacing resident resources.
+    By default, a fresh metadata-only signature is created for complete ordered
+    drift diagnosis. Admission callers that already validated their exact
+    frozen binding may pass that retained signature itself as
+    ``admission_token``. The identity token provides the compatible fast path
+    without rebuilding signature tuples; any different token fails closed.
 
     Args:
         signature: Exact baseline signature to compare.
         request: Exact ``ResidentSimulationRequest`` to assess.
+        admission_token: Optional exact retained signature authorizing the
+            cached compatible-admission path.
 
     Returns:
         Compatibility result containing the first changed group, if any.
@@ -590,7 +778,20 @@ def compare_resident_graph_capture_signature(
         raise TypeError(
             "signature must be an exact ResidentGraphCaptureSignature."
         )
-    current = create_resident_graph_capture_signature(request)
+    if admission_token is not None:
+        if type(admission_token) is not ResidentGraphCaptureSignature:
+            raise TypeError(
+                "admission_token must be an exact "
+                "ResidentGraphCaptureSignature or None."
+            )
+        if admission_token is not signature:
+            raise ValueError("admission_token must be the retained signature.")
+        return _compare_cached_admission_signature(signature, request)
+    current = create_resident_graph_capture_signature(
+        request,
+        validate_capture_resources=False,
+        cached_capture_set=signature.configurations[-2],
+    )
     for reason, field in (
         (GraphCaptureDriftReason.REQUEST, "request"),
         (GraphCaptureDriftReason.SESSION, "session"),
@@ -1182,7 +1383,6 @@ def gate_resident_graph_capture(binding: object) -> None:
         raise ValueError("request graph-capture attachment does not match.")
     guard.assert_step_closed()
     registry.validate_pinned_session(session)
-    validate_resident_capture_resources(request)
     if session.lifecycle.name != "ACTIVE":
         raise ValueError("resident session must be ACTIVE.")
     capability = binding._lifecycle.capability
@@ -1199,14 +1399,32 @@ def gate_resident_graph_capture(binding: object) -> None:
         raise ValueError("graph capture requires a CUDA resident device.")
     if binding._lifecycle.state is not GraphCaptureLifecycleState.CAPTURED:
         raise ValueError("graph capture lifecycle must be captured.")
+    # Requirements are part of the ordered ``configurations`` signature group.
+    # Compare that retained identity before the current publication lookup so a
+    # changed valid publication invalidates CAPTURED metadata as configuration
+    # drift instead of being reported as an early lookup error.
+    if (
+        binding._lifecycle.signature.configurations[-3]
+        is not request.capture_resource_requirements
+    ):
+        binding._lifecycle = invalidate_graph_capture(
+            binding._lifecycle,
+            GraphCaptureCompatibility(
+                False, GraphCaptureDriftReason.CONFIGURATIONS
+            ),
+        )
+        raise ValueError("resident graph-capture signature is incompatible.")
     compatibility = compare_resident_graph_capture_signature(
-        binding._lifecycle.signature, request
+        binding._lifecycle.signature,
+        request,
+        admission_token=binding._lifecycle.signature,
     )
     if not compatibility.compatible:
         binding._lifecycle = invalidate_graph_capture(
             binding._lifecycle, compatibility
         )
         raise ValueError("resident graph-capture signature is incompatible.")
+    validate_resident_capture_resources(request)
 
 
 def classify_resident_graph_capture_writer_failure(binding: object) -> None:

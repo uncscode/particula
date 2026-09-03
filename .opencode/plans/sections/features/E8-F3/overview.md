@@ -48,13 +48,24 @@ accessor. The narrowed optional resident-enqueue seam can retain and validate
 the exact set/views, without adding READY admission or changing token/dispatch
 behavior.
 
+E8-F3-P5 shipped in issue #1565. Final `ResidentSimulationRequest`
+construction now requires pre-published `CaptureResourceRequirements`.
+Graph-capture admission and READY prepared-timestep admission retrieve the
+cached set/report through registry validation, and freeze the exact
+`(requirements, set, report)` identity triple in the existing `configurations`
+signature group. Real GAS/PARTICLES loops and the resident example publish the
+complete set before request construction. The integration remains metadata-only
+at admission: it performs no resource work, payload inspection, synchronization,
+or stream lifecycle action.
+
 ## Value Proposition
 
 E8-F3 incrementally makes the registry the concrete authority for
 capture-lifetime reusable storage. P1 supplies the inventory, P2 adds the
 dilution descriptor/view validation seam, P3 pins selected communication and
 diagnostic resources, and P4 supplies atomic whole-set preparation and exact
-identity reuse. P5 retains broader admission and prepared-path policy work.
+identity reuse. P5 integrates the published set into CAPTURED and READY
+admission, completing this feature's resource-accounting boundary.
 
 ## User Stories
 

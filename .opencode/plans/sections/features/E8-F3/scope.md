@@ -28,7 +28,13 @@ metadata-only exact-identity retained-set validator. It initializes only newly
 created resident RNG stream sidecars before publication, preserves existing
 published stream state, and permits clean retry after candidate failures. Its
 optional resident-enqueue reference is validation/retention only; it does not
-impose a capture-set prerequisite or change READY, token, or dispatch policy.
+   impose a capture-set prerequisite or change READY, token, or dispatch policy.
+
+P5 is complete: final request construction requires previously published exact
+requirements. CAPTURED and READY admission validate the cached set/report and
+freeze the requirements/set/report identity triple in `configurations`; real
+GAS/PARTICLES loops and the resident example follow that setup order. Validation
+is metadata-only and rejects invalid publication before token entry or dispatch.
 
 ## In Scope
 
@@ -52,8 +58,9 @@ impose a capture-set prerequisite or change READY, token, or dispatch policy.
 
 ## Out of Scope
 
-- Graph capture/replay lifecycle itself (E8-F1) or process enqueue refactoring
-  (E8-F2).
+- Native graph capture/replay lifecycle itself (E8-F1) or process enqueue
+  refactoring (E8-F2), except for their concrete admission hooks required to
+  validate and freeze the already-published capture set.
 - CPU/uncaptured/captured physics parity (E8-F4), scaling benchmarks (E8-F5),
   the broader state/checkpoint/tape memory model (E8-F6), profiling (E8-F7), or
   examples, runbook, and closeout (E8-F8).

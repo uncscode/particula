@@ -1125,6 +1125,38 @@ def test_capture_resource_set_rejects_distinct_requirements_without_work(
 
 
 @pytest.mark.warp
+def test_capture_resource_lookup_validates_the_pinned_session(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A cached set cannot bypass stale pinned-session validation."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    condensation = registry.acquire_condensation()
+    inventory = registry.register_capture_resources(session, None, ())
+    requirements = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(0, 0, 0),
+        inventory,
+        PreparedResourceViews(condensation=condensation),
+        None,
+        condensation.scratch_buffers,
+    )
+    registry.prepare_capture_resources(requirements)
+    calls: list[object] = []
+
+    def reject_stale(value: object) -> None:
+        """Record the mandatory pinned-session validation."""
+        calls.append(value)
+        raise ValueError("stale pinned session")
+
+    monkeypatch.setattr(registry, "validate_pinned_session", reject_stale)
+
+    with pytest.raises(ValueError, match="stale pinned session"):
+        registry.validate_capture_resource_set(requirements)
+    assert calls == [session]
+
+
+@pytest.mark.warp
 def test_capture_resource_view_drift_rejects_before_allocation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

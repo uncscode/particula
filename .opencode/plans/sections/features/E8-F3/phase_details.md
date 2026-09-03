@@ -55,13 +55,18 @@
     identities. It adds no absent-set error, READY/capture admission, token, or
     dispatch behavior; public exports and checkpoint enumeration remain unchanged.
 
-- [ ] **E8-F3-P5:** Prepared-timestep integration, accounting validation, and documentation
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Require the complete pinned set before READY/capture, prove zero
-    allocator activity on repeated prepared execution, and document ownership
-    and accounting boundaries.
-  - Files: E8-F1/E8-F2 concrete execution modules,
-    `particula/execution/tests/`, `docs/Features/Roadmap/data-oriented-gpu.md`,
-    `.opencode/guides/testing_guide.md` if commands change
-  - Tests: Prepared-path integration, forbidden-allocation spies, exact byte
-    report snapshots, focused resident regression, and strict docs validation.
+- [x] **E8-F3-P5:** Prepared-timestep integration, accounting validation, and documentation
+  - Issue: #1565 | Size: S | Status: Shipped
+  - Delivered: Required exact pre-publication before final request construction;
+    integrated cached set/report validation at graph-capture and READY admission;
+    and froze the requirements/set/report identity triple in signature and
+    prepared carriers. Real loops and the resident example now publish before
+    constructing requests.
+  - Files: `particula/execution/gpu_resources.py`, `graph_capture.py`,
+    `resident_scheduler.py`, `resident_enqueue.py`, execution tests,
+    `docs/Examples/gpu_resident_multi_timestep.py`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`, and `AGENTS.md`
+  - Validation: Regression coverage checks cached report snapshots, invalid and
+    changed publication handling, frozen identity agreement, pre-token
+    rejection, repeat no-prohibited-work behavior, real GAS/PARTICLES loops,
+    and resident documentation/example contract coverage.

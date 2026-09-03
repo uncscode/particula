@@ -5,14 +5,15 @@ then optional volume evolution, before the ten ordinary loop nodes. It retains
 every resident object by identity and performs no upload, restore,
 synchronization, fallback, resource acquisition, retry, or rollback.
 Legacy scheduler execution gates an attached graph-capture binding by its exact
-resident identities, capability, lifecycle, and structural signature before the
-step token is opened. The prepared path is concrete-only, READY, and
-uncaptured; it retains setup-validated operation callables and rechecks only
-its attachment and structural signature before opening its token. After this
-mandatory pre-token gate, prepared dispatch repeats no host/setup metadata
-validation and performs no host readback, allocation, transfer, synchronization,
-lookup, rebinding, or RNG reset. Retained native operations still perform their
-device-side status and physical-state validation.
+resident identities, capability, lifecycle, cached capture-resource publication,
+and structural signature before the step token is opened. The prepared path is
+concrete-only, READY, and uncaptured; it retains setup-validated operation
+callables and rechecks its attachment, cached capture-resource publication, and
+structural signature before opening its token. After this mandatory pre-token
+gate, prepared dispatch repeats no host/setup metadata validation and performs
+no host readback, allocation, transfer, synchronization, lookup, rebinding, or
+RNG reset. Retained native operations still perform their device-side status and
+physical-state validation.
 """
 
 from __future__ import annotations
@@ -180,6 +181,12 @@ class PreparedResidentSimulation:
         ordered_node_ids: Canonical twelve-node operation identifiers.
         primary_arrays: Resident primary arrays retained by identity.
         resource_views: Published resource views retained by identity.
+        capture_requirements: Pre-published capture requirements retained by
+            identity.
+        capture_set: Registry-published capture resource set retained by
+            identity.
+        capture_report: Cached immutable logical-byte report retained by
+            identity.
         nodes: Canonical graph nodes in operation order.
         thermal: Prepared thermodynamic refresh sequence.
         communication: Prepared communication and volume barriers.
@@ -279,6 +286,8 @@ class ResidentSimulationRequest:
         environment_update: Optional exact environment update request.
         gas_update: Optional exact gas update request.
         communication: Exact request for the communication and volume barriers.
+        capture_resource_requirements: Exact pre-published capture resource
+            requirements retained for metadata-only admission checks.
         graph_capture_binding: Optional exact direct-module-only binding. It is
             attached only after final request construction and gates admission;
             it neither captures nor replays graphs nor changes dispatch.
@@ -678,7 +687,9 @@ def _validate_prepared_resident_simulation(prepared: object) -> None:
     ):
         raise ValueError("prepared capture resource set does not match.")
     compatibility = compare_resident_graph_capture_signature(
-        cast(Any, typed.signature), typed.request
+        cast(Any, typed.signature),
+        typed.request,
+        admission_token=cast(Any, typed.signature),
     )
     if not compatibility.compatible:
         raise ValueError("resident graph-capture signature is incompatible.")

@@ -1,9 +1,11 @@
 """Prepare READY resident graph metadata for later enqueue phases.
 
-This concrete direct-import-only P1 boundary validates and freezes READY-state
-identity metadata only. It does not construct executors, capture, enqueue,
-dispatch, acquire resources, inspect payloads, transfer, synchronize, mutate a
-lifecycle, or fall back. Preparation performs validation and retains the exact
+This concrete direct-import-only P1 boundary performs validation and freezes
+READY-state identity metadata only. It resolves the registry's
+already-published capture resource set and cached report by identity, but does
+not construct executors,
+capture, enqueue, dispatch, acquire resources, inspect payloads, transfer,
+synchronize, mutate a lifecycle, or fall back. Preparation retains the exact
 READY binding but does not authorize token entry or dispatch; identity or
 lifecycle drift requires a new prepared record and rejects before token entry.
 It performs no allocation.
@@ -254,12 +256,10 @@ class PreparedResidentTimestep:
             or cast(Any, self.capture_set).requirements
             is not self.capture_requirements
             or cast(Any, self.capture_set).report is not self.capture_report
-            or self.signature.configurations[-3:]
-            != (
-                self.capture_requirements,
-                self.capture_set,
-                self.capture_report,
-            )
+            or self.signature.configurations[-3]
+            is not self.capture_requirements
+            or self.signature.configurations[-2] is not self.capture_set
+            or self.signature.configurations[-1] is not self.capture_report
         ):
             raise ValueError("prepared capture resources do not match.")
 
@@ -270,10 +270,10 @@ def prepare_resident_timestep(  # noqa: C901
     """Validate and freeze one READY resident timestep without side effects.
 
     The direct-only preparation boundary performs shared read-only metadata
-    validation and retains identities in a frozen carrier. It does not construct
-    executors, open a guard token, acquire resources, inspect payloads, capture,
-    enqueue, dispatch, transfer, synchronize, mutate lifecycle state, or fall
-    back.
+        validation, cached capture-publication lookup, and identity retention in
+        a frozen carrier. It does not construct executors, open a guard token,
+        acquire resources, inspect payloads, capture, enqueue, dispatch,
+        transfer, synchronize, mutate lifecycle state, or fall back.
 
     Args:
         request: Exact attached resident simulation request.
@@ -339,15 +339,27 @@ def prepare_resident_timestep(  # noqa: C901
         request_any.registry,
         request_any.guard,
     )
+    # The publication triple belongs to the ordered configurations group.  A
+    # replacement must be rejected as signature drift before asking the
+    # registry to resolve the replacement publication.
+    if (
+        signature.configurations[-3]
+        is not request_any.capture_resource_requirements
+    ):
+        raise ValueError("resident graph-capture signature is incompatible.")
     capture_set = validate_resident_capture_resources(request_any)
     compatibility = compare_resident_graph_capture_signature(
-        cast(Any, signature), cast(Any, request_any)
+        cast(Any, signature),
+        cast(Any, request_any),
+        admission_token=cast(Any, signature),
     )
     if not compatibility.compatible:
         raise ValueError("resident graph-capture signature is incompatible.")
     _validate_complete_resident_timestep_metadata(request_any, duration)
     compatibility = compare_resident_graph_capture_signature(
-        cast(Any, signature), cast(Any, request_any)
+        cast(Any, signature),
+        cast(Any, request_any),
+        admission_token=cast(Any, signature),
     )
     if not compatibility.compatible:
         raise ValueError("resident graph-capture signature is incompatible.")

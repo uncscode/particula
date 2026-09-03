@@ -1112,8 +1112,9 @@ class GPUResourceRegistry:
     complete resource set privately, initializes only new coagulation or
     wall-loss streams, and assigns the set only after validation succeeds.
     :meth:`validate_capture_resource_set` only verifies retained identities and
-    returns the published set; it performs no allocation, initialization,
-    payload inspection, transfer, synchronization, or execution. Neither seam
+    returns the published set and its cached immutable report by identity; it
+    performs no allocation, initialization, payload inspection, transfer,
+    synchronization, or execution. Neither seam
     is re-exported from :mod:`particula.execution` or the top-level package.
     """
 
@@ -1388,16 +1389,17 @@ class GPUResourceRegistry:
         """Return the retained matching capture set without resource work.
 
         This direct-module-only accessor is metadata-only. It returns the exact
-        set and nested views retained by setup; it neither constructs reports
-        nor acquires, allocates, initializes, reads, transfers, synchronizes,
-        executes, or mutates any resource binding. It is not a broad package or
-        top-level API.
+        set, nested views, and cached immutable logical-byte report retained by
+        setup. It neither constructs reports nor acquires, allocates,
+        initializes, reads, transfers, synchronizes, executes, or mutates any
+        resource binding. It is not a broad package or top-level API.
 
         Args:
             requirements: Exact request previously used to publish the set.
 
         Returns:
-            The retained capture set, returned by object identity.
+            The retained capture set, including its cached report, returned by
+            object identity.
 
         Raises:
             TypeError: If ``requirements`` is not an exact request carrier.
@@ -1408,6 +1410,11 @@ class GPUResourceRegistry:
             raise TypeError(
                 "requirements must be an exact CaptureResourceRequirements."
             )
+        # A cached requirements identity alone is insufficient after the
+        # registry's pinned resident binding has become stale.  Retain the
+        # existing metadata-only validation boundary before consulting the
+        # published set.
+        self.validate_pinned_session(requirements.session)
         if not self._capture_set_matches(requirements):
             raise ValueError(
                 "Capture resource set identities are incompatible."

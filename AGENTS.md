@@ -986,7 +986,18 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 - Admission before scheduler token entry requires the attached exact
   request/session/registry/closed-guard binding, an `ACTIVE` pinned session,
   available qualified non-CPU Warp capability, `CAPTURED` lifecycle, and a
-  compatible signature.
+  compatible signature. Before constructing the final request, callers must
+  register the complete inventory, build exact views and capacities, construct
+  `CaptureResourceRequirements`, and publish that exact set once with
+  `GPUResourceRegistry.prepare_capture_resources()`. E8-F1 CAPTURED admission
+  and E8-F2 READY preparation use cached metadata-only validation and freeze
+  the exact requirements, set, and immutable logical-byte report identities;
+  they perform no resource preparation, acquisition, allocation, payload
+  inspection, synchronization, or stream lifecycle work. The identity triple
+  extends `configurations` without changing first-drift ordering. Logical-byte
+  reports cover manifest shape/dtype bytes only, excluding allocator-reserved
+  bytes, pointers or payload reads, checkpoint-copy costs, and future
+  autodiff-tape totals.
   E8-F2 P1--P6/P8 ship the concrete-only prepared enqueue boundary: setup
   validates,
   normalizes, binds identities, and may allocate established private fallback
@@ -1050,13 +1061,20 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   only an exact identity repeat returns the retained inventory. This is not a
   `particula.execution` or top-level API and provides no user workflow.
 - `GPUResourceRegistry.logical_resource_report(capacities)` is a
-  direct-module-only planning seam. Its immutable report resolves all six
+  direct-module-only planning seam. Its immutable report resolves all seven
   manifest families, including both communication families regardless of later
   acquisition, from pinned dimensions and explicit collision, gas-edge, and
   particle-edge capacities. It reports logical schema bytes only, not
   allocator-reserved bytes, and does not inspect payloads, allocate, acquire,
   bind, or mutate resources. Its carriers remain absent from
   `particula.execution` and top-level exports.
+- `prepare_capture_resources(requirements)` is the concrete-only publication
+  boundary used before final resident request construction. It retains one exact
+  complete resource set and cached immutable logical-byte report. Admission and
+  READY preparation only retrieve that published association by identity; they
+  do not rebuild inventory or reports, inspect payloads, allocate, acquire,
+  synchronize, or change stream state. The report excludes pointers, payload
+  reads, checkpoint-copy costs, and future autodiff-tape totals.
 - Checkpoint, finalize, close, and discard require an exact session/registry/
   closed-guard binding. Normal guard bookkeeping has no bulk synchronization.
   Read-only failures can remain ACTIVE after token release; writer failures can

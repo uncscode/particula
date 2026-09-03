@@ -12,9 +12,9 @@
 - [x] Add the descriptor-only dilution normalized-coefficient and factors roles
   and concrete `PreparedResourceViews` plumbing; validate supplied views
   read-only and retain accepted resource identities in prepared adapters.
-- [ ] Inventory the remaining E8-F2 prepared operations and add missing
-  fixed-shape process, control, selected-lane, and validation/status sidecars
-  to canonical manifests.
+- [x] Require complete published `CaptureResourceRequirements` before final
+  request construction and validate the cached publication at CAPTURED and READY
+  admission without resource work.
 - [x] Register ordered diagnostic outputs/accounting work as concrete-only
   selected capture resources while preserving direct diagnostics validation.
 - [x] Preserve mutually exclusive GAS/PARTICLES communication families and pin
@@ -25,10 +25,10 @@
   publication in `particula/execution/gpu_resources.py`.
 - [x] Add exact capture-set validation/accessors that cannot allocate, acquire,
   reseed, transfer, synchronize, inspect payloads, or mutate bindings.
-- [x] Add narrowed optional E8-F2 prepared-record retention/validation of an
-  exact capture set and prepared views; READY/capture admission remains P5.
-- [ ] Preserve checkpoint resource enumeration and restart compatibility; add
-  new continuation resources only when their semantics require checkpointing.
+- [x] Freeze the exact requirements/set/report triple in prepared timestep and
+  simulation carriers and in the existing `configurations` signature group.
+- [x] Preserve checkpoint resource enumeration and restart compatibility; this
+  integration adds no continuation resources.
 
 ## Tooling / Tests
 
@@ -44,6 +44,6 @@
 - [x] Assert repeated compatible preparation returns the exact outer view,
   native records, arrays, capacities, and byte report, and that distinct but
   value-equal requirements reject.
-- [ ] Run focused coverage-disabled assertions first, then the untargeted
-  repository runner for full-package coverage; run strict MkDocs validation
-  when documentation changes.
+- [x] Add cached-validation, signature, prepared-carrier, real-loop, and
+  documentation regressions, including prohibited-work spies and deterministic
+  report snapshots.

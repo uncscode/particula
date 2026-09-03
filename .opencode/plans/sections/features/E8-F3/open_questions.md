@@ -1,5 +1,15 @@
 # Open Questions
 
+- [x] Must a capture resource set be published before final request construction?
+  - Resolved 2026-09-02: Yes. The request retains exact
+    `CaptureResourceRequirements`; callers publish the matching complete set
+    first, and CAPTURED/READY admission retrieves only that cached association.
+  - Rationale: This prevents admission from allocating, acquiring, or rebuilding
+    resource accounting and gives signatures/prepared carriers stable identities.
+  - Evidence: Issue #1565 integration in `particula/execution/gpu_resources.py`,
+    `graph_capture.py`, `resident_scheduler.py`, and `resident_enqueue.py`.
+  - Resolved by: plan-update-full
+
 - [x] What should deterministic byte accounting measure?
   - Resolved 2026-08-30: Report logical manifest bytes computed from checked
     shape products and dtype item sizes, grouped by canonical role and family.

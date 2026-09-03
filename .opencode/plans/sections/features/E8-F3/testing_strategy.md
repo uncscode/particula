@@ -33,10 +33,17 @@ never lowered.
   capture set followed by a successful clean retry. The implementation preserves
   prior ordinary registry publications; broader P5 prepared-enqueue/no-work
   evidence remains deferred.
-- **P5:** Integration-test E8-F2 preparation and repeated uncaptured enqueue with
-  the exact set. Spy on `wp.zeros`, `wp.empty`, `wp.array`, registry acquisition,
-  payload readback, and synchronization to prove none occur after setup. CUDA
-  capture smoke rows pass or cleanly skip without CPU fallback. Validate docs.
+- **P5 (shipped, issue #1565):** `gpu_resources_test.py`,
+  `graph_capture_test.py`, `resident_enqueue_test.py`, `full_loop_test.py`, and
+  `multi_box_loop_test.py` cover mandatory pre-publication, cached exact
+  set/report lookup, configuration-triple signatures, CAPTURED invalidation,
+  READY rejection, frozen prepared carriers, and real GAS/PARTICLES builders.
+  Regression coverage includes absent/partial/stale/identity-distinct
+  publication, deterministic report snapshots, repeat reuse, and rejection
+  before token/handler/trace activity. Spies assert no post-setup allocation,
+  prepare/acquire, report/inventory rebuild, payload readback, synchronization,
+  reseed/reset, or replacement. The resident example/docs contract is covered
+  by its documentation tests; CUDA evidence remains optional pass-or-clean-skip.
 
 ## Test Locations and Commands
 
@@ -48,7 +55,7 @@ never lowered.
 
   ```bash
   pytest particula/execution/tests/gpu_resources_test.py -q --no-cov
-  pytest particula/execution/tests/ -q -k "resource or prepared or capture"
+   pytest particula/execution/tests/ -q -k "resource or prepared or capture" --no-cov
   ```
 
   A focused target with `--cov` is invalid comprehensive evidence; inability to
