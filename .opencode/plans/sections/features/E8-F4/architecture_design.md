@@ -2,6 +2,26 @@
 
 ## High-Level Design
 
+### Delivered P1 qualification boundary
+
+Issue #1567 delivered `qualify_prepared_resident_graph_capture()` in the
+concrete-only `particula.execution.graph_capture` module. It accepts the exact
+attached E8-F1 READY binding, E8-F2 prepared simulation, E8-F3 published capture
+set, and an injected runtime adapter. After fixed identity, lifecycle, registry,
+guard, session, device, signature, and resource validation, it performs lazy
+runtime → device → capture-API probes and retains one exact
+`GraphCaptureNativeCallables` record in a fresh immutable
+`PreparedGraphCaptureQualification` result.
+
+`Device.native` is opaque: only CPU and Warp CPU reject before adapter access.
+The adapter is the authority for qualification of a non-CPU Warp device. P1
+does not invoke any retained callable and has no native graph/exec-handle or
+cleanup ownership. It does not open a guard token, capture, enqueue, dispatch,
+allocate, transfer, synchronize, or change READY lifecycle state. P2 and P3
+remain responsible for native capture, handle publication/release, and replay.
+
+### Planned capture and replay lifecycle
+
 E8-F4 adds a concrete graph owner around the prepared enqueue path; it does not
 create a second scheduler. Capture and replay share the same immutable prepared
 plan and exact E8-F3 arrays. Host validation is outside capture, and replay does
@@ -41,12 +61,11 @@ CapturedResidentPlan(REPLAYABLE, exact binding + graph)
   new READY record -> explicit recapture
 ```
 
-Capture uses an internal runtime adapter so hardware-independent tests can
-assert call order and cleanup. Production resolution requires callable Warp
-`capture_begin`, `capture_end`, and `capture_launch`, a qualified CUDA device,
-and E8-F1 capability approval. If enqueue or capture-end fails, cleanup consumes
-the active capture once and no handle is published. If cleanup also fails, both
-errors remain visible.
+P1 supplies an internal runtime adapter and frozen native callable vocabulary so
+hardware-independent tests can assert qualification order. Future production
+capture will use the retained callable vocabulary for `capture_begin`,
+`capture_end`, and `capture_launch`; handle publication and cleanup are not part
+of the delivered qualification record.
 
 Replay compares metadata before token entry and launch. Mutable payloads and RNG
 words are intentionally not compared: they advance in the exact pinned arrays.
@@ -57,10 +76,10 @@ faults both graph and resident session; rollback and retry are not promised.
 
 ## Data / API / Workflow Changes
 
-- **Data model:** Add exact immutable or narrowly stateful concrete-only records
-  for the native capture adapter, captured resident plan, opaque graph handle,
-  and teardown result. Reuse E8-F1 lifecycle/signature and invalidation reason
-  types instead of creating parallel vocabulary.
+- **Data model:** P1 adds exact immutable concrete-only native-callable and
+  prepared-qualification records. Captured-plan, opaque graph-handle, and
+  teardown records remain future work. Reuse E8-F1 lifecycle/signature and
+  invalidation vocabulary rather than creating parallel vocabulary.
 - **API surface:** Add direct-module-only setup, replay, invalidate, and teardown
   operations under `particula.execution.graph_capture`. Do not export them from
   `particula.execution`, `particula.gpu.kernels`, or top-level `particula`.

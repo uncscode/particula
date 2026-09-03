@@ -1,9 +1,9 @@
 # Scope
 
 E8-F4 implements the runtime owner that consumes the exact E8-F2 prepared
-resident timestep and E8-F3 capture resource set, records its predetermined
-device sequence into a Warp graph, and replays it only while the E8-F1
-compatibility and lifecycle contracts remain valid.
+resident timestep and E8-F3 capture resource set. E8-F4-P1 now provides the
+read-only qualification boundary; later phases record and replay the fixed
+device sequence while E8-F1 compatibility and lifecycle contracts remain valid.
 
 ## In Scope
 
@@ -23,6 +23,22 @@ compatibility and lifecycle contracts remain valid.
   and captured CUDA for identical supported process configurations.
 - Co-located unit, lifecycle, integration, CUDA pass-or-clean-skip, export, and
   documentation-contract tests.
+
+## Delivered in E8-F4-P1 (issue #1567)
+
+- `particula/execution/graph_capture.py` provides the direct-import-only
+  prepared qualification controller, immutable native-callable and
+  qualification records, lazy adapter capability probes, and exact identity
+  retention for the READY binding, prepared simulation, and capture set.
+- Qualification rejects CPU and Warp-CPU before adapter access; the adapter
+  performs ordered runtime, device, and capture-API checks for opaque non-CPU
+  Warp native devices.
+- The delivered boundary neither invokes native callables nor captures,
+  dispatches, opens a guard token, allocates, transfers, synchronizes, publishes
+  a handle, or performs cleanup. READY remains unchanged on every outcome.
+- Tests were added in `particula/execution/tests/graph_capture_test.py` and
+  `particula/execution/tests/exports_test.py`; the new names remain intentionally
+  absent from package and top-level exports.
 
 ## Out of Scope
 

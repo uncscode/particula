@@ -7,10 +7,13 @@ baseline; native graph capture evidence is CUDA-only and pass-or-clean-skip.
 
 ## Per-Phase Approach
 
-- **P1 — capture owner:** Unit-test exact types, capability resolution, CUDA
-  gating, READY/ACTIVE/closed-guard preconditions, native call vocabulary,
-  handle ownership, cleanup, error chaining, and concrete-only exports in
-  `particula/execution/tests/graph_capture_test.py`.
+- **P1 — delivered qualification controller:**
+  `particula/execution/tests/graph_capture_test.py` covers exact types and
+  identities, READY/ACTIVE/closed-guard preconditions, ordered lazy adapter
+  probes, malformed adapter metadata, error propagation, and the negative
+  native-handle/cleanup/token/callable-invocation contract. Export denial is
+  covered in `particula/execution/tests/exports_test.py`. These host-only tests
+  do not claim native CUDA capture; that remains P2.
 - **P2 — fixed capture:** Trace the exact prepared twelve-node enqueue once,
   assert setup work stays outside capture, reject partial publication, and run a
   CUDA capture smoke row. Spies fail on allocation, readback, synchronization,

@@ -11,20 +11,19 @@ sequence, guards replay, or invalidates the opaque graph when its binding drifts
 
 ## Value Proposition
 
-E8-F4 turns the prepared resident plan into an executable, concrete-only Warp
-graph boundary. Setup captures the authoritative fixed twelve-node sequence
-once on a qualified CUDA device; replay checks exact lifecycle and compatibility
-metadata before launching the same opaque graph handle. Structural drift,
-terminal resident state, and post-launch failures invalidate or fault the graph
-without hidden recapture, CPU fallback, transfer, synchronization, or retry.
-The feature also establishes multi-timestep CPU, uncaptured Warp, and captured
-CUDA evidence for the same process configuration.
+E8-F4 is building an executable, concrete-only Warp graph boundary in phased
+increments. E8-F4-P1 is delivered: it qualifies one exact READY binding,
+prepared resident simulation, and published capture resource set, and lazily
+retains the adapter-provided native callable vocabulary for a non-CPU Warp
+device. Qualification is metadata-only, preserves READY on success and
+rejection, and owns no native graph/exec handle or cleanup. Later phases own
+native capture, replay, invalidation/teardown, and multi-timestep evidence.
 
 ## User Stories
 
-- As a GPU simulation operator, I want a prepared resident timestep captured
-  once and replayed safely so repeated fixed-shape timesteps avoid Python launch
-  orchestration without changing physics.
+- As a graph-capture implementer, I want an exact prepared binding qualified
+  before native capture so later capture code receives frozen identities and a
+  validated callable vocabulary without repeating runtime probing.
 - As a library maintainer, I want exact pre-launch compatibility checks and
   deterministic invalidation reasons so stale graphs never launch against
   replaced arrays, schedules, maps, or devices.

@@ -20,3 +20,4 @@
 | [ADR-016](ADR-016-direct-gpu-volume-evolution-boundary.md) | Direct GPU Volume-Evolution Boundary | Accepted | 2026-08-08 |
 | [ADR-017](ADR-017-direct-gpu-particle-transport-boundary.md) | Direct GPU Particle-Transport Boundary | Accepted | 2026-08-08 |
 | [ADR-018](ADR-018-resident-communication-integration.md) | Resident Communication Integration | Accepted | 2026-08-09 |
+| [ADR-019](ADR-019-prepared-resident-graph-capture-qualification.md) | Prepared Resident Graph-Capture Qualification | Accepted | 2026-09-03 |

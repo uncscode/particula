@@ -2,13 +2,15 @@
 
 ## Runtime / Backend
 
-- [ ] Create `particula/execution/graph_capture.py` with exact concrete-only
-  capture adapter and captured-plan types.
-- [ ] Resolve Warp capture APIs lazily and distinguish unsupported capability
-  from invalid binding and unexpected native failures.
-- [ ] Validate E8-F1 READY signature, exact ACTIVE session/registry/closed guard,
-  E8-F2 prepared plan, E8-F3 resource set, CUDA device, and duration before
-  `capture_begin`.
+- [x] Add the direct-import-only P1 qualification controller and exact immutable
+  native-callable/qualification records in
+  `particula/execution/graph_capture.py` (issue #1567).
+- [x] Resolve runtime, device, and capture-API capability lazily through an
+  injected adapter; distinguish unqualified capability, malformed adapter
+  metadata, and adapter exceptions without invoking native callables.
+- [x] Validate the exact E8-F1 READY signature, ACTIVE session, pinned registry,
+  closed guard, E8-F2 prepared simulation, E8-F3 resource set, device, and
+  duration before adapter lookup; preserve READY on every result.
 - [ ] Execute one E8-F2 prepared enqueue between `capture_begin` and
   `capture_end`; publish no handle until both enqueue and capture end succeed.
 - [ ] Implement exact-once capture cleanup and preserve operation plus cleanup
@@ -27,9 +29,9 @@
 
 ## Tooling / Tests
 
-- [ ] Add `particula/execution/tests/graph_capture_test.py` with fake-runtime
-  call traces, exact-type checks, capability errors, cleanup, compatibility,
-  lifecycle, token, and failure tests.
+- [x] Extend `particula/execution/tests/graph_capture_test.py` with host-only
+  adapter-order, exact identity, lifecycle, malformed metadata, no-handle/
+  no-cleanup, and no-native-call tests for P1.
 - [ ] Add forbidden-operation spies proving prepared capture/replay invokes no
   allocator, host readback, validation scan, synchronization, or process
   scheduler loop.
@@ -43,6 +45,7 @@
 - [ ] Add structural drift cases for dimensions, devices, arrays, prepared plan,
   graph/schedule, process configurations, communication maps, diagnostics, RNG
   sidecars, resident finalize/fault/close, teardown, and restart.
-- [ ] Extend export tests to prove all graph lifecycle names remain concrete-only.
+- [x] Extend `particula/execution/tests/exports_test.py` to prove P1 graph
+  qualification names remain concrete-only and are denied from public exports.
 - [ ] Run focused execution assertions without coverage, then the untargeted
   repository coverage runner and strict documentation build.

@@ -1,14 +1,18 @@
 # Phase Details
 
-- [ ] **E8-F4-P1:** Prepared resident graph capture controller with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Introduce an exact concrete-only graph owner and injectable Warp
-    capture adapter that bind one E8-F2 prepared plan, E8-F3 resource set, and
-    E8-F1 READY signature before native capture begins.
+- [x] **E8-F4-P1:** Prepared resident graph-capture qualification controller with
+  unit tests
+  - Issue: #1567 | Size: S | Status: Delivered
+  - Delivered: A direct-import-only controller binds one exact E8-F1 READY
+    binding, E8-F2 prepared simulation, and E8-F3 published capture set; lazy
+    adapter probes qualify opaque non-CPU Warp devices and retain frozen native
+    callable records by identity.
   - Files: `particula/execution/graph_capture.py`,
-    `particula/execution/tests/graph_capture_test.py`
-  - Tests: Exact carrier/runtime API checks, CUDA capability decisions, state
-    transitions, opaque-handle ownership, one-time cleanup, and no exports.
+    `particula/execution/tests/graph_capture_test.py`,
+    `particula/execution/tests/exports_test.py`
+  - Verified contract: ordered lazy probes, exact links, READY-preserving success
+    and failure, no token/native-callable invocation/handle/cleanup ownership,
+    and denied package/top-level exports. Native capture and replay remain P2/P3.
 
 - [ ] **E8-F4-P2:** Complete fixed-sequence capture and CUDA smoke tests
   - Issue: TBD | Size: S | Status: Not Started

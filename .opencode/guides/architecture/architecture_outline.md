@@ -269,7 +269,19 @@ The exact downstream ordering remains
    validation and excludes capture/replay, enqueue/dispatch, executors/tokens,
    resource acquisition, payload inspection, transfer, synchronization,
    lifecycle mutation, fallback, and exports. Graph capture owns lifecycle;
-   scheduler owns CAPTURED admission and dispatch.
+    scheduler owns CAPTURED admission and dispatch.
+- `graph_capture.py` - Concrete direct-import-only E8-F4 P1 prepared resident
+  graph-capture qualification boundary. It binds one exact attached E8-F1
+  `READY` lifecycle, E8-F2 prepared simulation/timestep, and E8-F3 published
+  capture resource set, then lazily qualifies the opaque non-CPU Warp device
+  through a caller-owned adapter and retains its native callable vocabulary by
+  identity. Qualification is host metadata only: it retains no native graph or
+  executable handle, cleanup callback, or payload copy; it does not enter a
+  guard token, dispatch prepared work, begin/end capture, replay, allocate,
+  transfer, synchronize, mutate lifecycle state, or change exports. CPU and
+  Warp-CPU devices fail closed before adapter use. P2/P3 native capture, handle,
+  replay, and cleanup work are not supplied. See
+  [ADR-019](decisions/ADR-019-prepared-resident-graph-capture-qualification.md).
 - `process_adapters.py` - Concrete-only, direct-import resident delegation
    boundary for dilution, wall loss, and nucleation. Frozen request carriers
    retain the exact active `ResidentSession`, its pinned

@@ -89,8 +89,27 @@
   lifecycle work, restoration, retry, nor rollback. Its concrete module,
   operations, and carriers remain absent from package and top-level exports,
   while its three policy enums are intentionally public. It does not add
-  implicit fallback to resident or direct GPU boundaries. See
-  [ADR-014](decisions/ADR-014-opt-in-cpu-fallback-boundary.md).
+   implicit fallback to resident or direct GPU boundaries. See
+   [ADR-014](decisions/ADR-014-opt-in-cpu-fallback-boundary.md).
+
+## Prepared Resident Graph-Capture Qualification
+
+- `particula.execution.graph_capture` remains a concrete, direct-import-only
+  host-metadata seam and is absent from `particula.execution` and top-level
+  exports. E8-F4 P1 qualifies an already attached E8-F1 `READY` lifecycle only
+  when it has the exact E8-F2 prepared resident simulation/timestep and E8-F3
+  published capture resource set.
+- Qualification verifies identity, active session, pinned registry, closed
+  guard, ready lifecycle, signature, and resource set before lazily consulting
+  a caller-owned adapter. CPU and Warp-CPU reject before adapter use; other
+  Warp native identifiers remain opaque and adapter qualification alone
+  determines native capture availability.
+- A successful result retains exact metadata and native callable vocabulary but
+  preserves `READY`; it owns no native graph/exec handle or cleanup callback.
+  It does not enter a token, dispatch, capture, replay, allocate, transfer,
+  synchronize, fall back, checkpoint, or change lifecycle. Native capture,
+  replay, handle ownership, and cleanup are unimplemented P2/P3 work. See
+  [ADR-019](decisions/ADR-019-prepared-resident-graph-capture-qualification.md).
 
 ## Concrete GPU-Resident Session Boundary
 

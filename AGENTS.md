@@ -965,6 +965,17 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   carriers and lifecycle operations are absent from `particula.execution` and
   top-level `particula`; it supplies no native CUDA graph capture, replay,
   parity, performance evidence, or user workflow.
+- E8-F4-P1 adds a concrete-only prepared qualification seam in that module. It
+  validates one exact READY binding, prepared simulation, and published capture
+  resource set, then lazily resolves an adapter's native callable vocabulary by
+  identity for an exact non-CPU Warp device. The adapter alone probes runtime,
+  device, and capture-API availability; `Device.native` remains opaque.
+  Qualification returns a fresh immutable metadata record and preserves READY
+  on success or rejection. It does not capture, invoke callables, open a guard
+  token, own graph/exec handles, release or clean up resources, dispatch,
+  allocate, transfer, or synchronize. Its names remain absent from package and
+  top-level exports; later E8-F4 phases own native capture, handles, cleanup,
+  replay, and evidence.
 - Eligibility is fail-closed: non-CPU Warp native devices require
   caller-provided availability/probe qualification. CPU and Warp CPU are neither
   capture nor fallback/emulation paths; E8-F1 supplies no availability-policy

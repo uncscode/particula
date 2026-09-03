@@ -1,12 +1,14 @@
 """Declare resident graph-capture capability and compatibility metadata.
 
-This concrete, direct-import-only, declaration-only boundary resolves whether a
-caller-provided probe reports graph-capture support and records identity-based
-compatibility for an already-built resident request. It neither captures nor
-replays graphs, imports Warp, probes devices itself, acquires resources,
-launches work, transfers data, or synchronizes. Its binding helpers gate
-scheduler admission and record explicit lifecycle successors without changing
-resident payloads.
+This concrete, direct-import-only boundary resolves caller-provided
+graph-capture support and records identity-based compatibility for an
+already-built resident request. Its prepared-qualification boundary lazily
+obtains an adapter's callable vocabulary for one exact READY binding, but owns
+no opaque native handle or cleanup callback and does not transition the
+lifecycle. It neither captures nor replays graphs, imports Warp, probes devices
+itself, acquires resources, launches work, transfers data, or synchronizes.
+Its binding helpers gate scheduler admission and record explicit lifecycle
+successors without changing resident payloads.
 """
 
 from __future__ import annotations
@@ -114,7 +116,11 @@ class GraphCaptureRuntimeProbe(Protocol):
 
 @dataclass(frozen=True, eq=False)
 class GraphCaptureNativeCallables:
-    """Retain native vocabulary without a native handle or cleanup callback.
+    """Retain an adapter's native callable vocabulary by exact identity.
+
+    This P1 record is vocabulary only: it holds no graph or executable handle
+    and owns no cleanup callback. In particular, ``capture_release`` is a
+    callable for a later owner to invoke, not a retained cleanup action.
 
     Attributes:
         capture_begin: Callable that begins native graph capture.
@@ -146,19 +152,21 @@ class GraphCaptureNativeCallables:
 class GraphCaptureRuntimeAdapter(GraphCaptureRuntimeProbe, Protocol):
     """Declare lazy runtime probes and callable resolution for P1.
 
-    The adapter owns runtime-specific behavior. This module only invokes its
-    probes after earlier checks succeed and retains the returned callables by
-    identity.
+    The adapter owns runtime-specific behavior and treats ``Device.native`` as
+    opaque. Qualification resolves runtime, device, and API availability in
+    order, then calls ``capture_callables`` once only after all checks pass. It
+    retains the returned exact vocabulary by identity and never invokes it.
     """
 
     def capture_callables(self, device: Device) -> GraphCaptureNativeCallables:
-        """Return native callable vocabulary for one exact device.
+        """Return native callable vocabulary for one exactly qualified device.
 
         Args:
             device: Exact device declaration whose capture API was qualified.
 
         Returns:
-            Exact callable vocabulary for the later native capture phase.
+            Exact callable vocabulary retained for a later native capture
+            phase; this call creates neither a native handle nor cleanup work.
         """
 
 
@@ -1570,12 +1578,14 @@ def complete_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
 
 @dataclass(frozen=True, eq=False)
 class PreparedGraphCaptureQualification:
-    """Retain one READY qualification without a native handle or cleanup.
+    """Retain one exact READY qualification without a native handle or cleanup.
 
-    P1 retains the exact prepared resident binding, published capture resources,
-    and native callable vocabulary by identity. It creates no graph/exec handle
-    and owns no cleanup callback. Successful qualification preserves READY;
-    P2/P3 alone own native capture, handles, release, and cleanup.
+    P1 retains the prepared resident binding, published capture resources, and
+    native callable vocabulary by identity; it copies no payloads. It creates
+    no graph or executable handle, owns no cleanup callback, and does not
+    invoke any retained callable. Successful qualification leaves the binding's
+    lifecycle in READY; P2/P3 alone own native capture, handles, release, and
+    cleanup.
 
     Attributes:
         binding: Attached resident graph-capture binding being qualified.
@@ -1668,12 +1678,15 @@ def qualify_prepared_resident_graph_capture(  # noqa: C901
     capture_set: object,
     adapter: GraphCaptureRuntimeAdapter,
 ) -> PreparedGraphCaptureQualification:
-    """Qualify one prepared READY binding for a later native capture phase.
+    """Qualify one exact prepared READY binding for later native capture.
 
-    This metadata-only P1 boundary validates existing exact identities, resolves
-    the adapter vocabulary lazily, and returns a fresh frozen record. It does
-    not open a guard token, invoke native callables, capture, enqueue, allocate,
-    synchronize, transfer, mutate lifecycle state, or release native resources.
+    This metadata-only P1 boundary validates existing exact identities, then
+    lazily resolves the adapter vocabulary in runtime, device, API, and
+    callable order. It returns a fresh frozen record by reference only. It does
+    not open a guard token; invoke native callables; capture, enqueue, allocate,
+    synchronize, or transfer; create or release an opaque handle; register
+    cleanup; or transition the READY lifecycle. Every rejection is read-only;
+    P2/P3 own capture, handle lifetime, release, and cleanup.
 
     Args:
         binding: Exact attached READY resident graph-capture binding.
@@ -1682,12 +1695,14 @@ def qualify_prepared_resident_graph_capture(  # noqa: C901
         adapter: Caller-owned lazy native runtime adapter.
 
     Returns:
-        A fresh qualification retaining only existing metadata identities.
+        A fresh qualification retaining only exact existing metadata identities
+        and the adapter's exact callable vocabulary.
 
     Raises:
         TypeError: If a carrier, adapter member, probe result, or callable
             record has an invalid exact type.
-        ValueError: If READY binding metadata or capability qualification fails.
+        ValueError: If READY binding metadata, identity compatibility, or
+            runtime/device/API qualification fails.
     """
     binding = _require_attached_resident_binding(binding)
     prepared = _require_exact_resident_carrier(

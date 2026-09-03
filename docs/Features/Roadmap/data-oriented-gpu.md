@@ -1682,9 +1682,9 @@ deferred to the later Epic H tracks and Epic I.
 
 ## Epic H: Graph Capture and Performance
 
-Status: active. E8-F1 and E8-F2 P1--P6/P8 are shipped. E8-F2 P7 and
-E8-F3--E8-F8 remain pending; native capture/replay and its evidence have not
-shipped.
+Status: active. E8-F1, E8-F2 P1--P6/P8, and E8-F4-P1 are shipped. E8-F2 P7,
+E8-F3, and E8-F4 P2--P3 remain pending; native capture/replay and its evidence
+have not shipped.
 
 ### E8-F1 shipped contract
 
@@ -1732,6 +1732,24 @@ parity, E8-F5--E8-F7 parity/performance/memory/profiling, and E8-F8 the
 example, limitations, and closeout.
 
 Work on E8-F4 restarted on September 3, 2026.
+
+### E8-F4-P1 prepared qualification contract
+
+E8-F4-P1 adds a developer-only, concrete-module qualification seam in
+`particula.execution.graph_capture`. It checks one exact READY resident binding,
+prepared simulation, and published capture-resource set, then lazily obtains an
+adapter-provided native callable vocabulary for the exact non-CPU Warp device.
+The adapter alone performs ordered runtime, device, and capture-API capability
+checks; `Device.native` remains opaque.
+
+Successful qualification retains metadata and callables by identity in a fresh,
+immutable record and leaves the lifecycle `READY`. Rejections likewise leave the
+binding and lifecycle unchanged. This P1 seam does not begin or end capture,
+invoke native callables, open a guard token, own graph or executable handles,
+release or clean up native resources, allocate, transfer, synchronize, or
+dispatch prepared work. Native capture, handles, release, cleanup, replay, and
+captured evidence remain deferred to later E8-F4 phases. These direct-import-only
+names remain absent from `particula.execution` and top-level `particula` exports.
 
 ### E8-F2 prepared enqueue contract
 
