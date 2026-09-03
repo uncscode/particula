@@ -439,6 +439,95 @@ def test_admission_token_reuses_signature_without_reconstruction(
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize(
+    ("path", "reason"),
+    (
+        ("session.particles.masses", GraphCaptureDriftReason.PRIMARY_ARRAYS),
+        ("diagnostics.node", GraphCaptureDriftReason.DIAGNOSTICS),
+        (
+            "communication.resources.configuration.communication_map",
+            GraphCaptureDriftReason.COMMUNICATION,
+        ),
+        (
+            "condensation.state.config",
+            GraphCaptureDriftReason.CONFIGURATIONS,
+        ),
+        (
+            "coagulation.resources.rng_states",
+            GraphCaptureDriftReason.RNG_RESOURCES,
+        ),
+    ),
+)
+def test_cached_admission_checks_every_late_structural_group(
+    resident_request: object,
+    path: str,
+    reason: GraphCaptureDriftReason,
+) -> None:
+    """Cached admission rejects representative nested drift in exact order."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    signature = create_resident_graph_capture_signature(request)
+    parent, attribute = _path_parent(request, path)
+    original = getattr(parent, attribute)
+    object.__setattr__(parent, attribute, object())
+    try:
+        result = compare_resident_graph_capture_signature(
+            signature, request, admission_token=signature
+        )
+    finally:
+        object.__setattr__(parent, attribute, original)
+
+    assert result.reason is reason
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "family",
+    (
+        "condensation",
+        "coagulation",
+        "wall_loss",
+        "nucleation",
+        "dilution",
+        "communication",
+        "diagnostics",
+    ),
+)
+def test_capture_publication_rejects_substituted_dispatch_resources(
+    resident_request: object,
+    family: str,
+) -> None:
+    """Final dispatch cannot substitute resources outside the capture set."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    if family == "condensation":
+        owner = request.condensation.state
+        attribute = "scratch_buffers"
+        replacement = copy.copy(owner.scratch_buffers)
+    elif family in {"coagulation", "wall_loss", "nucleation"}:
+        owner = getattr(request, family)
+        attribute = "resources"
+        replacement = copy.copy(owner.resources)
+    elif family == "dilution":
+        owner = request
+        attribute = "dilution"
+        replacement = replace(request.dilution, resources=None)
+    elif family == "communication":
+        owner = request.communication
+        attribute = "resources"
+        replacement = copy.copy(owner.resources)
+    else:
+        owner = request.diagnostics
+        attribute = "registrations"
+        replacement = tuple([*owner.registrations])
+    original = getattr(owner, attribute)
+    object.__setattr__(owner, attribute, replacement)
+    try:
+        with pytest.raises(ValueError, match="Capture resource set identities"):
+            create_resident_graph_capture_signature(request)
+    finally:
+        object.__setattr__(owner, attribute, original)
+
+
+@pytest.mark.warp
 def test_signature_reports_schedule_order_after_real_request(
     resident_request: object,
 ) -> None:

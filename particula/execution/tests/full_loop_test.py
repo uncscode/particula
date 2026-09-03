@@ -631,12 +631,28 @@ def _build_loop_fixture(  # noqa: C901
             nucleation_resources,
         ),
         communication,
+        (
+            "condensation",
+            "coagulation",
+            "wall_loss",
+            "nucleation",
+            "dilution",
+        ),
         condensation_resources.scratch_buffers,
         coagulation.resources,
         wall_loss_resources,
         nucleation_resources,
     )
-    registry.prepare_capture_resources(capture_requirements)
+    capture_set = registry.prepare_capture_resources(capture_requirements)
+    dilution_resources = capture_set.dilution
+    assert dilution_resources is not None
+    dilution_request = ResidentDilutionRequest(
+        session,
+        registry,
+        dilution_resources.normalized_coefficient,
+        0.0,
+        dilution_resources,
+    )
 
     request = ResidentSimulationRequest(
         session,

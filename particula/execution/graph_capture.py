@@ -353,6 +353,13 @@ def validate_resident_capture_resources(request: object) -> object:
     capture_set = cast(Any, registry).validate_capture_resource_set(
         typed.capture_resource_requirements
     )
+    prepared = capture_set.prepared_views
+    communication = typed.communication
+    communication_resources = (
+        None if communication is None else communication.resources
+    )
+    # Publication is an execution identity boundary: every final request
+    # resource must be the exact object staged in the published capture set.
     if (
         capture_set.requirements is not typed.capture_resource_requirements
         or typed.capture_resource_requirements.session is not typed.session
@@ -362,6 +369,24 @@ def validate_resident_capture_resources(request: object) -> object:
         is not typed.capture_resource_requirements.inventory
         or capture_set.communication_resources
         is not typed.capture_resource_requirements.communication_resources
+        or capture_set.communication_resources is not communication_resources
+        or capture_set.condensation is not prepared.condensation
+        or capture_set.coagulation is not prepared.coagulation
+        or capture_set.wall_loss is not prepared.wall_loss
+        or capture_set.nucleation is not prepared.nucleation
+        or capture_set.dilution is not prepared.dilution
+        or capture_set.condensation is None
+        or capture_set.condensation.scratch_buffers
+        is not typed.condensation.state.scratch_buffers
+        or capture_set.coagulation is not typed.coagulation.resources
+        or capture_set.wall_loss is not typed.wall_loss.resources
+        or capture_set.nucleation is not typed.nucleation.resources
+        or capture_set.dilution is None
+        or capture_set.dilution is not typed.dilution.resources
+        or capture_set.dilution.normalized_coefficient
+        is not typed.dilution.coefficient
+        or capture_set.inventory.registrations
+        is not typed.diagnostics.registrations
         or capture_set.report is None
     ):
         raise ValueError("Capture resource set identities are incompatible.")
@@ -628,6 +653,24 @@ def _compare_cached_admission_signature(  # noqa: C901
         return GraphCaptureCompatibility(
             False, GraphCaptureDriftReason.PRIMARY_CONTAINERS
         )
+    current_primary_arrays = _identity_tuple(
+        particles.masses,
+        particles.concentration,
+        particles.density,
+        particles.volume,
+        particles.charge,
+        gas.molar_mass,
+        gas.concentration,
+        gas.partitioning,
+        gas.vapor_pressure,
+        environment.temperature,
+        environment.pressure,
+        environment.saturation_ratio,
+    )
+    if not _same_identity(signature.primary_arrays, current_primary_arrays):
+        return GraphCaptureCompatibility(
+            False, GraphCaptureDriftReason.PRIMARY_ARRAYS
+        )
     expected_views = signature.resource_views
     view_index = 0
 
@@ -719,30 +762,98 @@ def _compare_cached_admission_signature(  # noqa: C901
         return GraphCaptureCompatibility(
             False, GraphCaptureDriftReason.SCHEDULE_ORDER
         )
-    if typed.diagnostics is not signature.diagnostics[0]:
+    diagnostics = typed.diagnostics
+    current_diagnostics = _identity_tuple(
+        diagnostics,
+        diagnostics.node,
+        diagnostics.registrations,
+        *(item.operation for item in diagnostics.registrations),
+        *(item.output for item in diagnostics.registrations),
+        *(
+            value
+            for item in diagnostics.registrations
+            for value in (
+                item.energy_transfer,
+                item.baseline_total_mass,
+                item.source_ledger,
+                item.sink_ledger,
+            )
+        ),
+    )
+    if not _same_identity(signature.diagnostics, current_diagnostics):
         return GraphCaptureCompatibility(
             False, GraphCaptureDriftReason.DIAGNOSTICS
         )
-    if typed.communication is not signature.communication[0]:
+    current_communication = _identity_tuple(
+        communication,
+        None if communication is None else communication.communication_node,
+        None if communication is None else communication.volume_evolution_node,
+        (
+            None
+            if communication_resources is None
+            else communication_resources.configuration
+        ),
+        (
+            None
+            if communication_resources is None
+            else communication_resources.configuration.communication_map
+        ),
+        (
+            None
+            if communication_resources is None
+            else communication_resources.buffers
+        ),
+        (
+            None
+            if communication_resources is None
+            else communication_resources.execution_state
+        ),
+        (
+            None
+            if communication_resources is None
+            else communication_resources.final_volumes
+        ),
+    )
+    if not _same_identity(signature.communication, current_communication):
         return GraphCaptureCompatibility(
             False, GraphCaptureDriftReason.COMMUNICATION
         )
     configurations = signature.configurations
-    if (
-        typed.registry is not configurations[0]
-        or typed.guard is not configurations[1]
-        or typed.thermodynamics is not configurations[2]
-        or typed.condensation is not configurations[3]
-        or typed.coagulation is not configurations[7]
-        or typed.dilution is not configurations[10]
-        or typed.wall_loss is not configurations[11]
-        or typed.nucleation is not configurations[13]
-        or typed.environment_update is not configurations[16]
-        or typed.gas_update is not configurations[17]
-        or typed.capture_resource_requirements is not configurations[18]
-    ):
+    capture_set = configurations[-2]
+    current_configurations = _identity_tuple(
+        typed.registry,
+        typed.guard,
+        typed.thermodynamics,
+        condensation,
+        condensation.state,
+        condensation.state.config,
+        condensation.state.thermodynamics,
+        coagulation,
+        coagulation.request,
+        coagulation.request.state,
+        typed.dilution,
+        wall_loss,
+        wall_loss.config,
+        nucleation,
+        nucleation.config,
+        nucleation.exhaustion_controls,
+        typed.environment_update,
+        typed.gas_update,
+        typed.capture_resource_requirements,
+        capture_set,
+        cast(Any, capture_set).report,
+    )
+    if not _same_identity(configurations, current_configurations):
         return GraphCaptureCompatibility(
             False, GraphCaptureDriftReason.CONFIGURATIONS
+        )
+    current_rng = _identity_tuple(
+        coagulation.resources.rng_states,
+        wall_loss.resources.rng_states,
+    )
+    if not _same_identity(signature.rng_resources, current_rng):
+        return GraphCaptureCompatibility(
+            False, GraphCaptureDriftReason.RNG_RESOURCES
         )
     return GraphCaptureCompatibility(True, None)
 

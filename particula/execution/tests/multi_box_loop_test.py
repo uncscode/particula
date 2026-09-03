@@ -601,12 +601,21 @@ def _scheduler_request(
             nucleation_resources,
         ),
         communication,
+        (
+            "condensation",
+            "coagulation",
+            "wall_loss",
+            "nucleation",
+            "dilution",
+        ),
         condensation_resources.scratch_buffers,
         coagulation_resources,
         wall_loss_resources,
         nucleation_resources,
     )
-    registry.prepare_capture_resources(capture_requirements)
+    capture_set = registry.prepare_capture_resources(capture_requirements)
+    dilution_resources = capture_set.dilution
+    assert dilution_resources is not None
     request = ResidentSimulationRequest(
         session,
         registry,
@@ -616,7 +625,13 @@ def _scheduler_request(
         thermodynamics,
         condensation,
         coagulation,
-        ResidentDilutionRequest(session, registry, 0.0, duration),
+        ResidentDilutionRequest(
+            session,
+            registry,
+            dilution_resources.normalized_coefficient,
+            duration,
+            dilution_resources,
+        ),
         ResidentWallLossRequest(
             session,
             registry,

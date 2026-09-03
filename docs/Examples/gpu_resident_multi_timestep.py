@@ -538,12 +538,21 @@ def _request(
             nucleation_view,
         ),
         communication_view,
+        (
+            "condensation",
+            "coagulation",
+            "wall_loss",
+            "nucleation",
+            "dilution",
+        ),
         condensation_view.scratch_buffers,
         coagulation_view,
         wall_loss_view,
         nucleation_view,
     )
-    registry.prepare_capture_resources(capture_requirements)
+    capture_set = registry.prepare_capture_resources(capture_requirements)
+    dilution_view = capture_set.dilution
+    assert dilution_view is not None
     request = runtime.resident_scheduler.ResidentSimulationRequest(
         session,
         registry,
@@ -554,7 +563,11 @@ def _request(
         condensation,
         coagulation,
         runtime.process_adapters.ResidentDilutionRequest(
-            session, registry, 0.0, duration
+            session,
+            registry,
+            dilution_view.normalized_coefficient,
+            duration,
+            dilution_view,
         ),
         runtime.process_adapters.ResidentWallLossRequest(
             session,

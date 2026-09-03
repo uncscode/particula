@@ -529,6 +529,9 @@ class CaptureResourceRequirements:
         inventory: Exact P3 selected resource inventory.
         prepared_views: Canonical process views required by preparation.
         communication_resources: Exact selected communication view, if present.
+        enabled_process_families: Canonically ordered process families retained
+            by the capture set. Enabled families may omit resources and views
+            to request private allocation.
         condensation: Supplied condensation record or an allocation request.
         coagulation: Supplied coagulation view or an allocation request.
         wall_loss: Supplied wall-loss view or an allocation request.
@@ -542,6 +545,7 @@ class CaptureResourceRequirements:
     inventory: SelectedResourceInventory
     prepared_views: PreparedResourceViews
     communication_resources: CommunicationResources | None
+    enabled_process_families: tuple[str, ...]
     condensation: CondensationScratchBuffers | None = None
     coagulation: CoagulationResources | None = None
     wall_loss: WallLossResources | None = None
@@ -598,6 +602,27 @@ class CaptureResourceRequirements:
             "dilution",
         ):
             raise ValueError("Capture resource family order is not canonical.")
+        canonical_processes = (
+            "condensation",
+            "coagulation",
+            "wall_loss",
+            "nucleation",
+            "dilution",
+        )
+        if (
+            type(self.enabled_process_families) is not tuple
+            or tuple(
+                name
+                for name in canonical_processes
+                if name in self.enabled_process_families
+            )
+            != self.enabled_process_families
+            or len(set(self.enabled_process_families))
+            != len(self.enabled_process_families)
+        ):
+            raise ValueError(
+                "enabled_process_families must be a canonical ordered subset."
+            )
         expected_resources = (
             (self.condensation, CondensationScratchBuffers, "condensation"),
             (self.coagulation, CoagulationResources, "coagulation"),
@@ -634,6 +659,19 @@ class CaptureResourceRequirements:
                 and type(resource_value) is not resource_type
             ):
                 raise TypeError(f"{name} request has an invalid exact type.")
+            if name not in self.enabled_process_families and (
+                resource_value is not None or _view is not None
+            ):
+                raise ValueError(
+                    f"disabled {name} family cannot retain resources."
+                )
+        if (
+            "dilution" not in self.enabled_process_families
+            and self.prepared_views.dilution is not None
+        ):
+            raise ValueError(
+                "disabled dilution family cannot retain resources."
+            )
         if self.condensation is not None and any(
             getattr(self.condensation, field.name) is None
             for field in fields(CondensationScratchBuffers)
@@ -674,6 +712,7 @@ class CaptureResourceSet:
         coagulation: Published coagulation resources, if requested.
         wall_loss: Published wall-loss resources, if requested.
         nucleation: Published nucleation resources, if requested.
+        dilution: Capture-owned dilution resources, if requested.
         coagulation_stream_registry: Persistent coagulation stream metadata.
         wall_loss_stream_registry: Persistent wall-loss stream metadata.
     """
@@ -688,6 +727,7 @@ class CaptureResourceSet:
     coagulation: CoagulationResources | None
     wall_loss: WallLossResources | None
     nucleation: NucleationResources | None
+    dilution: DilutionResources | None
     coagulation_stream_registry: _PublishedStreamRegistry | None
     wall_loss_stream_registry: _PublishedStreamRegistry | None
 
@@ -1277,6 +1317,7 @@ class GPUResourceRegistry:
             id(requirements.inventory),
             id(requirements.prepared_views),
             id(requirements.communication_resources),
+            requirements.enabled_process_families,
             tuple(
                 id(value)
                 for value in (
@@ -1358,9 +1399,18 @@ class GPUResourceRegistry:
         inventory = self._capture_inventory
         if inventory is None:
             return []
-        return [
+        values = [
             role.value for family in inventory.families for role in family.roles
         ]
+        capture_set = self._capture_resource_set
+        if capture_set is not None and capture_set.dilution is not None:
+            values.extend(
+                (
+                    capture_set.dilution.normalized_coefficient,
+                    capture_set.dilution.factors,
+                )
+            )
+        return values
 
     def _validate_capture_collision_capacity(self, capacity: Any) -> int:
         """Validate P4 collision capacity using ordinary acquisition bounds."""
@@ -1568,7 +1618,7 @@ class GPUResourceRegistry:
                 raise ValueError("Sidecar byte ranges must not overlap.")
 
     def _new_stream_registry(
-        self, process_id: str, state: Any, other_state: Any
+        self, process_id: str, state: Any
     ) -> _PublishedStreamRegistry:
         """Create and initialize exactly one unpublished resident RNG stream.
 
@@ -1576,36 +1626,61 @@ class GPUResourceRegistry:
         only a newly staged coagulation or wall-loss sidecar is initialized.
         """
         root_seed, logical_box_ids, lanes = self._stream_metadata()
-        initialize_all = other_state is None
-        if other_state is None:
-            other_state = wp.zeros(
-                self._shape(
-                    _WALL_LOSS.entries[0]
-                    if process_id == "coagulation"
-                    else _COAGULATION.entries[2]
-                ),
-                dtype=wp.uint32,
-                device=self._signature[2],
-            )
-        pairs = (
-            (
-                "coagulation",
-                state if process_id == "coagulation" else other_state,
-            ),
-            ("wall_loss", state if process_id == "wall_loss" else other_state),
-        )
-        registry = StreamRegistry(
+        # A single enabled family owns exactly one published RNG allocation;
+        # never allocate an unreported sibling merely to initialize its words.
+        registry = _RestoredStreamRegistry(
             root_seed,
-            self._session.dimensions.n_boxes,
             logical_box_ids,
             lanes,
-            pairs,
+            process_id,
+            state,
         )
-        if initialize_all:
-            registry.initialize()
-        else:
-            registry.initialize_process(process_id)
+        if logical_box_ids:
+            registry.initialize_selected(
+                process_ids=(process_id,), logical_box_ids=logical_box_ids
+            )
         return registry
+
+    def _capture_publication_report(
+        self, requirements: CaptureResourceRequirements
+    ) -> LogicalResourceReport:
+        """Report only roles retained by the exact capture publication."""
+        planning = self.logical_resource_report(requirements.capacities)
+        enabled = set(requirements.enabled_process_families)
+        families = [
+            family for family in planning.families if family.family in enabled
+        ]
+        for selected_family in requirements.inventory.families:
+            roles = tuple(
+                LogicalResourceRoleReport(
+                    ResolvedResourceInventoryEntry(
+                        selected_family.family,
+                        role.canonical_name,
+                        role.dtype,
+                        role.shape,
+                        "fixed",
+                        (
+                            "caller_configuration"
+                            if role.read_only
+                            else "registry_or_caller_sidecar"
+                        ),
+                    ),
+                    role.element_count,
+                    role.logical_byte_count,
+                )
+                for role in selected_family.roles
+            )
+            families.append(
+                LogicalResourceFamilyReport(
+                    selected_family.family,
+                    roles,
+                    selected_family.logical_byte_count,
+                )
+            )
+        return LogicalResourceReport(
+            tuple(families),
+            _checked_sum([family.logical_byte_count for family in families]),
+        )
 
     def prepare_capture_resources(  # noqa: C901
         self, requirements: CaptureResourceRequirements
@@ -1645,7 +1720,7 @@ class GPUResourceRegistry:
                 "Capture resource set identities are incompatible."
             )
         self._validate_capture_requirements(requirements)
-        report = self.logical_resource_report(requirements.capacities)
+        report = self._capture_publication_report(requirements)
         views = requirements.prepared_views
         condensation_supplied = {
             entry.role: None
@@ -1674,15 +1749,25 @@ class GPUResourceRegistry:
                 requirements.nucleation.exhaustion,
             )
         )
+        dilution_supplied = {
+            entry.role: (
+                None
+                if views.dilution is None
+                else getattr(views.dilution, entry.role)
+            )
+            for entry in _DILUTION.entries
+        }
+        # Enablement is explicit: ``None`` resources and views mean private
+        # allocation for an enabled family, not that the family is disabled.
         enabled = {
-            "condensation": views.condensation is not None
-            or requirements.condensation is not None,
-            "coagulation": views.coagulation is not None
-            or requirements.coagulation is not None,
-            "wall_loss": views.wall_loss is not None
-            or requirements.wall_loss is not None,
-            "nucleation": views.nucleation is not None
-            or requirements.nucleation is not None,
+            family: family in requirements.enabled_process_families
+            for family in (
+                "condensation",
+                "coagulation",
+                "wall_loss",
+                "nucleation",
+                "dilution",
+            )
         }
         collision_capacity = _validated_extent(
             requirements.capacities.collision_capacity
@@ -1691,6 +1776,8 @@ class GPUResourceRegistry:
             collision_capacity = self._validate_capture_collision_capacity(
                 requirements.capacities.collision_capacity
             )
+        if views.dilution is not None and not enabled["dilution"]:
+            raise ValueError("disabled dilution family has a prepared view.")
         if views.dilution is not None:
             self.validate_dilution_resources(
                 requirements.session, views.dilution
@@ -1728,6 +1815,8 @@ class GPUResourceRegistry:
             if not enabled[family]:
                 continue
             self._preflight_capture_family(manifest, supplied, capacity)
+            # Exact view identity is required only when reusing an established
+            # publication; a fresh supplied/allocation request has no view yet.
             if view is not None and self._views.get(family) is not view:
                 raise ValueError(f"prepared {family} view identity changed.")
         self._validate_capture_supplied_families(
@@ -1738,6 +1827,7 @@ class GPUResourceRegistry:
                     ("coagulation", coagulation_supplied),
                     ("wall_loss", wall_loss_supplied),
                     ("nucleation", nucleation_supplied),
+                    ("dilution", dilution_supplied),
                 )
                 if enabled[family] and family not in self._bindings
             )
@@ -1780,6 +1870,12 @@ class GPUResourceRegistry:
             _NUCLEATION,
             nucleation_supplied,
         )
+        dilution_bindings = stage(
+            enabled["dilution"], _DILUTION, dilution_supplied
+        )
+        # Dilution preparation is capture-owned rather than checkpoint-owned;
+        # retain it in the set without publishing a general registry family.
+        staged_families.pop("dilution", None)
 
         condensation_view = (
             None
@@ -1815,6 +1911,13 @@ class GPUResourceRegistry:
                 "nucleation", self._nucleation_view(nucleation_bindings)
             )
         )
+        dilution_view = (
+            None
+            if dilution_bindings is None
+            else self._views.get(
+                "dilution", DilutionResources(**dilution_bindings)
+            )
+        )
         view_identity_checks: tuple[tuple[Any, Any, Any, str], ...] = (
             (
                 views.condensation,
@@ -1840,9 +1943,15 @@ class GPUResourceRegistry:
                 nucleation_view,
                 "nucleation",
             ),
+            (
+                views.dilution,
+                views.dilution,
+                dilution_view,
+                "dilution",
+            ),
         )
-        for required, supplied, created, name in view_identity_checks:
-            if supplied is not None and required is not created:
+        for required, _supplied, created, name in view_identity_checks:
+            if required is not None and required is not created:
                 raise ValueError(f"prepared {name} view identity changed.")
 
         coagulation_stream = self._coagulation_stream_registry
@@ -1850,24 +1959,14 @@ class GPUResourceRegistry:
         if "coagulation" in staged_families:
             if coagulation_bindings is None:
                 raise RuntimeError("Coagulation bindings were not staged.")
-            other = (
-                wall_loss_bindings["rng_states"]
-                if wall_loss_bindings is not None
-                else None
-            )
             coagulation_stream = self._new_stream_registry(
-                "coagulation", coagulation_bindings["rng_states"], other
+                "coagulation", coagulation_bindings["rng_states"]
             )
         if "wall_loss" in staged_families:
             if wall_loss_bindings is None:
                 raise RuntimeError("Wall-loss bindings were not staged.")
-            other = (
-                coagulation_bindings["rng_states"]
-                if coagulation_bindings is not None
-                else None
-            )
             wall_loss_stream = self._new_stream_registry(
-                "wall_loss", wall_loss_bindings["rng_states"], other
+                "wall_loss", wall_loss_bindings["rng_states"]
             )
         # Allocation requests have no established view in the requirements.
         # Retain one complete canonical carrier containing the resolved staged
@@ -1875,7 +1974,7 @@ class GPUResourceRegistry:
         prepared = PreparedResourceViews(
             condensation_view,
             coagulation_view,
-            views.dilution,
+            dilution_view,
             wall_loss_view,
             nucleation_view,
         )
@@ -1890,6 +1989,7 @@ class GPUResourceRegistry:
             coagulation_view,
             wall_loss_view,
             nucleation_view,
+            dilution_view,
             coagulation_stream,
             wall_loss_stream,
         )
@@ -2809,6 +2909,24 @@ class GPUResourceRegistry:
             "normalized_coefficient": resources.normalized_coefficient,
             "factors": resources.factors,
         }
+        capture_set = self._capture_resource_set
+        if capture_set is not None and capture_set.dilution is resources:
+            for entry in _DILUTION.entries:
+                self._validate_array(entry, bindings[entry.role], None)
+            return
+        established = self._views.get("dilution")
+        if established is not None:
+            if resources is not established:
+                raise ValueError("dilution resource view identity changed.")
+            published = self._bindings.get("dilution")
+            if published is None or any(
+                bindings[entry.role] is not published[entry.role]
+                for entry in _DILUTION.entries
+            ):
+                raise ValueError("dilution resource bindings changed.")
+            for entry in _DILUTION.entries:
+                self._validate_array(entry, bindings[entry.role], None)
+            return
         self._validate_nonalias(bindings, _DILUTION.entries, capacity=None)
 
     def validate_prepared_resource_views(

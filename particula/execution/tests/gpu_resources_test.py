@@ -1061,6 +1061,7 @@ def test_capture_resource_set_reuses_exact_p3_and_family_identities() -> None:
         inventory,
         views,
         None,
+        ("condensation", "coagulation", "wall_loss", "nucleation"),
         condensation.scratch_buffers,
         coagulation,
         wall_loss,
@@ -1085,6 +1086,101 @@ def test_capture_resource_set_reuses_exact_p3_and_family_identities() -> None:
 
 
 @pytest.mark.warp
+def test_capture_resource_set_allocates_explicit_fresh_families() -> None:
+    """Explicit enablement allocates families without placeholder views."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    inventory = registry.register_capture_resources(session, None, ())
+    requirements = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(1, 0, 0),
+        inventory,
+        PreparedResourceViews(),
+        None,
+        (
+            "condensation",
+            "coagulation",
+            "wall_loss",
+            "nucleation",
+            "dilution",
+        ),
+    )
+
+    capture_set = registry.prepare_capture_resources(requirements)
+
+    assert capture_set.condensation is not None
+    assert capture_set.coagulation is not None
+    assert capture_set.wall_loss is not None
+    assert capture_set.nucleation is not None
+    assert capture_set.dilution is not None
+    assert set(registry._bindings) == {
+        "condensation",
+        "coagulation",
+        "wall_loss",
+        "nucleation",
+    }
+
+
+@pytest.mark.warp
+def test_capture_resource_set_accepts_supplied_family_without_prior_view() -> (
+    None
+):
+    """A supplied family creates its first view without false identity drift."""
+    session = _session()
+    supplied = GPUResourceRegistry(session).acquire_coagulation(1)
+    registry = GPUResourceRegistry(session)
+    inventory = registry.register_capture_resources(session, None, ())
+    requirements = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(1, 0, 0),
+        inventory,
+        PreparedResourceViews(),
+        None,
+        ("coagulation",),
+        coagulation=supplied,
+    )
+
+    capture_set = registry.prepare_capture_resources(requirements)
+
+    assert capture_set.coagulation is not supplied
+    assert capture_set.coagulation is not None
+    assert capture_set.coagulation.collision_pairs is supplied.collision_pairs
+    assert capture_set.coagulation.n_collisions is supplied.n_collisions
+    assert capture_set.coagulation.rng_states is supplied.rng_states
+
+
+@pytest.mark.warp
+def test_capture_report_contains_only_exact_published_families() -> None:
+    """Publication accounting excludes disabled and sibling RNG families."""
+    session = _session(boxes=0)
+    registry = GPUResourceRegistry(session)
+    inventory = registry.register_capture_resources(session, None, ())
+    requirements = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(1, 0, 0),
+        inventory,
+        PreparedResourceViews(),
+        None,
+        ("coagulation",),
+    )
+
+    capture_set = registry.prepare_capture_resources(requirements)
+
+    assert tuple(family.family for family in capture_set.report.families) == (
+        "coagulation",
+    )
+    roles = capture_set.report.families[0].roles
+    assert tuple(role.entry.role for role in roles) == (
+        "collision_pairs",
+        "n_collisions",
+        "rng_states",
+    )
+    assert roles[-1].logical_byte_count == 0
+    assert set(registry._bindings) == {"coagulation"}
+    assert registry._wall_loss_stream_registry is None
+
+
+@pytest.mark.warp
 def test_capture_resource_set_rejects_distinct_requirements_without_work(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1100,6 +1196,7 @@ def test_capture_resource_set_rejects_distinct_requirements_without_work(
         inventory,
         views,
         None,
+        ("condensation",),
         condensation.scratch_buffers,
     )
     capture_set = registry.prepare_capture_resources(requirements)
@@ -1109,6 +1206,7 @@ def test_capture_resource_set_rejects_distinct_requirements_without_work(
         inventory,
         views,
         None,
+        ("condensation",),
         condensation.scratch_buffers,
     )
     monkeypatch.setattr(
@@ -1139,6 +1237,7 @@ def test_capture_resource_lookup_validates_the_pinned_session(
         inventory,
         PreparedResourceViews(condensation=condensation),
         None,
+        ("condensation",),
         condensation.scratch_buffers,
     )
     registry.prepare_capture_resources(requirements)
@@ -1175,6 +1274,7 @@ def test_capture_resource_view_drift_rejects_before_allocation(
         inventory,
         PreparedResourceViews(condensation=placeholder),
         None,
+        ("condensation",),
     )
     monkeypatch.setattr(
         registry,
@@ -1205,6 +1305,7 @@ def test_capture_resource_capacity_rejects_before_allocation(
         inventory,
         PreparedResourceViews(coagulation=placeholder),
         None,
+        ("coagulation",),
     )
     monkeypatch.setattr(
         registry,
@@ -1253,6 +1354,7 @@ def test_capture_resource_rejects_inventory_alias_before_allocation(
         inventory,
         PreparedResourceViews(),
         None,
+        ("condensation",),
         condensation=supplied,
     )
     monkeypatch.setattr(
