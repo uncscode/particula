@@ -7,7 +7,7 @@ import subprocess
 import sys
 import textwrap
 from dataclasses import fields, is_dataclass, replace
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pytest
@@ -122,7 +122,9 @@ def test_resident_request_requires_exact_capture_requirements_without_lookup(
         lambda *_args: pytest.fail("request construction must not look up"),
     )
 
-    class InexactRequirements(type(request.capture_resource_requirements)):
+    class InexactRequirements(  # type: ignore[misc]
+        type(request.capture_resource_requirements)  # type: ignore[misc]
+    ):
         """Provide an inexact carrier without running inherited setup."""
 
     invalid_values = (
@@ -144,8 +146,9 @@ def test_resident_signature_retains_capture_publication_triple(
 ) -> None:
     """The configurations group ends with requirements, set, and report."""
     request = cast("ResidentSimulationRequest", resident_request)
-    capture_set = request.registry.validate_capture_resource_set(
-        request.capture_resource_requirements
+    registry = cast("GPUResourceRegistry", request.registry)
+    capture_set = registry.validate_capture_resource_set(
+        cast(Any, request.capture_resource_requirements)
     )
 
     signature = create_resident_graph_capture_signature(request)
@@ -498,6 +501,9 @@ def test_capture_publication_rejects_substituted_dispatch_resources(
 ) -> None:
     """Final dispatch cannot substitute resources outside the capture set."""
     request = cast("ResidentSimulationRequest", resident_request)
+    owner: Any
+    attribute: str
+    replacement: Any
     if family == "condensation":
         owner = request.condensation.state
         attribute = "scratch_buffers"
