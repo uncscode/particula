@@ -1731,6 +1731,8 @@ seams; E8-F3 owns resource work, E8-F4 native capture/replay and captured
 parity, E8-F5--E8-F7 parity/performance/memory/profiling, and E8-F8 the
 example, limitations, and closeout.
 
+Work on E8-F4 restarted on September 3, 2026.
+
 ### E8-F2 prepared enqueue contract
 
 ### E8-F3-P5 capture-resource accounting integration
