@@ -5,16 +5,18 @@ graph-capture support and records identity-based compatibility for an
 already-built resident request. P1 qualification retains a native callable
 vocabulary for one exact READY binding. P2 capture calls native begin, frozen
 operation dispatch, and end in order; it issues an authentic record for the
-resulting opaque handle and privately releases that handle after a post-capture
-rejection. P3 replay accepts only that issued record, revalidates its exact
-binding metadata, and performs one guard-token/native-launch/completion path.
+ resulting opaque handle and privately releases that handle after a post-capture
+ rejection or lifecycle teardown. P3 replay accepts only that issued record,
+ revalidates its exact binding metadata, and performs one guard-token/native-
+ launch/completion path.
 
 This module neither exports a package-level API nor inspects resident payloads.
 Replay performs no prepared-host dispatch, allocation, runtime probe, transfer,
 readback, synchronization, resource work, RNG initialization or reset,
-fallback, retry, automatic recapture, or native-handle lifecycle work. A native
-launch or completion failure is writer-capable: existing resident cleanup and
-fault classification apply, with no rollback guarantee.
+ fallback, retry, or automatic recapture. This module alone owns issued-handle
+ storage and releases handles exactly once during lifecycle teardown. A native
+ launch or completion failure is writer-capable: existing resident cleanup and
+ fault classification apply, with no rollback guarantee.
 """
 
 from __future__ import annotations
@@ -22,13 +24,17 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from threading import Lock
+from threading import Lock, RLock
 from typing import TYPE_CHECKING, Any, NoReturn, Protocol, cast
 
 from particula.execution import Backend, Device
 
 _ACTIVE_CAPTURE_BINDING_IDS: set[int] = set()
 _ACTIVE_CAPTURE_LOCK = Lock()
+# Issuance, replay, and teardown share this lease.  It deliberately covers the
+# replay token/launch window so a terminal notification cannot release the
+# opaque provenance after authentication but before native dispatch.
+_ISSUED_CAPTURED_GRAPHS_LOCK = RLock()
 
 if TYPE_CHECKING:
     from particula.execution.gpu_resources import (
@@ -1533,7 +1539,9 @@ def _attach_resident_graph_capture_binding(
 
     The request must be constructed without an attachment first. After all
     retained identities are checked, this construction-only helper performs the
-    sole assignment to the frozen request's optional binding field.
+    sole assignment to the frozen request's optional binding field and records
+    the binding privately on its exact session. Exact reattachment is a no-op;
+    a different binding for the same session is rejected.
 
     Args:
         request: Exact resident simulation request to attach.
@@ -1541,8 +1549,8 @@ def _attach_resident_graph_capture_binding(
 
     Raises:
         TypeError: If either argument is not the required exact concrete type.
-        ValueError: If the binding retains another request or the request is
-            already attached.
+        ValueError: If the binding retains another request, the request is
+            already attached, or the session retains a different binding.
     """
     request = cast(
         "ResidentSimulationRequest",
@@ -1752,14 +1760,15 @@ def _release_issued_captured_graphs_for_binding(
     deliberately not used by P3 replay, which only authenticates and launches
     an issued handle.
     """
-    issued = tuple(
-        (captured, handle)
-        for captured, handle in _ISSUED_CAPTURED_GRAPHS.items()
-        if captured.binding is binding
-    )
-    for captured, handle in issued:
-        del _ISSUED_CAPTURED_GRAPHS[captured]
-        captured.qualification.native_callables.capture_release(handle)
+    with _ISSUED_CAPTURED_GRAPHS_LOCK:
+        issued = tuple(
+            (captured, handle)
+            for captured, handle in _ISSUED_CAPTURED_GRAPHS.items()
+            if captured.binding is binding
+        )
+        for captured, handle in issued:
+            del _ISSUED_CAPTURED_GRAPHS[captured]
+            captured.qualification.native_callables.capture_release(handle)
 
 
 def _teardown_resident_graph_capture(  # noqa: C901
@@ -1767,59 +1776,77 @@ def _teardown_resident_graph_capture(  # noqa: C901
     cause: str,
     compatibility: GraphCaptureCompatibility | None = None,
 ) -> None:
-    """Make issued handles stale, transition lifecycle, then release once."""
-    binding = _require_attached_resident_binding(binding)
-    lifecycle = binding._lifecycle
-    if lifecycle.state is GraphCaptureLifecycleState.CLOSED:
-        return
-    if cause == "structural_drift" and lifecycle.state in (
-        GraphCaptureLifecycleState.INVALIDATED,
-        GraphCaptureLifecycleState.FAULTED,
-        GraphCaptureLifecycleState.RETIRED,
-    ):
-        return
-    if cause == "writer_fault" and lifecycle.state in (
-        GraphCaptureLifecycleState.INVALIDATED,
-        GraphCaptureLifecycleState.FAULTED,
-        GraphCaptureLifecycleState.RETIRED,
-    ):
-        return
-    if (
-        cause == "explicit_retirement"
-        and lifecycle.state is GraphCaptureLifecycleState.RETIRED
-    ):
-        return
-    if cause == "structural_drift":
-        if type(compatibility) is not GraphCaptureCompatibility:
-            raise TypeError(
-                "structural drift requires GraphCaptureCompatibility."
-            )
-        successor = invalidate_graph_capture(lifecycle, compatibility)
-    elif cause == "writer_fault":
-        successor = classify_graph_capture_failure(
-            lifecycle,
-            GraphCaptureFailureClassification.WRITER_MAY_HAVE_LAUNCHED,
-        )
-    elif cause == "explicit_retirement":
-        if lifecycle.state is not GraphCaptureLifecycleState.INVALIDATED:
-            raise ValueError("graph capture can retire only from invalidated.")
-        successor = retire_graph_capture(lifecycle)
-    elif cause in ("session_finalized", "session_closed"):
-        successor = close_graph_capture(lifecycle)
-    else:
-        raise ValueError("unknown graph-capture teardown cause.")
-    # Publish a non-dispatchable successor and remove provenance before native
-    # release so reentrant callbacks and release failures cannot replay it.
-    binding._lifecycle = successor
-    try:
-        _release_issued_captured_graphs_for_binding(binding)
-    except BaseException:
-        binding._lifecycle = _lifecycle_successor(
-            binding._lifecycle,
+    """Make issued handles stale, transition lifecycle, then release once.
+
+    Args:
+        binding: Exact attached binding that owns the issued records.
+        cause: Lifecycle event that requires invalidation, faulting, retirement,
+            or closure.
+        compatibility: Ordered drift result required only for structural drift.
+
+    Raises:
+        TypeError: If ``binding`` is invalid or structural drift lacks an exact
+            compatibility result.
+        ValueError: If ``cause`` is unknown or cannot transition the lifecycle.
+        BaseException: Propagates a native handle-release failure after records
+            are unregistered and lifecycle metadata is nondispatchable.
+    """
+    with _ISSUED_CAPTURED_GRAPHS_LOCK:
+        binding = _require_attached_resident_binding(binding)
+        lifecycle = binding._lifecycle
+        if lifecycle.state is GraphCaptureLifecycleState.CLOSED:
+            return
+        if cause == "structural_drift" and lifecycle.state in (
+            GraphCaptureLifecycleState.INVALIDATED,
             GraphCaptureLifecycleState.FAULTED,
-            binding._lifecycle.first_invalidation_reason,
-        )
-        raise
+            GraphCaptureLifecycleState.RETIRED,
+        ):
+            return
+        if cause == "writer_fault" and lifecycle.state in (
+            GraphCaptureLifecycleState.INVALIDATED,
+            GraphCaptureLifecycleState.FAULTED,
+            GraphCaptureLifecycleState.RETIRED,
+        ):
+            return
+        if (
+            cause == "explicit_retirement"
+            and lifecycle.state is GraphCaptureLifecycleState.RETIRED
+        ):
+            return
+        if cause == "structural_drift":
+            if type(compatibility) is not GraphCaptureCompatibility:
+                raise TypeError(
+                    "structural drift requires GraphCaptureCompatibility."
+                )
+            successor = invalidate_graph_capture(lifecycle, compatibility)
+        elif cause == "writer_fault":
+            successor = classify_graph_capture_failure(
+                lifecycle,
+                GraphCaptureFailureClassification.WRITER_MAY_HAVE_LAUNCHED,
+            )
+        elif cause == "explicit_retirement":
+            if lifecycle.state is not GraphCaptureLifecycleState.INVALIDATED:
+                raise ValueError(
+                    "graph capture can retire only from invalidated."
+                )
+            successor = retire_graph_capture(lifecycle)
+        elif cause in ("session_finalized", "session_closed"):
+            successor = close_graph_capture(lifecycle)
+        else:
+            raise ValueError("unknown graph-capture teardown cause.")
+        # Publish a non-dispatchable successor and remove provenance before
+        # native release so reentrant callbacks and release failures cannot
+        # replay it.
+        binding._lifecycle = successor
+        try:
+            _release_issued_captured_graphs_for_binding(binding)
+        except BaseException:
+            binding._lifecycle = _lifecycle_successor(
+                binding._lifecycle,
+                GraphCaptureLifecycleState.FAULTED,
+                binding._lifecycle.first_invalidation_reason,
+            )
+            raise
 
 
 def _notify_resident_graph_capture(
@@ -1828,7 +1855,23 @@ def _notify_resident_graph_capture(
     guard: object,
     cause: str,
 ) -> None:
-    """Route exact resident lifecycle events to an attached graph binding."""
+    """Route an exact resident lifecycle event to an attached graph binding.
+
+    Unattached sessions are successful no-ops. An attached binding must retain
+    the exact session, registry, and closed guard; the graph-capture owner then
+    makes its issued records stale and performs the requested teardown.
+
+    Args:
+        session: Resident session reporting the event.
+        registry: Registry that must be pinned to ``session``.
+        guard: Closed guard that must be bound to ``session`` and ``registry``.
+        cause: Teardown event forwarded to the graph-capture owner.
+
+    Raises:
+        TypeError: If an attached object is not an exact graph-capture binding.
+        ValueError: If an attached binding does not match the exact context.
+        BaseException: Propagates a graph lifecycle or native-release failure.
+    """
     binding = getattr(session, "_resident_graph_capture_binding", None)
     if binding is None:
         return
@@ -1841,6 +1884,7 @@ def _notify_resident_graph_capture(
         raise ValueError(
             "resident graph-capture notification binding mismatch."
         )
+    guard.assert_step_closed()
     _teardown_resident_graph_capture(binding, cause)
 
 
@@ -2325,35 +2369,38 @@ def capture_prepared_resident_graph(  # noqa: C901
                 )
 
             try:
-                typed = _validate_prepared_graph_capture_qualification(typed)
-                lifecycle = complete_resident_graph_capture(typed.binding)
-                if (
-                    lifecycle is not typed.binding.lifecycle
-                    or lifecycle.state
-                    is not GraphCaptureLifecycleState.CAPTURED
-                ):
-                    raise ValueError(
-                        "graph capture did not transition to captured."
+                with _ISSUED_CAPTURED_GRAPHS_LOCK:
+                    typed = _validate_prepared_graph_capture_qualification(
+                        typed
                     )
-                captured = CapturedResidentGraph(
-                    qualification=typed,
-                    binding=typed.binding,
-                    lifecycle=lifecycle,
-                    signature=typed.signature,
-                    request=typed.request,
-                    session=typed.session,
-                    registry=typed.registry,
-                    guard=typed.guard,
-                    prepared=typed.prepared,
-                    timestep=typed.timestep,
-                    capture_requirements=typed.capture_requirements,
-                    capture_set=typed.capture_set,
-                    capture_report=typed.capture_report,
-                    device=typed.device,
-                    handle=handle,
-                )
-                _ISSUED_CAPTURED_GRAPHS[captured] = handle
-                return captured
+                    lifecycle = complete_resident_graph_capture(typed.binding)
+                    if (
+                        lifecycle is not typed.binding.lifecycle
+                        or lifecycle.state
+                        is not GraphCaptureLifecycleState.CAPTURED
+                    ):
+                        raise ValueError(
+                            "graph capture did not transition to captured."
+                        )
+                    captured = CapturedResidentGraph(
+                        qualification=typed,
+                        binding=typed.binding,
+                        lifecycle=lifecycle,
+                        signature=typed.signature,
+                        request=typed.request,
+                        session=typed.session,
+                        registry=typed.registry,
+                        guard=typed.guard,
+                        prepared=typed.prepared,
+                        timestep=typed.timestep,
+                        capture_requirements=typed.capture_requirements,
+                        capture_set=typed.capture_set,
+                        capture_report=typed.capture_report,
+                        device=typed.device,
+                        handle=handle,
+                    )
+                    _ISSUED_CAPTURED_GRAPHS[captured] = handle
+                    return captured
             except BaseException as error:
                 try:
                     native.capture_release(handle)
@@ -2537,15 +2584,16 @@ def replay_captured_resident_graph(captured: object, duration: object) -> None:
         BaseException: Propagates native-launch or completion failure after
             writer-capable cleanup and capture-failure classification.
     """
-    qualification = _validate_replay_captured_graph(captured, duration)
-    captured_graph = cast(CapturedResidentGraph, captured)
-    guard = cast("ResidentStepGuard", qualification.guard)
-    token = guard.begin_step(duration)
-    try:
-        qualification.native_callables.capture_launch(captured_graph.handle)
-        guard.complete_step(token)
-    except BaseException as error:
-        _raise_replay_operational_failure(qualification, token, error)
+    with _ISSUED_CAPTURED_GRAPHS_LOCK:
+        qualification = _validate_replay_captured_graph(captured, duration)
+        captured_graph = cast(CapturedResidentGraph, captured)
+        guard = cast("ResidentStepGuard", qualification.guard)
+        token = guard.begin_step(duration)
+        try:
+            qualification.native_callables.capture_launch(captured_graph.handle)
+            guard.complete_step(token)
+        except BaseException as error:
+            _raise_replay_operational_failure(qualification, token, error)
 
 
 def gate_resident_graph_capture(binding: object) -> None:
@@ -2624,8 +2672,8 @@ def classify_resident_graph_capture_writer_failure(binding: object) -> None:
     """Record a scheduler-confirmed possible writer failure on a binding.
 
     The scheduler calls this only after its existing cleanup determines that a
-    writer may have launched. It records metadata only and does not retry,
-    roll back, or act on resident resources.
+    writer may have launched. It makes issued handles stale before their one
+    native release; it does not retry, roll back, or act on resident payloads.
 
     Args:
         binding: Exact binding whose lifecycle receives the classification.
@@ -2725,9 +2773,9 @@ def renew_resident_graph_capture(
 def close_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
     """Close lifecycle metadata owned by one exact attached binding.
 
-    Repeated closure returns the identical closed lifecycle. This metadata-only
-    operation does not dispatch or mutate resident state. It releases any P2
-    native handle owned by the binding exactly once before terminal closure.
+    Repeated closure returns the identical closed lifecycle. This operation does
+    not dispatch or mutate resident payloads. It makes any P2-issued record
+    stale and releases its native handle exactly once before terminal closure.
 
     Args:
         binding: Exact attached resident graph-capture binding to close.

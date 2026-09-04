@@ -22,3 +22,4 @@
 | [ADR-018](ADR-018-resident-communication-integration.md) | Resident Communication Integration | Accepted | 2026-08-09 |
 | [ADR-019](ADR-019-prepared-resident-graph-capture-qualification.md) | Prepared Resident Graph-Capture Qualification | Accepted | 2026-09-03 |
 | [ADR-020](ADR-020-authenticated-native-resident-graph-replay.md) | Authenticated Native Resident-Graph Replay | Accepted | 2026-09-03 |
+| [ADR-021](ADR-021-graph-capture-teardown-ownership.md) | Graph-Capture Teardown Ownership | Accepted | 2026-09-03 |

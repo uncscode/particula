@@ -20,8 +20,10 @@ communication view, if selected, and an ordered diagnostic registration tuple.
 It validates schemas and byte-range nonaliasing on the host without inspecting
 payloads; reports reuse that retained metadata. Inventory reporting neither
 inspects payloads nor acquires, allocates, binds, or mutates sidecars. Explicit
-lifecycle methods may inspect frozen stream metadata or reset selected
-published lanes without hidden transfer or synchronization.
+ lifecycle methods may inspect frozen stream metadata or reset selected
+ published lanes without hidden transfer or synchronization. A stream-writer
+ failure faults the exact resident binding and notifies any attached
+ graph-capture owner to tear down issued handles.
 
 Capture-set preparation is setup-only. It stages all requested sidecars,
 validates metadata and nonaliasing, and initializes only newly created resident
@@ -2480,7 +2482,26 @@ class GPUResourceRegistry:
         process_ids: tuple[str, ...] | None = None,
         logical_box_ids: tuple[str, ...] | None = None,
     ) -> None:
-        """Explicitly reinitialize selected currently published stream lanes."""
+        """Explicitly reinitialize selected currently published stream lanes.
+
+        The caller must provide the exact closed guard for this registry's
+        active session before any stream work. A writer failure faults that
+        binding and notifies its attached graph-capture owner; no rollback is
+        promised after a stream writer launches.
+
+        Args:
+            session: Exact active resident session pinned to this registry.
+            guard: Exact closed guard bound to ``session`` and this registry.
+            process_ids: Optional published processes to initialize.
+            logical_box_ids: Optional stable logical box IDs to initialize.
+
+        Raises:
+            TypeError: If the guard or stream selection has an invalid type.
+            ValueError: If the binding, lifecycle, or stream selection is
+                invalid.
+            BaseException: Propagates a stream-writer failure after faulting the
+                exact resident binding.
+        """
         from particula.execution.gpu_session import ResidentStepGuard
 
         if type(guard) is not ResidentStepGuard:

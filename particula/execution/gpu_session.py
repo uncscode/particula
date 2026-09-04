@@ -9,11 +9,13 @@ that order before publishing an ACTIVE session. Gas names remain CPU metadata.
 exact active session-registry binding. They execute no adapters and perform no
 implicit transfer, synchronization, allocation, fallback, or payload work.
 Direct owners explicitly classify failures: read-only failures release the open
-token and retain ACTIVE state, while possible post-launch writer failures fault
-the session without rollback. ``close`` and ``discard`` only perform terminal
-lifecycle transitions after the guard closes; they never restore, synchronize,
-or mutate resident payloads. Checkpoint, restart, and raw low-level helpers
-remain separate concrete-only boundaries.
+ token and retain ACTIVE state, while possible post-launch writer failures fault
+ the session without rollback. Exact writer and terminal lifecycle events lazily
+ notify an attached graph-capture owner to stale and release issued handles.
+ ``close`` and ``discard`` only perform terminal lifecycle transitions after the
+ guard closes; they never restore, synchronize, or mutate resident payloads.
+ Checkpoint, restart, and raw low-level helpers remain separate concrete-only
+ boundaries.
 
 Each factory-created session also retains immutable host-only P1 stream
 metadata. Setup validates that metadata before importing conversion helpers or
@@ -835,7 +837,25 @@ class ResidentSession:
         process_ids: tuple[str, ...] | None = None,
         logical_box_ids: tuple[str, ...] | None = None,
     ) -> None:
-        """Explicitly reinitialize selected published resident RNG streams."""
+        """Explicitly reinitialize selected published resident RNG streams.
+
+        The exact active session, registry, and closed guard are validated
+        before stream work. A stream-writer failure faults the exact binding
+        and notifies any attached graph-capture owner; no rollback is promised.
+
+        Args:
+            registry: Exact registry pinned to this active session.
+            guard: Exact closed guard bound to this session and registry.
+            process_ids: Optional published processes to initialize.
+            logical_box_ids: Optional stable logical box IDs to initialize.
+
+        Raises:
+            TypeError: If the binding or stream selection has an invalid type.
+            ValueError: If the binding, lifecycle, or stream selection is
+                invalid.
+            BaseException: Propagates a stream-writer failure after faulting the
+                binding.
+        """
         _validate_active_stream_binding(self, registry, guard)
         registry.initialize_published_streams(
             self,
@@ -881,7 +901,8 @@ class ResidentSession:
         identity checks because active-only registry validation is deliberately
         unavailable after a possible writer failure. CLOSED and FINALIZED are
         idempotent write-free no-ops. Finalization retains its cached
-        checkpoint.
+         checkpoint. If attached graph-handle teardown fails, the session closes
+         and the teardown error propagates.
 
         Args:
             registry: Exact registry pinned to this session.
@@ -891,6 +912,8 @@ class ResidentSession:
             TypeError: If the registry or guard is not an exact concrete type.
             ValueError: If the binding is wrong or the lifecycle is invalid.
             RuntimeError: If a resident timestep remains open.
+            BaseException: Propagates an attached graph-handle teardown failure
+                after transitioning this session to CLOSED.
         """
         if self.lifecycle in {
             ResidentLifecycle.CLOSED,
@@ -1255,7 +1278,17 @@ def _notify_resident_graph_capture(
     guard: ResidentStepGuard,
     cause: str,
 ) -> None:
-    """Lazily route an exact lifecycle event to graph-capture ownership."""
+    """Lazily route an exact lifecycle event to graph-capture ownership.
+
+    This seam transfers no native handle and does not inspect graph state. The
+    graph-capture module validates the exact context and owns all teardown.
+
+    Args:
+        session: Resident session reporting the event.
+        registry: Exact registry pinned to ``session``.
+        guard: Exact closed guard bound to ``session`` and ``registry``.
+        cause: Graph-capture teardown cause.
+    """
     from particula.execution.graph_capture import (
         _notify_resident_graph_capture as notify,
     )
@@ -1268,7 +1301,17 @@ def _fault_resident_session_with_context(
     registry: "GPUResourceRegistry",
     guard: ResidentStepGuard,
 ) -> None:
-    """Notify graph capture, then fault even if notification fails."""
+    """Notify graph capture, then fault even if notification fails.
+
+    Args:
+        session: Resident session to fault.
+        registry: Exact registry pinned to ``session``.
+        guard: Exact closed guard bound to ``session`` and ``registry``.
+
+    Raises:
+        BaseException: Propagates a graph-capture notification failure after
+            marking ``session`` faulted.
+    """
     try:
         _notify_resident_graph_capture(session, registry, guard, "writer_fault")
     finally:

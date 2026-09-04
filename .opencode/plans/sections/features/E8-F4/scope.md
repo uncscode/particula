@@ -60,6 +60,23 @@ device sequence while E8-F1 compatibility and lifecycle contracts remain valid.
   one-launch/one-token success, and writer-failure handling. Public exports are
   unchanged.
 
+## Delivered in E8-F4-P4 (issue #1570)
+
+- `particula/execution/graph_capture.py` is the sole owner of issued captured
+  handles, teardown, native release, and graph lifecycle transition. Its common
+  teardown path removes every matching issued record before one release for
+  structural drift, writer fault, finalization, close/discard, and retirement.
+- Resident lifecycle owners use a lazy private notification with the exact
+  session, registry, and closed guard; they neither import graph-capture types
+  at module load nor inspect opaque handles or change graph state themselves.
+- `gpu_session.py`, `checkpoint.py`, and `gpu_resources.py` notify the graph
+  owner for authoritative writer faults and terminal transitions. Published
+  stream initialization now requires and validates the exact closed guard.
+- Lifecycle regressions cover stale provenance before token entry or launch,
+  exact-once release including release failures, read-only preservation, fault
+  and terminal ordering, attachment/context rejection, and fresh-record-only
+  recapture. Checkpoint payloads and public exports remain unchanged.
+
 ## Out of Scope
 
 - Dynamic shapes, process-order selection, communication-map replacement, or

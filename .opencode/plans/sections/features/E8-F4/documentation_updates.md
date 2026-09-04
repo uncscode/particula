@@ -10,10 +10,10 @@
 - Update `.opencode/guides/testing_guide.md` only if permanent graph-capture test
   locations, marker usage, or validation commands change; preserve focused
   coverage-disabled versus untargeted full-package coverage policy.
-- E8-F4 plan sections now record P1 qualification, P2 capture, and P3 guarded
-  replay delivery, including actual implementation and test file paths. P3
-  remains concrete-only; user guidance, examples, teardown, and broader replay
-  evidence remain downstream work.
+- E8-F4 plan sections now record P1 qualification, P2 capture, P3 guarded
+  replay, and P4 teardown delivery, including actual implementation and test
+  file paths. P4 remains concrete-only; no user-facing documentation changed.
+  User guidance, examples, and broader replay evidence remain downstream work.
 - Add or update hardware-free documentation contract assertions for all new
   claims and run `mkdocs build --strict`.
 - No user-facing documentation changed for P1, P2, or P3. Defer the runnable

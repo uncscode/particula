@@ -24,9 +24,10 @@
   launch; map each structural mismatch to the canonical invalidation reason.
 - [x] Couple launch failure to resident and capture faulting through existing
   `_handle_failed_resident_operation` writer semantics.
-- [ ] Implement explicit invalidation and idempotent teardown, and require a
-  fresh READY record for recapture after retiring the old graph.
-- [ ] Keep graph handles absent from checkpoint/finalization payloads and all
+- [x] Centralize explicit invalidation and idempotent teardown in the graph
+  owner; stale records unregister before one release and recapture requires a
+  fresh READY record (issue #1570).
+- [x] Keep graph handles absent from checkpoint/finalization payloads and all
   package export tables.
 
 ## Tooling / Tests
@@ -51,6 +52,10 @@
    graph-capture names remain concrete-only and are denied from public exports.
 - [x] Extend `particula/execution/tests/graph_capture_test.py` for P3 authentic
   opaque-handle provenance, exact replay validation, one-token/one-launch
-  behavior, and writer-capable launch/completion failures (issue #1569).
+   behavior, and writer-capable launch/completion failures (issue #1569).
+- [x] Add P4 lifecycle regressions across `graph_capture_test.py`,
+  `gpu_session_test.py`, `checkpoint_test.py`, and `gpu_resources_test.py` for
+  exact-once release, stale provenance, exact notification context, terminals,
+  recapture, and guarded stream initialization (issue #1570).
 - [ ] Run focused execution assertions without coverage, then the untargeted
   repository coverage runner and strict documentation build.

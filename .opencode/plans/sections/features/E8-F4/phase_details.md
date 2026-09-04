@@ -45,16 +45,19 @@
     accepted calls launch the retained handle exactly once; package and top-level
     exports remain unchanged.
 
-- [ ] **E8-F4-P4:** Lifecycle invalidation fault and recapture handling with tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Connect structural invalidation, resident fault/finalize/close,
-    post-launch failure, teardown, and explicit recapture eligibility to the
-    E8-F1 state machine without automatic recapture or rollback.
-  - Files: `particula/execution/graph_capture.py`, lifecycle integration points,
-    `particula/execution/tests/{graph_capture,gpu_session,checkpoint}_test.py`
-  - Tests: Deterministic invalidation reasons, idempotent teardown, stale-handle
-    rejection, writer failure faulting, read-only rejection preservation,
-    terminal-state behavior, and fresh-record-only recapture.
+- [x] **E8-F4-P4:** Lifecycle invalidation fault and recapture handling with tests
+  - Issue: #1570 | Size: S | Status: Delivered
+  - Delivered: Graph-owned teardown unregisters issued records before exactly one
+    native release and drives nondispatchable lifecycle transition for drift,
+    writer fault, finalization, close/discard, and retirement. Lifecycle owners
+    use an exact session/registry/closed-guard lazy notification; stream
+    initialization now validates that guard.
+  - Files: `particula/execution/{graph_capture,gpu_session,checkpoint,gpu_resources}.py`,
+    `particula/execution/tests/{graph_capture,gpu_session,checkpoint,gpu_resources}_test.py`
+  - Verified contract: stale provenance rejects before token/launch, release is
+    exactly once even after callback failure, read-only rejection preserves the
+    record, writer and terminal paths invalidate it, and renewal/recapture issues
+    only a distinct fresh record without handle checkpointing or public exports.
 
 - [ ] **E8-F4-P5:** Three-way full-loop validation and development documentation
   - Issue: TBD | Size: S | Status: Not Started

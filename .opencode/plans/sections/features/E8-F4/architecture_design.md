@@ -61,7 +61,8 @@ CapturedResidentGraph(CAPTURED, exact binding + opaque graph)
        |                    |
  explicit retire and fresh compatible preparation only
        v
-  new READY record -> explicit recapture
+   teardown unregisters before one native release
+   new READY record -> explicit recapture
 ```
 
 P1 accepts a caller-injected runtime adapter and retains its frozen native
@@ -83,6 +84,26 @@ exactly one `begin_step`, one native `capture_launch`, and one completion. A
 launch or completion failure is writer-capable and faults graph/session state;
 rollback and retry are not promised.
 
+### Delivered P4 teardown and terminal notification
+
+Issue #1570 centralizes teardown in `graph_capture.py`. The graph owner retains
+the private exact resident binding, removes issued records before attempting
+native release, and transitions to a nondispatchable lifecycle successor before
+surfacing a release error. This makes stale provenance fail before guard-token
+entry or `capture_launch`; repeated notification or terminal calls cannot invoke
+a second release. Structural drift preserves the canonical first invalidation
+reason, writer failure classifies the graph fault, finalization/close close it,
+and retirement preserves the invalidated-to-retired renewal path.
+
+`gpu_session.py`, `checkpoint.py`, and `gpu_resources.py` reach that owner only
+through lazy private notification with the exact session/registry/closed-guard
+triple. Finalization tears down the issued record before copying or caching its
+ordinary handle-free checkpoint. Close/discard and writer failure also notify
+before their resident transition. Stream initialization requires the same exact
+closed guard, so stream-writer failures retain the authoritative
+fault-and-teardown path. No checkpoint schema, restart rule, export, automatic
+recapture, retry, rollback, fallback, or opaque-handle transfer was added.
+
 ## Data / API / Workflow Changes
 
 - **Data model:** P1 adds exact immutable concrete-only native-callable and
@@ -93,8 +114,8 @@ rollback and retry are not promised.
 - **API surface:** P2 adds direct-module-only
   `capture_prepared_resident_graph()` under
   `particula.execution.graph_capture`; P3 adds direct-module-only
-  `replay_captured_resident_graph()` there. Invalidation and teardown remain
-  future operations. Do not export concrete names from `particula.execution`,
+  `replay_captured_resident_graph()` there. P4 adds private notification and
+  teardown seams only; do not export concrete names from `particula.execution`,
   `particula.gpu.kernels`, or top-level `particula`.
 - **Workflow hooks:** E8-F4 consumes E8-F1 lifecycle/signature, E8-F2 prepared
   enqueue, and E8-F3 resource publication. E8-F5 validates the accepted replay

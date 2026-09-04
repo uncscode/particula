@@ -30,10 +30,15 @@ baseline; native graph capture evidence is CUDA-only and pass-or-clean-skip.
   validation, repeated one-token/one-launch success, mutable pinned payload and
   RNG-word compatibility, and no launch after rejected preflight. It also covers
   native launch/completion failures and writer-capable no-rollback faulting.
-- **P4 — invalidation:** Cover deterministic reason selection, read-only
-  rejection preservation, writer failure faulting, stale handle rejection,
-  finalize/close/restart behavior, idempotent teardown, and explicit fresh
-  recapture only.
+- **P4 — delivered invalidation:** `graph_capture_test.py`,
+  `gpu_session_test.py`, `checkpoint_test.py`, and `gpu_resources_test.py` use
+  deterministic fake-native traces for structural drift, writer fault,
+  finalization, close/discard, retirement, and recapture. They assert
+  unregister-before-release, exactly one release even when release raises,
+  stale provenance before token entry/launch, first-reason precedence, exact
+  attachment/context checks, read-only preservation, and guarded stream-writer
+  fault propagation. Checkpoint tests also cover notification ordering and no
+  cached finalized checkpoint after release failure.
 - **P5 — full loop:** In `captured_full_loop_test.py`, run identical fixtures for
   CPU reference, uncaptured Warp, and captured CUDA over multiple timesteps.
   Compare fields separately with documented deterministic tolerances; assert
@@ -61,6 +66,10 @@ Focused fix checks are assertion evidence only and run coverage-disabled:
 
 ```bash
 pytest particula/execution/tests/graph_capture_test.py -q --no-cov
+pytest particula/execution/tests/graph_capture_test.py \
+  particula/execution/tests/gpu_session_test.py \
+  particula/execution/tests/checkpoint_test.py \
+  particula/execution/tests/gpu_resources_test.py -q --no-cov
 pytest particula/execution/tests/graph_capture_test.py -q --no-cov \
   -m "warp and cuda"
 pytest particula/execution/tests/full_loop_test.py -q --no-cov

@@ -284,10 +284,21 @@ The exact downstream ordering remains
    rejects before token entry. Launch and completion failures are writer-capable:
    the token is cleaned up and session/capture metadata faults without rollback.
    The boundary has no public exports, allocation, payload readback, transfer,
-   synchronization, fallback, retry, recapture, or native-handle lifecycle work
-   during replay. CPU and Warp-CPU devices fail closed before adapter use. See
-   [ADR-019](decisions/ADR-019-prepared-resident-graph-capture-qualification.md)
-   and [ADR-020](decisions/ADR-020-authenticated-native-resident-graph-replay.md).
+    synchronization, fallback, retry, recapture, or native-handle lifecycle work
+    during replay. P4 makes this module the sole owner of issued opaque native
+    handles, provenance removal, native release, and captured-lifecycle
+    transitions. Structural drift, writer faults, finalization, close/discard,
+    and explicit retirement make the old record unreplayable before its one
+    release; renewal creates READY metadata only and requires a new P1/P2 issue.
+    `gpu_session.py`, `checkpoint.py`, and `gpu_resources.py` only make a lazy,
+    private exact-session/registry/closed-guard notification and neither import
+    graph-capture types eagerly nor inspect handles or transition its lifecycle.
+    This adds no public API, checkpoint payload, retry, rollback, fallback, or
+     automatic recapture. CPU and Warp-CPU devices fail closed before adapter
+     use. See
+     [ADR-019](decisions/ADR-019-prepared-resident-graph-capture-qualification.md),
+     [ADR-020](decisions/ADR-020-authenticated-native-resident-graph-replay.md),
+     and [ADR-021](decisions/ADR-021-graph-capture-teardown-ownership.md).
 - `process_adapters.py` - Concrete-only, direct-import resident delegation
    boundary for dilution, wall loss, and nucleation. Frozen request carriers
    retain the exact active `ResidentSession`, its pinned

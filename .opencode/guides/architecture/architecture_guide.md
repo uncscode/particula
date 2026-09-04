@@ -110,7 +110,19 @@
   issued records, revalidates the captured binding, and performs guarded native
   launch only. Replay never releases/removes handles, recaptures, falls back,
   transfers, or synchronizes. See
-  [ADR-019](decisions/ADR-019-prepared-resident-graph-capture-qualification.md).
+   [ADR-019](decisions/ADR-019-prepared-resident-graph-capture-qualification.md).
+- P4 keeps all native-handle ownership in `graph_capture`: it removes issuance
+  provenance before exactly one native release and makes old records
+  unreplayable on structural drift, writer faults, finalization, close/discard,
+  and explicit retirement. It alone transitions captured lifecycle metadata;
+  renewal produces READY metadata only and a later P1/P2 capture must issue a
+  new handle. `gpu_session`, `checkpoint`, and `gpu_resources` may only invoke
+  a lazy private notification with the exact session/registry/closed-guard
+  binding. They do not eagerly import graph-capture types, inspect opaque
+  handles, or alter graph lifecycle state. The notification adds no package or
+  top-level API, checkpoint data, retry, rollback, fallback, or automatic
+  recapture. See
+  [ADR-021](decisions/ADR-021-graph-capture-teardown-ownership.md).
 
 ## Concrete GPU-Resident Session Boundary
 

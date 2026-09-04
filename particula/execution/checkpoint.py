@@ -14,7 +14,9 @@ or falls back to CPU execution. Schema-v1 checkpoints have no communication
 family; schema-v2 checkpoints can retain one complete closed-map GAS or
 PARTICLES family and its optional final-volume sidecar. ``checkpoint()`` is
 nonterminal; ``finalize()`` caches a snapshot and terminally ends normal
-session use. No rollback is promised once a device operation has launched.
+ session use. Finalization first tears down any attached issued graph handle;
+ teardown failure faults the source session and never caches a final checkpoint.
+ No rollback is promised once a device operation has launched.
 
 Schema-v3 always carries published-stream continuation metadata and optionally
 carries its canonical coagulation and wall-loss current-word payloads after the
@@ -530,9 +532,12 @@ class ResidentCheckpointController:
     def finalize(self) -> ResidentCheckpoint:
         """Create once, cache, and terminally finalize this resident session.
 
-        The first successful call has checkpoint semantics and then transitions
-        the bound session from ACTIVE to FINALIZED. Repeated calls return the
-        identical cached checkpoint in O(1) without device activity.
+        The first successful call first makes any attached issued graph handle
+        non-replayable and tears it down, then snapshots the active binding,
+        transitions the session from ACTIVE to FINALIZED, and caches the
+        snapshot. A teardown failure faults the source session and leaves no
+        cached final checkpoint. Repeated calls return the identical cached
+        checkpoint in O(1) without device activity.
 
         Returns:
             The cached immutable terminal checkpoint.
@@ -540,10 +545,11 @@ class ResidentCheckpointController:
         Raises:
             ValueError: If a first finalization has an invalid lifecycle or
                 stream binding. The session remains ACTIVE.
+            BaseException: Propagates graph-handle teardown failure after
+                faulting the source session without caching a checkpoint.
         """
         if self._finalized is not None:
             return self._finalized
-        checkpoint = self.checkpoint()
         try:
             from particula.execution.gpu_session import (
                 _notify_resident_graph_capture,
@@ -560,6 +566,7 @@ class ResidentCheckpointController:
                 self._session, self._registry, self._guard
             )
             raise
+        checkpoint = self.checkpoint()
         self._session._finalize_checkpoint()
         self._finalized = checkpoint
         return checkpoint

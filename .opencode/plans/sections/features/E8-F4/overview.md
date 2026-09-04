@@ -18,8 +18,12 @@ record is provenance-checked, revalidated against its exact binding, then
 launched exactly once under one resident token. Replay rejects identity,
 lifecycle, device, and duration drift before token entry; it permits mutable
 pinned payload and resident RNG-word changes without reseeding. Native launch
-or completion failures use writer-capable no-rollback fault semantics. Later
-phases own teardown and multi-timestep evidence.
+or completion failures use writer-capable no-rollback fault semantics. P4 is
+delivered: graph-owned teardown makes each issued handle stale before one
+release on structural drift, writer fault, finalization, close/discard, or
+retirement. Exact session/registry/guard lifecycle notifications are lazy, and
+guarded stream initialization participates in the same writer-fault path.
+Multi-timestep evidence remains P5 work.
 
 ## User Stories
 

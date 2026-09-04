@@ -984,10 +984,17 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   probing, transfer, readback, synchronization, reseed/reset, fallback, retry,
   automatic recapture, or native-handle lifecycle work; pinned payload values
   and resident RNG words may advance without invalidating the record. Launch
-  or completion failures are writer-capable and retain resident no-rollback
-  fault semantics. P3 is intentionally absent from package and top-level
-  exports and is not a public user API; later E8-F4 phases own broader
-  captured evidence.
+   or completion failures are writer-capable and retain resident no-rollback
+   fault semantics. P3 is intentionally absent from package and top-level
+   exports and is not a public user API; later E8-F4 phases own broader
+   captured evidence.
+- E8-F4-P4 keeps issued native-handle lifecycle internal to
+  `graph_capture`. A P2-issued handle becomes stale before one release when
+  structural identity drifts, a writer may have launched, the exact resident
+  binding finalizes, closes, or discards, or capture is explicitly retired.
+  Release failures do not restore provenance or trigger retry, rollback, or
+  recovery. Exact session/registry/closed-guard notification is lazy and
+  private; it adds no exports, checkpoint payload fields, or user API.
 - Eligibility is fail-closed: non-CPU Warp native devices require
   caller-provided availability/probe qualification. CPU and Warp CPU are neither
   capture nor fallback/emulation paths; E8-F1 supplies no availability-policy

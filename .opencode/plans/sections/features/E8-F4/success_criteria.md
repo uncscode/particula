@@ -11,8 +11,9 @@
   mutable fixed-shape payload and persistent RNG-word changes remain replayable.
 - [x] Capture/enqueue/end failures publish no graph and clean up exactly once;
   post-launch replay failures fault graph and session without rollback.
-- [ ] Finalize, close, fault, teardown, restart, device change, or stale handle
-  cannot replay; recapture is explicit and creates a fresh record/handle.
+- [x] Finalize, close, fault, teardown, restart, device change, or stale handle
+  cannot replay; records unregister before one release and recapture is explicit
+  with a fresh record/handle.
 - [ ] CPU, uncaptured Warp, and captured CUDA fixtures use the same supported
   process sequence and agree within documented per-field criteria over multiple
   timesteps, with conservation asserted separately.

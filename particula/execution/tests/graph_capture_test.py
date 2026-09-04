@@ -1710,6 +1710,37 @@ def test_notification_requires_exact_attached_resident_context(
 
 
 @pytest.mark.warp
+def test_notification_requires_the_attached_guard_to_be_closed(
+    resident_request: object,
+) -> None:
+    """An open resident step cannot publish a teardown notification."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    token = request.guard.begin_step(0.0)
+
+    with pytest.raises(RuntimeError, match="resident timestep is open"):
+        _notify_resident_graph_capture(
+            request.session,
+            request.registry,
+            request.guard,
+            "session_closed",
+        )
+
+    request.guard._abort_step(token)
+    assert binding.lifecycle is lifecycle
+
+
+@pytest.mark.warp
 def test_binding_rejects_a_swapped_equivalent_guard(
     resident_request: object,
 ) -> None:
