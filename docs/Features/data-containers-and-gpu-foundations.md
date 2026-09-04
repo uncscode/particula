@@ -300,6 +300,15 @@ pass-or-clean-skip evidence. Capture freezes the first physical timestep, and
 each launch executes one timestep through one-token replay with authentic
 opaque-handle provenance.
 
+Opaque handles are privately owned and never exposed by captured records. One
+LIVE provenance record admits replay through a per-record lease; teardown marks
+it RELEASING before waiting and retains a RELEASED tombstone after its one
+release callback. Native launch, abort, and release callbacks run outside the
+global provenance lock. The session lifecycle protocol publishes terminal
+intent before close, discard, or finalize callbacks, preventing callback
+reentry and capture/replay races. Failures after capture begins abort native
+capture, fault resident and graph state, and preserve the initiating exception.
+
 The bounded regression evidence uses genuine nonzero native CUDA capture and
 replay with exact READY bindings for single- and multi-box loops. It compares
 meaningful particle, gas, environment, diagnostics, and partitioning fields

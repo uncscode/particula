@@ -633,6 +633,40 @@ def test_published_stream_reset_writer_failure_faults_bound_session(
 
 
 @pytest.mark.warp
+def test_stream_writer_cleanup_failure_is_chained_to_primary_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Stream fault notification cannot replace the device-writer failure."""
+    wp = pytest.importorskip("warp")
+    import particula.execution.gpu_session as gpu_session
+
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    registry.acquire_coagulation(1)
+    primary = RuntimeError("stream writer failed")
+    cleanup = ValueError("fault notification failed")
+
+    def fail_launch(*_args: object, **_kwargs: object) -> None:
+        raise primary
+
+    def fail_cleanup(*_args: object) -> None:
+        raise cleanup
+
+    monkeypatch.setattr(wp, "launch", fail_launch)
+    monkeypatch.setattr(
+        gpu_session, "_fault_resident_session_with_context", fail_cleanup
+    )
+
+    with pytest.raises(RuntimeError) as caught:
+        registry.initialize_published_streams(
+            session, guard=ResidentStepGuard(session, registry)
+        )
+
+    assert caught.value is primary
+    assert caught.value.__cause__ is cleanup
+
+
+@pytest.mark.warp
 def test_published_stream_default_reset_uses_nondefault_root_seed() -> None:
     """Test all published streams reset every lane from their retained root."""
     session = _session(boxes=2)

@@ -493,6 +493,57 @@ def _snapshot_inventory(snapshot: dict[str, np.ndarray]) -> np.ndarray:
     )
 
 
+def _deterministic_numpy_oracle(
+    initial: dict[str, np.ndarray],
+) -> dict[str, np.ndarray]:
+    """Advance the deterministic fixture without reading production output."""
+    expected = {name: value.copy() for name, value in initial.items()}
+    expected_vapor_pressure = np.full_like(initial["gas_vapor_pressure"], 800.0)
+    expected_saturation = (
+        initial["gas_concentration"]
+        * GAS_CONSTANT
+        * initial["temperature"][:, None]
+        / (initial["gas_molar_mass"][None, :] * expected_vapor_pressure)
+    )
+    expected_inventory = _snapshot_inventory(initial)
+    expected["gas_vapor_pressure"] = expected_vapor_pressure
+    expected["saturation_ratio"] = expected_saturation
+    expected["diagnostic_gas_concentration_snapshot"] = initial[
+        "gas_concentration"
+    ].copy()
+    expected["diagnostic_saturation_ratio_snapshot"] = (
+        expected_saturation.copy()
+    )
+    expected["diagnostic_total_species_mass"] = expected_inventory
+    expected["diagnostic_particle_number_concentration"] = np.sum(
+        initial["particle_concentration"], axis=1
+    )
+    expected["diagnostic_latent_heat_energy"] = np.zeros_like(
+        initial["gas_concentration"]
+    )
+    # The fixture's independently allocated baseline/source/sink ledgers are
+    # zero, so the diagnostic definition reduces to total species inventory.
+    expected["diagnostic_conservation_residual"] = expected_inventory.copy()
+    return expected
+
+
+def _independent_wall_loss_sink(
+    initial: dict[str, np.ndarray],
+    result: dict[str, np.ndarray],
+) -> np.ndarray:
+    """Measure removed initial particle inventory without differencing totals."""
+    removed = (initial["particle_concentration"] > 0.0) & (
+        result["particle_concentration"] == 0.0
+    )
+    removed_mass = np.sum(
+        initial["particle_masses"]
+        * initial["particle_concentration"][:, :, None]
+        * removed[:, :, None],
+        axis=1,
+    )
+    return initial["particle_volume"][:, None] * removed_mass
+
+
 def _wall_loss_removal_moments(
     snapshot: dict[str, np.ndarray],
     duration: float,
@@ -606,35 +657,12 @@ def test_real_uncaptured_warp_cpu_nonzero_loop_matches_numpy() -> None:
     loop = _build_prepared_loop("cpu", 3, 0.25, 1571)
     try:
         initial = _prepared_snapshot(loop)
+        expected = _deterministic_numpy_oracle(initial)
         for _ in range(3):
             enqueue_prepared_resident_simulation(loop.prepared)
         result = _prepared_snapshot(loop)
 
-        expected_vapor_pressure = np.full((3, 2), 800.0, dtype=np.float64)
-        expected_saturation = (
-            result["gas_concentration"]
-            * GAS_CONSTANT
-            * result["temperature"][:, None]
-            / (result["gas_molar_mass"][None, :] * expected_vapor_pressure)
-        )
-        npt.assert_allclose(
-            result["gas_vapor_pressure"],
-            expected_vapor_pressure,
-            rtol=PARITY_RTOL,
-            atol=PARITY_ATOL,
-        )
-        npt.assert_allclose(
-            result["saturation_ratio"],
-            expected_saturation,
-            rtol=PARITY_RTOL,
-            atol=PARITY_ATOL,
-        )
-        npt.assert_allclose(
-            result["diagnostic_total_species_mass"],
-            _snapshot_inventory(result),
-            rtol=PARITY_RTOL,
-            atol=PARITY_ATOL,
-        )
+        _assert_prepared_parity(result, expected)
         npt.assert_allclose(
             _snapshot_inventory(result),
             _snapshot_inventory(initial),
@@ -665,14 +693,8 @@ def test_native_cuda_nonzero_full_loop_matches_numpy_and_uncaptured_warp(
         cpu_initial = _prepared_snapshot(cpu_loop)
         cuda_initial = _prepared_snapshot(cuda_loop)
         _assert_prepared_parity(cuda_initial, cpu_initial)
-        initial_inventory = cpu_initial["particle_volume"][:, None] * (
-            np.sum(
-                cpu_initial["particle_masses"]
-                * cpu_initial["particle_concentration"][:, :, None],
-                axis=1,
-            )
-            + cpu_initial["gas_concentration"]
-        )
+        expected = _deterministic_numpy_oracle(cpu_initial)
+        initial_inventory = _snapshot_inventory(cpu_initial)
 
         capture_set = cuda_loop.registry.validate_capture_resource_set(
             cuda_loop.request.capture_resource_requirements
@@ -698,58 +720,10 @@ def test_native_cuda_nonzero_full_loop_matches_numpy_and_uncaptured_warp(
         cpu_result = _prepared_snapshot(cpu_loop)
         cuda_result = _prepared_snapshot(cuda_loop)
         _assert_prepared_parity(cuda_result, cpu_result)
-
-        expected_vapor_pressure = np.full(
-            (n_boxes, 2),
-            800.0,
-            dtype=np.float64,
-        )
-        expected_saturation = (
-            cpu_result["gas_concentration"]
-            * GAS_CONSTANT
-            * cpu_result["temperature"][:, None]
-            / (cpu_result["gas_molar_mass"][None, :] * expected_vapor_pressure)
-        )
-        expected_inventory = cpu_result["particle_volume"][:, None] * (
-            np.sum(
-                cpu_result["particle_masses"]
-                * cpu_result["particle_concentration"][:, :, None],
-                axis=1,
-            )
-            + cpu_result["gas_concentration"]
-        )
+        _assert_prepared_parity(cpu_result, expected)
+        _assert_prepared_parity(cuda_result, expected)
         npt.assert_allclose(
-            cuda_result["gas_vapor_pressure"],
-            expected_vapor_pressure,
-            rtol=PARITY_RTOL,
-            atol=PARITY_ATOL,
-        )
-        npt.assert_allclose(
-            cuda_result["saturation_ratio"],
-            expected_saturation,
-            rtol=PARITY_RTOL,
-            atol=PARITY_ATOL,
-        )
-        npt.assert_allclose(
-            cuda_result["diagnostic_gas_concentration_snapshot"],
-            cuda_result["gas_concentration"],
-            rtol=PARITY_RTOL,
-            atol=PARITY_ATOL,
-        )
-        npt.assert_allclose(
-            cuda_result["diagnostic_saturation_ratio_snapshot"],
-            expected_saturation,
-            rtol=PARITY_RTOL,
-            atol=PARITY_ATOL,
-        )
-        npt.assert_allclose(
-            cuda_result["diagnostic_total_species_mass"],
-            expected_inventory,
-            rtol=PARITY_RTOL,
-            atol=PARITY_ATOL,
-        )
-        npt.assert_allclose(
-            expected_inventory,
+            _snapshot_inventory(cuda_result),
             initial_inventory,
             rtol=PARITY_RTOL,
             atol=PARITY_ATOL,
@@ -757,7 +731,7 @@ def test_native_cuda_nonzero_full_loop_matches_numpy_and_uncaptured_warp(
         npt.assert_equal(cuda_result["gas_partitioning"], 0)
         assert cpu_loop.guard.completed_steps == steps
         assert cuda_loop.guard.completed_steps == steps
-        assert captured.handle is not None
+        assert not hasattr(captured, "handle")
     finally:
         captured = None
         if cuda_loop is not None:
@@ -859,10 +833,10 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
             ):
                 initial_inventory = _snapshot_inventory(initial)
                 final_inventory = _snapshot_inventory(result)
+                sink_inventory = _independent_wall_loss_sink(initial, result)
                 assert np.all(final_inventory <= initial_inventory)
-                removed_inventory = initial_inventory - final_inventory
                 npt.assert_allclose(
-                    final_inventory + removed_inventory,
+                    final_inventory + sink_inventory,
                     initial_inventory,
                     rtol=PARITY_RTOL,
                     atol=PARITY_ATOL,
@@ -940,7 +914,7 @@ def test_fake_native_capture_replays_nonzero_reference_steps_and_cleans_up(
         _assert_same_state(after_replay, before)
         replay_captured_resident_graph(captured, qualification.duration)
         _assert_same_state(_snapshot(fixture), before)
-        assert captured.handle is native.handle
+        assert not hasattr(captured, "handle")
         assert native.calls == [
             "runtime",
             "device:cuda:0",

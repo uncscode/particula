@@ -27,6 +27,7 @@ coagulation-only initialization.
 from dataclasses import dataclass
 from enum import Enum
 from numbers import Integral, Real
+from threading import RLock, get_ident
 from typing import TYPE_CHECKING, Any, cast
 
 from particula.execution import Backend, Device, _isfinite_real
@@ -757,6 +758,62 @@ class ResidentSession:
             metadata,
             wp,
         )
+        # Registry validation deliberately re-runs ``__post_init__`` to detect
+        # fabricated frozen carriers. Preserve live synchronization state on
+        # those validation passes instead of silently replacing the lock and
+        # forgetting an admitted operation.
+        if not hasattr(self, "_lifecycle_lock"):
+            object.__setattr__(self, "_lifecycle_lock", RLock())
+            object.__setattr__(self, "_terminal_intent", None)
+            object.__setattr__(self, "_native_operation", None)
+
+    def _acquire_native_operation(self, kind: str) -> object:
+        """Acquire this session's private capture/replay lifecycle lease."""
+        with self._lifecycle_lock:
+            if (
+                self.lifecycle is not ResidentLifecycle.ACTIVE
+                or self._terminal_intent is not None
+            ):
+                raise ValueError(
+                    "resident session is entering a terminal state."
+                )
+            if self._native_operation is not None:
+                raise RuntimeError(
+                    "A native resident operation is already active."
+                )
+            lease = (kind, get_ident(), object())
+            object.__setattr__(self, "_native_operation", lease)
+            return lease
+
+    def _release_native_operation(self, lease: object) -> None:
+        """Release the exact private capture/replay lifecycle lease."""
+        with self._lifecycle_lock:
+            if self._native_operation != lease:
+                return
+            object.__setattr__(self, "_native_operation", None)
+
+    def _begin_terminal_transition(self, intent: str) -> object:
+        """Publish terminal intent before any caller-controlled callback."""
+        with self._lifecycle_lock:
+            if self._terminal_intent is not None:
+                raise RuntimeError("A resident terminal transition is active.")
+            if self._native_operation is not None:
+                raise RuntimeError("A native resident operation is active.")
+            token = object()
+            object.__setattr__(
+                self, "_terminal_intent", (intent, token, get_ident())
+            )
+            return token
+
+    def _end_terminal_transition(self, token: object) -> None:
+        """Clear the exact private terminal-transition intent."""
+        with self._lifecycle_lock:
+            current = self._terminal_intent
+            if current is None:
+                return
+            if current[1] is not token:
+                raise ValueError("resident terminal transition does not match.")
+            object.__setattr__(self, "_terminal_intent", None)
 
     def _checkpoint_controller(
         self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
@@ -915,32 +972,31 @@ class ResidentSession:
             BaseException: Propagates an attached graph-handle teardown failure
                 after transitioning this session to CLOSED.
         """
-        if self.lifecycle in {
-            ResidentLifecycle.CLOSED,
-            ResidentLifecycle.FINALIZED,
-        }:
-            return
+        with self._lifecycle_lock:
+            if self.lifecycle in {
+                ResidentLifecycle.CLOSED,
+                ResidentLifecycle.FINALIZED,
+            }:
+                return
         _validate_terminal_binding(self, registry, guard)
-        if self.lifecycle is ResidentLifecycle.ACTIVE:
-            registry.validate_pinned_session(self)
+        terminal_token = self._begin_terminal_transition("close")
+        transitioned = False
+        try:
+            if self.lifecycle is ResidentLifecycle.ACTIVE:
+                registry.validate_pinned_session(self)
+            elif self.lifecycle is not ResidentLifecycle.FAULTED:
+                raise ValueError("session.lifecycle must be ACTIVE or FAULTED.")
             registry.assert_step_closed()
-            try:
-                _notify_resident_graph_capture(
-                    self, registry, guard, "session_closed"
-                )
-            finally:
+            # Make terminal intent observable before caller-controlled release.
+            object.__setattr__(self, "lifecycle", ResidentLifecycle.CLOSED)
+            transitioned = True
+            _notify_resident_graph_capture(
+                self, registry, guard, "session_closed"
+            )
+        finally:
+            if transitioned:
                 object.__setattr__(self, "lifecycle", ResidentLifecycle.CLOSED)
-            return
-        if self.lifecycle is ResidentLifecycle.FAULTED:
-            registry.assert_step_closed()
-            try:
-                _notify_resident_graph_capture(
-                    self, registry, guard, "session_closed"
-                )
-            finally:
-                object.__setattr__(self, "lifecycle", ResidentLifecycle.CLOSED)
-            return
-        raise ValueError("session.lifecycle must be ACTIVE or FAULTED.")
+            self._end_terminal_transition(terminal_token)
 
     def discard(
         self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
@@ -1094,13 +1150,18 @@ class ResidentStepGuard:
             RuntimeError: If another timestep is already open.
         """
         validated_duration = self._validate_duration(duration)
-        self._registry.validate_pinned_session(self._session)
-        if self._open_token is not None:
-            raise RuntimeError("A resident timestep is already open.")
-        token = ResidentStepToken(self, validated_duration)
-        self._registry.reserve_open_step(token)
-        self._open_token = token
-        return token
+        with self._session._lifecycle_lock:
+            if self._session._terminal_intent is not None:
+                raise ValueError(
+                    "resident session is entering a terminal state."
+                )
+            self._registry.validate_pinned_session(self._session)
+            if self._open_token is not None:
+                raise RuntimeError("A resident timestep is already open.")
+            token = ResidentStepToken(self, validated_duration)
+            self._registry.reserve_open_step(token)
+            self._open_token = token
+            return token
 
     def complete_step(self, token: ResidentStepToken) -> None:
         """Complete the exact outstanding token and advance bookkeeping.

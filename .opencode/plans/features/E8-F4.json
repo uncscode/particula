@@ -2,13 +2,13 @@
   "id": "E8-F4",
   "type": "feature",
   "title": "Resident Graph Capture and Guarded Replay Lifecycle",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
+  "completion_date": "2026-09-04",
   "last_updated": "2026-09-04",
   "dependencies": [],
   "section_files": {
@@ -32,11 +32,11 @@
     {
       "id": "E8-F4-P1",
       "title": "Prepared resident graph capture controller with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-04",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -46,11 +46,11 @@
     {
       "id": "E8-F4-P2",
       "title": "Complete fixed-sequence capture and CUDA smoke tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-04",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -88,11 +88,11 @@
     {
       "id": "E8-F4-P5",
       "title": "Three-way full-loop validation and development documentation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-04",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -100,6 +100,5 @@
       "reconciliation_evidence_fingerprint": null
     }
   ],
-  "totals": null,
-  "lifecycle": "active"
+  "totals": null
 }

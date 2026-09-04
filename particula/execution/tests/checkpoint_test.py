@@ -1087,3 +1087,33 @@ def test_checkpoint_synchronization_failure_faults_and_reraises(
 
     assert caught.value is failure
     assert session.lifecycle is ResidentLifecycle.FAULTED
+
+
+@pytest.mark.warp
+def test_checkpoint_cleanup_failure_is_chained_to_synchronization_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Checkpoint fault cleanup cannot replace the synchronization failure."""
+    wp = pytest.importorskip("warp")
+    import particula.execution.checkpoint as checkpoint_module
+
+    session, registry, guard = _resident_binding()
+    primary = RuntimeError("synchronize failed")
+    cleanup = ValueError("fault cleanup failed")
+
+    def fail_synchronize() -> None:
+        raise primary
+
+    def fail_cleanup(*_args: object) -> None:
+        raise cleanup
+
+    monkeypatch.setattr(wp, "synchronize", fail_synchronize)
+    monkeypatch.setattr(
+        checkpoint_module, "_fault_resident_session_with_context", fail_cleanup
+    )
+
+    with pytest.raises(RuntimeError) as caught:
+        session.checkpoint(registry, guard)
+
+    assert caught.value is primary
+    assert caught.value.__cause__ is cleanup

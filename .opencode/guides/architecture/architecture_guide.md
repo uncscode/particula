@@ -123,6 +123,15 @@
   top-level API, checkpoint data, retry, rollback, fallback, or automatic
   recapture. See
   [ADR-021](decisions/ADR-021-graph-capture-teardown-ownership.md).
+- Native handles are absent from captured carriers and live in one private
+  provenance record with LIVE, RELEASING, and RELEASED/tombstoned states.
+  Replay takes a per-record launch lease under the short provenance lock, but
+  native launch and release callbacks execute outside that global lock.
+- Capture and replay also take the exact session's lifecycle lease. Close,
+  discard, and finalize publish terminal intent before callbacks, so callback
+  reentry cannot admit work while the session still appears usable. A failed
+  post-begin capture invokes native abort, faults graph and resident state, and
+  preserves the initiating exception when cleanup also fails.
 
 ## Concrete GPU-Resident Session Boundary
 

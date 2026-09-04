@@ -38,9 +38,10 @@ modules to own opaque handles or captured-lifecycle transitions.
 `particula.execution.graph_capture` is the sole owner of issued native handles,
 provenance removal, native release, and graph-capture lifecycle transitions.
 
-1. It removes an affected record from issuance provenance before exactly one
-   release for structural drift, writer fault, finalization, close/discard, and
-   explicit retirement.
+1. It transitions an affected private provenance record from LIVE to RELEASING,
+   waits for admitted per-record launch leases, invokes release outside the
+   global provenance lock, then retains a RELEASED tombstone. Duplicate opaque
+   identities cannot be issued again.
 2. It transitions the graph to a nondispatchable successor before surfacing a
    release failure; later notifications are idempotent and do not retry release.
 3. `gpu_session`, `checkpoint`, and `gpu_resources` may only invoke a lazy,
@@ -48,6 +49,13 @@ provenance removal, native release, and graph-capture lifecycle transitions.
    transition graph lifecycle state.
 4. Renewal retains metadata-only READY behavior; only a fresh P1/P2 capture can
    issue a new authentic handle.
+5. Close, discard, and finalize publish terminal session intent before release
+   callbacks. Capture/replay admission uses the same per-session protocol, so
+   callback reentry observes a terminal or leased binding rather than ACTIVE
+   availability.
+6. Failure after native capture begins invokes the adapter abort contract,
+   closes resident ownership, faults graph and resident state, and raises the
+   initiating error with abort/release failures chained as cleanup context.
 
 ### Chosen Option
 

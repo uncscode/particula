@@ -35,8 +35,8 @@ runtime work and recovery behavior.
 Use `particula.execution.graph_capture.replay_captured_resident_graph()` as a
 concrete-only P3 native replay boundary:
 
-1. Accept only an exact P2-issued `CapturedResidentGraph` registered with its
-   retained opaque handle, comparing that handle by identity only.
+1. Accept only an exact P2-issued `CapturedResidentGraph`; its opaque handle is
+   absent from the carrier and retained in one private provenance record.
 2. Revalidate provenance and the entire captured binding before token entry,
    including capture lifecycle/publication, qualified device, and duration.
 3. On success, open exactly one `ResidentStepGuard` token, call native
@@ -45,6 +45,12 @@ concrete-only P3 native replay boundary:
 4. Treat native-launch and post-launch completion errors as writer-capable:
    release the token through existing failure handling and fault resident and
    capture metadata without rollback, retry, fallback, recapture, or release.
+5. Authenticate and acquire a per-record launch lease while holding the short
+   provenance lock, then invoke the native launch outside that lock. A
+   RELEASING or RELEASED/tombstoned record cannot acquire another lease.
+6. Serialize replay admission with terminal session intent. An admitted replay
+   retains its session and record leases through launch; close, discard, and
+   finalize reject rather than race or deadlock on callback reentry.
 
 ### Chosen Option
 

@@ -36,6 +36,7 @@ from __future__ import annotations
 import sys
 from dataclasses import dataclass
 from numbers import Integral, Real
+from threading import get_ident
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
@@ -373,6 +374,9 @@ class ResidentCheckpointController:
 
     def _validate(self) -> None:
         """Validate active identity-bound lifecycle state before readback."""
+        terminal_intent = self._session._terminal_intent
+        if terminal_intent is not None and terminal_intent[2] != get_ident():
+            raise ValueError("resident session is entering a terminal state.")
         if self._session.lifecycle is not ResidentLifecycle.ACTIVE:
             raise ValueError("session.lifecycle must be ACTIVE.")
         if (
@@ -416,10 +420,13 @@ class ResidentCheckpointController:
 
         try:
             wp.synchronize()
-        except BaseException:
-            _fault_resident_session_with_context(
-                self._session, self._registry, self._guard
-            )
+        except BaseException as error:
+            try:
+                _fault_resident_session_with_context(
+                    self._session, self._registry, self._guard
+                )
+            except BaseException as cleanup_error:
+                raise error from cleanup_error
             raise
         try:
             particles = from_warp_particle_data(
@@ -550,7 +557,11 @@ class ResidentCheckpointController:
         """
         if self._finalized is not None:
             return self._finalized
+        terminal_token = self._session._begin_terminal_transition("finalize")
         try:
+            # Snapshot while terminal intent blocks all competing admission.
+            checkpoint = self.checkpoint()
+            self._session._finalize_checkpoint()
             from particula.execution.gpu_session import (
                 _notify_resident_graph_capture,
             )
@@ -561,15 +572,18 @@ class ResidentCheckpointController:
                 self._guard,
                 "session_finalized",
             )
-        except BaseException:
-            _fault_resident_session_with_context(
-                self._session, self._registry, self._guard
-            )
+            self._finalized = checkpoint
+            return checkpoint
+        except BaseException as error:
+            try:
+                _fault_resident_session_with_context(
+                    self._session, self._registry, self._guard
+                )
+            except BaseException as cleanup_error:
+                raise error from cleanup_error
             raise
-        checkpoint = self.checkpoint()
-        self._session._finalize_checkpoint()
-        self._finalized = checkpoint
-        return checkpoint
+        finally:
+            self._session._end_terminal_transition(terminal_token)
 
 
 def restart_resident_session(  # noqa: C901

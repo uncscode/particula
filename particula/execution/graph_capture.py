@@ -5,7 +5,8 @@ graph-capture support and records identity-based compatibility for an
 already-built resident request. P1 qualification retains a native callable
 vocabulary for one exact READY binding. P2 capture calls native begin, frozen
 operation dispatch, and end in order; it issues an authentic record for the
- resulting opaque handle and privately releases that handle after a post-capture
+resulting opaque handle in private provenance and releases it after
+post-capture
  rejection or lifecycle teardown. P3 replay accepts only that issued record,
  revalidates its exact binding metadata, and performs one guard-token/native-
  launch/completion path.
@@ -14,7 +15,10 @@ This module neither exports a package-level API nor inspects resident payloads.
 Replay performs no prepared-host dispatch, allocation, runtime probe, transfer,
 readback, synchronization, resource work, RNG initialization or reset,
  fallback, retry, or automatic recapture. This module alone owns issued-handle
- storage and releases handles exactly once during lifecycle teardown. A native
+ storage with live/releasing/released tombstones and releases handles exactly
+ once during lifecycle teardown. Native callbacks run outside the global
+ provenance lock, while per-record and per-session leases serialize launch with
+ release and terminal lifecycle intent. A native
  launch or completion failure is writer-capable: existing resident cleanup and
  fault classification apply, with no rollback guarantee.
 """
@@ -22,9 +26,10 @@ readback, synchronization, resource work, RNG initialization or reset,
 from __future__ import annotations
 
 from collections.abc import Callable
+from contextlib import nullcontext
 from dataclasses import dataclass
 from enum import Enum
-from threading import Lock, RLock
+from threading import Condition, Lock, RLock
 from typing import TYPE_CHECKING, Any, NoReturn, Protocol, cast
 
 from particula.execution import Backend, Device
@@ -35,6 +40,12 @@ _ACTIVE_CAPTURE_LOCK = Lock()
 # replay token/launch window so a terminal notification cannot release the
 # opaque provenance after authentication but before native dispatch.
 _ISSUED_CAPTURED_GRAPHS_LOCK = RLock()
+_ISSUED_CAPTURED_GRAPHS_CONDITION = Condition(_ISSUED_CAPTURED_GRAPHS_LOCK)
+
+
+def _noop_capture_abort() -> None:
+    """Provide a compatibility abort for adapters without native cleanup."""
+
 
 if TYPE_CHECKING:
     from particula.execution.gpu_resources import (
@@ -135,9 +146,10 @@ class GraphCaptureRuntimeProbe(Protocol):
 class GraphCaptureNativeCallables:
     """Retain an adapter's native callable vocabulary by exact identity.
 
-    This record is vocabulary only: it holds no graph or executable handle and
-    owns no cleanup callback. P2 invokes only ``capture_begin()``,
-    ``capture_end()``, and, after a post-end rejection, ``capture_release()``.
+    This record is vocabulary only: it holds no graph or executable handle.
+    P2 invokes ``capture_begin()``, ``capture_end()``, and, after a post-end
+    rejection, ``capture_release()``. A failure after begin invokes
+    ``capture_abort()`` and releases a non-``None`` abort result.
     It never invokes ``capture_instantiate`` or ``capture_launch``. In
     particular, ``capture_release`` is a callable for a later owner to invoke,
     not a retained cleanup action.
@@ -148,6 +160,7 @@ class GraphCaptureNativeCallables:
         capture_instantiate: Callable that instantiates a captured graph.
         capture_launch: Callable that launches an instantiated graph.
         capture_release: Callable that releases a native graph resource.
+        capture_abort: Callable that aborts an incomplete native capture.
     """
 
     capture_begin: Callable[..., object]
@@ -155,6 +168,7 @@ class GraphCaptureNativeCallables:
     capture_instantiate: Callable[..., object]
     capture_launch: Callable[..., object]
     capture_release: Callable[..., object]
+    capture_abort: Callable[..., object] = _noop_capture_abort
 
     def __post_init__(self) -> None:
         """Require every native vocabulary member to be callable."""
@@ -164,6 +178,7 @@ class GraphCaptureNativeCallables:
             "capture_instantiate",
             "capture_launch",
             "capture_release",
+            "capture_abort",
         ):
             if not callable(getattr(self, name)):
                 raise TypeError(f"{name} must be callable.")
@@ -1699,8 +1714,8 @@ class CapturedResidentGraph:
         capture_requirements: Exact published capture-resource requirements.
         capture_set: Exact published capture-resource set.
         capture_report: Exact cached logical-byte report for ``capture_set``.
-        device: Exact qualified non-CPU Warp device.
-        handle: Opaque handle returned by native ``capture_end()``.
+        device: Exact qualified non-CPU Warp device. The opaque native handle
+            remains private to module-owned provenance.
     """
 
     qualification: PreparedGraphCaptureQualification
@@ -1717,7 +1732,6 @@ class CapturedResidentGraph:
     capture_set: object
     capture_report: object
     device: Device
-    handle: object
 
     def __post_init__(self) -> None:
         """Require the exact captured successor and qualification identities."""
@@ -1747,7 +1761,31 @@ class CapturedResidentGraph:
             raise ValueError("captured resident graph identities do not match.")
 
 
-_ISSUED_CAPTURED_GRAPHS: dict[CapturedResidentGraph, object] = {}
+class _NativeGraphState(str, Enum):
+    """Track private native graph provenance through one-way release states."""
+
+    LIVE = "live"
+    RELEASING = "releasing"
+    RELEASED = "released"
+
+
+class _DuplicateNativeHandleError(ValueError):
+    """Reject reuse of an opaque native handle identity."""
+
+
+@dataclass(eq=False)
+class _NativeGraphRecord:
+    """Own one opaque handle and its launch/release provenance privately."""
+
+    captured: CapturedResidentGraph
+    handle: object
+    release: Callable[..., object]
+    state: _NativeGraphState = _NativeGraphState.LIVE
+    launch_leases: int = 0
+
+
+_ISSUED_CAPTURED_GRAPHS: dict[CapturedResidentGraph, _NativeGraphRecord] = {}
+_NATIVE_HANDLE_PROVENANCE: dict[int, _NativeGraphRecord] = {}
 
 
 def _release_issued_captured_graphs_for_binding(
@@ -1760,15 +1798,31 @@ def _release_issued_captured_graphs_for_binding(
     deliberately not used by P3 replay, which only authenticates and launches
     an issued handle.
     """
-    with _ISSUED_CAPTURED_GRAPHS_LOCK:
+    with _ISSUED_CAPTURED_GRAPHS_CONDITION:
         issued = tuple(
-            (captured, handle)
-            for captured, handle in _ISSUED_CAPTURED_GRAPHS.items()
+            record
+            for captured, record in _ISSUED_CAPTURED_GRAPHS.items()
             if captured.binding is binding
+            and record.state is _NativeGraphState.LIVE
         )
-        for captured, handle in issued:
-            del _ISSUED_CAPTURED_GRAPHS[captured]
-            captured.qualification.native_callables.capture_release(handle)
+        for record in issued:
+            record.state = _NativeGraphState.RELEASING
+        while any(record.launch_leases for record in issued):
+            _ISSUED_CAPTURED_GRAPHS_CONDITION.wait()
+    first_error: BaseException | None = None
+    for record in issued:
+        try:
+            record.release(record.handle)
+        except BaseException as error:
+            if first_error is None:
+                first_error = error
+        finally:
+            with _ISSUED_CAPTURED_GRAPHS_CONDITION:
+                record.state = _NativeGraphState.RELEASED
+                _ISSUED_CAPTURED_GRAPHS.pop(record.captured, None)
+                _ISSUED_CAPTURED_GRAPHS_CONDITION.notify_all()
+    if first_error is not None:
+        raise first_error
 
 
 def _teardown_resident_graph_capture(  # noqa: C901
@@ -1791,7 +1845,7 @@ def _teardown_resident_graph_capture(  # noqa: C901
         BaseException: Propagates a native handle-release failure after records
             are unregistered and lifecycle metadata is nondispatchable.
     """
-    with _ISSUED_CAPTURED_GRAPHS_LOCK:
+    with nullcontext():
         binding = _require_attached_resident_binding(binding)
         lifecycle = binding._lifecycle
         if lifecycle.state is GraphCaptureLifecycleState.CLOSED:
@@ -1907,10 +1961,49 @@ def _require_issued_captured_graph(captured: object) -> CapturedResidentGraph:
     """
     if type(captured) is not CapturedResidentGraph:
         raise TypeError("captured must be an exact CapturedResidentGraph.")
-    expected_handle = _ISSUED_CAPTURED_GRAPHS.get(captured)
-    if expected_handle is None or expected_handle is not captured.handle:
+    record = _ISSUED_CAPTURED_GRAPHS.get(captured)
+    if record is None or record.state is not _NativeGraphState.LIVE:
         raise ValueError("captured resident graph handle is not P2-issued.")
     return captured
+
+
+def _register_captured_graph(
+    captured: CapturedResidentGraph, handle: object
+) -> None:
+    """Publish exactly one live provenance record for an opaque identity."""
+    with _ISSUED_CAPTURED_GRAPHS_CONDITION:
+        prior = _NATIVE_HANDLE_PROVENANCE.get(id(handle))
+        if prior is not None and prior.handle is handle:
+            raise _DuplicateNativeHandleError(
+                "native graph handle identity was already issued."
+            )
+        record = _NativeGraphRecord(
+            captured,
+            handle,
+            captured.qualification.native_callables.capture_release,
+        )
+        _ISSUED_CAPTURED_GRAPHS[captured] = record
+        _NATIVE_HANDLE_PROVENANCE[id(handle)] = record
+
+
+def _acquire_captured_graph_launch(
+    captured: object,
+) -> tuple[CapturedResidentGraph, _NativeGraphRecord]:
+    """Authenticate a live record and acquire its per-binding launch lease."""
+    with _ISSUED_CAPTURED_GRAPHS_CONDITION:
+        typed = _require_issued_captured_graph(captured)
+        record = _ISSUED_CAPTURED_GRAPHS[typed]
+        record.launch_leases += 1
+        return typed, record
+
+
+def _release_captured_graph_launch(record: _NativeGraphRecord) -> None:
+    """Release one exact launch lease and wake pending teardown."""
+    with _ISSUED_CAPTURED_GRAPHS_CONDITION:
+        if record.launch_leases <= 0:
+            raise ValueError("native graph launch lease is not active.")
+        record.launch_leases -= 1
+        _ISSUED_CAPTURED_GRAPHS_CONDITION.notify_all()
 
 
 def _require_adapter_method(
@@ -2260,7 +2353,15 @@ def _classify_capture_operational_failure(
     ):
         return None
     try:
-        classify_resident_graph_capture_writer_failure(binding)
+        from particula.execution.gpu_session import (
+            _fault_resident_session_with_context,
+        )
+
+        _fault_resident_session_with_context(
+            cast("ResidentSession", qualification.session),
+            cast("GPUResourceRegistry", qualification.registry),
+            cast("ResidentStepGuard", qualification.guard),
+        )
     except BaseException as error:
         try:
             _fault_resident_graph_capture_after_classification_failure(binding)
@@ -2317,7 +2418,8 @@ def capture_prepared_resident_graph(  # noqa: C901
 
     Returns:
         Immutable record retaining the captured lifecycle successor and exact
-        opaque handle returned by native ``capture_end()``.
+        binding metadata. The native ``capture_end()`` handle remains in
+        private module-owned provenance.
 
     Raises:
         TypeError: If ``qualification`` is not an exact valid qualification.
@@ -2327,93 +2429,80 @@ def capture_prepared_resident_graph(  # noqa: C901
         BaseException: Propagates native begin, dispatch, end, or release errors
             while preserving the operational error as the primary cause.
     """
+    typed = _validate_prepared_graph_capture_qualification(qualification)
+    session = cast("ResidentSession", typed.session)
+    operation_lease = session._acquire_native_operation("capture")
+    binding_id = id(typed.binding)
+    native = typed.native_callables
+    with _ACTIVE_CAPTURE_LOCK:
+        if binding_id in _ACTIVE_CAPTURE_BINDING_IDS:
+            session._release_native_operation(operation_lease)
+            raise ValueError("graph capture is already active for binding.")
+        _ACTIVE_CAPTURE_BINDING_IDS.add(binding_id)
     try:
-        typed = _validate_prepared_graph_capture_qualification(qualification)
-        binding_id = id(typed.binding)
-        with _ACTIVE_CAPTURE_LOCK:
-            if binding_id in _ACTIVE_CAPTURE_BINDING_IDS:
-                raise ValueError("graph capture is already active for binding.")
-            _ACTIVE_CAPTURE_BINDING_IDS.add(binding_id)
         try:
-            native = typed.native_callables
             native.capture_begin()
+            from particula.execution.resident_scheduler import (
+                _enqueue_captured_prepared_operations,
+            )
+
+            _enqueue_captured_prepared_operations(typed.prepared)
+            handle = native.capture_end()
+        except BaseException as error:
+            cleanup_error: BaseException | None = None
             try:
-                from particula.execution.resident_scheduler import (
-                    _enqueue_captured_prepared_operations,
+                abort_handle = native.capture_abort()
+                if abort_handle is not None:
+                    native.capture_release(abort_handle)
+            except BaseException as caught:
+                cleanup_error = caught
+            _raise_capture_operational_failure(typed, error, cleanup_error)
+        if handle is None:
+            _raise_capture_operational_failure(
+                typed,
+                ValueError("native graph capture did not return a handle."),
+            )
+        try:
+            typed = _validate_prepared_graph_capture_qualification(typed)
+            lifecycle = complete_resident_graph_capture(typed.binding)
+            if (
+                lifecycle is not typed.binding.lifecycle
+                or lifecycle.state is not GraphCaptureLifecycleState.CAPTURED
+            ):
+                raise ValueError(
+                    "graph capture did not transition to captured."
                 )
-
-                _enqueue_captured_prepared_operations(typed.prepared)
-            except BaseException as error:
-                try:
-                    cleanup_handle = native.capture_end()
-                except BaseException as cleanup_error:
-                    _raise_capture_operational_failure(
-                        typed, error, cleanup_error
-                    )
-                try:
-                    native.capture_release(cleanup_handle)
-                except BaseException as cleanup_error:
-                    _raise_capture_operational_failure(
-                        typed, error, cleanup_error
-                    )
-                _raise_capture_operational_failure(typed, error)
-            try:
-                handle = native.capture_end()
-            except BaseException as error:
-                _raise_capture_operational_failure(typed, error)
-
-            if handle is None:
-                _raise_capture_operational_failure(
-                    typed,
-                    ValueError("native graph capture did not return a handle."),
-                )
-
-            try:
-                with _ISSUED_CAPTURED_GRAPHS_LOCK:
-                    typed = _validate_prepared_graph_capture_qualification(
-                        typed
-                    )
-                    lifecycle = complete_resident_graph_capture(typed.binding)
-                    if (
-                        lifecycle is not typed.binding.lifecycle
-                        or lifecycle.state
-                        is not GraphCaptureLifecycleState.CAPTURED
-                    ):
-                        raise ValueError(
-                            "graph capture did not transition to captured."
-                        )
-                    captured = CapturedResidentGraph(
-                        qualification=typed,
-                        binding=typed.binding,
-                        lifecycle=lifecycle,
-                        signature=typed.signature,
-                        request=typed.request,
-                        session=typed.session,
-                        registry=typed.registry,
-                        guard=typed.guard,
-                        prepared=typed.prepared,
-                        timestep=typed.timestep,
-                        capture_requirements=typed.capture_requirements,
-                        capture_set=typed.capture_set,
-                        capture_report=typed.capture_report,
-                        device=typed.device,
-                        handle=handle,
-                    )
-                    _ISSUED_CAPTURED_GRAPHS[captured] = handle
-                    return captured
-            except BaseException as error:
+            captured = CapturedResidentGraph(
+                qualification=typed,
+                binding=typed.binding,
+                lifecycle=lifecycle,
+                signature=typed.signature,
+                request=typed.request,
+                session=typed.session,
+                registry=typed.registry,
+                guard=typed.guard,
+                prepared=typed.prepared,
+                timestep=typed.timestep,
+                capture_requirements=typed.capture_requirements,
+                capture_set=typed.capture_set,
+                capture_report=typed.capture_report,
+                device=typed.device,
+            )
+            _register_captured_graph(captured, handle)
+            return captured
+        except BaseException as error:
+            if not isinstance(error, _DuplicateNativeHandleError):
                 try:
                     native.capture_release(handle)
                 except BaseException as release_error:
                     _raise_capture_operational_failure(
                         typed, error, release_error
                     )
-                _raise_capture_operational_failure(typed, error)
-        finally:
-            with _ACTIVE_CAPTURE_LOCK:
-                _ACTIVE_CAPTURE_BINDING_IDS.discard(binding_id)
-    except BaseException:
-        raise
+            _raise_capture_operational_failure(typed, error)
+    finally:
+        with _ACTIVE_CAPTURE_LOCK:
+            _ACTIVE_CAPTURE_BINDING_IDS.discard(binding_id)
+        session._release_native_operation(operation_lease)
 
 
 def _validate_replay_captured_graph(
@@ -2584,16 +2673,32 @@ def replay_captured_resident_graph(captured: object, duration: object) -> None:
         BaseException: Propagates native-launch or completion failure after
             writer-capable cleanup and capture-failure classification.
     """
-    with _ISSUED_CAPTURED_GRAPHS_LOCK:
-        qualification = _validate_replay_captured_graph(captured, duration)
-        captured_graph = cast(CapturedResidentGraph, captured)
+    captured_graph, record = _acquire_captured_graph_launch(captured)
+    session = cast("ResidentSession", captured_graph.session)
+    operation_lease: object | None = None
+    launch_lease_active = True
+    try:
+        operation_lease = session._acquire_native_operation("replay")
+        qualification = _validate_replay_captured_graph(
+            captured_graph, duration
+        )
         guard = cast("ResidentStepGuard", qualification.guard)
         token = guard.begin_step(duration)
         try:
-            qualification.native_callables.capture_launch(captured_graph.handle)
+            qualification.native_callables.capture_launch(record.handle)
             guard.complete_step(token)
         except BaseException as error:
+            # Writer-failure classification tears down native provenance and
+            # waits for admitted launches. Relinquish this call's launch lease
+            # first so cleanup cannot wait on itself.
+            _release_captured_graph_launch(record)
+            launch_lease_active = False
             _raise_replay_operational_failure(qualification, token, error)
+    finally:
+        if operation_lease is not None:
+            session._release_native_operation(operation_lease)
+        if launch_lease_active:
+            _release_captured_graph_launch(record)
 
 
 def gate_resident_graph_capture(binding: object) -> None:

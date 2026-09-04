@@ -7,6 +7,7 @@ import subprocess
 import sys
 import textwrap
 from dataclasses import FrozenInstanceError, fields, is_dataclass, replace
+from threading import Event, Thread
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, cast
 
@@ -18,6 +19,7 @@ import particula.execution as execution
 import particula.execution.graph_capture as graph_capture
 from particula.execution import Backend, Device
 from particula.execution.graph_capture import (
+    CapturedResidentGraph,
     GraphCaptureAvailability,
     GraphCaptureCapability,
     GraphCaptureCompatibility,
@@ -2027,15 +2029,8 @@ def test_qualification_rejects_warp_cpu_without_native_activity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Qualification fails closed before probing or acting on Warp CPU."""
-    from particula.execution.resident_communication import (
-        PreparedResidentCommunicationBinding,
-    )
-    from particula.execution.resident_enqueue import prepare_resident_timestep
     from particula.execution.resident_scheduler import (
-        PreparedResidentSimulation,
-    )
-    from particula.execution.thermodynamic_updates import (
-        PreparedResidentThermodynamicSequence,
+        prepare_resident_simulation,
     )
 
     request = cast("ResidentSimulationRequest", resident_request)
@@ -2049,43 +2044,33 @@ def test_qualification_rejects_warp_cpu_without_native_activity(
         request, request.session, request.registry, request.guard, lifecycle
     )
     _attach_resident_graph_capture_binding(request, binding)
-    registry = cast("GPUResourceRegistry", request.registry)
-    capture_set = registry.validate_capture_resource_set(
+
+    class PreparedCall:
+        def execute(self) -> None:
+            return None
+
+    class PreparedAdapter:
+        def prepare(self, _request: object) -> PreparedCall:
+            return PreparedCall()
+
+    from particula.execution import resident_scheduler
+
+    for name in (
+        "WarpCondensationExecutionAdapter",
+        "ResidentBrownianCoagulationExecutionAdapter",
+        "ResidentDilutionAdapter",
+        "ResidentWallLossAdapter",
+        "ResidentNucleationAdapter",
+    ):
+        monkeypatch.setattr(resident_scheduler, name, PreparedAdapter)
+    prepared = prepare_resident_simulation(request, 0.0)
+    capture_set = cast(
+        "GPUResourceRegistry", request.registry
+    ).validate_capture_resource_set(
         cast(
             "CaptureResourceRequirements",
             request.capture_resource_requirements,
         )
-    )
-    timestep = prepare_resident_timestep(request, 0.0)
-    prepared = PreparedResidentSimulation(
-        timestep=timestep,
-        request=request,
-        session=request.session,
-        registry=request.registry,
-        guard=request.guard,
-        lifecycle=lifecycle,
-        signature=signature,
-        graph=request.graph,
-        schedule=request.schedule,
-        ordered_node_ids=request.schedule.ordered_node_ids,
-        primary_arrays=signature.primary_arrays,
-        resource_views=signature.resource_views,
-        capture_requirements=request.capture_resource_requirements,
-        capture_set=capture_set,
-        capture_report=capture_set.report,
-        nodes=(),
-        thermal=cast("PreparedResidentThermodynamicSequence", object()),
-        communication=cast("PreparedResidentCommunicationBinding", object()),
-        environment=object(),
-        gas=object(),
-        condensation=object(),
-        coagulation=object(),
-        dilution=object(),
-        wall_loss=object(),
-        nucleation=object(),
-        diagnostics=object(),
-        operations=(),
-        duration=timestep.duration,
     )
 
     monkeypatch.setattr(
@@ -2094,9 +2079,7 @@ def test_qualification_rejects_warp_cpu_without_native_activity(
         lambda: pytest.fail("qualification must not open a resident step"),
     )
 
-    with pytest.raises(
-        ValueError, match="prepared resident simulation identities"
-    ):
+    with pytest.raises(ValueError, match="CUDA resident device"):
         qualify_prepared_resident_graph_capture(
             binding,
             prepared,
@@ -2431,12 +2414,12 @@ def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
     captured = capture_prepared_resident_graph(qualification)
 
     assert trace == ["begin", "dispatch", "end"]
-    assert captured.handle is handle
+    assert not hasattr(captured, "handle")
     assert captured.qualification is qualification
     assert captured.lifecycle is binding.lifecycle
     assert binding.lifecycle.state is GraphCaptureLifecycleState.CAPTURED
     with pytest.raises(ValueError, match="handle is not P2-issued"):
-        replay_captured_resident_graph(replace(captured, handle=object()), 0.0)
+        replay_captured_resident_graph(replace(captured), 0.0)
     assert request.guard.completed_steps == 0
     for field in (
         "binding",
@@ -2619,6 +2602,10 @@ def test_capture_prepared_graph_ends_and_faults_after_dispatch_failure(
     def capture_release(_handle: object) -> None:
         trace.append("release")
 
+    def capture_abort() -> object:
+        trace.append("abort")
+        return capture_end()
+
     qualification = PreparedGraphCaptureQualification(
         binding,
         lifecycle,
@@ -2647,6 +2634,7 @@ def test_capture_prepared_graph_ends_and_faults_after_dispatch_failure(
             unexpected_callable,
             unexpected_callable,
             capture_release,
+            capture_abort,
         ),
     )
     monkeypatch.setattr(
@@ -2669,7 +2657,7 @@ def test_capture_prepared_graph_ends_and_faults_after_dispatch_failure(
     with pytest.raises(RuntimeError, match="frozen dispatch failed"):
         capture_prepared_resident_graph(qualification)
 
-    assert trace == ["begin", "dispatch", "end", "release"]
+    assert trace == ["begin", "dispatch", "abort", "end", "release"]
     assert binding.lifecycle.state is GraphCaptureLifecycleState.FAULTED
 
 
@@ -2766,12 +2754,14 @@ def test_capture_prepared_graph_faults_after_post_end_failure(
     )
     if classification_fails:
 
-        def fail_classification(_binding: object) -> None:
+        def fail_classification(*_args: object) -> None:
             raise ValueError("classification failed")
 
+        import particula.execution.gpu_session as gpu_session
+
         monkeypatch.setattr(
-            graph_capture,
-            "classify_resident_graph_capture_writer_failure",
+            gpu_session,
+            "_fault_resident_session_with_context",
             fail_classification,
         )
 
@@ -2896,6 +2886,429 @@ def test_capture_prepared_graph_real_cuda_smoke(
     )
 
     captured = capture_prepared_resident_graph(qualification)
-    assert captured.handle is not None
-    capture_release(captured.handle)
-    assert released == [captured.handle]
+    assert not hasattr(captured, "handle")
+    binding._lifecycle = invalidate_graph_capture(
+        binding.lifecycle,
+        GraphCaptureCompatibility(False, GraphCaptureDriftReason.REQUEST),
+    )
+    retire_resident_graph_capture(binding)
+    assert len(released) == 1
+
+
+def _issued_capture_for_lifecycle_test(
+    request: "ResidentSimulationRequest",
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    handle: object,
+    begin: Any = lambda: None,
+    end: Any | None = None,
+    launch: Any = lambda _handle: None,
+    release: Any = lambda _handle: None,
+    abort: Any = lambda: None,
+) -> tuple[CapturedResidentGraph, ResidentGraphCaptureBinding]:
+    """Issue one authentic record while bypassing unrelated CUDA validation."""
+    signature = create_resident_graph_capture_signature(request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            request.session.metadata.device,
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        signature,
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    capture_set = request.registry.validate_capture_resource_set(
+        request.capture_resource_requirements
+    )
+    prepared = SimpleNamespace(
+        timestep=SimpleNamespace(duration=0.0), duration=0.0
+    )
+    qualification = PreparedGraphCaptureQualification(
+        binding,
+        lifecycle,
+        signature,
+        request,
+        request.session,
+        request.registry,
+        request.guard,
+        prepared,
+        prepared.timestep,
+        request.capture_resource_requirements,
+        capture_set,
+        capture_set.report,
+        request.session.metadata.device,
+        request.session.dimensions,
+        request.graph,
+        request.schedule,
+        request.schedule.ordered_node_ids,
+        prepared.duration,
+        True,
+        signature.primary_arrays,
+        signature.resource_views,
+        GraphCaptureNativeCallables(
+            begin,
+            end or (lambda: handle),
+            lambda: None,
+            launch,
+            release,
+            abort,
+        ),
+    )
+    monkeypatch.setattr(
+        graph_capture,
+        "_validate_prepared_graph_capture_qualification",
+        lambda value: value,
+    )
+    import particula.execution.resident_scheduler as resident_scheduler
+
+    monkeypatch.setattr(
+        resident_scheduler,
+        "_enqueue_captured_prepared_operations",
+        lambda _prepared: None,
+    )
+    return capture_prepared_resident_graph(qualification), binding
+
+
+@pytest.mark.warp
+def test_native_handle_identity_is_single_use_even_after_release(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A live or tombstoned opaque identity cannot gain new provenance."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    handle = object()
+    captured, binding = _issued_capture_for_lifecycle_test(
+        request, monkeypatch, handle=handle
+    )
+    forged = replace(captured)
+
+    with pytest.raises(ValueError, match="already issued"):
+        graph_capture._register_captured_graph(forged, handle)
+    close_resident_graph_capture(binding)
+    with pytest.raises(ValueError, match="already issued"):
+        graph_capture._register_captured_graph(forged, handle)
+    assert close_resident_graph_capture(binding).state is (
+        GraphCaptureLifecycleState.CLOSED
+    )
+
+
+@pytest.mark.warp
+def test_concurrent_launch_finishes_before_single_release(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Release waits for an admitted launch lease and runs exactly once."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    launch_started = Event()
+    allow_launch = Event()
+    trace: list[str] = []
+    errors: list[BaseException] = []
+
+    def launch(_handle: object) -> None:
+        trace.append("launch-start")
+        launch_started.set()
+        assert allow_launch.wait(2.0)
+        trace.append("launch-end")
+
+    def release(_handle: object) -> None:
+        trace.append("release")
+
+    captured, binding = _issued_capture_for_lifecycle_test(
+        request,
+        monkeypatch,
+        handle=object(),
+        launch=launch,
+        release=release,
+    )
+    monkeypatch.setattr(
+        graph_capture, "gate_resident_graph_capture", lambda _binding: None
+    )
+
+    def run_replay() -> None:
+        try:
+            replay_captured_resident_graph(captured, 0.0)
+        except BaseException as error:
+            errors.append(error)
+
+    def run_release() -> None:
+        try:
+            close_resident_graph_capture(binding)
+        except BaseException as error:
+            errors.append(error)
+
+    replay_thread = Thread(target=run_replay)
+    release_thread = Thread(target=run_release)
+    replay_thread.start()
+    assert launch_started.wait(2.0)
+    release_thread.start()
+    assert release_thread.is_alive()
+    allow_launch.set()
+    replay_thread.join(2.0)
+    release_thread.join(2.0)
+
+    assert not replay_thread.is_alive()
+    assert not release_thread.is_alive()
+    assert errors == []
+    assert trace == ["launch-start", "launch-end", "release"]
+    assert request.guard.completed_steps == 1
+    assert close_resident_graph_capture(binding).state is (
+        GraphCaptureLifecycleState.CLOSED
+    )
+    assert trace.count("release") == 1
+
+
+@pytest.mark.warp
+def test_release_callback_runs_outside_global_provenance_lock(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Unrelated provenance work is not globally serialized by release."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    acquired = Event()
+
+    def acquire_lock_elsewhere() -> None:
+        with graph_capture._ISSUED_CAPTURED_GRAPHS_CONDITION:
+            acquired.set()
+
+    def release(_handle: object) -> None:
+        thread = Thread(target=acquire_lock_elsewhere)
+        thread.start()
+        assert acquired.wait(2.0)
+        thread.join(2.0)
+        assert not thread.is_alive()
+
+    _, binding = _issued_capture_for_lifecycle_test(
+        request, monkeypatch, handle=object(), release=release
+    )
+    close_resident_graph_capture(binding)
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("terminal_operation", ("close", "discard", "finalize"))
+def test_capture_lease_rejects_terminal_transition_race(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+    terminal_operation: str,
+) -> None:
+    """Terminal operations cannot pass an active native-capture lease."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    capture_started = Event()
+    allow_capture = Event()
+    result: list[CapturedResidentGraph] = []
+    errors: list[BaseException] = []
+
+    if terminal_operation == "finalize":
+        request.session._checkpoint_controller(request.registry, request.guard)
+
+    def begin() -> None:
+        capture_started.set()
+        assert allow_capture.wait(10.0)
+
+    def run_capture() -> None:
+        try:
+            result.append(
+                _issued_capture_for_lifecycle_test(
+                    request, monkeypatch, handle=object(), begin=begin
+                )[0]
+            )
+        except BaseException as error:
+            errors.append(error)
+
+    thread = Thread(target=run_capture)
+    thread.start()
+    assert capture_started.wait(2.0)
+    operation = getattr(request.session, terminal_operation)
+    with pytest.raises(RuntimeError, match="native resident operation"):
+        operation(request.registry, request.guard)
+    allow_capture.set()
+    thread.join(2.0)
+
+    assert not thread.is_alive()
+    assert errors == []
+    assert len(result) == 1
+    request.session.close(request.registry, request.guard)
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("terminal_operation", ("close", "discard", "finalize"))
+def test_replay_lease_rejects_terminal_transition_race(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+    terminal_operation: str,
+) -> None:
+    """Terminal operations cannot pass an admitted native-replay lease."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    launch_started = Event()
+    allow_launch = Event()
+    errors: list[BaseException] = []
+
+    if terminal_operation == "finalize":
+        request.session._checkpoint_controller(request.registry, request.guard)
+
+    def launch(_handle: object) -> None:
+        launch_started.set()
+        assert allow_launch.wait(10.0)
+
+    captured, _ = _issued_capture_for_lifecycle_test(
+        request, monkeypatch, handle=object(), launch=launch
+    )
+    monkeypatch.setattr(
+        graph_capture, "gate_resident_graph_capture", lambda _binding: None
+    )
+
+    def run_replay() -> None:
+        try:
+            replay_captured_resident_graph(captured, 0.0)
+        except BaseException as error:
+            errors.append(error)
+
+    thread = Thread(target=run_replay)
+    thread.start()
+    assert launch_started.wait(2.0)
+    operation = getattr(request.session, terminal_operation)
+    with pytest.raises(RuntimeError, match="native resident operation"):
+        operation(request.registry, request.guard)
+    allow_launch.set()
+    thread.join(2.0)
+
+    assert not thread.is_alive()
+    assert errors == []
+    assert request.guard.completed_steps == 1
+    request.session.close(request.registry, request.guard)
+
+
+@pytest.mark.warp
+def test_terminal_release_callback_reentry_cannot_replay(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Terminal intent and tombstoning are visible before release reentry."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    captured_holder: list[CapturedResidentGraph] = []
+    launches: list[object] = []
+    rejection: list[BaseException] = []
+
+    def release(_handle: object) -> None:
+        try:
+            replay_captured_resident_graph(captured_holder[0], 0.0)
+        except BaseException as error:
+            rejection.append(error)
+
+    captured, _ = _issued_capture_for_lifecycle_test(
+        request,
+        monkeypatch,
+        handle=object(),
+        launch=launches.append,
+        release=release,
+    )
+    captured_holder.append(captured)
+    request.session.close(request.registry, request.guard)
+
+    assert launches == []
+    assert len(rejection) == 1
+    assert isinstance(rejection[0], ValueError)
+    assert "not P2-issued" in str(rejection[0])
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("failure_phase", ("begin", "dispatch", "end"))
+def test_capture_failures_abort_fault_and_preserve_primary_error(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+    failure_phase: str,
+) -> None:
+    """Every native capture failure keeps its primary error over abort failure."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    trace: list[str] = []
+
+    def begin() -> None:
+        trace.append("begin")
+        if failure_phase == "begin":
+            raise RuntimeError("primary capture failure")
+
+    def end() -> object:
+        trace.append("end")
+        if failure_phase == "end":
+            raise RuntimeError("primary capture failure")
+        return object()
+
+    def abort() -> None:
+        trace.append("abort")
+        raise ValueError("abort cleanup failed")
+
+    signature = create_resident_graph_capture_signature(request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            request.session.metadata.device,
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        signature,
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    capture_set = request.registry.validate_capture_resource_set(
+        request.capture_resource_requirements
+    )
+    prepared = SimpleNamespace(
+        timestep=SimpleNamespace(duration=0.0), duration=0.0
+    )
+    qualification = PreparedGraphCaptureQualification(
+        binding,
+        lifecycle,
+        signature,
+        request,
+        request.session,
+        request.registry,
+        request.guard,
+        prepared,
+        prepared.timestep,
+        request.capture_resource_requirements,
+        capture_set,
+        capture_set.report,
+        request.session.metadata.device,
+        request.session.dimensions,
+        request.graph,
+        request.schedule,
+        request.schedule.ordered_node_ids,
+        prepared.duration,
+        True,
+        signature.primary_arrays,
+        signature.resource_views,
+        GraphCaptureNativeCallables(
+            begin,
+            end,
+            lambda: None,
+            lambda _handle: None,
+            lambda _handle: None,
+            abort,
+        ),
+    )
+    monkeypatch.setattr(
+        graph_capture,
+        "_validate_prepared_graph_capture_qualification",
+        lambda value: value,
+    )
+    import particula.execution.resident_scheduler as resident_scheduler
+
+    def dispatch(_prepared: object) -> None:
+        trace.append("dispatch")
+        if failure_phase == "dispatch":
+            raise RuntimeError("primary capture failure")
+
+    monkeypatch.setattr(
+        resident_scheduler, "_enqueue_captured_prepared_operations", dispatch
+    )
+
+    with pytest.raises(RuntimeError, match="primary capture failure") as raised:
+        capture_prepared_resident_graph(qualification)
+
+    assert isinstance(raised.value.__cause__, ValueError)
+    assert str(raised.value.__cause__) == "abort cleanup failed"
+    assert request.session.lifecycle.name == "FAULTED"
+    request.guard.assert_step_closed()
+    with pytest.raises(ValueError, match="entering a terminal state|ACTIVE"):
+        request.session._acquire_native_operation("capture")

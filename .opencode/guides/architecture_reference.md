@@ -352,6 +352,17 @@ resource acquisition, transfer, synchronization, fallback, or retry. Enqueue
 uses setup-bound handlers and launch arguments only: it performs no setup,
 allocation, signature reconstruction, or node lookup.
 
+`particula.execution.graph_capture` keeps native graph handles out of captured
+carriers and owns one private LIVE/RELEASING/RELEASED provenance record per
+opaque identity. Replay acquires a per-record launch lease under a short global
+provenance lock, then calls native launch outside that lock. Capture/replay also
+use the exact resident session's lifecycle lease; close, discard, and finalize
+publish terminal intent before release callbacks. Post-begin capture failures
+invoke native abort, fault resident and graph state, and preserve the initiating
+exception when cleanup fails. Qualification remains READY-only and replay
+remains CAPTURED-only; no public export, fallback, retry, rollback, or automatic
+recapture is added.
+
 ## Authenticated Native Resident-Graph Replay
 
 `particula.execution.graph_capture` remains a concrete, direct-import-only
@@ -360,9 +371,9 @@ P1 qualifies an exact READY resident binding, P2 captures that binding and
 issues a `CapturedResidentGraph`, and P3 supplies
 `replay_captured_resident_graph()`.
 
-P3 accepts only an authentic P2-issued record and forwards its retained opaque
-native handle by identity only. It revalidates provenance and the exact capture
-binding before opening one `ResidentStepGuard` token, calling native
+P3 accepts only an authentic P2-issued record and forwards the privately owned
+opaque native handle by identity only. It revalidates provenance and the exact
+capture binding before opening one `ResidentStepGuard` token, calling native
 `capture_launch` once, and completing the token. Pinned payload updates and
 advancing resident RNG words remain compatible; provenance, identity, lifecycle,
 device, publication, guard, or duration drift rejects before token entry.

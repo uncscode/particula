@@ -960,6 +960,16 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 
 ### Resident graph-capture admission lifecycle
 
+- Native graph handles are private provenance, not fields on captured records.
+  LIVE records admit replay through per-record leases; teardown transitions to
+  RELEASING, performs the one release outside the global provenance lock, and
+  retains a RELEASED tombstone so an opaque identity cannot be reissued.
+- Capture/replay and close/discard/finalize share a per-session lifecycle
+  protocol. Terminal intent is visible before caller-controlled callbacks, so
+  callback reentry cannot race admission. A post-begin capture failure invokes
+  native abort, faults resident and graph state, and preserves the initiating
+  exception with cleanup failures chained.
+
 #### Resident graph-capture P5 validation boundary
 
 - The delivered three-way P5 matrix uses CPU as a test-local NumPy reference,

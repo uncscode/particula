@@ -2547,7 +2547,10 @@ class GPUResourceRegistry:
                 _fault_resident_session_with_context,
             )
 
-            _fault_resident_session_with_context(self._session, self, guard)
+            try:
+                _fault_resident_session_with_context(self._session, self, guard)
+            except BaseException as cleanup_error:
+                raise error.error from cleanup_error
             raise error.error from error
 
     def validate_diagnostic_outputs(

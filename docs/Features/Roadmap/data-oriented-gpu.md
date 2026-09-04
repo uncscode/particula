@@ -1683,6 +1683,12 @@ deferred to the later Epic H tracks and Epic I.
 ## Epic H: Graph Capture and Performance
 
 Status: active. E8-F1, E8-F2 P1--P6/P8, and E8-F4 P1--P5 are shipped.
+E8-F4 keeps opaque native handles in private LIVE/RELEASING/RELEASED
+provenance. Per-record launch leases prevent release races, native callbacks
+run outside the global provenance lock, and the shared session lifecycle
+protocol publishes terminal intent before close, discard, or finalize
+callbacks. Post-begin capture failures abort, fault resident and graph state,
+and preserve the initiating exception.
 E8-F4 P5 supplies bounded three-way full-loop NumPy/Warp-CPU/native-CUDA
 validation. This work remains concrete-only and provides no public workflow.
 
