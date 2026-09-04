@@ -1658,7 +1658,7 @@ def test_binding_attaches_once_to_the_final_request(
     assert request.graph_capture_binding is binding
     assert binding.lifecycle is lifecycle
     _attach_resident_graph_capture_binding(request, binding)
-    assert request.session._resident_graph_capture_binding is binding
+    assert cast(Any, request.session)._resident_graph_capture_binding is binding
 
 
 @pytest.mark.warp
@@ -1686,7 +1686,9 @@ def test_notification_requires_exact_attached_resident_context(
         request, request.session, request.registry, request.guard, lifecycle
     )
     _attach_resident_graph_capture_binding(request, binding)
-    wrong_guard = ResidentStepGuard(request.session, request.registry)
+    wrong_guard = ResidentStepGuard(
+        request.session, cast("GPUResourceRegistry", request.registry)
+    )
 
     with pytest.raises(ValueError, match="notification binding mismatch"):
         _notify_resident_graph_capture(
