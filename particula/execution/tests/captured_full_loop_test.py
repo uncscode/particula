@@ -40,6 +40,17 @@ PARITY_RTOL = 1e-12
 PARITY_ATOL = 1e-30
 
 
+@pytest.fixture(autouse=True)
+def _remove_resolver_schedule_registrations() -> Any:
+    """Keep locally constructed schedules isolated between test cases."""
+    import particula.execution.scheduler as scheduler_module
+
+    schedules = scheduler_module._RESOLVER_SCHEDULES
+    initial_count = len(schedules)
+    yield
+    del schedules[initial_count:]
+
+
 def _inventory_oracle(fixture: Any) -> np.ndarray:
     """Compute concentration-weighted inventory independently."""
     particles = fixture.session.particles
