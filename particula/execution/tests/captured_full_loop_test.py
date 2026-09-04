@@ -46,9 +46,10 @@ def _remove_resolver_schedule_registrations() -> Any:
     import particula.execution.scheduler as scheduler_module
 
     schedules = scheduler_module._RESOLVER_SCHEDULES
-    initial_count = len(schedules)
+    initial_schedules = list(schedules)
+    schedules.clear()
     yield
-    del schedules[initial_count:]
+    schedules[:] = initial_schedules
 
 
 def _inventory_oracle(fixture: Any) -> np.ndarray:
@@ -320,8 +321,11 @@ def test_fake_native_capture_replays_nonzero_reference_steps_and_cleans_up(
     qualification, binding, native = _prepared_fake_capture(
         fixture, monkeypatch, 1.25
     )
+    import particula.execution.resident_scheduler as resident_scheduler
+
     monkeypatch.setattr(
-        "particula.execution.resident_scheduler._enqueue_captured_prepared_operations",
+        resident_scheduler,
+        "_enqueue_captured_prepared_operations",
         lambda _prepared: None,
     )
 
@@ -365,8 +369,11 @@ def test_captured_replay_rejects_stale_binding_and_duration_before_launch(
     qualification, binding, native = _prepared_fake_capture(
         fixture, monkeypatch, 2.0
     )
+    import particula.execution.resident_scheduler as resident_scheduler
+
     monkeypatch.setattr(
-        "particula.execution.resident_scheduler._enqueue_captured_prepared_operations",
+        resident_scheduler,
+        "_enqueue_captured_prepared_operations",
         lambda _prepared: None,
     )
     captured = capture_prepared_resident_graph(qualification)
