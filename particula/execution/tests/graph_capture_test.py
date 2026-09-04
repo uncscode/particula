@@ -2437,6 +2437,118 @@ def test_capture_prepared_graph_ends_and_faults_after_dispatch_failure(
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize("classification_fails", (False, True))
+def test_capture_prepared_graph_faults_after_post_end_failure(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+    classification_fails: bool,
+) -> None:
+    """Post-end failures fault lifecycle and retain their causal chain."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    signature = create_resident_graph_capture_signature(request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        signature,
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    capture_set = cast(
+        "GPUResourceRegistry", request.registry
+    ).validate_capture_resource_set(
+        cast(
+            "CaptureResourceRequirements", request.capture_resource_requirements
+        )
+    )
+    trace: list[str] = []
+    handle = object()
+
+    def capture_begin() -> None:
+        trace.append("begin")
+
+    def capture_end() -> object:
+        trace.append("end")
+        return handle
+
+    def capture_release(released_handle: object) -> None:
+        assert released_handle is handle
+        trace.append("release")
+
+    qualification = PreparedGraphCaptureQualification(
+        binding,
+        lifecycle,
+        signature,
+        request,
+        request.session,
+        request.registry,
+        request.guard,
+        object(),
+        object(),
+        request.capture_resource_requirements,
+        capture_set,
+        capture_set.report,
+        Device(Backend.WARP, "cuda:0"),
+        request.session.dimensions,
+        request.graph,
+        request.schedule,
+        request.schedule.ordered_node_ids,
+        0.0,
+        True,
+        signature.primary_arrays,
+        signature.resource_views,
+        GraphCaptureNativeCallables(
+            capture_begin,
+            capture_end,
+            lambda: None,
+            lambda: None,
+            capture_release,
+        ),
+    )
+    monkeypatch.setattr(
+        graph_capture,
+        "_validate_prepared_graph_capture_qualification",
+        lambda value: value,
+    )
+    import particula.execution.resident_scheduler as resident_scheduler
+
+    monkeypatch.setattr(
+        resident_scheduler,
+        "_enqueue_captured_prepared_operations",
+        lambda _prepared: trace.append("dispatch"),
+    )
+
+    def fail_completion(_binding: object) -> object:
+        raise RuntimeError("completion failed")
+
+    monkeypatch.setattr(
+        graph_capture, "complete_resident_graph_capture", fail_completion
+    )
+    if classification_fails:
+
+        def fail_classification(_binding: object) -> None:
+            raise ValueError("classification failed")
+
+        monkeypatch.setattr(
+            graph_capture,
+            "classify_resident_graph_capture_writer_failure",
+            fail_classification,
+        )
+
+    with pytest.raises(RuntimeError, match="completion failed") as raised:
+        capture_prepared_resident_graph(qualification)
+
+    assert trace == ["begin", "dispatch", "end", "release"]
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.FAULTED
+    if classification_fails:
+        assert isinstance(raised.value.__cause__, ValueError)
+        assert str(raised.value.__cause__) == "classification failed"
+
+
+@pytest.mark.warp
 @pytest.mark.cuda
 def test_capture_prepared_graph_real_cuda_smoke(
     resident_request: object,
@@ -2484,7 +2596,7 @@ def test_capture_prepared_graph_real_cuda_smoke(
     globals()["wp"] = wp
 
     @wp.kernel
-    def noop_kernel(data: wp.array(dtype=wp.float32)):
+    def noop_kernel(data: Any):
         data[0] = data[0]
 
     def device_noop() -> None:

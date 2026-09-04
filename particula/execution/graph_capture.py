@@ -18,7 +18,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from threading import Lock
-from typing import TYPE_CHECKING, Any, Protocol, cast
+from typing import TYPE_CHECKING, Any, NoReturn, Protocol, cast
 
 from particula.execution import Backend, Device
 
@@ -2078,7 +2078,7 @@ def _raise_capture_operational_failure(
     qualification: PreparedGraphCaptureQualification,
     error: BaseException,
     cleanup_error: BaseException | None = None,
-) -> None:
+) -> NoReturn:
     """Raise an operational capture error while retaining its primary cause.
 
     Args:
@@ -2195,8 +2195,10 @@ def capture_prepared_resident_graph(
                 try:
                     native.capture_release(handle)
                 except BaseException as release_error:
-                    raise error from release_error
-                raise
+                    _raise_capture_operational_failure(
+                        typed, error, release_error
+                    )
+                _raise_capture_operational_failure(typed, error)
         finally:
             with _ACTIVE_CAPTURE_LOCK:
                 _ACTIVE_CAPTURE_BINDING_IDS.discard(binding_id)
