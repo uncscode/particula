@@ -7,6 +7,7 @@ import subprocess
 import sys
 import textwrap
 from dataclasses import FrozenInstanceError, fields, is_dataclass, replace
+from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
@@ -2433,3 +2434,119 @@ def test_capture_prepared_graph_ends_and_faults_after_dispatch_failure(
 
     assert trace == ["begin", "dispatch", "end", "release"]
     assert binding.lifecycle.state is GraphCaptureLifecycleState.FAULTED
+
+
+@pytest.mark.warp
+@pytest.mark.cuda
+def test_capture_prepared_graph_real_cuda_smoke(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Capture twelve device no-ops with Warp's real CUDA capture API."""
+    wp = pytest.importorskip("warp")
+    devices = [
+        device for device in wp.get_devices() if str(device).startswith("cuda")
+    ]
+    if not devices:
+        pytest.skip("CUDA device unavailable")
+    device = str(devices[0])
+    if not all(
+        callable(getattr(wp, name, None))
+        for name in ("capture_begin", "capture_end")
+    ):
+        pytest.skip("Warp capture API unavailable")
+    graph_type = getattr(wp, "Graph", None)
+    if graph_type is None or not callable(getattr(graph_type, "destroy", None)):
+        pytest.skip("Warp capture release API unavailable")
+
+    request = cast("ResidentSimulationRequest", resident_request)
+    signature = create_resident_graph_capture_signature(request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, device),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        signature,
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    capture_set = cast(
+        "GPUResourceRegistry", request.registry
+    ).validate_capture_resource_set(
+        cast(
+            "CaptureResourceRequirements", request.capture_resource_requirements
+        )
+    )
+
+    values = wp.zeros(1, dtype=wp.float32, device=device)
+    globals()["wp"] = wp
+
+    @wp.kernel
+    def noop_kernel(data: wp.array(dtype=wp.float32)):
+        data[0] = data[0]
+
+    def device_noop() -> None:
+        wp.launch(noop_kernel, dim=1, inputs=[values], device=device)
+
+    released: list[object] = []
+
+    def capture_begin() -> None:
+        wp.capture_begin(device=device, force_module_load=True)
+
+    def capture_end() -> object:
+        return wp.capture_end()
+
+    def capture_release(handle: object) -> None:
+        released.append(handle)
+        destroy = getattr(handle, "destroy", None)
+        if not callable(destroy):
+            pytest.fail("Warp capture handle has no native release method")
+        destroy()
+
+    qualification = PreparedGraphCaptureQualification(
+        binding,
+        lifecycle,
+        signature,
+        request,
+        request.session,
+        request.registry,
+        request.guard,
+        SimpleNamespace(
+            operations=tuple(
+                SimpleNamespace(handler=device_noop, arguments=())
+                for _ in request.schedule.ordered_node_ids
+            )
+        ),
+        object(),
+        request.capture_resource_requirements,
+        capture_set,
+        capture_set.report,
+        Device(Backend.WARP, device),
+        request.session.dimensions,
+        request.graph,
+        request.schedule,
+        request.schedule.ordered_node_ids,
+        0.0,
+        True,
+        signature.primary_arrays,
+        signature.resource_views,
+        GraphCaptureNativeCallables(
+            capture_begin,
+            capture_end,
+            lambda: None,
+            lambda: None,
+            capture_release,
+        ),
+    )
+    monkeypatch.setattr(
+        graph_capture,
+        "_validate_prepared_graph_capture_qualification",
+        lambda value: value,
+    )
+
+    captured = capture_prepared_resident_graph(qualification)
+    assert captured.handle is not None
+    capture_release(captured.handle)
+    assert released == [captured.handle]
