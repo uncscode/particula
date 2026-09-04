@@ -2240,6 +2240,11 @@ def _validate_replay_captured_graph(
         raise TypeError(
             "qualification must be an exact PreparedGraphCaptureQualification."
         )
+    session = cast("ResidentSession", captured.session)
+    request = cast(Any, captured.request)
+    timestep = cast(Any, qualification.timestep)
+    prepared = cast(Any, qualification.prepared)
+    guard = cast("ResidentStepGuard", captured.guard)
     if (
         captured.binding is not qualification.binding
         or captured.signature is not qualification.signature
@@ -2269,11 +2274,11 @@ def _validate_replay_captured_graph(
         or qualification.capture_set is not captured.capture_set
         or qualification.capture_report is not captured.capture_report
         or qualification.device is not captured.device
-        or qualification.dimensions is not captured.session.dimensions
-        or qualification.graph is not captured.request.graph
-        or qualification.schedule is not captured.request.schedule
+        or qualification.dimensions is not session.dimensions
+        or qualification.graph is not request.graph
+        or qualification.schedule is not request.schedule
         or qualification.ordered_node_ids
-        is not captured.request.schedule.ordered_node_ids
+        is not request.schedule.ordered_node_ids
         or qualification.primary_arrays is not captured.signature.primary_arrays
         or qualification.resource_views is not captured.signature.resource_views
         or type(qualification.native_callables)
@@ -2281,22 +2286,22 @@ def _validate_replay_captured_graph(
     ):
         raise ValueError("captured resident graph identities do not match.")
     gate_resident_graph_capture(captured.binding)
-    captured.guard._validate_duration(duration)
+    guard._validate_duration(duration)
     if (
-        qualification.device != captured.session.metadata.device
+        qualification.device != session.metadata.device
         or qualification.device != captured.lifecycle.capability.device
-        or qualification.timestep is not qualification.prepared.timestep
-        or qualification.duration is not qualification.prepared.duration
+        or qualification.timestep is not prepared.timestep
+        or qualification.duration is not prepared.duration
     ):
         raise ValueError("captured resident graph qualification changed.")
     if qualification.duration_is_identity:
         if (
-            qualification.duration is not qualification.timestep.duration
+            qualification.duration is not timestep.duration
             or duration is not qualification.duration
         ):
             raise ValueError("captured graph replay duration does not match.")
     elif (
-        qualification.duration != qualification.timestep.duration
+        qualification.duration != timestep.duration
         or duration != qualification.duration
     ):
         raise ValueError("captured graph replay duration does not match.")
@@ -2310,6 +2315,7 @@ def _raise_replay_operational_failure(
 ) -> NoReturn:
     """Clean up a post-launch replay failure while preserving ``error``."""
     from particula.execution.gpu_session import (
+        ResidentStepToken,
         _handle_failed_resident_operation,
         _ResidentOperationOutcome,
     )
@@ -2317,10 +2323,10 @@ def _raise_replay_operational_failure(
     cleanup_error: BaseException | None = None
     try:
         _handle_failed_resident_operation(
-            qualification.session,
-            qualification.registry,
-            qualification.guard,
-            token,
+            cast("ResidentSession", qualification.session),
+            cast("GPUResourceRegistry", qualification.registry),
+            cast("ResidentStepGuard", qualification.guard),
+            cast("ResidentStepToken", token),
             _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
         )
     except BaseException as caught:
@@ -2354,10 +2360,12 @@ def replay_captured_resident_graph(captured: object, duration: object) -> None:
     words may change while their retained identities remain compatible.
     """
     qualification = _validate_replay_captured_graph(captured, duration)
-    token = qualification.guard.begin_step(duration)
+    captured_graph = cast(CapturedResidentGraph, captured)
+    guard = cast("ResidentStepGuard", qualification.guard)
+    token = guard.begin_step(duration)
     try:
-        qualification.native_callables.capture_launch(captured.handle)
-        qualification.guard.complete_step(token)
+        qualification.native_callables.capture_launch(captured_graph.handle)
+        guard.complete_step(token)
     except BaseException as error:
         _raise_replay_operational_failure(qualification, token, error)
 
