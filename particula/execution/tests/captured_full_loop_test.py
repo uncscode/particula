@@ -1259,7 +1259,7 @@ def _build_scenario_prepared_loop(
     registry = GPUResourceRegistry(session)
     guard = ResidentStepGuard(session, registry)
     graph, schedule, by_id = _resident_graph()
-    device = session.particles.masses.device
+    device = particles.masses.device
     configuration = CommunicationConfiguration(
         CommunicationMap(
             CommunicationMapForm.ONE_DIMENSIONAL,
