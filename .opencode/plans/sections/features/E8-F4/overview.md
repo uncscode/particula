@@ -23,7 +23,9 @@ delivered: graph-owned teardown makes each issued handle stale before one
 release on structural drift, writer fault, finalization, close/discard, or
 retirement. Exact session/registry/guard lifecycle notifications are lazy, and
 guarded stream initialization participates in the same writer-fault path.
-Multi-timestep evidence remains P5 work.
+P5 adds genuine nonzero native-CUDA single- and multi-box full-loop capture and
+replay comparisons against independent NumPy and uncaptured Warp CPU, with
+separate conservation, RNG-continuation, stochastic, and lifecycle evidence.
 
 ## User Stories
 
@@ -33,6 +35,6 @@ Multi-timestep evidence remains P5 work.
 - As a library maintainer, I want exact pre-launch compatibility checks and
   deterministic invalidation reasons so stale graphs never launch against
   replaced arrays, schedules, maps, or devices.
-- As a scientific reviewer, I want captured results compared with CPU and
-  uncaptured GPU references so graph execution is supported by numerical,
-  conservation, RNG-lifecycle, and failure-state evidence.
+- As a scientific reviewer, I want real CUDA capture results compared with CPU
+  and uncaptured Warp-CPU references so graph execution is supported by
+  numerical, conservation, RNG-lifecycle, and failure-state evidence.

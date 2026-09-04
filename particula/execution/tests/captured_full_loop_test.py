@@ -7,6 +7,7 @@ API is unavailable; it is never emulated on the CPU.
 
 from __future__ import annotations
 
+from dataclasses import dataclass, replace
 from types import SimpleNamespace
 from typing import Any
 
@@ -15,7 +16,15 @@ import numpy.testing as npt
 import pytest
 
 from particula.execution import Backend, Device
-from particula.execution.communication import CommunicationTransportMode
+from particula.execution.communication import (
+    CommunicationConfiguration,
+    CommunicationMap,
+    CommunicationMapForm,
+    CommunicationResourceShape,
+    CommunicationShapeKind,
+    CommunicationTransportMode,
+    PrescribedVolumeUpdate,
+)
 from particula.execution.graph_capture import (
     GraphCaptureAvailability,
     GraphCaptureCapability,
@@ -30,14 +39,88 @@ from particula.execution.graph_capture import (
     qualify_prepared_resident_graph_capture,
     replay_captured_resident_graph,
 )
+from particula.execution.process_adapters import ResidentNucleationRequest
+from particula.execution.resident_scheduler import (
+    enqueue_prepared_resident_simulation,
+    prepare_resident_simulation,
+)
 from particula.execution.tests.full_loop_test import _build_loop_fixture
+from particula.execution.tests.multi_box_loop_test import (
+    _binding,
+    _resident_graph,
+    _scheduler_request,
+)
+from particula.gpu.kernels.nucleation import (
+    NucleationConfig,
+    NucleationExhaustionControls,
+)
 from particula.gpu.tests.cuda_availability import (
     CUDA_SKIP_REASON,
     cuda_available,
 )
+from particula.util.constants import GAS_CONSTANT
 
 PARITY_RTOL = 1e-12
 PARITY_ATOL = 1e-30
+
+
+@dataclass
+class _PreparedLoop:
+    """Retain one authentic prepared resident loop and its resources."""
+
+    wp: Any
+    session: Any
+    registry: Any
+    guard: Any
+    request: Any
+    binding: ResidentGraphCaptureBinding
+    prepared: Any
+    coagulation_resources: Any
+    wall_loss_resources: Any
+
+
+class _WarpNativeCaptureAdapter:
+    """Expose Warp's genuine native graph operations after the CUDA gate."""
+
+    def __init__(self, wp: Any, native: str) -> None:
+        self.wp = wp
+        self.native = native
+
+    def runtime_available(self) -> bool:
+        """Return the already-established runtime qualification."""
+        return True
+
+    def device_available(self, device: Device) -> bool:
+        """Require the exact pre-qualified native CUDA device."""
+        return device.native == self.native
+
+    def capture_api_available(self, device: Device) -> bool:
+        """Require the exact device whose APIs were checked before setup."""
+        return device.native == self.native
+
+    def capture_callables(self, device: Device) -> GraphCaptureNativeCallables:
+        """Bind Warp capture, replay, and exact-handle cleanup operations."""
+
+        def capture_begin() -> None:
+            self.wp.capture_begin(
+                device=device.native,
+                force_module_load=True,
+            )
+
+        def capture_release(handle: object) -> None:
+            destroy = getattr(handle, "destroy", None)
+            if callable(destroy):
+                destroy()
+            # Warp versions without a public destroy method release the native
+            # graph when this exact opaque Python handle loses its final owner.
+
+        return GraphCaptureNativeCallables(
+            capture_begin,
+            self.wp.capture_end,
+            lambda: None,
+            self.wp.capture_launch,
+            capture_release,
+        )
 
 
 @pytest.fixture(autouse=True)
@@ -47,8 +130,10 @@ def _remove_resolver_schedule_registrations() -> Any:
 
     schedules = scheduler_module._RESOLVER_SCHEDULES
     initial_schedules = list(schedules)
+    _resident_graph.cache_clear()
     schedules.clear()
     yield
+    _resident_graph.cache_clear()
     schedules[:] = initial_schedules
 
 
@@ -216,6 +301,236 @@ def _snapshot(fixture: Any) -> tuple[np.ndarray, ...]:
     )
 
 
+def _zero_nucleation_request(
+    session: Any,
+    registry: Any,
+    resources: Any,
+    duration: float,
+) -> ResidentNucleationRequest:
+    """Build a valid, deterministic no-admission nucleation request."""
+    config = NucleationConfig(
+        rate_law="activation",
+        coefficient=0.0,
+        survival_factor=1.0,
+        precursor_index=0,
+        molecule_counts=(1, 0),
+        formation_diameter=1.0e-9,
+        precursor_number_concentration_lower=0.0,
+        precursor_number_concentration_upper=1.0e40,
+        temperature_lower=100.0,
+        temperature_upper=500.0,
+    )
+    return ResidentNucleationRequest(
+        session,
+        registry,
+        resources,
+        config,
+        duration,
+        NucleationExhaustionControls(True, False),
+    )
+
+
+def _capture_communication_configuration(session: Any, wp: Any) -> Any:
+    """Build a closed, zero-rate one-dimensional map on the active device."""
+    device = session.particles.masses.device
+    edges = max(session.dimensions.n_boxes - 1, 0)
+    sources = np.arange(edges, dtype=np.int32)
+    destinations = sources + 1
+    return CommunicationConfiguration(
+        CommunicationMap(
+            CommunicationMapForm.ONE_DIMENSIONAL,
+            CommunicationTransportMode.GAS,
+            edges,
+            wp.array(sources, dtype=wp.int32, device=device),
+            wp.array(destinations, dtype=wp.int32, device=device),
+            wp.ones(edges, dtype=wp.int32, device=device),
+            wp.zeros(edges, dtype=wp.float64, device=device),
+        ),
+        PrescribedVolumeUpdate(None),
+        (
+            CommunicationResourceShape(
+                "edge_rates",
+                wp.float64,
+                CommunicationShapeKind.E,
+            ),
+        ),
+    )
+
+
+def _build_prepared_loop(
+    device: str,
+    n_boxes: int,
+    duration: float,
+    root_seed: int,
+    *,
+    selected_wall_loss_boxes: tuple[int, ...] = (),
+) -> _PreparedLoop:
+    """Build one real all-operation resident loop on the requested device."""
+    manifest = tuple((f"box-{2 * index}", index) for index in range(n_boxes))
+    session, registry, guard = _binding(device, manifest, root_seed)
+    wp = pytest.importorskip("warp")
+    _resident_graph.cache_clear()
+    request, wall_loss, coagulation = _scheduler_request(
+        session,
+        registry,
+        guard,
+        duration,
+        selected_wall_loss_boxes,
+        _capture_communication_configuration(session, wp),
+        session.dimensions.n_particles,
+    )
+    request = replace(
+        request,
+        nucleation=_zero_nucleation_request(
+            session,
+            registry,
+            request.nucleation.resources,
+            duration,
+        ),
+    )
+    signature = create_resident_graph_capture_signature(request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            session.metadata.device,
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        signature,
+    )
+    binding = ResidentGraphCaptureBinding(
+        request,
+        session,
+        registry,
+        guard,
+        lifecycle,
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    prepared = prepare_resident_simulation(request, duration)
+    return _PreparedLoop(
+        wp=wp,
+        session=session,
+        registry=registry,
+        guard=guard,
+        request=request,
+        binding=binding,
+        prepared=prepared,
+        coagulation_resources=coagulation,
+        wall_loss_resources=wall_loss,
+    )
+
+
+def _prepared_snapshot(loop: _PreparedLoop) -> dict[str, np.ndarray]:
+    """Synchronize once and copy all meaningful resident-loop outputs."""
+    loop.wp.synchronize_device(loop.session.particles.masses.device)
+    particles = loop.session.particles
+    gas = loop.session.gas
+    environment = loop.session.environment
+    snapshot = {
+        "particle_masses": particles.masses.numpy().copy(),
+        "particle_concentration": particles.concentration.numpy().copy(),
+        "particle_charge": particles.charge.numpy().copy(),
+        "particle_density": particles.density.numpy().copy(),
+        "particle_volume": particles.volume.numpy().copy(),
+        "gas_molar_mass": gas.molar_mass.numpy().copy(),
+        "gas_concentration": gas.concentration.numpy().copy(),
+        "gas_vapor_pressure": gas.vapor_pressure.numpy().copy(),
+        "gas_partitioning": gas.partitioning.numpy().copy(),
+        "temperature": environment.temperature.numpy().copy(),
+        "pressure": environment.pressure.numpy().copy(),
+        "saturation_ratio": environment.saturation_ratio.numpy().copy(),
+        "collision_pairs": (
+            loop.coagulation_resources.collision_pairs.numpy().copy()
+        ),
+        "collision_counts": (
+            loop.coagulation_resources.n_collisions.numpy().copy()
+        ),
+        "coagulation_rng": (
+            loop.coagulation_resources.rng_states.numpy().copy()
+        ),
+        "wall_loss_rng": loop.wall_loss_resources.rng_states.numpy().copy(),
+    }
+    for registration in loop.request.diagnostics.registrations:
+        snapshot[f"diagnostic_{registration.operation.value}"] = (
+            registration.output.numpy().copy()
+        )
+    return snapshot
+
+
+def _close_prepared_loop(loop: _PreparedLoop) -> None:
+    """Release graph provenance before closing its resident session."""
+    close_resident_graph_capture(loop.binding)
+    loop.session.close(loop.registry, loop.guard)
+
+
+def _assert_prepared_parity(
+    actual: dict[str, np.ndarray],
+    expected: dict[str, np.ndarray],
+) -> None:
+    """Compare physical outputs without requiring cross-device RNG words."""
+    ignored = {"coagulation_rng", "wall_loss_rng"}
+    assert actual.keys() == expected.keys()
+    for name in actual.keys() - ignored:
+        if actual[name].dtype.kind in {"b", "i", "u"}:
+            npt.assert_equal(actual[name], expected[name], err_msg=name)
+        else:
+            npt.assert_allclose(
+                actual[name],
+                expected[name],
+                rtol=PARITY_RTOL,
+                atol=PARITY_ATOL,
+                err_msg=name,
+            )
+
+
+def _snapshot_inventory(snapshot: dict[str, np.ndarray]) -> np.ndarray:
+    """Compute per-box/species inventory from a detached snapshot."""
+    return snapshot["particle_volume"][:, None] * (
+        np.sum(
+            snapshot["particle_masses"]
+            * snapshot["particle_concentration"][:, :, None],
+            axis=1,
+        )
+        + snapshot["gas_concentration"]
+    )
+
+
+def _wall_loss_removal_moments(
+    snapshot: dict[str, np.ndarray],
+    duration: float,
+    steps: int,
+) -> tuple[float, float]:
+    """Return independent Bernoulli mean and variance for active slots."""
+    from particula.dynamics.properties.wall_loss_coefficient import (
+        get_spherical_wall_loss_coefficient_via_system_state,
+    )
+
+    mean = 0.0
+    variance = 0.0
+    density = snapshot["particle_density"]
+    for box in range(snapshot["particle_masses"].shape[0]):
+        for slot in range(snapshot["particle_masses"].shape[1]):
+            concentration = snapshot["particle_concentration"][box, slot]
+            masses = snapshot["particle_masses"][box, slot]
+            if concentration <= 0.0 or np.sum(masses) <= 0.0:
+                continue
+            particle_volume = np.sum(masses / density)
+            radius = (3.0 * particle_volume / (4.0 * np.pi)) ** (1.0 / 3.0)
+            effective_density = float(np.sum(masses) / particle_volume)
+            coefficient = float(
+                get_spherical_wall_loss_coefficient_via_system_state(
+                    wall_eddy_diffusivity=1.0,
+                    particle_radius=radius,
+                    particle_density=effective_density,
+                    temperature=float(snapshot["temperature"][box]),
+                    pressure=float(snapshot["pressure"][box]),
+                    chamber_radius=1.0,
+                )
+            )
+            probability = 1.0 - np.exp(-coefficient * duration * steps)
+            mean += probability
+            variance += probability * (1.0 - probability)
+    return mean, variance
+
+
 def _assert_same_state(
     actual: tuple[np.ndarray, ...], expected: tuple[np.ndarray, ...]
 ) -> None:
@@ -274,12 +589,297 @@ def _require_native_cuda_capture() -> Any:
     wp = pytest.importorskip("warp")
     if not cuda_available(wp):
         pytest.skip(CUDA_SKIP_REASON)
+    if not any(str(device).startswith("cuda") for device in wp.get_devices()):
+        pytest.skip(CUDA_SKIP_REASON)
     if not all(
         callable(getattr(wp, name, None))
-        for name in ("capture_begin", "capture_end")
+        for name in ("capture_begin", "capture_end", "capture_launch")
     ):
         pytest.skip("Warp capture API unavailable")
     return wp
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_real_uncaptured_warp_cpu_nonzero_loop_matches_numpy() -> None:
+    """Exercise the native-test fixture on the required uncaptured baseline."""
+    loop = _build_prepared_loop("cpu", 3, 0.25, 1571)
+    try:
+        initial = _prepared_snapshot(loop)
+        for _ in range(3):
+            enqueue_prepared_resident_simulation(loop.prepared)
+        result = _prepared_snapshot(loop)
+
+        expected_vapor_pressure = np.full((3, 2), 800.0, dtype=np.float64)
+        expected_saturation = (
+            result["gas_concentration"]
+            * GAS_CONSTANT
+            * result["temperature"][:, None]
+            / (result["gas_molar_mass"][None, :] * expected_vapor_pressure)
+        )
+        npt.assert_allclose(
+            result["gas_vapor_pressure"],
+            expected_vapor_pressure,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+        )
+        npt.assert_allclose(
+            result["saturation_ratio"],
+            expected_saturation,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+        )
+        npt.assert_allclose(
+            result["diagnostic_total_species_mass"],
+            _snapshot_inventory(result),
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+        )
+        npt.assert_allclose(
+            _snapshot_inventory(result),
+            _snapshot_inventory(initial),
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+        )
+        assert loop.guard.completed_steps == 3
+    finally:
+        _close_prepared_loop(loop)
+
+
+@pytest.mark.warp
+@pytest.mark.cuda
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize("n_boxes", (1, 3))
+def test_native_cuda_nonzero_full_loop_matches_numpy_and_uncaptured_warp(
+    n_boxes: int,
+) -> None:
+    """Replay a genuine nonzero CUDA graph against Warp CPU and NumPy."""
+    wp = _require_native_cuda_capture()
+    duration = 0.25
+    steps = 3
+    cpu_loop = _build_prepared_loop("cpu", n_boxes, duration, 1571)
+    cuda_loop = None
+    captured = None
+    try:
+        cuda_loop = _build_prepared_loop("cuda", n_boxes, duration, 1571)
+        cpu_initial = _prepared_snapshot(cpu_loop)
+        cuda_initial = _prepared_snapshot(cuda_loop)
+        _assert_prepared_parity(cuda_initial, cpu_initial)
+        initial_inventory = cpu_initial["particle_volume"][:, None] * (
+            np.sum(
+                cpu_initial["particle_masses"]
+                * cpu_initial["particle_concentration"][:, :, None],
+                axis=1,
+            )
+            + cpu_initial["gas_concentration"]
+        )
+
+        capture_set = cuda_loop.registry.validate_capture_resource_set(
+            cuda_loop.request.capture_resource_requirements
+        )
+        adapter = _WarpNativeCaptureAdapter(
+            wp,
+            cuda_loop.session.metadata.device.native,
+        )
+        qualification = qualify_prepared_resident_graph_capture(
+            cuda_loop.binding,
+            cuda_loop.prepared,
+            capture_set,
+            adapter,
+        )
+        captured = capture_prepared_resident_graph(qualification)
+        # Native recording itself is not a hidden physical launch.
+        _assert_prepared_parity(_prepared_snapshot(cuda_loop), cuda_initial)
+
+        for _ in range(steps):
+            enqueue_prepared_resident_simulation(cpu_loop.prepared)
+            replay_captured_resident_graph(captured, qualification.duration)
+
+        cpu_result = _prepared_snapshot(cpu_loop)
+        cuda_result = _prepared_snapshot(cuda_loop)
+        _assert_prepared_parity(cuda_result, cpu_result)
+
+        expected_vapor_pressure = np.full(
+            (n_boxes, 2),
+            800.0,
+            dtype=np.float64,
+        )
+        expected_saturation = (
+            cpu_result["gas_concentration"]
+            * GAS_CONSTANT
+            * cpu_result["temperature"][:, None]
+            / (cpu_result["gas_molar_mass"][None, :] * expected_vapor_pressure)
+        )
+        expected_inventory = cpu_result["particle_volume"][:, None] * (
+            np.sum(
+                cpu_result["particle_masses"]
+                * cpu_result["particle_concentration"][:, :, None],
+                axis=1,
+            )
+            + cpu_result["gas_concentration"]
+        )
+        npt.assert_allclose(
+            cuda_result["gas_vapor_pressure"],
+            expected_vapor_pressure,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+        )
+        npt.assert_allclose(
+            cuda_result["saturation_ratio"],
+            expected_saturation,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+        )
+        npt.assert_allclose(
+            cuda_result["diagnostic_gas_concentration_snapshot"],
+            cuda_result["gas_concentration"],
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+        )
+        npt.assert_allclose(
+            cuda_result["diagnostic_saturation_ratio_snapshot"],
+            expected_saturation,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+        )
+        npt.assert_allclose(
+            cuda_result["diagnostic_total_species_mass"],
+            expected_inventory,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+        )
+        npt.assert_allclose(
+            expected_inventory,
+            initial_inventory,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+        )
+        npt.assert_equal(cuda_result["gas_partitioning"], 0)
+        assert cpu_loop.guard.completed_steps == steps
+        assert cuda_loop.guard.completed_steps == steps
+        assert captured.handle is not None
+    finally:
+        captured = None
+        if cuda_loop is not None:
+            _close_prepared_loop(cuda_loop)
+        _close_prepared_loop(cpu_loop)
+
+
+@pytest.mark.warp
+@pytest.mark.cuda
+@pytest.mark.gpu_parity
+@pytest.mark.stochastic
+def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
+    """Compare wall-loss aggregates without cross-device trajectories."""
+    wp = _require_native_cuda_capture()
+    duration = 1.0
+    steps = 2
+    seeds = range(12)
+    cpu_removed = 0
+    cuda_removed = 0
+    expected_removed = 0.0
+    expected_variance = 0.0
+    continued_words = 0
+
+    for seed in seeds:
+        selected = (0, 1, 2)
+        cpu_loop = _build_prepared_loop(
+            "cpu",
+            len(selected),
+            duration,
+            seed,
+            selected_wall_loss_boxes=selected,
+        )
+        cuda_loop = None
+        captured = None
+        try:
+            cuda_loop = _build_prepared_loop(
+                "cuda",
+                len(selected),
+                duration,
+                seed,
+                selected_wall_loss_boxes=selected,
+            )
+            cpu_initial = _prepared_snapshot(cpu_loop)
+            cuda_initial = _prepared_snapshot(cuda_loop)
+            _assert_prepared_parity(cuda_initial, cpu_initial)
+            mean, variance = _wall_loss_removal_moments(
+                cpu_initial,
+                duration,
+                steps,
+            )
+            expected_removed += mean
+            expected_variance += variance
+
+            capture_set = cuda_loop.registry.validate_capture_resource_set(
+                cuda_loop.request.capture_resource_requirements
+            )
+            qualification = qualify_prepared_resident_graph_capture(
+                cuda_loop.binding,
+                cuda_loop.prepared,
+                capture_set,
+                _WarpNativeCaptureAdapter(
+                    wp,
+                    cuda_loop.session.metadata.device.native,
+                ),
+            )
+            captured = capture_prepared_resident_graph(qualification)
+            cuda_rng_initial = cuda_initial["wall_loss_rng"]
+
+            enqueue_prepared_resident_simulation(cpu_loop.prepared)
+            replay_captured_resident_graph(captured, qualification.duration)
+            cuda_first = _prepared_snapshot(cuda_loop)
+            assert np.any(cuda_first["wall_loss_rng"] != cuda_rng_initial)
+
+            enqueue_prepared_resident_simulation(cpu_loop.prepared)
+            replay_captured_resident_graph(captured, qualification.duration)
+            cpu_result = _prepared_snapshot(cpu_loop)
+            cuda_result = _prepared_snapshot(cuda_loop)
+            continued_words += int(
+                np.count_nonzero(
+                    cuda_result["wall_loss_rng"] != cuda_first["wall_loss_rng"]
+                )
+            )
+
+            cpu_removed += int(
+                np.count_nonzero(
+                    (cpu_initial["particle_concentration"] > 0.0)
+                    & (cpu_result["particle_concentration"] == 0.0)
+                )
+            )
+            cuda_removed += int(
+                np.count_nonzero(
+                    (cuda_initial["particle_concentration"] > 0.0)
+                    & (cuda_result["particle_concentration"] == 0.0)
+                )
+            )
+            for initial, result in (
+                (cpu_initial, cpu_result),
+                (cuda_initial, cuda_result),
+            ):
+                initial_inventory = _snapshot_inventory(initial)
+                final_inventory = _snapshot_inventory(result)
+                assert np.all(final_inventory <= initial_inventory)
+                removed_inventory = initial_inventory - final_inventory
+                npt.assert_allclose(
+                    final_inventory + removed_inventory,
+                    initial_inventory,
+                    rtol=PARITY_RTOL,
+                    atol=PARITY_ATOL,
+                )
+        finally:
+            captured = None
+            if cuda_loop is not None:
+                _close_prepared_loop(cuda_loop)
+            _close_prepared_loop(cpu_loop)
+
+    sigma = np.sqrt(expected_variance)
+    single_path_bound = max(4.0 * sigma, 2.0)
+    cross_path_bound = max(4.0 * np.sqrt(2.0) * sigma, 2.0)
+    assert abs(cpu_removed - expected_removed) <= single_path_bound
+    assert abs(cuda_removed - expected_removed) <= single_path_bound
+    assert abs(cuda_removed - cpu_removed) <= cross_path_bound
+    assert continued_words > 0
 
 
 @pytest.mark.warp

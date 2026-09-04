@@ -96,12 +96,13 @@ def test_p5_documents_three_way_native_capture_evidence_and_limits() -> None:
         ),
     }
     statements = (
-        "CPU is a test-local reference",
-        "Warp CPU is uncaptured evidence",
-        "CUDA native capture is optional pass-or-clean-skip evidence",
-        "capture is the frozen physical timestep one",
+        "test-local NumPy reference",
+        "uncaptured evidence",
+        "optional pass-or-clean-skip evidence",
+        "first physical timestep",
         "one-token replay",
         "opaque-handle provenance",
+        "single- and multi-box",
         "no public exports",
         "no automatic recapture",
         "no fallback",
@@ -110,19 +111,40 @@ def test_p5_documents_three_way_native_capture_evidence_and_limits() -> None:
         "cross-device replay",
         "deterministic parity",
         "independent conservation",
+        "persistent RNG continuation",
         "aggregate stochastic",
+        "cross-device RNG words",
         "no performance, profiling, or memory claim",
     )
     for path, document in documents.items():
-        normalized = " ".join(document.split())
+        normalized = " ".join(document.split()).lower()
         missing = [
             statement
             for statement in statements
-            if " ".join(statement.split()) not in normalized
+            if " ".join(statement.split()).lower() not in normalized
         ]
         assert not missing, f"Missing {missing!r} in {path}."
         assert "from particula.execution import graph_capture" not in document
         assert "from particula import graph_capture" not in document
+
+
+def test_foundations_graph_capture_is_not_nested_under_environment() -> None:
+    """Graph-capture validation remains a peer of the environment boundary."""
+    document = _read("docs/Features/data-containers-and-gpu-foundations.md")
+    environment = "### Environment transfer boundary"
+    graph_capture = "### Resident native graph-capture validation (test-only)"
+
+    environment_index = document.index(environment)
+    graph_capture_index = document.index(graph_capture)
+    next_environment_peer = document.index(
+        "### Gas transfer boundary",
+        environment_index,
+    )
+
+    assert graph_capture_index < environment_index < next_environment_peer
+    assert (
+        "### Resident native graph-capture validation boundary" not in document
+    )
 
 
 def test_planning_records_preserve_p4_validation_block_and_handoff_boundary() -> (

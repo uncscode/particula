@@ -39,11 +39,12 @@ baseline; native graph capture evidence is CUDA-only and pass-or-clean-skip.
   attachment/context checks, read-only preservation, and guarded stream-writer
   fault propagation. Checkpoint tests also cover notification ordering and no
   cached finalized checkpoint after release failure.
-- **P5 — full loop:** In `captured_full_loop_test.py`, run identical fixtures for
-  CPU reference, uncaptured Warp, and captured CUDA over multiple timesteps.
-  Compare fields separately with documented deterministic tolerances; assert
-  particle-plus-gas conservation independently; evaluate stochastic processes
-  with aggregate/sigma bounds rather than exact cross-device RNG replay.
+- **P5 — delivered full loop:** `captured_full_loop_test.py` covers genuine
+  nonzero single- and multi-box native-CUDA capture/replay against independent
+  NumPy and uncaptured Warp CPU, with meaningful fields, conservation,
+  persistent RNG continuation, bounded stochastic aggregates, CUDA availability,
+  lifecycle cleanup, stale rejection, and forbidden host work. The hardware-free
+  `graph_capture_docs_test.py` verifies the matching bounded claims.
 
 ## Required Scenarios
 
@@ -73,6 +74,8 @@ pytest particula/execution/tests/graph_capture_test.py \
 pytest particula/execution/tests/graph_capture_test.py -q --no-cov \
   -m "warp and cuda"
 pytest particula/execution/tests/full_loop_test.py -q --no-cov
+pytest particula/execution/tests/captured_full_loop_test.py \
+  particula/execution/tests/graph_capture_docs_test.py -q --no-cov
 pytest particula/execution/tests/exports_test.py -q --no-cov
 ```
 

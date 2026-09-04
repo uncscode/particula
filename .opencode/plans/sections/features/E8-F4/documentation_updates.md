@@ -18,3 +18,8 @@
   claims and run `mkdocs build --strict`.
 - No user-facing documentation changed for P1, P2, or P3. Defer the runnable
   graph-capture example and tutorial to E8-F8.
+- Issue #1571 documents the bounded delivered matrix: CPU is an independent
+  test-local NumPy reference, Warp CPU is uncaptured evidence, and CUDA capture
+  is optional native-only evidence. Genuine nonzero single- and multi-box rows
+  cover native capture/replay, conservation, RNG continuation, and aggregate
+  stochastic behavior without public-workflow or performance claims.

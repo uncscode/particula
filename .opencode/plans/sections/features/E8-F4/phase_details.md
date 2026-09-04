@@ -59,15 +59,16 @@
     record, writer and terminal paths invalidate it, and renewal/recapture issues
     only a distinct fresh record without handle checkpointing or public exports.
 
-- [ ] **E8-F4-P5:** Three-way full-loop validation and development documentation
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Validate multiple identical process-sequence timesteps across CPU,
-    uncaptured Warp, and captured CUDA, then document the implemented internal
-    contract and downstream evidence handoff.
-  - Files: `particula/execution/tests/captured_full_loop_test.py`, existing CPU
-    oracle/integration fixtures, `docs/Features/Roadmap/data-oriented-gpu.md`,
+- [x] **E8-F4-P5:** Three-way full-loop validation and development documentation
+  - Issue: #1571 | Size: S | Status: Delivered
+  - Delivered: Genuine nonzero native-CUDA single- and multi-box capture/replay
+    against independent NumPy and uncaptured Warp CPU, with conservation,
+    persistent RNG continuation, bounded stochastic aggregates, lifecycle,
+    availability-gating, and hardware-free documentation-contract coverage.
+  - Files: `particula/execution/tests/captured_full_loop_test.py`,
+    `particula/execution/tests/graph_capture_docs_test.py`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Features/data-containers-and-gpu-foundations.md`, `AGENTS.md`
-  - Tests: Per-field deterministic tolerances, tight conservation, aggregate
-    stochastic bounds, RNG continuation/reset, no hidden operations, Warp CPU
-    uncaptured baseline, CUDA pass-or-clean-skip rows, docs contracts, and
-    `mkdocs build --strict`.
+  - Tests: Per-field deterministic tolerances, independent conservation,
+    persistent RNG continuation, aggregate stochastic bounds, no fallback,
+    CUDA pass-or-clean-skip rows, docs contracts, and strict MkDocs validation.

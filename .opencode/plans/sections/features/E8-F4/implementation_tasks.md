@@ -40,9 +40,12 @@
   synchronization, transfer, or resource work in the native window.
 - [x] Add a CUDA-gated native capture smoke test with twelve device no-ops that
   skips only for unavailable Warp/CUDA/capture APIs and never falls back to CPU.
-- [ ] Add `captured_full_loop_test.py` with identical CPU, uncaptured Warp, and
-  captured CUDA fixtures over multiple timesteps.
-- [ ] Compare every meaningful particle, gas, environment, diagnostics, and RNG
+- [x] Add test-only P5 coverage in `captured_full_loop_test.py` for zero-duration
+  preservation, CUDA availability, lifecycle, stale rejection, cleanup, and
+  forbidden host work; add matching documentation-contract assertions.
+- [x] Add `captured_full_loop_test.py` with independent NumPy, uncaptured Warp,
+  and captured CUDA fixtures over multiple genuine native timesteps (#1571).
+- [x] Compare every meaningful particle, gas, environment, diagnostics, and RNG
   outcome separately; retain tight conservation checks and aggregate stochastic
   bounds.
 - [ ] Add structural drift cases for dimensions, devices, arrays, prepared plan,

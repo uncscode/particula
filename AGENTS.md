@@ -962,10 +962,13 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 
 #### Resident graph-capture P5 validation boundary
 
-- CPU is a test-local reference; Warp CPU is uncaptured evidence; CUDA native
-  capture is optional pass-or-clean-skip evidence; capture is the frozen
-  physical timestep one, with later timesteps using one-token replay and
-  authentic opaque-handle provenance.
+- The delivered three-way P5 matrix uses CPU as a test-local NumPy reference,
+  Warp CPU as uncaptured evidence, and CUDA native capture as optional
+  pass-or-clean-skip evidence. Capture freezes the first physical timestep, and
+  each launch executes one timestep through one-token replay with authentic
+  opaque-handle provenance. Genuine nonzero native-CUDA rows use exact READY
+  bindings for single- and multi-box full loops and compare meaningful state
+  against both references.
 - This is concrete-only: exact READY
   session/registry/closed-guard/request/publication binding, qualification,
   explicit invalidation, retirement, renewal, and teardown are required. There
@@ -973,9 +976,11 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   Warp-CPU capture), no recovery/retry/rollback, no hidden
   transfer/readback/synchronization, no checkpointed handle, and no
   cross-device replay.
-- The P5 evidence distinguishes deterministic parity, independent conservation,
-  and aggregate stochastic criteria. It makes no performance, profiling, or
-  memory claim and supplies no runnable user workflow or example.
+- The bounded P5 evidence distinguishes deterministic parity, independent
+  conservation, persistent RNG continuation, and aggregate stochastic criteria;
+  it does not compare cross-device RNG words or per-seed trajectories. It makes
+  no performance, profiling, or memory claim and supplies no runnable user
+  workflow or example.
 
 - E8-F1 supplies host metadata and scheduler admission only through the
   concrete-only `particula.execution.graph_capture` import boundary. Its

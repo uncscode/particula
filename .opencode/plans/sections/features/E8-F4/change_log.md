@@ -2,6 +2,7 @@
 
 | Date | Change | Author |
 |------|--------|--------|
+| 2026-09-04 | Issue #1571 delivered P5: added genuine nonzero native-CUDA capture/replay for single- and multi-box full loops against an independent NumPy oracle and uncaptured Warp CPU, plus conservation, RNG-continuation, bounded stochastic, lifecycle, and documentation-contract coverage. | implementation |
 | 2026-09-03 | Delivered E8-F4-P4 for issue #1570: graph-owned unregister-before-release teardown, exact session/registry/guard lazy notification on lifecycle terminals and writer faults, guarded stream initialization, lifecycle regression coverage, and no checkpoint/export changes. | implementation |
 | 2026-09-03 | Delivered E8-F4-P3 for issue #1569: concrete-only guarded native replay with authentic P2-issued opaque-handle provenance, exact binding/lifecycle/device/duration checks, one launch under one resident token, writer-capable no-rollback failure handling, graph-capture test coverage, and no public export changes. | implementation |
 | 2026-09-03 | Delivered E8-F4-P2 for issue #1568: concrete-only captured prepared resident graph record and begin/frozen-twelve-operation-dispatch/end transaction; post-end revalidation/CAPTURED publication, opaque identity-only handle cleanup, CUDA smoke coverage, and denied public exports. | implementation |

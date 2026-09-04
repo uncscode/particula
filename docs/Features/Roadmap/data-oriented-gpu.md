@@ -1682,9 +1682,9 @@ deferred to the later Epic H tracks and Epic I.
 
 ## Epic H: Graph Capture and Performance
 
-Status: active. E8-F1, E8-F2 P1--P6/P8, and E8-F4-P1 are shipped. E8-F2 P7,
-E8-F3, and E8-F4 P2--P3 remain pending; native capture/replay and its evidence
-have not shipped.
+Status: active. E8-F1, E8-F2 P1--P6/P8, and E8-F4 P1--P5 are shipped.
+E8-F4 P5 supplies bounded three-way full-loop NumPy/Warp-CPU/native-CUDA
+validation. This work remains concrete-only and provides no public workflow.
 
 ### E8-F1 shipped contract
 
@@ -1753,12 +1753,16 @@ names remain absent from `particula.execution` and top-level `particula` exports
 
 ### E8-F4-P5 full-loop validation contract
 
-P5 records three distinct forms of test-only evidence. CPU is a test-local
-reference; Warp CPU is uncaptured evidence; CUDA native capture is optional
-pass-or-clean-skip evidence; capture is the frozen physical timestep one and
-each later timestep is one-token replay of an authentic opaque-handle
-provenance record. The evidence compares deterministic parity and independent
-conservation separately from aggregate stochastic observations.
+The delivered P5 matrix has three distinct forms of test-only evidence. CPU is
+a test-local NumPy reference; Warp CPU is uncaptured evidence; CUDA native
+capture is optional pass-or-clean-skip evidence. Capture freezes the first
+physical timestep and each launch executes one timestep through one-token replay
+of an authentic opaque-handle provenance record. Genuine nonzero CUDA rows use
+exact READY bindings for single- and multi-box loops and compare meaningful
+particle, gas, environment, diagnostic, and partitioning fields against both
+the NumPy oracle and Warp CPU. Deterministic parity and independent conservation
+remain separate from persistent RNG continuation and bounded aggregate
+stochastic observations; cross-device RNG words are not compared.
 
 This remains a concrete-only direct-import boundary. Exact READY
 request/session/registry/closed-guard/publication binding, qualification, and

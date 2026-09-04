@@ -1,8 +1,8 @@
 # Success Criteria
 
-- [ ] A qualified CUDA device captures exactly the E8-F2 complete prepared
+- [x] A qualified CUDA device captures exactly the E8-F2 complete prepared
   twelve-node enqueue sequence using the exact E8-F3 resource set.
-- [ ] Capture and replay perform no allocation, resource acquisition, validation
+- [x] Capture and replay perform no allocation, resource acquisition, validation
   scan, host readback, synchronization, transfer, process scheduling, RNG reset,
   fallback, retry, or automatic recapture inside the native sequence.
 - [x] Every accepted replay opens one resident token, launches the exact graph
@@ -14,10 +14,10 @@
 - [x] Finalize, close, fault, teardown, restart, device change, or stale handle
   cannot replay; records unregister before one release and recapture is explicit
   with a fresh record/handle.
-- [ ] CPU, uncaptured Warp, and captured CUDA fixtures use the same supported
+- [x] CPU, uncaptured Warp, and captured CUDA fixtures use the same supported
   process sequence and agree within documented per-field criteria over multiple
   timesteps, with conservation asserted separately.
-- [ ] Warp CPU capture rejects or skips explicitly; CUDA unavailability cleanly
+- [x] Warp CPU capture rejects or skips explicitly; CUDA unavailability cleanly
   skips native rows and never substitutes CPU execution.
 - [x] Concrete graph names remain absent from package/top-level exports and
   graph handles remain absent from checkpoints.
@@ -37,3 +37,7 @@
 | Deterministic captured-vs-uncaptured field checks | Condensation-only harness | All selected full-loop fields within explicit tolerances | Full-loop tests |
 | Particle-plus-gas conservation | Uncaptured resident baseline | Existing tight process-specific bounds | Independent inventory assertions |
 | Aggregate full-package coverage | Existing repository threshold | Threshold unchanged and passing | `.opencode/tools/run_pytest.py` |
+
+P5 now supplies bounded genuine native-CUDA three-way numerical, conservation,
+RNG-continuation, and stochastic evidence. Full repository validation remains
+tracked by the final unchecked workflow-level criterion above.

@@ -291,6 +291,31 @@ a device, provide fallback, or guarantee rollback after an asynchronous writer
 launches. See
 [GPU resident checkpoints](gpu_resident_checkpoints.md).
 
+### Resident native graph-capture validation (test-only)
+
+Resident native graph capture remains a concrete-only direct-import boundary,
+not a public workflow. The delivered P5 matrix uses CPU as a test-local NumPy
+reference, Warp CPU as uncaptured evidence, and CUDA native capture as optional
+pass-or-clean-skip evidence. Capture freezes the first physical timestep, and
+each launch executes one timestep through one-token replay with authentic
+opaque-handle provenance.
+
+The bounded regression evidence uses genuine nonzero native CUDA capture and
+replay with exact READY bindings for single- and multi-box loops. It compares
+meaningful particle, gas, environment, diagnostics, and partitioning fields
+against both the independent NumPy oracle and uncaptured Warp CPU. Deterministic
+parity, independent conservation checks, persistent RNG continuation, and
+aggregate stochastic criteria remain separate; cross-device RNG words and
+per-seed trajectories are not parity requirements.
+
+Exact READY session/registry/closed-guard/request/publication binding,
+qualification, explicit invalidation, retirement, renewal, and teardown remain
+required. There are no public exports, no runnable example, no automatic
+recapture, no fallback (including Warp-CPU capture), recovery, retry, rollback,
+no hidden transfer/readback/synchronization, no checkpointed handle, or
+cross-device replay.
+This boundary makes no performance, profiling, or memory claim.
+
 ### GPU-resident deterministic timestep
 
 #### Resident prepared enqueue boundary
@@ -1130,26 +1155,6 @@ claims. See the [validation/evidence record](Roadmap/coagulation-validation.md)
 for the focused fixed-mask and stochastic command record.
 
 ### Environment transfer boundary
-
-### Resident native graph-capture validation boundary
-
-Resident graph capture is concrete-only at `particula.execution.graph_capture`.
-CPU is a test-local reference; Warp CPU is uncaptured evidence; CUDA native
-capture is optional pass-or-clean-skip evidence; capture is the frozen physical
-timestep one, and later execution is one-token replay using authentic
-opaque-handle provenance under the exact READY
-session/registry/closed-guard/request/publication binding.
-
-The test-only evidence keeps deterministic parity, independent conservation,
-and aggregate stochastic criteria separate.
-
-There are no public exports or graph-capture example. There is no automatic
-recapture, no fallback, recovery, retry, or rollback; no hidden
-transfer/readback/synchronization; no checkpointed handle; and no cross-device
-replay.
-Invalidation and retirement require explicit renewal and fresh
-qualification/capture. This evidence makes no performance, profiling, or memory
-claim.
 
 Use the environment helpers when thermodynamic state must cross the CPU↔GPU
 boundary:

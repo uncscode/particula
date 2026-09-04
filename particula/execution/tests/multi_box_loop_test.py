@@ -493,6 +493,8 @@ def _scheduler_request(
     guard: ResidentStepGuard,
     duration: float,
     selected: tuple[int, ...] | None,
+    communication_configuration: CommunicationConfiguration | None = None,
+    collision_capacity: int = 1,
 ) -> tuple[ResidentSimulationRequest, Any, Any]:
     """Build one complete scheduler request with isolated wall-loss physics."""
     wp = pytest.importorskip("warp")
@@ -506,10 +508,10 @@ def _scheduler_request(
     _, cpu_gas, cpu_environment = _cpu_carriers(manifest)
 
     communication = registry.acquire_communication(
-        _communication_configuration(session, wp)
+        communication_configuration or _communication_configuration(session, wp)
     )
     condensation_resources = registry.acquire_condensation()
-    coagulation_resources = registry.acquire_coagulation(1)
+    coagulation_resources = registry.acquire_coagulation(collision_capacity)
     wall_loss_resources = registry.acquire_wall_loss()
     nucleation_resources = registry.acquire_nucleation()
 
@@ -589,8 +591,14 @@ def _scheduler_request(
         session,
         ResourceInventoryCapacities(
             coagulation_resources.collision_capacity,
-            0,
-            communication.configuration.communication_map.edge_capacity,
+            communication.configuration.communication_map.edge_capacity
+            if communication.configuration.communication_map.transport_mode
+            is CommunicationTransportMode.GAS
+            else 0,
+            communication.configuration.communication_map.edge_capacity
+            if communication.configuration.communication_map.transport_mode
+            is CommunicationTransportMode.PARTICLES
+            else 0,
         ),
         inventory,
         PreparedResourceViews(

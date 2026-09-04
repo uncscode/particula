@@ -19,8 +19,8 @@ device sequence while E8-F1 compatibility and lifecycle contracts remain valid.
   captured sequence.
 - Deterministic invalidation, fault, close, teardown, and explicit recapture
   eligibility behavior for structural and resident lifecycle changes.
-- Multi-timestep three-way validation across CPU reference, uncaptured Warp,
-  and captured CUDA for identical supported process configurations.
+- Multi-timestep three-way validation across an independent NumPy reference,
+  uncaptured Warp CPU, and captured CUDA for supported process configurations.
 - Co-located unit, lifecycle, integration, CUDA pass-or-clean-skip, export, and
   documentation-contract tests.
 
@@ -75,7 +75,19 @@ device sequence while E8-F1 compatibility and lifecycle contracts remain valid.
 - Lifecycle regressions cover stale provenance before token entry or launch,
   exact-once release including release failures, read-only preservation, fault
   and terminal ordering, attachment/context rejection, and fresh-record-only
-  recapture. Checkpoint payloads and public exports remain unchanged.
+   recapture. Checkpoint payloads and public exports remain unchanged.
+
+## Delivered in E8-F4-P5 (issue #1571)
+
+- `particula/execution/tests/captured_full_loop_test.py` adds genuine nonzero
+  native-CUDA single- and multi-box full-loop capture/replay against independent
+  NumPy and uncaptured Warp CPU, with conservation, persistent RNG continuation,
+  bounded stochastic aggregates, lifecycle cleanup, and availability gating.
+- `particula/execution/tests/graph_capture_docs_test.py` checks the published
+  development-documentation contract and its limitations without requiring CUDA
+  hardware.
+- The evidence remains test-only and concrete-only. It adds no public workflow,
+  fallback, broad parity, cross-device RNG-word, or performance claim.
 
 ## Out of Scope
 
