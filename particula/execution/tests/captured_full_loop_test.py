@@ -11,7 +11,7 @@ from __future__ import annotations
 import sys
 from dataclasses import dataclass, replace
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import numpy.testing as npt
@@ -1732,7 +1732,7 @@ def test_close_prepared_loop_attempts_session_cleanup_after_graph_failure(
         sys.modules[__name__], "close_resident_graph_capture", fail_graph_close
     )
     with pytest.raises(RuntimeError, match="graph close failed"):
-        _close_prepared_loop(loop)
+        _close_prepared_loop(cast(_PreparedLoop, loop))
     assert closed == [(loop.registry, loop.guard)]
 
 
