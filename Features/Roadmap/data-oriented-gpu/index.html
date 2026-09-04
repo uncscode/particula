@@ -13592,6 +13592,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#e8-f4-p1-prepared-qualification-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F4-P1 prepared qualification contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e8-f4-p5-full-loop-validation-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F4-P5 full-loop validation contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#e8-f2-prepared-enqueue-contract" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -17039,6 +17061,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#e8-f4-p1-prepared-qualification-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F4-P1 prepared qualification contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e8-f4-p5-full-loop-validation-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F4-P5 full-loop validation contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#e8-f2-prepared-enqueue-contract" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -19467,9 +19511,15 @@ Native graph capture/replay beyond E8-F1 host admission, performance profiling
 and targets, memory-budget evidence, distributed execution, and autodiff remain
 deferred to the later Epic H tracks and Epic I.</p>
 <h2 id="epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance<a class="headerlink" href="#epic-h-graph-capture-and-performance" title="Permanent link">&para;</a></h2>
-<p>Status: active. E8-F1 and E8-F2 P1--P6/P8 are shipped. E8-F2 P7 and
-E8-F3--E8-F8 remain pending; native capture/replay and its evidence have not
-shipped.</p>
+<p>Status: active. E8-F1, E8-F2 P1--P6/P8, and E8-F4 P1--P5 are shipped.
+E8-F4 keeps opaque native handles in private LIVE/RELEASING/RELEASED
+provenance. Per-record launch leases prevent release races, native callbacks
+run outside the global provenance lock, and the shared session lifecycle
+protocol publishes terminal intent before close, discard, or finalize
+callbacks. Post-begin capture failures abort, fault resident and graph state,
+and preserve the initiating exception.
+E8-F4 P5 supplies bounded three-way full-loop NumPy/Warp-CPU/native-CUDA
+validation. This work remains concrete-only and provides no public workflow.</p>
 <h3 id="e8-f1-shipped-contract">E8-F1 shipped contract<a class="headerlink" href="#e8-f1-shipped-contract" title="Permanent link">&para;</a></h3>
 <p>E8-F1 ships host metadata and scheduler admission only. Its concrete-only
 direct-import boundary is <code>particula.execution.graph_capture</code>; its carriers and
@@ -19508,6 +19558,43 @@ changes, and user examples. E8-F2 owns the shipped concrete prepared enqueue
 seams; E8-F3 owns resource work, E8-F4 native capture/replay and captured
 parity, E8-F5--E8-F7 parity/performance/memory/profiling, and E8-F8 the
 example, limitations, and closeout.</p>
+<p>Work on E8-F4 restarted on September 3, 2026.</p>
+<h3 id="e8-f4-p1-prepared-qualification-contract">E8-F4-P1 prepared qualification contract<a class="headerlink" href="#e8-f4-p1-prepared-qualification-contract" title="Permanent link">&para;</a></h3>
+<p>E8-F4-P1 adds a developer-only, concrete-module qualification seam in
+<code>particula.execution.graph_capture</code>. It checks one exact READY resident binding,
+prepared simulation, and published capture-resource set, then lazily obtains an
+adapter-provided native callable vocabulary for the exact non-CPU Warp device.
+The adapter alone performs ordered runtime, device, and capture-API capability
+checks; <code>Device.native</code> remains opaque.</p>
+<p>Successful qualification retains metadata and callables by identity in a fresh,
+immutable record and leaves the lifecycle <code>READY</code>. Rejections likewise leave the
+binding and lifecycle unchanged. This P1 seam does not begin or end capture,
+invoke native callables, open a guard token, own graph or executable handles,
+release or clean up native resources, allocate, transfer, synchronize, or
+dispatch prepared work. Native capture, handles, release, cleanup, replay, and
+captured evidence remain deferred to later E8-F4 phases. These direct-import-only
+names remain absent from <code>particula.execution</code> and top-level <code>particula</code> exports.</p>
+<h3 id="e8-f4-p5-full-loop-validation-contract">E8-F4-P5 full-loop validation contract<a class="headerlink" href="#e8-f4-p5-full-loop-validation-contract" title="Permanent link">&para;</a></h3>
+<p>The delivered P5 matrix has three distinct forms of test-only evidence. CPU is
+a test-local NumPy reference; Warp CPU is uncaptured evidence; CUDA native
+capture is optional pass-or-clean-skip evidence. Capture freezes the first
+physical timestep and each launch executes one timestep through one-token replay
+of an authentic opaque-handle provenance record. Genuine nonzero CUDA rows use
+exact READY bindings for single- and multi-box loops and compare meaningful
+particle, gas, environment, diagnostic, and partitioning fields against both
+the NumPy oracle and Warp CPU. Deterministic parity and independent conservation
+remain separate from persistent RNG continuation and bounded aggregate
+stochastic observations; cross-device RNG words are not compared.</p>
+<p>This remains a concrete-only direct-import boundary. Exact READY
+request/session/registry/closed-guard/publication binding, qualification, and
+explicit lifecycle teardown are required. Invalidation, retirement, and explicit
+renewal require fresh preparation and capture; there is no automatic recapture.</p>
+<p>P5 provides no public exports or runnable graph-capture example. There is no
+fallback (including Warp-CPU capture), recovery, retry, or rollback; no hidden
+transfer/readback/synchronization; no checkpointed handle; and no cross-device
+replay.
+It makes no performance, profiling, or memory claim; E8-F5--E8-F8 retain those
+ownership boundaries.</p>
 <h3 id="e8-f2-prepared-enqueue-contract">E8-F2 prepared enqueue contract<a class="headerlink" href="#e8-f2-prepared-enqueue-contract" title="Permanent link">&para;</a></h3>
 <h3 id="e8-f3-p5-capture-resource-accounting-integration">E8-F3-P5 capture-resource accounting integration<a class="headerlink" href="#e8-f3-p5-capture-resource-accounting-integration" title="Permanent link">&para;</a></h3>
 <p>Before final <code>ResidentSimulationRequest</code> construction, callers register the

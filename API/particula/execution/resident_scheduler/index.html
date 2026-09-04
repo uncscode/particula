@@ -16303,7 +16303,7 @@ physical-state validation.</p>
 
 
 
-        <p>Retain one setup-validated resident operation for direct enqueue.</p>
+        <p>Retain one setup-validated resident operation for direct dispatch.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -16334,7 +16334,7 @@ physical-state validation.</p>
               (<code><span title="tuple">tuple</span>[<span title="object">object</span>, ...]</code>)
           –
           <div class="doc-md-description">
-            <p>Setup-bound arguments supplied to <code>handler</code> at enqueue.</p>
+            <p>Setup-bound arguments supplied to <code>handler</code> at dispatch.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -16397,7 +16397,7 @@ physical-state validation.</p>
   </span>
 
 <a href="#particula.execution.resident_scheduler.PreparedResidentSimulation" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">PreparedResidentSimulation</span><span class="p">(</span><span class="n">timestep</span><span class="p">:</span> <span class="n">PreparedResidentTimestep</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ResidentSimulationRequest</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">lifecycle</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">signature</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">schedule</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">ordered_node_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">primary_arrays</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">resource_views</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">capture_requirements</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">capture_set</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">capture_report</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">nodes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ProcessNode</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">thermal</span><span class="p">:</span> <span class="n">PreparedResidentThermodynamicSequence</span><span class="p">,</span> <span class="n">communication</span><span class="p">:</span> <span class="n">PreparedResidentCommunicationBinding</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">gas</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">condensation</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">coagulation</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">dilution</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">wall_loss</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">nucleation</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">diagnostics</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">operations</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">PreparedResidentOperation</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">PreparedResidentSimulation</span><span class="p">(</span><span class="n">timestep</span><span class="p">:</span> <span class="n">PreparedResidentTimestep</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ResidentSimulationRequest</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="n">GPUResourceRegistry</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">lifecycle</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">signature</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">schedule</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">ordered_node_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">primary_arrays</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">resource_views</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">capture_requirements</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">capture_set</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">capture_report</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">nodes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ProcessNode</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">thermal</span><span class="p">:</span> <span class="n">PreparedResidentThermodynamicSequence</span><span class="p">,</span> <span class="n">communication</span><span class="p">:</span> <span class="n">PreparedResidentCommunicationBinding</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">gas</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">condensation</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">coagulation</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">dilution</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">wall_loss</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">nucleation</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">diagnostics</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">operations</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">PreparedResidentOperation</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16450,7 +16450,7 @@ admission. It represents a READY attachment, not a captured graph.</p>
         </li>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.execution.resident_scheduler.PreparedResidentSimulation.registry">registry</span></code></b>
-              (<code><span title="object">object</span></code>)
+              (<code><a class="autorefs autorefs-internal" title="            GPUResourceRegistry (particula.execution.gpu_resources.GPUResourceRegistry)" href="../gpu_resources/#particula.execution.gpu_resources.GPUResourceRegistry">GPUResourceRegistry</a></code>)
           –
           <div class="doc-md-description">
             <p>Resource registry pinned to <code>session</code>.</p>
@@ -16715,7 +16715,7 @@ identity.</p>
   </span>
 
 <a href="#particula.execution.resident_scheduler.ResidentSimulationRequest" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ResidentSimulationRequest</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="n">ResidentStepGuard</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">ResolvedProcessGraph</span><span class="p">,</span> <span class="n">schedule</span><span class="p">:</span> <span class="n">ResolvedTimestepSchedule</span><span class="p">,</span> <span class="n">thermodynamics</span><span class="p">:</span> <span class="n">ThermodynamicsConfig</span><span class="p">,</span> <span class="n">condensation</span><span class="p">:</span> <span class="n">WarpCondensationExecutionState</span><span class="p">,</span> <span class="n">coagulation</span><span class="p">:</span> <span class="n">ResidentBrownianCoagulationExecutionState</span><span class="p">,</span> <span class="n">dilution</span><span class="p">:</span> <span class="n">ResidentDilutionRequest</span><span class="p">,</span> <span class="n">wall_loss</span><span class="p">:</span> <span class="n">ResidentWallLossRequest</span><span class="p">,</span> <span class="n">nucleation</span><span class="p">:</span> <span class="n">ResidentNucleationRequest</span><span class="p">,</span> <span class="n">diagnostics</span><span class="p">:</span> <span class="n">ResidentDiagnosticsPlan</span><span class="p">,</span> <span class="n">environment_update</span><span class="p">:</span> <span class="n">ResidentEnvironmentUpdateRequest</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">gas_update</span><span class="p">:</span> <span class="n">ResidentGasUpdateRequest</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">communication</span><span class="p">:</span> <span class="n">ResidentCommunicationRequest</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_resource_requirements</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">graph_capture_binding</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ResidentSimulationRequest</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">ResidentSession</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="n">GPUResourceRegistry</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="n">ResidentStepGuard</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">ResolvedProcessGraph</span><span class="p">,</span> <span class="n">schedule</span><span class="p">:</span> <span class="n">ResolvedTimestepSchedule</span><span class="p">,</span> <span class="n">thermodynamics</span><span class="p">:</span> <span class="n">ThermodynamicsConfig</span><span class="p">,</span> <span class="n">condensation</span><span class="p">:</span> <span class="n">WarpCondensationExecutionState</span><span class="p">,</span> <span class="n">coagulation</span><span class="p">:</span> <span class="n">ResidentBrownianCoagulationExecutionState</span><span class="p">,</span> <span class="n">dilution</span><span class="p">:</span> <span class="n">ResidentDilutionRequest</span><span class="p">,</span> <span class="n">wall_loss</span><span class="p">:</span> <span class="n">ResidentWallLossRequest</span><span class="p">,</span> <span class="n">nucleation</span><span class="p">:</span> <span class="n">ResidentNucleationRequest</span><span class="p">,</span> <span class="n">diagnostics</span><span class="p">:</span> <span class="n">ResidentDiagnosticsPlan</span><span class="p">,</span> <span class="n">environment_update</span><span class="p">:</span> <span class="n">ResidentEnvironmentUpdateRequest</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">gas_update</span><span class="p">:</span> <span class="n">ResidentGasUpdateRequest</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">communication</span><span class="p">:</span> <span class="n">ResidentCommunicationRequest</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_resource_requirements</span><span class="p">:</span> <span class="n">CaptureResourceRequirements</span><span class="p">,</span> <span class="n">graph_capture_binding</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16745,7 +16745,7 @@ transfer, synchronize, or validate physical process inputs.</p>
         </li>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.execution.resident_scheduler.ResidentSimulationRequest.registry">registry</span></code></b>
-              (<code><span title="object">object</span></code>)
+              (<code><a class="autorefs autorefs-internal" title="            GPUResourceRegistry (particula.execution.gpu_resources.GPUResourceRegistry)" href="../gpu_resources/#particula.execution.gpu_resources.GPUResourceRegistry">GPUResourceRegistry</a></code>)
           –
           <div class="doc-md-description">
             <p>Exact registry pinned to <code>session</code>.</p>
@@ -16922,7 +16922,12 @@ be validated in ascending order before dispatch.</p>
         </li>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.execution.resident_scheduler.ResidentSimulationRequest.capture_resource_requirements">capture_resource_requirements</span></code></b>
-              (<code><span title="object">object</span></code>)
+              (<code><a class="autorefs autorefs-internal" title="            CaptureResourceRequirements
+
+
+  
+      dataclass
+   (particula.execution.gpu_resources.CaptureResourceRequirements)" href="../gpu_resources/#particula.execution.gpu_resources.CaptureResourceRequirements">CaptureResourceRequirements</a></code>)
           –
           <div class="doc-md-description">
             <p>Exact pre-published capture resource
@@ -16993,13 +16998,7 @@ inexact concrete type.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_scheduler.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">320</span>
 <span class="normal">321</span>
 <span class="normal">322</span>
 <span class="normal">323</span>
@@ -17053,7 +17052,13 @@ inexact concrete type.</p>
 <span class="normal">371</span>
 <span class="normal">372</span>
 <span class="normal">373</span>
-<span class="normal">374</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate exact request components and optional update types.</span>
 
 <span class="sd">    Raises:</span>
@@ -17202,20 +17207,20 @@ transfer, synchronize, fall back, or replace resources for it.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/execution/resident_scheduler.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">826</span>
-<span class="normal">827</span>
-<span class="normal">828</span>
-<span class="normal">829</span>
-<span class="normal">830</span>
-<span class="normal">831</span>
-<span class="normal">832</span>
-<span class="normal">833</span>
-<span class="normal">834</span>
-<span class="normal">835</span>
-<span class="normal">836</span>
-<span class="normal">837</span>
-<span class="normal">838</span>
-<span class="normal">839</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ResidentSimulationRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ResidentSimulationRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Retain one exact resident simulation request.</span>
 
 <span class="sd">    Args:</span>
@@ -17310,100 +17315,100 @@ operation reject execution.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_scheduler.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">899</span>
-<span class="normal">900</span>
-<span class="normal">901</span>
-<span class="normal">902</span>
-<span class="normal">903</span>
-<span class="normal">904</span>
-<span class="normal">905</span>
-<span class="normal">906</span>
-<span class="normal">907</span>
-<span class="normal">908</span>
-<span class="normal">909</span>
-<span class="normal">910</span>
-<span class="normal">911</span>
-<span class="normal">912</span>
-<span class="normal">913</span>
-<span class="normal">914</span>
-<span class="normal">915</span>
-<span class="normal">916</span>
-<span class="normal">917</span>
-<span class="normal">918</span>
-<span class="normal">919</span>
-<span class="normal">920</span>
-<span class="normal">921</span>
-<span class="normal">922</span>
-<span class="normal">923</span>
-<span class="normal">924</span>
-<span class="normal">925</span>
-<span class="normal">926</span>
-<span class="normal">927</span>
-<span class="normal">928</span>
-<span class="normal">929</span>
-<span class="normal">930</span>
-<span class="normal">931</span>
-<span class="normal">932</span>
-<span class="normal">933</span>
-<span class="normal">934</span>
-<span class="normal">935</span>
-<span class="normal">936</span>
-<span class="normal">937</span>
-<span class="normal">938</span>
-<span class="normal">939</span>
-<span class="normal">940</span>
-<span class="normal">941</span>
-<span class="normal">942</span>
-<span class="normal">943</span>
-<span class="normal">944</span>
-<span class="normal">945</span>
-<span class="normal">946</span>
-<span class="normal">947</span>
-<span class="normal">948</span>
-<span class="normal">949</span>
-<span class="normal">950</span>
-<span class="normal">951</span>
-<span class="normal">952</span>
-<span class="normal">953</span>
-<span class="normal">954</span>
-<span class="normal">955</span>
-<span class="normal">956</span>
-<span class="normal">957</span>
-<span class="normal">958</span>
-<span class="normal">959</span>
-<span class="normal">960</span>
-<span class="normal">961</span>
-<span class="normal">962</span>
-<span class="normal">963</span>
-<span class="normal">964</span>
-<span class="normal">965</span>
-<span class="normal">966</span>
-<span class="normal">967</span>
-<span class="normal">968</span>
-<span class="normal">969</span>
-<span class="normal">970</span>
-<span class="normal">971</span>
-<span class="normal">972</span>
-<span class="normal">973</span>
-<span class="normal">974</span>
-<span class="normal">975</span>
-<span class="normal">976</span>
-<span class="normal">977</span>
-<span class="normal">978</span>
-<span class="normal">979</span>
-<span class="normal">980</span>
-<span class="normal">981</span>
-<span class="normal">982</span>
-<span class="normal">983</span>
-<span class="normal">984</span>
-<span class="normal">985</span>
-<span class="normal">986</span>
-<span class="normal">987</span>
-<span class="normal">988</span>
-<span class="normal">989</span>
-<span class="normal">990</span>
-<span class="normal">991</span>
-<span class="normal">992</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 924</span>
+<span class="normal"> 925</span>
+<span class="normal"> 926</span>
+<span class="normal"> 927</span>
+<span class="normal"> 928</span>
+<span class="normal"> 929</span>
+<span class="normal"> 930</span>
+<span class="normal"> 931</span>
+<span class="normal"> 932</span>
+<span class="normal"> 933</span>
+<span class="normal"> 934</span>
+<span class="normal"> 935</span>
+<span class="normal"> 936</span>
+<span class="normal"> 937</span>
+<span class="normal"> 938</span>
+<span class="normal"> 939</span>
+<span class="normal"> 940</span>
+<span class="normal"> 941</span>
+<span class="normal"> 942</span>
+<span class="normal"> 943</span>
+<span class="normal"> 944</span>
+<span class="normal"> 945</span>
+<span class="normal"> 946</span>
+<span class="normal"> 947</span>
+<span class="normal"> 948</span>
+<span class="normal"> 949</span>
+<span class="normal"> 950</span>
+<span class="normal"> 951</span>
+<span class="normal"> 952</span>
+<span class="normal"> 953</span>
+<span class="normal"> 954</span>
+<span class="normal"> 955</span>
+<span class="normal"> 956</span>
+<span class="normal"> 957</span>
+<span class="normal"> 958</span>
+<span class="normal"> 959</span>
+<span class="normal"> 960</span>
+<span class="normal"> 961</span>
+<span class="normal"> 962</span>
+<span class="normal"> 963</span>
+<span class="normal"> 964</span>
+<span class="normal"> 965</span>
+<span class="normal"> 966</span>
+<span class="normal"> 967</span>
+<span class="normal"> 968</span>
+<span class="normal"> 969</span>
+<span class="normal"> 970</span>
+<span class="normal"> 971</span>
+<span class="normal"> 972</span>
+<span class="normal"> 973</span>
+<span class="normal"> 974</span>
+<span class="normal"> 975</span>
+<span class="normal"> 976</span>
+<span class="normal"> 977</span>
+<span class="normal"> 978</span>
+<span class="normal"> 979</span>
+<span class="normal"> 980</span>
+<span class="normal"> 981</span>
+<span class="normal"> 982</span>
+<span class="normal"> 983</span>
+<span class="normal"> 984</span>
+<span class="normal"> 985</span>
+<span class="normal"> 986</span>
+<span class="normal"> 987</span>
+<span class="normal"> 988</span>
+<span class="normal"> 989</span>
+<span class="normal"> 990</span>
+<span class="normal"> 991</span>
+<span class="normal"> 992</span>
+<span class="normal"> 993</span>
+<span class="normal"> 994</span>
+<span class="normal"> 995</span>
+<span class="normal"> 996</span>
+<span class="normal"> 997</span>
+<span class="normal"> 998</span>
+<span class="normal"> 999</span>
+<span class="normal">1000</span>
+<span class="normal">1001</span>
+<span class="normal">1002</span>
+<span class="normal">1003</span>
+<span class="normal">1004</span>
+<span class="normal">1005</span>
+<span class="normal">1006</span>
+<span class="normal">1007</span>
+<span class="normal">1008</span>
+<span class="normal">1009</span>
+<span class="normal">1010</span>
+<span class="normal">1011</span>
+<span class="normal">1012</span>
+<span class="normal">1013</span>
+<span class="normal">1014</span>
+<span class="normal">1015</span>
+<span class="normal">1016</span>
+<span class="normal">1017</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">    </span><span class="sd">"""Preflight then run one complete ordered timestep.</span>
 
 <span class="sd">    Failures before a writer-capable invocation leave the session active.</span>
@@ -17583,13 +17588,7 @@ token entry.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_scheduler.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">698</span>
-<span class="normal">699</span>
-<span class="normal">700</span>
-<span class="normal">701</span>
-<span class="normal">702</span>
-<span class="normal">703</span>
-<span class="normal">704</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">704</span>
 <span class="normal">705</span>
 <span class="normal">706</span>
 <span class="normal">707</span>
@@ -17626,7 +17625,13 @@ token entry.</p>
 <span class="normal">738</span>
 <span class="normal">739</span>
 <span class="normal">740</span>
-<span class="normal">741</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">enqueue_prepared_resident_simulation</span><span class="p">(</span><span class="n">prepared</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">741</span>
+<span class="normal">742</span>
+<span class="normal">743</span>
+<span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">enqueue_prepared_resident_simulation</span><span class="p">(</span><span class="n">prepared</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Enqueue one prepared READY simulation under exactly one token.</span>
 
 <span class="sd">    This composed scheduler boundary is distinct from an individual prepared</span>
@@ -17767,13 +17772,7 @@ not satisfy the READY preparation contract.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_scheduler.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
-<span class="normal">383</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">383</span>
 <span class="normal">384</span>
 <span class="normal">385</span>
 <span class="normal">386</span>
@@ -17941,7 +17940,13 @@ not satisfy the READY preparation contract.</p>
 <span class="normal">548</span>
 <span class="normal">549</span>
 <span class="normal">550</span>
-<span class="normal">551</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prepare_resident_simulation</span><span class="p">(</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prepare_resident_simulation</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PreparedResidentSimulation</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Prepare all twelve resident operations while the attachment is READY.</span>

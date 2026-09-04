@@ -16169,7 +16169,7 @@ It performs no allocation.</p>
   </span>
 
 <a href="#particula.execution.resident_enqueue.PreparedResidentTimestep" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">PreparedResidentTimestep</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="s1">'ResidentSimulationRequest'</span><span class="p">,</span> <span class="n">binding</span><span class="p">:</span> <span class="s1">'ResidentGraphCaptureBinding'</span><span class="p">,</span> <span class="n">lifecycle</span><span class="p">:</span> <span class="s1">'GraphCaptureLifecycle'</span><span class="p">,</span> <span class="n">signature</span><span class="p">:</span> <span class="s1">'ResidentGraphCaptureSignature'</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">schedule</span><span class="p">:</span> <span class="s1">'ResolvedTimestepSchedule'</span><span class="p">,</span> <span class="n">ordered_node_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">primary_arrays</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">resource_views</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">capture_requirements</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_set</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_report</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">PreparedResidentTimestep</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="s1">'ResidentSimulationRequest'</span><span class="p">,</span> <span class="n">binding</span><span class="p">:</span> <span class="s1">'ResidentGraphCaptureBinding'</span><span class="p">,</span> <span class="n">lifecycle</span><span class="p">:</span> <span class="s1">'GraphCaptureLifecycle'</span><span class="p">,</span> <span class="n">signature</span><span class="p">:</span> <span class="s1">'ResidentGraphCaptureSignature'</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s1">'GPUResourceRegistry'</span><span class="p">,</span> <span class="n">guard</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">schedule</span><span class="p">:</span> <span class="s1">'ResolvedTimestepSchedule'</span><span class="p">,</span> <span class="n">ordered_node_ids</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">primary_arrays</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">resource_views</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">capture_requirements</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_set</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_report</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -16226,7 +16226,7 @@ acquiring them, and it does not authorize capture, enqueue, or dispatch.</p>
         </li>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.execution.resident_enqueue.PreparedResidentTimestep.registry">registry</span></code></b>
-              (<code><span title="object">object</span></code>)
+              (<code>&#39;GPUResourceRegistry&#39;</code>)
           –
           <div class="doc-md-description">
             <p>Exact resource registry shared by request and binding.</p>
@@ -16389,8 +16389,7 @@ state is not READY.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_enqueue.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
-<span class="normal">160</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">160</span>
 <span class="normal">161</span>
 <span class="normal">162</span>
 <span class="normal">163</span>
@@ -16494,7 +16493,8 @@ state is not READY.</p>
 <span class="normal">261</span>
 <span class="normal">262</span>
 <span class="normal">263</span>
-<span class="normal">264</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">264</span>
+<span class="normal">265</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">    </span><span class="sd">"""Validate exact carriers, READY state, and retained identities.</span>
 
 <span class="sd">    Raises:</span>
@@ -16697,8 +16697,7 @@ complete-loop metadata is invalid.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/resident_enqueue.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">267</span>
-<span class="normal">268</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">268</span>
 <span class="normal">269</span>
 <span class="normal">270</span>
 <span class="normal">271</span>
@@ -16824,7 +16823,8 @@ complete-loop metadata is invalid.</p>
 <span class="normal">391</span>
 <span class="normal">392</span>
 <span class="normal">393</span>
-<span class="normal">394</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prepare_resident_timestep</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">394</span>
+<span class="normal">395</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prepare_resident_timestep</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">request</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">object</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PreparedResidentTimestep</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Validate and freeze one READY resident timestep without side effects.</span>
