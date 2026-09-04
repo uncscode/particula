@@ -38,6 +38,7 @@ if TYPE_CHECKING:
         PreparedResidentSimulation,
         ResidentSimulationRequest,
     )
+    from particula.execution.scheduler import ResolvedTimestepSchedule
     from particula.gpu.warp_types import (
         WarpEnvironmentData,
         WarpGasData,
@@ -1944,7 +1945,7 @@ def _validate_prepared_graph_capture_qualification(
         raise TypeError(
             "qualification must be an exact PreparedGraphCaptureQualification."
         )
-    typed = qualification
+    typed = cast("PreparedGraphCaptureQualification", qualification)
     binding = _require_attached_resident_binding(typed.binding)
     if (
         typed.lifecycle is not binding.lifecycle
@@ -1957,6 +1958,9 @@ def _validate_prepared_graph_capture_qualification(
     ):
         raise ValueError("prepared graph-capture qualification changed.")
     prepared = cast("PreparedResidentSimulation", typed.prepared)
+    session = cast("ResidentSession", typed.session)
+    request = cast("ResidentSimulationRequest", typed.request)
+    schedule = cast("ResolvedTimestepSchedule", request.schedule)
     if type(typed.timestep) is not _prepared_resident_timestep_type():
         raise TypeError("timestep must be an exact PreparedResidentTimestep.")
     timestep = cast("PreparedResidentTimestep", typed.timestep)
@@ -1965,11 +1969,11 @@ def _validate_prepared_graph_capture_qualification(
         or typed.capture_requirements is not prepared.capture_requirements
         or typed.capture_set is not prepared.capture_set
         or typed.capture_report is not prepared.capture_report
-        or typed.device is not typed.session.metadata.device
-        or typed.dimensions is not typed.session.dimensions
-        or typed.graph is not typed.request.graph
-        or typed.schedule is not typed.request.schedule
-        or typed.ordered_node_ids is not typed.schedule.ordered_node_ids
+        or typed.device is not session.metadata.device
+        or typed.dimensions is not session.dimensions
+        or typed.graph is not request.graph
+        or typed.schedule is not request.schedule
+        or typed.ordered_node_ids is not schedule.ordered_node_ids
         or typed.duration is not prepared.duration
         or typed.primary_arrays is not typed.signature.primary_arrays
         or typed.resource_views is not typed.signature.resource_views
@@ -1989,7 +1993,7 @@ def _validate_prepared_graph_capture_qualification(
         raise ValueError("graph capture lifecycle must be ready.")
     capability = typed.lifecycle.capability
     if (
-        capability.device != typed.session.metadata.device
+        capability.device != session.metadata.device
         or capability.availability is not GraphCaptureAvailability.AVAILABLE
         or capability.device.backend is not Backend.WARP
         or capability.device.native == "cpu"

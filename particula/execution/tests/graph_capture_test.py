@@ -2337,7 +2337,7 @@ def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
         "device",
     ):
         with pytest.raises(ValueError, match="identities do not match"):
-            replace(captured, **{field: object()})
+            replace(captured, **cast(Any, {field: object()}))
 
 
 @pytest.mark.warp
