@@ -960,6 +960,23 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 
 ### Resident graph-capture admission lifecycle
 
+#### Resident graph-capture P5 validation boundary
+
+- CPU is a test-local reference; Warp CPU is uncaptured evidence; CUDA native
+  capture is optional pass-or-clean-skip evidence; capture is the frozen
+  physical timestep one, with later timesteps using one-token replay and
+  authentic opaque-handle provenance.
+- This is concrete-only: exact READY
+  session/registry/closed-guard/request/publication binding, qualification,
+  explicit invalidation, retirement, renewal, and teardown are required. There
+  are no public exports, no automatic recapture, no fallback (including
+  Warp-CPU capture), no recovery/retry/rollback, no hidden
+  transfer/readback/synchronization, no checkpointed handle, and no
+  cross-device replay.
+- The P5 evidence distinguishes deterministic parity, independent conservation,
+  and aggregate stochastic criteria. It makes no performance, profiling, or
+  memory claim and supplies no runnable user workflow or example.
+
 - E8-F1 supplies host metadata and scheduler admission only through the
   concrete-only `particula.execution.graph_capture` import boundary. Its
   carriers and lifecycle operations are absent from `particula.execution` and

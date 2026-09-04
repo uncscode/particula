@@ -1751,6 +1751,27 @@ dispatch prepared work. Native capture, handles, release, cleanup, replay, and
 captured evidence remain deferred to later E8-F4 phases. These direct-import-only
 names remain absent from `particula.execution` and top-level `particula` exports.
 
+### E8-F4-P5 full-loop validation contract
+
+P5 records three distinct forms of test-only evidence. CPU is a test-local
+reference; Warp CPU is uncaptured evidence; CUDA native capture is optional
+pass-or-clean-skip evidence; capture is the frozen physical timestep one and
+each later timestep is one-token replay of an authentic opaque-handle
+provenance record. The evidence compares deterministic parity and independent
+conservation separately from aggregate stochastic observations.
+
+This remains a concrete-only direct-import boundary. Exact READY
+request/session/registry/closed-guard/publication binding, qualification, and
+explicit lifecycle teardown are required. Invalidation, retirement, and explicit
+renewal require fresh preparation and capture; there is no automatic recapture.
+
+P5 provides no public exports or runnable graph-capture example. There is no
+fallback (including Warp-CPU capture), recovery, retry, or rollback; no hidden
+transfer/readback/synchronization; no checkpointed handle; and no cross-device
+replay.
+It makes no performance, profiling, or memory claim; E8-F5--E8-F8 retain those
+ownership boundaries.
+
 ### E8-F2 prepared enqueue contract
 
 ### E8-F3-P5 capture-resource accounting integration

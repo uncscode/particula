@@ -1131,6 +1131,26 @@ for the focused fixed-mask and stochastic command record.
 
 ### Environment transfer boundary
 
+### Resident native graph-capture validation boundary
+
+Resident graph capture is concrete-only at `particula.execution.graph_capture`.
+CPU is a test-local reference; Warp CPU is uncaptured evidence; CUDA native
+capture is optional pass-or-clean-skip evidence; capture is the frozen physical
+timestep one, and later execution is one-token replay using authentic
+opaque-handle provenance under the exact READY
+session/registry/closed-guard/request/publication binding.
+
+The test-only evidence keeps deterministic parity, independent conservation,
+and aggregate stochastic criteria separate.
+
+There are no public exports or graph-capture example. There is no automatic
+recapture, no fallback, recovery, retry, or rollback; no hidden
+transfer/readback/synchronization; no checkpointed handle; and no cross-device
+replay.
+Invalidation and retirement require explicit renewal and fresh
+qualification/capture. This evidence makes no performance, profiling, or memory
+claim.
+
 Use the environment helpers when thermodynamic state must cross the CPU↔GPU
 boundary:
 

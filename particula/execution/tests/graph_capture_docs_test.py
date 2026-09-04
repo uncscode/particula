@@ -86,6 +86,45 @@ def test_developer_documents_preserve_graph_capture_contract_and_order() -> (
         assert positions == sorted(positions), f"Drift order changed in {path}."
 
 
+def test_p5_documents_three_way_native_capture_evidence_and_limits() -> None:
+    """P5 records separate reference, Warp-CPU, and optional CUDA evidence."""
+    documents = {
+        "AGENTS.md": _read("AGENTS.md"),
+        "roadmap": _read("docs/Features/Roadmap/data-oriented-gpu.md"),
+        "foundations": _read(
+            "docs/Features/data-containers-and-gpu-foundations.md"
+        ),
+    }
+    statements = (
+        "CPU is a test-local reference",
+        "Warp CPU is uncaptured evidence",
+        "CUDA native capture is optional pass-or-clean-skip evidence",
+        "capture is the frozen physical timestep one",
+        "one-token replay",
+        "opaque-handle provenance",
+        "no public exports",
+        "no automatic recapture",
+        "no fallback",
+        "no hidden transfer/readback/synchronization",
+        "no checkpointed handle",
+        "cross-device replay",
+        "deterministic parity",
+        "independent conservation",
+        "aggregate stochastic",
+        "no performance, profiling, or memory claim",
+    )
+    for path, document in documents.items():
+        normalized = " ".join(document.split())
+        missing = [
+            statement
+            for statement in statements
+            if " ".join(statement.split()) not in normalized
+        ]
+        assert not missing, f"Missing {missing!r} in {path}."
+        assert "from particula.execution import graph_capture" not in document
+        assert "from particula import graph_capture" not in document
+
+
 def test_planning_records_preserve_p4_validation_block_and_handoff_boundary() -> (
     None
 ):
