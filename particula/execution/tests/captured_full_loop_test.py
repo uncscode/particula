@@ -15,7 +15,25 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-from particula.execution import Backend, Device
+from particula.execution import (
+    Backend,
+    CondensationActivityMode,
+    CondensationConfiguration,
+    CondensationExecutionMode,
+    CondensationSurfaceMode,
+    Device,
+)
+from particula.execution.adapters.coagulation import (
+    BrownianCoagulationConfig,
+    ResidentBrownianCoagulationExecutionState,
+    WarpBrownianCoagulationExecutionState,
+    WarpBrownianCoagulationState,
+)
+from particula.execution.adapters.condensation import (
+    CondensationExecutionConfig,
+    WarpCondensationExecutionState,
+    WarpCondensationState,
+)
 from particula.execution.communication import (
     CommunicationConfiguration,
     CommunicationMap,
@@ -24,6 +42,21 @@ from particula.execution.communication import (
     CommunicationShapeKind,
     CommunicationTransportMode,
     PrescribedVolumeUpdate,
+)
+from particula.execution.diagnostics import (
+    ResidentDiagnosticOperation,
+    ResidentDiagnosticRegistration,
+    ResidentDiagnosticsPlan,
+)
+from particula.execution.gpu_resources import (
+    CaptureResourceRequirements,
+    GPUResourceRegistry,
+    PreparedResourceViews,
+    ResourceInventoryCapacities,
+)
+from particula.execution.gpu_session import (
+    ResidentStepGuard,
+    setup_resident_session,
 )
 from particula.execution.graph_capture import (
     GraphCaptureAvailability,
@@ -39,10 +72,22 @@ from particula.execution.graph_capture import (
     qualify_prepared_resident_graph_capture,
     replay_captured_resident_graph,
 )
-from particula.execution.process_adapters import ResidentNucleationRequest
+from particula.execution.process_adapters import (
+    ResidentDilutionRequest,
+    ResidentNucleationRequest,
+    ResidentWallLossRequest,
+)
+from particula.execution.resident_communication import (
+    ResidentCommunicationRequest,
+)
 from particula.execution.resident_scheduler import (
+    ResidentSimulationRequest,
     enqueue_prepared_resident_simulation,
     prepare_resident_simulation,
+)
+from particula.execution.state_updates import (
+    ResidentEnvironmentUpdateRequest,
+    ResidentGasUpdateRequest,
 )
 from particula.execution.tests.full_loop_test import _build_loop_fixture
 from particula.execution.tests.multi_box_loop_test import (
@@ -50,14 +95,17 @@ from particula.execution.tests.multi_box_loop_test import (
     _resident_graph,
     _scheduler_request,
 )
+from particula.gas import EnvironmentData, GasData
 from particula.gpu.kernels.nucleation import (
     NucleationConfig,
     NucleationExhaustionControls,
 )
+from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
 from particula.gpu.tests.cuda_availability import (
     CUDA_SKIP_REASON,
     cuda_available,
 )
+from particula.particles import ParticleData
 from particula.util.constants import GAS_CONSTANT
 
 PARITY_RTOL = 1e-12
@@ -568,6 +616,41 @@ def test_captured_loop_inventory_separates_transport_volume_and_dilution() -> (
         * np.exp(-scenario.dilution_coefficient[:, None] * scenario.time_step),
         rtol=PARITY_RTOL,
         atol=PARITY_ATOL,
+    )
+
+
+def test_captured_loop_gas_work_oracle_has_per_dispatch_ledgers() -> None:
+    """Keep detached GAS work expectations separate from accumulated state."""
+    scenario = _captured_full_loop_scenario()
+    amounts, deltas, outbound = _independent_gas_work_oracle(
+        scenario.gas_concentration,
+        scenario.volume,
+        scenario.edge_sources,
+        scenario.edge_destinations,
+        scenario.edge_enabled,
+        scenario.edge_rates,
+        scenario.time_step,
+    )
+    npt.assert_allclose(
+        amounts,
+        [[4.0e-9, 2.0e-9], [2.0e-9, 6.0e-9]],
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+        err_msg="communication amounts",
+    )
+    npt.assert_allclose(
+        deltas,
+        [[-2.0e-10, -1.0e-10], [2.0e-10, 1.0e-10]],
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+        err_msg="communication amount deltas",
+    )
+    npt.assert_allclose(
+        outbound,
+        [[2.0e-10, 1.0e-10], [0.0, 0.0]],
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+        err_msg="communication outbound amounts",
     )
 
 
@@ -1123,6 +1206,366 @@ def _build_prepared_loop(
     )
 
 
+@dataclass
+class _ScenarioPreparedLoop:
+    """Retain the P1 scenario's exact READY binding and owned test arrays."""
+
+    loop: _PreparedLoop
+    communication_resources: Any
+    latent_energy: Any
+    baseline_total_mass: Any
+    source_ledger: Any
+    sink_ledger: Any
+
+
+def _build_scenario_prepared_loop(
+    monkeypatch: pytest.MonkeyPatch,
+    duration: float,
+) -> _ScenarioPreparedLoop:
+    """Build the P1 two-box scenario without shared fixture update sources."""
+    import particula.execution.resident_scheduler as resident_scheduler
+    from particula.execution.resident_scheduler import _CANONICAL_IDS
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    wp = pytest.importorskip("warp")
+    scenario = _captured_full_loop_scenario()
+    particles = ParticleData(
+        masses=scenario.particle_masses.copy(),
+        concentration=scenario.particle_concentration.copy(),
+        charge=scenario.particle_charge.copy(),
+        density=np.array([1000.0, 1200.0], dtype=np.float64),
+        volume=scenario.volume.copy(),
+    )
+    gas = GasData(
+        name=["species-a", "species-b"],
+        molar_mass=scenario.molar_mass.copy(),
+        concentration=scenario.gas_concentration.copy(),
+        partitioning=scenario.gas_partitioning[0].copy(),
+    )
+    environment = EnvironmentData(
+        temperature=scenario.temperature.copy(),
+        pressure=scenario.pressure.copy(),
+        saturation_ratio=np.zeros_like(scenario.gas_concentration),
+    )
+    session = setup_resident_session(
+        particles,
+        gas,
+        environment,
+        Device(Backend.WARP, "cpu"),
+        root_seed=scenario.root_seed,
+        logical_box_ids=tuple(str(value) for value in scenario.logical_box_ids),
+        lanes=(0, 1),
+    )
+    registry = GPUResourceRegistry(session)
+    guard = ResidentStepGuard(session, registry)
+    graph, schedule, by_id = _resident_graph()
+    device = session.particles.masses.device
+    configuration = CommunicationConfiguration(
+        CommunicationMap(
+            CommunicationMapForm.ONE_DIMENSIONAL,
+            CommunicationTransportMode.GAS,
+            len(scenario.edge_sources),
+            wp.array(scenario.edge_sources, dtype=wp.int32, device=device),
+            wp.array(scenario.edge_destinations, dtype=wp.int32, device=device),
+            wp.array(scenario.edge_enabled, dtype=wp.int32, device=device),
+            wp.array(scenario.edge_rates, dtype=wp.float64, device=device),
+        ),
+        PrescribedVolumeUpdate(
+            wp.array(
+                scenario.volume if duration == 0.0 else scenario.final_volume,
+                dtype=wp.float64,
+                device=device,
+            )
+        ),
+        (
+            CommunicationResourceShape(
+                "edge_rates", wp.float64, CommunicationShapeKind.E
+            ),
+        ),
+    )
+    communication = registry.acquire_communication(configuration)
+    condensation_resources = registry.acquire_condensation()
+    coagulation_resources = registry.acquire_coagulation(1)
+    wall_loss_resources = registry.acquire_wall_loss()
+    nucleation_resources = registry.acquire_nucleation()
+    thermodynamics = ThermodynamicsConfig(
+        modes=wp.zeros(2, dtype=wp.int32, device=device),
+        parameters=wp.array(
+            np.column_stack(
+                (scenario.vapor_pressure, np.zeros((2, 3), dtype=np.float64))
+            ),
+            dtype=wp.float64,
+            device=device,
+        ),
+        molar_mass_reference=wp.array(
+            scenario.molar_mass, dtype=wp.float64, device=device
+        ),
+    )
+    condensation = WarpCondensationExecutionState(
+        WarpCondensationState(
+            CondensationExecutionConfig(
+                CondensationConfiguration(
+                    CondensationExecutionMode.EQUAL_STEP,
+                    False,
+                    CondensationActivityMode.IDEAL,
+                    CondensationSurfaceMode.STATIC,
+                )
+            ),
+            session.particles,
+            session.gas,
+            session.environment,
+            thermodynamics,
+            scratch_buffers=condensation_resources.scratch_buffers,
+        ),
+        duration,
+    )
+    coagulation = ResidentBrownianCoagulationExecutionState(
+        WarpBrownianCoagulationExecutionState(
+            WarpBrownianCoagulationState(
+                BrownianCoagulationConfig(),
+                session.particles,
+                None,
+                None,
+                duration,
+                collision_pairs=coagulation_resources.collision_pairs,
+                n_collisions=coagulation_resources.n_collisions,
+                rng_states=coagulation_resources.rng_states,
+                initialize_rng=False,
+                environment=session.environment,
+            )
+        ),
+        session,
+        registry,
+        coagulation_resources,
+    )
+
+    def matrix() -> Any:
+        """Allocate one P1 diagnostic matrix on the resident device."""
+        return wp.zeros((2, 2), dtype=wp.float64, device=device)
+
+    latent_energy = matrix()
+    baseline_total_mass = wp.array(
+        scenario.baseline_total_mass, dtype=wp.float64, device=device
+    )
+    source_ledger = wp.array(
+        scenario.source_ledger, dtype=wp.float64, device=device
+    )
+    sink_ledger = wp.array(
+        scenario.sink_ledger, dtype=wp.float64, device=device
+    )
+    diagnostics = ResidentDiagnosticsPlan(
+        session,
+        registry,
+        graph,
+        schedule,
+        by_id["diagnostics"],
+        (
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT, matrix()
+            ),
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT, matrix()
+            ),
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.TOTAL_SPECIES_MASS, matrix()
+            ),
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
+                wp.zeros(2, dtype=wp.float64, device=device),
+            ),
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.LATENT_HEAT_ENERGY,
+                latent_energy,
+                energy_transfer=wp.array(
+                    scenario.energy_ledger, dtype=wp.float64, device=device
+                ),
+            ),
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.CONSERVATION_RESIDUAL,
+                matrix(),
+                baseline_total_mass=baseline_total_mass,
+                source_ledger=source_ledger,
+                sink_ledger=sink_ledger,
+            ),
+        ),
+    )
+    inventory = registry.register_capture_resources(
+        session, communication, diagnostics.registrations
+    )
+    requirements = CaptureResourceRequirements(
+        session,
+        ResourceInventoryCapacities(1, len(scenario.edge_sources), 0),
+        inventory,
+        PreparedResourceViews(
+            condensation_resources,
+            coagulation_resources,
+            None,
+            wall_loss_resources,
+            nucleation_resources,
+        ),
+        communication,
+        ("condensation", "coagulation", "wall_loss", "nucleation", "dilution"),
+        condensation_resources.scratch_buffers,
+        coagulation_resources,
+        wall_loss_resources,
+        nucleation_resources,
+    )
+    published = registry.prepare_capture_resources(requirements)
+    assert published.dilution is not None
+    wp.copy(
+        published.dilution.normalized_coefficient,
+        wp.array(
+            scenario.dilution_coefficient, dtype=wp.float64, device=device
+        ),
+    )
+    request = ResidentSimulationRequest(
+        session,
+        registry,
+        guard,
+        graph,
+        schedule,
+        thermodynamics,
+        condensation,
+        coagulation,
+        ResidentDilutionRequest(
+            session,
+            registry,
+            published.dilution.normalized_coefficient,
+            duration,
+            published.dilution,
+        ),
+        ResidentWallLossRequest(
+            session,
+            registry,
+            wall_loss_resources,
+            NeutralWallLossConfig("spherical", 1.0, chamber_radius=1.0),
+            duration,
+            enabled_box_indices=(),
+        ),
+        ResidentNucleationRequest(
+            session,
+            registry,
+            nucleation_resources,
+            object(),
+            duration,
+            object(),
+        ),
+        diagnostics,
+        ResidentEnvironmentUpdateRequest(
+            session,
+            registry,
+            graph,
+            by_id["environment_update"],
+            wp.array(scenario.temperature, dtype=wp.float64, device=device),
+            wp.array(scenario.pressure, dtype=wp.float64, device=device),
+        ),
+        ResidentGasUpdateRequest(
+            session,
+            registry,
+            graph,
+            by_id["gas_update"],
+            wp.array(
+                scenario.gas_concentration, dtype=wp.float64, device=device
+            ),
+        ),
+        ResidentCommunicationRequest(
+            session,
+            registry,
+            graph,
+            communication,
+            by_id["communication"],
+            by_id["volume_evolution"],
+            duration,
+        ),
+        requirements,
+    )
+    signature = create_resident_graph_capture_signature(request)
+    binding = ResidentGraphCaptureBinding(
+        request,
+        session,
+        registry,
+        guard,
+        create_graph_capture_lifecycle(
+            GraphCaptureCapability(
+                session.metadata.device, GraphCaptureAvailability.AVAILABLE
+            ),
+            signature,
+        ),
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+
+    class NoOpAdapter:
+        """Retain a test-only write-free process operation."""
+
+        def prepare(self, _request: object) -> Any:
+            """Return the frozen no-op prepared operation."""
+            return SimpleNamespace(execute=lambda: None)
+
+    for name in (
+        "WarpCondensationExecutionAdapter",
+        "ResidentBrownianCoagulationExecutionAdapter",
+        "ResidentWallLossAdapter",
+        "ResidentNucleationAdapter",
+    ):
+        monkeypatch.setattr(resident_scheduler, name, NoOpAdapter)
+
+    def no_op(*_prepared: object) -> None:
+        """Keep P1 state-update sources metadata-only for this test fixture."""
+
+    monkeypatch.setattr(
+        resident_scheduler,
+        "setup_prepared_environment_update",
+        lambda _prepared, _request: None,
+    )
+    monkeypatch.setattr(
+        resident_scheduler,
+        "setup_prepared_gas_update",
+        lambda _prepared, _request: None,
+    )
+    monkeypatch.setattr(
+        resident_scheduler, "_enqueue_prepared_environment_update", no_op
+    )
+    monkeypatch.setattr(
+        resident_scheduler, "_enqueue_prepared_gas_update", no_op
+    )
+    if duration == 0.0:
+        monkeypatch.setattr(
+            resident_scheduler, "_enqueue_prepared_vapor_pressure", no_op
+        )
+        monkeypatch.setattr(
+            resident_scheduler, "_enqueue_prepared_saturation_ratio", no_op
+        )
+        monkeypatch.setattr(
+            resident_scheduler,
+            "setup_prepared_resident_diagnostics",
+            lambda _prepared, _request: None,
+        )
+        monkeypatch.setattr(
+            resident_scheduler, "_enqueue_prepared_diagnostics_window", no_op
+        )
+    prepared = prepare_resident_simulation(request, duration)
+    assert prepared.ordered_node_ids == _CANONICAL_IDS
+    loop = _PreparedLoop(
+        wp,
+        session,
+        registry,
+        guard,
+        request,
+        binding,
+        prepared,
+        coagulation_resources,
+        wall_loss_resources,
+    )
+    return _ScenarioPreparedLoop(
+        loop,
+        communication,
+        latent_energy,
+        baseline_total_mass,
+        source_ledger,
+        sink_ledger,
+    )
+
+
 def _prepared_snapshot(loop: _PreparedLoop) -> dict[str, np.ndarray]:
     """Synchronize once and copy all meaningful resident-loop outputs."""
     loop.wp.synchronize_device(loop.session.particles.masses.device)
@@ -1152,6 +1595,54 @@ def _prepared_snapshot(loop: _PreparedLoop) -> dict[str, np.ndarray]:
             loop.coagulation_resources.rng_states.numpy().copy()
         ),
         "wall_loss_rng": loop.wall_loss_resources.rng_states.numpy().copy(),
+    }
+    for registration in loop.request.diagnostics.registrations:
+        snapshot[f"diagnostic_{registration.operation.value}"] = (
+            registration.output.numpy().copy()
+        )
+    return snapshot
+
+
+def _scenario_snapshot(loop: _ScenarioPreparedLoop) -> dict[str, np.ndarray]:
+    """Synchronize once at an assertion boundary and detach P1 outputs."""
+    prepared = loop.loop
+    prepared.wp.synchronize_device(prepared.session.particles.masses.device)
+    snapshot = _prepared_snapshot_without_sync(prepared)
+    buffers = loop.communication_resources.buffers
+    snapshot.update(
+        {
+            "communication_amounts": buffers.amounts.numpy().copy(),
+            "communication_deltas": buffers.amount_deltas.numpy().copy(),
+            "communication_outbound": buffers.outbound_amounts.numpy().copy(),
+            "latent_energy_input": loop.latent_energy.numpy().copy(),
+            "baseline_total_mass": loop.baseline_total_mass.numpy().copy(),
+            "source_ledger": loop.source_ledger.numpy().copy(),
+            "sink_ledger": loop.sink_ledger.numpy().copy(),
+        }
+    )
+    return snapshot
+
+
+def _prepared_snapshot_without_sync(
+    loop: _PreparedLoop,
+) -> dict[str, np.ndarray]:
+    """Copy prepared-loop arrays after the caller has synchronized once."""
+    particles = loop.session.particles
+    gas = loop.session.gas
+    environment = loop.session.environment
+    snapshot = {
+        "particle_masses": particles.masses.numpy().copy(),
+        "particle_concentration": particles.concentration.numpy().copy(),
+        "particle_charge": particles.charge.numpy().copy(),
+        "particle_density": particles.density.numpy().copy(),
+        "particle_volume": particles.volume.numpy().copy(),
+        "gas_molar_mass": gas.molar_mass.numpy().copy(),
+        "gas_concentration": gas.concentration.numpy().copy(),
+        "gas_vapor_pressure": gas.vapor_pressure.numpy().copy(),
+        "gas_partitioning": gas.partitioning.numpy().copy(),
+        "temperature": environment.temperature.numpy().copy(),
+        "pressure": environment.pressure.numpy().copy(),
+        "saturation_ratio": environment.saturation_ratio.numpy().copy(),
     }
     for registration in loop.request.diagnostics.registrations:
         snapshot[f"diagnostic_{registration.operation.value}"] = (
@@ -1196,6 +1687,180 @@ def _snapshot_inventory(snapshot: dict[str, np.ndarray]) -> np.ndarray:
         )
         + snapshot["gas_concentration"]
     )
+
+
+def _prepared_identity_signature(loop: _PreparedLoop) -> tuple[int, ...]:
+    """Return the identity-only resources retained by a prepared loop."""
+    session = loop.session
+    communication = loop.request.communication.resources
+    diagnostics = loop.request.diagnostics.registrations
+    return (
+        id(session.particles),
+        id(session.gas),
+        id(session.environment),
+        id(session.particles.masses),
+        id(session.particles.concentration),
+        id(session.particles.charge),
+        id(session.particles.density),
+        id(session.particles.volume),
+        id(session.gas.molar_mass),
+        id(session.gas.concentration),
+        id(session.gas.vapor_pressure),
+        id(session.gas.partitioning),
+        id(session.environment.temperature),
+        id(session.environment.pressure),
+        id(session.environment.saturation_ratio),
+        id(communication),
+        *(id(registration.output) for registration in diagnostics),
+    )
+
+
+def _scenario_identity_signature(
+    loop: _ScenarioPreparedLoop,
+) -> tuple[int, ...]:
+    """Return all primary, work, diagnostic, and accounting identities."""
+    buffers = loop.communication_resources.buffers
+    return _prepared_identity_signature(loop.loop) + (
+        id(loop.communication_resources),
+        id(buffers.amounts),
+        id(buffers.amount_deltas),
+        id(buffers.outbound_amounts),
+        id(loop.latent_energy),
+        id(loop.baseline_total_mass),
+        id(loop.source_ledger),
+        id(loop.sink_ledger),
+        id(loop.loop.prepared.resource_views),
+    )
+
+
+def _independent_gas_work_oracle(
+    gas_concentration: np.ndarray,
+    volume: np.ndarray,
+    sources: np.ndarray,
+    destinations: np.ndarray,
+    enabled: np.ndarray,
+    rates: np.ndarray,
+    time_step: float,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Calculate one GAS-communication work-buffer result without helpers."""
+    amounts = gas_concentration * volume[:, None]
+    deltas = np.zeros_like(amounts)
+    outbound = np.zeros_like(amounts)
+    for source, destination, is_enabled, rate in zip(
+        sources, destinations, enabled, rates, strict=True
+    ):
+        if is_enabled and rate != 0.0:
+            transfer = amounts[source] * rate * time_step
+            deltas[source] -= transfer
+            deltas[destination] += transfer
+            outbound[source] += transfer
+    return amounts, deltas, outbound
+
+
+def _assert_dilution_inventory_factor(
+    initial: dict[str, np.ndarray],
+    result: dict[str, np.ndarray],
+    coefficient: np.ndarray,
+    time_step: float,
+    steps: int,
+) -> None:
+    """Check detached per-box/species inventory against dilution alone."""
+    npt.assert_allclose(
+        _snapshot_inventory(result),
+        _snapshot_inventory(initial)
+        * np.exp(-coefficient[:, None] * time_step * steps),
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+        err_msg="per-box/species dilution inventory",
+    )
+
+
+def _assert_scenario_parity(
+    actual: dict[str, np.ndarray],
+    scenario: _CapturedLoopScenario,
+    steps: int,
+) -> None:
+    """Compare every P1 field and diagnostic to detached expectations."""
+    expected = _run_captured_full_loop_oracle(scenario, steps)
+    float_fields = {
+        "particle_masses": expected.state.particle_masses,
+        "particle_concentration": expected.state.particle_concentration,
+        "particle_volume": expected.state.volume,
+        "gas_concentration": expected.state.gas_concentration,
+        "gas_vapor_pressure": expected.state.vapor_pressure,
+        "saturation_ratio": expected.state.saturation_ratio,
+        "diagnostic_gas_concentration_snapshot": expected.gas_concentration_snapshot,
+        "diagnostic_saturation_ratio_snapshot": expected.saturation_ratio_snapshot,
+        "diagnostic_total_species_mass": expected.total_species_mass,
+        "diagnostic_particle_number_concentration": (
+            expected.particle_number_concentration
+        ),
+        "diagnostic_latent_heat_energy": expected.latent_heat_energy,
+        "diagnostic_conservation_residual": expected.conservation_residual,
+    }
+    for name, values in float_fields.items():
+        npt.assert_allclose(
+            actual[name],
+            values,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+            err_msg=name,
+        )
+    discrete_fields = {
+        "particle_charge": scenario.particle_charge,
+        "particle_density": np.array([1000.0, 1200.0]),
+        "gas_molar_mass": scenario.molar_mass,
+        "gas_partitioning": np.broadcast_to(
+            scenario.gas_partitioning[0], (2, 2)
+        ).astype(np.int32),
+        "temperature": scenario.temperature,
+        "pressure": scenario.pressure,
+        "latent_energy_input": scenario.energy_ledger,
+        "baseline_total_mass": scenario.baseline_total_mass,
+        "source_ledger": scenario.source_ledger,
+        "sink_ledger": scenario.sink_ledger,
+    }
+    for name, values in discrete_fields.items():
+        if actual[name].dtype.kind in {"i", "u", "b"}:
+            npt.assert_equal(actual[name], values, err_msg=name)
+        else:
+            npt.assert_allclose(
+                actual[name],
+                values,
+                rtol=PARITY_RTOL,
+                atol=PARITY_ATOL,
+                err_msg=name,
+            )
+
+
+def _assert_scenario_conservation(
+    initial: dict[str, np.ndarray],
+    result: dict[str, np.ndarray],
+    scenario: _CapturedLoopScenario,
+) -> None:
+    """Check detached transport, volume, and dilution inventory invariants."""
+    final_inventory = _snapshot_inventory(result)
+    expected_inventory = _species_inventory(
+        _run_captured_full_loop_oracle(scenario, scenario.time_steps).state
+    )
+    npt.assert_allclose(
+        final_inventory,
+        expected_inventory,
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+        err_msg="final per-box/species inventory",
+    )
+    initial_total = np.sum(_snapshot_inventory(initial), axis=0)
+    final_total = np.sum(final_inventory, axis=0)
+    expected_total = np.sum(expected_inventory, axis=0)
+    npt.assert_allclose(
+        final_total,
+        expected_total,
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+        err_msg="transport, volume, and dilution total inventory",
+    )
+    assert np.all(final_total < initial_total)
 
 
 def _deterministic_numpy_oracle(
@@ -1362,6 +2027,7 @@ def test_real_uncaptured_warp_cpu_nonzero_loop_matches_numpy() -> None:
     loop = _build_prepared_loop("cpu", 3, 0.25, 1571)
     try:
         initial = _prepared_snapshot(loop)
+        identity_signature = _prepared_identity_signature(loop)
         expected = _deterministic_numpy_oracle(initial)
         for _ in range(3):
             enqueue_prepared_resident_simulation(loop.prepared)
@@ -1374,7 +2040,203 @@ def test_real_uncaptured_warp_cpu_nonzero_loop_matches_numpy() -> None:
             rtol=PARITY_RTOL,
             atol=PARITY_ATOL,
         )
+        assert loop.prepared.ordered_node_ids == (
+            "communication",
+            "volume_evolution",
+            "environment_update",
+            "gas_update",
+            "vapor_pressure_refresh",
+            "saturation_refresh",
+            "condensation",
+            "brownian_coagulation",
+            "dilution",
+            "wall_loss",
+            "nucleation",
+            "diagnostics",
+        )
+        assert tuple(
+            operation.node.node_id for operation in loop.prepared.operations
+        ) == (loop.prepared.ordered_node_ids)
+        assert _prepared_identity_signature(loop) == identity_signature
         assert loop.guard.completed_steps == 3
+    finally:
+        _close_prepared_loop(loop)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_p1_ready_warp_cpu_loop_matches_detached_oracle(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Exercise P1's real READY-only barriers without enqueue-time host work."""
+    from particula.gpu import conversion
+
+    scenario = _captured_full_loop_scenario()
+    scenario_loop = _build_scenario_prepared_loop(
+        monkeypatch, scenario.time_step
+    )
+    loop = scenario_loop.loop
+    try:
+        snapshots = [_scenario_snapshot(scenario_loop)]
+        signature = _scenario_identity_signature(scenario_loop)
+        assert loop.prepared.ordered_node_ids == (
+            "communication",
+            "volume_evolution",
+            "environment_update",
+            "gas_update",
+            "vapor_pressure_refresh",
+            "saturation_refresh",
+            "condensation",
+            "brownian_coagulation",
+            "dilution",
+            "wall_loss",
+            "nucleation",
+            "diagnostics",
+        )
+        assert tuple(
+            node.node.node_id for node in loop.prepared.operations
+        ) == (loop.prepared.ordered_node_ids)
+        with monkeypatch.context() as dispatch_patch:
+
+            def forbidden(*_args: object, **_kwargs: object) -> None:
+                pytest.fail("prepared dispatch performed forbidden host work")
+
+            for name in (
+                "to_warp_particle_data",
+                "to_warp_gas_data",
+                "to_warp_environment_data",
+            ):
+                dispatch_patch.setattr(conversion, name, forbidden)
+            for name in ("synchronize", "synchronize_device", "zeros", "empty"):
+                dispatch_patch.setattr(loop.wp, name, forbidden)
+            for name in (
+                "acquire_communication",
+                "register_capture_resources",
+                "prepare_capture_resources",
+            ):
+                dispatch_patch.setattr(loop.registry, name, forbidden)
+            for _ in range(scenario.time_steps):
+                enqueue_prepared_resident_simulation(loop.prepared)
+        snapshots.extend([_scenario_snapshot(scenario_loop)])
+        result = snapshots[-1]
+        _assert_scenario_parity(result, scenario, scenario.time_steps)
+        # Work buffers are overwritten for one dispatch, rather than accumulated.
+        # The final snapshot is checked below against the independently evolved
+        # pre-final state to keep this ledger oracle separate from scheduler code.
+        pre_final = _run_captured_full_loop_oracle(
+            scenario, scenario.time_steps - 1
+        )
+        amounts, deltas, outbound = _independent_gas_work_oracle(
+            pre_final.state.gas_concentration,
+            pre_final.state.volume,
+            scenario.edge_sources,
+            scenario.edge_destinations,
+            scenario.edge_enabled,
+            scenario.edge_rates,
+            scenario.time_step,
+        )
+        npt.assert_allclose(
+            result["communication_amounts"],
+            amounts,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+            err_msg="final communication amounts",
+        )
+        npt.assert_allclose(
+            result["communication_deltas"],
+            deltas,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+            err_msg="final communication deltas",
+        )
+        npt.assert_allclose(
+            result["communication_outbound"],
+            outbound,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+            err_msg="final communication outbound",
+        )
+        _assert_scenario_conservation(
+            snapshots[0],
+            result,
+            scenario,
+        )
+        assert _scenario_identity_signature(scenario_loop) == signature
+        assert loop.guard.completed_steps == scenario.time_steps
+        assert loop.binding.lifecycle.state is GraphCaptureLifecycleState.READY
+    finally:
+        _close_prepared_loop(loop)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_p1_ready_warp_cpu_zero_duration_is_write_free(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Keep the exact P1 READY binding and payload state unchanged at zero time."""
+    scenario_loop = _build_scenario_prepared_loop(monkeypatch, 0.0)
+    loop = scenario_loop.loop
+    try:
+        before = _scenario_snapshot(scenario_loop)
+        signature = _scenario_identity_signature(scenario_loop)
+        with monkeypatch.context() as dispatch_patch:
+
+            def forbidden(*_args: object, **_kwargs: object) -> None:
+                pytest.fail(
+                    "zero-duration prepared dispatch performed host work"
+                )
+
+            for name in ("synchronize", "synchronize_device", "zeros", "empty"):
+                dispatch_patch.setattr(loop.wp, name, forbidden)
+            for name in (
+                "acquire_communication",
+                "register_capture_resources",
+                "prepare_capture_resources",
+            ):
+                dispatch_patch.setattr(loop.registry, name, forbidden)
+            enqueue_prepared_resident_simulation(loop.prepared)
+        after = _scenario_snapshot(scenario_loop)
+        assert after.keys() == before.keys()
+        for name in after:
+            npt.assert_equal(after[name], before[name], err_msg=name)
+        assert _scenario_identity_signature(scenario_loop) == signature
+        assert loop.guard.completed_steps == 1
+        assert loop.binding.lifecycle.state is GraphCaptureLifecycleState.READY
+    finally:
+        _close_prepared_loop(loop)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_real_uncaptured_warp_cpu_zero_duration_preserves_primary_state() -> (
+    None
+):
+    """A READY prepared zero-duration dispatch leaves primary state untouched."""
+    loop = _build_prepared_loop("cpu", 3, 0.0, 1571)
+    try:
+        before = _prepared_snapshot(loop)
+        identity_signature = _prepared_identity_signature(loop)
+        enqueue_prepared_resident_simulation(loop.prepared)
+        after = _prepared_snapshot(loop)
+
+        for name in (
+            "particle_masses",
+            "particle_concentration",
+            "particle_charge",
+            "particle_density",
+            "particle_volume",
+            "gas_molar_mass",
+            "gas_concentration",
+            "gas_partitioning",
+            "temperature",
+            "pressure",
+            "coagulation_rng",
+            "wall_loss_rng",
+        ):
+            npt.assert_equal(after[name], before[name], err_msg=name)
+        assert _prepared_identity_signature(loop) == identity_signature
+        assert loop.guard.completed_steps == 1
+        assert loop.binding.lifecycle.state is GraphCaptureLifecycleState.READY
     finally:
         _close_prepared_loop(loop)
 
