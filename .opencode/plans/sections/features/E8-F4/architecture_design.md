@@ -20,12 +20,15 @@ cleanup ownership. It does not open a guard token, capture, enqueue, dispatch,
 allocate, transfer, synchronize, or change READY lifecycle state. P2 and P3
 remain responsible for native capture, handle publication/release, and replay.
 
-### Planned capture and replay lifecycle
+### Delivered P2 capture lifecycle
 
-E8-F4 adds a concrete graph owner around the prepared enqueue path; it does not
-create a second scheduler. Capture and replay share the same immutable prepared
-plan and exact E8-F3 arrays. Host validation is outside capture, and replay does
-only bounded metadata checks, token bookkeeping, and one graph launch.
+Issue #1568 adds the concrete-only capture owner around the prepared enqueue
+path; it does not create a second scheduler. `CapturedResidentGraph` retains
+the exact qualification/binding identities and the opaque native end handle.
+`capture_prepared_resident_graph()` validates the exact READY qualification,
+calls native begin, uses the private capture-safe dispatcher for the retained
+twelve operations, calls native end, revalidates, and only then transitions and
+publishes CAPTURED state. Replay remains deferred to P3.
 
 ```text
 ACTIVE session + pinned registry + closed guard
@@ -42,9 +45,9 @@ wp.capture_begin(cuda, force_module_load=True)
 wp.capture_end() -> opaque graph
                  |
                  v
-CapturedResidentPlan(REPLAYABLE, exact binding + graph)
-                 |
-        replay(duration)
+CapturedResidentGraph(CAPTURED, exact binding + opaque graph)
+                  |
+        P3 planned: replay(duration)
   compare current signature/identities/lifecycle
   begin one resident token
   wp.capture_launch(graph)
@@ -63,8 +66,12 @@ CapturedResidentPlan(REPLAYABLE, exact binding + graph)
 
 P1 accepts a caller-injected runtime adapter and retains its frozen native
 callable vocabulary so hardware-independent tests can assert qualification
-order. P2/P3 native capture, handle publication, release/cleanup, and execution
-remain design-only/deferred; the P1 qualification record does not own them.
+order. P2 invokes only `capture_begin()`, `capture_end()`, and private
+`capture_release(handle)` on post-end rejection or dispatch cleanup; it never
+inspects the handle or invokes instantiate/launch. Its dispatcher performs only
+the frozen canonical operation calls and deliberately omits validation, guard
+tokens, thermodynamic bookkeeping, and cleanup. P3 native launch/replay remains
+deferred.
 
 Replay compares metadata before token entry and launch. Mutable payloads and RNG
 words are intentionally not compared: they advance in the exact pinned arrays.
@@ -76,12 +83,15 @@ faults both graph and resident session; rollback and retry are not promised.
 ## Data / API / Workflow Changes
 
 - **Data model:** P1 adds exact immutable concrete-only native-callable and
-  prepared-qualification records. Captured-plan, opaque graph-handle, and
-  teardown records remain future work. Reuse E8-F1 lifecycle/signature and
-  invalidation vocabulary rather than creating parallel vocabulary.
-- **API surface:** Add direct-module-only setup, replay, invalidate, and teardown
-  operations under `particula.execution.graph_capture`. Do not export them from
-  `particula.execution`, `particula.gpu.kernels`, or top-level `particula`.
+  prepared-qualification records; P2 adds immutable `CapturedResidentGraph`
+  retaining the exact CAPTURED successor and opaque end handle. Reuse E8-F1
+  lifecycle/signature and invalidation vocabulary rather than creating parallel
+  vocabulary.
+- **API surface:** P2 adds direct-module-only
+  `capture_prepared_resident_graph()` under
+  `particula.execution.graph_capture`; replay, invalidation, and teardown remain
+  future operations. Do not export concrete names from `particula.execution`,
+  `particula.gpu.kernels`, or top-level `particula`.
 - **Workflow hooks:** E8-F4 consumes E8-F1 lifecycle/signature, E8-F2 prepared
   enqueue, and E8-F3 resource publication. E8-F5 validates the accepted replay
   path; E8-F6 benchmarks its resource/graph lifetime; E8-F7 profiles the

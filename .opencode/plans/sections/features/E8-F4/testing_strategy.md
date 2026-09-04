@@ -14,10 +14,16 @@ baseline; native graph capture evidence is CUDA-only and pass-or-clean-skip.
   native-handle/cleanup/token/callable-invocation contract. Export denial is
   covered in `particula/execution/tests/exports_test.py`. These host-only tests
   do not claim native CUDA capture; that remains P2.
-- **P2 — fixed capture:** Trace the exact prepared twelve-node enqueue once,
-  assert setup work stays outside capture, reject partial publication, and run a
-  CUDA capture smoke row. Spies fail on allocation, readback, synchronization,
-  validation scans, resource acquisition, or host scheduling in the window.
+- **P2 — delivered fixed capture:** `graph_capture_test.py` covers begin →
+  twelve-operation dispatch → end ordering, opaque-handle identity retention,
+  pre-begin and post-end revalidation, delayed CAPTURED publication, and
+  begin/dispatch/end/release failure chains. Capture-window spies deny normal
+  scheduler/token work, validation, resource work, allocation, transfer,
+  readback, and synchronization. `full_loop_test.py` traces the private
+  dispatcher order, while `exports_test.py` denies the new carrier and capture
+  entry point from package and top-level exports. A `warp`/`cuda` row uses the
+  native capture APIs and twelve device no-ops; it skips only for absent Warp,
+  CUDA, or required capture APIs.
 - **P3 — guarded replay:** Cover repeated accepted launches, one token and one
   graph launch per timestep, mutable payload/RNG advancement, all exact identity
   mismatches, duration/lifecycle rejection, and zero launches after preflight
@@ -52,11 +58,11 @@ baseline; native graph capture evidence is CUDA-only and pass-or-clean-skip.
 Focused fix checks are assertion evidence only and run coverage-disabled:
 
 ```bash
-pytest particula/execution/tests/graph_capture_test.py \
-  particula/execution/tests/captured_full_loop_test.py -q
-pytest particula/execution/tests/ -q
-pytest particula/execution/tests/captured_full_loop_test.py -q \
+pytest particula/execution/tests/graph_capture_test.py -q --no-cov
+pytest particula/execution/tests/graph_capture_test.py -q --no-cov \
   -m "warp and cuda"
+pytest particula/execution/tests/full_loop_test.py -q --no-cov
+pytest particula/execution/tests/exports_test.py -q --no-cov
 ```
 
 The CUDA command may pass or cleanly skip; it never falls back to CPU. A focused

@@ -14,16 +14,22 @@
     and failure, no token/native-callable invocation/handle/cleanup ownership,
     and denied package/top-level exports. Native capture and replay remain P2/P3.
 
-- [ ] **E8-F4-P2:** Complete fixed-sequence capture and CUDA smoke tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Capture exactly one complete prepared twelve-node enqueue sequence
-    with no setup work inside the capture window and publish the graph only
-    after `capture_end` succeeds.
-  - Files: `particula/execution/graph_capture.py`, E8-F2 prepared enqueue module,
-    `particula/execution/tests/{graph_capture,full_loop}_test.py`
-  - Tests: Fake launch traces, forbidden allocation/readback/synchronization
-    spies, capture-begin/enqueue/end failure cleanup, and CUDA
-    pass-or-clean-skip capture smoke coverage.
+- [x] **E8-F4-P2:** Complete fixed-sequence capture and CUDA smoke tests
+  - Issue: #1568 | Size: S | Status: Delivered
+  - Delivered: `capture_prepared_resident_graph()` captures one already-qualified
+    prepared simulation as `capture_begin()` → the retained twelve-operation
+    dispatch → `capture_end()`. It revalidates before begin and after end,
+    publishes `CapturedResidentGraph` only after the binding becomes CAPTURED,
+    and privately releases an end handle after post-end rejection. The opaque
+    handle is retained and released by identity only.
+  - Files: `particula/execution/graph_capture.py`,
+    `particula/execution/resident_scheduler.py`,
+    `particula/execution/tests/{graph_capture,full_loop,exports}_test.py`
+  - Verified contract: fake-runtime ordering and failure cleanup, capture-window
+    prohibition of normal scheduler/token/validation/resource/transfer/readback/
+    synchronization work, retained-operation ordering, denied package/top-level
+    exports, and a CUDA-only native twelve-no-op smoke row. P3 replay remains
+    deferred.
 
 - [ ] **E8-F4-P3:** Guarded replay and exact compatibility checks with unit tests
   - Issue: TBD | Size: S | Status: Not Started

@@ -11,10 +11,12 @@
 - [x] Validate the exact E8-F1 READY signature, ACTIVE session, pinned registry,
   closed guard, E8-F2 prepared simulation, E8-F3 resource set, device, and
   duration before adapter lookup; preserve READY on every result.
-- [ ] Execute one E8-F2 prepared enqueue between `capture_begin` and
-  `capture_end`; publish no handle until both enqueue and capture end succeed.
-- [ ] Implement exact-once capture cleanup and preserve operation plus cleanup
-  failures without attempting a second `capture_end`.
+- [x] Execute one E8-F2 prepared enqueue between `capture_begin` and
+  `capture_end`; publish `CapturedResidentGraph` only after post-end
+  revalidation and the CAPTURED transition succeed.
+- [x] Implement exact-once capture cleanup and preserve operation plus cleanup
+  failures without attempting a second `capture_end`; release a successful-end
+  opaque handle by identity after post-end rejection.
 - [ ] Implement replay preflight and one-token/one-`capture_launch` execution
   with no process dispatch, allocation, validation scans, readback, transfer,
   synchronization, RNG reset, fallback, or recapture.
@@ -32,11 +34,11 @@
 - [x] Extend `particula/execution/tests/graph_capture_test.py` with host-only
   adapter-order, exact identity, lifecycle, malformed metadata, no-handle/
   no-cleanup, and no-native-call tests for P1.
-- [ ] Add forbidden-operation spies proving prepared capture/replay invokes no
-  allocator, host readback, validation scan, synchronization, or process
-  scheduler loop.
-- [ ] Add CUDA-gated capture and repeated-replay smoke tests that skip only for
-  explicit unavailable device/API conditions and never fall back to CPU.
+- [x] Add forbidden-operation spies proving prepared capture invokes no normal
+  scheduler/token work, allocator, host readback, validation scan,
+  synchronization, transfer, or resource work in the native window.
+- [x] Add a CUDA-gated native capture smoke test with twelve device no-ops that
+  skips only for unavailable Warp/CUDA/capture APIs and never falls back to CPU.
 - [ ] Add `captured_full_loop_test.py` with identical CPU, uncaptured Warp, and
   captured CUDA fixtures over multiple timesteps.
 - [ ] Compare every meaningful particle, gas, environment, diagnostics, and RNG
@@ -45,7 +47,7 @@
 - [ ] Add structural drift cases for dimensions, devices, arrays, prepared plan,
   graph/schedule, process configurations, communication maps, diagnostics, RNG
   sidecars, resident finalize/fault/close, teardown, and restart.
-- [x] Extend `particula/execution/tests/exports_test.py` to prove P1 graph
-  qualification names remain concrete-only and are denied from public exports.
+- [x] Extend `particula/execution/tests/exports_test.py` to prove P1 and P2
+  graph-capture names remain concrete-only and are denied from public exports.
 - [ ] Run focused execution assertions without coverage, then the untargeted
   repository coverage runner and strict documentation build.

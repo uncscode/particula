@@ -971,11 +971,14 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   identity for an exact non-CPU Warp device. The adapter alone probes runtime,
   device, and capture-API availability; `Device.native` remains opaque.
   Qualification returns a fresh immutable metadata record and preserves READY
-  on success or rejection. It does not capture, invoke callables, open a guard
-  token, own graph/exec handles, release or clean up resources, dispatch,
-  allocate, transfer, or synchronize. Its names remain absent from package and
-  top-level exports; later E8-F4 phases own native capture, handles, cleanup,
-  replay, and evidence.
+  on success or rejection. E8-F4-P2 consumes that exact qualification only to
+  perform native begin, frozen twelve-operation dispatch, and native end. It
+  revalidates before begin and after end, retains the opaque end handle by
+  identity only, and transitions READY to CAPTURED only after successful end.
+  A post-end rejection privately releases that exact handle. It never
+  instantiates, launches, replays, publicly releases, transfers, synchronizes,
+  or checkpoints a graph. These names remain absent from package and top-level
+  exports; later E8-F4 phases own replay and broader captured evidence.
 - Eligibility is fail-closed: non-CPU Warp native devices require
   caller-provided availability/probe qualification. CPU and Warp CPU are neither
   capture nor fallback/emulation paths; E8-F1 supplies no availability-policy

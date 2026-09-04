@@ -1,12 +1,13 @@
-"""Declare resident graph-capture capability and compatibility metadata.
+"""Qualify and capture prepared GPU-resident timestep graphs.
 
 This concrete, direct-import-only boundary resolves caller-provided
 graph-capture support and records identity-based compatibility for an
 already-built resident request. Its prepared-qualification boundary lazily
 obtains an adapter's callable vocabulary for one exact READY binding. Its
-capture boundary retains an opaque native handle after a successful capture and
-privately releases it when post-capture validation fails. It neither replays
-graphs, imports Warp, probes devices itself, acquires resources, transfers data,
+capture boundary calls native begin, retained-operation dispatch, and end in
+order, retains the resulting opaque handle, and privately releases it when
+post-capture validation fails. It neither instantiates, launches, nor replays
+graphs; imports Warp; probes devices itself; acquires resources; transfers data;
 or synchronizes. Its binding helpers gate scheduler admission and record
 explicit lifecycle successors without changing resident payloads.
 """
@@ -123,9 +124,12 @@ class GraphCaptureRuntimeProbe(Protocol):
 class GraphCaptureNativeCallables:
     """Retain an adapter's native callable vocabulary by exact identity.
 
-    This P1 record is vocabulary only: it holds no graph or executable handle
-    and owns no cleanup callback. In particular, ``capture_release`` is a
-    callable for a later owner to invoke, not a retained cleanup action.
+    This record is vocabulary only: it holds no graph or executable handle and
+    owns no cleanup callback. P2 invokes only ``capture_begin()``,
+    ``capture_end()``, and, after a post-end rejection, ``capture_release()``.
+    It never invokes ``capture_instantiate`` or ``capture_launch``. In
+    particular, ``capture_release`` is a callable for a later owner to invoke,
+    not a retained cleanup action.
 
     Attributes:
         capture_begin: Callable that begins native graph capture.
@@ -1646,8 +1650,27 @@ class PreparedGraphCaptureQualification:
 class CapturedResidentGraph:
     """Retain one completed native capture and its exact resident binding.
 
-    The opaque ``handle`` is retained by identity only. This concrete carrier
+    The opaque ``handle`` is retained by identity only; its type, equality,
+    truthiness, and serialization are never inspected. This concrete carrier
     neither instantiates nor launches the graph and does not expose cleanup.
+
+    Attributes:
+        qualification: Exact READY qualification validated before and after
+            native capture.
+        binding: Exact attached resident graph-capture binding.
+        lifecycle: Binding-owned CAPTURED lifecycle successor.
+        signature: Exact structural signature retained by ``qualification``.
+        request: Exact resident simulation request.
+        session: Exact active resident session.
+        registry: Exact resource registry pinned to ``session``.
+        guard: Exact closed resident step guard.
+        prepared: Exact prepared resident simulation dispatched during capture.
+        timestep: Exact prepared timestep retained by ``prepared``.
+        capture_requirements: Exact published capture-resource requirements.
+        capture_set: Exact published capture-resource set.
+        capture_report: Exact cached logical-byte report for ``capture_set``.
+        device: Exact qualified non-CPU Warp device.
+        handle: Opaque handle returned by native ``capture_end()``.
     """
 
     qualification: PreparedGraphCaptureQualification
@@ -1940,7 +1963,21 @@ def qualify_prepared_resident_graph_capture(  # noqa: C901
 def _validate_prepared_graph_capture_qualification(
     qualification: object,
 ) -> PreparedGraphCaptureQualification:
-    """Recheck one READY qualification without invoking native callables."""
+    """Recheck one READY qualification without invoking native callables.
+
+    Args:
+        qualification: Candidate exact qualification retaining the prepared
+            binding and native callable vocabulary.
+
+    Returns:
+        The same validated qualification object.
+
+    Raises:
+        TypeError: If ``qualification`` or a retained concrete carrier has an
+            invalid exact type.
+        ValueError: If the READY binding, resident session, signature, prepared
+            operations, or published capture resource set has changed.
+    """
     if type(qualification) is not PreparedGraphCaptureQualification:
         raise TypeError(
             "qualification must be an exact PreparedGraphCaptureQualification."
@@ -2010,7 +2047,14 @@ def _validate_prepared_graph_capture_qualification(
 def _classify_capture_operational_failure(
     qualification: PreparedGraphCaptureQualification,
 ) -> BaseException | None:
-    """Classify a capture failure when its exact binding remains attached."""
+    """Classify a capture failure when its exact binding remains attached.
+
+    Args:
+        qualification: Exact qualification associated with the failed capture.
+
+    Returns:
+        The classification error when classification fails, otherwise ``None``.
+    """
     binding = qualification.binding
     if (
         type(binding) is not ResidentGraphCaptureBinding
@@ -2035,7 +2079,17 @@ def _raise_capture_operational_failure(
     error: BaseException,
     cleanup_error: BaseException | None = None,
 ) -> None:
-    """Raise an operational capture error while retaining its primary cause."""
+    """Raise an operational capture error while retaining its primary cause.
+
+    Args:
+        qualification: Exact qualification associated with the failed capture.
+        error: Primary operational error to propagate.
+        cleanup_error: Optional capture-end or release error to chain.
+
+    Raises:
+        BaseException: Always raises ``error`` with any cleanup or
+            classification failure chained as its cause.
+    """
     classification_error = _classify_capture_operational_failure(qualification)
     if cleanup_error is not None:
         if classification_error is not None:
@@ -2053,7 +2107,26 @@ def capture_prepared_resident_graph(
 
     Only native ``capture_begin()``, retained prepared dispatch, and
     ``capture_end()`` run inside the capture window. A successful end handle is
-    released only if post-end validation or lifecycle completion rejects it.
+    released exactly once only if post-end validation or lifecycle completion
+    rejects it. This concrete-only operation neither instantiates, launches, nor
+    replays a graph, and it performs no token, allocation, transfer, readback,
+    or synchronization work in the capture window.
+
+    Args:
+        qualification: Exact READY qualification returned by
+            :func:`qualify_prepared_resident_graph_capture`.
+
+    Returns:
+        Immutable record retaining the captured lifecycle successor and exact
+        opaque handle returned by native ``capture_end()``.
+
+    Raises:
+        TypeError: If ``qualification`` is not an exact valid qualification.
+        ValueError: If retained READY metadata has drifted, capture is already
+            active for the binding, or lifecycle completion cannot publish a
+            CAPTURED successor.
+        BaseException: Propagates native begin, dispatch, end, or release errors
+            while preserving the operational error as the primary cause.
     """
     try:
         typed = _validate_prepared_graph_capture_qualification(qualification)

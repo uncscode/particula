@@ -141,12 +141,12 @@ _CANONICAL_WRITER_CAPABLE = (True,) * len(_CANONICAL_IDS)
 
 @dataclass(frozen=True, eq=False)
 class PreparedResidentOperation:
-    """Retain one setup-validated resident operation for direct enqueue.
+    """Retain one setup-validated resident operation for direct dispatch.
 
     Attributes:
         node: Resolver-produced node represented by this operation.
         handler: Scheduler-owned fixed handler for the prepared operation.
-        arguments: Setup-bound arguments supplied to ``handler`` at enqueue.
+        arguments: Setup-bound arguments supplied to ``handler`` at dispatch.
         product: Setup product retained by identity for drift detection.
         writer_capable: Whether invoking ``handler`` may launch a device writer.
     """
@@ -748,6 +748,12 @@ def _enqueue_captured_prepared_operations(prepared: object) -> None:
     capture window. This helper deliberately performs only the frozen operation
     calls, in their retained canonical order; it does not validate, open a
     guard token, record thermodynamic progress, or clean up failures.
+
+    Args:
+        prepared: Already-qualified exact prepared resident simulation.
+
+    Raises:
+        BaseException: Propagates an exception raised by a retained operation.
     """
     typed = cast(PreparedResidentSimulation, prepared)
     for operation in typed.operations:
