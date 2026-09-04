@@ -849,8 +849,13 @@ def test_captured_loop_rejects_invalid_aggregate_transport_fraction(
         edge_destinations=_scenario_replacement([1, 1, 0], np.int32),
         edge_rates=_scenario_replacement(rates, np.float64),
     )
-    with pytest.raises(ValueError, match=message):
-        _run_captured_full_loop_oracle(malformed, 1)
+    if message == "finite":
+        with pytest.warns(RuntimeWarning, match="overflow encountered in add"):
+            with pytest.raises(ValueError, match=message):
+                _run_captured_full_loop_oracle(malformed, 1)
+    else:
+        with pytest.raises(ValueError, match=message):
+            _run_captured_full_loop_oracle(malformed, 1)
     npt.assert_equal(malformed.gas_concentration, scenario.gas_concentration)
 
 
@@ -1224,6 +1229,11 @@ def _build_scenario_prepared_loop_impl(
     monkeypatch: pytest.MonkeyPatch,
     duration: float,
     cleanup_binding: list[tuple[Any, Any, Any]],
+    device: Device = Device(Backend.WARP, "cpu"),
+    communication_family: CommunicationTransportMode = (
+        CommunicationTransportMode.GAS
+    ),
+    scenario: _CapturedLoopScenario | None = None,
 ) -> _ScenarioPreparedLoop:
     """Build the P1 two-box scenario without shared fixture update sources."""
     import particula.execution.resident_scheduler as resident_scheduler
@@ -1231,7 +1241,8 @@ def _build_scenario_prepared_loop_impl(
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
 
     wp = pytest.importorskip("warp")
-    scenario = _captured_full_loop_scenario()
+    if scenario is None:
+        scenario = _captured_full_loop_scenario()
     particles = ParticleData(
         masses=scenario.particle_masses.copy(),
         concentration=scenario.particle_concentration.copy(),
@@ -1254,7 +1265,7 @@ def _build_scenario_prepared_loop_impl(
         particles,
         gas,
         environment,
-        Device(Backend.WARP, "cpu"),
+        device,
         root_seed=scenario.root_seed,
         logical_box_ids=tuple(str(value) for value in scenario.logical_box_ids),
         lanes=(0, 1),
@@ -1263,22 +1274,24 @@ def _build_scenario_prepared_loop_impl(
     guard = ResidentStepGuard(session, registry)
     cleanup_binding.append((session, registry, guard))
     graph, schedule, by_id = _resident_graph()
-    device = particles.masses.device
+    warp_device = session.particles.masses.device
     configuration = CommunicationConfiguration(
         CommunicationMap(
             CommunicationMapForm.ONE_DIMENSIONAL,
-            CommunicationTransportMode.GAS,
+            communication_family,
             len(scenario.edge_sources),
-            wp.array(scenario.edge_sources, dtype=wp.int32, device=device),
-            wp.array(scenario.edge_destinations, dtype=wp.int32, device=device),
-            wp.array(scenario.edge_enabled, dtype=wp.int32, device=device),
-            wp.array(scenario.edge_rates, dtype=wp.float64, device=device),
+            wp.array(scenario.edge_sources, dtype=wp.int32, device=warp_device),
+            wp.array(
+                scenario.edge_destinations, dtype=wp.int32, device=warp_device
+            ),
+            wp.array(scenario.edge_enabled, dtype=wp.int32, device=warp_device),
+            wp.array(scenario.edge_rates, dtype=wp.float64, device=warp_device),
         ),
         PrescribedVolumeUpdate(
             wp.array(
                 scenario.volume if duration == 0.0 else scenario.final_volume,
                 dtype=wp.float64,
-                device=device,
+                device=warp_device,
             )
         ),
         (
@@ -1293,16 +1306,16 @@ def _build_scenario_prepared_loop_impl(
     wall_loss_resources = registry.acquire_wall_loss()
     nucleation_resources = registry.acquire_nucleation()
     thermodynamics = ThermodynamicsConfig(
-        modes=wp.zeros(2, dtype=wp.int32, device=device),
+        modes=wp.zeros(2, dtype=wp.int32, device=warp_device),
         parameters=wp.array(
             np.column_stack(
                 (scenario.vapor_pressure, np.zeros((2, 3), dtype=np.float64))
             ),
             dtype=wp.float64,
-            device=device,
+            device=warp_device,
         ),
         molar_mass_reference=wp.array(
-            scenario.molar_mass, dtype=wp.float64, device=device
+            scenario.molar_mass, dtype=wp.float64, device=warp_device
         ),
     )
     condensation = WarpCondensationExecutionState(
@@ -1345,17 +1358,17 @@ def _build_scenario_prepared_loop_impl(
 
     def matrix() -> Any:
         """Allocate one P1 diagnostic matrix on the resident device."""
-        return wp.zeros((2, 2), dtype=wp.float64, device=device)
+        return wp.zeros((2, 2), dtype=wp.float64, device=warp_device)
 
     latent_energy = matrix()
     baseline_total_mass = wp.array(
-        scenario.baseline_total_mass, dtype=wp.float64, device=device
+        scenario.baseline_total_mass, dtype=wp.float64, device=warp_device
     )
     source_ledger = wp.array(
-        scenario.source_ledger, dtype=wp.float64, device=device
+        scenario.source_ledger, dtype=wp.float64, device=warp_device
     )
     sink_ledger = wp.array(
-        scenario.sink_ledger, dtype=wp.float64, device=device
+        scenario.sink_ledger, dtype=wp.float64, device=warp_device
     )
     diagnostics = ResidentDiagnosticsPlan(
         session,
@@ -1375,13 +1388,13 @@ def _build_scenario_prepared_loop_impl(
             ),
             ResidentDiagnosticRegistration(
                 ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
-                wp.zeros(2, dtype=wp.float64, device=device),
+                wp.zeros(2, dtype=wp.float64, device=warp_device),
             ),
             ResidentDiagnosticRegistration(
                 ResidentDiagnosticOperation.LATENT_HEAT_ENERGY,
                 latent_energy,
                 energy_transfer=wp.array(
-                    scenario.energy_ledger, dtype=wp.float64, device=device
+                    scenario.energy_ledger, dtype=wp.float64, device=warp_device
                 ),
             ),
             ResidentDiagnosticRegistration(
@@ -1398,7 +1411,15 @@ def _build_scenario_prepared_loop_impl(
     )
     requirements = CaptureResourceRequirements(
         session,
-        ResourceInventoryCapacities(1, len(scenario.edge_sources), 0),
+        ResourceInventoryCapacities(
+            1,
+            len(scenario.edge_sources)
+            if communication_family is CommunicationTransportMode.GAS
+            else 0,
+            len(scenario.edge_sources)
+            if communication_family is CommunicationTransportMode.PARTICLES
+            else 0,
+        ),
         inventory,
         PreparedResourceViews(
             condensation_resources,
@@ -1419,7 +1440,7 @@ def _build_scenario_prepared_loop_impl(
     wp.copy(
         published.dilution.normalized_coefficient,
         wp.array(
-            scenario.dilution_coefficient, dtype=wp.float64, device=device
+            scenario.dilution_coefficient, dtype=wp.float64, device=warp_device
         ),
     )
     request = ResidentSimulationRequest(
@@ -1460,8 +1481,10 @@ def _build_scenario_prepared_loop_impl(
             registry,
             graph,
             by_id["environment_update"],
-            wp.array(scenario.temperature, dtype=wp.float64, device=device),
-            wp.array(scenario.pressure, dtype=wp.float64, device=device),
+            wp.array(
+                scenario.temperature, dtype=wp.float64, device=warp_device
+            ),
+            wp.array(scenario.pressure, dtype=wp.float64, device=warp_device),
         ),
         ResidentGasUpdateRequest(
             session,
@@ -1469,7 +1492,7 @@ def _build_scenario_prepared_loop_impl(
             graph,
             by_id["gas_update"],
             wp.array(
-                scenario.gas_concentration, dtype=wp.float64, device=device
+                scenario.gas_concentration, dtype=wp.float64, device=warp_device
             ),
         ),
         ResidentCommunicationRequest(
@@ -1560,6 +1583,11 @@ def _build_scenario_prepared_loop_impl(
 def _build_scenario_prepared_loop(
     monkeypatch: pytest.MonkeyPatch,
     duration: float,
+    device: Device = Device(Backend.WARP, "cpu"),
+    communication_family: CommunicationTransportMode = (
+        CommunicationTransportMode.GAS
+    ),
+    scenario: _CapturedLoopScenario | None = None,
 ) -> _ScenarioPreparedLoop:
     """Build a scenario loop and close its exact binding after setup failure."""
     cleanup_binding: list[tuple[Any, Any, Any]] = []
@@ -1568,6 +1596,9 @@ def _build_scenario_prepared_loop(
             monkeypatch,
             duration,
             cleanup_binding,
+            device,
+            communication_family,
+            scenario,
         )
     except BaseException as setup_error:
         if cleanup_binding:
@@ -1622,11 +1653,28 @@ def _scenario_snapshot(loop: _ScenarioPreparedLoop) -> dict[str, np.ndarray]:
     prepared.wp.synchronize_device(prepared.session.particles.masses.device)
     snapshot = _prepared_snapshot_without_sync(prepared)
     buffers = loop.communication_resources.buffers
-    snapshot.update(
+    work_buffers = (
         {
             "communication_amounts": buffers.amounts.numpy().copy(),
             "communication_deltas": buffers.amount_deltas.numpy().copy(),
             "communication_outbound": buffers.outbound_amounts.numpy().copy(),
+        }
+        if loop.communication_resources.configuration.communication_map.transport_mode
+        is CommunicationTransportMode.GAS
+        else {
+            "communication_source_debits": buffers.source_debits.numpy().copy(),
+            "communication_destination_credits": (
+                buffers.destination_credits.numpy().copy()
+            ),
+            "communication_assignments": buffers.assignments.numpy().copy(),
+            "communication_requests": (
+                buffers.request_concentrations.numpy().copy()
+            ),
+        }
+    )
+    snapshot.update(
+        work_buffers
+        | {
             "latent_energy_input": loop.latent_energy.numpy().copy(),
             "baseline_total_mass": loop.baseline_total_mass.numpy().copy(),
             "source_ledger": loop.source_ledger.numpy().copy(),
@@ -1799,11 +1847,24 @@ def _scenario_identity_signature(
 ) -> tuple[int, ...]:
     """Return all primary, work, diagnostic, and accounting identities."""
     buffers = loop.communication_resources.buffers
+    buffer_ids = (
+        (
+            id(buffers.amounts),
+            id(buffers.amount_deltas),
+            id(buffers.outbound_amounts),
+        )
+        if loop.communication_resources.configuration.communication_map.transport_mode
+        is CommunicationTransportMode.GAS
+        else (
+            id(buffers.source_debits),
+            id(buffers.destination_credits),
+            id(buffers.assignments),
+            id(buffers.request_concentrations),
+        )
+    )
     return _prepared_identity_signature(loop.loop) + (
         id(loop.communication_resources),
-        id(buffers.amounts),
-        id(buffers.amount_deltas),
-        id(buffers.outbound_amounts),
+        *buffer_ids,
         id(loop.latent_energy),
         id(loop.baseline_total_mass),
         id(loop.source_ledger),
@@ -1852,6 +1913,24 @@ def _assert_dilution_inventory_factor(
         atol=PARITY_ATOL,
         err_msg="per-box/species dilution inventory",
     )
+
+
+def _particle_transport_inventories(
+    snapshot: dict[str, np.ndarray],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Return closed-map particle number, species-mass, and charge inventories."""
+    amounts = (
+        snapshot["particle_concentration"]
+        * snapshot["particle_volume"][:, None]
+    )
+    number = np.array([np.sum(amounts)], dtype=np.float64)
+    mass = np.sum(
+        snapshot["particle_masses"] * amounts[:, :, None], axis=(0, 1)
+    )
+    charge = np.array(
+        [np.sum(snapshot["particle_charge"] * amounts)], dtype=np.float64
+    )
+    return number, mass, charge
 
 
 def _assert_scenario_parity(
@@ -2106,19 +2185,47 @@ def test_deterministic_full_loop_matches_independent_uncaptured_baseline(
     assert reference.guard.completed_steps == 3
 
 
-def _require_native_cuda_capture() -> Any:
+def _native_cuda_candidates(wp: Any) -> tuple[Device, ...]:
+    """Return CUDA-native devices without coercion, replacement, or fallback."""
+    devices = wp.get_devices()
+    return tuple(
+        Device(Backend.WARP, native)
+        for native in devices
+        if isinstance(native, str) and native.startswith("cuda")
+    )
+
+
+def _require_native_cuda_capture() -> tuple[Any, tuple[Device, ...]]:
     """Skip only before native qualification when CUDA capture is unavailable."""
     wp = pytest.importorskip("warp")
     if not cuda_available(wp):
         pytest.skip(CUDA_SKIP_REASON)
-    if not any(str(device).startswith("cuda") for device in wp.get_devices()):
+    candidates = _native_cuda_candidates(wp)
+    if not candidates:
         pytest.skip(CUDA_SKIP_REASON)
     if not all(
         callable(getattr(wp, name, None))
         for name in ("capture_begin", "capture_end", "capture_launch")
     ):
         pytest.skip("Warp capture API unavailable")
-    return wp
+    return wp, candidates
+
+
+def test_native_cuda_candidate_discovery_retains_opaque_strings() -> None:
+    """Discovery ignores nonstrings without normalizing a usable CUDA value."""
+    first = "cuda:opaque:0"
+    second = "cuda:opaque:1"
+    fake_warp = SimpleNamespace(
+        get_devices=lambda: ("cpu", first, object(), second, 4)
+    )
+
+    candidates = _native_cuda_candidates(fake_warp)
+
+    assert tuple(candidate.native for candidate in candidates) == (
+        first,
+        second,
+    )
+    assert all(candidate.backend is Backend.WARP for candidate in candidates)
 
 
 def _forbid_prepared_host_work(
@@ -2391,6 +2498,116 @@ def test_p1_ready_warp_cpu_zero_duration_is_write_free(
 
 @pytest.mark.warp
 @pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "communication_family",
+    (CommunicationTransportMode.GAS, CommunicationTransportMode.PARTICLES),
+)
+def test_family_aware_ready_no_work_buffers_are_stable(
+    monkeypatch: pytest.MonkeyPatch,
+    communication_family: CommunicationTransportMode,
+) -> None:
+    """Both closed-map families retain their owned work buffers at no work."""
+    scenario_loop = _build_scenario_prepared_loop(
+        monkeypatch,
+        0.0,
+        Device(Backend.WARP, "cpu"),
+        communication_family,
+    )
+    loop = scenario_loop.loop
+    try:
+        before = _scenario_snapshot(scenario_loop)
+        identities = _scenario_identity_signature(scenario_loop)
+        enqueue_prepared_resident_simulation(loop.prepared)
+        after = _scenario_snapshot(scenario_loop)
+        work_names = tuple(
+            name for name in before if name.startswith("communication_")
+        )
+        for name in work_names:
+            npt.assert_equal(after[name], before[name], err_msg=name)
+        assert _scenario_identity_signature(scenario_loop) == identities
+        assert loop.guard.completed_steps == 1
+        assert loop.binding.lifecycle.state is GraphCaptureLifecycleState.READY
+    finally:
+        _close_prepared_loop(loop)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "communication_family",
+    (CommunicationTransportMode.GAS, CommunicationTransportMode.PARTICLES),
+    ids=("gas", "particles"),
+)
+@pytest.mark.parametrize(
+    "prescribed_volume", (False, True), ids=("fixed", "volume")
+)
+def test_family_aware_active_closed_map_preserves_detached_inventory(
+    monkeypatch: pytest.MonkeyPatch,
+    communication_family: CommunicationTransportMode,
+    prescribed_volume: bool,
+) -> None:
+    """Exercise active closed maps before optional volume evolution and dilution.
+
+    The detached totals are intentionally checked independently from the
+    scheduler's parity assertions.  With dilution disabled, a closed map and
+    prescribed volume update preserve total particle number, species mass, and
+    signed charge.  The GAS row additionally uses the existing detached gas
+    oracle through ``_assert_scenario_parity``.
+    """
+    scenario = _captured_full_loop_scenario()
+    scenario = replace(
+        scenario,
+        dilution_coefficient=_scenario_replacement([0.0, 0.0], np.float64),
+        final_volume=(
+            scenario.final_volume
+            if prescribed_volume
+            else _scenario_replacement(scenario.volume, np.float64)
+        ),
+    )
+    scenario_loop = _build_scenario_prepared_loop(
+        monkeypatch,
+        scenario.time_step,
+        Device(Backend.WARP, "cpu"),
+        communication_family,
+        scenario,
+    )
+    loop = scenario_loop.loop
+    try:
+        before = _scenario_snapshot(scenario_loop)
+        identities = _scenario_identity_signature(scenario_loop)
+        particle_before = _particle_transport_inventories(before)
+
+        enqueue_prepared_resident_simulation(loop.prepared)
+
+        after = _scenario_snapshot(scenario_loop)
+        particle_after = _particle_transport_inventories(after)
+        for actual, expected in zip(
+            particle_after, particle_before, strict=True
+        ):
+            npt.assert_allclose(
+                actual,
+                expected,
+                rtol=PARITY_RTOL,
+                atol=PARITY_ATOL,
+            )
+        if communication_family is CommunicationTransportMode.GAS:
+            _assert_scenario_parity(after, before, scenario, 1)
+        else:
+            assert (
+                after["particle_concentration"][0, 0]
+                < before["particle_concentration"][0, 0]
+            )
+            assert np.any(after["particle_concentration"][1] > 0.0)
+            assert np.any(after["communication_requests"] > 0.0)
+        assert _scenario_identity_signature(scenario_loop) == identities
+        assert loop.guard.completed_steps == 1
+        assert loop.binding.lifecycle.state is GraphCaptureLifecycleState.READY
+    finally:
+        _close_prepared_loop(loop)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
 def test_real_uncaptured_warp_cpu_zero_duration_preserves_primary_state() -> (
     None
 ):
@@ -2424,6 +2641,108 @@ def test_real_uncaptured_warp_cpu_zero_duration_preserves_primary_state() -> (
         _close_prepared_loop(loop)
 
 
+def _capture_scenario(kind: str) -> _CapturedLoopScenario:
+    """Return an immutable active, volume, or write-free capture scenario."""
+    scenario = _captured_full_loop_scenario()
+    if kind == "active":
+        return scenario
+    if kind == "volume":
+        return replace(
+            scenario,
+            dilution_coefficient=_scenario_replacement([0.0, 0.0], np.float64),
+        )
+    if kind == "no-work":
+        return replace(
+            scenario,
+            edge_enabled=_scenario_replacement([False, False, False], np.bool_),
+            edge_rates=_scenario_replacement([0.0, 0.0, 0.0], np.float64),
+            dilution_coefficient=_scenario_replacement([0.0, 0.0], np.float64),
+            final_volume=_scenario_replacement(scenario.volume, np.float64),
+        )
+    raise ValueError(f"unknown capture scenario: {kind}")
+
+
+@pytest.mark.warp
+@pytest.mark.cuda
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "communication_family",
+    (CommunicationTransportMode.GAS, CommunicationTransportMode.PARTICLES),
+    ids=("gas", "particles"),
+)
+@pytest.mark.parametrize("scenario_kind", ("active", "volume", "no-work"))
+def test_native_cuda_family_capture_replay_matches_uncaptured_baseline(
+    monkeypatch: pytest.MonkeyPatch,
+    communication_family: CommunicationTransportMode,
+    scenario_kind: str,
+) -> None:
+    """Replay each native CUDA candidate without host work or CPU fallback."""
+    from particula.gpu import conversion
+
+    wp, candidates = _require_native_cuda_capture()
+    scenario = _capture_scenario(scenario_kind)
+    for cuda_device in candidates:
+        cpu_loop = _build_scenario_prepared_loop(
+            monkeypatch,
+            scenario.time_step,
+            Device(Backend.WARP, "cpu"),
+            communication_family,
+            scenario,
+        )
+        cuda_loop: _ScenarioPreparedLoop | None = None
+        try:
+            cuda_loop = _build_scenario_prepared_loop(
+                monkeypatch,
+                scenario.time_step,
+                cuda_device,
+                communication_family,
+                scenario,
+            )
+            cpu_before = _scenario_snapshot(cpu_loop)
+            cuda_before = _scenario_snapshot(cuda_loop)
+            _assert_same_state(
+                tuple(cuda_before.values()), tuple(cpu_before.values())
+            )
+            capture_set = cuda_loop.loop.registry.validate_capture_resource_set(
+                cuda_loop.loop.request.capture_resource_requirements
+            )
+            qualification = qualify_prepared_resident_graph_capture(
+                cuda_loop.loop.binding,
+                cuda_loop.loop.prepared,
+                capture_set,
+                _WarpNativeCaptureAdapter(wp, cuda_device.native),
+            )
+            captured = capture_prepared_resident_graph(qualification)
+            with monkeypatch.context() as replay_patch:
+
+                def forbidden(*_args: object, **_kwargs: object) -> None:
+                    pytest.fail("native replay performed forbidden host work")
+
+                _forbid_prepared_host_work(
+                    replay_patch,
+                    cuda_loop.loop,
+                    conversion,
+                    forbidden,
+                )
+                replay_captured_resident_graph(captured, qualification.duration)
+            enqueue_prepared_resident_simulation(cpu_loop.loop.prepared)
+            cuda_after = _scenario_snapshot(cuda_loop)
+            cpu_after = _scenario_snapshot(cpu_loop)
+            _assert_same_state(
+                tuple(cuda_after.values()), tuple(cpu_after.values())
+            )
+            assert cuda_loop.loop.guard.completed_steps == 1
+            assert (
+                cuda_loop.loop.binding.lifecycle.state
+                is GraphCaptureLifecycleState.CAPTURED
+            )
+            assert not hasattr(captured, "handle")
+        finally:
+            if cuda_loop is not None:
+                _close_prepared_loop(cuda_loop.loop)
+            _close_prepared_loop(cpu_loop.loop)
+
+
 @pytest.mark.warp
 @pytest.mark.cuda
 @pytest.mark.gpu_parity
@@ -2432,14 +2751,16 @@ def test_native_cuda_nonzero_full_loop_matches_numpy_and_uncaptured_warp(
     n_boxes: int,
 ) -> None:
     """Replay a genuine nonzero CUDA graph against Warp CPU and NumPy."""
-    wp = _require_native_cuda_capture()
+    wp, candidates = _require_native_cuda_capture()
     duration = 0.25
     steps = 3
     cpu_loop = _build_prepared_loop("cpu", n_boxes, duration, 1571)
     cuda_loop = None
     captured = None
     try:
-        cuda_loop = _build_prepared_loop("cuda", n_boxes, duration, 1571)
+        cuda_loop = _build_prepared_loop(
+            candidates[0].native, n_boxes, duration, 1571
+        )
         cpu_initial = _prepared_snapshot(cpu_loop)
         cuda_initial = _prepared_snapshot(cuda_loop)
         _assert_prepared_parity(cuda_initial, cpu_initial)
@@ -2495,7 +2816,7 @@ def test_native_cuda_nonzero_full_loop_matches_numpy_and_uncaptured_warp(
 @pytest.mark.stochastic
 def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
     """Compare wall-loss aggregates without cross-device trajectories."""
-    wp = _require_native_cuda_capture()
+    wp, candidates = _require_native_cuda_capture()
     duration = 1.0
     steps = 2
     seeds = range(12)
@@ -2518,7 +2839,7 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
         captured = None
         try:
             cuda_loop = _build_prepared_loop(
-                "cuda",
+                candidates[0].native,
                 len(selected),
                 duration,
                 seed,
@@ -2611,11 +2932,8 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
 @pytest.mark.gpu_parity
 def test_cuda_capture_support_is_native_only() -> None:
     """Native CUDA is an optional capture boundary, never a Warp-CPU fallback."""
-    wp = _require_native_cuda_capture()
-    devices = [
-        device for device in wp.get_devices() if str(device).startswith("cuda")
-    ]
-    assert devices
+    _wp, candidates = _require_native_cuda_capture()
+    assert candidates
 
 
 @pytest.mark.warp
@@ -2625,7 +2943,7 @@ def test_cuda_capture_zero_duration_contract_is_available_before_capture() -> (
     None
 ):
     """CUDA availability is decided before a zero-duration capture is attempted."""
-    wp = _require_native_cuda_capture()
+    wp, _candidates = _require_native_cuda_capture()
     assert callable(wp.capture_begin)
     assert callable(wp.capture_end)
 
@@ -2682,6 +3000,46 @@ def test_fake_native_capture_replays_nonzero_reference_steps_and_cleans_up(
         close_resident_graph_capture(binding)
     assert native.calls[-1] == "release"
     assert native.calls.count("release") == 1
+
+
+@pytest.mark.warp
+def test_qualification_rejection_skips_capture_before_guard_entry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A row-local native rejection cannot begin capture or open a step token."""
+    fixture = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
+    qualification, binding, _native = _prepared_fake_capture(
+        fixture, monkeypatch, 1.0
+    )
+
+    class RejectedAdapter:
+        """Reject runtime qualification before native callable resolution."""
+
+        def runtime_available(self) -> bool:
+            return False
+
+        def __getattr__(self, name: str) -> object:
+            raise AssertionError(f"rejected adapter resolved {name}")
+
+    capture_set = fixture.registry.validate_capture_resource_set(
+        fixture.request.capture_resource_requirements
+    )
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            sys.modules[__name__],
+            "capture_prepared_resident_graph",
+            lambda _qualification: pytest.fail("rejected row captured"),
+        )
+        with pytest.raises(ValueError, match="runtime"):
+            qualify_prepared_resident_graph_capture(
+                binding,
+                qualification.prepared,
+                capture_set,
+                RejectedAdapter(),
+            )
+    assert fixture.guard.completed_steps == 0
+    close_resident_graph_capture(binding)
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.CLOSED
 
 
 @pytest.mark.warp
