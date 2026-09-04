@@ -1650,9 +1650,12 @@ class PreparedGraphCaptureQualification:
 class CapturedResidentGraph:
     """Retain one completed native capture and its exact resident binding.
 
-    The opaque ``handle`` is retained by identity only; its type, equality,
-    truthiness, and serialization are never inspected. This concrete carrier
-    neither instantiates nor launches the graph and does not expose cleanup.
+    Authentic records are issued only after P2 capture completes and publishes
+    CAPTURED metadata. The opaque ``handle`` is retained by identity only; its
+    type, equality, truthiness, and serialization are never inspected. P2 owns
+    native begin/end/release work; P3 may only forward an authentic handle to
+    ``capture_launch``. This concrete carrier neither instantiates nor launches
+    the graph and does not expose cleanup.
 
     Attributes:
         qualification: Exact READY qualification validated before and after
@@ -1715,6 +1718,19 @@ class CapturedResidentGraph:
             or self.device is not qualification.device
         ):
             raise ValueError("captured resident graph identities do not match.")
+
+
+_ISSUED_CAPTURED_GRAPHS: dict[CapturedResidentGraph, object] = {}
+
+
+def _require_issued_captured_graph(captured: object) -> CapturedResidentGraph:
+    """Require a P2-issued record whose opaque handle retains identity."""
+    if type(captured) is not CapturedResidentGraph:
+        raise TypeError("captured must be an exact CapturedResidentGraph.")
+    expected_handle = _ISSUED_CAPTURED_GRAPHS.get(captured)
+    if expected_handle is None or expected_handle is not captured.handle:
+        raise ValueError("captured resident graph handle is not P2-issued.")
+    return captured
 
 
 def _require_adapter_method(
@@ -2100,7 +2116,7 @@ def _raise_capture_operational_failure(
     raise error
 
 
-def capture_prepared_resident_graph(
+def capture_prepared_resident_graph(  # noqa: C901
     qualification: object,
 ) -> CapturedResidentGraph:
     """Capture one qualified prepared timestep and retain its opaque handle.
@@ -2163,6 +2179,12 @@ def capture_prepared_resident_graph(
             except BaseException as error:
                 _raise_capture_operational_failure(typed, error)
 
+            if handle is None:
+                _raise_capture_operational_failure(
+                    typed,
+                    ValueError("native graph capture did not return a handle."),
+                )
+
             try:
                 typed = _validate_prepared_graph_capture_qualification(typed)
                 lifecycle = complete_resident_graph_capture(typed.binding)
@@ -2174,7 +2196,7 @@ def capture_prepared_resident_graph(
                     raise ValueError(
                         "graph capture did not transition to captured."
                     )
-                return CapturedResidentGraph(
+                captured = CapturedResidentGraph(
                     qualification=typed,
                     binding=typed.binding,
                     lifecycle=lifecycle,
@@ -2191,6 +2213,8 @@ def capture_prepared_resident_graph(
                     device=typed.device,
                     handle=handle,
                 )
+                _ISSUED_CAPTURED_GRAPHS[captured] = handle
+                return captured
             except BaseException as error:
                 try:
                     native.capture_release(handle)
@@ -2204,6 +2228,138 @@ def capture_prepared_resident_graph(
                 _ACTIVE_CAPTURE_BINDING_IDS.discard(binding_id)
     except BaseException:
         raise
+
+
+def _validate_replay_captured_graph(
+    captured: object, duration: object
+) -> PreparedGraphCaptureQualification:
+    """Validate an issued record without inspecting resident payloads."""
+    captured = _require_issued_captured_graph(captured)
+    qualification = captured.qualification
+    if type(qualification) is not PreparedGraphCaptureQualification:
+        raise TypeError(
+            "qualification must be an exact PreparedGraphCaptureQualification."
+        )
+    if (
+        captured.binding is not qualification.binding
+        or captured.signature is not qualification.signature
+        or captured.request is not qualification.request
+        or captured.session is not qualification.session
+        or captured.registry is not qualification.registry
+        or captured.guard is not qualification.guard
+        or captured.prepared is not qualification.prepared
+        or captured.timestep is not qualification.timestep
+        or captured.capture_requirements
+        is not qualification.capture_requirements
+        or captured.capture_set is not qualification.capture_set
+        or captured.capture_report is not qualification.capture_report
+        or captured.device is not qualification.device
+        or captured.lifecycle is not captured.binding.lifecycle
+        or captured.lifecycle.state is not GraphCaptureLifecycleState.CAPTURED
+        or qualification.signature is not captured.lifecycle.signature
+        or qualification.binding is not captured.binding
+        or qualification.request is not captured.request
+        or qualification.session is not captured.session
+        or qualification.registry is not captured.registry
+        or qualification.guard is not captured.guard
+        or qualification.prepared is not captured.prepared
+        or qualification.timestep is not captured.timestep
+        or qualification.capture_requirements
+        is not captured.capture_requirements
+        or qualification.capture_set is not captured.capture_set
+        or qualification.capture_report is not captured.capture_report
+        or qualification.device is not captured.device
+        or qualification.dimensions is not captured.session.dimensions
+        or qualification.graph is not captured.request.graph
+        or qualification.schedule is not captured.request.schedule
+        or qualification.ordered_node_ids
+        is not captured.request.schedule.ordered_node_ids
+        or qualification.primary_arrays is not captured.signature.primary_arrays
+        or qualification.resource_views is not captured.signature.resource_views
+        or type(qualification.native_callables)
+        is not GraphCaptureNativeCallables
+    ):
+        raise ValueError("captured resident graph identities do not match.")
+    gate_resident_graph_capture(captured.binding)
+    captured.guard._validate_duration(duration)
+    if (
+        qualification.device != captured.session.metadata.device
+        or qualification.device != captured.lifecycle.capability.device
+        or qualification.timestep is not qualification.prepared.timestep
+        or qualification.duration is not qualification.prepared.duration
+    ):
+        raise ValueError("captured resident graph qualification changed.")
+    if qualification.duration_is_identity:
+        if (
+            qualification.duration is not qualification.timestep.duration
+            or duration is not qualification.duration
+        ):
+            raise ValueError("captured graph replay duration does not match.")
+    elif (
+        qualification.duration != qualification.timestep.duration
+        or duration != qualification.duration
+    ):
+        raise ValueError("captured graph replay duration does not match.")
+    return qualification
+
+
+def _raise_replay_operational_failure(
+    qualification: PreparedGraphCaptureQualification,
+    token: object,
+    error: BaseException,
+) -> NoReturn:
+    """Clean up a post-launch replay failure while preserving ``error``."""
+    from particula.execution.gpu_session import (
+        _handle_failed_resident_operation,
+        _ResidentOperationOutcome,
+    )
+
+    cleanup_error: BaseException | None = None
+    try:
+        _handle_failed_resident_operation(
+            qualification.session,
+            qualification.registry,
+            qualification.guard,
+            token,
+            _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
+        )
+    except BaseException as caught:
+        cleanup_error = caught
+    classification_error: BaseException | None = None
+    try:
+        classify_resident_graph_capture_writer_failure(qualification.binding)
+    except BaseException as caught:
+        classification_error = caught
+        try:
+            _fault_resident_graph_capture_after_classification_failure(
+                qualification.binding
+            )
+        except BaseException:  # noqa: S110
+            pass
+    if cleanup_error is not None:
+        if classification_error is not None:
+            cleanup_error.__context__ = classification_error
+        raise error from cleanup_error
+    if classification_error is not None:
+        raise error from classification_error
+    raise error
+
+
+def replay_captured_resident_graph(captured: object, duration: object) -> None:
+    """Launch one authentic captured graph under exactly one resident token.
+
+    Accepted replay performs no prepared-host dispatch, native capture lifecycle
+    work, allocation, payload scan, transfer, readback, synchronization, RNG
+    reset, fallback, retry, or recapture. Pinned array values and resident RNG
+    words may change while their retained identities remain compatible.
+    """
+    qualification = _validate_replay_captured_graph(captured, duration)
+    token = qualification.guard.begin_step(duration)
+    try:
+        qualification.native_callables.capture_launch(captured.handle)
+        qualification.guard.complete_step(token)
+    except BaseException as error:
+        _raise_replay_operational_failure(qualification, token, error)
 
 
 def gate_resident_graph_capture(binding: object) -> None:

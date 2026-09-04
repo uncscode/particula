@@ -46,6 +46,7 @@ from particula.execution.graph_capture import (
     qualify_prepared_resident_graph_capture,
     renew_resident_graph_capture,
     renew_retired_graph_capture,
+    replay_captured_resident_graph,
     resolve_graph_capture_capability,
     retire_graph_capture,
     retire_resident_graph_capture,
@@ -1078,6 +1079,7 @@ def test_graph_capture_names_remain_direct_import_only() -> None:
         "close_graph_capture",
         "CapturedResidentGraph",
         "capture_prepared_resident_graph",
+        "replay_captured_resident_graph",
     )
     for name in names:
         assert name not in execution.__all__
@@ -2240,7 +2242,7 @@ def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
     signature = create_resident_graph_capture_signature(request)
     lifecycle = create_graph_capture_lifecycle(
         GraphCaptureCapability(
-            Device(Backend.WARP, "cuda:0"),
+            request.session.metadata.device,
             GraphCaptureAvailability.AVAILABLE,
         ),
         signature,
@@ -2257,7 +2259,10 @@ def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
         )
     )
     trace: list[str] = []
+    launches: list[object] = []
     handle = object()
+    timestep = SimpleNamespace(duration=0.0)
+    prepared = SimpleNamespace(timestep=timestep, duration=0.0)
 
     def capture_begin() -> None:
         trace.append("begin")
@@ -2268,6 +2273,9 @@ def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
 
     def unexpected_callable() -> None:
         pytest.fail("only capture begin and end belong to this phase")
+
+    def capture_launch(replayed_handle: object) -> None:
+        launches.append(replayed_handle)
 
     def capture_release(_handle: object) -> None:
         trace.append("release")
@@ -2280,12 +2288,12 @@ def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
         request.session,
         request.registry,
         request.guard,
-        object(),
-        object(),
+        prepared,
+        timestep,
         request.capture_resource_requirements,
         capture_set,
         capture_set.report,
-        Device(Backend.WARP, "cuda:0"),
+        request.session.metadata.device,
         request.session.dimensions,
         request.graph,
         request.schedule,
@@ -2298,7 +2306,7 @@ def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
             capture_begin,
             capture_end,
             unexpected_callable,
-            unexpected_callable,
+            capture_launch,
             unexpected_callable,
         ),
     )
@@ -2322,6 +2330,9 @@ def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
     assert captured.qualification is qualification
     assert captured.lifecycle is binding.lifecycle
     assert binding.lifecycle.state is GraphCaptureLifecycleState.CAPTURED
+    with pytest.raises(ValueError, match="handle is not P2-issued"):
+        replay_captured_resident_graph(replace(captured, handle=object()), 0.0)
+    assert request.guard.completed_steps == 0
     for field in (
         "binding",
         "lifecycle",
@@ -2339,6 +2350,17 @@ def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
     ):
         with pytest.raises(ValueError, match="identities do not match"):
             replace(captured, **cast(Any, {field: object()}))
+
+    monkeypatch.setattr(
+        graph_capture,
+        "gate_resident_graph_capture",
+        lambda _binding: None,
+    )
+    replay_captured_resident_graph(captured, 0.0)
+    replay_captured_resident_graph(captured, 0.0)
+
+    assert launches == [handle, handle]
+    assert request.guard.completed_steps == 2
 
 
 @pytest.mark.warp
