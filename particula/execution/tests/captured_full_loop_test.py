@@ -62,6 +62,608 @@ from particula.util.constants import GAS_CONSTANT
 
 PARITY_RTOL = 1e-12
 PARITY_ATOL = 1e-30
+_ORACLE_GAS_CONSTANT = 8.31446261815324
+
+
+@dataclass(frozen=True)
+class _CapturedLoopScenario:
+    """Retain immutable inputs for the CPU-only captured-loop oracle."""
+
+    logical_box_ids: np.ndarray
+    particle_masses: np.ndarray
+    particle_concentration: np.ndarray
+    particle_charge: np.ndarray
+    gas_concentration: np.ndarray
+    volume: np.ndarray
+    final_volume: np.ndarray
+    temperature: np.ndarray
+    pressure: np.ndarray
+    molar_mass: np.ndarray
+    vapor_pressure: np.ndarray
+    dilution_coefficient: np.ndarray
+    edge_sources: np.ndarray
+    edge_destinations: np.ndarray
+    edge_enabled: np.ndarray
+    edge_rates: np.ndarray
+    gas_partitioning: np.ndarray
+    baseline_total_mass: np.ndarray
+    source_ledger: np.ndarray
+    sink_ledger: np.ndarray
+    energy_ledger: np.ndarray
+    time_step: float
+    time_steps: int
+    root_seed: int
+    process_controls: tuple[bool, bool, bool, bool]
+
+
+@dataclass(frozen=True)
+class _CapturedLoopState:
+    """Retain mutable detached state used exclusively by the NumPy oracle."""
+
+    particle_masses: np.ndarray
+    particle_concentration: np.ndarray
+    gas_concentration: np.ndarray
+    volume: np.ndarray
+    temperature: np.ndarray
+    pressure: np.ndarray
+    vapor_pressure: np.ndarray
+    saturation_ratio: np.ndarray
+
+
+@dataclass(frozen=True)
+class _CapturedLoopResult:
+    """Retain detached primary, derived, and diagnostic oracle outputs."""
+
+    state: _CapturedLoopState
+    gas_concentration_snapshot: np.ndarray
+    saturation_ratio_snapshot: np.ndarray
+    total_species_mass: np.ndarray
+    particle_number_concentration: np.ndarray
+    latent_heat_energy: np.ndarray
+    conservation_residual: np.ndarray
+
+
+def _readonly_array(values: np.ndarray, dtype: np.dtype | type) -> np.ndarray:
+    """Copy an array into C-contiguous immutable storage of the required type."""
+    result = np.array(values, dtype=dtype, order="C", copy=True)
+    result.setflags(write=False)
+    return result
+
+
+def _validate_captured_loop_scenario(  # noqa: C901
+    scenario: _CapturedLoopScenario,
+) -> None:
+    """Validate immutable CPU-oracle fixture fields before state allocation."""
+    arrays = {
+        "logical_box_ids": (scenario.logical_box_ids, (2,), np.int32),
+        "particle_masses": (scenario.particle_masses, (2, 3, 2), np.float64),
+        "particle_concentration": (
+            scenario.particle_concentration,
+            (2, 3),
+            np.float64,
+        ),
+        "particle_charge": (scenario.particle_charge, (2, 3), np.float64),
+        "gas_concentration": (scenario.gas_concentration, (2, 2), np.float64),
+        "volume": (scenario.volume, (2,), np.float64),
+        "final_volume": (scenario.final_volume, (2,), np.float64),
+        "temperature": (scenario.temperature, (2,), np.float64),
+        "pressure": (scenario.pressure, (2,), np.float64),
+        "molar_mass": (scenario.molar_mass, (2,), np.float64),
+        "vapor_pressure": (scenario.vapor_pressure, (2,), np.float64),
+        "dilution_coefficient": (
+            scenario.dilution_coefficient,
+            (2,),
+            np.float64,
+        ),
+        "edge_sources": (scenario.edge_sources, (3,), np.int32),
+        "edge_destinations": (scenario.edge_destinations, (3,), np.int32),
+        "edge_enabled": (scenario.edge_enabled, (3,), np.bool_),
+        "edge_rates": (scenario.edge_rates, (3,), np.float64),
+        "gas_partitioning": (scenario.gas_partitioning, (2, 2), np.bool_),
+        "baseline_total_mass": (
+            scenario.baseline_total_mass,
+            (2, 2),
+            np.float64,
+        ),
+        "source_ledger": (scenario.source_ledger, (2, 2), np.float64),
+        "sink_ledger": (scenario.sink_ledger, (2, 2), np.float64),
+        "energy_ledger": (scenario.energy_ledger, (2, 2), np.float64),
+    }
+    for name, (values, shape, dtype) in arrays.items():
+        if values.shape != shape:
+            raise ValueError(f"{name} has invalid shape")
+        if values.dtype != dtype:
+            raise ValueError(f"{name} has invalid dtype")
+        if not values.flags.c_contiguous:
+            raise ValueError(f"{name} must be C-contiguous")
+        if not np.all(np.isfinite(values)):
+            raise ValueError(f"{name} must be finite")
+    if len(np.unique(scenario.logical_box_ids)) != 2:
+        raise ValueError("logical_box_ids must be unique")
+    for name in (
+        "volume",
+        "final_volume",
+        "temperature",
+        "pressure",
+        "molar_mass",
+        "vapor_pressure",
+    ):
+        if np.any(getattr(scenario, name) <= 0.0):
+            raise ValueError(f"{name} must be positive")
+    for name in (
+        "dilution_coefficient",
+        "edge_rates",
+        "baseline_total_mass",
+        "source_ledger",
+        "sink_ledger",
+        "energy_ledger",
+    ):
+        if np.any(getattr(scenario, name) < 0.0):
+            raise ValueError(f"{name} must be nonnegative")
+    enabled = scenario.edge_enabled
+    if np.any(scenario.edge_sources[enabled] < 0) or np.any(
+        scenario.edge_sources[enabled] >= 2
+    ):
+        raise ValueError("edge_sources has invalid enabled edge")
+    if np.any(scenario.edge_destinations[enabled] < 0) or np.any(
+        scenario.edge_destinations[enabled] >= 2
+    ):
+        raise ValueError("edge_destinations has invalid enabled edge")
+    if isinstance(scenario.time_step, bool) or not isinstance(
+        scenario.time_step, (int, float, np.integer, np.floating)
+    ):
+        raise ValueError("time_step must be a finite positive number")
+    if not np.isfinite(scenario.time_step) or scenario.time_step <= 0.0:
+        raise ValueError("time_step must be positive")
+    if isinstance(scenario.time_steps, bool) or not isinstance(
+        scenario.time_steps, (int, np.integer)
+    ):
+        raise ValueError("time_steps must be an integer")
+    if scenario.time_steps < 0:
+        raise ValueError("time_steps must be nonnegative")
+    if isinstance(scenario.root_seed, bool) or not isinstance(
+        scenario.root_seed, (int, np.integer)
+    ):
+        raise ValueError("root_seed must be an integer")
+    if scenario.root_seed < 0:
+        raise ValueError("root_seed must be nonnegative")
+    if len(scenario.process_controls) != 4 or not all(
+        isinstance(control, bool) for control in scenario.process_controls
+    ):
+        raise ValueError("process_controls must contain four booleans")
+
+
+def _captured_full_loop_scenario() -> _CapturedLoopScenario:
+    """Create a fresh immutable deterministic two-box full-loop fixture."""
+    scenario = _CapturedLoopScenario(
+        logical_box_ids=_readonly_array([101, 202], np.int32),
+        particle_masses=_readonly_array(
+            [
+                [[1.0e-18, 2.0e-18], [0.0, 0.0], [3.0e-18, 1.0e-18]],
+                [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]],
+            ],
+            np.float64,
+        ),
+        particle_concentration=_readonly_array(
+            [[2.0e6, 0.0, 5.0e5], [0.0, 0.0, 0.0]], np.float64
+        ),
+        particle_charge=_readonly_array(
+            [[1.0, 0.0, -1.0], [0.0, 0.0, 0.0]], np.float64
+        ),
+        gas_concentration=_readonly_array(
+            [[4.0e-9, 2.0e-9], [1.0e-9, 3.0e-9]], np.float64
+        ),
+        volume=_readonly_array([1.0, 2.0], np.float64),
+        final_volume=_readonly_array([2.0, 1.0], np.float64),
+        temperature=_readonly_array([298.15, 310.15], np.float64),
+        pressure=_readonly_array([101325.0, 100000.0], np.float64),
+        molar_mass=_readonly_array([0.018, 0.098], np.float64),
+        vapor_pressure=_readonly_array([1000.0, 500.0], np.float64),
+        dilution_coefficient=_readonly_array([0.1, 0.2], np.float64),
+        edge_sources=_readonly_array([0, 1, 1], np.int32),
+        edge_destinations=_readonly_array([1, 0, 0], np.int32),
+        edge_enabled=_readonly_array([True, True, False], np.bool_),
+        edge_rates=_readonly_array([0.1, 0.0, 0.25], np.float64),
+        gas_partitioning=_readonly_array(
+            [[True, True], [True, False]], np.bool_
+        ),
+        baseline_total_mass=_readonly_array(
+            [[2.0e-9, 3.0e-9], [4.0e-9, 5.0e-9]], np.float64
+        ),
+        source_ledger=_readonly_array(
+            [[1.0e-10, 2.0e-10], [3.0e-10, 4.0e-10]], np.float64
+        ),
+        sink_ledger=_readonly_array(
+            [[5.0e-11, 6.0e-11], [7.0e-11, 8.0e-11]], np.float64
+        ),
+        energy_ledger=_readonly_array([[1.0, 2.0], [3.0, 4.0]], np.float64),
+        time_step=0.5,
+        time_steps=3,
+        root_seed=1575,
+        process_controls=(False, False, False, False),
+    )
+    _validate_captured_loop_scenario(scenario)
+    return scenario
+
+
+def _species_inventory(state: _CapturedLoopState) -> np.ndarray:
+    """Calculate per-box species inventory without production helpers."""
+    return state.volume[:, None] * (
+        np.sum(
+            state.particle_masses * state.particle_concentration[:, :, None],
+            axis=1,
+        )
+        + state.gas_concentration
+    )
+
+
+def _detached_oracle_state(
+    scenario: _CapturedLoopScenario,
+) -> _CapturedLoopState:
+    """Create writable, nonaliasing state from validated immutable input."""
+    vapor_pressure = np.broadcast_to(
+        scenario.vapor_pressure, scenario.gas_concentration.shape
+    ).copy()
+    saturation_ratio = np.zeros_like(scenario.gas_concentration)
+    return _CapturedLoopState(
+        particle_masses=scenario.particle_masses.copy(),
+        particle_concentration=scenario.particle_concentration.copy(),
+        gas_concentration=scenario.gas_concentration.copy(),
+        volume=scenario.volume.copy(),
+        temperature=scenario.temperature.copy(),
+        pressure=scenario.pressure.copy(),
+        vapor_pressure=vapor_pressure,
+        saturation_ratio=saturation_ratio,
+    )
+
+
+def _run_captured_full_loop_oracle(
+    scenario: _CapturedLoopScenario,
+    steps: int,
+) -> _CapturedLoopResult:
+    """Advance the deterministic communication, volume, and dilution oracle."""
+    if isinstance(steps, bool) or not isinstance(steps, (int, np.integer)):
+        raise TypeError("steps must be an integer")
+    if steps < 0:
+        raise ValueError("steps must be nonnegative")
+    _validate_captured_loop_scenario(scenario)
+    state = _detached_oracle_state(scenario)
+    for _ in range(steps):
+        pre_step_volume = state.volume.copy()
+        amounts = state.gas_concentration * pre_step_volume[:, None]
+        debits = np.zeros_like(amounts)
+        credits = np.zeros_like(amounts)
+        for source, destination, enabled, rate in zip(
+            scenario.edge_sources,
+            scenario.edge_destinations,
+            scenario.edge_enabled,
+            scenario.edge_rates,
+            strict=True,
+        ):
+            if enabled and rate != 0.0:
+                transferred = amounts[source] * rate * scenario.time_step
+                debits[source] += transferred
+                credits[destination] += transferred
+        state.gas_concentration[:] = (
+            amounts - debits + credits
+        ) / pre_step_volume[:, None]
+        changed_volume = state.volume != scenario.final_volume
+        if np.any(changed_volume):
+            scale = (
+                state.volume[changed_volume]
+                / scenario.final_volume[changed_volume]
+            )
+            state.particle_concentration[changed_volume] *= scale[:, None]
+            state.gas_concentration[changed_volume] *= scale[:, None]
+            state.volume[changed_volume] = scenario.final_volume[changed_volume]
+        dilution = np.exp(-scenario.dilution_coefficient * scenario.time_step)
+        state.particle_concentration[:] = (
+            state.particle_concentration * dilution[:, None]
+        )
+        state.gas_concentration[:] = state.gas_concentration * dilution[:, None]
+        state.vapor_pressure[:] = scenario.vapor_pressure[None, :]
+        state.saturation_ratio[:] = (
+            state.gas_concentration
+            * _ORACLE_GAS_CONSTANT
+            * state.temperature[:, None]
+            / (scenario.molar_mass[None, :] * state.vapor_pressure)
+        )
+    total_species_mass = _species_inventory(state)
+    return _CapturedLoopResult(
+        state=state,
+        gas_concentration_snapshot=state.gas_concentration.copy(),
+        saturation_ratio_snapshot=state.saturation_ratio.copy(),
+        total_species_mass=total_species_mass.copy(),
+        particle_number_concentration=np.sum(
+            state.particle_concentration, axis=1
+        ).copy(),
+        latent_heat_energy=scenario.energy_ledger.copy(),
+        conservation_residual=(
+            total_species_mass
+            - scenario.baseline_total_mass
+            - scenario.source_ledger
+            + scenario.sink_ledger
+        ).copy(),
+    )
+
+
+def _scenario_replacement(
+    values: np.ndarray, dtype: np.dtype | type
+) -> np.ndarray:
+    """Return a C-contiguous immutable replacement suitable for ``replace``."""
+    return _readonly_array(values, dtype)
+
+
+def test_captured_loop_scenario_is_fresh_immutable_and_results_detach() -> None:
+    """Keep deterministic CPU-oracle inputs immutable across independent calls."""
+    first = _captured_full_loop_scenario()
+    second = _captured_full_loop_scenario()
+    assert first.logical_box_ids.tolist() == [101, 202]
+    assert first.time_steps == 3
+    assert first.root_seed == 1575
+    assert first.process_controls == (False, False, False, False)
+    for name in (
+        "particle_masses",
+        "particle_concentration",
+        "particle_charge",
+        "gas_concentration",
+        "volume",
+        "final_volume",
+        "temperature",
+        "pressure",
+        "molar_mass",
+        "vapor_pressure",
+        "dilution_coefficient",
+    ):
+        first_values = getattr(first, name)
+        second_values = getattr(second, name)
+        npt.assert_equal(first_values, second_values)
+        assert first_values.dtype == second_values.dtype
+        assert not first_values.flags.writeable
+        with pytest.raises(ValueError):
+            first_values.flat[0] = 0.0
+    result = _run_captured_full_loop_oracle(first, 1)
+    assert result.state.gas_concentration.flags.writeable
+    assert not np.shares_memory(
+        result.state.gas_concentration, first.gas_concentration
+    )
+    assert not np.shares_memory(
+        result.total_species_mass, first.baseline_total_mass
+    )
+
+
+def test_captured_loop_oracle_matches_one_and_multiple_step_literals() -> None:
+    """Check primary and derived fields against explicit two-box calculations."""
+    scenario = _captured_full_loop_scenario()
+    one_step = _run_captured_full_loop_oracle(scenario, 1)
+    first_dilution = np.exp(-0.05)
+    second_dilution = np.exp(-0.1)
+    npt.assert_allclose(
+        one_step.state.particle_concentration,
+        [[1.0e6 * first_dilution, 0.0, 2.5e5 * first_dilution], [0.0] * 3],
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+    )
+    npt.assert_allclose(
+        one_step.state.gas_concentration,
+        [
+            [1.9e-9 * first_dilution, 0.95e-9 * first_dilution],
+            [2.2e-9 * second_dilution, 6.1e-9 * second_dilution],
+        ],
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+    )
+    npt.assert_allclose(one_step.state.volume, [2.0, 1.0])
+    npt.assert_equal(one_step.state.particle_masses, scenario.particle_masses)
+    npt.assert_equal(one_step.state.temperature, scenario.temperature)
+    npt.assert_equal(one_step.state.pressure, scenario.pressure)
+    npt.assert_allclose(one_step.state.vapor_pressure, [[1000.0, 500.0]] * 2)
+    expected_saturation = (
+        one_step.state.gas_concentration
+        * _ORACLE_GAS_CONSTANT
+        * scenario.temperature[:, None]
+        / (scenario.molar_mass[None, :] * scenario.vapor_pressure[None, :])
+    )
+    npt.assert_allclose(
+        one_step.state.saturation_ratio,
+        expected_saturation,
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+    )
+    multiple = _run_captured_full_loop_oracle(scenario, 3)
+    npt.assert_allclose(
+        multiple.state.particle_concentration[0],
+        np.array([1.0e6, 0.0, 2.5e5]) * np.exp(-0.15),
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+    )
+    npt.assert_equal(multiple.state.particle_concentration[1], 0.0)
+    npt.assert_allclose(multiple.state.volume, [2.0, 1.0])
+
+
+def test_captured_loop_oracle_reports_independent_diagnostics() -> None:
+    """Compare every result diagnostic with an independent direct expression."""
+    scenario = _captured_full_loop_scenario()
+    result = _run_captured_full_loop_oracle(scenario, 2)
+    state = result.state
+    inventory = state.volume[:, None] * (
+        np.sum(
+            state.particle_masses * state.particle_concentration[:, :, None],
+            axis=1,
+        )
+        + state.gas_concentration
+    )
+    npt.assert_allclose(
+        result.gas_concentration_snapshot, state.gas_concentration
+    )
+    npt.assert_allclose(
+        result.saturation_ratio_snapshot, state.saturation_ratio
+    )
+    npt.assert_allclose(result.total_species_mass, inventory)
+    npt.assert_allclose(
+        result.particle_number_concentration,
+        np.sum(state.particle_concentration, axis=1),
+    )
+    npt.assert_equal(result.latent_heat_energy, scenario.energy_ledger)
+    npt.assert_allclose(
+        result.conservation_residual,
+        inventory
+        - scenario.baseline_total_mass
+        - scenario.source_ledger
+        + scenario.sink_ledger,
+    )
+
+
+def test_captured_loop_inventory_separates_transport_volume_and_dilution() -> (
+    None
+):
+    """Prevent dilution loss from being misreported as communication loss."""
+    scenario = _captured_full_loop_scenario()
+    no_dilution = replace(
+        scenario,
+        dilution_coefficient=_scenario_replacement([0.0, 0.0], np.float64),
+    )
+    initial = _detached_oracle_state(no_dilution)
+    result = _run_captured_full_loop_oracle(no_dilution, 1)
+    npt.assert_allclose(
+        np.sum(_species_inventory(result.state), axis=0),
+        np.sum(_species_inventory(initial), axis=0),
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+    )
+    isolated = replace(
+        no_dilution,
+        edge_enabled=_scenario_replacement([False, False, False], np.bool_),
+    )
+    isolated_result = _run_captured_full_loop_oracle(isolated, 1)
+    npt.assert_allclose(
+        _species_inventory(isolated_result.state),
+        _species_inventory(_detached_oracle_state(isolated)),
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+    )
+    diluted = _run_captured_full_loop_oracle(scenario, 1)
+    npt.assert_allclose(
+        _species_inventory(diluted.state),
+        _species_inventory(result.state)
+        * np.exp(-scenario.dilution_coefficient[:, None] * scenario.time_step),
+        rtol=PARITY_RTOL,
+        atol=PARITY_ATOL,
+    )
+
+
+def test_captured_loop_no_work_rows_and_inactive_slots_are_write_free() -> None:
+    """Keep disabled transport, zero rates, and empty particle rows canonical."""
+    scenario = _captured_full_loop_scenario()
+    no_work = replace(
+        scenario,
+        edge_enabled=_scenario_replacement([False, True, False], np.bool_),
+        edge_rates=_scenario_replacement([0.0, 0.0, 0.25], np.float64),
+        dilution_coefficient=_scenario_replacement([0.0, 0.0], np.float64),
+        final_volume=_scenario_replacement([1.0, 2.0], np.float64),
+    )
+    result = _run_captured_full_loop_oracle(no_work, 1)
+    npt.assert_equal(
+        result.state.particle_concentration, scenario.particle_concentration
+    )
+    npt.assert_equal(result.state.gas_concentration, scenario.gas_concentration)
+    npt.assert_equal(result.state.volume, scenario.volume)
+    npt.assert_equal(result.state.particle_masses[0, 1], [0.0, 0.0])
+    npt.assert_equal(result.state.particle_concentration[1], [0.0, 0.0, 0.0])
+    assert np.all(np.isfinite(result.saturation_ratio_snapshot))
+
+
+@pytest.mark.parametrize(
+    ("steps", "exception", "message"),
+    [
+        (None, TypeError, "integer"),
+        ("1", TypeError, "integer"),
+        (1.0, TypeError, "integer"),
+        (True, TypeError, "integer"),
+        (-1, ValueError, "nonnegative"),
+    ],
+)
+def test_captured_loop_invalid_steps_preserve_immutable_scenario(
+    steps: object,
+    exception: type[Exception],
+    message: str,
+) -> None:
+    """Reject invalid step counts before allocating or changing private state."""
+    scenario = _captured_full_loop_scenario()
+    before = {
+        name: getattr(scenario, name).copy()
+        for name in (
+            "particle_masses",
+            "particle_concentration",
+            "gas_concentration",
+            "volume",
+        )
+    }
+    with pytest.raises(exception, match=message):
+        _run_captured_full_loop_oracle(scenario, steps)  # type: ignore[arg-type]
+    for name, values in before.items():
+        npt.assert_equal(getattr(scenario, name), values)
+        assert not getattr(scenario, name).flags.writeable
+
+
+@pytest.mark.parametrize(
+    ("field", "values", "dtype", "message"),
+    [
+        (
+            "gas_concentration",
+            np.zeros((1, 2)),
+            np.float64,
+            "gas_concentration",
+        ),
+        (
+            "gas_concentration",
+            np.zeros((2, 2)),
+            np.float32,
+            "gas_concentration",
+        ),
+        (
+            "particle_concentration",
+            np.zeros((3, 2)).T,
+            np.float64,
+            "particle_concentration",
+        ),
+        ("logical_box_ids", [101, 101], np.int32, "logical_box_ids"),
+        ("temperature", [np.nan, 300.0], np.float64, "temperature"),
+        ("temperature", [np.inf, 300.0], np.float64, "temperature"),
+        ("pressure", [0.0, 100000.0], np.float64, "pressure"),
+        (
+            "dilution_coefficient",
+            [-0.1, 0.0],
+            np.float64,
+            "dilution_coefficient",
+        ),
+        ("edge_rates", [-0.1, 0.0, 0.0], np.float64, "edge_rates"),
+        ("edge_sources", [2, 1, 1], np.int32, "edge_sources"),
+    ],
+)
+def test_captured_loop_malformed_scenarios_reject_without_source_mutation(
+    field: str,
+    values: object,
+    dtype: np.dtype | type,
+    message: str,
+) -> None:
+    """Name malformed fixture fields and leave the original fixture unchanged."""
+    scenario = _captured_full_loop_scenario()
+    original_arrays = {
+        name: value.copy()
+        for name, value in vars(scenario).items()
+        if isinstance(value, np.ndarray)
+    }
+    replacement = np.array(values, dtype=dtype, order="C", copy=True)
+    if field == "particle_concentration":
+        replacement = replacement.T
+    replacement.setflags(write=False)
+    malformed = replace(scenario, **{field: replacement})
+    with pytest.raises(ValueError, match=message):
+        _run_captured_full_loop_oracle(malformed, 1)
+    for name, original in original_arrays.items():
+        npt.assert_equal(getattr(scenario, name), original)
+        assert not getattr(scenario, name).flags.writeable
 
 
 @dataclass
