@@ -10,9 +10,12 @@ lowered, and production behavior is not changed solely to expose test internals.
   scenario and an independent NumPy oracle. They cover closed gas communication,
   volume evolution, dilution, saturation, six diagnostics, per-box/species
   inventory, no-work/inactive-slot behavior, and invalid input rejection.
-- **P2:** Integration-test the uncaptured prepared path on Warp CPU over multiple
-  timesteps. Compare fields individually, assert diagnostics and identities, and
-  reject hidden upload/allocation/readback/synchronization.
+- **P2 (shipped, #1576):** `captured_full_loop_test.py` runs the real READY
+  prepared uncaptured path on Warp CPU over multiple timesteps. It compares
+  fields, closed-GAS work buffers, accounting, and six diagnostics individually
+  with the P1 oracle; separately checks conservation and stable identities; and
+  uses scoped spies to reject enqueue-time setup, allocation, upload, readback,
+  and synchronization. A zero-duration row verifies write-free preservation.
 - **P3:** Enumerate every CUDA device visible to Warp and mark capture rows
   `warp`, `cuda`, and `gpu_parity`. Compare each captured CUDA device with P1/P2,
   cover both closed-map families, and record an independent unavailable result

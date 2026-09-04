@@ -13,14 +13,16 @@
     and derived values, concentration-weighted inventory, no-work rows, inactive
     slots, and invalid step/scenario rejection.
 
-- [ ] **E8-F5-P2:** Uncaptured Warp full-loop parity and conservation validation
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Run the prepared uncaptured sequence on Warp CPU and compare every
-    observable field and diagnostic with the P1 oracle.
-  - Files: `particula/execution/tests/captured_full_loop_test.py`, existing
-    `full_loop_test.py` and `multi_box_loop_test.py` helpers as appropriate.
-  - Tests: Multi-box/multi-step state parity, canonical order, stable identities,
-    no hidden transfers, separate diagnostic assertions, and tight conservation.
+- [x] **E8-F5-P2:** Uncaptured Warp full-loop parity and conservation validation
+  - Issue: #1576 | Size: S | Status: Shipped
+  - Delivered: Test-only READY prepared uncaptured Warp-CPU multi-timestep
+    parity/conservation evidence in
+    `particula/execution/tests/captured_full_loop_test.py`.
+  - Tests: Detached primary/derived, closed-GAS work-buffer, accounting, and six
+    diagnostic assertions; canonical order and stable identities; scoped
+    forbidden-work spies; and zero-duration write-free preservation.
+  - Boundary: No production modules, APIs, scheduler behavior, or capture/replay
+    behavior changed.
 
 - [ ] **E8-F5-P3:** Captured CUDA communication diagnostics and parity validation
   - Issue: TBD | Size: S | Status: Not Started

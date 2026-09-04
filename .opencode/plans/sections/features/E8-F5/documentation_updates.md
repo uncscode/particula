@@ -13,6 +13,9 @@
   literal outcomes, unavailable hardware rows, and downstream handoffs.
 - Issue #1575 changed no user documentation: its implementation is test-only and
   does not alter production APIs, modules, or architecture.
+- Issue #1576 likewise changed no user documentation: it adds test-only
+  uncaptured Warp-CPU parity/conservation and no-work evidence in
+  `captured_full_loop_test.py`, with no production or API change.
 - Do not add a new user example in this feature; the sibling graph-capture
   example track owns runnable usage and limitations.
 - Validate all changed documentation with contract tests and

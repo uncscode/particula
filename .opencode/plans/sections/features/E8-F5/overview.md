@@ -24,6 +24,12 @@ closed gas communication, prescribed volume evolution, dilution, derived
 saturation, and inventory diagnostics. No production API, module, scheduler,
 graph-capture, or resident-session architecture changed.
 
+E8-F5-P2 shipped for issue #1576 in the same test module. It adds test-only
+uncaptured Warp-CPU READY prepared-path multi-timestep parity and independent
+conservation evidence, including forbidden-work spies and zero-duration
+coverage. It changes no production module, API, scheduler behavior, or capture
+and replay behavior.
+
 ## User Stories
 
 - As a scientific user, I want captured and uncaptured loops compared with an

@@ -7,12 +7,13 @@
   logical box IDs, process controls, maps, diagnostics, and seeds.
 - [x] Implement independent CPU/NumPy step and extensive-inventory oracles; do
   not call the production GPU helper under comparison.
-- [ ] Build uncaptured and captured bindings from the same E8-F2 prepared plan
-  and E8-F3 resource set without replacing E8-F4's graph owner.
-- [ ] Add assertion helpers that compare each primary and derived field,
-  communication ledger, and diagnostic output separately.
-- [ ] Add launch/allocation/readback/synchronization spies around prepared
-  replay and rejection rows.
+- [x] Build the P2 uncaptured READY prepared binding from the existing E8-F2/E8-F3
+  seams without changing E8-F4 graph ownership (issue #1576).
+- [x] Add P2 test-local assertions for primary/derived fields, closed-GAS work
+  buffers, accounting, and each diagnostic output separately (issue #1576).
+- [x] Add scoped P2 forbidden-work spies for prepared enqueue setup, allocation,
+  upload, readback, and synchronization, plus zero-duration coverage (issue
+  #1576).
 
 ## Tooling / Tests
 
@@ -21,9 +22,8 @@
   rejection (issue #1575). Warp CPU parity remains P2.
 - [ ] Add optional CUDA captured rows for GAS and PARTICLES communication,
   prescribed volume evolution, empty/no-work boxes, and diagnostics.
-- [ ] Assert concentration-weighted per-box/per-species inventory independently
-  from parity, using `rtol=1e-12` and `atol=1e-30` unless evidence requires a
-  tighter documented process-specific bound.
+- [x] Assert P2 concentration-weighted per-box/per-species inventory independently
+  from parity using `rtol=1e-12` and `atol=1e-30` (issue #1576).
 - [ ] Add aggregate stochastic checks for coagulation and wall loss without
   requiring exact CPU/CUDA seed trajectories.
 - [ ] Add persistent RNG identity, advancement, explicit reset, and checkpoint/

@@ -1,12 +1,14 @@
-"""Partial P1 three-way evidence boundaries for resident graph-capture loops.
+"""P1/P2 full-loop evidence boundaries for resident graph-capture loops.
 
-Warp CPU supplies the uncaptured resident baseline. Native CUDA capture is
-optional and is skipped before qualification when the device or Warp capture
-API is unavailable; it is never emulated on the CPU.
+This test-only module supplies the P1 NumPy oracle and P2 uncaptured Warp-CPU
+READY-path parity, conservation, forbidden-work, and no-work evidence. Native
+CUDA capture remains optional, is skipped before qualification when the device
+or Warp capture API is unavailable, and is never emulated on the CPU.
 """
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass, replace
 from types import SimpleNamespace
 from typing import Any
@@ -1218,9 +1220,10 @@ class _ScenarioPreparedLoop:
     sink_ledger: Any
 
 
-def _build_scenario_prepared_loop(
+def _build_scenario_prepared_loop_impl(
     monkeypatch: pytest.MonkeyPatch,
     duration: float,
+    cleanup_binding: list[tuple[Any, Any, Any]],
 ) -> _ScenarioPreparedLoop:
     """Build the P1 two-box scenario without shared fixture update sources."""
     import particula.execution.resident_scheduler as resident_scheduler
@@ -1258,6 +1261,7 @@ def _build_scenario_prepared_loop(
     )
     registry = GPUResourceRegistry(session)
     guard = ResidentStepGuard(session, registry)
+    cleanup_binding.append((session, registry, guard))
     graph, schedule, by_id = _resident_graph()
     device = particles.masses.device
     configuration = CommunicationConfiguration(
@@ -1528,21 +1532,6 @@ def _build_scenario_prepared_loop(
     monkeypatch.setattr(
         resident_scheduler, "_enqueue_prepared_gas_update", no_op
     )
-    if duration == 0.0:
-        monkeypatch.setattr(
-            resident_scheduler, "_enqueue_prepared_vapor_pressure", no_op
-        )
-        monkeypatch.setattr(
-            resident_scheduler, "_enqueue_prepared_saturation_ratio", no_op
-        )
-        monkeypatch.setattr(
-            resident_scheduler,
-            "setup_prepared_resident_diagnostics",
-            lambda _prepared, _request: None,
-        )
-        monkeypatch.setattr(
-            resident_scheduler, "_enqueue_prepared_diagnostics_window", no_op
-        )
     prepared = prepare_resident_simulation(request, duration)
     assert prepared.ordered_node_ids == _CANONICAL_IDS
     loop = _PreparedLoop(
@@ -1556,7 +1545,7 @@ def _build_scenario_prepared_loop(
         coagulation_resources,
         wall_loss_resources,
     )
-    return _ScenarioPreparedLoop(
+    result = _ScenarioPreparedLoop(
         loop,
         communication,
         latent_energy,
@@ -1564,6 +1553,30 @@ def _build_scenario_prepared_loop(
         source_ledger,
         sink_ledger,
     )
+    cleanup_binding.clear()
+    return result
+
+
+def _build_scenario_prepared_loop(
+    monkeypatch: pytest.MonkeyPatch,
+    duration: float,
+) -> _ScenarioPreparedLoop:
+    """Build a scenario loop and close its exact binding after setup failure."""
+    cleanup_binding: list[tuple[Any, Any, Any]] = []
+    try:
+        return _build_scenario_prepared_loop_impl(
+            monkeypatch,
+            duration,
+            cleanup_binding,
+        )
+    except BaseException as setup_error:
+        if cleanup_binding:
+            session, registry, guard = cleanup_binding[0]
+            try:
+                session.close(registry, guard)
+            except BaseException as cleanup_error:
+                raise setup_error from cleanup_error
+        raise
 
 
 def _prepared_snapshot(loop: _PreparedLoop) -> dict[str, np.ndarray]:
@@ -1643,6 +1656,16 @@ def _prepared_snapshot_without_sync(
         "temperature": environment.temperature.numpy().copy(),
         "pressure": environment.pressure.numpy().copy(),
         "saturation_ratio": environment.saturation_ratio.numpy().copy(),
+        "collision_pairs": (
+            loop.coagulation_resources.collision_pairs.numpy().copy()
+        ),
+        "collision_counts": (
+            loop.coagulation_resources.n_collisions.numpy().copy()
+        ),
+        "coagulation_rng": (
+            loop.coagulation_resources.rng_states.numpy().copy()
+        ),
+        "wall_loss_rng": loop.wall_loss_resources.rng_states.numpy().copy(),
     }
     for registration in loop.request.diagnostics.registrations:
         snapshot[f"diagnostic_{registration.operation.value}"] = (
@@ -1653,8 +1676,64 @@ def _prepared_snapshot_without_sync(
 
 def _close_prepared_loop(loop: _PreparedLoop) -> None:
     """Release graph provenance before closing its resident session."""
-    close_resident_graph_capture(loop.binding)
+    try:
+        close_resident_graph_capture(loop.binding)
+    except BaseException as graph_error:
+        try:
+            loop.session.close(loop.registry, loop.guard)
+        except BaseException as cleanup_error:
+            raise graph_error from cleanup_error
+        raise
     loop.session.close(loop.registry, loop.guard)
+
+
+@pytest.mark.warp
+def test_scenario_builder_closes_session_when_preparation_fails(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Close the exact resident binding if scenario setup cannot return it."""
+    import particula.execution.gpu_session as gpu_session
+
+    closed: list[tuple[Any, Any, Any]] = []
+
+    def close(session: Any, registry: Any, guard: Any) -> None:
+        closed.append((session, registry, guard))
+
+    def fail_prepare(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("prepared setup failed")
+
+    monkeypatch.setattr(gpu_session.ResidentSession, "close", close)
+    monkeypatch.setattr(
+        sys.modules[__name__], "prepare_resident_simulation", fail_prepare
+    )
+    with pytest.raises(RuntimeError, match="prepared setup failed"):
+        _build_scenario_prepared_loop(monkeypatch, 0.0)
+    assert len(closed) == 1
+
+
+def test_close_prepared_loop_attempts_session_cleanup_after_graph_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Attempt exact session cleanup while preserving graph-close failures."""
+    closed: list[tuple[Any, Any]] = []
+    loop = SimpleNamespace(
+        binding=object(),
+        session=SimpleNamespace(
+            close=lambda registry, guard: closed.append((registry, guard))
+        ),
+        registry=object(),
+        guard=object(),
+    )
+
+    def fail_graph_close(_binding: object) -> None:
+        raise RuntimeError("graph close failed")
+
+    monkeypatch.setattr(
+        sys.modules[__name__], "close_resident_graph_capture", fail_graph_close
+    )
+    with pytest.raises(RuntimeError, match="graph close failed"):
+        _close_prepared_loop(loop)
+    assert closed == [(loop.registry, loop.guard)]
 
 
 def _assert_prepared_parity(
@@ -1777,6 +1856,7 @@ def _assert_dilution_inventory_factor(
 
 def _assert_scenario_parity(
     actual: dict[str, np.ndarray],
+    initial: dict[str, np.ndarray],
     scenario: _CapturedLoopScenario,
     steps: int,
 ) -> None:
@@ -1831,6 +1911,15 @@ def _assert_scenario_parity(
                 atol=PARITY_ATOL,
                 err_msg=name,
             )
+    # This fixture intentionally supplies no coagulation or wall-loss work.
+    # Retained outputs and resident streams must therefore remain unchanged.
+    for name in (
+        "collision_pairs",
+        "collision_counts",
+        "coagulation_rng",
+        "wall_loss_rng",
+    ):
+        npt.assert_equal(actual[name], initial[name], err_msg=name)
 
 
 def _assert_scenario_conservation(
@@ -2032,6 +2121,40 @@ def _require_native_cuda_capture() -> Any:
     return wp
 
 
+def _forbid_prepared_host_work(
+    dispatch_patch: pytest.MonkeyPatch,
+    loop: _PreparedLoop,
+    conversion: Any,
+    forbidden: Any,
+) -> None:
+    """Reject enqueue-time upload, allocation, copy, readback, and sync work."""
+    for name in (
+        "to_warp_particle_data",
+        "to_warp_gas_data",
+        "to_warp_environment_data",
+    ):
+        dispatch_patch.setattr(conversion, name, forbidden)
+    # Patch module-level Warp aliases used by the retained prepared operations;
+    # individual Warp array methods are intentionally not patched globally.
+    for name in (
+        "synchronize",
+        "synchronize_device",
+        "zeros",
+        "empty",
+        "array",
+        "copy",
+        "to_numpy",
+    ):
+        if callable(getattr(loop.wp, name, None)):
+            dispatch_patch.setattr(loop.wp, name, forbidden)
+    for name in (
+        "acquire_communication",
+        "register_capture_resources",
+        "prepare_capture_resources",
+    ):
+        dispatch_patch.setattr(loop.registry, name, forbidden)
+
+
 @pytest.mark.warp
 @pytest.mark.gpu_parity
 def test_real_uncaptured_warp_cpu_nonzero_loop_matches_numpy() -> None:
@@ -2116,30 +2239,21 @@ def test_p1_ready_warp_cpu_loop_matches_detached_oracle(
                         "prepared dispatch performed forbidden host work"
                     )
 
-                for name in (
-                    "to_warp_particle_data",
-                    "to_warp_gas_data",
-                    "to_warp_environment_data",
-                ):
-                    dispatch_patch.setattr(conversion, name, forbidden)
-                for name in (
-                    "synchronize",
-                    "synchronize_device",
-                    "zeros",
-                    "empty",
-                    "array",
-                ):
-                    dispatch_patch.setattr(loop.wp, name, forbidden)
-                for name in (
-                    "acquire_communication",
-                    "register_capture_resources",
-                    "prepare_capture_resources",
-                ):
-                    dispatch_patch.setattr(loop.registry, name, forbidden)
+                _forbid_prepared_host_work(
+                    dispatch_patch,
+                    loop,
+                    conversion,
+                    forbidden,
+                )
                 enqueue_prepared_resident_simulation(loop.prepared)
             snapshots.append(_scenario_snapshot(scenario_loop))
         result = snapshots[-1]
-        _assert_scenario_parity(result, scenario, scenario.time_steps)
+        _assert_scenario_parity(
+            result,
+            snapshots[0],
+            scenario,
+            scenario.time_steps,
+        )
         # Work buffers are overwritten for one dispatch, rather than accumulated.
         # The final snapshot is checked below against the independently evolved
         # pre-final state to keep this ledger oracle separate from scheduler code.
@@ -2197,6 +2311,7 @@ def test_p1_ready_warp_cpu_zero_duration_is_write_free(
 
     scenario_loop = _build_scenario_prepared_loop(monkeypatch, 0.0)
     loop = scenario_loop.loop
+    scenario = _captured_full_loop_scenario()
     try:
         before = _scenario_snapshot(scenario_loop)
         signature = _scenario_identity_signature(scenario_loop)
@@ -2207,31 +2322,66 @@ def test_p1_ready_warp_cpu_zero_duration_is_write_free(
                     "zero-duration prepared dispatch performed host work"
                 )
 
-            for name in (
-                "to_warp_particle_data",
-                "to_warp_gas_data",
-                "to_warp_environment_data",
-            ):
-                dispatch_patch.setattr(conversion, name, forbidden)
-            for name in (
-                "synchronize",
-                "synchronize_device",
-                "zeros",
-                "empty",
-                "array",
-            ):
-                dispatch_patch.setattr(loop.wp, name, forbidden)
-            for name in (
-                "acquire_communication",
-                "register_capture_resources",
-                "prepare_capture_resources",
-            ):
-                dispatch_patch.setattr(loop.registry, name, forbidden)
+            _forbid_prepared_host_work(
+                dispatch_patch,
+                loop,
+                conversion,
+                forbidden,
+            )
             enqueue_prepared_resident_simulation(loop.prepared)
         after = _scenario_snapshot(scenario_loop)
         assert after.keys() == before.keys()
-        for name in after:
+        refreshed = {
+            "gas_vapor_pressure",
+            "saturation_ratio",
+            "diagnostic_gas_concentration_snapshot",
+            "diagnostic_saturation_ratio_snapshot",
+            "diagnostic_total_species_mass",
+            "diagnostic_particle_number_concentration",
+            "diagnostic_latent_heat_energy",
+            "diagnostic_conservation_residual",
+            "latent_energy_input",
+        }
+        for name in after.keys() - refreshed:
             npt.assert_equal(after[name], before[name], err_msg=name)
+        expected_vapor_pressure = np.broadcast_to(
+            scenario.vapor_pressure,
+            scenario.gas_concentration.shape,
+        )
+        expected_saturation = (
+            scenario.gas_concentration
+            * _ORACLE_GAS_CONSTANT
+            * scenario.temperature[:, None]
+            / (scenario.molar_mass[None, :] * expected_vapor_pressure)
+        )
+        expected_inventory = _snapshot_inventory(before)
+        npt.assert_equal(after["gas_vapor_pressure"], expected_vapor_pressure)
+        npt.assert_allclose(after["saturation_ratio"], expected_saturation)
+        npt.assert_equal(
+            after["diagnostic_gas_concentration_snapshot"],
+            before["gas_concentration"],
+        )
+        npt.assert_allclose(
+            after["diagnostic_saturation_ratio_snapshot"], expected_saturation
+        )
+        npt.assert_allclose(
+            after["diagnostic_total_species_mass"], expected_inventory
+        )
+        npt.assert_allclose(
+            after["diagnostic_particle_number_concentration"],
+            np.sum(before["particle_concentration"], axis=1),
+        )
+        npt.assert_equal(
+            after["diagnostic_latent_heat_energy"], scenario.energy_ledger
+        )
+        npt.assert_equal(after["latent_energy_input"], scenario.energy_ledger)
+        npt.assert_allclose(
+            after["diagnostic_conservation_residual"],
+            expected_inventory
+            - scenario.baseline_total_mass
+            - scenario.source_ledger
+            + scenario.sink_ledger,
+        )
         assert _scenario_identity_signature(scenario_loop) == signature
         assert loop.guard.completed_steps == 1
         assert loop.binding.lifecycle.state is GraphCaptureLifecycleState.READY

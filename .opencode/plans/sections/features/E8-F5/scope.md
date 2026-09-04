@@ -11,6 +11,11 @@ two-box fixture, independent NumPy oracle, diagnostic and inventory assertions,
 no-work coverage, and validation rejection coverage. Uncaptured Warp and
 captured CUDA parity remain later phases.
 
+Issue #1576 delivered P2 in `particula/execution/tests/captured_full_loop_test.py`
+only: real READY prepared uncaptured Warp-CPU multi-timestep parity and
+conservation rows, scoped forbidden-work spies, and zero-duration preservation
+coverage. It did not modify production behavior, APIs, or capture/replay.
+
 ## In Scope
 
 - Independent NumPy/CPU expected-state and inventory calculations.

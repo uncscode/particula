@@ -50,6 +50,16 @@ applies prescribed volume evolution and dilution, then derives saturation and
 concentration-weighted inventory diagnostics. It neither constructs GPU bindings
 nor changes the production execution architecture.
 
+### P2 implementation
+
+Issue #1576 adds the uncaptured Warp-CPU evidence branch in the same test file.
+It constructs a scenario-specific READY prepared binding, executes multiple
+prepared enqueues, and compares detached field, closed-GAS-work-buffer,
+accounting, and diagnostic snapshots with the P1 NumPy oracle and independent
+inventory checks. Scoped test spies reject enqueue-time setup, allocation,
+transfer, readback, and synchronization; a zero-duration row verifies
+write-free preservation. These are tests only, not production-path changes.
+
 ## Security & Compliance
 
 There is no network, credential, or persistence change. Validation is fail
