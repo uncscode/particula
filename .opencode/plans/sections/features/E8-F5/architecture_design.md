@@ -40,6 +40,16 @@ launch. A post-launch writer failure follows the existing fault/no-rollback rule
   closeout with a recorded three-way validation matrix. CUDA rows are optional
   pass-or-clean-skip evidence; Warp CPU covers uncaptured behavior when installed.
 
+### P1 implementation
+
+Issue #1575 implements the CPU branch only, co-located in
+`particula/execution/tests/captured_full_loop_test.py`. Frozen scenario, private
+state, and result carriers retain read-only fixture inputs and detached writable
+oracle results. The NumPy transition stages closed gas-map debits/credits,
+applies prescribed volume evolution and dilution, then derives saturation and
+concentration-weighted inventory diagnostics. It neither constructs GPU bindings
+nor changes the production execution architecture.
+
 ## Security & Compliance
 
 There is no network, credential, or persistence change. Validation is fail

@@ -1,4 +1,4 @@
-"""Three-way evidence boundaries for resident graph-capture full loops.
+"""Partial P1 three-way evidence boundaries for resident graph-capture loops.
 
 Warp CPU supplies the uncaptured resident baseline. Native CUDA capture is
 optional and is skipped before qualification when the device or Warp capture
@@ -170,6 +170,8 @@ def _validate_captured_loop_scenario(  # noqa: C901
         "energy_ledger": (scenario.energy_ledger, (2, 2), np.float64),
     }
     for name, (values, shape, dtype) in arrays.items():
+        if values.flags.writeable:
+            raise ValueError(f"{name} must be immutable")
         if values.shape != shape:
             raise ValueError(f"{name} has invalid shape")
         if values.dtype != dtype:
@@ -197,6 +199,13 @@ def _validate_captured_loop_scenario(  # noqa: C901
         "source_ledger",
         "sink_ledger",
         "energy_ledger",
+    ):
+        if np.any(getattr(scenario, name) < 0.0):
+            raise ValueError(f"{name} must be nonnegative")
+    for name in (
+        "particle_masses",
+        "particle_concentration",
+        "gas_concentration",
     ):
         if np.any(getattr(scenario, name) < 0.0):
             raise ValueError(f"{name} must be nonnegative")
@@ -331,6 +340,17 @@ def _run_captured_full_loop_oracle(
     for _ in range(steps):
         pre_step_volume = state.volume.copy()
         amounts = state.gas_concentration * pre_step_volume[:, None]
+        outbound_fractions = np.zeros_like(pre_step_volume)
+        enabled = scenario.edge_enabled
+        np.add.at(
+            outbound_fractions,
+            scenario.edge_sources[enabled],
+            scenario.edge_rates[enabled] * scenario.time_step,
+        )
+        if not np.all(np.isfinite(outbound_fractions)):
+            raise ValueError("aggregate outbound fractions must be finite")
+        if np.any(outbound_fractions > 1.0):
+            raise ValueError("aggregate outbound fractions must not exceed 1")
         debits = np.zeros_like(amounts)
         credits = np.zeros_like(amounts)
         for source, destination, enabled, rate in zip(
@@ -457,7 +477,8 @@ def test_captured_loop_oracle_matches_one_and_multiple_step_literals() -> None:
     npt.assert_equal(one_step.state.pressure, scenario.pressure)
     npt.assert_allclose(one_step.state.vapor_pressure, [[1000.0, 500.0]] * 2)
     expected_saturation = (
-        one_step.state.gas_concentration
+        np.array([[1.9e-9, 0.95e-9], [2.2e-9, 6.1e-9]])
+        * np.array([[first_dilution], [second_dilution]])
         * _ORACLE_GAS_CONSTANT
         * scenario.temperature[:, None]
         / (scenario.molar_mass[None, :] * scenario.vapor_pressure[None, :])
@@ -571,6 +592,29 @@ def test_captured_loop_no_work_rows_and_inactive_slots_are_write_free() -> None:
     assert np.all(np.isfinite(result.saturation_ratio_snapshot))
 
 
+def test_captured_loop_saturation_snapshot_uses_final_gas_state() -> None:
+    """Derive saturation after communication, volume, and dilution updates."""
+    scenario = replace(
+        _captured_full_loop_scenario(),
+        edge_enabled=_scenario_replacement([False, False, False], np.bool_),
+        final_volume=_scenario_replacement([1.0, 2.0], np.float64),
+    )
+    result = _run_captured_full_loop_oracle(scenario, 1)
+    expected_saturation = (
+        scenario.gas_concentration
+        * np.exp(-scenario.dilution_coefficient[:, None] * scenario.time_step)
+        * _ORACLE_GAS_CONSTANT
+        * scenario.temperature[:, None]
+        / (scenario.molar_mass[None, :] * scenario.vapor_pressure[None, :])
+    )
+    npt.assert_allclose(result.saturation_ratio_snapshot, expected_saturation)
+    npt.assert_allclose(
+        result.gas_concentration_snapshot,
+        scenario.gas_concentration
+        * np.exp(-scenario.dilution_coefficient[:, None] * scenario.time_step),
+    )
+
+
 @pytest.mark.parametrize(
     ("steps", "exception", "message"),
     [
@@ -662,6 +706,67 @@ def test_captured_loop_malformed_scenarios_reject_without_source_mutation(
     for name, original in original_arrays.items():
         npt.assert_equal(getattr(scenario, name), original)
         assert not getattr(scenario, name).flags.writeable
+
+
+@pytest.mark.parametrize(
+    ("field", "index", "value", "message"),
+    [
+        ("particle_masses", (0, 0, 0), -1.0, "particle_masses"),
+        ("particle_concentration", (0, 0), -1.0, "particle_concentration"),
+        ("gas_concentration", (0, 0), -1.0, "gas_concentration"),
+    ],
+)
+def test_captured_loop_rejects_negative_primary_state(
+    field: str,
+    index: tuple[int, ...],
+    value: float,
+    message: str,
+) -> None:
+    """Reject invalid primary state without mutating the source scenario."""
+    scenario = _captured_full_loop_scenario()
+    replacement = getattr(scenario, field).copy()
+    replacement.setflags(write=True)
+    replacement[index] = value
+    replacement.setflags(write=False)
+    malformed = replace(scenario, **{field: replacement})
+    with pytest.raises(ValueError, match=message):
+        _run_captured_full_loop_oracle(malformed, 1)
+    assert getattr(scenario, field)[index] >= 0.0
+
+
+def test_captured_loop_rejects_writable_scenario_arrays() -> None:
+    """Require all scenario-owned arrays to remain immutable before execution."""
+    scenario = _captured_full_loop_scenario()
+    writable_gas = scenario.gas_concentration.copy()
+    malformed = replace(scenario, gas_concentration=writable_gas)
+    with pytest.raises(ValueError, match="gas_concentration must be immutable"):
+        _run_captured_full_loop_oracle(malformed, 1)
+    assert writable_gas.flags.writeable
+    assert not scenario.gas_concentration.flags.writeable
+
+
+@pytest.mark.parametrize(
+    ("rates", "message"),
+    [
+        ([np.finfo(np.float64).max] * 3, "finite"),
+        ([1.5, 1.5, 0.0], "must not exceed 1"),
+    ],
+)
+def test_captured_loop_rejects_invalid_aggregate_transport_fraction(
+    rates: list[float], message: str
+) -> None:
+    """Reject nonfinite or overdraw transport before oracle state commits."""
+    scenario = _captured_full_loop_scenario()
+    malformed = replace(
+        scenario,
+        edge_enabled=_scenario_replacement([True, True, True], np.bool_),
+        edge_sources=_scenario_replacement([0, 0, 0], np.int32),
+        edge_destinations=_scenario_replacement([1, 1, 0], np.int32),
+        edge_rates=_scenario_replacement(rates, np.float64),
+    )
+    with pytest.raises(ValueError, match=message):
+        _run_captured_full_loop_oracle(malformed, 1)
+    npt.assert_equal(malformed.gas_concentration, scenario.gas_concentration)
 
 
 @dataclass

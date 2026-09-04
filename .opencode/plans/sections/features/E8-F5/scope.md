@@ -5,6 +5,12 @@ CPU, uncaptured Warp, and captured CUDA configurations. The deliverable verifies
 observable state, accounting, stochastic lifecycle, and rejection semantics; it
 does not introduce a new scheduler or change scientific models.
 
+Issue #1575 delivered the P1 CPU-only foundation in
+`particula/execution/tests/captured_full_loop_test.py`: a deterministic immutable
+two-box fixture, independent NumPy oracle, diagnostic and inventory assertions,
+no-work coverage, and validation rejection coverage. Uncaptured Warp and
+captured CUDA parity remain later phases.
+
 ## In Scope
 
 - Independent NumPy/CPU expected-state and inventory calculations.

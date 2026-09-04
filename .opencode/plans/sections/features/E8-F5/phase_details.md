@@ -1,13 +1,17 @@
 # Phase Details
 
-- [ ] **E8-F5-P1:** Shared full-loop fixtures and independent CPU oracle with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E8-F5-P1:** Shared full-loop fixtures and independent CPU oracle with unit tests
+  - Issue: #1575 | Size: S | Status: Shipped
   - Goal: Build one immutable scenario specification and independent CPU/NumPy
     oracle used to compare all execution paths without production-helper leakage.
-  - Files: `particula/execution/tests/captured_full_loop_test.py`, optional shared
-    support under `particula/execution/tests/`.
-  - Tests: Fixture schema, multiple timesteps, per-field expected values,
-    concentration-weighted inventory, no-op rows, and deterministic setup.
+  - Files: `particula/execution/tests/captured_full_loop_test.py` only; no shared
+    support module or production module was changed.
+  - Delivered: Frozen two-box fixture and detached NumPy oracle for closed gas
+    communication, prescribed volume evolution, dilution, saturation, and six
+    diagnostic outputs.
+  - Tests: Fixture schema and immutability, multiple timesteps, literal primary
+    and derived values, concentration-weighted inventory, no-work rows, inactive
+    slots, and invalid step/scenario rejection.
 
 - [ ] **E8-F5-P2:** Uncaptured Warp full-loop parity and conservation validation
   - Issue: TBD | Size: S | Status: Not Started

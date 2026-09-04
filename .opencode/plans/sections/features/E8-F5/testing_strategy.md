@@ -5,9 +5,11 @@ lowered, and production behavior is not changed solely to expose test internals.
 
 ## Per-Phase Approach
 
-- **P1:** Unit-test scenario validation and independent CPU/NumPy oracles,
-  including no-op, multi-box, multi-species, communication, volume, and inventory
-  calculations.
+- **P1 (shipped, #1575):** CPU-only unit tests in
+  `captured_full_loop_test.py` validate an immutable two-box/multi-species
+  scenario and an independent NumPy oracle. They cover closed gas communication,
+  volume evolution, dilution, saturation, six diagnostics, per-box/species
+  inventory, no-work/inactive-slot behavior, and invalid input rejection.
 - **P2:** Integration-test the uncaptured prepared path on Warp CPU over multiple
   timesteps. Compare fields individually, assert diagnostics and identities, and
   reject hidden upload/allocation/readback/synchronization.
@@ -36,7 +38,7 @@ lowered, and production behavior is not changed solely to expose test internals.
 Focused fix checks are assertion-only and coverage disabled:
 
 ```bash
-pytest particula/execution/tests/captured_full_loop_test.py -q
+pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov
 pytest particula/execution/tests/graph_capture_test.py \
   particula/execution/tests/rng_invariance_test.py \
   particula/execution/tests/checkpoint_test.py -q

@@ -15,6 +15,15 @@ evidence-backed optimization rather than a separate scientific execution mode,
 detects replay-only state defects, and gives downstream benchmark, memory, and
 documentation tracks a stable correctness gate.
 
+## Implementation Status
+
+E8-F5-P1 shipped for issue #1575 as test-only support in
+`particula/execution/tests/captured_full_loop_test.py`. It provides an immutable
+deterministic two-box scenario and an independent NumPy full-loop oracle for
+closed gas communication, prescribed volume evolution, dilution, derived
+saturation, and inventory diagnostics. No production API, module, scheduler,
+graph-capture, or resident-session architecture changed.
+
 ## User Stories
 
 - As a scientific user, I want captured and uncaptured loops compared with an

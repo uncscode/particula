@@ -2,10 +2,10 @@
 
 ## Backend / Test Support
 
-- [ ] Define a test-only immutable full-loop scenario in
+- [x] Define a test-only immutable full-loop scenario in
   `particula/execution/tests/captured_full_loop_test.py` with fixed float64 state,
   logical box IDs, process controls, maps, diagnostics, and seeds.
-- [ ] Implement independent CPU/NumPy step and extensive-inventory oracles; do
+- [x] Implement independent CPU/NumPy step and extensive-inventory oracles; do
   not call the production GPU helper under comparison.
 - [ ] Build uncaptured and captured bindings from the same E8-F2 prepared plan
   and E8-F3 resource set without replacing E8-F4's graph owner.
@@ -16,7 +16,9 @@
 
 ## Tooling / Tests
 
-- [ ] Add deterministic CPU versus Warp CPU uncaptured multi-timestep rows.
+- [x] Add CPU-only deterministic fixture/oracle rows for multi-step primary and
+  derived state, diagnostics, inventories, no-work behavior, and validation
+  rejection (issue #1575). Warp CPU parity remains P2.
 - [ ] Add optional CUDA captured rows for GAS and PARTICLES communication,
   prescribed volume evolution, empty/no-work boxes, and diagnostics.
 - [ ] Assert concentration-weighted per-box/per-species inventory independently

@@ -11,6 +11,8 @@
   after the implementation is executable.
 - Update E8 and E8-F5 plan sections with shipped phase status, exact commands,
   literal outcomes, unavailable hardware rows, and downstream handoffs.
+- Issue #1575 changed no user documentation: its implementation is test-only and
+  does not alter production APIs, modules, or architecture.
 - Do not add a new user example in this feature; the sibling graph-capture
   example track owns runnable usage and limitations.
 - Validate all changed documentation with contract tests and
