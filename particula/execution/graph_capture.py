@@ -1884,7 +1884,7 @@ def _notify_resident_graph_capture(
         raise ValueError(
             "resident graph-capture notification binding mismatch."
         )
-    guard.assert_step_closed()
+    cast("ResidentStepGuard", guard).assert_step_closed()
     _teardown_resident_graph_capture(binding, cause)
 
 
