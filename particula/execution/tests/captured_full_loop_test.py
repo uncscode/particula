@@ -123,7 +123,7 @@ class _CapturedLoopResult:
     conservation_residual: np.ndarray
 
 
-def _readonly_array(values: np.ndarray, dtype: np.dtype | type) -> np.ndarray:
+def _readonly_array(values: object, dtype: np.dtype | type) -> np.ndarray:
     """Copy an array into C-contiguous immutable storage of the required type."""
     result = np.array(values, dtype=dtype, order="C", copy=True)
     result.setflags(write=False)
@@ -387,9 +387,7 @@ def _run_captured_full_loop_oracle(
     )
 
 
-def _scenario_replacement(
-    values: np.ndarray, dtype: np.dtype | type
-) -> np.ndarray:
+def _scenario_replacement(values: object, dtype: np.dtype | type) -> np.ndarray:
     """Return a C-contiguous immutable replacement suitable for ``replace``."""
     return _readonly_array(values, dtype)
 
@@ -658,7 +656,7 @@ def test_captured_loop_malformed_scenarios_reject_without_source_mutation(
     if field == "particle_concentration":
         replacement = replacement.T
     replacement.setflags(write=False)
-    malformed = replace(scenario, **{field: replacement})
+    malformed = replace(scenario, **{field: replacement})  # type: ignore[arg-type]
     with pytest.raises(ValueError, match=message):
         _run_captured_full_loop_oracle(malformed, 1)
     for name, original in original_arrays.items():
