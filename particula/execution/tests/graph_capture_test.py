@@ -2307,7 +2307,7 @@ def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
             capture_end,
             unexpected_callable,
             capture_launch,
-            unexpected_callable,
+            capture_release,
         ),
     )
     monkeypatch.setattr(
@@ -2361,6 +2361,116 @@ def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
 
     assert launches == [handle, handle]
     assert request.guard.completed_steps == 2
+    binding._lifecycle = invalidate_graph_capture(
+        binding.lifecycle,
+        GraphCaptureCompatibility(False, GraphCaptureDriftReason.REQUEST),
+    )
+    retire_resident_graph_capture(binding)
+
+    assert trace == ["begin", "dispatch", "end", "release"]
+    with pytest.raises(ValueError, match="handle is not P2-issued"):
+        replay_captured_resident_graph(captured, 0.0)
+
+
+@pytest.mark.warp
+def test_retirement_release_failure_revokes_replay_and_is_not_retried(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A failed release revokes an issued handle before faulting its binding."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    signature = create_resident_graph_capture_signature(request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            request.session.metadata.device,
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        signature,
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    capture_set = cast(
+        "GPUResourceRegistry", request.registry
+    ).validate_capture_resource_set(
+        cast(
+            "CaptureResourceRequirements", request.capture_resource_requirements
+        )
+    )
+    handle = object()
+    releases: list[object] = []
+    prepared = SimpleNamespace(
+        timestep=SimpleNamespace(duration=0.0), duration=0.0
+    )
+
+    def release(released_handle: object) -> None:
+        releases.append(released_handle)
+        raise RuntimeError("native release failed")
+
+    qualification = PreparedGraphCaptureQualification(
+        binding,
+        lifecycle,
+        signature,
+        request,
+        request.session,
+        request.registry,
+        request.guard,
+        prepared,
+        prepared.timestep,
+        request.capture_resource_requirements,
+        capture_set,
+        capture_set.report,
+        request.session.metadata.device,
+        request.session.dimensions,
+        request.graph,
+        request.schedule,
+        request.schedule.ordered_node_ids,
+        0.0,
+        True,
+        signature.primary_arrays,
+        signature.resource_views,
+        GraphCaptureNativeCallables(
+            lambda: None,
+            lambda: handle,
+            lambda: None,
+            lambda _handle: None,
+            release,
+        ),
+    )
+    monkeypatch.setattr(
+        graph_capture,
+        "_validate_prepared_graph_capture_qualification",
+        lambda value: value,
+    )
+    import particula.execution.resident_scheduler as resident_scheduler
+
+    monkeypatch.setattr(
+        resident_scheduler,
+        "_enqueue_captured_prepared_operations",
+        lambda _prepared: None,
+    )
+
+    captured = capture_prepared_resident_graph(qualification)
+    binding._lifecycle = invalidate_graph_capture(
+        binding.lifecycle,
+        GraphCaptureCompatibility(False, GraphCaptureDriftReason.REQUEST),
+    )
+    with pytest.raises(RuntimeError, match="native release failed"):
+        retire_resident_graph_capture(binding)
+
+    assert releases == [handle]
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.FAULTED
+    with pytest.raises(ValueError, match="handle is not P2-issued"):
+        replay_captured_resident_graph(captured, 0.0)
+
+    assert close_resident_graph_capture(binding).state is (
+        GraphCaptureLifecycleState.CLOSED
+    )
+    assert close_resident_graph_capture(binding).state is (
+        GraphCaptureLifecycleState.CLOSED
+    )
+    assert releases == [handle]
 
 
 @pytest.mark.warp

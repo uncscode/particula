@@ -24,10 +24,12 @@ baseline; native graph capture evidence is CUDA-only and pass-or-clean-skip.
   entry point from package and top-level exports. A `warp`/`cuda` row uses the
   native capture APIs and twelve device no-ops; it skips only for absent Warp,
   CUDA, or required capture APIs.
-- **P3 — guarded replay:** Cover repeated accepted launches, one token and one
-  graph launch per timestep, mutable payload/RNG advancement, all exact identity
-  mismatches, duration/lifecycle rejection, and zero launches after preflight
-  failure.
+- **P3 — delivered guarded replay:**
+  `particula/execution/tests/graph_capture_test.py` covers authentic P2-issued
+  opaque-handle provenance, exact record/binding/lifecycle/device/duration
+  validation, repeated one-token/one-launch success, mutable pinned payload and
+  RNG-word compatibility, and no launch after rejected preflight. It also covers
+  native launch/completion failures and writer-capable no-rollback faulting.
 - **P4 — invalidation:** Cover deterministic reason selection, read-only
   rejection preservation, writer failure faulting, stale handle rejection,
   finalize/close/restart behavior, idempotent teardown, and explicit fresh

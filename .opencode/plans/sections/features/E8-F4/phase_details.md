@@ -31,17 +31,19 @@
     exports, and a CUDA-only native twelve-no-op smoke row. P3 replay remains
     deferred.
 
-- [ ] **E8-F4-P3:** Guarded replay and exact compatibility checks with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Validate the current exact resident/prepared/resource/signature
-    binding before opening one timestep token and launching the captured graph
-    exactly once without reseeding or host process dispatch.
+- [x] **E8-F4-P3:** Guarded replay and exact compatibility checks with unit tests
+  - Issue: #1569 | Size: S | Status: Delivered
+  - Delivered: `replay_captured_resident_graph()` accepts only authentic
+    P2-issued opaque-handle records, verifies their exact captured binding and
+    duration before token entry, then performs one native launch and one token
+    completion. It preserves payload/RNG-word compatibility and applies
+    writer-capable no-rollback fault handling to launch or completion failures.
   - Files: `particula/execution/graph_capture.py`,
-    `particula/execution/gpu_session.py`,
     `particula/execution/tests/graph_capture_test.py`
-  - Tests: Accepted repeated replay, every identity-drift category, duration and
-    lifecycle rejection, token completion, persistent RNG advancement, and no
-    launch on failed preflight.
+  - Verified contract: provenance rejects manual/tampered records before launch;
+    identity, lifecycle, device, and duration drift reject before token entry;
+    accepted calls launch the retained handle exactly once; package and top-level
+    exports remain unchanged.
 
 - [ ] **E8-F4-P4:** Lifecycle invalidation fault and recapture handling with tests
   - Issue: TBD | Size: S | Status: Not Started

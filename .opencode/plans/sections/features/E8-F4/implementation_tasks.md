@@ -17,12 +17,12 @@
 - [x] Implement exact-once capture cleanup and preserve operation plus cleanup
   failures without attempting a second `capture_end`; release a successful-end
   opaque handle by identity after post-end rejection.
-- [ ] Implement replay preflight and one-token/one-`capture_launch` execution
+- [x] Implement replay preflight and one-token/one-`capture_launch` execution
   with no process dispatch, allocation, validation scans, readback, transfer,
   synchronization, RNG reset, fallback, or recapture.
-- [ ] Compare E8-F1 signatures and exact nested resource identities before every
+- [x] Compare E8-F1 signatures and exact nested resource identities before every
   launch; map each structural mismatch to the canonical invalidation reason.
-- [ ] Couple launch failure to resident and capture faulting through existing
+- [x] Couple launch failure to resident and capture faulting through existing
   `_handle_failed_resident_operation` writer semantics.
 - [ ] Implement explicit invalidation and idempotent teardown, and require a
   fresh READY record for recapture after retiring the old graph.
@@ -48,6 +48,9 @@
   graph/schedule, process configurations, communication maps, diagnostics, RNG
   sidecars, resident finalize/fault/close, teardown, and restart.
 - [x] Extend `particula/execution/tests/exports_test.py` to prove P1 and P2
-  graph-capture names remain concrete-only and are denied from public exports.
+   graph-capture names remain concrete-only and are denied from public exports.
+- [x] Extend `particula/execution/tests/graph_capture_test.py` for P3 authentic
+  opaque-handle provenance, exact replay validation, one-token/one-launch
+  behavior, and writer-capable launch/completion failures (issue #1569).
 - [ ] Run focused execution assertions without coverage, then the untargeted
   repository coverage runner and strict documentation build.

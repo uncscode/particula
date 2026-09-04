@@ -270,18 +270,24 @@ The exact downstream ordering remains
    resource acquisition, payload inspection, transfer, synchronization,
    lifecycle mutation, fallback, and exports. Graph capture owns lifecycle;
     scheduler owns CAPTURED admission and dispatch.
-- `graph_capture.py` - Concrete direct-import-only E8-F4 P1 prepared resident
-  graph-capture qualification boundary. It binds one exact attached E8-F1
-  `READY` lifecycle, E8-F2 prepared simulation/timestep, and E8-F3 published
-  capture resource set, then lazily qualifies the opaque non-CPU Warp device
-  through a caller-owned adapter and retains its native callable vocabulary by
-  identity. Qualification is host metadata only: it retains no native graph or
-  executable handle, cleanup callback, or payload copy; it does not enter a
-  guard token, dispatch prepared work, begin/end capture, replay, allocate,
-  transfer, synchronize, mutate lifecycle state, or change exports. CPU and
-  Warp-CPU devices fail closed before adapter use. P2/P3 native capture, handle,
-  replay, and cleanup work are not supplied. See
-  [ADR-019](decisions/ADR-019-prepared-resident-graph-capture-qualification.md).
+- `graph_capture.py` - Concrete direct-import-only E8-F4 graph-capture
+   boundary. P1 qualification binds one exact attached E8-F1 `READY` lifecycle,
+   E8-F2 prepared simulation/timestep, and E8-F3 published capture resource set,
+   then lazily qualifies the opaque non-CPU Warp device through a caller-owned
+   adapter. P2 performs native capture and publishes a `CAPTURED` record only
+   after successful end validation. P3 `replay_captured_resident_graph()` accepts
+   only that P2-issued record: it verifies issuance provenance and forwards its
+   opaque native handle by identity, revalidates the exact captured binding, then
+   opens one `ResidentStepGuard` token, calls native `capture_launch` once, and
+   completes that token. Pinned payload and resident RNG-word changes remain
+   compatible; identity, lifecycle, device, publication, or duration drift
+   rejects before token entry. Launch and completion failures are writer-capable:
+   the token is cleaned up and session/capture metadata faults without rollback.
+   The boundary has no public exports, allocation, payload readback, transfer,
+   synchronization, fallback, retry, recapture, or native-handle lifecycle work
+   during replay. CPU and Warp-CPU devices fail closed before adapter use. See
+   [ADR-019](decisions/ADR-019-prepared-resident-graph-capture-qualification.md)
+   and [ADR-020](decisions/ADR-020-authenticated-native-resident-graph-replay.md).
 - `process_adapters.py` - Concrete-only, direct-import resident delegation
    boundary for dilution, wall loss, and nucleation. Frozen request carriers
    retain the exact active `ResidentSession`, its pinned

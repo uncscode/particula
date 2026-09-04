@@ -47,10 +47,10 @@ wp.capture_end() -> opaque graph
                  v
 CapturedResidentGraph(CAPTURED, exact binding + opaque graph)
                   |
-        P3 planned: replay(duration)
-  compare current signature/identities/lifecycle
+         P3 delivered: replay(duration)
+   authenticate P2-issued handle and compare exact retained binding
   begin one resident token
-  wp.capture_launch(graph)
+   wp.capture_launch(graph) exactly once
   complete token
                  |
        +---------+----------+
@@ -70,15 +70,18 @@ order. P2 invokes only `capture_begin()`, `capture_end()`, and private
 `capture_release(handle)` on post-end rejection or dispatch cleanup; it never
 inspects the handle or invokes instantiate/launch. Its dispatcher performs only
 the frozen canonical operation calls and deliberately omits validation, guard
-tokens, thermodynamic bookkeeping, and cleanup. P3 native launch/replay remains
-deferred.
+tokens, thermodynamic bookkeeping, and cleanup. P3 supplies replay without
+adding scheduler dispatch or native-handle lifecycle work.
 
-Replay compares metadata before token entry and launch. Mutable payloads and RNG
-words are intentionally not compared: they advance in the exact pinned arrays.
-Any shape, device, request, schedule, process configuration, communication map,
-diagnostic binding, or resource identity drift deterministically invalidates
-the record and rejects launch. A graph-launch failure is writer-capable and
-faults both graph and resident session; rollback and retry are not promised.
+`replay_captured_resident_graph()` first requires exact P2 issuance and an
+identity-matching opaque handle, then revalidates the retained binding and
+duration before token entry. Mutable payloads and RNG words are intentionally
+not compared: they advance in the exact pinned arrays. Any shape, device,
+request, schedule, process configuration, communication map, diagnostic
+binding, or resource identity drift rejects before launch. Accepted replay does
+exactly one `begin_step`, one native `capture_launch`, and one completion. A
+launch or completion failure is writer-capable and faults graph/session state;
+rollback and retry are not promised.
 
 ## Data / API / Workflow Changes
 
@@ -89,7 +92,8 @@ faults both graph and resident session; rollback and retry are not promised.
   vocabulary.
 - **API surface:** P2 adds direct-module-only
   `capture_prepared_resident_graph()` under
-  `particula.execution.graph_capture`; replay, invalidation, and teardown remain
+  `particula.execution.graph_capture`; P3 adds direct-module-only
+  `replay_captured_resident_graph()` there. Invalidation and teardown remain
   future operations. Do not export concrete names from `particula.execution`,
   `particula.gpu.kernels`, or top-level `particula`.
 - **Workflow hooks:** E8-F4 consumes E8-F1 lifecycle/signature, E8-F2 prepared
@@ -97,7 +101,8 @@ faults both graph and resident session; rollback and retry are not promised.
   path; E8-F6 benchmarks its resource/graph lifetime; E8-F7 profiles the
   correctness-qualified path; and E8-F8 documents and closes the epic.
 - **Lifecycle:** Capture requires exact ACTIVE/READY/closed bindings. Replay
-  requires REPLAYABLE. Finalize, close, fault, explicit teardown, or structural
+  requires an authentic CAPTURED record, exact ACTIVE session, and closed guard.
+  Finalize, close, fault, explicit teardown, or structural
   drift prevent launch. Recapture always creates a fresh record and native
   handle; old handles are never checkpointed or resurrected.
 

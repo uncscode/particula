@@ -12,12 +12,14 @@ sequence, guards replay, or invalidates the opaque graph when its binding drifts
 ## Value Proposition
 
 E8-F4 is building an executable, concrete-only Warp graph boundary in phased
-increments. E8-F4-P1 is delivered: it qualifies one exact READY binding,
-prepared resident simulation, and published capture resource set, and lazily
-retains the adapter-provided native callable vocabulary for a non-CPU Warp
-device. Qualification is metadata-only, preserves READY on success and
-rejection, and owns no native graph/exec handle or cleanup. Later phases own
-native capture, replay, invalidation/teardown, and multi-timestep evidence.
+increments. P1 qualifies an exact READY binding and P2 captures its frozen
+twelve-operation sequence. P3 is delivered: an authentic P2-issued captured
+record is provenance-checked, revalidated against its exact binding, then
+launched exactly once under one resident token. Replay rejects identity,
+lifecycle, device, and duration drift before token entry; it permits mutable
+pinned payload and resident RNG-word changes without reseeding. Native launch
+or completion failures use writer-capable no-rollback fault semantics. Later
+phases own teardown and multi-timestep evidence.
 
 ## User Stories
 

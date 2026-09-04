@@ -40,6 +40,26 @@ device sequence while E8-F1 compatibility and lifecycle contracts remain valid.
   `particula/execution/tests/exports_test.py`; the new names remain intentionally
   absent from package and top-level exports.
 
+## Delivered in E8-F4-P3 (issue #1569)
+
+- `particula/execution/graph_capture.py` now provides the direct-import-only
+  `replay_captured_resident_graph()` boundary. It accepts only an authentic
+  P2-issued captured record, checks opaque-handle provenance by identity, and
+  validates the exact captured binding, capture publication, device, lifecycle,
+  and duration before token entry.
+- Each accepted call opens one resident token, invokes the retained native
+  `capture_launch` once with the exact opaque handle, and completes that token.
+  It neither dispatches prepared host operations nor allocates, probes,
+  transfers, reads back, synchronizes, reseeds, falls back, retries, or
+  recaptures.
+- Launch and completion failures use existing writer-capable resident cleanup
+  and graph/session fault classification; rollback is not promised. Preflight
+  and `begin_step()` failures are read-only and do not launch.
+- Coverage was added in `particula/execution/tests/graph_capture_test.py` for
+  authentic-handle provenance, exact drift/lifecycle/duration rejection,
+  one-launch/one-token success, and writer-failure handling. Public exports are
+  unchanged.
+
 ## Out of Scope
 
 - Dynamic shapes, process-order selection, communication-map replacement, or

@@ -95,7 +95,7 @@
 ## Prepared Resident Graph-Capture Qualification
 
 - `particula.execution.graph_capture` remains a concrete, direct-import-only
-  host-metadata seam and is absent from `particula.execution` and top-level
+  graph-capture boundary and is absent from `particula.execution` and top-level
   exports. E8-F4 P1 qualifies an already attached E8-F1 `READY` lifecycle only
   when it has the exact E8-F2 prepared resident simulation/timestep and E8-F3
   published capture resource set.
@@ -104,11 +104,12 @@
   a caller-owned adapter. CPU and Warp-CPU reject before adapter use; other
   Warp native identifiers remain opaque and adapter qualification alone
   determines native capture availability.
-- A successful result retains exact metadata and native callable vocabulary but
-  preserves `READY`; it owns no native graph/exec handle or cleanup callback.
-  It does not enter a token, dispatch, capture, replay, allocate, transfer,
-  synchronize, fall back, checkpoint, or change lifecycle. Native capture,
-  replay, handle ownership, and cleanup are unimplemented P2/P3 work. See
+- P2 performs native begin/end capture, publishes authentic opaque handles only
+  after CAPTURED completion, and owns exactly-once release/removal when the
+  captured lifecycle is retired or closed. P3 accepts only those authentic
+  issued records, revalidates the captured binding, and performs guarded native
+  launch only. Replay never releases/removes handles, recaptures, falls back,
+  transfers, or synchronizes. See
   [ADR-019](decisions/ADR-019-prepared-resident-graph-capture-qualification.md).
 
 ## Concrete GPU-Resident Session Boundary

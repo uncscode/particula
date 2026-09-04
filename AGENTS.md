@@ -975,10 +975,19 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   perform native begin, frozen twelve-operation dispatch, and native end. It
   revalidates before begin and after end, retains the opaque end handle by
   identity only, and transitions READY to CAPTURED only after successful end.
-  A post-end rejection privately releases that exact handle. It never
-  instantiates, launches, replays, publicly releases, transfers, synchronizes,
-  or checkpoints a graph. These names remain absent from package and top-level
-  exports; later E8-F4 phases own replay and broader captured evidence.
+  A post-end rejection privately releases that exact handle. E8-F4-P3 adds
+  `replay_captured_resident_graph(captured, duration)`, a concrete
+  direct-import boundary that accepts only an authentic P2-issued capture
+  record. After exact provenance, binding, lifecycle, and duration preflight,
+  it forwards the opaque handle by identity through exactly one guard token,
+  native launch, and completion. It performs no host dispatch, allocation,
+  probing, transfer, readback, synchronization, reseed/reset, fallback, retry,
+  automatic recapture, or native-handle lifecycle work; pinned payload values
+  and resident RNG words may advance without invalidating the record. Launch
+  or completion failures are writer-capable and retain resident no-rollback
+  fault semantics. P3 is intentionally absent from package and top-level
+  exports and is not a public user API; later E8-F4 phases own broader
+  captured evidence.
 - Eligibility is fail-closed: non-CPU Warp native devices require
   caller-provided availability/probe qualification. CPU and Warp CPU are neither
   capture nor fallback/emulation paths; E8-F1 supplies no availability-policy

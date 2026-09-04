@@ -352,6 +352,28 @@ resource acquisition, transfer, synchronization, fallback, or retry. Enqueue
 uses setup-bound handlers and launch arguments only: it performs no setup,
 allocation, signature reconstruction, or node lookup.
 
+## Authenticated Native Resident-Graph Replay
+
+`particula.execution.graph_capture` remains a concrete, direct-import-only
+boundary and is absent from `particula.execution` and top-level exports. E8-F4
+P1 qualifies an exact READY resident binding, P2 captures that binding and
+issues a `CapturedResidentGraph`, and P3 supplies
+`replay_captured_resident_graph()`.
+
+P3 accepts only an authentic P2-issued record and forwards its retained opaque
+native handle by identity only. It revalidates provenance and the exact capture
+binding before opening one `ResidentStepGuard` token, calling native
+`capture_launch` once, and completing the token. Pinned payload updates and
+advancing resident RNG words remain compatible; provenance, identity, lifecycle,
+device, publication, guard, or duration drift rejects before token entry.
+
+Native-launch and post-launch completion failures are writer-capable: existing
+resident cleanup faults session and capture metadata without rollback. Replay
+does not allocate, scan or read back payloads, transfer, synchronize, dispatch
+prepared host operations, retry, fall back, recapture, or perform native-handle
+lifecycle work. See
+[ADR-020](architecture/decisions/ADR-020-authenticated-native-resident-graph-replay.md).
+
 ## Scientific Utilities
 
 - Physical constants belong in `particula.util.constants`.

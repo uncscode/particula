@@ -5,12 +5,12 @@
 - [ ] Capture and replay perform no allocation, resource acquisition, validation
   scan, host readback, synchronization, transfer, process scheduling, RNG reset,
   fallback, retry, or automatic recapture inside the native sequence.
-- [ ] Every accepted replay opens one resident token, launches the exact graph
+- [x] Every accepted replay opens one resident token, launches the exact graph
   once, completes the token, and retains all primary and sidecar identities.
-- [ ] Structural drift is rejected before launch with an E8-F1 canonical reason;
+- [x] Structural drift is rejected before launch with an E8-F1 canonical reason;
   mutable fixed-shape payload and persistent RNG-word changes remain replayable.
-- [ ] Capture/enqueue/end failures publish no graph and clean up exactly once;
-  post-launch failures fault graph and session without rollback.
+- [x] Capture/enqueue/end failures publish no graph and clean up exactly once;
+  post-launch replay failures fault graph and session without rollback.
 - [ ] Finalize, close, fault, teardown, restart, device change, or stale handle
   cannot replay; recapture is explicit and creates a fresh record/handle.
 - [ ] CPU, uncaptured Warp, and captured CUDA fixtures use the same supported
@@ -18,7 +18,7 @@
   timesteps, with conservation asserted separately.
 - [ ] Warp CPU capture rejects or skips explicitly; CUDA unavailability cleanly
   skips native rows and never substitutes CPU execution.
-- [ ] Concrete graph names remain absent from package/top-level exports and
+- [x] Concrete graph names remain absent from package/top-level exports and
   graph handles remain absent from checkpoints.
 - [ ] Focused tests, untargeted repository coverage validation, linting, and
   strict documentation build pass without lowering thresholds.
