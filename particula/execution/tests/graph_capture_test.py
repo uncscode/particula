@@ -26,9 +26,11 @@ from particula.execution.graph_capture import (
     GraphCaptureLifecycleState,
     GraphCaptureNativeCallables,
     GraphCaptureRuntimeAdapter,
+    PreparedGraphCaptureQualification,
     ResidentGraphCaptureBinding,
     ResidentGraphCaptureSignature,
     _attach_resident_graph_capture_binding,
+    capture_prepared_resident_graph,
     classify_graph_capture_failure,
     classify_resident_graph_capture_writer_failure,
     close_graph_capture,
@@ -1073,6 +1075,8 @@ def test_graph_capture_names_remain_direct_import_only() -> None:
         "retire_graph_capture",
         "renew_retired_graph_capture",
         "close_graph_capture",
+        "CapturedResidentGraph",
+        "capture_prepared_resident_graph",
     )
     for name in names:
         assert name not in execution.__all__
@@ -2223,3 +2227,209 @@ def test_qualification_rejects_adapter_lifecycle_reentrancy(
 
     assert binding.lifecycle.state is GraphCaptureLifecycleState.CLOSED
     assert calls == ["runtime", "device", "api", "callables"]
+
+
+@pytest.mark.warp
+def test_capture_prepared_graph_dispatches_between_native_capture_boundaries(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Native capture retains its end handle after frozen dispatch succeeds."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    signature = create_resident_graph_capture_signature(request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        signature,
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    capture_set = cast(
+        "GPUResourceRegistry", request.registry
+    ).validate_capture_resource_set(
+        cast(
+            "CaptureResourceRequirements", request.capture_resource_requirements
+        )
+    )
+    trace: list[str] = []
+    handle = object()
+
+    def capture_begin() -> None:
+        trace.append("begin")
+
+    def capture_end() -> object:
+        trace.append("end")
+        return handle
+
+    def unexpected_callable() -> None:
+        pytest.fail("only capture begin and end belong to this phase")
+
+    def capture_release(_handle: object) -> None:
+        trace.append("release")
+
+    qualification = PreparedGraphCaptureQualification(
+        binding,
+        lifecycle,
+        signature,
+        request,
+        request.session,
+        request.registry,
+        request.guard,
+        object(),
+        object(),
+        request.capture_resource_requirements,
+        capture_set,
+        capture_set.report,
+        Device(Backend.WARP, "cuda:0"),
+        request.session.dimensions,
+        request.graph,
+        request.schedule,
+        request.schedule.ordered_node_ids,
+        0.0,
+        True,
+        signature.primary_arrays,
+        signature.resource_views,
+        GraphCaptureNativeCallables(
+            capture_begin,
+            capture_end,
+            unexpected_callable,
+            unexpected_callable,
+            unexpected_callable,
+        ),
+    )
+    monkeypatch.setattr(
+        graph_capture,
+        "_validate_prepared_graph_capture_qualification",
+        lambda value: value,
+    )
+    import particula.execution.resident_scheduler as resident_scheduler
+
+    monkeypatch.setattr(
+        resident_scheduler,
+        "_enqueue_captured_prepared_operations",
+        lambda _prepared: trace.append("dispatch"),
+    )
+
+    captured = capture_prepared_resident_graph(qualification)
+
+    assert trace == ["begin", "dispatch", "end"]
+    assert captured.handle is handle
+    assert captured.qualification is qualification
+    assert captured.lifecycle is binding.lifecycle
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.CAPTURED
+    for field in (
+        "binding",
+        "lifecycle",
+        "signature",
+        "request",
+        "session",
+        "registry",
+        "guard",
+        "prepared",
+        "timestep",
+        "capture_requirements",
+        "capture_set",
+        "capture_report",
+        "device",
+    ):
+        with pytest.raises(ValueError, match="identities do not match"):
+            replace(captured, **{field: object()})
+
+
+@pytest.mark.warp
+def test_capture_prepared_graph_ends_and_faults_after_dispatch_failure(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A dispatch failure ends capture and faults its attached lifecycle."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    signature = create_resident_graph_capture_signature(request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        signature,
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    capture_set = cast(
+        "GPUResourceRegistry", request.registry
+    ).validate_capture_resource_set(
+        cast(
+            "CaptureResourceRequirements", request.capture_resource_requirements
+        )
+    )
+    trace: list[str] = []
+
+    def capture_begin() -> None:
+        trace.append("begin")
+
+    def capture_end() -> object:
+        trace.append("end")
+        return object()
+
+    def unexpected_callable() -> None:
+        pytest.fail("only capture begin and end belong to this phase")
+
+    def capture_release(_handle: object) -> None:
+        trace.append("release")
+
+    qualification = PreparedGraphCaptureQualification(
+        binding,
+        lifecycle,
+        signature,
+        request,
+        request.session,
+        request.registry,
+        request.guard,
+        object(),
+        object(),
+        request.capture_resource_requirements,
+        capture_set,
+        capture_set.report,
+        Device(Backend.WARP, "cuda:0"),
+        request.session.dimensions,
+        request.graph,
+        request.schedule,
+        request.schedule.ordered_node_ids,
+        0.0,
+        True,
+        signature.primary_arrays,
+        signature.resource_views,
+        GraphCaptureNativeCallables(
+            capture_begin,
+            capture_end,
+            unexpected_callable,
+            unexpected_callable,
+            capture_release,
+        ),
+    )
+    monkeypatch.setattr(
+        graph_capture,
+        "_validate_prepared_graph_capture_qualification",
+        lambda value: value,
+    )
+    import particula.execution.resident_scheduler as resident_scheduler
+
+    def fail_dispatch(_prepared: object) -> None:
+        trace.append("dispatch")
+        raise RuntimeError("frozen dispatch failed")
+
+    monkeypatch.setattr(
+        resident_scheduler,
+        "_enqueue_captured_prepared_operations",
+        fail_dispatch,
+    )
+
+    with pytest.raises(RuntimeError, match="frozen dispatch failed"):
+        capture_prepared_resident_graph(qualification)
+
+    assert trace == ["begin", "dispatch", "end", "release"]
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.FAULTED

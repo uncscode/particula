@@ -6,6 +6,7 @@ coordinator while keeping the direct process adapters bounded and deterministic.
 
 import copy
 from dataclasses import dataclass
+from types import SimpleNamespace
 from typing import Any, cast
 
 import numpy as np
@@ -1604,3 +1605,27 @@ def test_swapped_capture_binding_rejects_before_token_or_dispatch(
     assert first.trace == []
     assert first.guard.completed_steps == 0
     assert first.session.lifecycle is ResidentLifecycle.ACTIVE
+
+
+def test_captured_dispatch_calls_retained_operations_in_order() -> None:
+    """Captured dispatch invokes each retained operation without token work."""
+    from particula.execution.resident_scheduler import (
+        _enqueue_captured_prepared_operations,
+    )
+
+    trace: list[int] = []
+
+    def append(value: int) -> None:
+        """Record one retained operation identity."""
+        trace.append(value)
+
+    prepared = SimpleNamespace(
+        operations=tuple(
+            SimpleNamespace(handler=append, arguments=(index,))
+            for index in range(12)
+        )
+    )
+
+    _enqueue_captured_prepared_operations(prepared)
+
+    assert trace == list(range(12))

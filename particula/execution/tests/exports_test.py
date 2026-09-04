@@ -121,6 +121,8 @@ DENIED_PUBLIC_NAMES = (
     "GraphCaptureNativeCallables",
     "PreparedGraphCaptureQualification",
     "qualify_prepared_resident_graph_capture",
+    "CapturedResidentGraph",
+    "capture_prepared_resident_graph",
 )
 
 GRAPH_CAPTURE_NAMES = DENIED_PUBLIC_NAMES[48:]

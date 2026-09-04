@@ -741,6 +741,19 @@ def enqueue_prepared_resident_simulation(prepared: object) -> None:
         )
 
 
+def _enqueue_captured_prepared_operations(prepared: object) -> None:
+    """Dispatch retained prepared operations inside an active native capture.
+
+    The graph-capture owner validates ``prepared`` before opening its native
+    capture window. This helper deliberately performs only the frozen operation
+    calls, in their retained canonical order; it does not validate, open a
+    guard token, record thermodynamic progress, or clean up failures.
+    """
+    typed = cast(PreparedResidentSimulation, prepared)
+    for operation in typed.operations:
+        operation.handler(*operation.arguments)
+
+
 def _cleanup_resident_execution_failure(
     request: ResidentSimulationRequest,
     token: object,
