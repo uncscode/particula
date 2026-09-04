@@ -1834,33 +1834,45 @@ def _assert_scenario_parity(
 
 
 def _assert_scenario_conservation(
-    initial: dict[str, np.ndarray],
-    result: dict[str, np.ndarray],
+    snapshots: list[dict[str, np.ndarray]],
     scenario: _CapturedLoopScenario,
 ) -> None:
-    """Check detached transport, volume, and dilution inventory invariants."""
-    final_inventory = _snapshot_inventory(result)
-    expected_inventory = _species_inventory(
-        _run_captured_full_loop_oracle(scenario, scenario.time_steps).state
-    )
-    npt.assert_allclose(
-        final_inventory,
-        expected_inventory,
-        rtol=PARITY_RTOL,
-        atol=PARITY_ATOL,
-        err_msg="final per-box/species inventory",
-    )
-    initial_total = np.sum(_snapshot_inventory(initial), axis=0)
-    final_total = np.sum(final_inventory, axis=0)
-    expected_total = np.sum(expected_inventory, axis=0)
-    npt.assert_allclose(
-        final_total,
-        expected_total,
-        rtol=PARITY_RTOL,
-        atol=PARITY_ATOL,
-        err_msg="transport, volume, and dilution total inventory",
-    )
-    assert np.all(final_total < initial_total)
+    """Check independent transport and retained dilution per timestep."""
+    assert len(snapshots) == scenario.time_steps + 1
+    for step, (before, after) in enumerate(
+        zip(snapshots[:-1], snapshots[1:], strict=True), start=1
+    ):
+        _, deltas, _ = _independent_gas_work_oracle(
+            before["gas_concentration"],
+            before["particle_volume"],
+            scenario.edge_sources,
+            scenario.edge_destinations,
+            scenario.edge_enabled,
+            scenario.edge_rates,
+            scenario.time_step,
+        )
+        transported = _snapshot_inventory(before) + deltas
+        actual = _snapshot_inventory(after)
+        npt.assert_allclose(
+            actual
+            / np.exp(
+                -scenario.dilution_coefficient[:, None] * scenario.time_step
+            ),
+            transported,
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+            err_msg=f"transport and volume inventory before dilution at step {step}",
+        )
+        npt.assert_allclose(
+            actual,
+            transported
+            * np.exp(
+                -scenario.dilution_coefficient[:, None] * scenario.time_step
+            ),
+            rtol=PARITY_RTOL,
+            atol=PARITY_ATOL,
+            err_msg=f"retained dilution inventory at step {step}",
+        )
 
 
 def _deterministic_numpy_oracle(
@@ -2096,28 +2108,36 @@ def test_p1_ready_warp_cpu_loop_matches_detached_oracle(
         assert tuple(
             node.node.node_id for node in loop.prepared.operations
         ) == (loop.prepared.ordered_node_ids)
-        with monkeypatch.context() as dispatch_patch:
+        for _ in range(scenario.time_steps):
+            with monkeypatch.context() as dispatch_patch:
 
-            def forbidden(*_args: object, **_kwargs: object) -> None:
-                pytest.fail("prepared dispatch performed forbidden host work")
+                def forbidden(*_args: object, **_kwargs: object) -> None:
+                    pytest.fail(
+                        "prepared dispatch performed forbidden host work"
+                    )
 
-            for name in (
-                "to_warp_particle_data",
-                "to_warp_gas_data",
-                "to_warp_environment_data",
-            ):
-                dispatch_patch.setattr(conversion, name, forbidden)
-            for name in ("synchronize", "synchronize_device", "zeros", "empty"):
-                dispatch_patch.setattr(loop.wp, name, forbidden)
-            for name in (
-                "acquire_communication",
-                "register_capture_resources",
-                "prepare_capture_resources",
-            ):
-                dispatch_patch.setattr(loop.registry, name, forbidden)
-            for _ in range(scenario.time_steps):
+                for name in (
+                    "to_warp_particle_data",
+                    "to_warp_gas_data",
+                    "to_warp_environment_data",
+                ):
+                    dispatch_patch.setattr(conversion, name, forbidden)
+                for name in (
+                    "synchronize",
+                    "synchronize_device",
+                    "zeros",
+                    "empty",
+                    "array",
+                ):
+                    dispatch_patch.setattr(loop.wp, name, forbidden)
+                for name in (
+                    "acquire_communication",
+                    "register_capture_resources",
+                    "prepare_capture_resources",
+                ):
+                    dispatch_patch.setattr(loop.registry, name, forbidden)
                 enqueue_prepared_resident_simulation(loop.prepared)
-        snapshots.extend([_scenario_snapshot(scenario_loop)])
+            snapshots.append(_scenario_snapshot(scenario_loop))
         result = snapshots[-1]
         _assert_scenario_parity(result, scenario, scenario.time_steps)
         # Work buffers are overwritten for one dispatch, rather than accumulated.
@@ -2157,8 +2177,7 @@ def test_p1_ready_warp_cpu_loop_matches_detached_oracle(
             err_msg="final communication outbound",
         )
         _assert_scenario_conservation(
-            snapshots[0],
-            result,
+            snapshots,
             scenario,
         )
         assert _scenario_identity_signature(scenario_loop) == signature
@@ -2174,6 +2193,8 @@ def test_p1_ready_warp_cpu_zero_duration_is_write_free(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Keep the exact P1 READY binding and payload state unchanged at zero time."""
+    from particula.gpu import conversion
+
     scenario_loop = _build_scenario_prepared_loop(monkeypatch, 0.0)
     loop = scenario_loop.loop
     try:
@@ -2186,7 +2207,19 @@ def test_p1_ready_warp_cpu_zero_duration_is_write_free(
                     "zero-duration prepared dispatch performed host work"
                 )
 
-            for name in ("synchronize", "synchronize_device", "zeros", "empty"):
+            for name in (
+                "to_warp_particle_data",
+                "to_warp_gas_data",
+                "to_warp_environment_data",
+            ):
+                dispatch_patch.setattr(conversion, name, forbidden)
+            for name in (
+                "synchronize",
+                "synchronize_device",
+                "zeros",
+                "empty",
+                "array",
+            ):
                 dispatch_patch.setattr(loop.wp, name, forbidden)
             for name in (
                 "acquire_communication",
