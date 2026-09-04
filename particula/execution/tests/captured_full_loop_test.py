@@ -1274,7 +1274,7 @@ def _build_scenario_prepared_loop_impl(
     guard = ResidentStepGuard(session, registry)
     cleanup_binding.append((session, registry, guard))
     graph, schedule, by_id = _resident_graph()
-    warp_device = session.particles.masses.device
+    warp_device = cast(Any, session.particles).masses.device
     configuration = CommunicationConfiguration(
         CommunicationMap(
             CommunicationMapForm.ONE_DIMENSIONAL,
@@ -3018,8 +3018,18 @@ def test_qualification_rejection_skips_capture_before_guard_entry(
         def runtime_available(self) -> bool:
             return False
 
-        def __getattr__(self, name: str) -> object:
-            raise AssertionError(f"rejected adapter resolved {name}")
+        def device_available(self, device: Device) -> bool:
+            raise AssertionError(f"rejected adapter resolved device {device}")
+
+        def capture_api_available(self, device: Device) -> bool:
+            raise AssertionError(f"rejected adapter resolved API {device}")
+
+        def capture_callables(
+            self, device: Device
+        ) -> GraphCaptureNativeCallables:
+            raise AssertionError(
+                f"rejected adapter resolved callables {device}"
+            )
 
     capture_set = fixture.registry.validate_capture_resource_set(
         fixture.request.capture_resource_requirements
