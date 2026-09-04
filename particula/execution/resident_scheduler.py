@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from numbers import Real
-from typing import Any, Callable, cast
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 from particula.execution import _isfinite_real
 from particula.execution.adapters.coagulation import (
@@ -67,6 +67,12 @@ from particula.execution.process_graph import (
     _is_resolver_produced_graph,
     resolve_canonical_topological_order,
 )
+
+if TYPE_CHECKING:
+    from particula.execution.gpu_resources import (
+        CaptureResourceRequirements,
+        GPUResourceRegistry,
+    )
 from particula.execution.resident_communication import (
     PreparedResidentCommunicationBinding,
     ResidentCommunicationExecutor,
@@ -205,7 +211,7 @@ class PreparedResidentSimulation:
     timestep: PreparedResidentTimestep
     request: ResidentSimulationRequest
     session: object
-    registry: object
+    registry: GPUResourceRegistry
     guard: object
     lifecycle: object
     signature: object
@@ -294,7 +300,7 @@ class ResidentSimulationRequest:
     """
 
     session: ResidentSession
-    registry: object
+    registry: GPUResourceRegistry
     guard: ResidentStepGuard
     graph: ResolvedProcessGraph
     schedule: ResolvedTimestepSchedule
@@ -308,7 +314,7 @@ class ResidentSimulationRequest:
     environment_update: ResidentEnvironmentUpdateRequest | None
     gas_update: ResidentGasUpdateRequest | None
     communication: ResidentCommunicationRequest | None
-    capture_resource_requirements: object
+    capture_resource_requirements: CaptureResourceRequirements
     graph_capture_binding: object | None = None
 
     def __post_init__(self) -> None:

@@ -220,7 +220,10 @@ def test_resident_request_requires_exact_capture_requirements_without_lookup(
             TypeError,
             match="capture_resource_requirements must be an exact",
         ):
-            replace(request, capture_resource_requirements=value)
+            replace(
+                request,
+                capture_resource_requirements=cast(Any, value),
+            )
 
 
 @pytest.mark.warp

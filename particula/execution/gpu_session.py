@@ -24,7 +24,7 @@ an RNG sidecar. First coagulation resource acquisition owns that later,
 coagulation-only initialization.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from numbers import Integral, Real
 from threading import RLock, get_ident
@@ -722,6 +722,13 @@ class ResidentSession:
     dimensions: ResidentDimensions
     metadata: ResidentMetadata
     lifecycle: ResidentLifecycle
+    _lifecycle_lock: Any = field(init=False, repr=False, compare=False)
+    _terminal_intent: tuple[str, object, int] | None = field(
+        init=False, repr=False, compare=False, default=None
+    )
+    _native_operation: object | None = field(
+        init=False, repr=False, compare=False, default=None
+    )
 
     def __post_init__(self) -> None:
         """Perform ordered O(1) metadata-only resident-session preflight.

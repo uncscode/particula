@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, Any, cast
 from particula.execution import _isfinite_real
 
 if TYPE_CHECKING:
+    from particula.execution.gpu_resources import GPUResourceRegistry
     from particula.execution.graph_capture import (
         GraphCaptureLifecycle,
         ResidentGraphCaptureBinding,
@@ -142,7 +143,7 @@ class PreparedResidentTimestep:
     lifecycle: "GraphCaptureLifecycle"
     signature: "ResidentGraphCaptureSignature"
     session: object
-    registry: object
+    registry: "GPUResourceRegistry"
     guard: object
     device: object
     dimensions: object
