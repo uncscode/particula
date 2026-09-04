@@ -404,7 +404,7 @@ def test_restart_continues_all_published_rng_streams_without_reinitializing(
         ),
     )
 
-    restored, restored_registry, _ = restart_resident_session(
+    restored, restored_registry, restored_guard = restart_resident_session(
         checkpoint, Device(Backend.WARP, "cpu")
     )
     restored_coagulation = restored_registry.acquire_coagulation(1)
@@ -668,7 +668,7 @@ def test_restored_stream_changes_only_after_explicit_reset() -> None:
     source = registry.acquire_wall_loss().rng_states
     source.assign(np.array([17], dtype=np.uint32))
     checkpoint = session.checkpoint(registry, guard)
-    restored, restored_registry, _ = restart_resident_session(
+    restored, restored_registry, restored_guard = restart_resident_session(
         checkpoint, Device(Backend.WARP, "cpu")
     )
     restored_words = restored_registry.acquire_wall_loss().rng_states
@@ -676,6 +676,7 @@ def test_restored_stream_changes_only_after_explicit_reset() -> None:
     np.testing.assert_array_equal(restored_words.numpy(), [17])
     restored_registry.initialize_published_streams(
         restored,
+        guard=restored_guard,
         process_ids=("wall_loss",),
         logical_box_ids=("0",),
     )

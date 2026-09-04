@@ -44,6 +44,7 @@ from particula.execution.gpu_session import (
     ResidentLifecycle,
     ResidentMetadata,
     ResidentSession,
+    ResidentStepGuard,
 )
 from particula.execution.process_graph import (
     TimestepPlan,
@@ -434,6 +435,7 @@ def test_published_stream_reset_targets_only_selected_sidecars_and_lanes() -> (
 
     registry.initialize_published_streams(
         session,
+        guard=ResidentStepGuard(session, registry),
         process_ids=("coagulation",),
         logical_box_ids=("0",),
     )
@@ -451,6 +453,58 @@ def test_published_stream_reset_targets_only_selected_sidecars_and_lanes() -> (
 
 
 @pytest.mark.warp
+def test_published_stream_reset_requires_the_exact_closed_guard() -> None:
+    """Direct stream resets reject omitted, foreign, and open guards."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    registry.acquire_coagulation(1)
+    guard = ResidentStepGuard(session, registry)
+
+    with pytest.raises(TypeError, match="required keyword-only"):
+        registry.initialize_published_streams(session)  # type: ignore[call-arg]
+    with pytest.raises(TypeError, match="exact ResidentStepGuard"):
+        registry.initialize_published_streams(
+            session, guard=cast(Any, object())
+        )
+
+    foreign_session = _session()
+    foreign_guard = ResidentStepGuard(
+        foreign_session, GPUResourceRegistry(foreign_session)
+    )
+    with pytest.raises(ValueError, match="guard must match"):
+        registry.initialize_published_streams(session, guard=foreign_guard)
+
+    token = guard.begin_step(0.0)
+    with pytest.raises(RuntimeError, match="open"):
+        registry.initialize_published_streams(session, guard=guard)
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    guard.complete_step(token)
+
+
+@pytest.mark.warp
+def test_session_stream_reset_forwards_its_exact_guard(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Session stream reset delegates the already validated guard by identity."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    guard = ResidentStepGuard(session, registry)
+    received: list[object] = []
+
+    def record_reset(
+        received_session: ResidentSession, **kwargs: object
+    ) -> None:
+        assert received_session is session
+        received.append(kwargs["guard"])
+
+    monkeypatch.setattr(registry, "initialize_published_streams", record_reset)
+
+    session.initialize_streams(registry, guard)
+
+    assert received == [guard]
+
+
+@pytest.mark.warp
 def test_published_stream_reset_rejects_empty_registry_selectors_without_allocation() -> (
     None
 ):
@@ -460,11 +514,15 @@ def test_published_stream_reset_rejects_empty_registry_selectors_without_allocat
 
     with pytest.raises(ValueError, match="has not been acquired"):
         registry.initialize_published_streams(
-            session, process_ids=("coagulation",)
+            session,
+            guard=ResidentStepGuard(session, registry),
+            process_ids=("coagulation",),
         )
     with pytest.raises(LookupError, match="No lane"):
         registry.initialize_published_streams(
-            session, logical_box_ids=("missing",)
+            session,
+            guard=ResidentStepGuard(session, registry),
+            logical_box_ids=("missing",),
         )
 
     assert registry._bindings == {}
@@ -492,6 +550,7 @@ def test_unpublished_process_rejection_precedes_published_stream_write() -> (
     with pytest.raises(ValueError, match="has not been acquired"):
         registry.initialize_published_streams(
             session,
+            guard=ResidentStepGuard(session, registry),
             process_ids=("coagulation", "wall_loss"),
         )
 
@@ -524,7 +583,9 @@ def test_published_stream_reset_preflights_every_registry_before_writing(
     with pytest.raises(
         TypeError, match="wall_loss state array must have dtype"
     ):
-        registry.initialize_published_streams(session)
+        registry.initialize_published_streams(
+            session, guard=ResidentStepGuard(session, registry)
+        )
 
     assert writes == []
     assert coagulation.rng_states.numpy().tolist() != [19]
@@ -558,7 +619,9 @@ def test_published_stream_reset_writer_failure_faults_bound_session(
 
     monkeypatch.setattr(wp, "launch", fail_second_launch)
     with pytest.raises(RuntimeError, match="second reset writer failed"):
-        registry.initialize_published_streams(session)
+        registry.initialize_published_streams(
+            session, guard=ResidentStepGuard(session, registry)
+        )
 
     stream = registry._coagulation_stream_registry
     assert stream is not None
@@ -590,7 +653,9 @@ def test_published_stream_default_reset_uses_nondefault_root_seed() -> None:
     coagulation.rng_states.assign(np.full(2, 17, dtype=np.uint32))
     wall_loss.rng_states.assign(np.full(2, 19, dtype=np.uint32))
 
-    registry.initialize_published_streams(session)
+    registry.initialize_published_streams(
+        session, guard=ResidentStepGuard(session, registry)
+    )
 
     for process_id, states, stream in (
         (

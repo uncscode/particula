@@ -31,6 +31,7 @@ from particula.execution.graph_capture import (
     ResidentGraphCaptureBinding,
     ResidentGraphCaptureSignature,
     _attach_resident_graph_capture_binding,
+    _notify_resident_graph_capture,
     capture_prepared_resident_graph,
     classify_graph_capture_failure,
     classify_resident_graph_capture_writer_failure,
@@ -1656,8 +1657,54 @@ def test_binding_attaches_once_to_the_final_request(
 
     assert request.graph_capture_binding is binding
     assert binding.lifecycle is lifecycle
-    with pytest.raises(ValueError, match="already has"):
-        _attach_resident_graph_capture_binding(request, binding)
+    _attach_resident_graph_capture_binding(request, binding)
+    assert request.session._resident_graph_capture_binding is binding
+
+
+@pytest.mark.warp
+def test_notification_requires_exact_attached_resident_context(
+    resident_request: object,
+) -> None:
+    """Notifications no-op unattached and reject mismatched bindings."""
+    from particula.execution.gpu_session import ResidentStepGuard
+
+    request = cast("ResidentSimulationRequest", resident_request)
+    _notify_resident_graph_capture(
+        request.session,
+        request.registry,
+        request.guard,
+        "session_closed",
+    )
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    wrong_guard = ResidentStepGuard(request.session, request.registry)
+
+    with pytest.raises(ValueError, match="notification binding mismatch"):
+        _notify_resident_graph_capture(
+            request.session,
+            request.registry,
+            wrong_guard,
+            "session_closed",
+        )
+    assert binding.lifecycle is lifecycle
+
+    _notify_resident_graph_capture(
+        request.session,
+        request.registry,
+        request.guard,
+        "session_closed",
+    )
+
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.CLOSED
 
 
 @pytest.mark.warp
@@ -1721,6 +1768,31 @@ def test_binding_renewal_rejects_a_signature_for_another_request(
         renew_resident_graph_capture(binding, foreign_signature)
 
     assert binding.lifecycle.state is GraphCaptureLifecycleState.RETIRED
+
+
+@pytest.mark.warp
+def test_explicit_retirement_requires_prior_invalidation(
+    resident_request: object,
+) -> None:
+    """Explicit retirement does not invalidate an otherwise captured graph."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    lifecycle = create_graph_capture_lifecycle(
+        GraphCaptureCapability(
+            Device(Backend.WARP, "cuda:0"),
+            GraphCaptureAvailability.AVAILABLE,
+        ),
+        create_resident_graph_capture_signature(request),
+    )
+    binding = ResidentGraphCaptureBinding(
+        request, request.session, request.registry, request.guard, lifecycle
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    complete_resident_graph_capture(binding)
+
+    with pytest.raises(ValueError, match="retire only from invalidated"):
+        retire_resident_graph_capture(binding)
+
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.CAPTURED
 
 
 @pytest.mark.warp

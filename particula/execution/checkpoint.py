@@ -44,7 +44,7 @@ from particula.execution.gpu_session import (
     ResidentLifecycle,
     ResidentSession,
     ResidentStepGuard,
-    _fault_resident_session,
+    _fault_resident_session_with_context,
     setup_resident_session,
 )
 
@@ -415,7 +415,9 @@ class ResidentCheckpointController:
         try:
             wp.synchronize()
         except BaseException:
-            _fault_resident_session(self._session)
+            _fault_resident_session_with_context(
+                self._session, self._registry, self._guard
+            )
             raise
         try:
             particles = from_warp_particle_data(
@@ -542,6 +544,22 @@ class ResidentCheckpointController:
         if self._finalized is not None:
             return self._finalized
         checkpoint = self.checkpoint()
+        try:
+            from particula.execution.gpu_session import (
+                _notify_resident_graph_capture,
+            )
+
+            _notify_resident_graph_capture(
+                self._session,
+                self._registry,
+                self._guard,
+                "session_finalized",
+            )
+        except BaseException:
+            _fault_resident_session_with_context(
+                self._session, self._registry, self._guard
+            )
+            raise
         self._session._finalize_checkpoint()
         self._finalized = checkpoint
         return checkpoint

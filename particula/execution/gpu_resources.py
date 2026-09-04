@@ -50,7 +50,7 @@ from __future__ import annotations
 from dataclasses import dataclass, fields
 from heapq import heappop, heappush
 from numbers import Integral
-from typing import Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import numpy as np
 import warp as wp
@@ -83,6 +83,9 @@ from particula.gpu.kernels.nucleation import (
     NucleationFinalizedDemandBuffers,
     NucleationScratchBuffers,
 )
+
+if TYPE_CHECKING:
+    from particula.execution.gpu_session import ResidentStepGuard
 
 __all__ = [
     "ManifestEntry",
@@ -2473,10 +2476,20 @@ class GPUResourceRegistry:
         self,
         session: ResidentSession,
         *,
+        guard: "ResidentStepGuard",
         process_ids: tuple[str, ...] | None = None,
         logical_box_ids: tuple[str, ...] | None = None,
     ) -> None:
         """Explicitly reinitialize selected currently published stream lanes."""
+        from particula.execution.gpu_session import ResidentStepGuard
+
+        if type(guard) is not ResidentStepGuard:
+            raise TypeError("guard must be an exact ResidentStepGuard.")
+        if guard._session is not self._session or guard._registry is not self:
+            raise ValueError(
+                "guard must match the resident session and registry."
+            )
+        guard.assert_step_closed()
         self.validate_pinned_session(session)
         self.assert_step_closed()
         _, registered_ids, _ = self._stream_metadata()
@@ -2509,9 +2522,11 @@ class GPUResourceRegistry:
                     process_ids=(process_id,), logical_box_ids=selected_ids
                 )
         except _StreamWriterError as error:
-            from particula.execution.gpu_session import _fault_resident_session
+            from particula.execution.gpu_session import (
+                _fault_resident_session_with_context,
+            )
 
-            _fault_resident_session(self._session)
+            _fault_resident_session_with_context(self._session, self, guard)
             raise error.error from error
 
     def validate_diagnostic_outputs(

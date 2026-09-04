@@ -839,6 +839,7 @@ class ResidentSession:
         _validate_active_stream_binding(self, registry, guard)
         registry.initialize_published_streams(
             self,
+            guard=guard,
             process_ids=process_ids,
             logical_box_ids=logical_box_ids,
         )
@@ -900,11 +901,21 @@ class ResidentSession:
         if self.lifecycle is ResidentLifecycle.ACTIVE:
             registry.validate_pinned_session(self)
             registry.assert_step_closed()
-            object.__setattr__(self, "lifecycle", ResidentLifecycle.CLOSED)
+            try:
+                _notify_resident_graph_capture(
+                    self, registry, guard, "session_closed"
+                )
+            finally:
+                object.__setattr__(self, "lifecycle", ResidentLifecycle.CLOSED)
             return
         if self.lifecycle is ResidentLifecycle.FAULTED:
             registry.assert_step_closed()
-            object.__setattr__(self, "lifecycle", ResidentLifecycle.CLOSED)
+            try:
+                _notify_resident_graph_capture(
+                    self, registry, guard, "session_closed"
+                )
+            finally:
+                object.__setattr__(self, "lifecycle", ResidentLifecycle.CLOSED)
             return
         raise ValueError("session.lifecycle must be ACTIVE or FAULTED.")
 
@@ -1238,6 +1249,32 @@ def _fault_resident_session(session: ResidentSession) -> None:
     object.__setattr__(session, "lifecycle", ResidentLifecycle.FAULTED)
 
 
+def _notify_resident_graph_capture(
+    session: ResidentSession,
+    registry: "GPUResourceRegistry",
+    guard: ResidentStepGuard,
+    cause: str,
+) -> None:
+    """Lazily route an exact lifecycle event to graph-capture ownership."""
+    from particula.execution.graph_capture import (
+        _notify_resident_graph_capture as notify,
+    )
+
+    notify(session, registry, guard, cause)
+
+
+def _fault_resident_session_with_context(
+    session: ResidentSession,
+    registry: "GPUResourceRegistry",
+    guard: ResidentStepGuard,
+) -> None:
+    """Notify graph capture, then fault even if notification fails."""
+    try:
+        _notify_resident_graph_capture(session, registry, guard, "writer_fault")
+    finally:
+        _fault_resident_session(session)
+
+
 def _validate_failed_operation_context(
     session: ResidentSession,
     registry: "GPUResourceRegistry",
@@ -1307,10 +1344,10 @@ def _handle_failed_resident_operation(
         guard._abort_step(token)
     except BaseException:
         if outcome is _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED:
-            _fault_resident_session(session)
+            _fault_resident_session_with_context(session, registry, guard)
         raise
     if outcome is _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED:
-        _fault_resident_session(session)
+        _fault_resident_session_with_context(session, registry, guard)
 
 
 def setup_resident_session(

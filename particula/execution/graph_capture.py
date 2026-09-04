@@ -1563,9 +1563,22 @@ def _attach_resident_graph_capture_binding(
     )
     if binding._request is not request:
         raise ValueError("binding must retain the exact request.")
+    if request.graph_capture_binding is binding:
+        return
     if request.graph_capture_binding is not None:
         raise ValueError("request already has a graph-capture binding.")
+    attached = getattr(
+        binding._session, "_resident_graph_capture_binding", None
+    )
+    if attached is not None:
+        if attached is binding:
+            object.__setattr__(request, "graph_capture_binding", binding)
+            return
+        raise ValueError("session already has a graph-capture binding.")
     object.__setattr__(request, "graph_capture_binding", binding)
+    object.__setattr__(
+        binding._session, "_resident_graph_capture_binding", binding
+    )
 
 
 def complete_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
@@ -1746,10 +1759,89 @@ def _release_issued_captured_graphs_for_binding(
     )
     for captured, handle in issued:
         del _ISSUED_CAPTURED_GRAPHS[captured]
-        try:
-            captured.qualification.native_callables.capture_release(handle)
-        except BaseException as error:
-            _raise_capture_operational_failure(captured.qualification, error)
+        captured.qualification.native_callables.capture_release(handle)
+
+
+def _teardown_resident_graph_capture(  # noqa: C901
+    binding: ResidentGraphCaptureBinding,
+    cause: str,
+    compatibility: GraphCaptureCompatibility | None = None,
+) -> None:
+    """Make issued handles stale, transition lifecycle, then release once."""
+    binding = _require_attached_resident_binding(binding)
+    lifecycle = binding._lifecycle
+    if lifecycle.state is GraphCaptureLifecycleState.CLOSED:
+        return
+    if cause == "structural_drift" and lifecycle.state in (
+        GraphCaptureLifecycleState.INVALIDATED,
+        GraphCaptureLifecycleState.FAULTED,
+        GraphCaptureLifecycleState.RETIRED,
+    ):
+        return
+    if cause == "writer_fault" and lifecycle.state in (
+        GraphCaptureLifecycleState.INVALIDATED,
+        GraphCaptureLifecycleState.FAULTED,
+        GraphCaptureLifecycleState.RETIRED,
+    ):
+        return
+    if (
+        cause == "explicit_retirement"
+        and lifecycle.state is GraphCaptureLifecycleState.RETIRED
+    ):
+        return
+    if cause == "structural_drift":
+        if type(compatibility) is not GraphCaptureCompatibility:
+            raise TypeError(
+                "structural drift requires GraphCaptureCompatibility."
+            )
+        successor = invalidate_graph_capture(lifecycle, compatibility)
+    elif cause == "writer_fault":
+        successor = classify_graph_capture_failure(
+            lifecycle,
+            GraphCaptureFailureClassification.WRITER_MAY_HAVE_LAUNCHED,
+        )
+    elif cause == "explicit_retirement":
+        if lifecycle.state is not GraphCaptureLifecycleState.INVALIDATED:
+            raise ValueError("graph capture can retire only from invalidated.")
+        successor = retire_graph_capture(lifecycle)
+    elif cause in ("session_finalized", "session_closed"):
+        successor = close_graph_capture(lifecycle)
+    else:
+        raise ValueError("unknown graph-capture teardown cause.")
+    # Publish a non-dispatchable successor and remove provenance before native
+    # release so reentrant callbacks and release failures cannot replay it.
+    binding._lifecycle = successor
+    try:
+        _release_issued_captured_graphs_for_binding(binding)
+    except BaseException:
+        binding._lifecycle = _lifecycle_successor(
+            binding._lifecycle,
+            GraphCaptureLifecycleState.FAULTED,
+            binding._lifecycle.first_invalidation_reason,
+        )
+        raise
+
+
+def _notify_resident_graph_capture(
+    session: object,
+    registry: object,
+    guard: object,
+    cause: str,
+) -> None:
+    """Route exact resident lifecycle events to an attached graph binding."""
+    binding = getattr(session, "_resident_graph_capture_binding", None)
+    if binding is None:
+        return
+    binding = _require_binding(binding)
+    if (
+        binding._session is not session
+        or binding._registry is not registry
+        or binding._guard is not guard
+    ):
+        raise ValueError(
+            "resident graph-capture notification binding mismatch."
+        )
+    _teardown_resident_graph_capture(binding, cause)
 
 
 def _require_issued_captured_graph(captured: object) -> CapturedResidentGraph:
@@ -2412,23 +2504,8 @@ def _raise_replay_operational_failure(
         )
     except BaseException as caught:
         cleanup_error = caught
-    classification_error: BaseException | None = None
-    try:
-        classify_resident_graph_capture_writer_failure(qualification.binding)
-    except BaseException as caught:
-        classification_error = caught
-        try:
-            _fault_resident_graph_capture_after_classification_failure(
-                qualification.binding
-            )
-        except BaseException:  # noqa: S110
-            pass
     if cleanup_error is not None:
-        if classification_error is not None:
-            cleanup_error.__context__ = classification_error
         raise error from cleanup_error
-    if classification_error is not None:
-        raise error from classification_error
     raise error
 
 
@@ -2522,8 +2599,9 @@ def gate_resident_graph_capture(binding: object) -> None:
         binding._lifecycle.signature.configurations[-3]
         is not request.capture_resource_requirements
     ):
-        binding._lifecycle = invalidate_graph_capture(
-            binding._lifecycle,
+        _teardown_resident_graph_capture(
+            binding,
+            "structural_drift",
             GraphCaptureCompatibility(
                 False, GraphCaptureDriftReason.CONFIGURATIONS
             ),
@@ -2535,8 +2613,8 @@ def gate_resident_graph_capture(binding: object) -> None:
         admission_token=binding._lifecycle.signature,
     )
     if not compatibility.compatible:
-        binding._lifecycle = invalidate_graph_capture(
-            binding._lifecycle, compatibility
+        _teardown_resident_graph_capture(
+            binding, "structural_drift", compatibility
         )
         raise ValueError("resident graph-capture signature is incompatible.")
     validate_resident_capture_resources(request)
@@ -2557,10 +2635,14 @@ def classify_resident_graph_capture_writer_failure(binding: object) -> None:
         ValueError: If its lifecycle is retired or closed.
     """
     binding = _require_attached_resident_binding(binding)
-    binding._lifecycle = classify_graph_capture_failure(
-        binding._lifecycle,
-        GraphCaptureFailureClassification.WRITER_MAY_HAVE_LAUNCHED,
-    )
+    if binding._lifecycle.state in (
+        GraphCaptureLifecycleState.RETIRED,
+        GraphCaptureLifecycleState.CLOSED,
+    ):
+        raise ValueError(
+            "graph capture failure cannot be classified from terminal state."
+        )
+    _teardown_resident_graph_capture(binding, "writer_fault")
 
 
 def _fault_resident_graph_capture_after_classification_failure(
@@ -2595,8 +2677,10 @@ def retire_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
             retired.
     """
     binding = _require_attached_resident_binding(binding)
-    _release_issued_captured_graphs_for_binding(binding)
-    binding._lifecycle = retire_graph_capture(binding._lifecycle)
+    _teardown_resident_graph_capture(
+        binding,
+        "explicit_retirement",
+    )
     return binding._lifecycle
 
 
@@ -2656,6 +2740,5 @@ def close_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
         ValueError: If retained ownership or attachment identities are stale.
     """
     binding = _require_attached_resident_binding(binding)
-    _release_issued_captured_graphs_for_binding(binding)
-    binding._lifecycle = close_graph_capture(binding._lifecycle)
+    _teardown_resident_graph_capture(binding, "session_closed")
     return binding._lifecycle
