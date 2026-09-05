@@ -1801,14 +1801,20 @@ cross-device RNG-word replay.
 The evidence remains concrete-only. It creates no public graph-capture API or
 example and makes no fallback, automatic recapture, retry, rollback, hidden
 transfer/readback/synchronization, checkpointed-native-handle, or cross-device
-replay claim. It also makes no performance, memory, or profiling completion
-claim. Correctness-qualified handoffs are limited to E8-F6 scaling/memory,
-E8-F7 profiling, and E8-F8 example/closeout work.
+replay claim. CPU and Warp-CPU are uncaptured validation only, never capture
+fallbacks. It also makes no performance, memory, or profiling completion claim.
+Correctness-qualified handoffs are limited to E8-F6 scaling/memory, E8-F7
+profiling, and E8-F8 example/closeout work.
 
-**Dated evidence (2026-09-04):** Python 3.12.12; Warp installed for the required
-uncaptured row; no native CUDA device/capture prerequisite qualified, so the
-optional CUDA selector cleanly skipped. The authoritative record is
-[`E8-F5 testing strategy`](../../../.opencode/plans/sections/features/E8-F5/testing_strategy.md).
+**Evidence record date (2026-09-05):** This record follows the P4 plan update
+dated 2026-09-05 and preserves its original literal command outcomes. Python
+3.12.12; the required installed-Warp uncaptured matrix passed with 48 passes.
+No native CUDA device/capture prerequisite qualified, so the optional CUDA
+selector cleanly skipped; this is not CPU or Warp-CPU capture fallback. The
+available wrapper did not report a Warp version or enumerate opaque device
+strings. The authoritative repository record is
+`.opencode/plans/sections/features/E8-F5/testing_strategy.md`; it is an internal
+plan record rather than a published MkDocs page.
 
 | Kind | Exact command | Exit status | Literal outcome |
 | --- | --- | --- | --- |

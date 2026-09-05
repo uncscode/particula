@@ -238,18 +238,28 @@ Use focused, coverage-free commands while developing GPU code:
 
 ```bash
 # Direct GPU code
-pytest particula/gpu/ -q
+pytest particula/gpu/ -q --no-cov
 
 # Resident execution
-pytest particula/execution/tests/ -q
+pytest particula/execution/tests/ -q --no-cov
 
 # Optional CUDA-only evidence
-pytest particula/gpu/ particula/execution/tests/ -q -m "warp and cuda"
+pytest particula/gpu/ particula/execution/tests/ -q \
+  -m "warp and cuda" --no-cov
 ```
 
 After focused checks pass, run `.opencode/tools/run_pytest.py` without a target
 for repository-wide assertions and coverage. Run `mkdocs build --strict` when
 GPU examples or user-facing documentation change.
+
+For resident graph-capture validation, use the maintained
+`particula/execution/tests/captured_full_loop_test.py` matrix as an
+assertion-only, `--no-cov` check. Its uncaptured Warp CPU rows are required
+when Warp is installed; native CUDA capture/replay rows are optional and must
+pass or cleanly skip. A skipped installed-Warp uncaptured row is unavailable
+evidence, not a successful CUDA fallback. Keep deterministic parity,
+concentration-weighted conservation, and stochastic checks as separate
+criteria under the device-aware tolerance policy below.
 
 Warp-dependent modules should skip clearly when Warp or CUDA is missing. Use a
 fixture or test-local `pytest.importorskip("warp")` when a module also contains
@@ -293,7 +303,8 @@ validation, alongside the applicable focused tests and the repository's
 untargeted coverage runner:
 
 ```bash
-pytest particula/tests/gpu_coagulation_docs_test.py -q
+pytest particula/tests/gpu_coagulation_docs_test.py \
+  particula/execution/tests/graph_capture_docs_test.py -q --no-cov
 ```
 
 ### Device-aware tolerance policy

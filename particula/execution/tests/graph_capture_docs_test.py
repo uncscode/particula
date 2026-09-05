@@ -448,3 +448,18 @@ def test_e8_f5_p5_closeout_docs_link_authoritative_evidence_and_preserve_limits(
     for command in commands:
         assert command in evidence
         assert command in subsection
+
+    _require_statements(
+        evidence,
+        "E8-F5-P5 authoritative evidence",
+        (
+            "P5 (blocked, #1579)",
+            "Evidence record date:** 2026-09-05",
+            "P5 remains unshipped solely",
+            "mkdocs build --strict` | unavailable",
+            "no worktree-scoped MkDocs runner is available",
+        ),
+    )
+    assert "Evidence record date (2026-09-05)" in subsection
+    assert "P4 plan update" in subsection
+    assert "dated 2026-09-05" in subsection

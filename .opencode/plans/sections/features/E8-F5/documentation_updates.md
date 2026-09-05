@@ -30,8 +30,10 @@
 
 ## P5 Reconciliation (#1579)
 
-The roadmap and hardware-free regression test were updated. The existing testing
-guide already states the durable focused, Warp-baseline, CUDA-clean-skip, and
-separate deterministic/conservation/stochastic policy, so it was unchanged.
-The dedicated AGENTS block remains unchanged because strict MkDocs verification
-is unavailable. The final strict build is the sole shipment blocker.
+The roadmap, hardware-free regression test, and testing guide were updated. The
+testing guide now includes the graph-capture documentation regression alongside
+the existing hardware-free GPU documentation check, with `--no-cov` to preserve
+its assertion-only status. The phase inventory is therefore the roadmap,
+testing guide, graph-capture documentation test, and E8-F5 plan records. The
+dedicated AGENTS block remains unchanged because strict MkDocs verification is
+unavailable. The final strict build is the sole shipment blocker.

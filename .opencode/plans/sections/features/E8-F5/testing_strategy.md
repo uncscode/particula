@@ -59,7 +59,7 @@ pytest particula/execution/tests/graph_capture_test.py \
   particula/execution/tests/rng_invariance_test.py \
   particula/execution/tests/checkpoint_test.py -q --no-cov
 pytest particula/execution/tests/captured_full_loop_test.py -q \
-  -m "warp and cuda"
+  -m "warp and cuda" --no-cov
 ```
 
 A focused target with `--cov` is invalid comprehensive evidence; inability to
@@ -78,11 +78,13 @@ inferring pass. Optional CUDA rows may pass or cleanly skip.
 
 ## E8-F5-P5 authoritative integrated validation evidence
 
-**Date:** 2026-09-04. **Runtime preflight:** Python 3.12.12; Warp was installed
-because the required uncaptured matrix executed with 48 passes. The available
-test wrapper did not report a Warp version or enumerate opaque device strings.
-No native CUDA device/capture prerequisite was qualified: the optional selector
-cleanly skipped all 11 CUDA rows. This is not CPU or Warp-CPU capture fallback.
+**Evidence record date:** 2026-09-05. This record follows the P4 plan update
+dated 2026-09-05 and preserves the original literal command outcomes. **Runtime
+preflight:** Python 3.12.12; Warp was installed because the required uncaptured
+matrix executed with 48 passes. The available test wrapper did not report a
+Warp version or enumerate opaque device strings. No native CUDA device/capture
+prerequisite was qualified: the optional selector cleanly skipped all 11 CUDA
+rows. This is not CPU or Warp-CPU capture fallback.
 
 Required focused rows use `--no-cov`; the wrapper enforced equivalent disabled
 coverage. The untargeted runner is the sole full-package coverage evidence.
