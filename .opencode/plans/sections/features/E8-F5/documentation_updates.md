@@ -16,6 +16,10 @@
 - Issue #1576 likewise changed no user documentation: it adds test-only
   uncaptured Warp-CPU parity/conservation and no-work evidence in
   `captured_full_loop_test.py`, with no production or API change.
+- Issue #1577 likewise changed no user documentation: it adds optional,
+  test-only native-CUDA capture/replay parity and diagnostic evidence in
+  `particula/execution/tests/captured_full_loop_test.py`, with no production,
+  API, export, architecture, or example change.
 - Do not add a new user example in this feature; the sibling graph-capture
   example track owns runnable usage and limitations.
 - Validate all changed documentation with contract tests and

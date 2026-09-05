@@ -30,6 +30,17 @@ conservation evidence, including forbidden-work spies and zero-duration
 coverage. It changes no production module, API, scheduler behavior, or capture
 and replay behavior.
 
+E8-F5-P3 shipped for issue #1577 in
+`particula/execution/tests/captured_full_loop_test.py` only. It adds optional
+native-CUDA captured resident-loop evidence for separate closed-map GAS and
+PARTICLES families across active, prescribed-volume, and no-work cases. The
+matrix compares replayed CUDA state and diagnostic/work-buffer snapshots with
+an independently enqueued Warp-CPU binding, retains opaque CUDA device strings,
+rejects unqualified candidates before capture/guard entry, and forbids visible
+host setup, allocation, transfer, readback, synchronization, or resource work
+during replay. No production API, export, user documentation, example, or
+architecture changed.
+
 ## User Stories
 
 - As a scientific user, I want captured and uncaptured loops compared with an

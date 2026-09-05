@@ -20,8 +20,14 @@
 - [x] Add CPU-only deterministic fixture/oracle rows for multi-step primary and
   derived state, diagnostics, inventories, no-work behavior, and validation
   rejection (issue #1575). Warp CPU parity remains P2.
-- [ ] Add optional CUDA captured rows for GAS and PARTICLES communication,
-  prescribed volume evolution, empty/no-work boxes, and diagnostics.
+- [x] Add optional native-CUDA captured rows for separate GAS and PARTICLES
+  communication, active/prescribed-volume/no-work scenarios, diagnostics, and
+  family work buffers; retain opaque candidate strings and skip before capture
+  when CUDA/capture prerequisites are unavailable (issue #1577).
+- [x] Add P3 replay-only forbidden-host-work instrumentation for visible
+  conversion, allocation, copy, readback, synchronization, registry acquisition,
+  and capture-resource publication; assert qualification rejection before
+  capture or guard entry (issue #1577).
 - [x] Assert P2 concentration-weighted per-box/per-species inventory independently
   from parity using `rtol=1e-12` and `atol=1e-30` (issue #1576).
 - [ ] Add aggregate stochastic checks for coagulation and wall loss without

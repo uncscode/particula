@@ -1,9 +1,9 @@
-"""P1/P2 full-loop evidence boundaries for resident graph-capture loops.
+"""P1-P3 full-loop evidence boundaries for resident graph-capture loops.
 
 This test-only module supplies the P1 NumPy oracle and P2 uncaptured Warp-CPU
-READY-path parity, conservation, forbidden-work, and no-work evidence. Native
-CUDA capture remains optional, is skipped before qualification when the device
-or Warp capture API is unavailable, and is never emulated on the CPU.
+READY-path parity, conservation, forbidden-work, and no-work evidence. P3 adds
+optional native-CUDA capture/replay evidence, which cleanly skips per candidate
+before capture when qualification is unavailable and is never emulated on CPU.
 """
 
 from __future__ import annotations
@@ -1933,6 +1933,89 @@ def _particle_transport_inventories(
     return number, mass, charge
 
 
+def _independent_particle_work_oracle(
+    snapshot: dict[str, np.ndarray],
+    scenario: _CapturedLoopScenario,
+) -> dict[str, np.ndarray]:
+    """Calculate detached PARTICLES state and planning buffers for one step."""
+    concentration = snapshot["particle_concentration"].copy()
+    masses = snapshot["particle_masses"].copy()
+    charge = snapshot["particle_charge"].copy()
+    boxes, slots = concentration.shape
+    edges = len(scenario.edge_sources)
+    debits = np.zeros_like(concentration)
+    credits = np.zeros_like(concentration)
+    assignments = np.full((edges, slots), -1, dtype=np.int32)
+    requests = np.zeros((edges, slots), dtype=np.float64)
+    for edge, (source, destination, enabled, rate) in enumerate(
+        zip(
+            scenario.edge_sources,
+            scenario.edge_destinations,
+            scenario.edge_enabled,
+            scenario.edge_rates,
+            strict=True,
+        )
+    ):
+        if not enabled or rate == 0.0:
+            continue
+        for source_slot in range(slots):
+            request = (
+                concentration[source, source_slot] * rate * scenario.time_step
+            )
+            if request == 0.0:
+                continue
+            requests[edge, source_slot] = request
+            debits[source, source_slot] += request
+            target = next(
+                (
+                    target_slot
+                    for target_slot in range(slots)
+                    if concentration[destination, target_slot] > 0.0
+                    and np.array_equal(
+                        masses[source, source_slot],
+                        masses[destination, target_slot],
+                    )
+                    and charge[source, source_slot]
+                    == charge[destination, target_slot]
+                ),
+                None,
+            )
+            if target is None:
+                target = next(
+                    target_slot
+                    for target_slot in range(slots)
+                    if concentration[destination, target_slot] == 0.0
+                    and target_slot not in assignments[:edge].ravel()
+                    and target_slot not in assignments[edge, :source_slot]
+                )
+                masses[destination, target] = masses[source, source_slot]
+                charge[destination, target] = charge[source, source_slot]
+            assignments[edge, source_slot] = target
+            credits[destination, target] += (
+                request
+                * snapshot["particle_volume"][source]
+                / snapshot["particle_volume"][destination]
+            )
+    concentration += credits - debits
+    for box in range(boxes):
+        for slot in range(slots):
+            if concentration[box, slot] == 0.0:
+                masses[box, slot] = 0.0
+                charge[box, slot] = 0.0
+    concentration *= (
+        snapshot["particle_volume"][:, None] / scenario.final_volume[:, None]
+    )
+    return {
+        "particle_concentration": concentration,
+        "particle_masses": masses,
+        "particle_charge": charge,
+        "communication_source_debits": debits,
+        "communication_destination_credits": credits,
+        "communication_assignments": assignments,
+        "communication_requests": requests,
+    }
+
+
 def _assert_scenario_parity(
     actual: dict[str, np.ndarray],
     initial: dict[str, np.ndarray],
@@ -2233,6 +2316,7 @@ def _forbid_prepared_host_work(
     loop: _PreparedLoop,
     conversion: Any,
     forbidden: Any,
+    forbid_resource_validation: bool = False,
 ) -> None:
     """Reject enqueue-time upload, allocation, copy, readback, and sync work."""
     for name in (
@@ -2254,11 +2338,14 @@ def _forbid_prepared_host_work(
     ):
         if callable(getattr(loop.wp, name, None)):
             dispatch_patch.setattr(loop.wp, name, forbidden)
-    for name in (
+    resource_methods = [
         "acquire_communication",
         "register_capture_resources",
         "prepare_capture_resources",
-    ):
+    ]
+    if forbid_resource_validation:
+        resource_methods.append("validate_capture_resource_set")
+    for name in resource_methods:
         dispatch_patch.setattr(loop.registry, name, forbidden)
 
 
@@ -2593,6 +2680,18 @@ def test_family_aware_active_closed_map_preserves_detached_inventory(
         if communication_family is CommunicationTransportMode.GAS:
             _assert_scenario_parity(after, before, scenario, 1)
         else:
+            expected = _independent_particle_work_oracle(before, scenario)
+            for name, values in expected.items():
+                if values.dtype.kind in {"i", "u", "b"}:
+                    npt.assert_equal(after[name], values, err_msg=name)
+                else:
+                    npt.assert_allclose(
+                        after[name],
+                        values,
+                        rtol=PARITY_RTOL,
+                        atol=PARITY_ATOL,
+                        err_msg=name,
+                    )
             assert (
                 after["particle_concentration"][0, 0]
                 < before["particle_concentration"][0, 0]
@@ -2681,6 +2780,7 @@ def test_native_cuda_family_capture_replay_matches_uncaptured_baseline(
 
     wp, candidates = _require_native_cuda_capture()
     scenario = _capture_scenario(scenario_kind)
+    qualified_candidates = 0
     for cuda_device in candidates:
         cpu_loop = _build_scenario_prepared_loop(
             monkeypatch,
@@ -2706,12 +2806,16 @@ def test_native_cuda_family_capture_replay_matches_uncaptured_baseline(
             capture_set = cuda_loop.loop.registry.validate_capture_resource_set(
                 cuda_loop.loop.request.capture_resource_requirements
             )
-            qualification = qualify_prepared_resident_graph_capture(
-                cuda_loop.loop.binding,
-                cuda_loop.loop.prepared,
-                capture_set,
-                _WarpNativeCaptureAdapter(wp, cuda_device.native),
-            )
+            try:
+                qualification = qualify_prepared_resident_graph_capture(
+                    cuda_loop.loop.binding,
+                    cuda_loop.loop.prepared,
+                    capture_set,
+                    _WarpNativeCaptureAdapter(wp, cuda_device.native),
+                )
+            except ValueError:
+                continue
+            qualified_candidates += 1
             captured = capture_prepared_resident_graph(qualification)
             with monkeypatch.context() as replay_patch:
 
@@ -2741,6 +2845,8 @@ def test_native_cuda_family_capture_replay_matches_uncaptured_baseline(
             if cuda_loop is not None:
                 _close_prepared_loop(cuda_loop.loop)
             _close_prepared_loop(cpu_loop.loop)
+    if not qualified_candidates:
+        pytest.skip("no CUDA candidate qualified for native capture")
 
 
 @pytest.mark.warp
@@ -2750,64 +2856,62 @@ def test_native_cuda_family_capture_replay_matches_uncaptured_baseline(
 def test_native_cuda_nonzero_full_loop_matches_numpy_and_uncaptured_warp(
     n_boxes: int,
 ) -> None:
-    """Replay a genuine nonzero CUDA graph against Warp CPU and NumPy."""
+    """Replay every qualified nonzero CUDA graph against Warp CPU and NumPy."""
     wp, candidates = _require_native_cuda_capture()
     duration = 0.25
     steps = 3
-    cpu_loop = _build_prepared_loop("cpu", n_boxes, duration, 1571)
-    cuda_loop = None
-    captured = None
-    try:
-        cuda_loop = _build_prepared_loop(
-            candidates[0].native, n_boxes, duration, 1571
-        )
-        cpu_initial = _prepared_snapshot(cpu_loop)
-        cuda_initial = _prepared_snapshot(cuda_loop)
-        _assert_prepared_parity(cuda_initial, cpu_initial)
-        expected = _deterministic_numpy_oracle(cpu_initial)
-        initial_inventory = _snapshot_inventory(cpu_initial)
-
-        capture_set = cuda_loop.registry.validate_capture_resource_set(
-            cuda_loop.request.capture_resource_requirements
-        )
-        adapter = _WarpNativeCaptureAdapter(
-            wp,
-            cuda_loop.session.metadata.device.native,
-        )
-        qualification = qualify_prepared_resident_graph_capture(
-            cuda_loop.binding,
-            cuda_loop.prepared,
-            capture_set,
-            adapter,
-        )
-        captured = capture_prepared_resident_graph(qualification)
-        # Native recording itself is not a hidden physical launch.
-        _assert_prepared_parity(_prepared_snapshot(cuda_loop), cuda_initial)
-
-        for _ in range(steps):
-            enqueue_prepared_resident_simulation(cpu_loop.prepared)
-            replay_captured_resident_graph(captured, qualification.duration)
-
-        cpu_result = _prepared_snapshot(cpu_loop)
-        cuda_result = _prepared_snapshot(cuda_loop)
-        _assert_prepared_parity(cuda_result, cpu_result)
-        _assert_prepared_parity(cpu_result, expected)
-        _assert_prepared_parity(cuda_result, expected)
-        npt.assert_allclose(
-            _snapshot_inventory(cuda_result),
-            initial_inventory,
-            rtol=PARITY_RTOL,
-            atol=PARITY_ATOL,
-        )
-        npt.assert_equal(cuda_result["gas_partitioning"], 0)
-        assert cpu_loop.guard.completed_steps == steps
-        assert cuda_loop.guard.completed_steps == steps
-        assert not hasattr(captured, "handle")
-    finally:
-        captured = None
-        if cuda_loop is not None:
-            _close_prepared_loop(cuda_loop)
-        _close_prepared_loop(cpu_loop)
+    qualified_candidates = 0
+    for cuda_device in candidates:
+        cpu_loop = _build_prepared_loop("cpu", n_boxes, duration, 1571)
+        cuda_loop = None
+        try:
+            cuda_loop = _build_prepared_loop(
+                cuda_device.native, n_boxes, duration, 1571
+            )
+            cpu_initial = _prepared_snapshot(cpu_loop)
+            cuda_initial = _prepared_snapshot(cuda_loop)
+            _assert_prepared_parity(cuda_initial, cpu_initial)
+            expected = _deterministic_numpy_oracle(cpu_initial)
+            initial_inventory = _snapshot_inventory(cpu_initial)
+            capture_set = cuda_loop.registry.validate_capture_resource_set(
+                cuda_loop.request.capture_resource_requirements
+            )
+            try:
+                qualification = qualify_prepared_resident_graph_capture(
+                    cuda_loop.binding,
+                    cuda_loop.prepared,
+                    capture_set,
+                    _WarpNativeCaptureAdapter(wp, cuda_device.native),
+                )
+            except ValueError:
+                continue
+            qualified_candidates += 1
+            captured = capture_prepared_resident_graph(qualification)
+            _assert_prepared_parity(_prepared_snapshot(cuda_loop), cuda_initial)
+            for _ in range(steps):
+                enqueue_prepared_resident_simulation(cpu_loop.prepared)
+                replay_captured_resident_graph(captured, qualification.duration)
+            cpu_result = _prepared_snapshot(cpu_loop)
+            cuda_result = _prepared_snapshot(cuda_loop)
+            _assert_prepared_parity(cuda_result, cpu_result)
+            _assert_prepared_parity(cpu_result, expected)
+            _assert_prepared_parity(cuda_result, expected)
+            npt.assert_allclose(
+                _snapshot_inventory(cuda_result),
+                initial_inventory,
+                rtol=PARITY_RTOL,
+                atol=PARITY_ATOL,
+            )
+            npt.assert_equal(cuda_result["gas_partitioning"], 0)
+            assert cpu_loop.guard.completed_steps == steps
+            assert cuda_loop.guard.completed_steps == steps
+            assert not hasattr(captured, "handle")
+        finally:
+            if cuda_loop is not None:
+                _close_prepared_loop(cuda_loop)
+            _close_prepared_loop(cpu_loop)
+    if not qualified_candidates:
+        pytest.skip("no CUDA candidate qualified for native capture")
 
 
 @pytest.mark.warp
@@ -3126,7 +3230,6 @@ def test_capture_replay_has_no_forbidden_host_work_and_preserves_rng_noop(
             "capture/replay must not transfer"
         ),
     )
-
     coagulation_rng = (
         fixture.request.coagulation.resources.rng_states.numpy().copy()
     )

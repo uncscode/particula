@@ -16,6 +16,15 @@ only: real READY prepared uncaptured Warp-CPU multi-timestep parity and
 conservation rows, scoped forbidden-work spies, and zero-duration preservation
 coverage. It did not modify production behavior, APIs, or capture/replay.
 
+Issue #1577 delivered P3 in `particula/execution/tests/captured_full_loop_test.py`
+only: optional native-CUDA capture/replay parity and diagnostic evidence for
+separate closed-map GAS and PARTICLES families, including active,
+prescribed-volume, and no-work scenarios. It preserves opaque CUDA candidate
+strings, skips before capture when native CUDA/capture qualification is
+unavailable, and instruments replay against visible host work. It did not
+modify production behavior, APIs, exports, documentation, examples, or
+architecture.
+
 ## In Scope
 
 - Independent NumPy/CPU expected-state and inventory calculations.

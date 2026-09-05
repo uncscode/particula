@@ -60,6 +60,23 @@ inventory checks. Scoped test spies reject enqueue-time setup, allocation,
 transfer, readback, and synchronization; a zero-duration row verifies
 write-free preservation. These are tests only, not production-path changes.
 
+### P3 implementation
+
+Issue #1577 adds the optional native-CUDA captured branch in
+`particula/execution/tests/captured_full_loop_test.py`. Test-local discovery
+retains each Warp-reported CUDA string unchanged and rejects non-string or
+non-CUDA values without substituting a device. For each discovered candidate,
+the test constructs independent CUDA and Warp-CPU bindings for GAS or
+PARTICLES closed-map scenarios, qualifies the exact CUDA binding, captures it,
+and compares its replay snapshot with the uncaptured binding. The captured
+matrix includes active, prescribed-volume, and no-work scenarios; snapshots
+cover primary/derived fields, diagnostics, and family work buffers. Replay is
+wrapped in scoped instrumentation that rejects test-visible conversion,
+allocation, copy, readback, synchronization, registry acquisition, and capture
+resource publication. Qualification rejection is asserted before capture or
+guard-token entry. All of this remains test-only; no execution architecture or
+production ownership changed.
+
 ## Security & Compliance
 
 There is no network, credential, or persistence change. Validation is fail

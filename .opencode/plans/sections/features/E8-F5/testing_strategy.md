@@ -16,10 +16,16 @@ lowered, and production behavior is not changed solely to expose test internals.
   with the P1 oracle; separately checks conservation and stable identities; and
   uses scoped spies to reject enqueue-time setup, allocation, upload, readback,
   and synchronization. A zero-duration row verifies write-free preservation.
-- **P3:** Enumerate every CUDA device visible to Warp and mark capture rows
-  `warp`, `cuda`, and `gpu_parity`. Compare each captured CUDA device with P1/P2,
-  cover both closed-map families, and record an independent unavailable result
-  when a device cannot qualify. Never run a CPU fallback for these rows.
+- **P3 (shipped, #1577):** `captured_full_loop_test.py` discovers only opaque
+  CUDA string candidates from Warp, marks native rows `warp`, `cuda`, and
+  `gpu_parity`, and skips before capture when CUDA, the capture API, or a
+  candidate is unavailable. It captures qualified CUDA GAS and PARTICLES
+  closed-map bindings for active, prescribed-volume, and no-work scenarios and
+  compares replay snapshots (including diagnostics and family buffers) with an
+  independently enqueued Warp-CPU binding. Scoped replay instrumentation rejects
+  visible conversion, allocation, copy, readback, synchronization, and registry
+  resource work; a hermetic rejection row proves qualification fails before
+  capture or guard entry. No CPU or Warp-CPU capture fallback is used.
 - **P4:** Use deterministic lifecycle tables plus `stochastic` aggregate rows for
   RNG. Assert explicit reset and continuation semantics separately from exact
   state parity; verify no graph launch after preflight rejection.

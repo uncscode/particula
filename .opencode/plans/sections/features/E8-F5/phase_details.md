@@ -24,15 +24,20 @@
   - Boundary: No production modules, APIs, scheduler behavior, or capture/replay
     behavior changed.
 
-- [ ] **E8-F5-P3:** Captured CUDA communication diagnostics and parity validation
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Replay the exact P2 scenario through E8-F4 capture and validate GAS and
-    PARTICLES communication, volume updates, diagnostics, and final state.
-  - Files: `particula/execution/tests/captured_full_loop_test.py` and capture test
-    support from `particula/execution/tests/graph_capture_test.py`.
-  - Tests: Captured-versus-uncaptured and CPU comparisons, both closed-map
-    families, diagnostic outputs, no replay allocation/readback/sync, and clean
-    CUDA skip with no CPU fallback.
+- [x] **E8-F5-P3:** Captured CUDA communication diagnostics and parity validation
+  - Issue: #1577 | Size: S | Status: Shipped
+  - Delivered: Optional native-CUDA captured resident-loop validation in
+    `particula/execution/tests/captured_full_loop_test.py` only. Separate
+    closed-map GAS and PARTICLES bindings cover active, prescribed-volume, and
+    no-work scenarios; CUDA replay snapshots compare with independently enqueued
+    Warp-CPU snapshots, including diagnostics and communication work buffers.
+  - Tests: Opaque CUDA-string candidate discovery; pre-capture CUDA/capture-API
+    skips; exact-binding qualification; qualification rejection before capture or
+    guard entry; replay-only forbidden-host-work instrumentation; CAPTURED
+    lifecycle, hidden-handle, and guard-completion checks.
+  - Boundary: No production modules, APIs, exports, user documentation, examples,
+    scheduler behavior, or architecture changed. CUDA remains optional native
+    evidence and never falls back to CPU or Warp-CPU capture.
 
 - [ ] **E8-F5-P4:** RNG continuation and lifecycle rejection matrix with tests
   - Issue: TBD | Size: S | Status: Not Started
