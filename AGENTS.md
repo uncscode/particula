@@ -300,10 +300,11 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   registry-owned continuation sidecars, ledgers, diagnostics, and at most one
   complete closed-map communication family, plus detached CPU inspection
   carriers. It excludes arbitrary caller outputs and ordinary `rng_states`.
-  Schema-v3 always carries RNG continuation metadata; its published
-  coagulation/wall-loss current-word payloads may be empty, but when present
-  they are the sole continuation authority. Inspection `GasData` has no GPU
-  vapor-pressure field and is intentionally lossy; restart restores canonical
+  Current schema-v4 checkpoints always carry RNG continuation metadata. Their
+  canonical process-family inventory preserves the acquired-stream boundary.
+  Published coagulation/wall-loss current-word payloads may be empty, but when
+  present they are the sole continuation authority. Inspection `GasData` has
+  no GPU vapor-pressure field and is intentionally lossy; restart restores
   device bytes rather than treating inspection data as authoritative.
   Snapshotting needs roughly one additional host copy of resident payload bytes
   as well as the detached inspection copies.
@@ -319,7 +320,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   carrier type `"ResidentSession"`, complete valid descriptors and bytes, and
   an exactly equal target `Device` is required. Schema-v1 permits only
   noncommunication checkpoints; schema-v2 permits no communication family or
-  one complete closed-map family. Controllers create schema-v3 checkpoints,
+  one complete closed-map family. Controllers create schema-v4 checkpoints,
   which require continuation metadata even with zero published-stream payloads.
   A published stream payload must pair with its matching acquired resource
   family, and either unmatched or incompatible form rejects before setup.
@@ -353,12 +354,13 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   or synchronization. Selected or all-stream initialization/reset is
   deliberate; normal scheduling does not inspect, transfer, synchronize,
   reseed, checkpoint, restart, fall back, or promise rollback.
-- Schema-v3 checkpoints always contain continuation metadata. Immutable current
-  words for any published streams are the continuation authority, separate from
-  lossy CPU inspection carriers; zero stream payloads are valid. Continuation is
-  manual through a fresh session on an exactly equal supported `Device`; it
-  excludes cross-backend or cross-device replay, migration, durable
-  serialization, automatic restart, and implicit reseeding. See
+- Schema-v3-and-later checkpoints always contain continuation metadata; schema-v4
+  is the current format. Immutable current words for any published streams are
+  the continuation authority, separate from lossy CPU inspection carriers; zero
+  stream payloads are valid. Continuation is manual through a fresh session on
+  an exactly equal supported `Device`; it excludes cross-backend or cross-device
+  replay, migration, durable serialization, automatic restart, and implicit
+  reseeding. See
   [GPU resident checkpoints](docs/Features/gpu_resident_checkpoints.md).
 - Warp CPU is the installed-Warp baseline. CUDA validation is optional and
   skips cleanly when unavailable.
@@ -1187,11 +1189,11 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   resize, or compaction. A failure after a writer-capable call closes the token,
   faults the session, and has no rollback or retry guarantee.
 - Compatibility is fail-closed: schema-v1 noncommunication, schema-v2
-  optional-communication, and schema-v3 continuation checkpoints require
-  carrier type `"ResidentSession"`, ACTIVE state, complete valid payloads, and
-  an exactly equal `Device` restart. Schema-v3 continuation metadata is required
-  even when it has zero published-stream payloads; stream/resource mismatches
-  reject before setup.
+  optional-communication, and schema-v3-or-later continuation checkpoints
+  require carrier type `"ResidentSession"`, ACTIVE state, complete valid
+  payloads, and an exactly equal `Device` restart. Schema-v3-or-later
+  continuation metadata is required even when it has zero published-stream
+  payloads. Stream/resource mismatches reject before setup.
   `ParticleData.volume` is fixed resident state except for the optional
   prescribed volume-evolution barrier. The standalone E7-F7-P2 direct import is
   `particula.gpu.kernels.communication.volume_evolution_step_gpu`: callers pass

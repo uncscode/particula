@@ -571,11 +571,22 @@ def test_schema_v4_restart_continues_real_process_streams(
             restored_wall_loss.rng_states.numpy(), source_wall_loss
         )
 
+        _dispatch_real_processes(session, registry)
         _dispatch_real_processes(restored, restored_registry)
-        assert np.any(
-            restored_coagulation.rng_states.numpy() != source_coagulation
-        )
-        assert np.any(restored_wall_loss.rng_states.numpy() != source_wall_loss)
+
+        for source, restored_state in (
+            (session.particles.masses, restored.particles.masses),
+            (session.particles.concentration, restored.particles.concentration),
+            (session.particles.charge, restored.particles.charge),
+            (session.gas.concentration, restored.gas.concentration),
+            (coagulation.rng_states, restored_coagulation.rng_states),
+            (wall_loss.rng_states, restored_wall_loss.rng_states),
+        ):
+            np.testing.assert_array_equal(
+                restored_state.numpy(), source.numpy()
+            )
+        assert np.any(coagulation.rng_states.numpy() != source_coagulation)
+        assert np.any(wall_loss.rng_states.numpy() != source_wall_loss)
     finally:
         if restored is not None:
             assert restored_registry is not None

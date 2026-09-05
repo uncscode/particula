@@ -1,6 +1,6 @@
 # GPU resident checkpoints
 
-Current controllers create schema-v3 checkpoints; v1 noncommunication and v2
+Current controllers create schema-v4 checkpoints; v1 noncommunication and v2
 communication checkpoints remain restart-compatible. Resident communication is a concrete-only
 closed-map barrier: communication runs before optional prescribed volume
 evolution, and both invalidate saturation ratio only.
@@ -43,33 +43,33 @@ Restart compatibility is intentionally exact and fail-closed. It accepts
 target `Device`. Schema-v1 checkpoints must be noncommunication checkpoints.
 Schema-v2 checkpoints may contain no communication family or exactly one
 complete closed-map GAS or PARTICLES communication family with matching
-metadata and payloads. Schema-v3 always requires continuation metadata, though
-its published-stream payload collection may be empty when neither canonical
-coagulation nor wall-loss resource family is acquired. Its immutable current
-`uint32` words are restart authority; normal dispatch and reacquisition neither
-read them back nor reset them, and only explicit stream reset derives new words
-from the root seed for a restored published stream. This does not prevent normal
-first acquisition from deriving words for a stream that was absent from the
-checkpoint. Finalization terminalizes its source session but returns
-an `ACTIVE`, restartable checkpoint record. Restart creates fresh session,
+metadata and payloads. Schema-v3-and-later records always require continuation
+metadata, though their published-stream payload collection may be empty when
+neither canonical coagulation nor wall-loss resource family is acquired. Their
+immutable current `uint32` words are restart authority; normal dispatch and
+reacquisition neither read them back nor reset them, and only explicit stream
+reset derives new words from the root seed for a restored published stream. This
+does not prevent normal first acquisition from deriving words for a stream that
+was absent from the checkpoint. Finalization terminalizes its source session but
+returns an `ACTIVE`, restartable checkpoint record. Restart creates fresh session,
 registry, guard, resident arrays, and communication bindings; it never reuses
 source identities or provides fallback. It rejects other versions or carrier
 schemas, malformed, incomplete, partial, mixed, or mismatched communication
 payloads, non-`ACTIVE` checkpoint records, and device mismatches; it does not
 promise forward or backward compatibility.
 
-Schema-v3 continuation covers the canonical published `coagulation` and
-`wall_loss` streams. Each retained record includes schema-versioned stable
-logical-ID, root-seed, and namespace metadata plus immutable current `uint32`
-words. Those words are the sole continuation authority, rather than lossy CPU
-inspection carriers or ordinary resource payloads. Checkpoint capture is the
-sole explicit synchronization/readback boundary for this continuation. Normal
-scheduling and reacquisition do not inspect, transfer, synchronize, seed, or
-reset streams. Before setup, the checkpoint validates exact bidirectional
-pairing between acquired coagulation/wall-loss process families and continuation
-payloads; continuation-only and resource-only forms reject. Normal first
-acquisition initializes a stream only when its resource family was absent from
-the checkpoint.
+Schema-v3-and-later continuation covers the canonical published `coagulation`
+and `wall_loss` streams; schema-v4 is the current format. Each retained record
+includes schema-versioned stable logical-ID, root-seed, and namespace metadata
+plus immutable current `uint32` words. Those words are the sole continuation
+authority, rather than lossy CPU inspection carriers or ordinary resource
+payloads. Checkpoint capture is the sole explicit synchronization/readback
+boundary for this continuation. Normal scheduling and reacquisition do not
+inspect, transfer, synchronize, seed, or reset streams. Before setup, the
+checkpoint validates exact bidirectional pairing between acquired coagulation/
+wall-loss process families and continuation payloads; continuation-only and
+resource-only forms reject. Normal first acquisition initializes a stream only
+when its resource family was absent from the checkpoint.
 
 Split-run continuation requires a manual restart into a fresh session with a
 frozen configuration and exactly equal supported `Device`. It excludes CPU,

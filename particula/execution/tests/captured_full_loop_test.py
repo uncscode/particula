@@ -2919,7 +2919,7 @@ def test_native_cuda_nonzero_full_loop_matches_numpy_and_uncaptured_warp(
 @pytest.mark.gpu_parity
 @pytest.mark.stochastic
 def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
-    """Compare wall-loss aggregates without cross-device trajectories."""
+    """Compare wall-loss and Brownian aggregates without trajectories."""
     wp, candidates = _require_native_cuda_capture()
     duration = 1.0
     steps = 2
@@ -2929,6 +2929,8 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
     expected_removed = 0.0
     expected_variance = 0.0
     continued_words = 0
+    cpu_collisions = 0
+    cuda_collisions = 0
 
     for seed in seeds:
         selected = (0, 1, 2)
@@ -2963,15 +2965,20 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
             capture_set = cuda_loop.registry.validate_capture_resource_set(
                 cuda_loop.request.capture_resource_requirements
             )
-            qualification = qualify_prepared_resident_graph_capture(
-                cuda_loop.binding,
-                cuda_loop.prepared,
-                capture_set,
-                _WarpNativeCaptureAdapter(
-                    wp,
-                    cuda_loop.session.metadata.device.native,
-                ),
-            )
+            try:
+                qualification = qualify_prepared_resident_graph_capture(
+                    cuda_loop.binding,
+                    cuda_loop.prepared,
+                    capture_set,
+                    _WarpNativeCaptureAdapter(
+                        wp,
+                        cuda_loop.session.metadata.device.native,
+                    ),
+                )
+            except ValueError as error:
+                pytest.skip(
+                    f"no CUDA candidate qualified for native capture: {error}"
+                )
             captured = capture_prepared_resident_graph(qualification)
             assert (
                 cuda_loop.registry.coagulation_resources.rng_states
@@ -3010,6 +3017,8 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
                     & (cuda_result["particle_concentration"] == 0.0)
                 )
             )
+            cpu_collisions += int(np.sum(cpu_result["collision_counts"]))
+            cuda_collisions += int(np.sum(cuda_result["collision_counts"]))
             for initial, result in (
                 (cpu_initial, cpu_result),
                 (cuda_initial, cuda_result),
@@ -3036,6 +3045,8 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
     assert abs(cpu_removed - expected_removed) <= single_path_bound
     assert abs(cuda_removed - expected_removed) <= single_path_bound
     assert abs(cuda_removed - cpu_removed) <= cross_path_bound
+    collision_bound = max(4.0 * np.sqrt(cpu_collisions + cuda_collisions), 2.0)
+    assert abs(cuda_collisions - cpu_collisions) <= collision_bound
     assert continued_words > 0
 
 

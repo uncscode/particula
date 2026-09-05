@@ -3159,10 +3159,12 @@ def test_fake_native_replay_rejection_matrix_is_prelaunch_only(  # noqa: C901
                 request.session.discard(request.registry, request.guard)
             candidate = captured
 
+        release_count_before_replay = len(releases)
         with pytest.raises(expected, match=match):
             replay_captured_resident_graph(candidate, 0.0)
         assert launches == []
         assert request.guard.completed_steps == 0
+        assert len(releases) == release_count_before_replay
     finally:
         if original is not None:
             object.__setattr__(original[0], original[1], original[2])
@@ -3173,6 +3175,7 @@ def test_fake_native_replay_rejection_matrix_is_prelaunch_only(  # noqa: C901
                 getattr(captured, case),
             )
         close_resident_graph_capture(binding)
+    assert releases == [handle]
 
 
 @pytest.mark.warp

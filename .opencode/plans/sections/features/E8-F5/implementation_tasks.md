@@ -30,12 +30,13 @@
   capture or guard entry (issue #1577).
 - [x] Assert P2 concentration-weighted per-box/per-species inventory independently
   from parity using `rtol=1e-12` and `atol=1e-30` (issue #1576).
-- [ ] Add aggregate stochastic checks for coagulation and wall loss without
-  requiring exact CPU/CUDA seed trajectories.
-- [ ] Add persistent RNG identity, advancement, explicit reset, and checkpoint/
-  restart continuation rows.
-- [ ] Parameterize structural and lifecycle rejection categories; assert no
-  capture launch on preflight failure and session fault on writer launch failure.
+- [x] Add aggregate stochastic checks for coagulation and wall loss without
+  requiring exact CPU/CUDA seed trajectories (issue #1578).
+- [x] Add persistent RNG identity, advancement, explicit reset, and schema-v4
+  same-device checkpoint/restart continuation rows (issue #1578).
+- [x] Parameterize structural and lifecycle rejection categories; assert no
+  capture launch on preflight failure and session fault/revocation on writer
+  launch failure (issue #1578).
 - [ ] Run focused tests directly without coverage, then run the untargeted
   `.opencode/tools/run_pytest.py` full-package coverage command.
 - [ ] Run Ruff/mypy where applicable and `mkdocs build --strict` for docs changes.

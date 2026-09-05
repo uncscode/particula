@@ -41,6 +41,17 @@ host setup, allocation, transfer, readback, synchronization, or resource work
 during replay. No production API, export, user documentation, example, or
 architecture changed.
 
+E8-F5-P4 shipped for issue #1578 as test-only validation in
+`particula/execution/tests/captured_full_loop_test.py`,
+`rng_invariance_test.py`, `checkpoint_test.py`, and `graph_capture_test.py`.
+It verifies independent resident coagulation and wall-loss streams around real
+dispatch, selected-lane explicit reset, schema-v4 exact-device checkpoint
+continuation without reinitialization, optional native-CUDA aggregate stream
+advancement, and fake-native replay rejection before launch. A separate native
+writer-failure row verifies fault, provenance revocation, and one release; it
+makes no rollback or recovery claim. No production module, API, export, user
+documentation, or example changed.
+
 ## User Stories
 
 - As a scientific user, I want captured and uncaptured loops compared with an

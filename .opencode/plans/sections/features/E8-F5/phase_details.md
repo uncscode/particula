@@ -39,15 +39,23 @@
     scheduler behavior, or architecture changed. CUDA remains optional native
     evidence and never falls back to CPU or Warp-CPU capture.
 
-- [ ] **E8-F5-P4:** RNG continuation and lifecycle rejection matrix with tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E8-F5-P4:** RNG continuation and lifecycle rejection matrix with tests
+  - Issue: #1578 | Size: S | Status: Shipped
   - Goal: Prove stream advancement/reset/continuation and fail-closed captured
     replay across structural drift and terminal lifecycle states.
   - Files: `particula/execution/tests/captured_full_loop_test.py`,
     `rng_invariance_test.py`, `checkpoint_test.py`, `graph_capture_test.py`.
-  - Tests: Coagulation/wall-loss stream identity and advancement, explicit reset,
-    checkpoint/restart continuation, stale handle, signature drift, finalize,
-    close, fault, teardown, writer-failure, and fresh-only recapture.
+  - Delivered: Test-only evidence for real independent resident streams,
+    selected explicit reset, schema-v4 exact-device continuation without
+    reinitialization, optional native-CUDA aggregate advancement, and fake-native
+    replay rejection/fault behavior.
+  - Tests: `rng_invariance_test.py` exercises real Brownian and selected wall-loss
+    dispatch plus selected-lane reset; `checkpoint_test.py` restores both advanced
+    streams into fresh sidecars and dispatches again; `graph_capture_test.py`
+    covers forged, attachment, signature, lifecycle, finalize, close, discard,
+    renewal-READY, and writer-failure paths before/through native launch.
+  - Boundary: No production modules, APIs, exports, user documentation, examples,
+    retry, recovery, automatic recapture, or rollback behavior changed.
 
 - [ ] **E8-F5-P5:** Integrated validation matrix and documentation updates
   - Issue: TBD | Size: S | Status: Not Started

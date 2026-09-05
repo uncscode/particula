@@ -26,9 +26,14 @@ lowered, and production behavior is not changed solely to expose test internals.
   visible conversion, allocation, copy, readback, synchronization, and registry
   resource work; a hermetic rejection row proves qualification fails before
   capture or guard entry. No CPU or Warp-CPU capture fallback is used.
-- **P4:** Use deterministic lifecycle tables plus `stochastic` aggregate rows for
-  RNG. Assert explicit reset and continuation semantics separately from exact
-  state parity; verify no graph launch after preflight rejection.
+- **P4 (shipped, #1578):** `rng_invariance_test.py` validates independent real
+  Brownian/wall-loss stream advancement, selected-lane reset, and no hidden
+  normal-dispatch reset. `checkpoint_test.py` validates schema-v4 same-device
+  continuation of both advanced streams without stream initialization.
+  `graph_capture_test.py` validates forged, attachment, signature, terminal,
+  and lifecycle replay rejections before launch plus one writer-failure
+  fault/revocation/release case. `captured_full_loop_test.py` adds optional
+  native-CUDA aggregate evidence that both scheduled streams advance.
 - **P5:** Run the integrated focused matrix, documentation contract tests, and
   strict MkDocs validation.
 
@@ -50,7 +55,7 @@ Focused fix checks are assertion-only and coverage disabled:
 pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov
 pytest particula/execution/tests/graph_capture_test.py \
   particula/execution/tests/rng_invariance_test.py \
-  particula/execution/tests/checkpoint_test.py -q
+  particula/execution/tests/checkpoint_test.py -q --no-cov
 pytest particula/execution/tests/captured_full_loop_test.py -q \
   -m "warp and cuda"
 ```

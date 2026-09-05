@@ -77,6 +77,21 @@ resource publication. Qualification rejection is asserted before capture or
 guard-token entry. All of this remains test-only; no execution architecture or
 production ownership changed.
 
+### P4 implementation
+
+Issue #1578 adds only test evidence. `rng_invariance_test.py` dispatches real
+Brownian coagulation and selected wall loss against distinct registry-owned
+sidecars, confirms ordinary dispatch does not reseed them, and compares a
+selected reset lane with an independently initialized reference. `checkpoint_test.py`
+uses a real process binding to checkpoint both advanced streams under schema v4,
+restart them into fresh same-device sidecars without initialization, and dispatch
+again. `graph_capture_test.py` parameterizes forged, attachment, signature,
+lifecycle, and terminal replay rejections with launch/guard instrumentation;
+its separate launch-error row establishes the documented fault/revocation/one-
+release boundary. `captured_full_loop_test.py` adds optional native-CUDA
+aggregate evidence that both scheduled streams advance. Production ownership and
+the replay implementation remain unchanged.
+
 ## Security & Compliance
 
 There is no network, credential, or persistence change. Validation is fail

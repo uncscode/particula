@@ -20,6 +20,9 @@
   test-only native-CUDA capture/replay parity and diagnostic evidence in
   `particula/execution/tests/captured_full_loop_test.py`, with no production,
   API, export, architecture, or example change.
+- Issue #1578 changed no user documentation: it adds test-only resident RNG
+  lifecycle/checkpoint-continuation and graph-replay-rejection evidence, with
+  no production, API, export, architecture, example, or user-doc change.
 - Do not add a new user example in this feature; the sibling graph-capture
   example track owns runnable usage and limitations.
 - Validate all changed documentation with contract tests and
