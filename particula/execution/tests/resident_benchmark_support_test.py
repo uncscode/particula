@@ -17,16 +17,20 @@ from particula.execution.tests.resident_benchmark_support import (
     MAX_ARTIFACT_PAYLOAD_BYTES,
     MAX_ARTIFACT_ROWS,
     MAX_TIMING_SAMPLES,
+    MAX_WARMUP_SAMPLES,
+    RESIDENT_CAPTURE_COMPARISON_DESTINATION,
     ResidentBenchmarkArtifact,
     ResidentBenchmarkCase,
     ResidentBenchmarkResult,
     ResidentBenchmarkStatus,
     build_resident_benchmark_case_id,
     build_resident_benchmark_metadata,
+    collect_paired_device_timings,
     deserialize_resident_benchmark_artifact,
     serialize_resident_benchmark_artifact,
     summarize_timing_samples,
     write_json_artifact,
+    write_resident_capture_comparison_artifact,
 )
 
 
@@ -125,7 +129,7 @@ def test_records_summaries_metadata_and_round_trip_are_deterministic():
         artifact.cases[0].seed = 8
     first = serialize_resident_benchmark_artifact(artifact)
     assert first.endswith("\n")
-    assert json.loads(first)["schema_version"] == 1
+    assert json.loads(first)["schema_version"] == 2
     assert deserialize_resident_benchmark_artifact(first) == artifact
     assert (
         serialize_resident_benchmark_artifact(
@@ -611,3 +615,90 @@ def test_write_json_artifact_rejects_directory_swap_to_external_symlink(
     with pytest.raises(OSError, match="escapes"):
         write_json_artifact(root, "nested/result.json", {"safe": True})
     assert not (outside / "result.json").exists()
+
+
+def test_paired_collector_alternates_without_warmup_synchronization() -> None:
+    """Measure paired operations with exactly one sync per measured path."""
+    calls: list[str] = []
+    ticks = iter((0.0, 1.0, 2.0, 4.0, 5.0, 8.0, 10.0, 14.0))
+    uncaptured, replay = collect_paired_device_timings(
+        uncaptured_operation=lambda: calls.append("uncaptured"),
+        replay_operation=lambda: calls.append("replay"),
+        synchronize=lambda: calls.append("sync"),
+        clock=lambda: next(ticks),
+        warmup_count=1,
+        sample_count=2,
+    )
+    assert uncaptured == (1.0, 3.0)
+    assert replay == (2.0, 4.0)
+    assert calls == [
+        "uncaptured",
+        "replay",
+        "uncaptured",
+        "sync",
+        "replay",
+        "sync",
+        "uncaptured",
+        "sync",
+        "replay",
+        "sync",
+    ]
+
+
+@pytest.mark.parametrize(
+    "warmup_count,sample_count",
+    [
+        (MAX_WARMUP_SAMPLES + 1, 1),
+        (0, MAX_TIMING_SAMPLES + 1),
+        (0, 0),
+    ],
+)
+def test_paired_collector_rejects_counts_before_callbacks(
+    warmup_count: int, sample_count: int
+) -> None:
+    """Reject bounded count failures before an operation, clock, or sync call."""
+    calls: list[str] = []
+    with pytest.raises(ValueError):
+        collect_paired_device_timings(
+            uncaptured_operation=lambda: calls.append("uncaptured"),
+            replay_operation=lambda: calls.append("replay"),
+            synchronize=lambda: calls.append("sync"),
+            clock=lambda: calls.append("clock"),
+            warmup_count=warmup_count,
+            sample_count=sample_count,
+        )
+    assert calls == []
+
+
+def test_comparison_writer_emits_one_fixed_schema_envelope(
+    tmp_path: Path,
+) -> None:
+    """Persist only the fixed resident artifact without generic output state."""
+    root = tmp_path / ".artifacts"
+    root.mkdir()
+    artifact = _artifact()
+    destination = write_resident_capture_comparison_artifact(root, artifact)
+    assert destination == root / RESIDENT_CAPTURE_COMPARISON_DESTINATION
+    assert (
+        deserialize_resident_benchmark_artifact(destination.read_text())
+        == artifact
+    )
+    assert list(root.rglob("*.json")) == [destination]
+
+
+def test_schema_v1_decode_populates_absent_timing_provenance_with_none() -> (
+    None
+):
+    """Retain backwards decoding while v2 remains the only emitted schema."""
+    payload = json.loads(serialize_resident_benchmark_artifact(_artifact()))
+    payload["schema_version"] = 1
+    for result in payload["artifact"]["results"]:
+        result.pop("setup_elapsed_seconds")
+        result.pop("capture_elapsed_seconds")
+    decoded = deserialize_resident_benchmark_artifact(json.dumps(payload))
+    assert all(
+        result.setup_elapsed_seconds is None for result in decoded.results
+    )
+    assert all(
+        result.capture_elapsed_seconds is None for result in decoded.results
+    )

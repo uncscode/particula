@@ -33,6 +33,20 @@ import pytest
 from numpy.typing import NDArray
 
 from particula._pytest_support import benchmark_option_enabled_from_env
+from particula.execution.tests.resident_benchmark_cuda_support import (
+    qualified_cuda_resident_benchmark,
+)
+from particula.execution.tests.resident_benchmark_support import (
+    ResidentBenchmarkArtifact,
+    ResidentBenchmarkCase,
+    ResidentBenchmarkResult,
+    ResidentBenchmarkStatus,
+    build_resident_benchmark_case_id,
+    build_resident_benchmark_metadata,
+    collect_paired_device_timings,
+    summarize_timing_samples,
+    write_resident_capture_comparison_artifact,
+)
 from particula.gpu.tests.cuda_availability import (
     CUDA_SKIP_REASON,
     cuda_available,
@@ -1865,3 +1879,108 @@ def test_mass_precision_projection_benchmark(
         "n_species": case.masses.shape[2],
     }
     _save_results()
+
+
+@pytest.mark.warp
+@pytest.mark.cuda
+def test_resident_captured_replay_comparison() -> None:
+    """Collect CUDA-only supplemental capture evidence without a speed claim.
+
+    Unavailable CUDA or native capture skips. This opt-in evidence never times
+    CPU/Warp-CPU, changes generic benchmark output, or asserts a ratio.
+    """
+    _skip_if_no_cuda()
+    with qualified_cuda_resident_benchmark() as binding:
+        uncaptured, replay = collect_paired_device_timings(
+            uncaptured_operation=binding.enqueue,
+            replay_operation=binding.replay,
+            synchronize=binding.synchronize,
+            clock=time.perf_counter,
+            warmup_count=2,
+            sample_count=3,
+        )
+        case = ResidentBenchmarkCase(
+            case_id=build_resident_benchmark_case_id(
+                requested_shape=(1, 3, 2),
+                actual_shape=(1, 3, 2),
+                active_fraction=1.0,
+                processes=(
+                    "communication",
+                    "condensation",
+                    "coagulation",
+                    "dilution",
+                    "wall_loss",
+                    "nucleation",
+                    "diagnostics",
+                ),
+                communication="gas",
+                diagnostics=("gas", "saturation"),
+                warmup=2,
+                timestep_count=3,
+                seed=1582,
+            ),
+            requested_shape=(1, 3, 2),
+            actual_shape=(1, 3, 2),
+            active_fraction=1.0,
+            processes=(
+                "communication",
+                "condensation",
+                "coagulation",
+                "dilution",
+                "wall_loss",
+                "nucleation",
+                "diagnostics",
+            ),
+            communication="gas",
+            diagnostics=("gas", "saturation"),
+            warmup=2,
+            timestep_count=3,
+            seed=1582,
+        )
+        provenance = {"binding": "native_cuda_capture"}
+        common = {
+            "case_id": case.case_id,
+            "requested_shape": case.requested_shape,
+            "status": ResidentBenchmarkStatus.EXECUTED,
+            "reason": None,
+            "provenance": provenance,
+            "setup_elapsed_seconds": binding.setup_elapsed_seconds,
+            "capture_elapsed_seconds": binding.capture_elapsed_seconds,
+        }
+        artifact = ResidentBenchmarkArtifact(
+            metadata=build_resident_benchmark_metadata(
+                timestamp_utc=datetime.now(timezone.utc),
+                command=" ".join(sys.argv),
+                synchronization_method="warp.synchronize",
+                warmup=case.warmup,
+                timestep_count=case.timestep_count,
+                seed=case.seed,
+                prepared_signature_digest=str(id(binding.loop.prepared)),
+                warp_version={
+                    "status": "available",
+                    "value": str(wp.__version__),
+                },
+                device={"status": "available", "identity": "cuda", "memory": 0},
+            ),
+            cases=(case,),
+            results=(
+                ResidentBenchmarkResult(
+                    timing_mode="prepared_uncaptured_device_synchronized",
+                    samples=uncaptured,
+                    summary=summarize_timing_samples(uncaptured),
+                    **common,
+                ),
+                ResidentBenchmarkResult(
+                    timing_mode="captured_replay_device_synchronized",
+                    samples=replay,
+                    summary=summarize_timing_samples(replay),
+                    **common,
+                ),
+            ),
+        )
+        root = Path(".artifacts")
+        root.mkdir(exist_ok=True)
+        destination = write_resident_capture_comparison_artifact(root, artifact)
+    print(f"resident capture comparison: {destination}")
+    for result in artifact.results:
+        print(f"{result.timing_mode}: {result.summary}")

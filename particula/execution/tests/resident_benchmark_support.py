@@ -27,11 +27,14 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Mapping
 
-RESIDENT_BENCHMARK_SCHEMA_VERSION = 1
+RESIDENT_BENCHMARK_SCHEMA_VERSION = 2
 """Version of the resident benchmark JSON envelope."""
 
 MAX_TIMING_SAMPLES = 10_000
 """Maximum P1 timing samples accepted for one executed benchmark result."""
+
+MAX_WARMUP_SAMPLES = 10_000
+"""Maximum paired warmup samples accepted for resident timing evidence."""
 
 MAX_ARTIFACT_PAYLOAD_BYTES = 1_048_576
 """Maximum UTF-8 size accepted for an untrusted artifact payload."""
@@ -58,7 +61,23 @@ PROCESS_ORDER = (
 )
 """Canonical ordering for process combinations in resident evidence."""
 
-SUPPORTED_TIMING_MODES = frozenset({"wall_clock", "device_synchronized"})
+SUPPORTED_TIMING_MODES = frozenset(
+    {
+        "wall_clock",
+        "device_synchronized",
+        "prepared_uncaptured_device_synchronized",
+        "captured_replay_device_synchronized",
+    }
+)
+_CAPTURE_COMPARISON_TIMING_MODES = frozenset(
+    {
+        "prepared_uncaptured_device_synchronized",
+        "captured_replay_device_synchronized",
+    }
+)
+RESIDENT_CAPTURE_COMPARISON_DESTINATION = (
+    "benchmarks/resident_capture_comparison.json"
+)
 SUPPORTED_COMMUNICATION = frozenset({"none", "gas", "particles"})
 REQUIRED_METADATA_FIELDS = frozenset(
     {
@@ -608,6 +627,8 @@ class ResidentBenchmarkResult:
     samples: tuple[float, ...]
     summary: ResidentTimingSummary | None
     provenance: Mapping[str, Any]
+    setup_elapsed_seconds: float | None = None
+    capture_elapsed_seconds: float | None = None
 
     def __post_init__(self) -> None:
         """Validate status-specific evidence and provenance consistency.
@@ -631,6 +652,10 @@ class ResidentBenchmarkResult:
             self.provenance, "provenance", nonempty=True
         )
         object.__setattr__(self, "provenance", provenance)
+        for name in ("setup_elapsed_seconds", "capture_elapsed_seconds"):
+            value = getattr(self, name)
+            if value is not None:
+                _require_float(value, name, minimum=0.0)
         if self.status is ResidentBenchmarkStatus.EXECUTED:
             if self.timing_mode not in SUPPORTED_TIMING_MODES:
                 raise ValueError(
@@ -643,6 +668,20 @@ class ResidentBenchmarkResult:
                 if not isinstance(self.reason, str):
                     raise TypeError("reason must be a string or None.")
                 raise ValueError("executed results must not have a reason.")
+            if self.timing_mode not in _CAPTURE_COMPARISON_TIMING_MODES and (
+                self.setup_elapsed_seconds is not None
+                or self.capture_elapsed_seconds is not None
+            ):
+                raise ValueError(
+                    "only capture comparison modes may contain timing provenance."
+                )
+            if self.timing_mode in _CAPTURE_COMPARISON_TIMING_MODES and (
+                self.setup_elapsed_seconds is None
+                or self.capture_elapsed_seconds is None
+            ):
+                raise ValueError(
+                    "capture comparison modes require timing provenance."
+                )
         else:
             if (
                 self.timing_mode is not None
@@ -657,6 +696,13 @@ class ResidentBenchmarkResult:
             if not isinstance(self.reason, str) or not self.reason:
                 raise ValueError(
                     "non-executed results require a nonempty reason."
+                )
+            if (
+                self.setup_elapsed_seconds is not None
+                or self.capture_elapsed_seconds is not None
+            ):
+                raise ValueError(
+                    "non-executed results cannot contain timing provenance."
                 )
 
 
@@ -894,6 +940,62 @@ def _require_fields(
     return value
 
 
+def collect_paired_device_timings(
+    *,
+    uncaptured_operation: Any,
+    replay_operation: Any,
+    synchronize: Any,
+    clock: Any,
+    warmup_count: int,
+    sample_count: int,
+) -> tuple[tuple[float, ...], tuple[float, ...]]:
+    """Collect alternating paired completed-device timings.
+
+    Warmups alternate uncaptured then replay without synchronization. Each
+    measured operation is clock, operation, synchronization, and clock.
+    """
+    warmup_count = _require_int(warmup_count, "warmup_count")
+    sample_count = _require_int(sample_count, "sample_count", positive=True)
+    if warmup_count > MAX_WARMUP_SAMPLES:
+        raise ValueError("warmup_count exceeds MAX_WARMUP_SAMPLES.")
+    if sample_count > MAX_TIMING_SAMPLES:
+        raise ValueError("sample_count exceeds MAX_TIMING_SAMPLES.")
+    callbacks = (uncaptured_operation, replay_operation, synchronize, clock)
+    if not all(callable(callback) for callback in callbacks):
+        raise TypeError("operations, synchronize, and clock must be callable.")
+    for _ in range(warmup_count):
+        uncaptured_operation()
+        replay_operation()
+    uncaptured_samples: list[float] = []
+    replay_samples: list[float] = []
+    for _ in range(sample_count):
+        start = clock()
+        uncaptured_operation()
+        synchronize()
+        uncaptured_samples.append(
+            _require_float(clock() - start, "uncaptured elapsed", minimum=0.0)
+        )
+        start = clock()
+        replay_operation()
+        synchronize()
+        replay_samples.append(
+            _require_float(clock() - start, "replay elapsed", minimum=0.0)
+        )
+    return tuple(uncaptured_samples), tuple(replay_samples)
+
+
+def write_resident_capture_comparison_artifact(
+    artifact_root: str | os.PathLike[str], artifact: ResidentBenchmarkArtifact
+) -> Path:
+    """Atomically persist the isolated resident-comparison schema envelope."""
+    serialized = serialize_resident_benchmark_artifact(artifact)
+    return write_json_artifact(
+        artifact_root,
+        RESIDENT_CAPTURE_COMPARISON_DESTINATION,
+        json.loads(serialized),
+    )
+
+
 def _validate_payload_structure(value: object) -> None:
     """Reject decoded JSON structures exceeding bounded artifact limits.
 
@@ -976,7 +1078,8 @@ def deserialize_resident_benchmark_artifact(
     envelope = _require_fields(
         envelope, {"schema_version", "artifact"}, "envelope"
     )
-    if envelope["schema_version"] != RESIDENT_BENCHMARK_SCHEMA_VERSION:
+    schema_version = envelope["schema_version"]
+    if schema_version not in {1, RESIDENT_BENCHMARK_SCHEMA_VERSION}:
         raise ValueError("unsupported schema_version.")
     raw = _require_fields(
         envelope["artifact"], {"metadata", "cases", "results"}, "artifact"
@@ -1007,9 +1110,10 @@ def deserialize_resident_benchmark_artifact(
         )
     results = []
     for item in raw["results"]:
-        item = _require_fields(
-            item, set(ResidentBenchmarkResult.__dataclass_fields__), "result"
-        )
+        fields = set(ResidentBenchmarkResult.__dataclass_fields__)
+        if schema_version == 1:
+            fields -= {"setup_elapsed_seconds", "capture_elapsed_seconds"}
+        item = _require_fields(item, fields, "result")
         summary = item["summary"]
         if summary is not None:
             summary = ResidentTimingSummary(
@@ -1029,6 +1133,16 @@ def deserialize_resident_benchmark_artifact(
                 samples=tuple(item["samples"]),
                 summary=summary,
                 provenance=item["provenance"],
+                setup_elapsed_seconds=(
+                    item.get("setup_elapsed_seconds")
+                    if schema_version != 1
+                    else None
+                ),
+                capture_elapsed_seconds=(
+                    item.get("capture_elapsed_seconds")
+                    if schema_version != 1
+                    else None
+                ),
             )
         )
     return ResidentBenchmarkArtifact(
