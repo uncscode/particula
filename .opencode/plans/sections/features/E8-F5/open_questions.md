@@ -13,10 +13,9 @@
       contains the conflicting stale assignment.
   - Resolved by: plan-question-resolver
 
-- [ ] Can the strict MkDocs gate run in the isolated #1579 worktree?
-  - Blocked 2026-09-04: no worktree-scoped MkDocs runner is available. This is
-    the sole blocker for P5 shipment; rerun `mkdocs build --strict` before
-    changing E8-F5 status.
+- [x] Can the strict MkDocs gate run in the isolated #1579 worktree?
+  - Resolved 2026-09-05: the approved strict-equivalent worktree validation
+    wrapper passed with exit status 0, releasing P5 for shipment.
 
 - [x] Which CPU process composition is sufficiently equivalent for the complete
   three-way fixture where a process has no exact high-level CPU twin?

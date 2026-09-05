@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-09-04",
+  "last_updated": "2026-09-05",
   "dependencies": [],
   "section_files": {
     "appendix": ".opencode/plans/sections/epics/E8/appendix.md",
@@ -37,7 +37,27 @@
       "type": "feature"
     },
     {
+      "id": "E8-F3",
+      "type": "feature"
+    },
+    {
+      "id": "E8-F4",
+      "type": "feature"
+    },
+    {
       "id": "E8-F5",
+      "type": "feature"
+    },
+    {
+      "id": "E8-F6",
+      "type": "feature"
+    },
+    {
+      "id": "E8-F7",
+      "type": "feature"
+    },
+    {
+      "id": "E8-F8",
       "type": "feature"
     }
   ],

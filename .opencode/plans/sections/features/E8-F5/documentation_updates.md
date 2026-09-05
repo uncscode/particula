@@ -34,6 +34,6 @@ The roadmap, hardware-free regression test, and testing guide were updated. The
 testing guide now includes the graph-capture documentation regression alongside
 the existing hardware-free GPU documentation check, with `--no-cov` to preserve
 its assertion-only status. The phase inventory is therefore the roadmap,
-testing guide, graph-capture documentation test, and E8-F5 plan records. The
-dedicated AGENTS block remains unchanged because strict MkDocs verification is
-unavailable. The final strict build is the sole shipment blocker.
+testing guide, graph-capture documentation test, dedicated AGENTS graph-capture
+validation block, and E8-F5 plan records. Approved strict-equivalent worktree
+validation passed, so P5 is shipped.

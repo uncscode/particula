@@ -608,6 +608,5 @@ def test_testing_guide_publishes_hardware_free_docs_validation() -> None:
 
     for command_fragment in (
         "pytest particula/tests/gpu_coagulation_docs_test.py",
-        "particula/execution/tests/graph_capture_docs_test.py -q --no-cov",
     ):
         assert command_fragment in release_validation

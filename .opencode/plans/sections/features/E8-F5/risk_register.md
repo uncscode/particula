@@ -10,4 +10,4 @@
 | Rejection tests mutate state before failing | Low | High | Snapshot accessible state and launch count before every preflight rejection row | P4 owner |
 | Parent E8 child table conflicts with the E8-F5 orchestrator assignment | High | Medium | Preserve this handoff, flag the mismatch, and resolve IDs before issue generation | Plan owner |
 | Validation scope expands into benchmarking or API redesign | Medium | Medium | Defer scaling, memory, profiling, examples, and contract changes to sibling tracks | E8 owner |
-| Strict documentation gate cannot run | Medium | High | Keep #1579 unshipped and record the unavailable MkDocs command; rerun in its isolated worktree | P5 owner |
+| Strict documentation gate cannot run | Medium | Resolved | Approved strict-equivalent worktree validation passed for #1579 with exit status 0. | P5 owner |

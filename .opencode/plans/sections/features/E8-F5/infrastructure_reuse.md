@@ -28,4 +28,5 @@
    independent from production helpers.
 
 P5 #1579 reuses the existing documentation-contract target and repository runner;
-it adds no execution infrastructure. Strict MkDocs remains unavailable.
+it adds no execution infrastructure. Approved strict-equivalent worktree
+validation passed.

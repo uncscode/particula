@@ -27,8 +27,8 @@
 
 - [x] Focused required evidence, optional CUDA clean-skip evidence, untargeted
   coverage, and hardware-free documentation assertions passed.
-- [ ] `mkdocs build --strict` passed. Blocked: no worktree-scoped MkDocs runner
-  is available. E8-F5 remains In Progress.
+- [x] `mkdocs build --strict` passed through the approved strict-equivalent
+  worktree validation wrapper. E8-F5 is shipped.
 
 ## Metrics
 

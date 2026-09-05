@@ -2,14 +2,14 @@
   "id": "E8-F5",
   "type": "feature",
   "title": "Captured Full-Loop Parity and Lifecycle Validation",
-  "status": "In Progress",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-09-04",
+  "completion_date": "2026-09-05",
+  "last_updated": "2026-09-05",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E8-F5/architecture_design.md",
@@ -88,18 +88,18 @@
     {
       "id": "E8-F5-P5",
       "title": "Integrated validation matrix and documentation updates",
-      "status": "In Progress",
+      "status": "Shipped",
       "size": "S",
       "issue_number": 1579,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-05",
       "estimates": null,
       "actuals": null,
-      "notes_ref": ".opencode/plans/sections/features/E8-F5/testing_strategy.md#e8-f5-p5-authoritative-integrated-validation-evidence; strict MkDocs unavailable",
+      "notes_ref": ".opencode/plans/sections/features/E8-F5/testing_strategy.md#e8-f5-p5-authoritative-integrated-validation-evidence; strict MkDocs-equivalent validation passed",
       "depends_on": null,
       "reconciliation_evidence_fingerprint": null
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

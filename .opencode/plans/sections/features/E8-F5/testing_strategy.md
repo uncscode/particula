@@ -34,7 +34,7 @@ lowered, and production behavior is not changed solely to expose test internals.
   and lifecycle replay rejections before launch plus one writer-failure
   fault/revocation/release case. `captured_full_loop_test.py` adds optional
   native-CUDA aggregate evidence that both scheduled streams advance.
-- **P5 (blocked, #1579):** The dated integrated closeout below records the
+- **P5 (shipped, #1579):** The dated integrated closeout below records the
   focused matrix, untargeted coverage runner, documentation contract tests, and
   strict MkDocs validation. It adds documentation evidence only; it does not
   change production behavior or P1--P4 fixtures.
@@ -96,12 +96,11 @@ coverage. The untargeted runner is the sole full-package coverage evidence.
 | Focused optional CUDA | `pytest particula/execution/tests/captured_full_loop_test.py -q -m "warp and cuda" --no-cov` | 0 | `11 skipped, 48 deselected` (clean skip) |
 | Untargeted coverage | `.opencode/tools/run_pytest.py` | 0 | `6634 passed, 24 skipped, 1 xfailed, 92.92% coverage` |
 | Documentation required | `pytest particula/execution/tests/graph_capture_docs_test.py particula/tests/execution_selection_docs_test.py -q --no-cov` | 0 | `25 passed` |
-| Documentation required | `mkdocs build --strict` | unavailable | Not run: no worktree-scoped MkDocs runner is available. |
+| Documentation required | `mkdocs build --strict` | 0 | Passed through the approved strict-equivalent worktree validation wrapper. |
 
 The required installed-Warp uncaptured evidence passed. Deterministic fields use
 `rtol=1e-12, atol=1e-30`; independent concentration-weighted per-box/per-species
 conservation remains separate; stochastic evidence uses aggregate or sigma-bounded
 criteria rather than exact per-seed or cross-device RNG-word replay. The optional
-native-CUDA row does not alter that mandatory gate. P5 remains unshipped solely
-because the required strict MkDocs command is unavailable; no shipped status is
-inferred from the passing assertion-only documentation check.
+native-CUDA row does not alter that mandatory gate. The approved strict-equivalent
+worktree validation passed after the original evidence record, so P5 is shipped.

@@ -102,6 +102,6 @@ automatic recapture, retry, or rollback guarantees.
 
 ## P5 Reconciliation
 
-Issue #1579 records documentation and validation evidence only. Its strict
-MkDocs gate is unavailable, so this architecture remains unchanged and E8-F5 is
-not marked shipped.
+Issue #1579 records documentation and validation evidence only. Approved
+strict-equivalent worktree validation passed, so E8-F5 is shipped without an
+architecture change.

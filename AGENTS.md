@@ -994,6 +994,23 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   no performance, profiling, or memory claim and supplies no runnable user
   workflow or example.
 
+  Validate the P5 evidence boundary with focused assertions before the
+  untargeted coverage runner; CUDA selection is optional pass-or-clean-skip
+  evidence only:
+
+  ```bash
+  pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov
+  pytest particula/execution/tests/graph_capture_test.py \
+    particula/execution/tests/rng_invariance_test.py \
+    particula/execution/tests/checkpoint_test.py -q --no-cov
+  pytest particula/execution/tests/captured_full_loop_test.py -q \
+    -m "warp and cuda" --no-cov
+  .opencode/tools/run_pytest.py
+  pytest particula/execution/tests/graph_capture_docs_test.py \
+    particula/tests/execution_selection_docs_test.py -q --no-cov
+  mkdocs build --strict
+  ```
+
 - E8-F1 supplies host metadata and scheduler admission only through the
   concrete-only `particula.execution.graph_capture` import boundary. Its
   carriers and lifecycle operations are absent from `particula.execution` and

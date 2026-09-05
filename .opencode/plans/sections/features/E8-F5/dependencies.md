@@ -35,5 +35,5 @@ The E8 child-plan table and dependency map assign captured replay implementation
 to E8-F4 and captured full-loop validation to E8-F5; downstream E8-F6 benchmark
 rows and E8-F7 profiling must consume E8-F5 correctness-qualified results.
 
-P5 #1579 remains blocked on `mkdocs build --strict`; downstream correctness-
-qualified handoffs are therefore not yet released.
+P5 #1579 passed approved strict-equivalent worktree validation, releasing the
+downstream correctness-qualified E8-F6/E8-F7/E8-F8 handoffs.

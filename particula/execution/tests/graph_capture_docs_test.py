@@ -249,9 +249,7 @@ def test_planning_records_preserve_p4_validation_block_and_handoff_boundary() ->
     )
     assert epic_record["status"] == "In Progress"
     assert {child["id"] for child in epic_record["child_plans"]} == {
-        "E8-F1",
-        "E8-F2",
-        "E8-F5",
+        f"E8-F{number}" for number in range(1, 9)
     }
     assert epic_record["milestones"] == [
         {
@@ -453,11 +451,11 @@ def test_e8_f5_p5_closeout_docs_link_authoritative_evidence_and_preserve_limits(
         evidence,
         "E8-F5-P5 authoritative evidence",
         (
-            "P5 (blocked, #1579)",
+            "P5 (shipped, #1579)",
             "Evidence record date:** 2026-09-05",
-            "P5 remains unshipped solely",
-            "mkdocs build --strict` | unavailable",
-            "no worktree-scoped MkDocs runner is available",
+            "approved strict-equivalent",
+            "mkdocs build --strict` | 0",
+            "P5 is shipped",
         ),
     )
     assert "Evidence record date (2026-09-05)" in subsection

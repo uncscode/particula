@@ -57,13 +57,13 @@
   - Boundary: No production modules, APIs, exports, user documentation, examples,
     retry, recovery, automatic recapture, or rollback behavior changed.
 
-- [ ] **E8-F5-P5:** Integrated validation matrix and documentation updates
-  - Issue: #1579 | Size: S | Status: In Progress (strict MkDocs blocked)
+- [x] **E8-F5-P5:** Integrated validation matrix and documentation updates
+  - Issue: #1579 | Size: S | Status: Shipped
   - Goal: Consolidate the default and optional validation commands, document
     tolerances and evidence boundaries, and publish the downstream handoff.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `particula/execution/tests/graph_capture_docs_test.py`, and E8 plan sections.
   - Evidence: focused required rows passed (48 and 274 passes), optional CUDA
     cleanly skipped, untargeted coverage passed (6634 passes, 92.92%), and the
-    documentation contract passed (25 passes). `mkdocs build --strict` is
-    unavailable because no worktree-scoped MkDocs runner exists; P5 is unshipped.
+    documentation contract passed (37 passes in final validation). The approved
+    strict-equivalent worktree validation passed with exit status 0; P5 is shipped.
