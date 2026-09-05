@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-09-04",
+  "last_updated": "2026-09-05",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E8-F5/architecture_design.md",
@@ -60,11 +60,11 @@
     {
       "id": "E8-F5-P3",
       "title": "Captured CUDA communication diagnostics and parity validation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-05",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
