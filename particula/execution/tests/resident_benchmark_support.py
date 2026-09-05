@@ -952,7 +952,26 @@ def collect_paired_device_timings(
     """Collect alternating paired completed-device timings.
 
     Warmups alternate uncaptured then replay without synchronization. Each
-    measured operation is clock, operation, synchronization, and clock.
+    measured operation follows ``clock, operation, synchronize, clock``;
+    synchronization therefore measures completed device work rather than only
+    host enqueue time. Setup and capture timing are intentionally outside this
+    collector.
+
+    Args:
+        uncaptured_operation: Zero-argument prepared-operation callback.
+        replay_operation: Zero-argument captured-replay callback.
+        synchronize: Callback that waits for the device operation to complete.
+        clock: Monotonic clock returning elapsed seconds.
+        warmup_count: Number of unsynchronized paired warmup iterations.
+        sample_count: Number of synchronized samples to collect per operation.
+
+    Returns:
+        Two immutable timing tuples in uncaptured-then-replay order.
+
+    Raises:
+        TypeError: If counts or callbacks have unsupported types.
+        ValueError: If counts are outside their configured bounds or a measured
+            elapsed time is negative or nonfinite.
     """
     warmup_count = _require_int(warmup_count, "warmup_count")
     sample_count = _require_int(sample_count, "sample_count", positive=True)
@@ -987,7 +1006,19 @@ def collect_paired_device_timings(
 def write_resident_capture_comparison_artifact(
     artifact_root: str | os.PathLike[str], artifact: ResidentBenchmarkArtifact
 ) -> Path:
-    """Atomically persist the isolated resident-comparison schema envelope."""
+    """Atomically persist the isolated resident-comparison schema envelope.
+
+    Args:
+        artifact_root: Existing ``.artifacts`` directory used as the output
+            root.
+        artifact: Fully validated resident benchmark artifact to serialize.
+
+    Returns:
+        The fixed resident-comparison artifact path.
+
+    Raises:
+        OSError: If validation, serialization, or atomic persistence fails.
+    """
     serialized = serialize_resident_benchmark_artifact(artifact)
     return write_json_artifact(
         artifact_root,

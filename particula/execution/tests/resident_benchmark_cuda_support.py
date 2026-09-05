@@ -15,7 +15,20 @@ from typing import Any, Callable, Iterator
 
 @dataclass(frozen=True, slots=True)
 class ResidentCaptureBenchmarkBinding:
-    """Retain one qualified CUDA binding and provenance-only setup timings."""
+    """Retain one qualified CUDA binding and provenance-only setup timings.
+
+    Attributes:
+        loop: Prepared resident loop whose identities must remain unchanged.
+        captured: Native captured graph record used for replay.
+        duration: Frozen physical timestep duration in seconds.
+        setup_elapsed_seconds: One-time setup duration, excluded from samples.
+        capture_elapsed_seconds: One-time capture duration, excluded from
+            samples.
+        synchronize: Device-completion callback owned by the benchmark caller.
+        enqueue_operation: Prepared uncaptured operation callback.
+        replay_operation: Captured replay operation callback.
+        capture_set: Published capture-resource set retained by identity.
+    """
 
     loop: Any
     captured: Any
@@ -28,15 +41,21 @@ class ResidentCaptureBenchmarkBinding:
     capture_set: Any
 
     def enqueue(self) -> None:
-        """Enqueue the already-prepared uncaptured timestep without syncing."""
+        """Enqueue one prepared uncaptured timestep without synchronization."""
         self.enqueue_operation()
 
     def replay(self) -> None:
-        """Replay the captured timestep without lifecycle work or syncing."""
+        """Replay one captured timestep without lifecycle work or sync."""
         self.replay_operation()
 
     def validate_identities(self) -> None:
-        """Reject capture-binding drift before any timing callback can run."""
+        """Reject binding drift before any timing callback can run.
+
+        Raises:
+            ValueError: If the prepared loop no longer owns the exact request,
+                resident resources, guard, or published capture set retained
+                during qualification.
+        """
         binding = self.loop.binding
         if (
             binding.request is not self.loop.request
@@ -59,6 +78,19 @@ def qualified_cuda_resident_benchmark(
     capture durations are provenance only and each completion synchronization is
     outside sampling. Cleanup preserves an initiating writer failure while
     attempting release before exact session closure.
+
+    Args:
+        duration: Physical resident timestep duration in seconds.
+        n_boxes: Number of resident simulation boxes to construct.
+        root_seed: Root seed for resident random-number streams.
+
+    Yields:
+        One binding exposing paired uncaptured and captured operations.
+
+    Raises:
+        ValueError: If identity validation fails or qualification rejects the
+            prepared resident loop.
+        RuntimeError: If native CUDA capture setup fails after qualification.
     """
     from particula.execution.graph_capture import (
         capture_prepared_resident_graph,
