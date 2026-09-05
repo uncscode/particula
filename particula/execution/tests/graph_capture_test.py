@@ -3020,6 +3020,162 @@ def test_fake_native_replay_rejects_invalid_duration_before_launch(
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize(
+    ("case", "expected", "match"),
+    [
+        ("forged", ValueError, "not P2-issued"),
+        ("request", ValueError, "identities do not match"),
+        ("session", ValueError, "identities do not match"),
+        ("registry", ValueError, "identities do not match"),
+        ("guard", ValueError, "identities do not match"),
+        ("dimensions", ValueError, "signature is incompatible"),
+        ("primary_containers", ValueError, "signature is incompatible"),
+        ("primary_arrays", ValueError, "identities do not match"),
+        ("resource_views", ValueError, "identities do not match"),
+        ("graph", ValueError, "signature is incompatible"),
+        ("schedule", ValueError, "signature is incompatible"),
+        ("schedule_order", ValueError, "signature is incompatible"),
+        ("diagnostics", ValueError, "signature is incompatible"),
+        ("communication", ValueError, "signature is incompatible"),
+        ("configurations", ValueError, "signature is incompatible"),
+        ("rng_resources", ValueError, "signature is incompatible"),
+        ("invalidated", ValueError, "identities do not match"),
+        ("retired", ValueError, "not P2-issued"),
+        ("ready_after_renewal", ValueError, "not P2-issued"),
+        ("finalized", ValueError, "not P2-issued"),
+        ("closed", ValueError, "not P2-issued"),
+        ("discarded", ValueError, "not P2-issued"),
+    ],
+)
+def test_fake_native_replay_rejection_matrix_is_prelaunch_only(  # noqa: C901
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+    case: str,
+    expected: type[Exception],
+    match: str,
+) -> None:  # noqa: C901
+    """Replay rejects forged, mismatched, drifted, and terminal records early."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    launches: list[object] = []
+    releases: list[object] = []
+    handle = object()
+    captured, binding = _issued_capture_for_lifecycle_test(
+        request,
+        monkeypatch,
+        handle=handle,
+        launch=launches.append,
+        release=releases.append,
+    )
+    monkeypatch.setattr(
+        graph_capture, "gate_resident_graph_capture", lambda _binding: None
+    )
+    if case in {
+        "dimensions",
+        "primary_containers",
+        "primary_arrays",
+        "resource_views",
+        "graph",
+        "schedule",
+        "schedule_order",
+        "diagnostics",
+        "communication",
+        "configurations",
+        "rng_resources",
+    }:
+
+        def compare_only_gate(candidate_binding: object) -> None:
+            compatibility = compare_resident_graph_capture_signature(
+                candidate_binding.lifecycle.signature,
+                candidate_binding._request,
+                admission_token=candidate_binding.lifecycle.signature,
+            )
+            if not compatibility.compatible:
+                raise ValueError(
+                    "resident graph-capture signature is incompatible."
+                )
+
+        monkeypatch.setattr(
+            graph_capture, "gate_resident_graph_capture", compare_only_gate
+        )
+
+    original: tuple[object, str, object] | None = None
+    try:
+        if case == "forged":
+            candidate = replace(captured)
+        elif case in {"request", "session", "registry", "guard"}:
+            object.__setattr__(captured.qualification, case, object())
+            candidate = captured
+        elif case in {
+            "dimensions",
+            "primary_containers",
+            "primary_arrays",
+            "resource_views",
+            "graph",
+            "schedule",
+            "schedule_order",
+            "diagnostics",
+            "communication",
+            "configurations",
+            "rng_resources",
+        }:
+            signature = captured.signature
+            original = (signature, case, getattr(signature, case))
+            current = getattr(signature, case)
+            if type(current) is tuple:
+                value = list(current)
+                value[0] = object()
+                current = tuple(value)
+            else:
+                current = object()
+            object.__setattr__(signature, case, current)
+            candidate = captured
+        elif case == "invalidated":
+            binding._lifecycle = invalidate_graph_capture(
+                binding.lifecycle,
+                GraphCaptureCompatibility(
+                    False, GraphCaptureDriftReason.REQUEST
+                ),
+            )
+            candidate = captured
+        elif case in {"retired", "ready_after_renewal"}:
+            binding._lifecycle = invalidate_graph_capture(
+                binding.lifecycle,
+                GraphCaptureCompatibility(
+                    False, GraphCaptureDriftReason.REQUEST
+                ),
+            )
+            retire_resident_graph_capture(binding)
+            if case == "ready_after_renewal":
+                renew_resident_graph_capture(
+                    binding, create_resident_graph_capture_signature(request)
+                )
+            candidate = captured
+        else:
+            if case == "finalized":
+                request.session.finalize(request.registry, request.guard)
+            elif case == "closed":
+                request.session.close(request.registry, request.guard)
+            else:
+                request.session.discard(request.registry, request.guard)
+            candidate = captured
+
+        with pytest.raises(expected, match=match):
+            replay_captured_resident_graph(candidate, 0.0)
+        assert launches == []
+        assert request.guard.completed_steps == 0
+    finally:
+        if original is not None:
+            object.__setattr__(original[0], original[1], original[2])
+        if case in {"request", "session", "registry", "guard"}:
+            object.__setattr__(
+                captured.qualification,
+                case,
+                getattr(captured, case),
+            )
+        close_resident_graph_capture(binding)
+
+
+@pytest.mark.warp
 def test_fake_native_replay_writer_failure_faults_and_revokes_once(
     resident_request: object,
     monkeypatch: pytest.MonkeyPatch,
