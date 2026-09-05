@@ -2668,12 +2668,12 @@ def test_family_aware_active_closed_map_preserves_detached_inventory(
 
         after = _scenario_snapshot(scenario_loop)
         particle_after = _particle_transport_inventories(after)
-        for actual, expected in zip(
+        for actual, expected_inventory in zip(
             particle_after, particle_before, strict=True
         ):
             npt.assert_allclose(
                 actual,
-                expected,
+                expected_inventory,
                 rtol=PARITY_RTOL,
                 atol=PARITY_ATOL,
             )
