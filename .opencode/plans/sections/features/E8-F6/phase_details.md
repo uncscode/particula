@@ -31,16 +31,25 @@
     CUDA-only row is opt-in and passes or cleanly skips when native capture is
     unavailable; it is supplemental evidence only.
 
-- [ ] **E8-F6-P3:** Extend box-first scaling matrix and budget-aware unavailable rows with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Define 1/10/100/1000-box cases and a <=100-LOC preflight that emits
-    `executed`, `skipped_budget`, or `unavailable` rows before oversized device
-    allocation; retain the requested case shape in every row.
+- [x] **E8-F6-P3:** Extend box-first scaling matrix and budget-aware unavailable rows with unit tests
+  - Issue: #1583 | Size: S | Status: Shipped
+  - Delivered: Host-only 1/10/100/1000-box cases with explicit axes and exact
+    requested/actual shapes; conservative preflight permits budget equality and
+    emits only `executed`, `skipped_budget`, or `unavailable` evidence before
+    CUDA probing/allocation. Exact dimensions flow through the P2 fixture seam;
+    the opt-in consumer aggregates all rows without capacity downscaling or
+    CPU/Warp-CPU fallback. P4/P5 allocator and byte accounting were not added.
   - Files: `particula/execution/tests/resident_benchmark_support.py`,
     `particula/execution/tests/resident_benchmark_support_test.py`,
-    `particula/gpu/tests/benchmark_test.py`
-  - Tests: Matrix axes, budget boundaries, requested-versus-reduced capacity,
-    CUDA clean skip, and no hidden CPU fallback.
+    `particula/execution/tests/resident_benchmark_cuda_support.py`,
+    `particula/execution/tests/multi_box_loop_test.py`,
+    `particula/execution/tests/captured_full_loop_test.py`,
+    `particula/gpu/tests/benchmark_test.py`, and
+    `particula/gpu/tests/benchmark_safety_test.py`.
+  - Tests: Matrix/axis and no-downscale assertions; invalid/equal/over-budget
+    boundaries; unavailable and malformed-availability outcomes; exact
+    forwarding; availability memoization; binding reuse/cleanup; aggregate
+    writer behavior; and no fallback.
 
 - [ ] **E8-F6-P4:** Build analytical resident memory-budget model with unit tests
   - Issue: TBD | Size: S | Status: Not Started

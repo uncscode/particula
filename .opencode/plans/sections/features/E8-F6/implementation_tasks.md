@@ -17,10 +17,10 @@
 - [x] Implement `summarize_timing_samples()` with deterministic count/min/median/
   mean/nearest-rank-p95 fields; reject nonfinite, negative, empty, or over-cap
   executed timing sample sequences.
-- [ ] Define `RESIDENT_BOX_COUNTS = (1, 10, 100, 1000)` and construct cases with
+- [x] Define `RESIDENT_BOX_COUNTS = (1, 10, 100, 1000)` and construct cases with
   explicit particle/species, active-fraction, communication, diagnostics, and
   process-set fields rather than anonymous tuple configurations.
-- [ ] Implement `preflight_resident_benchmark_case()` before fixture/device
+- [x] Implement `preflight_resident_benchmark_case()` before fixture/device
   allocation; return structured `executed`, `skipped_budget`, or `unavailable`
   rows with the requested and actual capacities plus a reason.
 - [x] Add the dedicated `write_json_artifact()` atomic writer in
@@ -63,7 +63,13 @@
   `particula/gpu/tests/benchmark_helpers_test.py`.
 - [x] Add one opt-in resident CUDA benchmark marked `slow`, `performance`,
   `benchmark`, `warp`, and `cuda`, with clean native-CUDA-capture skip and no
-  CPU/Warp-CPU substitution.
+   CPU/Warp-CPU substitution.
+- [x] Replace the resident artifact's single-case path with the P3 matrix
+  consumer: preflight every exact-shape row, memoize eligible availability,
+  reuse one binding per approved row, and publish one aggregate artifact only
+  after all rows complete.
+- [x] Forward validated exact `n_boxes`, `n_particles`, and `n_species` through
+  the P2 fixture/request seam without changing its default 16-by-2 callers.
 - [ ] Keep default test collection unchanged and add regression coverage for
   malformed dimensions, overflow, duplicate categories, unavailable probes,
   and artifact path safety.

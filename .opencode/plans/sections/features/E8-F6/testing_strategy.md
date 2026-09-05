@@ -21,9 +21,14 @@ supplemental evidence, not an assertion threshold, and remains opt-in.
   `test_resident_captured_replay_comparison` row in `benchmark_test.py` is
   CUDA-only; it records two equal nonempty sample sets and validates summaries
   when CUDA/native capture qualifies, otherwise cleanly skips.
-- **P3:** Parametrized unit tests verify the required box-count matrix and all
-  secondary axes. Budget boundaries and unavailable CUDA/capture rows must be
-  deterministic and must never dispatch a CPU fallback.
+- **P3 (delivered, issue #1583):** Default-collection host tests in
+  `resident_benchmark_support_test.py` cover the exact 1/10/100/1000 matrix,
+  explicit axes, exact requested/actual dimensions, equality and over-budget
+  boundaries, malformed estimates/availability, import isolation, and no probe
+  for invalid or over-budget cases. CUDA-seam and opt-in consumer tests cover
+  exact nondefault dimension forwarding, one availability probe across eligible
+  rows, structured unavailable outcomes, one binding per approved row, cleanup,
+  one aggregate writer call, and no CPU/Warp-CPU fallback.
 - **P4:** Formula tests cover each memory category, zero dimensions, inactive
   fixed capacity, E8-F3 total reconciliation, communication alternatives,
   checkpoint scenarios, projected tape scaling, and checked integer arithmetic.
@@ -44,14 +49,18 @@ Focused fix checks are assertion-only and coverage disabled:
 ```bash
 pytest particula/execution/tests/resident_benchmark_support_test.py -q --no-cov
 pytest particula/execution/tests/resident_benchmark_cuda_support_test.py -q --no-cov
+pytest particula/execution/tests/multi_box_loop_test.py -q --no-cov
+pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov
 pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov
 pytest particula/gpu/tests/benchmark_safety_test.py --benchmark -q --no-cov
 pytest particula/gpu/tests/benchmark_test.py --benchmark \
   -k resident -v -s --no-cov
 ```
 
-The CUDA benchmark command may pass or cleanly skip. It must never fall back to
-Warp CPU, and skipped/unavailable rows are not inferred as measurements.
+The CUDA benchmark command may pass or cleanly skip only before the resident
+artifact path is entered. Once entered, unavailable CUDA/native capture is a
+structured row. It must never fall back to Warp CPU, and nonexecuted rows are
+not inferred as measurements.
 
 A focused target with `--cov` is invalid comprehensive evidence. Focused checks
 must run without coverage; inability to meet full-package coverage from those

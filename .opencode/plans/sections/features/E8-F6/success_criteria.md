@@ -1,9 +1,9 @@
 # Success Criteria
 
-- [ ] The opt-in CUDA matrix includes 1, 10, 100, and 1000 boxes where memory
+- [x] The opt-in CUDA matrix includes 1, 10, 100, and 1000 boxes where memory
   permits, with particles per box, species, active fraction, process set,
   communication, and diagnostics represented as explicit case metadata.
-- [ ] Every infeasible or unavailable required row records a structured reason;
+- [x] Every infeasible or unavailable required row records a structured reason;
   no row silently disappears, falls back to CPU, or is reported as measured.
 - [x] One small repeated-step workload records uncaptured and captured raw samples
   from one identical validated native-CUDA fixture using alternating paired
@@ -25,9 +25,9 @@
 - [ ] Sizing is deterministic and overflow-safe, and identical case/resource
   inputs produce byte-identical normalized evidence aside from timestamps and
   raw measured values.
-- [x] Default pytest collection remains unchanged; the P2 row requires
-  `--benchmark`, CUDA/native capture cleanly skips, and no performance number
-  gates CI.
+- [x] Default pytest collection remains unchanged; P3 is opt-in behind
+  `--benchmark`, preserves exact requested/actual capacity, emits structured
+  nonexecution rows after artifact entry, and no performance number gates CI.
 - [ ] Focused tests, untargeted repository coverage, linters, documentation
   contract tests, and `mkdocs build --strict` pass without lowering thresholds.
 

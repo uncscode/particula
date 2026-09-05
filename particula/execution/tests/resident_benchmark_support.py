@@ -586,9 +586,14 @@ def build_default_resident_benchmark_matrix() -> tuple[
 ]:
     """Build the fixed box-first P3 matrix without sizing or device work.
 
-    Each row preserves its requested capacity as its actual capacity. P3 only
-    classifies configured budget and P2 availability; P4--P5 own byte formulas
-    and allocator analysis.
+    The four rows use 1, 10, 100, and 1,000 boxes, each with 16 particles and
+    2 species per box. They share explicit active-slot, process,
+    communication, and diagnostics axes. Each row preserves its requested
+    capacity as its actual capacity; P3 classifies budget and P2 availability
+    only. P4--P5 own byte formulas and allocator analysis.
+
+    Returns:
+        Immutable canonical cases in ascending requested box-count order.
     """
     common: dict[str, Any] = {
         "active_fraction": 1.0,
@@ -632,9 +637,27 @@ def preflight_resident_benchmark_case(
 ) -> ResidentBenchmarkPreflight:
     """Classify one exact request before probing CUDA or allocating a fixture.
 
+    P3 reuses the injected P1/P2 requested-case estimate and availability
+    seams rather than deriving byte formulas or inspecting allocator state.
     Equality with the configured budget is eligible. No row is downscaled or
     redirected to CPU/Warp-CPU; availability is queried only after all host
     validation and budget classification complete.
+
+    Args:
+        case: Exact canonical matrix case to classify.
+        budget_bytes: Positive configured allocation budget in bytes.
+        estimate_requested_bytes: P1/P2 estimator for the requested case.
+        availability: Zero-argument P2 CUDA/native-capture availability probe.
+
+    Returns:
+        An executed, budget-skipped, or unavailable preflight outcome that
+        retains the case's requested and actual capacity metadata.
+
+    Raises:
+        TypeError: If a carrier, callback, or callback result has an invalid
+            type.
+        ValueError: If a case shape, budget, or requested-case estimate is
+            invalid.
     """
     if not isinstance(case, ResidentBenchmarkCase):
         raise TypeError("case must be a ResidentBenchmarkCase.")

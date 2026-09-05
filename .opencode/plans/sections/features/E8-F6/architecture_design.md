@@ -39,16 +39,32 @@ prepared-loop close path. The opt-in test persists one schema-v2 envelope at the
 fixed resident-comparison destination; it neither invokes nor modifies the
 generic benchmark writer.
 
+### P3 implementation boundary
+
+The standard-library-only support module builds four immutable box-first cases
+(`1`, `10`, `100`, and `1000`) and classifies each before CUDA work. It accepts
+only a positive integer requested-case estimate and configured budget, permits
+estimate equality, and retains identical requested and actual shapes. A
+strictly over-budget case returns `skipped_budget` without invoking availability;
+an eligible preconstruction CUDA/device/native-capture absence returns
+`unavailable` with a reason. Invalid inputs and malformed availability carriers
+raise before callback invocation.
+
+The opt-in consumer preflights every case, memoizes eligibility availability,
+forwards exact dimensions into the P2 fixture seam, and appends structured
+nonexecution outcomes to the single aggregate artifact. Postconstruction,
+capture, timing, result-validation, and cleanup failures remain errors: they do
+not become unavailable rows or partial artifacts. No CPU or Warp-CPU fallback,
+capacity downscale, allocator accounting, or production API is introduced.
+
 ```text
 validated BenchmarkCase + qualified CUDA device
           |
-          +--> dimension memory model
-          |      primary/inactive capacity
-          |      + E8-F3 logical resource report
-          |      + diagnostics/communication/checkpoint
-          |      + labeled future tape projection
+          +--> P3 host preflight
+          |      requested estimate vs. budget
+          |      equality eligible; exact shapes retained
           |                |
-          |        budget preflight ----------> unavailable row
+          |        skipped_budget / unavailable row
           v
 E8-F5 validated fixture -> E8-F2 prepared loop -> E8-F4 capture
           |                         |                 |

@@ -47,6 +47,23 @@ row. The row cleanly skips when CUDA or native capture is unavailable, never
 uses CPU or Warp-CPU as a substitute, changes no production API or generic GPU
 benchmark artifact, and makes no speed, regression, or performance claim.
 
+## Delivered P3 Box-First Matrix (Issue #1583)
+
+Issue #1583 delivered the host-only 1/10/100/1000-box matrix and its
+budget-aware classification before CUDA probing or fixture allocation. Every
+row preserves its exact requested and actual dimensions; equality with the
+configured budget is eligible and an over-budget row is recorded as
+`skipped_budget` without probing availability. Missing CUDA, an unsupported
+device, or unavailable native capture produces a structured `unavailable` row
+with a reason, never CPU or Warp-CPU fallback.
+
+The P2 CUDA fixture seam now receives exact box, particle, and species
+dimensions. The opt-in resident artifact consumer preflights all matrix rows,
+memoizes availability across eligible rows, reuses one binding per approved
+row, and writes one aggregate artifact only after all rows complete. This is
+test-only evidence: P4/P5 byte-category, allocator, and observed-memory work
+remain unimplemented, and no production API changed.
+
 ## User Stories
 
 - As a performance engineer, I want captured and uncaptured resident loops run

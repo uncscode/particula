@@ -48,7 +48,22 @@ to the exact E8 resource inventory.
 - One `--benchmark`, `slow`, `performance`, `warp`, and `cuda` resident
   comparison row in `particula/gpu/tests/benchmark_test.py`. It records equal,
   nonempty paired sample counts only after CUDA/native-capture qualification;
-  unavailable CUDA/native capture skips rather than falling back.
+   unavailable CUDA/native capture skips rather than falling back.
+
+## Delivered in P3 (Issue #1583)
+
+- Host-only canonical matrix rows for 1, 10, 100, and 1000 boxes in
+  `particula/execution/tests/resident_benchmark_support.py`, with explicit
+  case axes and exact requested/actual shapes; no row is capacity-downscaled.
+- Conservative requested-case-estimate preflight before device probing,
+  fixture construction, allocation, or timing. Budget equality is allowed;
+  over-budget rows are structured `skipped_budget` outcomes and eligible
+  unavailable CUDA/device/capture rows are structured `unavailable` outcomes.
+- Exact `n_boxes`, `n_particles`, and `n_species` forwarding through the P2
+  CUDA fixture seam and an opt-in aggregate resident-artifact consumer.
+- Host and injected-double regression coverage for matrix metadata, budget and
+  availability boundaries, exact dimensions, availability memoization, cleanup,
+  one aggregate writer call, and no CPU/Warp-CPU fallback.
 
 ## Out of Scope
 
@@ -62,5 +77,6 @@ to the exact E8 resource inventory.
   projections for Epic I until measured evidence exists.
 - CUDA occupancy/kernel profiling, which belongs to E8-F7, and the runnable
   lifecycle example, runbook, and final Epic H closeout, which belong to E8-F8.
-- A box-count matrix, memory-budget model/probe, published documentation, and
+- P4/P5 byte-category formulas, allocator high-water probing, and
+  analytical-versus-observed memory comparisons; published documentation; and
   any speed threshold or general performance conclusion.

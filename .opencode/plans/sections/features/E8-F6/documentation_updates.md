@@ -14,6 +14,13 @@ the implementation docstrings define the timing boundary, CUDA-only clean-skip
 behavior, artifact isolation, and absence of a speed claim. Public benchmark
 publication and documentation remain P6 work.
 
+## P3 status
+
+Issue #1583 makes no public documentation change. It adds test-only host
+matrix/preflight and opt-in artifact-consumer evidence, including structured
+budget and preconstruction-unavailable rows. P4/P5 allocator/byte accounting
+and P6 publication/documentation remain future work.
+
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` under Epic H Performance
   and Memory with the exact plain reproduction command, date, Warp/Python
   versions, qualified device, matrix, raw artifact path, summary table, memory
