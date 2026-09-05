@@ -74,11 +74,11 @@
     {
       "id": "E8-F5-P4",
       "title": "RNG continuation and lifecycle rejection matrix with tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-05",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
