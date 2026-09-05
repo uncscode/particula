@@ -25,7 +25,10 @@ from particula.execution.gpu_session import (
     ResidentMetadata,
     ResidentSession,
     ResidentStepGuard,
+    setup_resident_session,
 )
+from particula.gas import EnvironmentData, GasData
+from particula.particles import ParticleData
 
 if TYPE_CHECKING:
     from particula.execution.gpu_resources import GPUResourceRegistry
@@ -90,6 +93,92 @@ def _resident_binding(
     )
     registry = GPUResourceRegistry(session)
     return session, registry, ResidentStepGuard(session, registry)
+
+
+def _real_dispatch_binding() -> tuple[Any, "GPUResourceRegistry", Any]:
+    """Create a two-slot CPU Warp binding suitable for stochastic adapters."""
+    wp = pytest.importorskip("warp")
+    from particula.execution.gpu_resources import GPUResourceRegistry
+
+    particles = ParticleData(
+        masses=np.array([[[1.0e-18], [1.5e-18]]]),
+        concentration=np.ones((1, 2)),
+        charge=np.zeros((1, 2)),
+        density=np.array([1000.0]),
+        volume=np.ones(1),
+    )
+    gas = GasData(
+        name=["species"],
+        molar_mass=np.array([0.1]),
+        concentration=np.zeros((1, 1)),
+        partitioning=np.array([False]),
+    )
+    environment = EnvironmentData(
+        temperature=np.array([298.15]),
+        pressure=np.array([101325.0]),
+        saturation_ratio=np.ones((1, 1)),
+    )
+    session = setup_resident_session(
+        particles,
+        gas,
+        environment,
+        Device(Backend.WARP, str(wp.get_device("cpu"))),
+        root_seed=734,
+        logical_box_ids=("box-a",),
+        lanes=(0,),
+    )
+    registry = GPUResourceRegistry(session)
+    return session, registry, ResidentStepGuard(session, registry)
+
+
+def _dispatch_real_processes(session: Any, registry: Any) -> tuple[Any, Any]:
+    """Dispatch Brownian and selected neutral wall loss with resident streams."""
+    from particula.execution.adapters.coagulation import (
+        BrownianCoagulationConfig,
+        ResidentBrownianCoagulationExecutionAdapter,
+        ResidentBrownianCoagulationExecutionState,
+        WarpBrownianCoagulationExecutionState,
+        WarpBrownianCoagulationState,
+    )
+    from particula.execution.process_adapters import (
+        ResidentWallLossAdapter,
+        ResidentWallLossRequest,
+    )
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    coagulation = registry.acquire_coagulation(1)
+    state = ResidentBrownianCoagulationExecutionState(
+        WarpBrownianCoagulationExecutionState(
+            WarpBrownianCoagulationState(
+                BrownianCoagulationConfig(),
+                session.particles,
+                None,
+                None,
+                1.0,
+                collision_pairs=coagulation.collision_pairs,
+                n_collisions=coagulation.n_collisions,
+                rng_states=coagulation.rng_states,
+                initialize_rng=False,
+                environment=session.environment,
+            )
+        ),
+        session,
+        registry,
+        coagulation,
+    )
+    ResidentBrownianCoagulationExecutionAdapter().execute(state)
+    wall_loss = registry.acquire_wall_loss()
+    ResidentWallLossAdapter().execute(
+        ResidentWallLossRequest(
+            session,
+            registry,
+            wall_loss,
+            NeutralWallLossConfig("spherical", 1.0, chamber_radius=1.0),
+            1.0,
+            enabled_box_indices=(0,),
+        )
+    )
+    return coagulation, wall_loss
 
 
 def test_checkpoint_payload_is_frozen() -> None:
@@ -425,6 +514,72 @@ def test_restart_continues_all_published_rng_streams_without_reinitializing(
     np.testing.assert_array_equal(
         restored_wall_loss.rng_states.numpy(), wall_loss_words
     )
+
+
+@pytest.mark.warp
+@pytest.mark.stochastic
+def test_schema_v4_restart_continues_real_process_streams(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Checkpoint real dispatch words into fresh restart-owned sidecars."""
+    import particula.execution.gpu_resources as gpu_resources
+
+    session, registry, guard = _real_dispatch_binding()
+    restored = restored_registry = restored_guard = None
+    try:
+        coagulation, wall_loss = _dispatch_real_processes(session, registry)
+        source_coagulation = coagulation.rng_states.numpy().copy()
+        source_wall_loss = wall_loss.rng_states.numpy().copy()
+        checkpoint = session.checkpoint(registry, guard)
+
+        assert checkpoint.schema_version == 4
+        assert checkpoint.rng_continuation is not None
+        assert [
+            item.process_id for item in checkpoint.rng_continuation.payloads
+        ] == [
+            "coagulation",
+            "wall_loss",
+        ]
+        monkeypatch.setattr(
+            gpu_resources.StreamRegistry,
+            "initialize",
+            lambda _self: pytest.fail(
+                "restart must not initialize RNG streams"
+            ),
+        )
+        monkeypatch.setattr(
+            gpu_resources.StreamRegistry,
+            "initialize_process",
+            lambda _self, _process: pytest.fail(
+                "restart must not initialize an RNG stream"
+            ),
+        )
+        restored, restored_registry, restored_guard = restart_resident_session(
+            checkpoint, session.metadata.device
+        )
+        restored_coagulation = restored_registry.acquire_coagulation(1)
+        restored_wall_loss = restored_registry.acquire_wall_loss()
+        assert restored is not session
+        assert restored_registry is not registry
+        assert restored_guard is not guard
+        assert restored_coagulation.rng_states is not coagulation.rng_states
+        assert restored_wall_loss.rng_states is not wall_loss.rng_states
+        np.testing.assert_array_equal(
+            restored_coagulation.rng_states.numpy(), source_coagulation
+        )
+        np.testing.assert_array_equal(
+            restored_wall_loss.rng_states.numpy(), source_wall_loss
+        )
+
+        _dispatch_real_processes(restored, restored_registry)
+        assert np.any(
+            restored_coagulation.rng_states.numpy() != source_coagulation
+        )
+        assert np.any(restored_wall_loss.rng_states.numpy() != source_wall_loss)
+    finally:
+        if restored is not None:
+            restored.close(restored_registry, restored_guard)
+        session.close(registry, guard)
 
 
 @pytest.mark.warp

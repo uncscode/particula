@@ -2975,6 +2975,91 @@ def _issued_capture_for_lifecycle_test(
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize(
+    ("duration", "exception", "match"),
+    [
+        (
+            1.0,
+            ValueError,
+            "captured graph replay duration does not match",
+        ),
+        ("invalid", TypeError, "duration must be a non-boolean real"),
+        (-1.0, ValueError, "duration must be finite and nonnegative"),
+        (float("nan"), ValueError, "duration must be finite and nonnegative"),
+        (float("inf"), ValueError, "duration must be finite and nonnegative"),
+    ],
+)
+def test_fake_native_replay_rejects_invalid_duration_before_launch(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+    duration: object,
+    exception: type[Exception],
+    match: str,
+) -> None:
+    """Invalid replay durations reject before a native launch or guard step."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    launches: list[object] = []
+    captured, binding = _issued_capture_for_lifecycle_test(
+        request,
+        monkeypatch,
+        handle=object(),
+        launch=launches.append,
+    )
+    # Fake-native records use the CPU fixture, so isolate duration validation
+    # from CUDA admission while retaining every other replay preflight.
+    monkeypatch.setattr(
+        graph_capture, "gate_resident_graph_capture", lambda _binding: None
+    )
+    try:
+        with pytest.raises(exception, match=match):
+            replay_captured_resident_graph(captured, duration)
+        assert launches == []
+        assert request.guard.completed_steps == 0
+    finally:
+        close_resident_graph_capture(binding)
+
+
+@pytest.mark.warp
+def test_fake_native_replay_writer_failure_faults_and_revokes_once(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A native replay writer error faults without retry or recovery."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    launches: list[object] = []
+    releases: list[object] = []
+    handle = object()
+
+    def launch(replayed_handle: object) -> None:
+        launches.append(replayed_handle)
+        raise RuntimeError("native replay failure")
+
+    captured, binding = _issued_capture_for_lifecycle_test(
+        request,
+        monkeypatch,
+        handle=handle,
+        launch=launch,
+        release=releases.append,
+    )
+    monkeypatch.setattr(
+        graph_capture, "gate_resident_graph_capture", lambda _binding: None
+    )
+    try:
+        with pytest.raises(RuntimeError, match="native replay failure"):
+            replay_captured_resident_graph(captured, 0.0)
+        assert launches == [handle]
+        assert releases == [handle]
+        assert request.guard.completed_steps == 0
+        request.guard.assert_step_closed()
+        assert request.session.lifecycle.name == "FAULTED"
+        assert binding.lifecycle.state is GraphCaptureLifecycleState.FAULTED
+        with pytest.raises(ValueError, match="not P2-issued"):
+            replay_captured_resident_graph(captured, 0.0)
+    finally:
+        close_resident_graph_capture(binding)
+
+
+@pytest.mark.warp
 def test_native_handle_identity_is_single_use_even_after_release(
     resident_request: object,
     monkeypatch: pytest.MonkeyPatch,

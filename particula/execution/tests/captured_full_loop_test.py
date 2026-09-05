@@ -2973,11 +2973,19 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
                 ),
             )
             captured = capture_prepared_resident_graph(qualification)
+            assert (
+                cuda_loop.registry.coagulation_resources.rng_states
+                is not cuda_loop.registry.wall_loss_resources.rng_states
+            )
+            cuda_coagulation_rng_initial = cuda_initial["coagulation_rng"]
             cuda_rng_initial = cuda_initial["wall_loss_rng"]
 
             enqueue_prepared_resident_simulation(cpu_loop.prepared)
             replay_captured_resident_graph(captured, qualification.duration)
             cuda_first = _prepared_snapshot(cuda_loop)
+            assert np.any(
+                cuda_first["coagulation_rng"] != cuda_coagulation_rng_initial
+            )
             assert np.any(cuda_first["wall_loss_rng"] != cuda_rng_initial)
 
             enqueue_prepared_resident_simulation(cpu_loop.prepared)

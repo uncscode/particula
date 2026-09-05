@@ -531,3 +531,59 @@ def test_resident_processes_publish_distinct_rng_sidecars(
         is not registry.acquire_wall_loss().rng_states
     )
     assert session.metadata.stream is not None
+
+
+@pytest.mark.warp
+@pytest.mark.stochastic
+def test_resident_streams_advance_independently_and_reset_selected_lane() -> (
+    None
+):
+    """Test real process dispatch preserves independent stream lifecycles."""
+    _require_device("cpu")
+    session, registry, guard = _make_session("cpu", ("box-a", "box-b"), (0, 1))
+    reference, reference_registry, reference_guard = _make_session(
+        "cpu", ("box-a", "box-b"), (0, 1)
+    )
+    try:
+        coagulation = registry.acquire_coagulation(1)
+        wall_loss = registry.acquire_wall_loss()
+        reference_wall_loss = reference_registry.acquire_wall_loss()
+        assert coagulation.rng_states is not wall_loss.rng_states
+
+        initial_coagulation = _rng_snapshot(coagulation)
+        initial_wall_loss = _rng_snapshot(wall_loss)
+        _dispatch_coagulation(session, registry)
+        advanced_coagulation = _rng_snapshot(coagulation)
+        np.testing.assert_array_equal(
+            _rng_snapshot(wall_loss), initial_wall_loss
+        )
+        assert np.any(advanced_coagulation != initial_coagulation)
+
+        _dispatch_wall_loss(session, registry, 1.0, (0,))
+        advanced_wall_loss = _rng_snapshot(wall_loss)
+        assert advanced_wall_loss[0] != initial_wall_loss[0]
+        assert advanced_wall_loss[1] == initial_wall_loss[1]
+        np.testing.assert_array_equal(
+            _rng_snapshot(coagulation), advanced_coagulation
+        )
+
+        _dispatch_wall_loss(session, registry, 1.0, (0,))
+        continued_wall_loss = _rng_snapshot(wall_loss)
+        assert continued_wall_loss[0] != advanced_wall_loss[0]
+
+        session.reset_streams(
+            registry,
+            guard,
+            process_ids=("wall_loss",),
+            logical_box_ids=("box-a",),
+        )
+        reset_wall_loss = _rng_snapshot(wall_loss)
+        reference_words = _rng_snapshot(reference_wall_loss)
+        assert reset_wall_loss[0] == reference_words[0]
+        assert reset_wall_loss[1] == continued_wall_loss[1]
+        np.testing.assert_array_equal(
+            _rng_snapshot(coagulation), advanced_coagulation
+        )
+    finally:
+        reference.close(reference_registry, reference_guard)
+        session.close(registry, guard)
