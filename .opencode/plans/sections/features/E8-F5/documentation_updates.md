@@ -27,3 +27,11 @@
   example track owns runnable usage and limitations.
 - Validate all changed documentation with contract tests and
   `mkdocs build --strict`.
+
+## P5 Reconciliation (#1579)
+
+The roadmap and hardware-free regression test were updated. The existing testing
+guide already states the durable focused, Warp-baseline, CUDA-clean-skip, and
+separate deterministic/conservation/stochastic policy, so it was unchanged.
+The dedicated AGENTS block remains unchanged because strict MkDocs verification
+is unavailable. The final strict build is the sole shipment blocker.

@@ -38,3 +38,6 @@
    timing and memory evidence.
 7. E8-F8 publishes the runnable workflow, runbook, and epic closeout; it
    depends on all preceding tracks.
+
+P5 #1579 has recorded its passing assertion evidence but remains blocked on the
+unavailable strict MkDocs gate; E8-F6/E8-F7/E8-F8 must not treat it as shipped.

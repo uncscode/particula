@@ -13,6 +13,11 @@
       contains the conflicting stale assignment.
   - Resolved by: plan-question-resolver
 
+- [ ] Can the strict MkDocs gate run in the isolated #1579 worktree?
+  - Blocked 2026-09-04: no worktree-scoped MkDocs runner is available. This is
+    the sole blocker for P5 shipment; rerun `mkdocs build --strict` before
+    changing E8-F5 status.
+
 - [x] Which CPU process composition is sufficiently equivalent for the complete
   three-way fixture where a process has no exact high-level CPU twin?
   - Resolved 2026-08-30: Compose independent per-process NumPy equations and

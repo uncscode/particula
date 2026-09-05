@@ -251,6 +251,7 @@ def test_planning_records_preserve_p4_validation_block_and_handoff_boundary() ->
     assert {child["id"] for child in epic_record["child_plans"]} == {
         "E8-F1",
         "E8-F2",
+        "E8-F5",
     }
     assert epic_record["milestones"] == [
         {
@@ -394,3 +395,56 @@ def test_prepared_source_docstrings_state_setup_dispatch_boundary() -> None:
     assert "pre-token gate" in normalized
     assert "exactly one token" in normalized
     assert "fresh signature comparison" in normalized
+
+
+def test_e8_f5_p5_closeout_docs_link_authoritative_evidence_and_preserve_limits() -> (
+    None
+):
+    """Test E8-F5-P5 evidence is ordered, bounded, and cross-recorded."""
+    roadmap = _read("docs/Features/Roadmap/data-oriented-gpu.md")
+    evidence = _read(
+        ".opencode/plans/sections/features/E8-F5/testing_strategy.md"
+    )
+    prior = "### E8-F4-P5 full-loop validation contract"
+    closeout = "### E8-F5-P5 integrated validation closeout"
+    evidence_heading = (
+        "## E8-F5-P5 authoritative integrated validation evidence"
+    )
+
+    assert roadmap.index(prior) < roadmap.index(closeout)
+    subsection = _section(roadmap, closeout)
+    _require_statements(
+        subsection,
+        "E8-F5-P5 roadmap closeout",
+        (
+            "independent CPU/NumPy oracle",
+            "required installed-Warp uncaptured rows",
+            "optional native-CUDA capture/replay rows",
+            "rtol=1e-12",
+            "atol=1e-30",
+            "concentration-weighted per-box/per-species conservation",
+            "aggregate or sigma-bounded checks",
+            "concrete-only",
+            "no public graph-capture API or example",
+            "no fallback, automatic recapture, retry, rollback",
+            "hidden transfer/readback/synchronization",
+            "checkpointed-native-handle",
+            "cross-device replay claim",
+            "no performance, memory, or profiling completion claim",
+        ),
+    )
+    commands = (
+        "pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov",
+        "pytest particula/execution/tests/graph_capture_test.py",
+        "particula/execution/tests/rng_invariance_test.py",
+        "particula/execution/tests/checkpoint_test.py -q --no-cov",
+        '-m "warp and cuda" --no-cov',
+        ".opencode/tools/run_pytest.py",
+        "pytest particula/execution/tests/graph_capture_docs_test.py",
+        "particula/tests/execution_selection_docs_test.py -q --no-cov",
+        "mkdocs build --strict",
+    )
+    assert evidence_heading in evidence
+    for command in commands:
+        assert command in evidence
+        assert command in subsection

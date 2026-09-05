@@ -58,11 +58,12 @@
     retry, recovery, automatic recapture, or rollback behavior changed.
 
 - [ ] **E8-F5-P5:** Integrated validation matrix and documentation updates
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1579 | Size: S | Status: In Progress (strict MkDocs blocked)
   - Goal: Consolidate the default and optional validation commands, document
     tolerances and evidence boundaries, and publish the downstream handoff.
-  - Files: `.opencode/guides/testing_guide.md`,
-    `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`, E8 plan sections.
-  - Tests: Focused resident assertions, optional CUDA pass-or-clean-skip rows,
-    untargeted repository coverage runner, documentation contract tests, and
-    `mkdocs build --strict`.
+  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
+    `particula/execution/tests/graph_capture_docs_test.py`, and E8 plan sections.
+  - Evidence: focused required rows passed (48 and 274 passes), optional CUDA
+    cleanly skipped, untargeted coverage passed (6634 passes, 92.92%), and the
+    documentation contract passed (25 passes). `mkdocs build --strict` is
+    unavailable because no worktree-scoped MkDocs runner exists; P5 is unshipped.

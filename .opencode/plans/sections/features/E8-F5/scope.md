@@ -46,3 +46,9 @@ architecture.
   dynamic resizing, compaction, migration, or CPU fallback.
 - Public graph-capture exports, automatic recapture, checkpointing graph handles,
   rollback after a writer launch, or changes to E8-F1--E8-F4 contracts.
+
+## P5 Status (#1579)
+
+P5 adds the roadmap evidence table and one hardware-free documentation regression
+assertion only. Passing assertions do not substitute for strict MkDocs; that
+unavailable command leaves the feature unshipped.

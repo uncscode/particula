@@ -25,4 +25,7 @@
   than mock a parallel capture architecture.
 - Follow `particula/gpu/kernels/tests/condensation_graph_capture_test.py` for
   CUDA capability checks and clean skips, but keep full-loop expectations
-  independent from production helpers.
+   independent from production helpers.
+
+P5 #1579 reuses the existing documentation-contract target and repository runner;
+it adds no execution infrastructure. Strict MkDocs remains unavailable.

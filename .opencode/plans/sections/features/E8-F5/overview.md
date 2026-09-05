@@ -52,6 +52,11 @@ writer-failure row verifies fault, provenance revocation, and one release; it
 makes no rollback or recovery claim. No production module, API, export, user
 documentation, or example changed.
 
+E8-F5-P5 is in progress for issue #1579. Its authoritative evidence record
+captures passing focused, optional-CUDA clean-skip, untargeted coverage, and
+documentation-contract results. It remains unshipped until the unavailable
+`mkdocs build --strict` gate can run; no production API or example changed.
+
 ## User Stories
 
 - As a scientific user, I want captured and uncaptured loops compared with an

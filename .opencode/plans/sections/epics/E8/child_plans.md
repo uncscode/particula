@@ -11,7 +11,7 @@ must ship its own co-located unit and contract tests.
 | E8-F2 | Capture-Ready Device Enqueue Paths | In Progress | P1--P6/P8 shipped; P7 composition remains pending. |
 | E8-F3 | Registry Preallocation, Identity Reuse, and Byte Accounting | Pending | Preallocate and pin process, communication, diagnostic, and RNG sidecars |
 | E8-F4 | Resident Graph Capture and Guarded Replay Lifecycle | Shipped | P1--P5 delivered; private handle provenance, guarded replay, teardown, and three-way validation are covered. |
-| E8-F5 | Captured Full-Loop Parity and Lifecycle Validation | Pending | Compare CPU, uncaptured GPU, and captured GPU process sequences |
+| E8-F5 | Captured Full-Loop Parity and Lifecycle Validation | In Progress | P1--P4 shipped; #1579 P5 evidence passed except unavailable `mkdocs build --strict`, so it remains unshipped. |
 | E8-F6 | Multi-Box Scaling Benchmarks and Memory-Budget Evidence | Pending | Measure scaling and publish reproducible memory-budget evidence behind opt-in CUDA gates |
 | E8-F7 | CUDA Profiling and Machine-Bounded Performance Decisions | Pending | Record occupancy, memory access, and captured-versus-uncaptured launch overhead |
 | E8-F8 | Graph-Capture Example, Runbook, Limitations, and Closeout | Pending | Publish the runnable workflow and close the epic with literal evidence |

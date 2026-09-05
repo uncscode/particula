@@ -7,7 +7,7 @@ Calendar dates require owner scheduling; ordering and exit evidence are fixed.
 | Capture lifecycle established | TBD | 2026-08-30 | Shipped | E8-F1 host-side contract handoff; no captured fixed-loop smoke test has shipped. #1550 focused checks passed (2 graph-document tests and 16 export tests), the untargeted runner passed (6382 passed, 9 skipped, 94% coverage), and `mkdocs build --strict` passed (exit 0). |
 | Prepared enqueue boundary shipped | TBD | 2026-09-01 | In Progress | E8-F2 P1--P6/P8 shipped; P7 and E8-F3 resource work remain pending. |
 | Graph capture and guarded replay established | TBD | 2026-09-04 | Shipped | E8-F4 P1--P5; capture, replay, invalidation, private handle provenance, and CUDA smoke evidence |
-| Three-way correctness gate passes | TBD | - | Not Started | E8-F5; CPU, uncaptured GPU, and captured GPU evidence |
+| Three-way correctness gate passes | TBD | - | In Progress | E8-F5 #1579: focused, coverage, and docs assertions passed; strict MkDocs is unavailable, so no shipment. |
 | Scaling and memory evidence published | TBD | - | Not Started | E8-F6; dated artifacts with environment metadata |
 | Profiling evidence published | TBD | - | Not Started | E8-F7; machine-bounded launch and kernel evidence |
 | User workflow and closeout accepted | TBD | - | Not Started | E8-F8; example, runbook, docs, and full validation |

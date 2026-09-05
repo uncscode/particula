@@ -34,8 +34,10 @@ lowered, and production behavior is not changed solely to expose test internals.
   and lifecycle replay rejections before launch plus one writer-failure
   fault/revocation/release case. `captured_full_loop_test.py` adds optional
   native-CUDA aggregate evidence that both scheduled streams advance.
-- **P5:** Run the integrated focused matrix, documentation contract tests, and
-  strict MkDocs validation.
+- **P5 (blocked, #1579):** The dated integrated closeout below records the
+  focused matrix, untargeted coverage runner, documentation contract tests, and
+  strict MkDocs validation. It adds documentation evidence only; it does not
+  change production behavior or P1--P4 fixtures.
 
 ## Numerical Policy
 
@@ -73,3 +75,31 @@ mkdocs build --strict
 
 If a required command is unavailable, record it as unavailable rather than
 inferring pass. Optional CUDA rows may pass or cleanly skip.
+
+## E8-F5-P5 authoritative integrated validation evidence
+
+**Date:** 2026-09-04. **Runtime preflight:** Python 3.12.12; Warp was installed
+because the required uncaptured matrix executed with 48 passes. The available
+test wrapper did not report a Warp version or enumerate opaque device strings.
+No native CUDA device/capture prerequisite was qualified: the optional selector
+cleanly skipped all 11 CUDA rows. This is not CPU or Warp-CPU capture fallback.
+
+Required focused rows use `--no-cov`; the wrapper enforced equivalent disabled
+coverage. The untargeted runner is the sole full-package coverage evidence.
+
+| Kind | Exact command | Exit status | Literal outcome |
+| --- | --- | --- | --- |
+| Focused required | `pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov` | 0 | `48 passed, 11 skipped` |
+| Focused required | `pytest particula/execution/tests/graph_capture_test.py particula/execution/tests/rng_invariance_test.py particula/execution/tests/checkpoint_test.py -q --no-cov` | 0 | `274 passed, 1 skipped` |
+| Focused optional CUDA | `pytest particula/execution/tests/captured_full_loop_test.py -q -m "warp and cuda" --no-cov` | 0 | `11 skipped, 48 deselected` (clean skip) |
+| Untargeted coverage | `.opencode/tools/run_pytest.py` | 0 | `6634 passed, 24 skipped, 1 xfailed, 92.92% coverage` |
+| Documentation required | `pytest particula/execution/tests/graph_capture_docs_test.py particula/tests/execution_selection_docs_test.py -q --no-cov` | 0 | `25 passed` |
+| Documentation required | `mkdocs build --strict` | unavailable | Not run: no worktree-scoped MkDocs runner is available. |
+
+The required installed-Warp uncaptured evidence passed. Deterministic fields use
+`rtol=1e-12, atol=1e-30`; independent concentration-weighted per-box/per-species
+conservation remains separate; stochastic evidence uses aggregate or sigma-bounded
+criteria rather than exact per-seed or cross-device RNG-word replay. The optional
+native-CUDA row does not alter that mandatory gate. P5 remains unshipped solely
+because the required strict MkDocs command is unavailable; no shipped status is
+inferred from the passing assertion-only documentation check.

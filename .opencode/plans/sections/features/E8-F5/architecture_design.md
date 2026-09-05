@@ -99,3 +99,9 @@ closed: graph handles cannot cross session, registry, device, restart, or
 terminal lifecycle boundaries. Test diagnostics expose copied numerical state,
 not native pointers or opaque handles. No failure path adds fallback, migration,
 automatic recapture, retry, or rollback guarantees.
+
+## P5 Reconciliation
+
+Issue #1579 records documentation and validation evidence only. Its strict
+MkDocs gate is unavailable, so this architecture remains unchanged and E8-F5 is
+not marked shipped.

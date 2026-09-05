@@ -23,6 +23,13 @@
 - [ ] Focused tests, untargeted repository coverage, and strict docs validation
   pass; required unavailable commands remain visibly unshipped.
 
+## P5 Gate Status (#1579)
+
+- [x] Focused required evidence, optional CUDA clean-skip evidence, untargeted
+  coverage, and hardware-free documentation assertions passed.
+- [ ] `mkdocs build --strict` passed. Blocked: no worktree-scoped MkDocs runner
+  is available. E8-F5 remains In Progress.
+
 ## Metrics
 
 | Metric | Baseline | Target | Source |

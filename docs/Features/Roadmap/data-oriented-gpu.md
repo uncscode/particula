@@ -1782,6 +1782,43 @@ replay.
 It makes no performance, profiling, or memory claim; E8-F5--E8-F8 retain those
 ownership boundaries.
 
+### E8-F5-P5 integrated validation closeout
+
+This separately labelled closeout records E8-F5 P1--P4 correctness evidence; it
+does not replace the preceding E8-F4-P5 full-loop validation contract. The
+test-only matrix uses an independent CPU/NumPy oracle, required installed-Warp
+uncaptured rows, and optional native-CUDA capture/replay rows that pass or cleanly
+skip. It covers closed GAS and PARTICLES maps, active, prescribed-volume, and
+no-work scenarios, and single- and multi-box rows. It compares fields,
+diagnostics, and family buffers, rejects invalid lifecycle bindings, and retains
+RNG continuation coverage.
+
+Deterministic fields use per-field `rtol=1e-12` and `atol=1e-30`. Independent
+concentration-weighted per-box/per-species conservation is checked separately.
+Stochastic rows use aggregate or sigma-bounded checks, not exact per-seed or
+cross-device RNG-word replay.
+
+The evidence remains concrete-only. It creates no public graph-capture API or
+example and makes no fallback, automatic recapture, retry, rollback, hidden
+transfer/readback/synchronization, checkpointed-native-handle, or cross-device
+replay claim. It also makes no performance, memory, or profiling completion
+claim. Correctness-qualified handoffs are limited to E8-F6 scaling/memory,
+E8-F7 profiling, and E8-F8 example/closeout work.
+
+**Dated evidence (2026-09-04):** Python 3.12.12; Warp installed for the required
+uncaptured row; no native CUDA device/capture prerequisite qualified, so the
+optional CUDA selector cleanly skipped. The authoritative record is
+[`E8-F5 testing strategy`](../../../.opencode/plans/sections/features/E8-F5/testing_strategy.md).
+
+| Kind | Exact command | Exit status | Literal outcome |
+| --- | --- | --- | --- |
+| Focused | `pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov` | 0 | `48 passed, 11 skipped` |
+| Focused | `pytest particula/execution/tests/graph_capture_test.py particula/execution/tests/rng_invariance_test.py particula/execution/tests/checkpoint_test.py -q --no-cov` | 0 | `274 passed, 1 skipped` |
+| Optional CUDA | `pytest particula/execution/tests/captured_full_loop_test.py -q -m "warp and cuda" --no-cov` | 0 | `11 skipped, 48 deselected` (clean skip) |
+| Untargeted coverage | `.opencode/tools/run_pytest.py` | 0 | `6634 passed, 24 skipped, 1 xfailed, 92.92% coverage` |
+| Documentation | `pytest particula/execution/tests/graph_capture_docs_test.py particula/tests/execution_selection_docs_test.py -q --no-cov` | 0 | `25 passed` |
+| Documentation | `mkdocs build --strict` | unavailable | Not run: no worktree-scoped MkDocs runner is available. |
+
 ### E8-F2 prepared enqueue contract
 
 ### E8-F3-P5 capture-resource accounting integration

@@ -37,6 +37,7 @@
 - [x] Parameterize structural and lifecycle rejection categories; assert no
   capture launch on preflight failure and session fault/revocation on writer
   launch failure (issue #1578).
-- [ ] Run focused tests directly without coverage, then run the untargeted
-  `.opencode/tools/run_pytest.py` full-package coverage command.
-- [ ] Run Ruff/mypy where applicable and `mkdocs build --strict` for docs changes.
+- [x] Run focused tests directly without coverage, then run the untargeted
+  `.opencode/tools/run_pytest.py` full-package coverage command (#1579).
+- [ ] Run `mkdocs build --strict` for docs changes (#1579): blocked because no
+  worktree-scoped MkDocs runner is available; do not mark P5 shipped.
