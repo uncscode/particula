@@ -3,7 +3,7 @@
 import subprocess
 import sys
 from types import ModuleType, SimpleNamespace
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
@@ -144,7 +144,9 @@ def test_provenance_uses_real_signature_and_nondefault_device() -> None:
         selected_device=device,
     )
 
-    signature, selected_device = resident_benchmark_provenance(binding)
+    signature, selected_device = resident_benchmark_provenance(
+        cast(ResidentCaptureBenchmarkBinding, binding)
+    )
 
     assert signature == "real-prepared-signature"
     assert selected_device is device

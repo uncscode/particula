@@ -4,9 +4,13 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import SimpleNamespace
+from typing import cast
 
 import pytest
 
+from particula.execution.tests.resident_benchmark_cuda_support import (
+    ResidentCaptureBenchmarkBinding,
+)
 from particula.gpu.tests import benchmark_test
 
 
@@ -83,7 +87,7 @@ def test_resident_provenance_uses_fixture_signature_and_device() -> None:
     )
 
     signature, selected_device = benchmark_test.resident_benchmark_provenance(
-        binding
+        cast(ResidentCaptureBenchmarkBinding, binding)
     )
 
     assert signature == "real-prepared-signature"
