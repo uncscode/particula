@@ -578,6 +578,8 @@ def test_schema_v4_restart_continues_real_process_streams(
         assert np.any(restored_wall_loss.rng_states.numpy() != source_wall_loss)
     finally:
         if restored is not None:
+            assert restored_registry is not None
+            assert restored_guard is not None
             restored.close(restored_registry, restored_guard)
         session.close(registry, guard)
 
