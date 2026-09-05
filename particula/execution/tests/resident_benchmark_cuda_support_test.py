@@ -3,6 +3,7 @@
 import subprocess
 import sys
 from types import ModuleType, SimpleNamespace
+from typing import Any
 
 import pytest
 
@@ -105,10 +106,13 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
     calls: list[tuple[str, object]] = []
     request = SimpleNamespace(capture_resource_requirements="requirements")
     session = object()
+
+    def validate_capture_resource_set(requirements: object) -> str:
+        calls.append(("validate", requirements))
+        return "capture-set"
+
     registry = SimpleNamespace(
-        validate_capture_resource_set=lambda requirements: (
-            calls.append(("validate", requirements)) or "capture-set"
-        )
+        validate_capture_resource_set=validate_capture_resource_set
     )
     guard = object()
     binding_identity = SimpleNamespace(
@@ -126,15 +130,25 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
         prepared="prepared",
     )
     graph_capture = ModuleType("particula.execution.graph_capture")
+
+    def qualify_capture(
+        binding: object,
+        prepared: object,
+        capture_set: object,
+        adapter: object,
+    ) -> str:
+        calls.append(("qualify", (binding, prepared, capture_set, adapter)))
+        return "qualification"
+
+    def capture_graph(qualification: object) -> str:
+        calls.append(("capture", qualification))
+        return "captured"
+
     graph_capture.qualify_prepared_resident_graph_capture = (  # type: ignore[attr-defined]
-        lambda binding, prepared, capture_set, adapter: (
-            calls.append(("qualify", (binding, prepared, capture_set, adapter)))
-            or "qualification"
-        )
+        qualify_capture
     )
     graph_capture.capture_prepared_resident_graph = (  # type: ignore[attr-defined]
-        lambda qualification: calls.append(("capture", qualification))
-        or "captured"
+        capture_graph
     )
     graph_capture.replay_captured_resident_graph = (  # type: ignore[attr-defined]
         lambda captured, duration: calls.append(
@@ -153,8 +167,13 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
         fake_warp,
         [SimpleNamespace(native="cuda:0")],
     )
+
+    def build_prepared_loop(*args: object) -> Any:
+        calls.append(("build", args))
+        return loop
+
     helpers._build_prepared_loop = lambda *args: (  # type: ignore[attr-defined]
-        calls.append(("build", args)) or loop
+        build_prepared_loop(*args)
     )
     helpers._close_prepared_loop = lambda value: calls.append(  # type: ignore[attr-defined]
         ("close", value)

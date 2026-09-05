@@ -1938,15 +1938,6 @@ def test_resident_captured_replay_comparison() -> None:
             seed=1582,
         )
         provenance = {"binding": "native_cuda_capture"}
-        common = {
-            "case_id": case.case_id,
-            "requested_shape": case.requested_shape,
-            "status": ResidentBenchmarkStatus.EXECUTED,
-            "reason": None,
-            "provenance": provenance,
-            "setup_elapsed_seconds": binding.setup_elapsed_seconds,
-            "capture_elapsed_seconds": binding.capture_elapsed_seconds,
-        }
         artifact = ResidentBenchmarkArtifact(
             metadata=build_resident_benchmark_metadata(
                 timestamp_utc=datetime.now(timezone.utc),
@@ -1965,16 +1956,28 @@ def test_resident_captured_replay_comparison() -> None:
             cases=(case,),
             results=(
                 ResidentBenchmarkResult(
+                    case_id=case.case_id,
                     timing_mode="prepared_uncaptured_device_synchronized",
                     samples=uncaptured,
+                    requested_shape=case.requested_shape,
+                    status=ResidentBenchmarkStatus.EXECUTED,
+                    reason=None,
+                    provenance=provenance,
+                    setup_elapsed_seconds=binding.setup_elapsed_seconds,
+                    capture_elapsed_seconds=binding.capture_elapsed_seconds,
                     summary=summarize_timing_samples(uncaptured),
-                    **common,
                 ),
                 ResidentBenchmarkResult(
+                    case_id=case.case_id,
                     timing_mode="captured_replay_device_synchronized",
                     samples=replay,
+                    requested_shape=case.requested_shape,
+                    status=ResidentBenchmarkStatus.EXECUTED,
+                    reason=None,
+                    provenance=provenance,
+                    setup_elapsed_seconds=binding.setup_elapsed_seconds,
+                    capture_elapsed_seconds=binding.capture_elapsed_seconds,
                     summary=summarize_timing_samples(replay),
-                    **common,
                 ),
             ),
         )
