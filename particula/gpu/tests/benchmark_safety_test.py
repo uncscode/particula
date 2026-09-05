@@ -5,12 +5,15 @@ from __future__ import annotations
 from contextlib import contextmanager
 from pathlib import Path
 from types import SimpleNamespace
-from typing import cast
+from typing import Any, cast
 
 import pytest
 
 from particula.execution.tests.resident_benchmark_cuda_support import (
     ResidentCaptureBenchmarkBinding,
+)
+from particula.execution.tests.resident_benchmark_support import (
+    ResidentBenchmarkAvailability,
 )
 from particula.gpu.tests import benchmark_test
 
@@ -100,13 +103,15 @@ def test_resident_matrix_records_unavailability_with_one_probe(
 ) -> None:
     """Preflight all exact rows before CUDA construction and memoize absence."""
     probes: list[str] = []
+
+    def unavailable_after_probe() -> ResidentBenchmarkAvailability:
+        probes.append("probe")
+        return ResidentBenchmarkAvailability(False, "no CUDA")
+
     monkeypatch.setattr(
         benchmark_test,
         "cuda_capture_availability",
-        lambda: (
-            probes.append("probe"),
-            benchmark_test.ResidentBenchmarkAvailability(False, "no CUDA"),
-        )[1],
+        unavailable_after_probe,
     )
     monkeypatch.setattr(
         benchmark_test,
@@ -162,7 +167,7 @@ def test_resident_matrix_forwards_exact_dimensions_and_reuses_bindings(
     monkeypatch.setattr(
         benchmark_test,
         "cuda_capture_availability",
-        lambda: benchmark_test.ResidentBenchmarkAvailability(True),
+        lambda: ResidentBenchmarkAvailability(True),
     )
     monkeypatch.setattr(
         benchmark_test,
@@ -181,5 +186,5 @@ def test_resident_matrix_forwards_exact_dimensions_and_reuses_bindings(
         (call["n_boxes"], call["n_particles"], call["n_species"])
         for call in calls
     ] == [(1, 16, 2), (10, 16, 2), (100, 16, 2), (1000, 16, 2)]
-    assert all(call["availability"].available for call in calls)
+    assert all(cast(Any, call["availability"]).available for call in calls)
     assert len(artifact.results) == 8

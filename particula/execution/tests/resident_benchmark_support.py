@@ -590,7 +590,7 @@ def build_default_resident_benchmark_matrix() -> tuple[
     classifies configured budget and P2 availability; P4--P5 own byte formulas
     and allocator analysis.
     """
-    common = {
+    common: dict[str, Any] = {
         "active_fraction": 1.0,
         "processes": (
             "communication",
@@ -626,7 +626,7 @@ def build_default_resident_benchmark_matrix() -> tuple[
 def preflight_resident_benchmark_case(
     case: ResidentBenchmarkCase,
     *,
-    budget_bytes: int,
+    budget_bytes: object,
     estimate_requested_bytes: Any,
     availability: Any,
 ) -> ResidentBenchmarkPreflight:
