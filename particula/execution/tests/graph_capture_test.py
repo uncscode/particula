@@ -3084,6 +3084,9 @@ def test_fake_native_replay_rejection_matrix_is_prelaunch_only(  # noqa: C901
     }:
 
         def compare_only_gate(candidate_binding: object) -> None:
+            candidate_binding = cast(
+                ResidentGraphCaptureBinding, candidate_binding
+            )
             compatibility = compare_resident_graph_capture_signature(
                 candidate_binding.lifecycle.signature,
                 candidate_binding._request,

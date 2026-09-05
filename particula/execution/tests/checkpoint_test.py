@@ -574,14 +574,19 @@ def test_schema_v4_restart_continues_real_process_streams(
         _dispatch_real_processes(session, registry)
         _dispatch_real_processes(restored, restored_registry)
 
-        for source, restored_state in (
-            (session.particles.masses, restored.particles.masses),
-            (session.particles.concentration, restored.particles.concentration),
-            (session.particles.charge, restored.particles.charge),
-            (session.gas.concentration, restored.gas.concentration),
+        source_particles = cast(Any, session.particles)
+        restored_particles = cast(Any, restored.particles)
+        source_gas = cast(Any, session.gas)
+        restored_gas = cast(Any, restored.gas)
+        states: tuple[tuple[Any, Any], ...] = (
+            (source_particles.masses, restored_particles.masses),
+            (source_particles.concentration, restored_particles.concentration),
+            (source_particles.charge, restored_particles.charge),
+            (source_gas.concentration, restored_gas.concentration),
             (coagulation.rng_states, restored_coagulation.rng_states),
             (wall_loss.rng_states, restored_wall_loss.rng_states),
-        ):
+        )
+        for source, restored_state in states:
             np.testing.assert_array_equal(
                 restored_state.numpy(), source.numpy()
             )
