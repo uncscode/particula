@@ -79,6 +79,8 @@ RESIDENT_CAPTURE_COMPARISON_DESTINATION = (
     "benchmarks/resident_capture_comparison.json"
 )
 SUPPORTED_COMMUNICATION = frozenset({"none", "gas", "particles"})
+RESIDENT_BOX_COUNTS = (1, 10, 100, 1000)
+"""Canonical host-only resident scaling rows; requests are never downscaled."""
 REQUIRED_METADATA_FIELDS = frozenset(
     {
         "timestamp_utc",
@@ -112,6 +114,50 @@ class ResidentBenchmarkStatus(str, Enum):
     EXECUTED = "executed"
     UNAVAILABLE = "unavailable"
     SKIPPED_BUDGET = "skipped_budget"
+
+
+@dataclass(frozen=True, slots=True)
+class ResidentBenchmarkAvailability:
+    """Describe preconstruction CUDA/native-capture availability."""
+
+    available: bool
+    reason: str | None = None
+
+    def __post_init__(self) -> None:
+        """Validate an availability carrier before it reaches fixture setup."""
+        if not isinstance(self.available, bool):
+            raise TypeError("availability must be a bool.")
+        if self.available:
+            if self.reason is not None:
+                raise ValueError(
+                    "available availability must not have a reason."
+                )
+        elif not isinstance(self.reason, str) or not self.reason:
+            raise ValueError(
+                "unavailable availability requires a nonempty reason."
+            )
+
+
+@dataclass(frozen=True, slots=True)
+class ResidentBenchmarkPreflight:
+    """Store a validated host-only matrix outcome before fixture construction."""
+
+    case: "ResidentBenchmarkCase"
+    status: ResidentBenchmarkStatus
+    reason: str
+
+    def __post_init__(self) -> None:
+        """Require one allowed status and a nonempty deterministic reason."""
+        if not isinstance(self.case, ResidentBenchmarkCase):
+            raise TypeError("case must be a ResidentBenchmarkCase.")
+        if self.status not in {
+            ResidentBenchmarkStatus.EXECUTED,
+            ResidentBenchmarkStatus.SKIPPED_BUDGET,
+            ResidentBenchmarkStatus.UNAVAILABLE,
+        }:
+            raise ValueError("preflight status is invalid.")
+        if not isinstance(self.reason, str) or not self.reason:
+            raise ValueError("preflight reason must be a nonempty string.")
 
 
 def _require_int(value: object, name: str, *, positive: bool = False) -> int:
@@ -533,6 +579,97 @@ class ResidentBenchmarkCase:
             raise ValueError(
                 "case_id must exactly match its canonical configuration."
             )
+
+
+def build_default_resident_benchmark_matrix() -> tuple[
+    ResidentBenchmarkCase, ...
+]:
+    """Build the fixed box-first P3 matrix without sizing or device work.
+
+    Each row preserves its requested capacity as its actual capacity. P3 only
+    classifies configured budget and P2 availability; P4--P5 own byte formulas
+    and allocator analysis.
+    """
+    common = {
+        "active_fraction": 1.0,
+        "processes": (
+            "communication",
+            "condensation",
+            "coagulation",
+            "dilution",
+            "wall_loss",
+            "nucleation",
+            "diagnostics",
+        ),
+        "communication": "gas",
+        "diagnostics": ("gas", "saturation"),
+        "warmup": 2,
+        "timestep_count": 3,
+        "seed": 1582,
+    }
+    cases = []
+    for n_boxes in RESIDENT_BOX_COUNTS:
+        shape = (n_boxes, 16, 2)
+        cases.append(
+            ResidentBenchmarkCase(
+                case_id=build_resident_benchmark_case_id(
+                    requested_shape=shape, actual_shape=shape, **common
+                ),
+                requested_shape=shape,
+                actual_shape=shape,
+                **common,
+            )
+        )
+    return tuple(cases)
+
+
+def preflight_resident_benchmark_case(
+    case: ResidentBenchmarkCase,
+    *,
+    budget_bytes: int,
+    estimate_requested_bytes: Any,
+    availability: Any,
+) -> ResidentBenchmarkPreflight:
+    """Classify one exact request before probing CUDA or allocating a fixture.
+
+    Equality with the configured budget is eligible. No row is downscaled or
+    redirected to CPU/Warp-CPU; availability is queried only after all host
+    validation and budget classification complete.
+    """
+    if not isinstance(case, ResidentBenchmarkCase):
+        raise TypeError("case must be a ResidentBenchmarkCase.")
+    _validate_shape(case.requested_shape, "requested_shape")
+    _validate_shape(case.actual_shape, "actual_shape")
+    if case.requested_shape != case.actual_shape:
+        raise ValueError("matrix cases must retain their requested shape.")
+    budget = _require_int(budget_bytes, "budget_bytes", positive=True)
+    if not callable(estimate_requested_bytes):
+        raise TypeError("estimate_requested_bytes must be callable.")
+    if not callable(availability):
+        raise TypeError("availability must be callable.")
+    estimate = _require_int(
+        estimate_requested_bytes(case), "requested-case estimate", positive=True
+    )
+    if estimate > budget:
+        return ResidentBenchmarkPreflight(
+            case,
+            ResidentBenchmarkStatus.SKIPPED_BUDGET,
+            f"requested estimate {estimate} exceeds budget {budget}",
+        )
+    result = availability()
+    if not isinstance(result, ResidentBenchmarkAvailability):
+        raise TypeError(
+            "availability must return ResidentBenchmarkAvailability."
+        )
+    if not result.available:
+        return ResidentBenchmarkPreflight(
+            case,
+            ResidentBenchmarkStatus.UNAVAILABLE,
+            result.reason or "unavailable",
+        )
+    return ResidentBenchmarkPreflight(
+        case, ResidentBenchmarkStatus.EXECUTED, "eligible exact requested shape"
+    )
 
 
 @dataclass(frozen=True, slots=True)

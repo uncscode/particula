@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from pathlib import Path
 from types import SimpleNamespace
 from typing import cast
@@ -92,3 +93,93 @@ def test_resident_provenance_uses_fixture_signature_and_device() -> None:
 
     assert signature == "real-prepared-signature"
     assert selected_device is device
+
+
+def test_resident_matrix_records_unavailability_with_one_probe(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Preflight all exact rows before CUDA construction and memoize absence."""
+    probes: list[str] = []
+    monkeypatch.setattr(
+        benchmark_test,
+        "cuda_capture_availability",
+        lambda: (
+            probes.append("probe"),
+            benchmark_test.ResidentBenchmarkAvailability(False, "no CUDA"),
+        )[1],
+    )
+    monkeypatch.setattr(
+        benchmark_test,
+        "qualified_cuda_resident_benchmark",
+        lambda **_: pytest.fail("CUDA fixture must not be constructed"),
+    )
+
+    artifact = benchmark_test._collect_resident_capture_matrix()
+
+    assert probes == ["probe"]
+    assert len(artifact.cases) == len(artifact.results) == 4
+    assert {result.status for result in artifact.results} == {
+        benchmark_test.ResidentBenchmarkStatus.UNAVAILABLE
+    }
+    assert all(result.reason == "no CUDA" for result in artifact.results)
+
+
+def test_resident_matrix_forwards_exact_dimensions_and_reuses_bindings(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Construct one exact CUDA binding for each approved matrix request."""
+    calls: list[dict[str, object]] = []
+
+    @contextmanager
+    def qualified_cuda_resident_benchmark(**kwargs: object):
+        calls.append(kwargs)
+        dimensions = SimpleNamespace(
+            n_boxes=kwargs["n_boxes"],
+            n_particles=kwargs["n_particles"],
+            n_species=kwargs["n_species"],
+        )
+        binding = SimpleNamespace(
+            loop=SimpleNamespace(
+                prepared=SimpleNamespace(
+                    signature=SimpleNamespace(dimensions=dimensions)
+                )
+            ),
+            validate_identities=lambda: None,
+            enqueue=lambda: None,
+            replay=lambda: None,
+            synchronize=lambda: None,
+            setup_elapsed_seconds=0.0,
+            capture_elapsed_seconds=0.0,
+            prepared_signature_digest="exact",
+            selected_device={
+                "status": "available",
+                "identity": "cuda:0",
+                "memory": 1,
+            },
+        )
+        yield binding
+
+    monkeypatch.setattr(
+        benchmark_test,
+        "cuda_capture_availability",
+        lambda: benchmark_test.ResidentBenchmarkAvailability(True),
+    )
+    monkeypatch.setattr(
+        benchmark_test,
+        "qualified_cuda_resident_benchmark",
+        qualified_cuda_resident_benchmark,
+    )
+    monkeypatch.setattr(
+        benchmark_test,
+        "collect_paired_device_timings",
+        lambda **_: ((1.0,), (2.0,)),
+    )
+
+    artifact = benchmark_test._collect_resident_capture_matrix()
+
+    assert [
+        (call["n_boxes"], call["n_particles"], call["n_species"])
+        for call in calls
+    ] == [(1, 16, 2), (10, 16, 2), (100, 16, 2), (1000, 16, 2)]
+    assert all(call["availability"].available for call in calls)
+    assert len(artifact.results) == 8

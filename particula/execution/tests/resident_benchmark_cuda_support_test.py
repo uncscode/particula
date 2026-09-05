@@ -9,6 +9,7 @@ import pytest
 
 from particula.execution.tests import resident_benchmark_cuda_support
 from particula.execution.tests.resident_benchmark_cuda_support import (
+    ResidentBenchmarkUnavailableError,
     ResidentCaptureBenchmarkBinding,
     _close_loop_preserving_error,
     qualified_cuda_resident_benchmark,
@@ -136,6 +137,28 @@ def test_cleanup_failure_is_chained_behind_callback_failure() -> None:
     assert str(caught.value.__cause__) == "cleanup failed"
 
 
+def test_qualified_cuda_binding_rejects_unavailable_before_import(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Use supplied unavailable preflight without importing the CUDA helper."""
+    calls: list[str] = []
+    monkeypatch.setattr(
+        resident_benchmark_cuda_support,
+        "cuda_capture_availability",
+        lambda: calls.append("probe"),
+    )
+
+    with pytest.raises(ResidentBenchmarkUnavailableError, match="no CUDA"):
+        with qualified_cuda_resident_benchmark(
+            availability=resident_benchmark_cuda_support.ResidentBenchmarkAvailability(
+                False, "no CUDA"
+            )
+        ):
+            pass
+
+    assert calls == []
+
+
 def test_provenance_uses_real_signature_and_nondefault_device() -> None:
     """Expose fixture-owned signature and selected nondefault CUDA metadata."""
     device = {"status": "available", "identity": "cuda:7", "memory": 42}
@@ -231,12 +254,12 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
         [SimpleNamespace(native="cuda:7")],
     )
 
-    def build_prepared_loop(*args: object) -> Any:
-        calls.append(("build", args))
+    def build_prepared_loop(*args: object, **kwargs: object) -> Any:
+        calls.append(("build", (args, kwargs)))
         return loop
 
-    helpers._build_prepared_loop = lambda *args: (  # type: ignore[attr-defined]
-        build_prepared_loop(*args)
+    helpers._build_prepared_loop = lambda *args, **kwargs: (  # type: ignore[attr-defined]
+        build_prepared_loop(*args, **kwargs)
     )
     helpers._close_prepared_loop = lambda value: calls.append(  # type: ignore[attr-defined]
         ("close", value)
@@ -273,7 +296,13 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
         binding.synchronize()
 
     assert calls == [
-        ("build", ("cuda:7", 2, 0.5, 3)),
+        (
+            "build",
+            (
+                ("cuda:7", 2, 0.5, 3),
+                {"n_particles": 16, "n_species": 2},
+            ),
+        ),
         ("sync", None),
         ("validate", "requirements"),
         (

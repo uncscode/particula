@@ -18,15 +18,20 @@ from particula.execution.tests.resident_benchmark_support import (
     MAX_ARTIFACT_ROWS,
     MAX_TIMING_SAMPLES,
     MAX_WARMUP_SAMPLES,
+    RESIDENT_BOX_COUNTS,
     RESIDENT_CAPTURE_COMPARISON_DESTINATION,
     ResidentBenchmarkArtifact,
+    ResidentBenchmarkAvailability,
     ResidentBenchmarkCase,
+    ResidentBenchmarkPreflight,
     ResidentBenchmarkResult,
     ResidentBenchmarkStatus,
+    build_default_resident_benchmark_matrix,
     build_resident_benchmark_case_id,
     build_resident_benchmark_metadata,
     collect_paired_device_timings,
     deserialize_resident_benchmark_artifact,
+    preflight_resident_benchmark_case,
     serialize_resident_benchmark_artifact,
     summarize_timing_samples,
     write_json_artifact,
@@ -105,6 +110,95 @@ def _artifact() -> ResidentBenchmarkArtifact:
             ),
         ),
     )
+
+
+def test_default_matrix_preserves_all_exact_box_first_requests() -> None:
+    """Keep the four canonical rows and every requested capacity unchanged."""
+    cases = build_default_resident_benchmark_matrix()
+
+    assert RESIDENT_BOX_COUNTS == (1, 10, 100, 1000)
+    assert (
+        tuple(case.requested_shape[0] for case in cases) == RESIDENT_BOX_COUNTS
+    )
+    assert all(case.requested_shape == case.actual_shape for case in cases)
+    assert cases[-1].requested_shape == (1000, 16, 2)
+    assert all(case.active_fraction == 1.0 for case in cases)
+    assert all(
+        case.processes
+        == (
+            "communication",
+            "condensation",
+            "coagulation",
+            "dilution",
+            "wall_loss",
+            "nucleation",
+            "diagnostics",
+        )
+        for case in cases
+    )
+    assert all(case.communication == "gas" for case in cases)
+    assert all(case.diagnostics == ("gas", "saturation") for case in cases)
+    assert all(
+        case.case_id.startswith(f"r{case.requested_shape[0]}x")
+        for case in cases
+    )
+
+
+def test_preflight_classifies_budget_before_availability_probe() -> None:
+    """Reject over-budget rows without a device probe, allocation, or timing."""
+    case = build_default_resident_benchmark_matrix()[0]
+    probes: list[str] = []
+
+    outcome = preflight_resident_benchmark_case(
+        case,
+        budget_bytes=10,
+        estimate_requested_bytes=lambda _: 11,
+        availability=lambda: probes.append("probe"),
+    )
+
+    assert outcome.status is ResidentBenchmarkStatus.SKIPPED_BUDGET
+    assert outcome.case.requested_shape == outcome.case.actual_shape
+    assert outcome.reason
+    assert probes == []
+
+    outcome = preflight_resident_benchmark_case(
+        case,
+        budget_bytes=11,
+        estimate_requested_bytes=lambda _: 11,
+        availability=lambda: ResidentBenchmarkAvailability(True),
+    )
+    assert outcome.status is ResidentBenchmarkStatus.EXECUTED
+
+
+@pytest.mark.parametrize("budget, estimate", [(0, 1), (1, 0), (1, True)])
+def test_preflight_rejects_invalid_budget_or_estimate_before_probe(
+    budget: object, estimate: object
+) -> None:
+    """Fail closed before availability for invalid dimensions or estimates."""
+    probes: list[str] = []
+    with pytest.raises((TypeError, ValueError)):
+        preflight_resident_benchmark_case(
+            build_default_resident_benchmark_matrix()[0],
+            budget_bytes=budget,
+            estimate_requested_bytes=lambda _: estimate,
+            availability=lambda: probes.append("probe"),
+        )
+    assert probes == []
+
+
+def test_preflight_emits_structured_unavailable_without_fallback() -> None:
+    """Preserve exact shape when native CUDA capture is unavailable."""
+    case = build_default_resident_benchmark_matrix()[1]
+    outcome = preflight_resident_benchmark_case(
+        case,
+        budget_bytes=1,
+        estimate_requested_bytes=lambda _: 1,
+        availability=lambda: ResidentBenchmarkAvailability(False, "no CUDA"),
+    )
+    assert isinstance(outcome, ResidentBenchmarkPreflight)
+    assert outcome.status is ResidentBenchmarkStatus.UNAVAILABLE
+    assert outcome.reason == "no CUDA"
+    assert outcome.case.requested_shape == (10, 16, 2)
 
 
 def test_records_summaries_metadata_and_round_trip_are_deterministic():

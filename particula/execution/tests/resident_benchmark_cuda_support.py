@@ -14,6 +14,14 @@ from hashlib import sha256
 from time import perf_counter
 from typing import Any, Callable, Iterator
 
+from particula.execution.tests.resident_benchmark_support import (
+    ResidentBenchmarkAvailability,
+)
+
+
+class ResidentBenchmarkUnavailableError(RuntimeError):
+    """Report a legal preconstruction CUDA/native-capture absence."""
+
 
 @dataclass(frozen=True, slots=True)
 class ResidentCaptureBenchmarkBinding:
@@ -114,6 +122,30 @@ def resident_benchmark_provenance(
     return binding.prepared_signature_digest, binding.selected_device
 
 
+def cuda_capture_availability() -> ResidentBenchmarkAvailability:
+    """Probe P2's CUDA/capture gate and normalize only its absence result."""
+    import pytest
+
+    from particula.execution.tests.captured_full_loop_test import (
+        _require_native_cuda_capture,
+    )
+
+    try:
+        _require_native_cuda_capture()
+    except pytest.skip.Exception as error:
+        return ResidentBenchmarkAvailability(False, str(error))
+    return ResidentBenchmarkAvailability(True)
+
+
+def _require_positive_dimension(value: object, name: str) -> int:
+    """Validate a preconstruction non-boolean positive dimension."""
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise TypeError(f"{name} must be a non-bool integer.")
+    if value <= 0:
+        raise ValueError(f"{name} must be positive.")
+    return value
+
+
 def _close_loop_preserving_error(
     close_loop: Callable[[Any], None], loop: Any, error: BaseException | None
 ) -> None:
@@ -130,19 +162,30 @@ def _close_loop_preserving_error(
 
 @contextmanager
 def qualified_cuda_resident_benchmark(
-    *, duration: float = 0.0, n_boxes: int = 1, root_seed: int = 1582
+    *,
+    duration: float = 0.0,
+    n_boxes: int = 1,
+    n_particles: int = 16,
+    n_species: int = 2,
+    root_seed: int = 1582,
+    availability: ResidentBenchmarkAvailability | None = None,
 ) -> Iterator[ResidentCaptureBenchmarkBinding]:
     """Build, qualify, capture, and clean up one real native CUDA binding.
 
-    CUDA/native-capture unavailability skips before construction. Setup and
-    capture durations are provenance only and each completion synchronization is
-    outside sampling. Cleanup preserves an initiating writer failure while
-    attempting release before exact session closure.
+    CUDA/native-capture unavailability raises a structured preconstruction
+    exception. Callers may provide the already-memoized preflight availability
+    result; setup and capture failures remain errors. Setup and capture
+    durations are provenance only and each completion synchronization is outside
+    sampling. Cleanup preserves an initiating writer failure while attempting
+    release before exact session closure.
 
     Args:
         duration: Physical resident timestep duration in seconds.
         n_boxes: Number of resident simulation boxes to construct.
+        n_particles: Particle capacity per resident box.
+        n_species: Species capacity per resident box.
         root_seed: Root seed for resident random-number streams.
+        availability: Optional validated preflight availability result.
 
     Yields:
         One binding exposing paired uncaptured and captured operations.
@@ -152,6 +195,17 @@ def qualified_cuda_resident_benchmark(
             prepared resident loop.
         RuntimeError: If native CUDA capture setup fails after qualification.
     """
+    n_boxes = _require_positive_dimension(n_boxes, "n_boxes")
+    n_particles = _require_positive_dimension(n_particles, "n_particles")
+    n_species = _require_positive_dimension(n_species, "n_species")
+    resolved_availability = (
+        cuda_capture_availability() if availability is None else availability
+    )
+    if not isinstance(resolved_availability, ResidentBenchmarkAvailability):
+        raise TypeError("availability must be a ResidentBenchmarkAvailability.")
+    if not resolved_availability.available:
+        raise ResidentBenchmarkUnavailableError(resolved_availability.reason)
+
     from particula.execution.graph_capture import (
         capture_prepared_resident_graph,
         qualify_prepared_resident_graph_capture,
@@ -163,7 +217,6 @@ def qualified_cuda_resident_benchmark(
     from particula.execution.tests.captured_full_loop_test import (
         _build_prepared_loop,
         _close_prepared_loop,
-        _qualification_is_explicitly_unavailable,
         _require_native_cuda_capture,
         _WarpNativeCaptureAdapter,
     )
@@ -171,7 +224,14 @@ def qualified_cuda_resident_benchmark(
     wp, candidates = _require_native_cuda_capture()
     device = candidates[0]
     setup_start = perf_counter()
-    loop = _build_prepared_loop(device.native, n_boxes, duration, root_seed)
+    loop = _build_prepared_loop(
+        device.native,
+        n_boxes,
+        duration,
+        root_seed,
+        n_particles=n_particles,
+        n_species=n_species,
+    )
     try:
         wp.synchronize()
         setup_elapsed = perf_counter() - setup_start
@@ -179,16 +239,9 @@ def qualified_cuda_resident_benchmark(
         capture_set = loop.registry.validate_capture_resource_set(
             loop.request.capture_resource_requirements
         )
-        try:
-            qualification = qualify_prepared_resident_graph_capture(
-                loop.binding, loop.prepared, capture_set, adapter
-            )
-        except ValueError as error:
-            if _qualification_is_explicitly_unavailable(error):
-                import pytest
-
-                pytest.skip(str(error))
-            raise
+        qualification = qualify_prepared_resident_graph_capture(
+            loop.binding, loop.prepared, capture_set, adapter
+        )
         capture_start = perf_counter()
         captured = capture_prepared_resident_graph(qualification)
         wp.synchronize()

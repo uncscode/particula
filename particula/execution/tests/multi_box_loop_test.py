@@ -145,13 +145,22 @@ def _require_device(device: str) -> Any:
 
 def _cpu_carriers(
     manifest: tuple[tuple[str, int], ...],
+    *,
+    n_particles: int = 16,
+    n_species: int = 2,
 ) -> tuple[ParticleData, GasData, EnvironmentData]:
-    """Build independent 16-slot, two-species rows at manifest lanes."""
+    """Build exact-dimension independent rows at manifest lanes."""
+    if isinstance(n_particles, bool) or not isinstance(n_particles, int):
+        raise TypeError("n_particles must be a non-bool integer.")
+    if isinstance(n_species, bool) or not isinstance(n_species, int):
+        raise TypeError("n_species must be a non-bool integer.")
+    if n_particles <= 0 or n_species <= 0:
+        raise ValueError("n_particles and n_species must be positive.")
     n_boxes = len(manifest)
-    masses = np.zeros((n_boxes, 16, 2), dtype=np.float64)
-    concentration = np.zeros((n_boxes, 16), dtype=np.float64)
-    charge = np.zeros((n_boxes, 16), dtype=np.float64)
-    gas_concentration = np.zeros((n_boxes, 2), dtype=np.float64)
+    masses = np.zeros((n_boxes, n_particles, n_species), dtype=np.float64)
+    concentration = np.zeros((n_boxes, n_particles), dtype=np.float64)
+    charge = np.zeros((n_boxes, n_particles), dtype=np.float64)
+    gas_concentration = np.zeros((n_boxes, n_species), dtype=np.float64)
     temperature = np.zeros(n_boxes, dtype=np.float64)
     pressure = np.zeros(n_boxes, dtype=np.float64)
     volume = np.zeros(n_boxes, dtype=np.float64)
@@ -163,14 +172,13 @@ def _cpu_carriers(
             else 1 + (sum(ord(character) for character in logical_id) % 2)
         )
         value = float(sum(ord(character) for character in logical_id))
-        masses[lane, :active_slots] = np.array(
-            [1.0e-20 * value, 2.0e-20 * value],
-            dtype=np.float64,
+        active_slots = min(active_slots, n_particles)
+        masses[lane, :active_slots] = (
+            np.arange(1, n_species + 1, dtype=np.float64) * 1.0e-20 * value
         )
         concentration[lane, :active_slots] = 1.0 + value / 1000.0
-        gas_concentration[lane] = np.array(
-            [1.0e-11 * value, 2.0e-11 * value],
-            dtype=np.float64,
+        gas_concentration[lane] = (
+            np.arange(1, n_species + 1, dtype=np.float64) * 1.0e-11 * value
         )
         temperature[lane] = 295.0 + value / 100.0
         pressure[lane] = 101325.0 - value
@@ -179,23 +187,23 @@ def _cpu_carriers(
         masses=masses,
         concentration=concentration,
         charge=charge,
-        density=np.array([1000.0, 1200.0], dtype=np.float64),
+        density=np.linspace(1000.0, 1200.0, n_species, dtype=np.float64),
         volume=volume,
     )
     gas = GasData(
-        name=["species-a", "species-b"],
-        molar_mass=np.array([0.018, 0.098], dtype=np.float64),
+        name=[f"species-{index}" for index in range(n_species)],
+        molar_mass=np.linspace(0.018, 0.098, n_species, dtype=np.float64),
         concentration=gas_concentration,
-        partitioning=np.array([False, False]),
+        partitioning=np.zeros(n_species, dtype=bool),
     )
     environment = EnvironmentData(
         temperature=temperature,
         pressure=pressure,
-        saturation_ratio=np.ones((n_boxes, 2), dtype=np.float64),
+        saturation_ratio=np.ones((n_boxes, n_species), dtype=np.float64),
     )
-    assert particles.masses.shape == (n_boxes, 16, 2)
-    assert particles.concentration.shape == (n_boxes, 16)
-    assert gas.concentration.shape == (n_boxes, 2)
+    assert particles.masses.shape == (n_boxes, n_particles, n_species)
+    assert particles.concentration.shape == (n_boxes, n_particles)
+    assert gas.concentration.shape == (n_boxes, n_species)
     return particles, gas, environment
 
 
@@ -203,10 +211,15 @@ def _binding(
     device: str,
     manifest: tuple[tuple[str, int], ...],
     root_seed: int = 1531,
+    *,
+    n_particles: int = 16,
+    n_species: int = 2,
 ) -> tuple[Any, GPUResourceRegistry, ResidentStepGuard]:
     """Upload one manifest fixture and bind its exact registry and guard."""
+    particles, gas, environment = _cpu_carriers(
+        manifest, n_particles=n_particles, n_species=n_species
+    )
     wp = _require_device(device)
-    particles, gas, environment = _cpu_carriers(manifest)
     ids, lanes = zip(*manifest, strict=True)
     session = setup_resident_session(
         particles,

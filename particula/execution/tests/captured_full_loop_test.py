@@ -1158,12 +1158,20 @@ def _build_prepared_loop(
     duration: float,
     root_seed: int,
     *,
+    n_particles: int = 16,
+    n_species: int = 2,
     selected_wall_loss_boxes: tuple[int, ...] = (),
     single_active_particle: bool = False,
 ) -> _PreparedLoop:
     """Build one real all-operation resident loop on the requested device."""
     manifest = tuple((f"box-{2 * index}", index) for index in range(n_boxes))
-    session, registry, guard = _binding(device, manifest, root_seed)
+    session, registry, guard = _binding(
+        device,
+        manifest,
+        root_seed,
+        n_particles=n_particles,
+        n_species=n_species,
+    )
     wp = pytest.importorskip("warp")
     if single_active_particle:
         warp_device = session.particles.masses.device

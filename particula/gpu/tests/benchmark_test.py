@@ -34,17 +34,19 @@ from numpy.typing import NDArray
 
 from particula._pytest_support import benchmark_option_enabled_from_env
 from particula.execution.tests.resident_benchmark_cuda_support import (
+    ResidentBenchmarkUnavailableError,
+    cuda_capture_availability,
     qualified_cuda_resident_benchmark,
     resident_benchmark_provenance,
 )
 from particula.execution.tests.resident_benchmark_support import (
     ResidentBenchmarkArtifact,
-    ResidentBenchmarkCase,
     ResidentBenchmarkResult,
     ResidentBenchmarkStatus,
-    build_resident_benchmark_case_id,
+    build_default_resident_benchmark_matrix,
     build_resident_benchmark_metadata,
     collect_paired_device_timings,
+    preflight_resident_benchmark_case,
     summarize_timing_samples,
     write_resident_capture_comparison_artifact,
 )
@@ -155,6 +157,7 @@ DEFAULT_MASS_ACCOMMODATION = 1.0
 DEFAULT_DIFFUSION_COEFFICIENT = 2.0e-5
 MAX_COLLISIONS = 256
 DEFAULT_BENCHMARK_MAX_BYTES = 2 * 1024 * 1024 * 1024
+RESIDENT_BENCHMARK_REQUESTED_BYTES = DEFAULT_BENCHMARK_MAX_BYTES
 BENCHMARK_ARTIFACT_DIR = Path(".artifacts") / "benchmarks"
 DEFAULT_BENCHMARK_OUTPUT_NAME = "gpu_benchmark_results.json"
 
@@ -1882,112 +1885,137 @@ def test_mass_precision_projection_benchmark(
     _save_results()
 
 
+def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
+    """Collect the exact P3 matrix, with no downscale, fallback, or partial write."""
+    cases = build_default_resident_benchmark_matrix()
+    results: list[ResidentBenchmarkResult] = []
+    availability_result = None
+
+    def availability():
+        nonlocal availability_result
+        if availability_result is None:
+            availability_result = cuda_capture_availability()
+        return availability_result
+
+    digest = "unavailable"
+    device = {"status": "unavailable", "identity": None, "memory": None}
+    for case in cases:
+        preflight = preflight_resident_benchmark_case(
+            case,
+            budget_bytes=_parse_positive_int_env(
+                "BENCHMARK_MAX_BYTES", DEFAULT_BENCHMARK_MAX_BYTES
+            ),
+            estimate_requested_bytes=lambda _: RESIDENT_BENCHMARK_REQUESTED_BYTES,
+            availability=availability,
+        )
+        if preflight.status is not ResidentBenchmarkStatus.EXECUTED:
+            results.append(
+                ResidentBenchmarkResult(
+                    case_id=case.case_id,
+                    timing_mode=None,
+                    requested_shape=case.requested_shape,
+                    status=preflight.status,
+                    reason=preflight.reason,
+                    samples=(),
+                    summary=None,
+                    provenance={"binding": "preconstruction"},
+                )
+            )
+            continue
+        try:
+            context = qualified_cuda_resident_benchmark(
+                n_boxes=case.requested_shape[0],
+                n_particles=case.requested_shape[1],
+                n_species=case.requested_shape[2],
+                root_seed=case.seed,
+                availability=availability(),
+            )
+            with context as binding:
+                binding.validate_identities()
+                dimensions = binding.loop.prepared.signature.dimensions
+                if (
+                    dimensions.n_boxes,
+                    dimensions.n_particles,
+                    dimensions.n_species,
+                ) != case.requested_shape:
+                    raise ValueError(
+                        "resident benchmark fixture dimensions do not match "
+                        "the exact requested shape."
+                    )
+                prepared_signature_digest, selected_device = (
+                    resident_benchmark_provenance(binding)
+                )
+                digest = prepared_signature_digest
+                device = selected_device
+                uncaptured, replay = collect_paired_device_timings(
+                    uncaptured_operation=binding.enqueue,
+                    replay_operation=binding.replay,
+                    synchronize=binding.synchronize,
+                    clock=time.perf_counter,
+                    warmup_count=case.warmup,
+                    sample_count=case.timestep_count,
+                )
+        except ResidentBenchmarkUnavailableError as error:
+            results.append(
+                ResidentBenchmarkResult(
+                    case_id=case.case_id,
+                    timing_mode=None,
+                    requested_shape=case.requested_shape,
+                    status=ResidentBenchmarkStatus.UNAVAILABLE,
+                    reason=str(error),
+                    samples=(),
+                    summary=None,
+                    provenance={"binding": "preconstruction"},
+                )
+            )
+            continue
+        provenance = {"binding": "native_cuda_capture"}
+        for timing_mode, samples in (
+            ("prepared_uncaptured_device_synchronized", uncaptured),
+            ("captured_replay_device_synchronized", replay),
+        ):
+            results.append(
+                ResidentBenchmarkResult(
+                    case_id=case.case_id,
+                    timing_mode=timing_mode,
+                    samples=samples,
+                    requested_shape=case.requested_shape,
+                    status=ResidentBenchmarkStatus.EXECUTED,
+                    reason=None,
+                    provenance=provenance,
+                    setup_elapsed_seconds=binding.setup_elapsed_seconds,
+                    capture_elapsed_seconds=binding.capture_elapsed_seconds,
+                    summary=summarize_timing_samples(samples),
+                )
+            )
+    return ResidentBenchmarkArtifact(
+        metadata=build_resident_benchmark_metadata(
+            timestamp_utc=datetime.now(timezone.utc),
+            command=" ".join(sys.argv),
+            synchronization_method="warp.synchronize",
+            warmup=cases[0].warmup,
+            timestep_count=cases[0].timestep_count,
+            seed=cases[0].seed,
+            prepared_signature_digest=digest,
+            warp_version={
+                "status": "available" if wp is not None else "unavailable",
+                "value": str(wp.__version__) if wp is not None else None,
+            },
+            device=device,
+        ),
+        cases=cases,
+        results=tuple(results),
+    )
+
+
 @pytest.mark.warp
 @pytest.mark.cuda
 def test_resident_captured_replay_comparison() -> None:
-    """Collect CUDA-only supplemental capture evidence without a speed claim.
-
-    Unavailable CUDA or native capture skips. This opt-in evidence never times
-    CPU/Warp-CPU, changes generic benchmark output, or asserts a ratio.
-    """
-    _skip_if_no_cuda()
-    with qualified_cuda_resident_benchmark() as binding:
-        prepared_signature_digest, selected_device = (
-            resident_benchmark_provenance(binding)
-        )
-        uncaptured, replay = collect_paired_device_timings(
-            uncaptured_operation=binding.enqueue,
-            replay_operation=binding.replay,
-            synchronize=binding.synchronize,
-            clock=time.perf_counter,
-            warmup_count=2,
-            sample_count=3,
-        )
-        case = ResidentBenchmarkCase(
-            case_id=build_resident_benchmark_case_id(
-                requested_shape=(1, 3, 2),
-                actual_shape=(1, 3, 2),
-                active_fraction=1.0,
-                processes=(
-                    "communication",
-                    "condensation",
-                    "coagulation",
-                    "dilution",
-                    "wall_loss",
-                    "nucleation",
-                    "diagnostics",
-                ),
-                communication="gas",
-                diagnostics=("gas", "saturation"),
-                warmup=2,
-                timestep_count=3,
-                seed=1582,
-            ),
-            requested_shape=(1, 3, 2),
-            actual_shape=(1, 3, 2),
-            active_fraction=1.0,
-            processes=(
-                "communication",
-                "condensation",
-                "coagulation",
-                "dilution",
-                "wall_loss",
-                "nucleation",
-                "diagnostics",
-            ),
-            communication="gas",
-            diagnostics=("gas", "saturation"),
-            warmup=2,
-            timestep_count=3,
-            seed=1582,
-        )
-        provenance = {"binding": "native_cuda_capture"}
-        artifact = ResidentBenchmarkArtifact(
-            metadata=build_resident_benchmark_metadata(
-                timestamp_utc=datetime.now(timezone.utc),
-                command=" ".join(sys.argv),
-                synchronization_method="warp.synchronize",
-                warmup=case.warmup,
-                timestep_count=case.timestep_count,
-                seed=case.seed,
-                prepared_signature_digest=prepared_signature_digest,
-                warp_version={
-                    "status": "available",
-                    "value": str(wp.__version__),
-                },
-                device=selected_device,
-            ),
-            cases=(case,),
-            results=(
-                ResidentBenchmarkResult(
-                    case_id=case.case_id,
-                    timing_mode="prepared_uncaptured_device_synchronized",
-                    samples=uncaptured,
-                    requested_shape=case.requested_shape,
-                    status=ResidentBenchmarkStatus.EXECUTED,
-                    reason=None,
-                    provenance=provenance,
-                    setup_elapsed_seconds=binding.setup_elapsed_seconds,
-                    capture_elapsed_seconds=binding.capture_elapsed_seconds,
-                    summary=summarize_timing_samples(uncaptured),
-                ),
-                ResidentBenchmarkResult(
-                    case_id=case.case_id,
-                    timing_mode="captured_replay_device_synchronized",
-                    samples=replay,
-                    requested_shape=case.requested_shape,
-                    status=ResidentBenchmarkStatus.EXECUTED,
-                    reason=None,
-                    provenance=provenance,
-                    setup_elapsed_seconds=binding.setup_elapsed_seconds,
-                    capture_elapsed_seconds=binding.capture_elapsed_seconds,
-                    summary=summarize_timing_samples(replay),
-                ),
-            ),
-        )
-        root = Path(".artifacts")
-        root.mkdir(exist_ok=True)
-        destination = write_resident_capture_comparison_artifact(root, artifact)
+    """Publish one aggregate opt-in matrix artifact after every row completes."""
+    artifact = _collect_resident_capture_matrix()
+    root = Path(".artifacts")
+    root.mkdir(exist_ok=True)
+    destination = write_resident_capture_comparison_artifact(root, artifact)
     print(f"resident capture comparison: {destination}")
     for result in artifact.results:
         print(f"{result.timing_mode}: {result.summary}")
