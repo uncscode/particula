@@ -21,6 +21,24 @@ containment and symlink safety below an existing `.artifacts` root before
 creating directories or temporary files, then writes via fsync and replacement.
 This phase neither imports/probes Warp/CUDA nor invokes resident execution.
 
+### P2 implementation boundary
+
+The paired collector performs uncaptured then replay warmups on the continuing
+resident/RNG state without synchronization. Each measured operation is bounded
+by `clock(); operation(); synchronize(); clock()` and produces its own immutable
+raw tuple and deterministic summary. Setup and native capture are timed once as
+provenance only, outside warmup and sample collection. Invalid counts reject
+before callbacks; the CUDA binding validates retained resident identities before
+the collector starts.
+
+CUDA construction and capture are isolated in
+`resident_benchmark_cuda_support.py`, whose import does not import Warp or
+probe CUDA. Its qualified context exposes zero-argument prepared enqueue and
+captured replay callbacks and performs ordered teardown through the established
+prepared-loop close path. The opt-in test persists one schema-v2 envelope at the
+fixed resident-comparison destination; it neither invokes nor modifies the
+generic benchmark writer.
+
 ```text
 validated BenchmarkCase + qualified CUDA device
           |

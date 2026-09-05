@@ -10,7 +10,9 @@ import pytest
 from particula.execution.tests import resident_benchmark_cuda_support
 from particula.execution.tests.resident_benchmark_cuda_support import (
     ResidentCaptureBenchmarkBinding,
+    _close_loop_preserving_error,
     qualified_cuda_resident_benchmark,
+    resident_benchmark_provenance,
 )
 
 
@@ -57,6 +59,8 @@ def test_binding_delegates_prepared_enqueue_and_captured_replay(
         enqueue_operation=lambda: calls.append(("enqueue", "prepared", None)),
         replay_operation=lambda: calls.append(("replay", "captured", 0.25)),
         capture_set="capture-set",
+        prepared_signature_digest="signature",
+        selected_device={"status": "available", "identity": "cuda:0"},
     )
 
     binding.enqueue()
@@ -93,10 +97,57 @@ def test_binding_identity_gate_rejects_drift_before_timing_callbacks() -> None:
         enqueue_operation=lambda: calls.append("enqueue"),
         replay_operation=lambda: calls.append("replay"),
         capture_set=object(),
+        prepared_signature_digest="signature",
+        selected_device={"status": "available", "identity": "cuda:0"},
     )
     with pytest.raises(ValueError, match="identity drifted"):
         binding.validate_identities()
     assert calls == []
+
+
+def test_cleanup_runs_in_release_then_close_order_after_setup_failure() -> None:
+    """Clean up acquired capture resources after a setup failure."""
+    calls: list[str] = []
+
+    def close_loop(_loop: object) -> None:
+        calls.extend(("release", "close"))
+
+    with pytest.raises(RuntimeError, match="setup failed"):
+        _close_loop_preserving_error(
+            close_loop,
+            object(),
+            RuntimeError("setup failed"),
+        )
+
+    assert calls == ["release", "close"]
+
+
+def test_cleanup_failure_is_chained_behind_callback_failure() -> None:
+    """Keep the benchmark callback failure primary when teardown also fails."""
+    primary = RuntimeError("callback failed")
+
+    def fail_close(_loop: object) -> None:
+        raise ValueError("cleanup failed")
+
+    with pytest.raises(RuntimeError, match="callback failed") as caught:
+        _close_loop_preserving_error(fail_close, object(), primary)
+
+    assert isinstance(caught.value.__cause__, ValueError)
+    assert str(caught.value.__cause__) == "cleanup failed"
+
+
+def test_provenance_uses_real_signature_and_nondefault_device() -> None:
+    """Expose fixture-owned signature and selected nondefault CUDA metadata."""
+    device = {"status": "available", "identity": "cuda:7", "memory": 42}
+    binding = SimpleNamespace(
+        prepared_signature_digest="real-prepared-signature",
+        selected_device=device,
+    )
+
+    signature, selected_device = resident_benchmark_provenance(binding)
+
+    assert signature == "real-prepared-signature"
+    assert selected_device is device
 
 
 def test_qualified_cuda_binding_captures_and_closes_after_context(
@@ -127,7 +178,14 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
         session=session,
         guard=guard,
         binding=binding_identity,
-        prepared="prepared",
+        prepared=SimpleNamespace(
+            signature=SimpleNamespace(
+                device=SimpleNamespace(backend="warp", native="cuda:7"),
+                dimensions=SimpleNamespace(
+                    n_boxes=2, n_particles=3, n_species=2
+                ),
+            )
+        ),
     )
     graph_capture = ModuleType("particula.execution.graph_capture")
 
@@ -161,11 +219,14 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
     )
     helpers = ModuleType("particula.execution.tests.captured_full_loop_test")
     fake_warp = SimpleNamespace(
-        synchronize=lambda: calls.append(("sync", None))
+        synchronize=lambda: calls.append(("sync", None)),
+        get_device=lambda native: SimpleNamespace(
+            alias=native, total_memory=1024
+        ),
     )
     helpers._require_native_cuda_capture = lambda: (  # type: ignore[attr-defined]
         fake_warp,
-        [SimpleNamespace(native="cuda:0")],
+        [SimpleNamespace(native="cuda:7")],
     )
 
     def build_prepared_loop(*args: object) -> Any:
@@ -201,19 +262,25 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
         assert binding.duration == 0.5
         assert binding.setup_elapsed_seconds == 2.0
         assert binding.capture_elapsed_seconds == 5.0
+        assert binding.prepared_signature_digest
+        assert binding.selected_device == {
+            "status": "available",
+            "identity": "cuda:7",
+            "memory": 1024,
+        }
         binding.synchronize()
 
     assert calls == [
-        ("build", ("cuda:0", 2, 0.5, 3)),
+        ("build", ("cuda:7", 2, 0.5, 3)),
         ("sync", None),
         ("validate", "requirements"),
         (
             "qualify",
             (
                 binding_identity,
-                "prepared",
+                loop.prepared,
                 "capture-set",
-                ("adapter", (fake_warp, "cuda:0")),
+                ("adapter", (fake_warp, "cuda:7")),
             ),
         ),
         ("capture", "qualification"),

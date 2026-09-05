@@ -11,9 +11,16 @@ supplemental evidence, not an assertion threshold, and remains opt-in.
   sample summaries, malformed-input rejection, path/symlink safety, and atomic
   writer failure handling. They verify that importing the support module does
   not load Warp and do not probe CUDA or allocate device memory.
-- **P2:** Unit tests spy on prepared/captured routing, warmup exclusion, explicit
-  synchronization, exact fixture identity, and separation of setup from replay.
-  One opt-in CUDA row records real uncaptured/captured samples.
+- **P2 (delivered, issue #1582):** Default-collection tests in
+  `resident_benchmark_support_test.py` and
+  `resident_benchmark_cuda_support_test.py` cover bounded count rejection before
+  callbacks, alternating warmup/sample order, no warmup synchronization, one
+  synchronization per measured operation, schema-v1 decode/schema-v2 round
+  trip, isolated artifact persistence, lazy Warp import, binding drift
+  rejection, and setup/capture timing boundaries. The opt-in
+  `test_resident_captured_replay_comparison` row in `benchmark_test.py` is
+  CUDA-only; it records two equal nonempty sample sets and validates summaries
+  when CUDA/native capture qualifies, otherwise cleanly skips.
 - **P3:** Parametrized unit tests verify the required box-count matrix and all
   secondary axes. Budget boundaries and unavailable CUDA/capture rows must be
   deterministic and must never dispatch a CPU fallback.
@@ -36,11 +43,11 @@ Focused fix checks are assertion-only and coverage disabled:
 
 ```bash
 pytest particula/execution/tests/resident_benchmark_support_test.py -q --no-cov
-pytest particula/gpu/tests/benchmark_helpers_test.py \
-  particula/gpu/tests/benchmark_safety_test.py -q
-pytest particula/execution/tests/ -q -k "benchmark or memory_budget"
+pytest particula/execution/tests/resident_benchmark_cuda_support_test.py -q --no-cov
+pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov
+pytest particula/gpu/tests/benchmark_safety_test.py --benchmark -q --no-cov
 pytest particula/gpu/tests/benchmark_test.py --benchmark \
-  -k "resident and (scaling or memory)" -v -s
+  -k resident -v -s --no-cov
 ```
 
 The CUDA benchmark command may pass or cleanly skip. It must never fall back to

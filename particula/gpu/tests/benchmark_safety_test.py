@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -71,3 +72,19 @@ def test_validate_benchmark_budget_skips_oversized_case(
     )
     with pytest.raises(pytest.skip.Exception, match="exceeding"):
         benchmark_test._validate_benchmark_budget(budget)
+
+
+def test_resident_provenance_uses_fixture_signature_and_device() -> None:
+    """Persist the selected CUDA device rather than a synthetic ordinal."""
+    device = {"status": "available", "identity": "cuda:7", "memory": 42}
+    binding = SimpleNamespace(
+        prepared_signature_digest="real-prepared-signature",
+        selected_device=device,
+    )
+
+    signature, selected_device = benchmark_test.resident_benchmark_provenance(
+        binding
+    )
+
+    assert signature == "real-prepared-signature"
+    assert selected_device is device

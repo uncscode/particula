@@ -5,11 +5,12 @@
   communication, and diagnostics represented as explicit case metadata.
 - [ ] Every infeasible or unavailable required row records a structured reason;
   no row silently disappears, falls back to CPU, or is reported as measured.
-- [ ] Small and medium repeated-step workloads record uncaptured and captured raw
-  samples from identical validated fixtures after separate warmup.
-- [ ] Timing evidence records setup/capture separately from replay, explicit
+- [x] One small repeated-step workload records uncaptured and captured raw samples
+  from one identical validated native-CUDA fixture using alternating paired
+  warmup. Broader matrix coverage remains P3.
+- [x] P2 timing evidence records setup/capture separately from replay, explicit
   synchronization, timer, samples, summary statistics, command, versions,
-  device, dimensions, seed, and UTC timestamps.
+  device, dimensions, seed, and UTC timestamps in schema v2.
 - [ ] The memory model accounts separately for primary state, inactive fixed
   slots, E8-F3 reusable resources, diagnostics, communication, checkpoints, and
   projected autodiff tape without double counting.
@@ -24,8 +25,9 @@
 - [ ] Sizing is deterministic and overflow-safe, and identical case/resource
   inputs produce byte-identical normalized evidence aside from timestamps and
   raw measured values.
-- [ ] Default pytest collection remains unchanged; heavy rows require
-  `--benchmark`, optional CUDA cleanly skips, and no performance number gates CI.
+- [x] Default pytest collection remains unchanged; the P2 row requires
+  `--benchmark`, CUDA/native capture cleanly skips, and no performance number
+  gates CI.
 - [ ] Focused tests, untargeted repository coverage, linters, documentation
   contract tests, and `mkdocs build --strict` pass without lowering thresholds.
 

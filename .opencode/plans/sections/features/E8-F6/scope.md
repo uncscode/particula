@@ -32,6 +32,24 @@ to the exact E8 resource inventory.
 - No benchmark dispatch, CUDA/Warp import or probe, production execution change,
   package export, public documentation, or artifact publication.
 
+## Delivered in P2 (Issue #1582)
+
+- Schema-v2 capture-comparison records in
+  `particula/execution/tests/resident_benchmark_support.py`: two dedicated
+  device-synchronized modes, bounded paired timing collection, backward v1
+  decode, and provenance-only setup/capture durations.
+- A fixed, isolated atomic artifact destination:
+  `.artifacts/benchmarks/resident_capture_comparison.json`. Generic benchmark
+  state and its writer remain untouched.
+- Lazy CUDA-only fixture/capture support in
+  `particula/execution/tests/resident_benchmark_cuda_support.py`, with
+  hardware-free support tests and exact binding identity validation before
+  collection.
+- One `--benchmark`, `slow`, `performance`, `warp`, and `cuda` resident
+  comparison row in `particula/gpu/tests/benchmark_test.py`. It records equal,
+  nonempty paired sample counts only after CUDA/native-capture qualification;
+  unavailable CUDA/native capture skips rather than falling back.
+
 ## Out of Scope
 
 - Changing scientific kernels, process ordering, graph semantics, or memory
@@ -44,3 +62,5 @@ to the exact E8 resource inventory.
   projections for Epic I until measured evidence exists.
 - CUDA occupancy/kernel profiling, which belongs to E8-F7, and the runnable
   lifecycle example, runbook, and final Epic H closeout, which belong to E8-F8.
+- A box-count matrix, memory-budget model/probe, published documentation, and
+  any speed threshold or general performance conclusion.

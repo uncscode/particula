@@ -13,16 +13,23 @@
     rules, metadata, canonical IDs, deterministic round trips, malformed rows,
     import isolation, path/symlink rejection, and atomic-write failures.
 
-- [ ] **E8-F6-P2:** Benchmark captured versus uncaptured repeated resident timesteps with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add <=100-LOC timing helpers that time one E8-F2 prepared fixture
-    through uncaptured enqueue and E8-F4 replay, retaining raw samples separately
-    from setup and capture costs.
+- [x] **E8-F6-P2:** Benchmark captured versus uncaptured repeated resident timesteps with unit tests
+  - Issue: #1582 | Size: S | Status: Shipped
+  - Delivered: Schema-v2 paired timing support alternates uncaptured prepared
+    enqueue and captured replay on continuing state. Measured calls synchronize
+    once each; setup/capture elapsed time is immutable provenance, not a sample.
+    A lazy CUDA-only qualified binding and one opt-in benchmark row emit exactly
+    two executed comparison results to the isolated fixed artifact.
   - Files: `particula/execution/tests/resident_benchmark_support.py`,
     `particula/execution/tests/resident_benchmark_support_test.py`,
-    `particula/gpu/tests/benchmark_test.py`
-  - Tests: Warmup/setup exclusion, synchronization placement, deterministic
-    summary calculations, and identical fixture/identity routing.
+    `particula/execution/tests/resident_benchmark_cuda_support.py`,
+    `particula/execution/tests/resident_benchmark_cuda_support_test.py`, and
+    `particula/gpu/tests/benchmark_test.py`.
+  - Tests: Host and fake-CUDA tests validate bounds, callback order,
+    synchronization placement, schema compatibility, fixed artifact isolation,
+    lazy import, identity rejection, and setup/capture boundaries. The real
+    CUDA-only row is opt-in and passes or cleanly skips when native capture is
+    unavailable; it is supplemental evidence only.
 
 - [ ] **E8-F6-P3:** Extend box-first scaling matrix and budget-aware unavailable rows with unit tests
   - Issue: TBD | Size: S | Status: Not Started

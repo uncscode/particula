@@ -9,9 +9,11 @@
   record Python/platform/Warp versions, exact device identity and memory, UTC
   timestamp, command, synchronization method, warmup, timestep count, seed, and
   prepared-signature digest.
-- [ ] Implement `time_prepared_resident_modes()` to accept one E8-F2/E8-F5
-  fixture, pin its E8-F3/E8-F4 identities before warmup, and return distinct raw
-  uncaptured, replay, setup, and capture sample sequences.
+- [x] Implement bounded paired capture-comparison timing in
+  `collect_paired_device_timings()` and the lazy CUDA binding support. It
+  alternates uncaptured enqueue and captured replay on one qualified binding,
+  retains separate raw tuples/summaries, and records setup/capture time only as
+  provenance.
 - [x] Implement `summarize_timing_samples()` with deterministic count/min/median/
   mean/nearest-rank-p95 fields; reject nonfinite, negative, empty, or over-cap
   executed timing sample sequences.
@@ -24,6 +26,8 @@
 - [x] Add the dedicated `write_json_artifact()` atomic writer in
   `resident_benchmark_support.py`; it accepts normalized generic JSON only below
   a verified `.artifacts` root and rejects containment/symlink escapes.
+- [x] Add `write_resident_capture_comparison_artifact()` for the fixed isolated
+  schema-v2 resident artifact without invoking generic benchmark output.
 
 ## Memory Model
 
@@ -57,8 +61,9 @@
   schema, summaries, serialization, and artifact path safety; byte sizing and
   fixture routing remain future P2/P3 work. Keep existing generic coverage in
   `particula/gpu/tests/benchmark_helpers_test.py`.
-- [ ] Add opt-in resident CUDA benchmark tests marked `slow`, `performance`,
-  `benchmark`, `warp`, and `cuda`, with clean skip and no CPU substitution.
+- [x] Add one opt-in resident CUDA benchmark marked `slow`, `performance`,
+  `benchmark`, `warp`, and `cuda`, with clean native-CUDA-capture skip and no
+  CPU/Warp-CPU substitution.
 - [ ] Keep default test collection unchanged and add regression coverage for
   malformed dimensions, overflow, duplicate categories, unavailable probes,
   and artifact path safety.

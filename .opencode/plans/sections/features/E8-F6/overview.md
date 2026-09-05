@@ -29,6 +29,24 @@ round-trips schema-versioned JSON; and atomically writes generic JSON only
 beneath a verified `.artifacts` root. It does not execute benchmarks, import or
 probe Warp/CUDA, modify resident execution, add exports, or publish evidence.
 
+## Delivered P2 Capture Comparison
+
+Issue #1582 delivered one opt-in, CUDA-only supplemental comparison of an
+already prepared uncaptured resident timestep and an already captured native
+replay timestep. The host-only support now emits schema-v2 artifacts with two
+comparison timing modes, bounded alternating paired warmups/samples, immutable
+summaries, and setup/capture provenance excluded from samples and summaries.
+It writes only
+`.artifacts/benchmarks/resident_capture_comparison.json` through a dedicated
+atomic helper.
+
+`particula/execution/tests/resident_benchmark_cuda_support.py` lazily builds,
+qualifies, captures, identity-gates, and closes the CUDA-only test binding;
+`particula/gpu/tests/benchmark_test.py` supplies the sole `warp`/`cuda` marked
+row. The row cleanly skips when CUDA or native capture is unavailable, never
+uses CPU or Warp-CPU as a substitute, changes no production API or generic GPU
+benchmark artifact, and makes no speed, regression, or performance claim.
+
 ## User Stories
 
 - As a performance engineer, I want captured and uncaptured resident loops run

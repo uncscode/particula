@@ -7,8 +7,10 @@ before closing the resident session; timing callers own synchronization.
 
 from __future__ import annotations
 
+import json
 from contextlib import contextmanager
 from dataclasses import dataclass
+from hashlib import sha256
 from time import perf_counter
 from typing import Any, Callable, Iterator
 
@@ -39,6 +41,8 @@ class ResidentCaptureBenchmarkBinding:
     enqueue_operation: Callable[[], None]
     replay_operation: Callable[[], None]
     capture_set: Any
+    prepared_signature_digest: str
+    selected_device: dict[str, Any]
 
     def enqueue(self) -> None:
         """Enqueue one prepared uncaptured timestep without synchronization."""
@@ -66,6 +70,62 @@ class ResidentCaptureBenchmarkBinding:
             or self.capture_set is None
         ):
             raise ValueError("resident benchmark binding identity drifted.")
+
+
+def _prepared_signature_digest(loop: Any) -> str:
+    """Return a stable digest for the actual retained prepared signature."""
+    signature = loop.prepared.signature
+    device = signature.device
+    dimensions = signature.dimensions
+    payload = {
+        "device_backend": str(device.backend),
+        "device_native": str(device.native),
+        "dimensions": {
+            name: getattr(dimensions, name)
+            for name in ("n_boxes", "n_particles", "n_species")
+        },
+        "signature_type": (
+            f"{type(signature).__module__}.{type(signature).__qualname__}"
+        ),
+    }
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def _selected_device_metadata(wp: Any, native: object) -> dict[str, Any]:
+    """Return identity and memory for the selected native CUDA device."""
+    selected = wp.get_device(native)
+    total_memory = getattr(selected, "total_memory", None)
+    metadata: dict[str, Any] = {
+        "status": "available",
+        "identity": str(getattr(selected, "alias", native)),
+    }
+    if isinstance(total_memory, int | float):
+        metadata["memory"] = int(total_memory)
+    else:
+        metadata["memory"] = {"status": "unavailable"}
+    return metadata
+
+
+def resident_benchmark_provenance(
+    binding: ResidentCaptureBenchmarkBinding,
+) -> tuple[str, dict[str, Any]]:
+    """Return fixture-authoritative signature and device provenance."""
+    return binding.prepared_signature_digest, binding.selected_device
+
+
+def _close_loop_preserving_error(
+    close_loop: Callable[[Any], None], loop: Any, error: BaseException | None
+) -> None:
+    """Close a loop without allowing teardown to mask a primary failure."""
+    if error is None:
+        close_loop(loop)
+        return
+    try:
+        close_loop(loop)
+    except BaseException as cleanup_error:
+        raise error from cleanup_error
+    raise error
 
 
 @contextmanager
@@ -112,9 +172,9 @@ def qualified_cuda_resident_benchmark(
     device = candidates[0]
     setup_start = perf_counter()
     loop = _build_prepared_loop(device.native, n_boxes, duration, root_seed)
-    wp.synchronize()
-    setup_elapsed = perf_counter() - setup_start
     try:
+        wp.synchronize()
+        setup_elapsed = perf_counter() - setup_start
         adapter = _WarpNativeCaptureAdapter(wp, device.native)
         capture_set = loop.registry.validate_capture_resource_set(
             loop.request.capture_resource_requirements
@@ -147,8 +207,12 @@ def qualified_cuda_resident_benchmark(
                 captured, duration
             ),
             capture_set=capture_set,
+            prepared_signature_digest=_prepared_signature_digest(loop),
+            selected_device=_selected_device_metadata(wp, device.native),
         )
         benchmark_binding.validate_identities()
         yield benchmark_binding
-    finally:
-        _close_prepared_loop(loop)
+    except BaseException as error:
+        _close_loop_preserving_error(_close_prepared_loop, loop, error)
+    else:
+        _close_loop_preserving_error(_close_prepared_loop, loop, None)

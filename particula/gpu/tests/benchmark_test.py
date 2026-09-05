@@ -35,6 +35,7 @@ from numpy.typing import NDArray
 from particula._pytest_support import benchmark_option_enabled_from_env
 from particula.execution.tests.resident_benchmark_cuda_support import (
     qualified_cuda_resident_benchmark,
+    resident_benchmark_provenance,
 )
 from particula.execution.tests.resident_benchmark_support import (
     ResidentBenchmarkArtifact,
@@ -1891,6 +1892,9 @@ def test_resident_captured_replay_comparison() -> None:
     """
     _skip_if_no_cuda()
     with qualified_cuda_resident_benchmark() as binding:
+        prepared_signature_digest, selected_device = (
+            resident_benchmark_provenance(binding)
+        )
         uncaptured, replay = collect_paired_device_timings(
             uncaptured_operation=binding.enqueue,
             replay_operation=binding.replay,
@@ -1946,12 +1950,12 @@ def test_resident_captured_replay_comparison() -> None:
                 warmup=case.warmup,
                 timestep_count=case.timestep_count,
                 seed=case.seed,
-                prepared_signature_digest=str(id(binding.loop.prepared)),
+                prepared_signature_digest=prepared_signature_digest,
                 warp_version={
                     "status": "available",
                     "value": str(wp.__version__),
                 },
-                device={"status": "available", "identity": "cuda", "memory": 0},
+                device=selected_device,
             ),
             cases=(case,),
             results=(

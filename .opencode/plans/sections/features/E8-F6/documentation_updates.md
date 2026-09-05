@@ -6,6 +6,14 @@ Issue #1581 made no public documentation change. The delivered host-only test
 support module is concrete implementation support, not a user-facing benchmark
 or publication surface. Documentation and artifact publication remain P6 work.
 
+## P2 status
+
+Issue #1582 likewise makes no public documentation change. It adds test-only
+CUDA supplemental evidence and an isolated machine-generated artifact path;
+the implementation docstrings define the timing boundary, CUDA-only clean-skip
+behavior, artifact isolation, and absence of a speed claim. Public benchmark
+publication and documentation remain P6 work.
+
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` under Epic H Performance
   and Memory with the exact plain reproduction command, date, Warp/Python
   versions, qualified device, matrix, raw artifact path, summary table, memory
