@@ -453,7 +453,7 @@ def test_e8_f5_p5_closeout_docs_link_authoritative_evidence_and_preserve_limits(
         (
             "P5 (shipped, #1579)",
             "Evidence record date:** 2026-09-05",
-            "approved strict-equivalent",
+            "approved `docs-validator` `build_mkdocs_validate`",
             "mkdocs build --strict` | 0",
             "P5 is shipped",
         ),

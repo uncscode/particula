@@ -16,14 +16,18 @@ lowered, and production behavior is not changed solely to expose test internals.
   with the P1 oracle; separately checks conservation and stable identities; and
   uses scoped spies to reject enqueue-time setup, allocation, upload, readback,
   and synchronization. A zero-duration row verifies write-free preservation.
-- **P3 (shipped, #1577):** `captured_full_loop_test.py` discovers only opaque
-  CUDA string candidates from Warp, marks native rows `warp`, `cuda`, and
+- **P3 (shipped, #1577):** `captured_full_loop_test.py` normalizes Warp device
+  objects to opaque native strings, retains only CUDA candidates, and marks
+  native rows `warp`, `cuda`, and
   `gpu_parity`, and skips before capture when CUDA, the capture API, or a
-  candidate is unavailable. It captures qualified CUDA GAS and PARTICLES
+  candidate is unavailable. Only explicit runtime, device, or capture-API
+  unavailability may skip; binding, lifecycle, and resource failures propagate.
+  It captures qualified CUDA GAS and PARTICLES
   closed-map bindings for active, prescribed-volume, and no-work scenarios and
   compares replay snapshots (including diagnostics and family buffers) with an
   independently enqueued Warp-CPU binding. Scoped replay instrumentation rejects
-  visible conversion, allocation, copy, readback, synchronization, and registry
+  visible conversion, allocation, copy, module and array-method readback,
+  synchronization, and registry
   resource work; a hermetic rejection row proves qualification fails before
   capture or guard entry. No CPU or Warp-CPU capture fallback is used.
 - **P4 (shipped, #1578):** `rng_invariance_test.py` validates independent real
@@ -31,9 +35,10 @@ lowered, and production behavior is not changed solely to expose test internals.
   normal-dispatch reset. `checkpoint_test.py` validates schema-v4 same-device
   continuation of both advanced streams without stream initialization.
   `graph_capture_test.py` validates forged, attachment, signature, terminal,
-  and lifecycle replay rejections before launch plus one writer-failure
-  fault/revocation/release case. `captured_full_loop_test.py` adds optional
-  native-CUDA aggregate evidence that both scheduled streams advance.
+  and lifecycle replay rejections before launch plus launch- and completion-
+  failure fault/revocation/release cases. `captured_full_loop_test.py` adds
+  optional native-CUDA aggregate evidence that independently isolated wall-loss
+  and coagulation streams advance and have non-vacuous activity.
 - **P5 (shipped, #1579):** The dated integrated closeout below records the
   focused matrix, untargeted coverage runner, documentation contract tests, and
   strict MkDocs validation. It adds documentation evidence only; it does not
@@ -96,11 +101,12 @@ coverage. The untargeted runner is the sole full-package coverage evidence.
 | Focused optional CUDA | `pytest particula/execution/tests/captured_full_loop_test.py -q -m "warp and cuda" --no-cov` | 0 | `11 skipped, 48 deselected` (clean skip) |
 | Untargeted coverage | `.opencode/tools/run_pytest.py` | 0 | `6634 passed, 24 skipped, 1 xfailed, 92.92% coverage` |
 | Documentation required | `pytest particula/execution/tests/graph_capture_docs_test.py particula/tests/execution_selection_docs_test.py -q --no-cov` | 0 | `25 passed` |
-| Documentation required | `mkdocs build --strict` | 0 | Passed through the approved strict-equivalent worktree validation wrapper. |
+| Documentation required | `mkdocs build --strict` | 0 | Passed through the approved `docs-validator` `build_mkdocs_validate` worktree wrapper; strict mode is intrinsic and the exact workflow worktree is supplied as `cwd`. |
 
 The required installed-Warp uncaptured evidence passed. Deterministic fields use
 `rtol=1e-12, atol=1e-30`; independent concentration-weighted per-box/per-species
 conservation remains separate; stochastic evidence uses aggregate or sigma-bounded
 criteria rather than exact per-seed or cross-device RNG-word replay. The optional
-native-CUDA row does not alter that mandatory gate. The approved strict-equivalent
-worktree validation passed after the original evidence record, so P5 is shipped.
+native-CUDA row does not alter that mandatory gate. The approved
+`docs-validator` `build_mkdocs_validate` strict worktree validation passed after
+the original evidence record, so P5 is shipped.

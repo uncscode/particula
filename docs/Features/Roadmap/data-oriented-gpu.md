@@ -1823,7 +1823,7 @@ plan record rather than a published MkDocs page.
 | Optional CUDA | `pytest particula/execution/tests/captured_full_loop_test.py -q -m "warp and cuda" --no-cov` | 0 | `11 skipped, 48 deselected` (clean skip) |
 | Untargeted coverage | `.opencode/tools/run_pytest.py` | 0 | `6634 passed, 24 skipped, 1 xfailed, 92.92% coverage` |
 | Documentation | `pytest particula/execution/tests/graph_capture_docs_test.py particula/tests/execution_selection_docs_test.py -q --no-cov` | 0 | `25 passed` |
-| Documentation | `mkdocs build --strict` | 0 | Passed through the approved strict-equivalent worktree validation wrapper. |
+| Documentation | `mkdocs build --strict` | 0 | Passed through the approved `docs-validator` `build_mkdocs_validate` worktree wrapper; strict mode is intrinsic and the exact workflow worktree is supplied as `cwd`. |
 
 ### E8-F2 prepared enqueue contract
 

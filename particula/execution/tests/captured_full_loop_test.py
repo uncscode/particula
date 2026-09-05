@@ -1159,11 +1159,32 @@ def _build_prepared_loop(
     root_seed: int,
     *,
     selected_wall_loss_boxes: tuple[int, ...] = (),
+    single_active_particle: bool = False,
 ) -> _PreparedLoop:
     """Build one real all-operation resident loop on the requested device."""
     manifest = tuple((f"box-{2 * index}", index) for index in range(n_boxes))
     session, registry, guard = _binding(device, manifest, root_seed)
     wp = pytest.importorskip("warp")
+    if single_active_particle:
+        warp_device = session.particles.masses.device
+        masses = session.particles.masses.numpy()
+        concentration = session.particles.concentration.numpy()
+        charge = session.particles.charge.numpy()
+        masses[:, 1:, :] = 0.0
+        concentration[:, 1:] = 0.0
+        charge[:, 1:] = 0.0
+        wp.copy(
+            session.particles.masses,
+            wp.array(masses, dtype=wp.float64, device=warp_device),
+        )
+        wp.copy(
+            session.particles.concentration,
+            wp.array(concentration, dtype=wp.float64, device=warp_device),
+        )
+        wp.copy(
+            session.particles.charge,
+            wp.array(charge, dtype=wp.float64, device=warp_device),
+        )
     _resident_graph.cache_clear()
     request, wall_loss, coagulation = _scheduler_request(
         session,
@@ -1223,6 +1244,10 @@ class _ScenarioPreparedLoop:
     baseline_total_mass: Any
     source_ledger: Any
     sink_ledger: Any
+
+
+def _no_op_prepared_state_update(*_prepared: object) -> None:
+    """Keep scenario state-update sources metadata-only across loop builds."""
 
 
 def _build_scenario_prepared_loop_impl(
@@ -1536,9 +1561,6 @@ def _build_scenario_prepared_loop_impl(
     ):
         monkeypatch.setattr(resident_scheduler, name, NoOpAdapter)
 
-    def no_op(*_prepared: object) -> None:
-        """Keep P1 state-update sources metadata-only for this test fixture."""
-
     monkeypatch.setattr(
         resident_scheduler,
         "setup_prepared_environment_update",
@@ -1550,10 +1572,14 @@ def _build_scenario_prepared_loop_impl(
         lambda _prepared, _request: None,
     )
     monkeypatch.setattr(
-        resident_scheduler, "_enqueue_prepared_environment_update", no_op
+        resident_scheduler,
+        "_enqueue_prepared_environment_update",
+        _no_op_prepared_state_update,
     )
     monkeypatch.setattr(
-        resident_scheduler, "_enqueue_prepared_gas_update", no_op
+        resident_scheduler,
+        "_enqueue_prepared_gas_update",
+        _no_op_prepared_state_update,
     )
     prepared = prepare_resident_simulation(request, duration)
     assert prepared.ordered_node_ids == _CANONICAL_IDS
@@ -2269,12 +2295,12 @@ def test_deterministic_full_loop_matches_independent_uncaptured_baseline(
 
 
 def _native_cuda_candidates(wp: Any) -> tuple[Device, ...]:
-    """Return CUDA-native devices without coercion, replacement, or fallback."""
-    devices = wp.get_devices()
+    """Return normalized CUDA natives without replacement or fallback."""
+    devices = (str(device) for device in wp.get_devices())
     return tuple(
         Device(Backend.WARP, native)
         for native in devices
-        if isinstance(native, str) and native.startswith("cuda")
+        if native.startswith("cuda")
     )
 
 
@@ -2294,12 +2320,28 @@ def _require_native_cuda_capture() -> tuple[Any, tuple[Device, ...]]:
     return wp, candidates
 
 
-def test_native_cuda_candidate_discovery_retains_opaque_strings() -> None:
-    """Discovery ignores nonstrings without normalizing a usable CUDA value."""
+def test_native_cuda_candidate_discovery_normalizes_warp_devices() -> None:
+    """Discovery normalizes Warp-like objects and excludes non-CUDA values."""
+
+    class DeviceValue:
+        """Provide the string behavior of a Warp device object."""
+
+        def __init__(self, native: str) -> None:
+            self.native = native
+
+        def __str__(self) -> str:
+            return self.native
+
     first = "cuda:opaque:0"
     second = "cuda:opaque:1"
     fake_warp = SimpleNamespace(
-        get_devices=lambda: ("cpu", first, object(), second, 4)
+        get_devices=lambda: (
+            DeviceValue("cpu"),
+            DeviceValue(first),
+            object(),
+            second,
+            4,
+        )
     )
 
     candidates = _native_cuda_candidates(fake_warp)
@@ -2309,6 +2351,41 @@ def test_native_cuda_candidate_discovery_retains_opaque_strings() -> None:
         second,
     )
     assert all(candidate.backend is Backend.WARP for candidate in candidates)
+
+
+_EXPLICIT_CAPTURE_UNAVAILABILITY = frozenset(
+    {
+        "graph capture runtime is unavailable.",
+        "graph capture device is unavailable.",
+        "graph capture API is unsupported.",
+    }
+)
+
+
+def _qualification_is_explicitly_unavailable(error: ValueError) -> bool:
+    """Return whether qualification reported only an optional capability gap."""
+    return str(error) in _EXPLICIT_CAPTURE_UNAVAILABILITY
+
+
+@pytest.mark.parametrize(
+    ("message", "expected"),
+    (
+        ("graph capture runtime is unavailable.", True),
+        ("graph capture device is unavailable.", True),
+        ("graph capture API is unsupported.", True),
+        ("prepared graph-capture identities do not match.", False),
+        ("graph capture lifecycle must be ready.", False),
+        ("prepared capture resource set does not match.", False),
+    ),
+)
+def test_native_cuda_qualification_skips_only_explicit_unavailability(
+    message: str, expected: bool
+) -> None:
+    """Keep binding, lifecycle, and resource failures fail closed."""
+    assert (
+        _qualification_is_explicitly_unavailable(ValueError(message))
+        is expected
+    )
 
 
 def _forbid_prepared_host_work(
@@ -2325,8 +2402,8 @@ def _forbid_prepared_host_work(
         "to_warp_environment_data",
     ):
         dispatch_patch.setattr(conversion, name, forbidden)
-    # Patch module-level Warp aliases used by the retained prepared operations;
-    # individual Warp array methods are intentionally not patched globally.
+    # Patch module-level Warp aliases and the concrete resident-array readback
+    # method used by the retained prepared operations.
     for name in (
         "synchronize",
         "synchronize_device",
@@ -2338,6 +2415,9 @@ def _forbid_prepared_host_work(
     ):
         if callable(getattr(loop.wp, name, None)):
             dispatch_patch.setattr(loop.wp, name, forbidden)
+    array_type = type(loop.session.particles.masses)
+    if callable(getattr(array_type, "numpy", None)):
+        dispatch_patch.setattr(array_type, "numpy", forbidden)
     resource_methods = [
         "acquire_communication",
         "register_capture_resources",
@@ -2347,6 +2427,35 @@ def _forbid_prepared_host_work(
         resource_methods.append("validate_capture_resource_set")
     for name in resource_methods:
         dispatch_patch.setattr(loop.registry, name, forbidden)
+
+
+@pytest.mark.warp
+def test_forbidden_host_work_detects_warp_array_method_readback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Reject the common resident Warp-array ``numpy`` readback boundary."""
+    from particula.gpu import conversion
+
+    loop = _build_prepared_loop("cpu", 1, 0.0, 1571)
+    try:
+        with monkeypatch.context() as replay_patch:
+
+            def forbidden(*_args: object, **_kwargs: object) -> None:
+                pytest.fail("native replay performed forbidden host work")
+
+            _forbid_prepared_host_work(
+                replay_patch,
+                loop,
+                conversion,
+                forbidden,
+            )
+            with pytest.raises(
+                pytest.fail.Exception,
+                match="native replay performed forbidden host work",
+            ):
+                loop.session.particles.masses.numpy()
+    finally:
+        _close_prepared_loop(loop)
 
 
 @pytest.mark.warp
@@ -2813,8 +2922,10 @@ def test_native_cuda_family_capture_replay_matches_uncaptured_baseline(
                     capture_set,
                     _WarpNativeCaptureAdapter(wp, cuda_device.native),
                 )
-            except ValueError:
-                continue
+            except ValueError as error:
+                if _qualification_is_explicitly_unavailable(error):
+                    continue
+                raise
             qualified_candidates += 1
             captured = capture_prepared_resident_graph(qualification)
             with monkeypatch.context() as replay_patch:
@@ -2883,8 +2994,10 @@ def test_native_cuda_nonzero_full_loop_matches_numpy_and_uncaptured_warp(
                     capture_set,
                     _WarpNativeCaptureAdapter(wp, cuda_device.native),
                 )
-            except ValueError:
-                continue
+            except ValueError as error:
+                if _qualification_is_explicitly_unavailable(error):
+                    continue
+                raise
             qualified_candidates += 1
             captured = capture_prepared_resident_graph(qualification)
             _assert_prepared_parity(_prepared_snapshot(cuda_loop), cuda_initial)
@@ -2918,8 +3031,8 @@ def test_native_cuda_nonzero_full_loop_matches_numpy_and_uncaptured_warp(
 @pytest.mark.cuda
 @pytest.mark.gpu_parity
 @pytest.mark.stochastic
-def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
-    """Compare wall-loss and Brownian aggregates without trajectories."""
+def test_native_cuda_wall_loss_rng_and_stochastic_aggregate() -> None:
+    """Compare isolated wall-loss aggregates without coagulation clearing."""
     wp, candidates = _require_native_cuda_capture()
     duration = 1.0
     steps = 2
@@ -2929,8 +3042,6 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
     expected_removed = 0.0
     expected_variance = 0.0
     continued_words = 0
-    cpu_collisions = 0
-    cuda_collisions = 0
 
     for seed in seeds:
         selected = (0, 1, 2)
@@ -2940,6 +3051,7 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
             duration,
             seed,
             selected_wall_loss_boxes=selected,
+            single_active_particle=True,
         )
         cuda_loop = None
         captured = None
@@ -2950,6 +3062,7 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
                 duration,
                 seed,
                 selected_wall_loss_boxes=selected,
+                single_active_particle=True,
             )
             cpu_initial = _prepared_snapshot(cpu_loop)
             cuda_initial = _prepared_snapshot(cuda_loop)
@@ -2976,23 +3089,22 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
                     ),
                 )
             except ValueError as error:
-                pytest.skip(
-                    f"no CUDA candidate qualified for native capture: {error}"
-                )
+                if _qualification_is_explicitly_unavailable(error):
+                    pytest.skip(
+                        "no CUDA candidate qualified for native capture: "
+                        f"{error}"
+                    )
+                raise
             captured = capture_prepared_resident_graph(qualification)
             assert (
                 cuda_loop.registry.coagulation_resources.rng_states
                 is not cuda_loop.registry.wall_loss_resources.rng_states
             )
-            cuda_coagulation_rng_initial = cuda_initial["coagulation_rng"]
             cuda_rng_initial = cuda_initial["wall_loss_rng"]
 
             enqueue_prepared_resident_simulation(cpu_loop.prepared)
             replay_captured_resident_graph(captured, qualification.duration)
             cuda_first = _prepared_snapshot(cuda_loop)
-            assert np.any(
-                cuda_first["coagulation_rng"] != cuda_coagulation_rng_initial
-            )
             assert np.any(cuda_first["wall_loss_rng"] != cuda_rng_initial)
 
             enqueue_prepared_resident_simulation(cpu_loop.prepared)
@@ -3017,8 +3129,6 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
                     & (cuda_result["particle_concentration"] == 0.0)
                 )
             )
-            cpu_collisions += int(np.sum(cpu_result["collision_counts"]))
-            cuda_collisions += int(np.sum(cuda_result["collision_counts"]))
             for initial, result in (
                 (cpu_initial, cpu_result),
                 (cuda_initial, cuda_result),
@@ -3045,6 +3155,102 @@ def test_native_cuda_rng_continuation_and_stochastic_aggregate() -> None:
     assert abs(cpu_removed - expected_removed) <= single_path_bound
     assert abs(cuda_removed - expected_removed) <= single_path_bound
     assert abs(cuda_removed - cpu_removed) <= cross_path_bound
+    assert continued_words > 0
+
+
+@pytest.mark.warp
+@pytest.mark.cuda
+@pytest.mark.gpu_parity
+@pytest.mark.stochastic
+def test_native_cuda_coagulation_rng_and_nonvacuous_activity() -> None:
+    """Compare isolated Brownian activity with an independent opportunity gate."""
+    wp, candidates = _require_native_cuda_capture()
+    duration = 1.0
+    steps = 2
+    seeds = range(12)
+    cpu_collisions = 0
+    cuda_collisions = 0
+    collision_opportunities = 0
+    continued_words = 0
+
+    for seed in seeds:
+        cpu_loop = _build_prepared_loop("cpu", 3, duration, seed)
+        cuda_loop = None
+        try:
+            cuda_loop = _build_prepared_loop(
+                candidates[0].native,
+                3,
+                duration,
+                seed,
+            )
+            cpu_initial = _prepared_snapshot(cpu_loop)
+            cuda_initial = _prepared_snapshot(cuda_loop)
+            _assert_prepared_parity(cuda_initial, cpu_initial)
+            active_per_box = np.count_nonzero(
+                cpu_initial["particle_concentration"] > 0.0,
+                axis=1,
+            )
+            collision_opportunities += int(
+                steps * np.sum(active_per_box * (active_per_box - 1) // 2)
+            )
+            capture_set = cuda_loop.registry.validate_capture_resource_set(
+                cuda_loop.request.capture_resource_requirements
+            )
+            try:
+                qualification = qualify_prepared_resident_graph_capture(
+                    cuda_loop.binding,
+                    cuda_loop.prepared,
+                    capture_set,
+                    _WarpNativeCaptureAdapter(
+                        wp,
+                        cuda_loop.session.metadata.device.native,
+                    ),
+                )
+            except ValueError as error:
+                if _qualification_is_explicitly_unavailable(error):
+                    pytest.skip(
+                        "no CUDA candidate qualified for native capture: "
+                        f"{error}"
+                    )
+                raise
+            captured = capture_prepared_resident_graph(qualification)
+            first_words = cuda_initial["coagulation_rng"]
+            for step in range(steps):
+                enqueue_prepared_resident_simulation(cpu_loop.prepared)
+                replay_captured_resident_graph(captured, qualification.duration)
+                if step == 0:
+                    cuda_first = _prepared_snapshot(cuda_loop)
+                    assert np.any(cuda_first["coagulation_rng"] != first_words)
+            cpu_result = _prepared_snapshot(cpu_loop)
+            cuda_result = _prepared_snapshot(cuda_loop)
+            continued_words += int(
+                np.count_nonzero(
+                    cuda_result["coagulation_rng"]
+                    != cuda_first["coagulation_rng"]
+                )
+            )
+            cpu_collisions += int(np.sum(cpu_result["collision_counts"]))
+            cuda_collisions += int(np.sum(cuda_result["collision_counts"]))
+            npt.assert_allclose(
+                _snapshot_inventory(cpu_result),
+                _snapshot_inventory(cpu_initial),
+                rtol=PARITY_RTOL,
+                atol=PARITY_ATOL,
+            )
+            npt.assert_allclose(
+                _snapshot_inventory(cuda_result),
+                _snapshot_inventory(cuda_initial),
+                rtol=PARITY_RTOL,
+                atol=PARITY_ATOL,
+            )
+        finally:
+            if cuda_loop is not None:
+                _close_prepared_loop(cuda_loop)
+            _close_prepared_loop(cpu_loop)
+
+    assert collision_opportunities > 0
+    assert cpu_collisions > 0
+    assert cuda_collisions > 0
     collision_bound = max(4.0 * np.sqrt(cpu_collisions + cuda_collisions), 2.0)
     assert abs(cuda_collisions - cpu_collisions) <= collision_bound
     assert continued_words > 0

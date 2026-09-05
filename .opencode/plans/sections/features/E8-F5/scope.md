@@ -50,5 +50,7 @@ architecture.
 ## P5 Status (#1579)
 
 P5 adds the roadmap evidence table and one hardware-free documentation regression
-assertion only. Passing assertions do not substitute for strict MkDocs; that
-unavailable command leaves the feature unshipped.
+assertion only. The documentation assertions and the approved `docs-validator`
+`build_mkdocs_validate` strict worktree check passed. Optional CUDA remained a
+clean skip rather than executed correctness evidence; the feature is shipped
+without treating that skip as CUDA parity.

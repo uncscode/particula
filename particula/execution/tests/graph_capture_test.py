@@ -3182,11 +3182,15 @@ def test_fake_native_replay_rejection_matrix_is_prelaunch_only(  # noqa: C901
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize(
+    "failure_stage", ("launch", "completion"), ids=("launch", "completion")
+)
 def test_fake_native_replay_writer_failure_faults_and_revokes_once(
     resident_request: object,
     monkeypatch: pytest.MonkeyPatch,
+    failure_stage: str,
 ) -> None:
-    """A native replay writer error faults without retry or recovery."""
+    """A launch or completion error faults without retry or recovery."""
     request = cast("ResidentSimulationRequest", resident_request)
     launches: list[object] = []
     releases: list[object] = []
@@ -3194,7 +3198,8 @@ def test_fake_native_replay_writer_failure_faults_and_revokes_once(
 
     def launch(replayed_handle: object) -> None:
         launches.append(replayed_handle)
-        raise RuntimeError("native replay failure")
+        if failure_stage == "launch":
+            raise RuntimeError("native replay launch failure")
 
     captured, binding = _issued_capture_for_lifecycle_test(
         request,
@@ -3206,8 +3211,18 @@ def test_fake_native_replay_writer_failure_faults_and_revokes_once(
     monkeypatch.setattr(
         graph_capture, "gate_resident_graph_capture", lambda _binding: None
     )
+    if failure_stage == "completion":
+        monkeypatch.setattr(
+            type(request.guard),
+            "complete_step",
+            lambda _guard, _token: (_ for _ in ()).throw(
+                RuntimeError("native replay completion failure")
+            ),
+        )
     try:
-        with pytest.raises(RuntimeError, match="native replay failure"):
+        with pytest.raises(
+            RuntimeError, match=f"native replay {failure_stage} failure"
+        ):
             replay_captured_resident_graph(captured, 0.0)
         assert launches == [handle]
         assert releases == [handle]
@@ -3219,6 +3234,7 @@ def test_fake_native_replay_writer_failure_faults_and_revokes_once(
             replay_captured_resident_graph(captured, 0.0)
     finally:
         close_resident_graph_capture(binding)
+    assert releases == [handle]
 
 
 @pytest.mark.warp

@@ -65,5 +65,6 @@
     `particula/execution/tests/graph_capture_docs_test.py`, and E8 plan sections.
   - Evidence: focused required rows passed (48 and 274 passes), optional CUDA
     cleanly skipped, untargeted coverage passed (6634 passes, 92.92%), and the
-    documentation contract passed (37 passes in final validation). The approved
-    strict-equivalent worktree validation passed with exit status 0; P5 is shipped.
+    documentation contract passed (25 passes). The approved `docs-validator`
+    `build_mkdocs_validate` strict worktree validation passed with exit status 0;
+    P5 is shipped.
