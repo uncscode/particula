@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-08-30",
+  "last_updated": "2026-09-06",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E8-F6/architecture_design.md",
@@ -102,11 +102,11 @@
     {
       "id": "E8-F6-P6",
       "title": "Publish benchmark and memory-budget evidence with documentation validation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-06",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
