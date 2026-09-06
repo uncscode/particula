@@ -1703,3 +1703,600 @@ def collect_nsight_evidence(
         return NsightUnavailable(tool, "export contains no kernel rows")
     workload = build_default_profiling_workload_matrix()[0]
     return NsightEvidence(qualification, workload.workload_id, "resident", rows)
+
+
+# Analysis-only P4 records: they intentionally are not serialized artifacts.
+ANALYSIS_MODES = frozenset(("prepared_uncaptured", "captured_replay"))
+ANALYSIS_STATUSES = frozenset(("reconciled", "insufficient", "unavailable"))
+ANALYSIS_CONFIDENCE = frozenset(("sufficient", "low", "none"))
+
+
+def _analysis_tuple(value: object, name: str) -> tuple[object, ...]:
+    if not isinstance(value, tuple):
+        raise TypeError(f"{name} must be a tuple.")
+    return value
+
+
+def _require_analysis_mode(value: object) -> str:
+    """Return one supported analysis mode without coercion."""
+    if not isinstance(value, str):
+        raise TypeError("mode must be a string.")
+    if value not in ANALYSIS_MODES:
+        raise ValueError("mode is not supported.")
+    return value
+
+
+@dataclass(frozen=True, slots=True)
+class ArtifactReference:
+    """Explicit metadata-only artifact and raw-report binding."""
+
+    artifact_key: str
+    generation: str
+    raw_reports: tuple[RawReportProvenance, ...]
+
+    def __post_init__(self) -> None:
+        """Validate metadata and immutable raw-report provenance.
+
+        Raises:
+            TypeError: If raw-report provenance is not a tuple of records.
+            ValueError: If metadata is unsafe or report provenance is empty or
+                duplicated.
+        """
+        _require_text(self.artifact_key, "artifact_key")
+        _require_text(self.generation, "generation")
+        reports = _analysis_tuple(self.raw_reports, "raw_reports")
+        if not reports or not all(
+            isinstance(x, RawReportProvenance) for x in reports
+        ):
+            raise TypeError("raw_reports must contain RawReportProvenance.")
+        if len(reports) != len(set(reports)):
+            raise ValueError("raw_reports must be unique.")
+
+
+def _artifact_key(reference: ArtifactReference, mode: str, method: str) -> None:
+    if reference.artifact_key != f"{mode}_{method}.json":
+        raise ValueError(
+            "artifact_key must match the explicit mode and method."
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class HostEvidenceBinding:
+    """One explicitly mode-bound P2 measurement."""
+
+    evidence: ExecutedEvidence
+    mode: str
+    reference: ArtifactReference
+
+    def __post_init__(self) -> None:
+        """Validate the explicit P2 mode, method, and provenance binding.
+
+        Raises:
+            TypeError: If evidence or its reference has an invalid type.
+            ValueError: If the mode, method, artifact key, or provenance does
+                not match.
+        """
+        if not isinstance(self.evidence, ExecutedEvidence):
+            raise TypeError("evidence must be ExecutedEvidence.")
+        _require_analysis_mode(self.mode)
+        if not isinstance(self.reference, ArtifactReference):
+            raise TypeError("reference must be ArtifactReference.")
+        if self.evidence.method.source not in {
+            "host_launch",
+            "synchronized_elapsed",
+        }:
+            raise ValueError("host evidence method is not supported.")
+        _artifact_key(self.reference, self.mode, self.evidence.method.source)
+        if self.reference.raw_reports != self.evidence.raw_reports:
+            raise ValueError(
+                "reference provenance must equal evidence provenance."
+            )
+
+
+@dataclass(frozen=True, slots=True)
+class MachineBoundKernelEvidence:
+    """One explicitly mode- and machine-bound P3 export."""
+
+    evidence: NsightEvidence
+    mode: str
+    machine: MachineProvenance
+    reference: ArtifactReference
+
+    def __post_init__(self) -> None:
+        """Validate the explicit P3 mode, machine, and provenance binding.
+
+        Raises:
+            TypeError: If evidence, machine, or reference has an invalid type.
+            ValueError: If the workload, resident process, row identities, or
+                ordered provenance is invalid.
+        """
+        if not isinstance(self.evidence, NsightEvidence):
+            raise TypeError("evidence must be NsightEvidence.")
+        _require_analysis_mode(self.mode)
+        if self.evidence.process != "resident":
+            raise ValueError("kernel evidence mode or process is invalid.")
+        if not isinstance(self.machine, MachineProvenance) or not isinstance(
+            self.reference, ArtifactReference
+        ):
+            raise TypeError("kernel evidence context is invalid.")
+        if (
+            self.evidence.workload_id
+            != build_default_profiling_workload_matrix()[0].workload_id
+        ):
+            raise ValueError(
+                "kernel evidence must describe the frozen small workload."
+            )
+        reports = tuple(
+            dict.fromkeys(row.provenance for row in self.evidence.rows)
+        )
+        if reports != self.reference.raw_reports:
+            raise ValueError(
+                "reference provenance must equal ordered row provenance."
+            )
+        identities = {
+            (
+                row.tool,
+                row.kernel_name,
+                row.correlation_id,
+                row.metric_name,
+                row.provenance,
+            )
+            for row in self.evidence.rows
+        }
+        if len(identities) != len(self.evidence.rows):
+            raise ValueError("Nsight row identities must be unique.")
+
+
+@dataclass(frozen=True, slots=True)
+class EvidenceUnavailable:
+    """Unavailable P2 or P3 evidence without a fabricated measurement."""
+
+    workload: ProfilingWorkload
+    mode: str
+    machine: MachineProvenance | None
+    reference: ArtifactReference | None
+    reason: str
+
+    def __post_init__(self) -> None:
+        """Validate unavailable evidence without fabricating measurements.
+
+        Raises:
+            TypeError: If workload, machine, or reference has an invalid type.
+            ValueError: If the mode or bounded unavailability reason is
+                invalid.
+        """
+        if not isinstance(self.workload, ProfilingWorkload):
+            raise TypeError("workload must be ProfilingWorkload.")
+        _require_analysis_mode(self.mode)
+        if self.machine is not None and not isinstance(
+            self.machine, MachineProvenance
+        ):
+            raise TypeError("machine is invalid.")
+        if self.reference is not None and not isinstance(
+            self.reference, ArtifactReference
+        ):
+            raise TypeError("reference is invalid.")
+        _require_text(self.reason, "reason")
+
+
+@dataclass(frozen=True, slots=True)
+class KernelContribution:
+    """One ranked attributed Nsight duration contribution."""
+
+    process: str
+    kernel_name: str
+    value: float
+    provenance: RawReportProvenance
+    row_position: int
+    metric: str = "profiler_gpu_duration"
+    unit: str = "ns"
+
+    def __post_init__(self) -> None:
+        """Validate one ranked, attributed profiler-duration contribution.
+
+        Raises:
+            TypeError: If provenance has an invalid type.
+            ValueError: If text, value, position, metric, or unit is invalid.
+        """
+        _require_text(self.process, "process")
+        _require_text(self.kernel_name, "kernel_name")
+        _require_number(self.value, "value")
+        if self.metric != "profiler_gpu_duration" or self.unit != "ns":
+            raise ValueError("contribution metric or unit is invalid.")
+        if not isinstance(self.provenance, RawReportProvenance):
+            raise TypeError("provenance must be RawReportProvenance.")
+        _require_int(self.row_position, "row_position")
+
+
+@dataclass(frozen=True, slots=True)
+class Reconciliation:
+    """Synchronized-elapsed versus attributed-Nsight duration comparison."""
+
+    status: str
+    host_total_ns: float
+    profiler_total_ns: float
+    signed_difference_ns: float
+    absolute_difference_ns: float
+
+    def __post_init__(self) -> None:
+        """Validate finite host/profiler totals and their reconciliation state.
+
+        Raises:
+            ValueError: If a status or total is invalid or nonfinite.
+        """
+        if self.status not in {"reconciled", "non_reconcilable"}:
+            raise ValueError("reconciliation status is invalid.")
+        for field in (
+            "host_total_ns",
+            "profiler_total_ns",
+            "absolute_difference_ns",
+        ):
+            _require_number(getattr(self, field), field)
+        if type(self.signed_difference_ns) not in (
+            int,
+            float,
+        ) or not math.isfinite(self.signed_difference_ns):
+            raise ValueError("signed_difference_ns must be finite.")
+
+
+@dataclass(frozen=True, slots=True)
+class PerformanceDecision:
+    """Immutable machine- and workload-bounded analysis outcome."""
+
+    status: str
+    confidence: str
+    workload: ProfilingWorkload
+    mode: str
+    machine: MachineProvenance | None
+    contributions: tuple[KernelContribution, ...]
+    reconciliation: Reconciliation | None
+    limitations: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        """Validate an immutable bounded performance-analysis decision.
+
+        Raises:
+            TypeError: If contribution or limitation sequences are invalid.
+            ValueError: If decision fields, mode, or workload are invalid.
+        """
+        if (
+            self.status not in ANALYSIS_STATUSES
+            or self.confidence not in ANALYSIS_CONFIDENCE
+        ):
+            raise ValueError("decision status or confidence is invalid.")
+        _require_analysis_mode(self.mode)
+        if not isinstance(self.workload, ProfilingWorkload):
+            raise ValueError("decision workload is invalid.")
+        if not all(
+            isinstance(x, KernelContribution)
+            for x in _analysis_tuple(self.contributions, "contributions")
+        ):
+            raise TypeError("contributions are invalid.")
+        for limitation in _analysis_tuple(self.limitations, "limitations"):
+            _require_text(limitation, "limitation")
+
+
+def analyze_machine_bounded_performance(
+    host_inputs: tuple[HostEvidenceBinding | EvidenceUnavailable, ...],
+    kernel_inputs: tuple[MachineBoundKernelEvidence | EvidenceUnavailable, ...],
+) -> PerformanceDecision:
+    """Pure fail-closed analysis of explicit captured-replay evidence."""
+    hosts = _analysis_tuple(host_inputs, "host_inputs")
+    kernels = _analysis_tuple(kernel_inputs, "kernel_inputs")
+    if not hosts or not kernels:
+        raise ValueError("both evidence families are required.")
+    if not all(
+        isinstance(x, (HostEvidenceBinding, EvidenceUnavailable)) for x in hosts
+    ) or not all(
+        isinstance(x, (MachineBoundKernelEvidence, EvidenceUnavailable))
+        for x in kernels
+    ):
+        raise TypeError("analysis inputs are invalid.")
+    unavailable = next(
+        (x for x in (*hosts, *kernels) if isinstance(x, EvidenceUnavailable)),
+        None,
+    )
+    workload = (
+        unavailable.workload
+        if unavailable
+        else cast(HostEvidenceBinding, hosts[0]).evidence.workload
+    )
+    if unavailable:
+        if unavailable.mode != "captured_replay":
+            return PerformanceDecision(
+                "insufficient",
+                "low",
+                workload,
+                unavailable.mode,
+                unavailable.machine,
+                (),
+                None,
+                ("unavailable evidence is not captured replay",),
+            )
+        return PerformanceDecision(
+            "unavailable",
+            "none",
+            workload,
+            unavailable.mode,
+            unavailable.machine,
+            (),
+            None,
+            (unavailable.reason,),
+        )
+    bound_hosts = cast(tuple[HostEvidenceBinding, ...], hosts)
+    bound_kernels = cast(tuple[MachineBoundKernelEvidence, ...], kernels)
+    if (
+        any(x.mode != "captured_replay" for x in (*bound_hosts, *bound_kernels))
+        or workload.label != "small"
+    ):
+        return PerformanceDecision(
+            "insufficient",
+            "low",
+            workload,
+            "captured_replay",
+            None,
+            (),
+            None,
+            ("mode or workload mismatch",),
+        )
+    machine = bound_hosts[0].evidence.machine
+    methods = tuple(x.evidence.method.source for x in bound_hosts)
+    if len(methods) != len(set(methods)):
+        raise ValueError("duplicate host evidence method.")
+    if any(
+        x.evidence.workload != workload or x.evidence.machine != machine
+        for x in bound_hosts
+    ) or any(
+        x.evidence.workload_id != workload.workload_id or x.machine != machine
+        for x in bound_kernels
+    ):
+        return PerformanceDecision(
+            "insufficient",
+            "low",
+            workload,
+            "captured_replay",
+            machine,
+            (),
+            None,
+            ("workload or machine mismatch",),
+        )
+    return _analyze_bound_machine_performance(
+        workload,
+        machine,
+        bound_hosts,
+        bound_kernels,
+    )
+
+
+def _analyze_bound_machine_performance(
+    workload: ProfilingWorkload,
+    machine: MachineProvenance,
+    bound_hosts: tuple[HostEvidenceBinding, ...],
+    bound_kernels: tuple[MachineBoundKernelEvidence, ...],
+) -> PerformanceDecision:
+    """Analyze already validated, machine-matched captured-replay evidence."""
+    synchronized = [
+        x
+        for x in bound_hosts
+        if x.evidence.method.source == "synchronized_elapsed"
+    ]
+    if not synchronized:
+        return PerformanceDecision(
+            "insufficient",
+            "low",
+            workload,
+            "captured_replay",
+            machine,
+            (),
+            None,
+            ("missing synchronized elapsed",),
+        )
+    rows = tuple(
+        (binding, pos, row)
+        for binding in bound_kernels
+        for pos, row in enumerate(binding.evidence.rows)
+    )
+    if any(
+        row.tool != "nsys"
+        or row.metric_name is not None
+        or row.unit != "ns"
+        or row.attribution != "attributed"
+        for _, _, row in rows
+    ):
+        return PerformanceDecision(
+            "insufficient",
+            "low",
+            workload,
+            "captured_replay",
+            machine,
+            (),
+            None,
+            ("incomplete attribution",),
+        )
+    contributions = tuple(
+        sorted(
+            (
+                KernelContribution(
+                    binding.evidence.process,
+                    row.kernel_name,
+                    float(row.value),
+                    row.provenance,
+                    pos,
+                )
+                for binding, pos, row in rows
+            ),
+            key=lambda x: (
+                -x.value,
+                x.process,
+                x.kernel_name,
+                x.provenance.raw_filename,
+                x.provenance.sha256,
+                x.row_position,
+            ),
+        )
+    )
+    host_total = sum(
+        s.duration_ns / s.replay_count
+        for s in synchronized[0].evidence.raw_samples
+    ) / len(synchronized[0].evidence.raw_samples)
+    profiler_total = sum(x.value for x in contributions)
+    if not profiler_total or not host_total:
+        return PerformanceDecision(
+            "insufficient",
+            "low",
+            workload,
+            "captured_replay",
+            machine,
+            (),
+            None,
+            ("zero total has no percentage",),
+        )
+    difference = profiler_total - host_total
+    reconciliation = Reconciliation(
+        "reconciled"
+        if abs(difference) <= max(1.0, 0.05 * host_total)
+        else "non_reconcilable",
+        host_total,
+        profiler_total,
+        difference,
+        abs(difference),
+    )
+    if reconciliation.status != "reconciled":
+        return PerformanceDecision(
+            "insufficient",
+            "low",
+            workload,
+            "captured_replay",
+            machine,
+            (),
+            reconciliation,
+            ("non reconcilable totals",),
+        )
+    return PerformanceDecision(
+        "reconciled",
+        "sufficient",
+        workload,
+        "captured_replay",
+        machine,
+        contributions,
+        reconciliation,
+        (
+            "not portable bounded to workload machine software source metric "
+            "and artifacts",
+        ),
+    )
+
+
+GUARDED_PROPOSAL_CATEGORIES = frozenset(
+    (
+        "kernel",
+        "host_launch",
+        "memory",
+        "scientific",
+        "ownership",
+        "order",
+        "rng",
+    )
+)
+_CORRECTNESS_CATEGORIES = frozenset(("scientific", "ownership", "order", "rng"))
+_PORTABLE_WORDING = re.compile(
+    r"\b(portable|universal|all machines|always)\b", re.I
+)
+_CORRECTNESS_TEXT = re.compile(
+    r"\b(scientific|equation|numerical\s+tolerance|ownership|transfer|process\s+order|rng)\b",
+    re.I,
+)
+
+
+@dataclass(frozen=True, slots=True)
+class PerformanceProposal:
+    """Evidence-linked, machine- and workload-bounded proposed change."""
+
+    category: str
+    text: str
+    correctness_plan_reference: str | None = None
+
+    def __post_init__(self) -> None:
+        """Validate bounded proposal wording and correctness-plan guardrails.
+
+        Raises:
+            ValueError: If the category, wording, or correctness plan is
+                invalid or insufficient.
+        """
+        if self.category not in GUARDED_PROPOSAL_CATEGORIES:
+            raise ValueError("proposal category is invalid.")
+        text = _require_text(self.text, "text")
+        if _PORTABLE_WORDING.search(text):
+            raise ValueError("proposal text must not make portable claims.")
+        if "machine" not in text.lower() or "workload" not in text.lower():
+            raise ValueError(
+                "proposal text must be machine- and workload-bounded."
+            )
+        plan = self.correctness_plan_reference
+        if plan is not None:
+            _require_text(plan, "correctness_plan_reference")
+        if (
+            self.category in _CORRECTNESS_CATEGORIES
+            or _CORRECTNESS_TEXT.search(text)
+        ) and not plan:
+            raise ValueError(
+                "guarded proposal requires a correctness plan reference."
+            )
+
+
+@dataclass(frozen=True, slots=True)
+class Recommendation:
+    """A retained proposal emitted only from reconciled sufficient evidence."""
+
+    decision: PerformanceDecision
+    proposal: PerformanceProposal
+    contribution: KernelContribution
+
+    def __post_init__(self) -> None:
+        """Validate that a recommendation retains reconciled ranked evidence.
+
+        Raises:
+            TypeError: If a decision, proposal, or contribution is invalid.
+            ValueError: If the decision is not sufficient or does not retain
+                the contribution and non-portability limitation.
+        """
+        if not isinstance(self.decision, PerformanceDecision):
+            raise TypeError("decision must be PerformanceDecision.")
+        if not isinstance(self.proposal, PerformanceProposal):
+            raise TypeError("proposal must be PerformanceProposal.")
+        if not isinstance(self.contribution, KernelContribution):
+            raise TypeError("contribution must be KernelContribution.")
+        if (
+            self.decision.status != "reconciled"
+            or self.decision.confidence != "sufficient"
+        ):
+            raise ValueError(
+                "recommendations require reconciled sufficient evidence."
+            )
+        if (
+            self.decision.reconciliation is None
+            or self.contribution not in self.decision.contributions
+        ):
+            raise ValueError(
+                "recommendation must retain ranked decision evidence."
+            )
+        if not any(
+            "not portable" in item for item in self.decision.limitations
+        ):
+            raise ValueError(
+                "recommendation requires a non-portability limitation."
+            )
+
+
+def build_machine_bounded_recommendation(
+    decision: PerformanceDecision,
+    proposal: PerformanceProposal,
+) -> Recommendation:
+    """Emit one guarded recommendation from the top retained contribution."""
+    if not isinstance(decision, PerformanceDecision):
+        raise TypeError("decision must be PerformanceDecision.")
+    if not isinstance(proposal, PerformanceProposal):
+        raise TypeError("proposal must be PerformanceProposal.")
+    if not decision.contributions:
+        raise ValueError("recommendation requires a ranked contribution.")
+    return Recommendation(decision, proposal, decision.contributions[0])

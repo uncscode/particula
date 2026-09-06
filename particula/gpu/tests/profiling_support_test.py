@@ -86,6 +86,108 @@ def test_host_only_import_does_not_load_warp() -> None:
     assert result.returncode == 0, result.stderr
 
 
+def test_analysis_records_reject_mutable_provenance_and_portable_proposals() -> (
+    None
+):
+    """Test P4 analysis records retain immutable bounded inputs."""
+    report = support.RawReportProvenance("trace.json", 5, "a" * 64)
+    with pytest.raises(TypeError, match="raw_reports must be a tuple"):
+        support.ArtifactReference(
+            "captured_replay_host_launch.json", "one", [report]
+        )
+    with pytest.raises(ValueError, match="portable claims"):
+        support.PerformanceProposal(
+            "kernel", "portable improvement for this machine workload"
+        )
+    with pytest.raises(ValueError, match="correctness plan"):
+        support.PerformanceProposal(
+            "rng", "change bounded to this machine workload"
+        )
+
+
+def test_analysis_records_reject_wrong_type_modes() -> None:
+    """Test all analysis records reject non-text modes without coercion."""
+    host = _analysis_host_evidence("host_launch")
+    kernel = _analysis_kernel_evidence("attributed")
+    unavailable = support.EvidenceUnavailable(
+        _workloads()[0], "captured_replay", _machine(), None, "unavailable"
+    )
+    decision = support.PerformanceDecision(
+        "insufficient",
+        "low",
+        _workloads()[0],
+        "captured_replay",
+        None,
+        (),
+        None,
+        ("limited",),
+    )
+    for factory in (
+        lambda: support.HostEvidenceBinding(host.evidence, 1, host.reference),
+        lambda: support.MachineBoundKernelEvidence(
+            kernel.evidence, 1, kernel.machine, kernel.reference
+        ),
+        lambda: support.EvidenceUnavailable(
+            unavailable.workload,
+            1,
+            unavailable.machine,
+            None,
+            unavailable.reason,
+        ),
+        lambda: support.PerformanceDecision(
+            decision.status,
+            decision.confidence,
+            decision.workload,
+            1,
+            decision.machine,
+            decision.contributions,
+            decision.reconciliation,
+            decision.limitations,
+        ),
+    ):
+        with pytest.raises(TypeError, match="mode must be a string"):
+            factory()
+
+
+def test_analysis_rejects_duplicate_nsight_row_identity() -> None:
+    """Test machine-bound evidence rejects repeated native row identities."""
+    kernel = _analysis_kernel_evidence("attributed")
+    duplicated = support.NsightEvidence(
+        kernel.evidence.qualification,
+        kernel.evidence.workload_id,
+        kernel.evidence.process,
+        (kernel.evidence.rows[0], kernel.evidence.rows[0]),
+    )
+    with pytest.raises(ValueError, match="row identities must be unique"):
+        support.MachineBoundKernelEvidence(
+            duplicated, "captured_replay", _machine(), kernel.reference
+        )
+
+
+def test_proposal_textual_numerical_tolerance_requires_correctness_plan() -> (
+    None
+):
+    """Test numerical-tolerance wording is guarded regardless of category."""
+    with pytest.raises(ValueError, match="correctness plan"):
+        support.PerformanceProposal(
+            "kernel", "adjust numerical tolerance for this machine workload"
+        )
+
+
+def test_analysis_unavailable_returns_no_fabricated_measurements() -> None:
+    """Test unavailable inputs remain an explicit non-actionable decision."""
+    unavailable = support.EvidenceUnavailable(
+        _workloads()[0], "captured_replay", _machine(), None, "tool unavailable"
+    )
+    result = support.analyze_machine_bounded_performance(
+        (unavailable,), (unavailable,)
+    )
+    assert result.status == "unavailable"
+    assert result.confidence == "none"
+    assert result.contributions == ()
+    assert result.reconciliation is None
+
+
 def test_artifact_round_trips_to_byte_identical_canonical_json() -> None:
     """Test the executed/unavailable union round-trips canonically."""
     unavailable = support.UnavailableEvidence(
@@ -571,3 +673,94 @@ def test_collect_nsight_rejects_unsafe_report_before_worker(
             runner=fake_runner,
         )
     assert calls == []
+
+
+def _analysis_host_evidence(method: str) -> support.HostEvidenceBinding:
+    """Build valid captured-replay host evidence with 100 ns per replay."""
+    report = support.RawReportProvenance("trace.json", 5, "a" * 64)
+    metric_name = f"{method}_duration"
+    evidence = support.ExecutedEvidence(
+        "executed",
+        _workloads()[0],
+        _machine(),
+        support.MeasurementMethod(method, method, "tool --run", "1", "ns"),
+        tuple(
+            support.RawDurationSample(replay_count, 100 * replay_count)
+            for replay_count in support.REPLAY_COUNTS
+            for _ in range(_workloads()[0].sample_count)
+        ),
+        (support.NormalizedMetric(metric_name, 100.0, "ns"),),
+        (report,),
+    )
+    return support.HostEvidenceBinding(
+        evidence,
+        "captured_replay",
+        support.ArtifactReference(
+            f"captured_replay_{method}.json", "one", (report,)
+        ),
+    )
+
+
+def _analysis_kernel_evidence(
+    attribution: str,
+) -> support.MachineBoundKernelEvidence:
+    """Build one synthetic Systems duration row for analysis tests."""
+    report = support.RawReportProvenance("systems.csv", 5, "b" * 64)
+    row = support.NsightKernelRow(
+        "nsys", "resident_kernel", 1, None, 100, "ns", 1, attribution, report
+    )
+    evidence = support.NsightEvidence(
+        support.NsightToolQualification("nsys", support.NSYS_BANNER),
+        _workloads()[0].workload_id,
+        "resident",
+        (row,),
+    )
+    return support.MachineBoundKernelEvidence(
+        evidence,
+        "captured_replay",
+        _machine(),
+        support.ArtifactReference("systems.json", "one", (report,)),
+    )
+
+
+def test_analysis_reconciles_explicit_evidence_and_ranks_recommendation() -> (
+    None
+):
+    """Test analysis retains explicit matched evidence for one recommendation."""
+    decision = support.analyze_machine_bounded_performance(
+        (
+            _analysis_host_evidence("host_launch"),
+            _analysis_host_evidence("synchronized_elapsed"),
+        ),
+        (_analysis_kernel_evidence("attributed"),),
+    )
+
+    assert decision.status == "reconciled"
+    assert decision.confidence == "sufficient"
+    assert decision.reconciliation is not None
+    assert decision.reconciliation.host_total_ns == 100.0
+    assert decision.reconciliation.profiler_total_ns == 100.0
+    assert [item.kernel_name for item in decision.contributions] == [
+        "resident_kernel"
+    ]
+    recommendation = support.build_machine_bounded_recommendation(
+        decision,
+        support.PerformanceProposal(
+            "kernel", "consider this change for the measured machine workload"
+        ),
+    )
+    assert recommendation.contribution is decision.contributions[0]
+
+
+def test_analysis_rejects_unattributed_kernel_evidence() -> None:
+    """Test analysis does not reconcile profiler rows without attribution."""
+    decision = support.analyze_machine_bounded_performance(
+        (_analysis_host_evidence("synchronized_elapsed"),),
+        (_analysis_kernel_evidence("unattributed"),),
+    )
+
+    assert decision.status == "insufficient"
+    assert decision.confidence == "low"
+    assert decision.contributions == ()
+    assert decision.reconciliation is None
+    assert decision.limitations == ("incomplete attribution",)
