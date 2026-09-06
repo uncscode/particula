@@ -18,11 +18,16 @@
 - [ ] Commit only bounded normalized summaries and parser fixtures. Include raw
   filename, byte size, and SHA-256 provenance, but provide no upload, attachment,
   release-asset, Git LFS, or ordinary-Git raw-report path.
-- [ ] Add separate host enqueue/launch and synchronized elapsed samplers without
+- [x] Add separate host enqueue/launch and synchronized elapsed samplers without
   placing setup, capture construction, fixture reset, or serialization in the
   measured region.
-- [ ] Route both replay modes through the same prepared state contract and emit
+- [x] Route both replay modes through the same prepared state contract and emit
   explicit unavailable rows for missing CUDA/capture support.
+- [x] Publish four P1-valid mode/method artifacts and `manifest.json` atomically;
+  restore the prior complete publication when staging or replacement fails.
+- [x] Add a private identity-preserving CUDA fixture reset that snapshots and
+  restores mutable primary and acquired continuation arrays, including RNG
+  sidecars, between warmups and independent batches.
 - [ ] Add parsers for selected machine-readable Nsight Systems/Compute exports;
   fail closed on unsupported schema or units and retain raw source references.
 - [ ] Qualify the Arch Linux `nsight-systems 2026.1.3.425-1` and
@@ -48,9 +53,9 @@
 
 - [x] Add `particula/gpu/tests/profiling_support_test.py` for schema, canonical
   JSON, workload, evidence-union, and raw-provenance path-safety coverage.
-- [ ] Extend `particula/gpu/tests/benchmark_helpers_test.py` with timer-spy tests
+- [x] Extend `particula/gpu/tests/benchmark_helpers_test.py` with timer-spy tests
   proving warmup/setup exclusion and synchronization boundaries.
-- [ ] Add CUDA-gated opt-in rows to `benchmark_test.py`; retain `benchmark`,
+- [x] Add CUDA-gated opt-in rows to `benchmark_test.py`; retain `benchmark`,
   `slow`, `performance`, `warp`, and `cuda` intent markers as applicable.
 - [ ] Store compact text/JSON parser fixtures in a bounded test-data directory;
   do not require NVIDIA tooling for default unit tests.

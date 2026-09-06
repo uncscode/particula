@@ -29,6 +29,24 @@ executed/unavailable evidence union, bounded canonical JSON, and injected
 a profiler process, add a public export, or claim that timing evidence was
 collected.
 
+## P2 Delivered
+
+Issue #1590 shipped the opt-in native-CUDA collection in
+`particula/gpu/tests/benchmark_test.py`. It publishes four separately
+schema-valid artifacts for prepared-uncaptured and captured-replay host-launch
+and synchronized-elapsed measurements, plus an explicit mode/method manifest
+under `.artifacts/benchmarks/profiling/`. Each executed row retains a
+replay-count-major raw JSON sample report and checksum provenance under the
+controlled `profiling/raw/` root; unavailable CUDA/capture prerequisites instead
+publish complete unavailable rows for both frozen workloads without timing or
+CPU/Warp-CPU fallback.
+
+The qualified fixture now snapshots mutable resident primary arrays and acquired
+continuation sidecars, including RNG state, in
+`particula/execution/tests/resident_benchmark_cuda_support.py`. Its private
+reset drains, restores pre-bound same-device storage, drains again, and validates
+the retained identities before the next batch; it never rebuilds or recaptures.
+
 ## User Stories
 
 - As a performance engineer, I want host launch and device execution costs

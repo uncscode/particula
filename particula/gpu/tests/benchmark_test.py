@@ -25,8 +25,11 @@ from __future__ import annotations
 import json
 import os
 import platform
+import shutil
+import subprocess
 import sys
 import time
+import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -1955,8 +1958,36 @@ def _profiling_machine(binding: Any) -> MachineProvenance:
         cuda_version=str(getattr(wp, "__version__", "unknown")),
         driver_version="qualified",
         device=identity,
-        source_revision="working-tree",
+        source_revision=_source_revision(),
     )
+
+
+def _source_revision() -> str:
+    """Return revision and dirty-state provenance without fabricating Git data."""
+    git = shutil.which("git")
+    if git is None:
+        return "vcs-unavailable"
+    try:
+        revision = subprocess.run(  # noqa: S603
+            [git, "rev-parse", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        ).stdout.strip()  # noqa: S603
+        status = subprocess.run(  # noqa: S603
+            [git, "status", "--porcelain"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        ).stdout  # noqa: S603
+    except (OSError, subprocess.SubprocessError):
+        return "vcs-unavailable"
+    if not revision:
+        return "vcs-unavailable"
+    dirty_state = "true" if status.strip() else "false"
+    return f"git:{revision}-dirty-{dirty_state}"
 
 
 def _profiling_method(source: str) -> MeasurementMethod:
@@ -1964,7 +1995,9 @@ def _profiling_method(source: str) -> MeasurementMethod:
     return MeasurementMethod(
         method_id=source,
         source=source,
-        command=" ".join(sys.argv) or "pytest",
+        # Command-line arguments may contain paths and shell punctuation that
+        # the bounded evidence schema intentionally rejects.
+        command="pytest",
         version="perf_counter_ns",
         duration_unit="ns",
     )
@@ -2039,49 +2072,46 @@ def _collect_profile_row(
 def _stage_profile_artifacts(
     profiling_root: Path,
     artifacts: dict[tuple[str, str], ProfilingArtifact],
-) -> list[tuple[Path, Path]]:
-    """Serialize and stage every profiling artifact and its manifest."""
+) -> tuple[Path, Path, Path]:
+    """Stage one complete versioned artifact generation and pointer payload."""
     serialized = {
         key: serialize_profiling_artifact(value) + "\n"
         for key, value in artifacts.items()
     }
-    manifest = (
-        json.dumps(
-            {
-                f"{mode}/{method}": PROFILING_ARTIFACT_NAMES[(mode, method)]
-                for mode, method in PROFILING_ARTIFACT_NAMES
-            },
-            sort_keys=True,
-            separators=(",", ":"),
+    generation = f"generation-{uuid.uuid4().hex}"
+    generations_root = profiling_root / "generations"
+    temporary_generation = generations_root / f".{generation}.tmp"
+    final_generation = generations_root / generation
+    temporary_generation.mkdir(parents=True, exist_ok=False)
+    pointer_temporary = profiling_root / ".manifest.json.tmp"
+    try:
+        manifest = (
+            json.dumps(
+                {
+                    f"{mode}/{method}": (
+                        f"generations/{generation}/"
+                        f"{PROFILING_ARTIFACT_NAMES[(mode, method)]}"
+                    )
+                    for mode, method in PROFILING_ARTIFACT_NAMES
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n"
         )
-        + "\n"
-    )
-    staged: list[tuple[Path, Path]] = []
-    for key, payload in serialized.items():
-        final = profiling_root / PROFILING_ARTIFACT_NAMES[key]
-        temporary = final.with_suffix(final.suffix + ".tmp")
-        temporary.write_text(payload, encoding="utf-8")
-        staged.append((temporary, final))
-    manifest_final = profiling_root / "manifest.json"
-    manifest_temporary = manifest_final.with_suffix(".json.tmp")
-    manifest_temporary.write_text(manifest, encoding="utf-8")
-    staged.append((manifest_temporary, manifest_final))
-    return staged
-
-
-def _restore_profile_artifacts(
-    staged: list[tuple[Path, Path]],
-    backups: list[tuple[Path, Path]],
-    published: list[Path],
-) -> None:
-    """Remove partial output and restore the previous complete publication."""
-    for final in published:
-        final.unlink(missing_ok=True)
-    for backup, final in backups:
-        if backup.exists():
-            os.replace(backup, final)
-    for temporary, _ in staged:
-        temporary.unlink(missing_ok=True)
+        for key, payload in serialized.items():
+            (temporary_generation / PROFILING_ARTIFACT_NAMES[key]).write_text(
+                payload, encoding="utf-8"
+            )
+        (temporary_generation / "generation_manifest.json").write_text(
+            manifest, encoding="utf-8"
+        )
+        pointer_temporary.write_text(manifest, encoding="utf-8")
+    except BaseException:
+        pointer_temporary.unlink(missing_ok=True)
+        shutil.rmtree(temporary_generation, ignore_errors=True)
+        raise
+    return temporary_generation, final_generation, pointer_temporary
 
 
 def _write_profile_artifacts(
@@ -2092,24 +2122,23 @@ def _write_profile_artifacts(
     artifact_root.mkdir(parents=True, exist_ok=True)
     profiling_root = artifact_root / "benchmarks" / "profiling"
     profiling_root.mkdir(parents=True, exist_ok=True)
-    staged: list[tuple[Path, Path]] = []
-    backups: list[tuple[Path, Path]] = []
-    published: list[Path] = []
+    temporary_generation: Path | None = None
+    final_generation: Path | None = None
+    pointer_temporary: Path | None = None
     try:
-        staged = _stage_profile_artifacts(profiling_root, artifacts)
-        for _, final in staged:
-            if final.exists():
-                backup = final.with_suffix(final.suffix + ".bak")
-                os.replace(final, backup)
-                backups.append((backup, final))
-        for temporary, final in staged:
-            os.replace(temporary, final)
-            published.append(final)
+        temporary_generation, final_generation, pointer_temporary = (
+            _stage_profile_artifacts(profiling_root, artifacts)
+        )
+        os.replace(temporary_generation, final_generation)
+        os.replace(pointer_temporary, profiling_root / "manifest.json")
     except BaseException:
-        _restore_profile_artifacts(staged, backups, published)
+        if pointer_temporary is not None:
+            pointer_temporary.unlink(missing_ok=True)
+        if temporary_generation is not None:
+            shutil.rmtree(temporary_generation, ignore_errors=True)
+        if final_generation is not None and final_generation.exists():
+            shutil.rmtree(final_generation, ignore_errors=True)
         raise
-    for backup, _ in backups:
-        backup.unlink(missing_ok=True)
 
 
 def _collect_resident_launch_profile_artifacts(
@@ -2121,6 +2150,8 @@ def _collect_resident_launch_profile_artifacts(
     artifact_root.mkdir(parents=True, exist_ok=True)
     workloads = build_default_profiling_workload_matrix()
     pairs = tuple(PROFILING_ARTIFACT_NAMES)
+    raw_paths: list[Path] = []
+    samples_collected = False
     try:
         availability = cuda_capture_availability()
         if not availability.available:
@@ -2151,8 +2182,13 @@ def _collect_resident_launch_profile_artifacts(
                     samples = _collect_profile_row(
                         binding, workload, mode=mode, source=source, clock=clock
                     )
-                    raw_filename = f"{workload.label}_{mode}_{source}.json"
-                    (raw_root / raw_filename).write_text(
+                    raw_filename = (
+                        f"{workload.label}_{mode}_{source}_"
+                        f"{uuid.uuid4().hex}.json"
+                    )
+                    raw_path = raw_root / raw_filename
+                    raw_paths.append(raw_path)
+                    raw_path.write_text(
                         json.dumps(
                             {
                                 "capture_elapsed_seconds": binding.capture_elapsed_seconds,
@@ -2171,6 +2207,7 @@ def _collect_resident_launch_profile_artifacts(
                         ),
                         encoding="utf-8",
                     )
+                    samples_collected = True
                     provenance = build_raw_report_provenance(
                         artifact_root, raw_filename
                     )
@@ -2199,6 +2236,10 @@ def _collect_resident_launch_profile_artifacts(
             key: ProfilingArtifact(tuple(value)) for key, value in rows.items()
         }
     except (ResidentBenchmarkUnavailableError, pytest.skip.Exception) as error:
+        for raw_path in raw_paths:
+            raw_path.unlink(missing_ok=True)
+        if samples_collected:
+            raise
         artifacts = {
             pair: ProfilingArtifact(
                 tuple(
@@ -2208,7 +2249,12 @@ def _collect_resident_launch_profile_artifacts(
             )
             for pair in pairs
         }
-    _write_profile_artifacts(artifact_root, artifacts)
+    try:
+        _write_profile_artifacts(artifact_root, artifacts)
+    except BaseException:
+        for raw_path in raw_paths:
+            raw_path.unlink(missing_ok=True)
+        raise
     return artifacts
 
 

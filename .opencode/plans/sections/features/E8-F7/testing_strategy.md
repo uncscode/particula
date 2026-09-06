@@ -12,10 +12,19 @@ assertion thresholds.
   machine metadata allow-lists, safe injected-root paths and streaming
   checksums, invalid dimensions/units, and explicit unavailable records. These
   tests are hardware-free and do not import Warp or invoke CUDA/profiler tools.
-- **P2:** Timer and synchronizer spies prove setup/capture/warmup are excluded,
-  captured and uncaptured paths use identical fixture identities and step
-  counts, each raw sample is retained, and absent CUDA skips without fallback.
-  A real CUDA row records samples but asserts structure rather than speedup.
+- **P2 (delivered):** Hardware-free timer, operation, synchronizer, reset, raw
+  report, provenance, serializer, and replacement spies prove host-launch has
+  only two clocks around dispatch, synchronized elapsed has one post-loop
+  completion call, and warmup/reset/serialization remain outside those
+  intervals. Tests retain replay-count-major positive raw samples and mean
+  ns/operation metrics; cover invalid clocks, identity/dimension drift, reset,
+  dispatch, synchronization, provenance, serialization, and atomic-publication
+  failures. CUDA absence and preflight reset incapability publish complete
+  unavailable artifacts without timer, operation, synchronization, or reset
+  calls. `resident_benchmark_cuda_support_test.py` additionally covers mutable
+  primary/RNG snapshot restoration, empty registries, validation order, and
+  propagated reset errors. The opt-in CUDA row asserts artifact structure, never
+  a speedup threshold.
 - **P3:** Parser tests use checked-in bounded text/JSON fixtures for supported
   profiler exports. Cover unit conversion, duplicate invocations, unattributed
   kernels, missing counters, unsupported versions, bounded errors, and stable

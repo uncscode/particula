@@ -574,7 +574,6 @@ def qualified_cuda_resident_benchmark(
         captured = capture_prepared_resident_graph(qualification)
         wp.synchronize()
         capture_elapsed = perf_counter() - capture_start
-        monitor.snapshot_peak()
         benchmark_binding = ResidentCaptureBenchmarkBinding(
             loop=loop,
             captured=captured,
@@ -600,6 +599,10 @@ def qualified_cuda_resident_benchmark(
             "reset_fixture",
             _build_fixture_reset(wp, loop, validate_identities),
         )
+        # Reset snapshots are resident allocations, so construct and drain them
+        # before recording the fixture high-water mark.  Reset calls remain
+        # outside the measured dispatch and replay intervals.
+        monitor.snapshot_peak()
         benchmark_binding.validate_identities()
         yield benchmark_binding
     except BaseException as error:

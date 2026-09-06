@@ -1,7 +1,7 @@
 # Testing Guide
 
 **Project:** particula  
-**Last Updated:** 2026-08-11
+**Last Updated:** 2026-09-06
 
 particula uses pytest as its primary testing framework. Tests should be close to
 the code they validate and should exercise scientific correctness, edge cases,
@@ -177,6 +177,37 @@ This suite verifies O(n) scaling at 1k/10k/100k particles, theta-mode behavior,
 and deterministic seeded behavior. Staggered stepping uses sequential
 Gauss-Seidel updates, so high overhead compared to simultaneous vectorized
 stepping is expected.
+
+### Native-CUDA resident profiling evidence
+
+Resident launch-cost collection is opt-in test support, not a public benchmark
+workflow. It runs only with qualified native CUDA capture; CPU and Warp-CPU are
+neither timing backends nor fallbacks. Run its hardware-free schema and
+collector assertions with:
+
+```bash
+pytest particula/gpu/tests/profiling_support_test.py \
+  particula/gpu/tests/benchmark_helpers_test.py -q --no-cov
+```
+
+To collect evidence on a qualified native-CUDA system, run:
+
+```bash
+pytest particula/gpu/tests/benchmark_test.py --benchmark \
+  -k "resident and (launch or profile)" -v -s --no-cov
+```
+
+The collector writes four separate P1-valid artifacts under
+`.artifacts/benchmarks/profiling/`: prepared-uncaptured and captured-replay
+rows, each for `host_launch` and `synchronized_elapsed`. The manifest only maps
+mode/method pairs to filenames; raw samples and provenance are retained under
+`raw/`. Host-launch samples exclude synchronization between their clocks, while
+synchronized-elapsed samples include one completion synchronization. If native
+CUDA capture, qualification, replay, or identity-preserving reset is
+unavailable before collection, all four artifacts contain explicit unavailable
+evidence for both frozen workloads. Do not treat this as CPU or Warp-CPU timing
+success, and do not use these test artifacts to claim a public API, scheduler
+change, or general performance result.
 
 ## Wall Loss Coverage
 

@@ -14,14 +14,27 @@
     metrics, and unavailable evidence. No Warp/CUDA/profiler process or public
     export was added.
 
-- [ ] **E8-F7-P2:** Measure captured and uncaptured host launch costs with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Run identical prepared fixtures while separating enqueue/launch time
-    from explicitly synchronized end-to-end device completion time.
+- [x] **E8-F7-P2:** Measure captured and uncaptured host launch costs with unit tests
+  - Issue: #1590 | Size: S | Status: Shipped
+  - Delivered: One qualified native-CUDA binding per frozen workload supplies
+    prepared-uncaptured and captured-replay rows for host-launch and explicitly
+    synchronized elapsed methods. Four P1-valid artifacts and an explicit
+    manifest are atomically published below `.artifacts/benchmarks/profiling/`;
+    executed rows retain raw JSON sample provenance, while unavailable
+    prerequisites publish all four complete workload-ordered unavailable rows.
+  - Reset boundary: Benchmark-private snapshots restore existing mutable
+    resident primary arrays and acquired continuation/RNG sidecars before every
+    warmup and independent batch, then validate identity. No reset rebuilds,
+    checkpoints, restarts, or recaptures the qualified fixture.
   - Files: `particula/gpu/tests/benchmark_test.py`,
-    `particula/gpu/tests/benchmark_helpers_test.py`
-  - Tests: Warmup exclusion, setup exclusion, call counts, synchronization
-    placement, raw samples, captured/uncaptured identity, and clean CUDA skip.
+    `particula/gpu/tests/benchmark_helpers_test.py`,
+    `particula/execution/tests/resident_benchmark_cuda_support.py`,
+    `particula/execution/tests/resident_benchmark_cuda_support_test.py`
+  - Tests: Hardware-free spies cover two-clock host timing with no in-interval
+    synchronization, one synchronized-elapsed completion boundary, replay-major
+    raw samples and positive deltas, unavailable no-call routing, and atomic
+    publication rollback. CUDA-support tests cover primary/RNG restoration,
+    empty registries, validation ordering, and error propagation.
 
 - [ ] **E8-F7-P3:** Collect per-kernel CUDA timing occupancy and memory-access evidence with tests
   - Issue: TBD | Size: S | Status: Not Started

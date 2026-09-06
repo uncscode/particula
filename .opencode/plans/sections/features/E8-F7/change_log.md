@@ -2,6 +2,7 @@
 
 | Date | Change | Author |
 |------|--------|--------|
+| 2026-09-06 | Shipped E8-F7-P2 for issue #1590 (commits `47cdfb312`, `0ed316c94`, `95d93a6db`, and `61fdfe1cb`): native-CUDA-only prepared/captured host-launch and synchronized-elapsed collection, four atomically published P1-valid artifacts plus manifest, raw-report provenance, complete unavailable publication, and identity-preserving primary/continuation/RNG reset coverage. | implementation |
 | 2026-09-06 | Shipped E8-F7-P1 for issue #1589: host-only strict profiling evidence records, exact small/medium frozen workload matrix, executed/unavailable union, bounded canonical JSON, and safe injected `.artifacts` raw provenance in `profiling_support.py` with hardware-free tests. No Warp/CUDA/profiler process, public export, or timing evidence was added. | implementation |
 | 2026-08-30 | Selected ignored local-only raw Nsight retention under `.artifacts/benchmarks/profiling/raw/`; only bounded normalized summaries, raw checksums, and the explicit non-shared limitation are committed | user decision |
 | 2026-08-30 | Required E8-F7 to freeze canonical small and medium workload IDs from the smallest launch-sensitive and largest repeatably feasible E8-F6 rows, with no per-device substitution | user decision |

@@ -8,6 +8,7 @@ paths without requiring CUDA benchmark execution during default test runs.
 from __future__ import annotations
 
 import importlib.util
+import json
 import os
 import sys
 import types
@@ -1387,29 +1388,121 @@ def test_profile_artifact_publication_restores_complete_previous_set(
     }
     profiling_root = tmp_path / "benchmarks" / "profiling"
     profiling_root.mkdir(parents=True)
-    final_paths = [
-        profiling_root / name
-        for name in benchmark_module.PROFILING_ARTIFACT_NAMES.values()
-    ] + [profiling_root / "manifest.json"]
-    previous = {path: f"previous:{path.name}\n" for path in final_paths}
-    for path, contents in previous.items():
-        path.write_text(contents, encoding="utf-8")
+    manifest = profiling_root / "manifest.json"
+    previous = "previous-complete-generation\n"
+    manifest.write_text(previous, encoding="utf-8")
 
     replace = benchmark_module.os.replace
 
-    def fail_first_publish(source: Path, destination: Path) -> None:
-        if source.suffix == ".tmp":
+    def fail_pointer_publish(source: Path, destination: Path) -> None:
+        if destination == manifest:
             raise OSError("replacement failed")
         replace(source, destination)
 
-    monkeypatch.setattr(benchmark_module.os, "replace", fail_first_publish)
+    monkeypatch.setattr(benchmark_module.os, "replace", fail_pointer_publish)
 
     with pytest.raises(OSError, match="replacement failed"):
         benchmark_module._write_profile_artifacts(tmp_path, artifacts)
 
-    assert {
-        path: path.read_text(encoding="utf-8") for path in final_paths
-    } == previous
+    assert manifest.read_text(encoding="utf-8") == previous
+    assert not list(profiling_root.glob("**/*.tmp"))
+    generations = profiling_root / "generations"
+    assert not list(generations.iterdir())
+
+
+def test_profile_artifact_publication_points_to_one_complete_generation(
+    benchmark_module,
+    tmp_path: Path,
+) -> None:
+    """Publish all four artifacts before atomically exposing their generation."""
+    workloads = benchmark_module.build_default_profiling_workload_matrix()
+    artifacts = {
+        pair: benchmark_module.ProfilingArtifact(
+            tuple(
+                benchmark_module.UnavailableEvidence(
+                    "unavailable", workload, "CUDA absent"
+                )
+                for workload in workloads
+            )
+        )
+        for pair in benchmark_module.PROFILING_ARTIFACT_NAMES
+    }
+
+    benchmark_module._write_profile_artifacts(tmp_path, artifacts)
+
+    profiling_root = tmp_path / "benchmarks" / "profiling"
+    manifest = json.loads(
+        (profiling_root / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert set(manifest) == {
+        f"{mode}/{method}"
+        for mode, method in benchmark_module.PROFILING_ARTIFACT_NAMES
+    }
+    assert len({Path(value).parts[1] for value in manifest.values()}) == 1
+    assert all(
+        (profiling_root / value).is_file() for value in manifest.values()
+    )
+
+
+@pytest.mark.parametrize(
+    ("revision", "status", "expected"),
+    [
+        ("abc123\n", "", "git:abc123-dirty-false"),
+        ("abc123\n", " M file.py\n", "git:abc123-dirty-true"),
+    ],
+)
+def test_source_revision_records_git_revision_and_dirty_state(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+    revision: str,
+    status: str,
+    expected: str,
+) -> None:
+    """Retain reproducible Git metadata in bounded source provenance."""
+    responses = iter((revision, status))
+    monkeypatch.setattr(
+        benchmark_module.subprocess,
+        "run",
+        lambda *args, **kwargs: types.SimpleNamespace(stdout=next(responses)),
+    )
+
+    assert benchmark_module._source_revision() == expected
+
+
+def test_source_revision_uses_labeled_fallback_when_git_is_unavailable(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Do not invent a revision when VCS metadata cannot be queried."""
+    monkeypatch.setattr(
+        benchmark_module.subprocess,
+        "run",
+        lambda *args, **kwargs: (_ for _ in ()).throw(OSError("no git")),
+    )
+
+    assert benchmark_module._source_revision() == "vcs-unavailable"
+
+
+@pytest.mark.parametrize("source", ("host_launch", "synchronized_elapsed"))
+def test_profiling_method_sanitizes_command_provenance(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+    source: str,
+) -> None:
+    """Keep arbitrary pytest arguments out of profiling method provenance."""
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["pytest", "benchmark_test.py", "--benchmark", "-k", "resident"],
+    )
+
+    method = benchmark_module._profiling_method(source)
+
+    assert method.method_id == source
+    assert method.source == source
+    assert method.command == "pytest"
+    assert method.version == "perf_counter_ns"
+    assert method.duration_unit == "ns"
 
 
 def test_unavailable_profile_collection_never_invokes_fixture_or_clock(
@@ -1449,6 +1542,94 @@ def test_unavailable_profile_collection_never_invokes_fixture_or_clock(
     )
     manifest = artifact_root / "benchmarks" / "profiling" / "manifest.json"
     assert manifest.is_file()
+
+
+def test_profile_collector_publishes_complete_fake_cuda_generation(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Exercise all mode/method rows without invoking a CPU timing path."""
+    events: list[str] = []
+    workloads = benchmark_module.build_default_profiling_workload_matrix()
+    monkeypatch.setattr(
+        benchmark_module,
+        "cuda_capture_availability",
+        lambda: types.SimpleNamespace(available=True, reason="available"),
+    )
+
+    @contextmanager
+    def fake_binding(**kwargs: Any):
+        workload = next(
+            item for item in workloads if item.workload_id == kwargs["case_id"]
+        )
+        binding = types.SimpleNamespace(
+            loop=types.SimpleNamespace(
+                prepared=types.SimpleNamespace(
+                    signature=types.SimpleNamespace(
+                        dimensions=types.SimpleNamespace(
+                            n_boxes=workload.shape[0],
+                            n_particles=workload.shape[1],
+                            n_species=workload.shape[2],
+                        )
+                    )
+                )
+            ),
+            duration=workload.duration_seconds,
+            reset=lambda: events.append("reset"),
+            validate_identities=lambda: events.append("validate"),
+            synchronize=lambda: events.append("synchronize"),
+            enqueue=lambda: events.append("enqueue"),
+            replay=lambda: events.append("replay"),
+            capture_elapsed_seconds=0.1,
+            setup_elapsed_seconds=0.2,
+        )
+        yield binding
+
+    monkeypatch.setattr(
+        benchmark_module, "qualified_cuda_resident_benchmark", fake_binding
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "_profiling_machine",
+        lambda _: benchmark_module.MachineProvenance(
+            "machine",
+            "linux",
+            "3.12",
+            "warp",
+            "qualified",
+            "cuda:0",
+            "git:abc-dirty-false",
+        ),
+    )
+    ticks = iter(range(1, 100_000))
+
+    artifact_root = tmp_path / ".artifacts"
+    artifact_root.mkdir()
+    artifacts = benchmark_module._collect_resident_launch_profile_artifacts(
+        artifact_root, clock=lambda: next(ticks)
+    )
+
+    assert set(artifacts) == set(benchmark_module.PROFILING_ARTIFACT_NAMES)
+    assert all(
+        [row.workload.workload_id for row in artifact.evidence]
+        == [workload.workload_id for workload in workloads]
+        for artifact in artifacts.values()
+    )
+    assert events.count("enqueue") > 0
+    assert events.count("replay") > 0
+    raw_root = artifact_root / "benchmarks" / "profiling" / "raw"
+    assert len(list(raw_root.glob("*.json"))) == len(workloads) * 4
+    manifest = json.loads(
+        (
+            artifact_root / "benchmarks" / "profiling" / "manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert len(manifest) == 4
+    assert all(
+        (artifact_root / "benchmarks" / "profiling" / path).is_file()
+        for path in manifest.values()
+    )
 
 
 def test_condensation_scaling_records_cpu_and_gpu_paths(

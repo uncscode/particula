@@ -9,16 +9,19 @@
 - [ ] Every measured artifact records date, exact command, CUDA device name and
   architecture, driver/runtime, Warp, Python, profiler version, timer, and
   synchronization method.
-- [ ] Captured and uncaptured runs use identical prepared fixture contracts and
-  retain raw host launch and synchronized elapsed samples separately.
-- [ ] Setup, allocation, graph construction, warmup, serialization, and profiler
-  startup are excluded from replay measurements or separately labeled.
+- [x] Captured and uncaptured runs use one identical qualified prepared fixture
+  per frozen workload and retain raw host-launch and synchronized-elapsed samples
+  separately for each mode/method artifact.
+- [x] Setup, allocation, graph construction, warmup, identity-preserving reset,
+  raw-report processing, and serialization are excluded from replay intervals;
+  host launch has no in-interval synchronization and elapsed timing has exactly
+  one post-dispatch synchronization.
 - [ ] Dominant kernels have duration and invocation evidence plus occupancy and
   memory-access or achieved-bandwidth metrics with documented units; a row
   missing this floor is explicitly unavailable and never synthesized.
 - [ ] Kernel contributions and host-launch contribution reconcile within the
   documented method limits, with unattributed time retained rather than hidden.
-- [ ] Raw local reports are confined to the gitignored
+- [x] P2 raw local reports are confined to the gitignored
   `.artifacts/benchmarks/profiling/raw/` subtree; normalized evidence and checksum
   manifests remain reviewable and no raw binary report is committed.
 - [ ] Documentation states that raw reports are local-only and not retrievable by
@@ -26,8 +29,9 @@
   committed normalized evidence.
 - [ ] Each recommendation cites workload, machine, metric, raw artifact, and
   confidence/limitation, and no recommendation changes scientific contracts.
-- [ ] Missing CUDA, capture, profiler tools, permissions, or counters cleanly
-  records unavailable evidence without CPU fallback.
+- [x] Missing CUDA, capture, qualification, or reset capability records complete
+  P2 unavailable evidence without CPU fallback or timing callbacks. Profiler
+  tools, permissions, and counters remain P3 requirements.
 - [ ] Real Nsight rows run only on a qualified NVIDIA CUDA GPU; fixture-based
   parser tests remain independent of CUDA and installed profiler binaries.
 - [ ] An opt-in local smoke test invokes the selected `nsys` and `ncu`

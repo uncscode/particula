@@ -38,6 +38,9 @@ pytest particula/gpu/tests/mass_precision_cases_test.py -q
 # Host-only resident profiling-evidence schema tests (no profiler or GPU)
 pytest particula/gpu/tests/profiling_support_test.py -q --no-cov
 
+# Hardware-free resident profiling collector/publication tests
+pytest particula/gpu/tests/benchmark_helpers_test.py -q --no-cov
+
 # Opt-in native-CUDA resident benchmark collection (not standard CI)
 pytest particula/gpu/tests/benchmark_test.py --benchmark -k resident -v -s --no-cov
 
@@ -62,8 +65,16 @@ unavailable and unmeasured; see
 It freezes the small `(1, 16, 2)` and medium `(1000, 16, 2)` profiling
 workloads and validates bounded evidence/provenance records. It neither imports
 Warp nor probes hardware, runs a profiler, records measurements, or provides a
-public API. Passing its tests confirms schema handling only; it does not change
-the unmeasured resident-evidence status above.
+public API. The opt-in resident collection may publish four separate P1-valid
+profiling artifacts beneath `.artifacts/benchmarks/profiling/`: prepared
+uncaptured and captured replay, each measured as host launch and synchronized
+elapsed time. A private manifest maps those mode/method pairs to their files;
+raw samples and provenance remain under its `raw/` directory. Native CUDA
+capture qualification is mandatory. If it is unavailable, the collection
+records workload-complete unavailable evidence in all four artifacts without
+timing CPU or Warp-CPU execution. This test-support evidence changes no public
+API, scheduler behavior, or user workflow, and does not change the separate
+unmeasured schema-v3 resident timing and allocator status above.
 
 ### Installation
 

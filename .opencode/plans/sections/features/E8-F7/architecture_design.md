@@ -55,6 +55,24 @@ E8-F5 fixture + E8-F6 matrix + qualified CUDA device
 - **P1 boundary:** The delivered support performs no Warp/CUDA import or probe,
   profiler invocation, process execution, or timing collection. Collection and
   profiler parsing remain later phases.
+- **P2 collection boundary:** `benchmark_test.py` constructs one qualified
+  binding per frozen workload and reuses it across all four mode/method rows.
+  `host_launch` is exactly clock → replay-count operations → clock, then drains
+  outside the interval. `synchronized_elapsed` inserts exactly one completion
+  synchronization before its second clock. Warmup, reset, identity validation,
+  raw-report writing/hashing, and artifact serialization are outside timed
+  intervals.
+- **P2 reset boundary:** The CUDA test-support fixture snapshots every discovered
+  mutable resident primary and acquired continuation sidecar once after capture.
+  Each reset drains, restores those existing arrays with same-device copies,
+  drains, and validates identities. It cannot checkpoint/restart, replace a
+  qualified resource, rebuild a loop, or recapture a graph.
+- **P2 publication boundary:** Four P1-valid `ProfilingArtifact` documents are
+  staged with `manifest.json`; failed staging or replacement removes new partial
+  output and restores a pre-existing complete publication. Preconstruction CUDA,
+  capture, qualification, or reset-capability absence produces four complete
+  workload-ordered unavailable artifacts without clocks, dispatch, reset, or
+  synchronization.
 - **Process boundary:** Python test-support orchestration invokes `nsys` and
   `ncu` as optional external executables with explicit argument vectors,
   `shell=False`, bounded timeouts, captured exit status, and bounded stdout and
