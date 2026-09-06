@@ -100,6 +100,11 @@ class CudaFixtureMemoryMonitor:
     reason: str | None = None
 
     def _unavailable(self, reason: object) -> None:
+        """Mark this monitor unavailable with a deterministic reason.
+
+        Args:
+            reason: Failure value converted to the structured reason text.
+        """
         self.reason = str(reason) or "incomplete CUDA allocator coverage"
 
     def begin(self) -> None:

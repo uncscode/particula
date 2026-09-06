@@ -238,6 +238,15 @@ class CudaDefaultPoolHighWater:
         self._loader = loader
 
     def _functions(self) -> tuple[Any, Any, Any, Any, int]:
+        """Resolve and cache the required CUDA Runtime function handles.
+
+        Returns:
+            The default-pool, attribute get/set, library, and runtime-version
+            handles needed by this adapter.
+
+        Raises:
+            RuntimeError: If CUDA Runtime is unavailable or older than 11.2.
+        """
         if type(self)._resolved is not None:
             resolved = type(self)._resolved
             if resolved is None:
@@ -277,6 +286,17 @@ class CudaDefaultPoolHighWater:
         )
 
     def _pool(self, device: int) -> Any:
+        """Return the default memory pool handle for a CUDA device.
+
+        Args:
+            device: Exact CUDA device ordinal.
+
+        Returns:
+            The native CUDA default memory-pool handle.
+
+        Raises:
+            RuntimeError: If the default pool cannot be obtained.
+        """
         default_pool = self._functions()[0]
         pool = ctypes.c_void_p()
         if default_pool(ctypes.byref(pool), device):
@@ -1618,6 +1638,8 @@ class ResidentBenchmarkArtifact:
         metadata: Complete stable host provenance metadata.
         cases: Canonical benchmark configurations with unique identifiers.
         results: Case-referencing results with unique case/mode identities.
+        memory_observations: At most one case-scoped memory observation per
+            referenced benchmark case.
     """
 
     metadata: Mapping[str, Any]
