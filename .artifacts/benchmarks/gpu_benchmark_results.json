@@ -1,0 +1,41 @@
+{
+  "started_at": "2026-09-06T00:12:44.409179+00:00",
+  "benchmark_metadata": {
+    "command": "/home/kyle/Code/particula/.venv/bin/pytest -v --tb=short --cov --cov-fail-under=80 --cov-report=term-missing --benchmark",
+    "artifact_path": ".artifacts/benchmarks/gpu_benchmark_results.json",
+    "warp_version": "1.17.0",
+    "warp_available": true,
+    "cuda_available": true,
+    "device": {
+      "alias": "cuda:0",
+      "name": "NVIDIA GeForce RTX 5060",
+      "ordinal": 0,
+      "arch": 120,
+      "is_cuda": true,
+      "is_cpu": false,
+      "is_uva": true,
+      "total_memory_bytes": 8122859520
+    }
+  },
+  "benchmarks": {
+    "coagulation_1x500": {
+      "n_boxes": 1,
+      "n_particles": 500,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 1.0298384469933808,
+      "cpu_time_s": 0.5286779960151762,
+      "speedup": 0.5133601270749355
+    },
+    "coagulation_1x2k": {
+      "n_boxes": 1,
+      "n_particles": 2000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 15.972663135034963,
+      "cpu_time_s": 0.6708195860264823,
+      "speedup": 0.04199797994581659
+    }
+  },
+  "updated_at": "2026-09-06T00:15:38.509789+00:00"
+}

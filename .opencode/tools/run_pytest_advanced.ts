@@ -245,7 +245,13 @@ const validateTestPathWithinRepo = (
 
 const COVERAGE_PYTEST_ARG_PATTERN = /^(--cov(?:=|\b)|--cov-report(?:=|\b)|--cov-fail-under(?:=|\b)|--cov-config(?:=|\b)|--cov-context(?:=|\b))/;
 const PYTEST_VALUE_OPTIONS = new Set(["-k", "-m"]);
-const PYTEST_STANDALONE_OPTIONS = new Set(["--collect-only", "-q", "-v", "--verbose"]);
+const PYTEST_STANDALONE_OPTIONS = new Set([
+  "--benchmark",
+  "--collect-only",
+  "-q",
+  "-v",
+  "--verbose",
+]);
 const PYTEST_RESERVED_PREFIXES = [
   "--output", "--min-tests", "--timeout", "--cwd", "--test-path", "--test-filter",
   "--coverage", "--no-coverage", "--coverage-source", "--coverage-threshold", "--cov-report",

@@ -224,6 +224,16 @@ describe("run_pytest_advanced wrapper", () => {
     expect(await execute({ coverage: false, pytestArgs: ["--collect-only"] })).toContain("collected_count");
   });
 
+  it("forwards the benchmark opt-in through the validated pytest suffix", async () => {
+    setDollarText(buildSuccessOutput("ok"));
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    expect(await execute({ coverage: false, pytestArgs: ["--benchmark", "-q"] })).toBe("ok");
+    expect(getInvocations().at(-1)?.args).toContain(
+      '--pytest-argv-json=["--benchmark","-q"]',
+    );
+  });
+
   it("preserves stdout/stderr/message failure precedence", async () => {
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
 

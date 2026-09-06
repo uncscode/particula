@@ -115,7 +115,13 @@ MAX_DIAGNOSTIC_NODE_IDS = 50
 MAX_DIAGNOSTIC_NODE_ID_LENGTH = 512
 MAX_FAILURE_SCAN_TEXT = 20_000
 PYTEST_ARG_VALUE_OPTIONS = {"-k", "-m"}
-PYTEST_ARG_STANDALONE_OPTIONS = {"--collect-only", "-q", "-v", "--verbose"}
+PYTEST_ARG_STANDALONE_OPTIONS = {
+    "--benchmark",
+    "--collect-only",
+    "-q",
+    "-v",
+    "--verbose",
+}
 PYTEST_ARG_TB_VALUES = {"short", "long", "line", "native", "no"}
 PYTEST_ARG_RESERVED_PREFIXES = (
     "--output",

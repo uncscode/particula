@@ -63,6 +63,22 @@ def test_runner_cli_rejects_pytest_argv_json_with_legacy_passthrough_before_spaw
     assert runner.main(["--pytest-argv-json", "[]", "tests/"]) == 1
 
 
+def test_runner_cli_accepts_benchmark_pytest_argument(monkeypatch) -> None:
+    """The explicit benchmark opt-in reaches the pytest execution suffix."""
+    runner = _load_runner()
+    captured: dict[str, object] = {}
+
+    def fake_run(args, **kwargs):
+        captured["args"] = args
+        captured.update(kwargs)
+        return 0, "ok"
+
+    monkeypatch.setattr(runner, "run_pytest", fake_run)
+
+    assert runner.main(["--pytest-argv-json", '["--benchmark", "-q"]']) == 0
+    assert captured["args"] == ["--benchmark", "-q"]
+
+
 def test_runner_cli_rejects_invalid_json_and_empty_override_ini_before_spawn(monkeypatch) -> None:
     runner = _load_runner()
     monkeypatch.setattr(

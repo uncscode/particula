@@ -95,7 +95,7 @@ Keep advanced payload-bearing fields explicit.
 - `pytestArgs` is a literal ordered array. Accepted entries are transported once as a compact JSON
   array; they are never trimmed, split, joined, or appended as runner arguments.
 - The permitted caller grammar is confined path/node-id targets, `-k VALUE`, `-m VALUE`,
-  `--collect-only`, `-q`, `-v`, `--verbose`, and
+  `--benchmark`, `--collect-only`, `-q`, `-v`, `--verbose`, and
   `--tb=short|long|line|native|no`. Caller plugin, `-o`, `addopts`, and other ini
   controls are rejected.
 - Raw coverage and runner controls (output, timeout, cwd, targeting, fail-fast, durations, and
