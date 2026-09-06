@@ -374,7 +374,7 @@ def test_qualified_cuda_binding_validates_duration_before_cuda_preflight(
     """Reject invalid timing inputs before any CUDA availability handling."""
     with pytest.raises((TypeError, ValueError), match="duration"):
         with qualified_cuda_resident_benchmark(
-            duration=duration,
+            duration=cast(float, duration),
             availability=resident_benchmark_cuda_support.ResidentBenchmarkAvailability(
                 False, "no CUDA"
             ),
@@ -389,7 +389,7 @@ def test_qualified_cuda_binding_validates_dimensions_before_cuda_preflight(
     """Reject invalid fixture shapes before any CUDA availability handling."""
     with pytest.raises((TypeError, ValueError), match="n_boxes"):
         with qualified_cuda_resident_benchmark(
-            n_boxes=dimension,
+            n_boxes=cast(int, dimension),
             availability=resident_benchmark_cuda_support.ResidentBenchmarkAvailability(
                 False, "no CUDA"
             ),

@@ -1237,6 +1237,11 @@ def test_profile_row_keeps_host_launch_synchronization_outside_clocks(
     workload = benchmark_module.build_default_profiling_workload_matrix()[0]
     events: list[str] = []
     ticks = iter(range(1, 10_000))
+
+    def clock() -> int:
+        events.append("clock")
+        return next(ticks)
+
     binding = types.SimpleNamespace(
         enqueue=lambda: events.append("operation"),
         replay=lambda: events.append("replay"),
@@ -1250,7 +1255,7 @@ def test_profile_row_keeps_host_launch_synchronization_outside_clocks(
         workload,
         mode="prepared_uncaptured",
         source="host_launch",
-        clock=lambda: events.append("clock") or next(ticks),
+        clock=clock,
     )
 
     assert [sample.replay_count for sample in samples] == [
@@ -1273,6 +1278,11 @@ def test_profile_row_synchronizes_once_inside_elapsed_interval(
     workload = benchmark_module.build_default_profiling_workload_matrix()[0]
     events: list[str] = []
     ticks = iter(range(1, 10_000))
+
+    def clock() -> int:
+        events.append("clock")
+        return next(ticks)
+
     binding = types.SimpleNamespace(
         enqueue=lambda: events.append("operation"),
         replay=lambda: events.append("replay"),
@@ -1286,7 +1296,7 @@ def test_profile_row_synchronizes_once_inside_elapsed_interval(
         workload,
         mode="captured_replay",
         source="synchronized_elapsed",
-        clock=lambda: events.append("clock") or next(ticks),
+        clock=clock,
     )
 
     assert any(
@@ -1422,9 +1432,13 @@ def test_unavailable_profile_collection_never_invokes_fixture_or_clock(
         lambda **_: calls.append("fixture"),
     )
 
+    def clock() -> int:
+        calls.append("clock")
+        return 1
+
     artifacts = benchmark_module._collect_resident_launch_profile_artifacts(
         artifact_root,
-        clock=lambda: calls.append("clock") or 1,
+        clock=clock,
     )
 
     assert calls == []
