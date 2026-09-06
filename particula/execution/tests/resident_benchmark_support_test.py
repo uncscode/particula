@@ -973,6 +973,39 @@ def test_memory_records_enforce_reconciliation_and_immutability() -> None:
         )
 
 
+@pytest.mark.parametrize(
+    "communication",
+    [
+        ResidentMemoryCategory(
+            "communication.gas", 0, "analytical", True, "steady_state"
+        ),
+        ResidentMemoryCategory(
+            "communication.gas", 0, "analytical", False, "checkpoint"
+        ),
+        ResidentMemoryCategory(
+            "communication.gas", 0, "projected", False, "steady_state"
+        ),
+    ],
+)
+def test_memory_model_rejects_malformed_communication_metadata(
+    communication: ResidentMemoryCategory,
+) -> None:
+    """Require communication selection records to be nonadditive metadata."""
+    with pytest.raises(ValueError):
+        ResidentMemoryModel(
+            (
+                communication,
+                ResidentMemoryCategory(
+                    "inactive_particle_capacity_attribution",
+                    0,
+                    "analytical",
+                    False,
+                    "steady_state",
+                ),
+            )
+        )
+
+
 @pytest.mark.parametrize("communication", ("none", "gas", "particles"))
 def test_memory_model_records_each_communication_selection_without_bytes(
     communication: str,

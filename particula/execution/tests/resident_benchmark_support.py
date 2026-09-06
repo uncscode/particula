@@ -332,10 +332,20 @@ class ResidentMemoryModel:
         communication = [
             item for item in excluded if item.name.startswith("communication.")
         ]
+        named_communication = [
+            item
+            for item in self.categories
+            if item.name.startswith("communication.")
+        ]
+        if named_communication != communication:
+            raise ValueError(
+                "communication selection must be excluded steady-state metadata."
+            )
         if len(communication) > 1 or any(
             item.name.removeprefix("communication.")
             not in RESIDENT_MEMORY_COMMUNICATIONS
             or item.byte_count
+            or item.provenance != "analytical"
             for item in communication
         ):
             raise ValueError("communication selection must have zero bytes.")
