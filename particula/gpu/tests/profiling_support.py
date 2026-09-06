@@ -13,6 +13,7 @@ import math
 import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Any, cast
 
 PROFILING_SCHEMA_VERSION = 1
 MAX_STRING_LENGTH = 256
@@ -63,7 +64,7 @@ def _require_number(
     """Return a finite scalar while rejecting Boolean and nonnumeric values."""
     if type(value) not in (int, float):
         raise TypeError(f"{name} must be a numeric scalar.")
-    result = float(value)
+    result = float(cast(int | float, value))
     if (
         not math.isfinite(result)
         or result < 0.0
@@ -416,11 +417,11 @@ def build_default_profiling_workload_matrix() -> tuple[ProfilingWorkload, ...]:
         rows.append(
             ProfilingWorkload(
                 workload_id=build_profiling_workload_id(
-                    label=label, shape=shape, **common
+                    label=label, shape=shape, **cast(dict[str, Any], common)
                 ),
                 label=label,
                 shape=shape,
-                **common,
+                **cast(dict[str, Any], common),
             )
         )
     return tuple(rows)
@@ -595,12 +596,12 @@ def _workload_from_json(value: object) -> ProfilingWorkload:
         value, set(ProfilingWorkload.__dataclass_fields__), "workload"
     )
     return ProfilingWorkload(
-        **raw
+        **cast(dict[str, Any], raw)
         | {
-            "shape": tuple(raw["shape"]),
-            "processes": tuple(raw["processes"]),
-            "diagnostics": tuple(raw["diagnostics"]),
-            "replay_counts": tuple(raw["replay_counts"]),
+            "shape": tuple(cast(Any, raw["shape"])),
+            "processes": tuple(cast(Any, raw["processes"])),
+            "diagnostics": tuple(cast(Any, raw["diagnostics"])),
+            "replay_counts": tuple(cast(Any, raw["replay_counts"])),
         }
     )
 
@@ -634,51 +635,69 @@ def deserialize_profiling_artifact(payload: str) -> ProfilingArtifact:
             raise ValueError("evidence row is invalid.")
         status = row["status"]
         if status == "executed":
-            raw = _require_exact_keys(
-                row,
-                set(ExecutedEvidence.__dataclass_fields__),
-                "executed evidence",
+            raw = cast(
+                dict[str, Any],
+                _require_exact_keys(
+                    row,
+                    set(ExecutedEvidence.__dataclass_fields__),
+                    "executed evidence",
+                ),
             )
             machine = MachineProvenance(
-                **_require_exact_keys(
-                    raw["machine"],
-                    set(MachineProvenance.__dataclass_fields__),
-                    "machine",
+                **cast(
+                    dict[str, Any],
+                    _require_exact_keys(
+                        raw["machine"],
+                        set(MachineProvenance.__dataclass_fields__),
+                        "machine",
+                    ),
                 )
             )
             method = MeasurementMethod(
-                **_require_exact_keys(
-                    raw["method"],
-                    set(MeasurementMethod.__dataclass_fields__),
-                    "method",
+                **cast(
+                    dict[str, Any],
+                    _require_exact_keys(
+                        raw["method"],
+                        set(MeasurementMethod.__dataclass_fields__),
+                        "method",
+                    ),
                 )
             )
             samples = tuple(
                 RawDurationSample(
-                    **_require_exact_keys(
-                        item,
-                        set(RawDurationSample.__dataclass_fields__),
-                        "sample",
+                    **cast(
+                        dict[str, Any],
+                        _require_exact_keys(
+                            item,
+                            set(RawDurationSample.__dataclass_fields__),
+                            "sample",
+                        ),
                     )
                 )
                 for item in raw["raw_samples"]
             )
             metrics = tuple(
                 NormalizedMetric(
-                    **_require_exact_keys(
-                        item,
-                        set(NormalizedMetric.__dataclass_fields__),
-                        "metric",
+                    **cast(
+                        dict[str, Any],
+                        _require_exact_keys(
+                            item,
+                            set(NormalizedMetric.__dataclass_fields__),
+                            "metric",
+                        ),
                     )
                 )
                 for item in raw["metrics"]
             )
             reports = tuple(
                 RawReportProvenance(
-                    **_require_exact_keys(
-                        item,
-                        set(RawReportProvenance.__dataclass_fields__),
-                        "report",
+                    **cast(
+                        dict[str, Any],
+                        _require_exact_keys(
+                            item,
+                            set(RawReportProvenance.__dataclass_fields__),
+                            "report",
+                        ),
                     )
                 )
                 for item in raw["raw_reports"]
@@ -695,10 +714,13 @@ def deserialize_profiling_artifact(payload: str) -> ProfilingArtifact:
                 )
             )
         elif status == "unavailable":
-            raw = _require_exact_keys(
-                row,
-                set(UnavailableEvidence.__dataclass_fields__),
-                "unavailable evidence",
+            raw = cast(
+                dict[str, Any],
+                _require_exact_keys(
+                    row,
+                    set(UnavailableEvidence.__dataclass_fields__),
+                    "unavailable evidence",
+                ),
             )
             evidence.append(
                 UnavailableEvidence(
