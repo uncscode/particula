@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 from types import ModuleType, SimpleNamespace
+from typing import Any, cast
 
 from particula.gpu.tests import profiling_support as support
 from particula.gpu.tests import profiling_workload_runner as runner
@@ -32,7 +33,7 @@ def test_unavailable_cuda_capture_returns_bounded_status(
     monkeypatch, capsys
 ) -> None:
     """Test an unavailable capture binding reports no substitute execution."""
-    module = ModuleType("resident_benchmark_cuda_support")
+    module = cast(Any, ModuleType("resident_benchmark_cuda_support"))
     module.ResidentBenchmarkUnavailableError = RuntimeError
     module.cuda_capture_availability = lambda: SimpleNamespace(
         available=False,
@@ -82,7 +83,7 @@ def test_available_worker_executes_closed_reset_warmup_and_sample(
             calls.append("synchronize")
 
     binding = Binding()
-    module = ModuleType("resident_benchmark_cuda_support")
+    module = cast(Any, ModuleType("resident_benchmark_cuda_support"))
     module.ResidentBenchmarkUnavailableError = RuntimeError
     module.cuda_capture_availability = lambda: SimpleNamespace(available=True)
 

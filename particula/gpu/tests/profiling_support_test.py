@@ -452,4 +452,4 @@ def test_collect_nsight_rejects_unsafe_report_before_worker(
             process_ids={},
             runner=fake_runner,
         )
-    assert calls == [("nsys", "--version")]
+    assert calls == []

@@ -1427,7 +1427,7 @@ def _plain_report_path(raw_root: Path, filename: str) -> Path:
     """Return one plain contained report path before a profiler can run."""
     filename = _validate_raw_filename(filename)
     path = raw_root / filename
-    if path.parent != raw_root or raw_root.is_symlink():
+    if path.parent != raw_root or raw_root.is_symlink() or path.is_symlink():
         raise ValueError("report destination is not contained.")
     return path
 
@@ -1467,11 +1467,11 @@ def collect_nsight_evidence(
     profiler templates remain fixed here; arbitrary environment and arguments
     never cross this boundary.
     """
+    raw_root = ensure_profiling_raw_root(artifact_root)
+    report = _plain_report_path(raw_root, report_filename)
     qualification = qualify_nsight_tool(tool, runner)
     if not isinstance(qualification, NsightToolQualification):
         return qualification
-    raw_root = ensure_profiling_raw_root(artifact_root)
-    report = _plain_report_path(raw_root, report_filename)
     worker = _run_outcome("worker", "worker", WORKER_COMMAND, runner)
     if isinstance(worker, NsightUnavailable):
         return worker
