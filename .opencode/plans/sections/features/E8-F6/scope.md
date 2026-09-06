@@ -65,6 +65,21 @@ to the exact E8 resource inventory.
   availability boundaries, exact dimensions, availability memoization, cleanup,
   one aggregate writer call, and no CPU/Warp-CPU fallback.
 
+## Delivered in P4 (Issue #1584)
+
+- Standard-library-only checked byte arithmetic and frozen resident-memory
+  category/model records in
+  `particula/execution/tests/resident_benchmark_support.py`.
+- Exact analytical primary-field categories; one caller-provided E8-F3 registry
+  logical-byte category; selected diagnostic outputs; and visible, non-additive
+  communication selection and inactive-capacity attribution.
+- Separate excluded checkpoint primary/sidecar/inspection-copy scenarios and
+  checked full-retention/checkpointed tape projections. Unknown Epic I overhead
+  is explicitly excluded rather than estimated.
+- Comprehensive default-collection host-only formula, boundary, invariant,
+  reconciliation, immutability, and import-isolation tests. No production or
+  public documentation files changed.
+
 ## Out of Scope
 
 - Changing scientific kernels, process ordering, graph semantics, or memory
@@ -77,6 +92,6 @@ to the exact E8 resource inventory.
   projections for Epic I until measured evidence exists.
 - CUDA occupancy/kernel profiling, which belongs to E8-F7, and the runnable
   lifecycle example, runbook, and final Epic H closeout, which belong to E8-F8.
-- P4/P5 byte-category formulas, allocator high-water probing, and
+- P5 allocator high-water probing and
   analytical-versus-observed memory comparisons; published documentation; and
   any speed threshold or general performance conclusion.

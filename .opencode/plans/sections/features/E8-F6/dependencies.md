@@ -26,7 +26,8 @@
 ## Phase Ordering
 
 P1 defines records before P2/P3 emit benchmark rows. P2 establishes fair timing
-before P3 expands the matrix. P4 depends on E8-F3 and may proceed after P1 in
-parallel with P2/P3. P5 requires P2-P4 so observations use finalized cases and
+before P3 expands the matrix. P4 shipped after P1 with E8-F3's logical-byte
+report as a supplied integer boundary; it adds no production resource-module
+dependency. P5 requires P2-P4 so observations use finalized cases and
 categories. P6 publishes only executed or explicitly unavailable evidence after
 all required validation commands are recorded.

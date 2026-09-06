@@ -57,6 +57,23 @@ capture, timing, result-validation, and cleanup failures remain errors: they do
 not become unavailable rows or partial artifacts. No CPU or Warp-CPU fallback,
 capacity downscale, allocator accounting, or production API is introduced.
 
+### P4 implementation boundary
+
+The private support module now models resident memory with checked
+Python-integer arithmetic and frozen ordered category records. It derives exact
+float64/int32 primary-field sizes, accepts E8-F3 only as one validated logical
+byte total, and counts only selected caller-owned diagnostic outputs.
+Communication selection and inactive fixed-slot capacity are visible,
+non-additive attribution, preventing double counting of E8-F3 resources and
+full primary capacity.
+
+Checkpoint primary, sidecar, and inspection copies are excluded checkpoint
+scenarios. Full-retention and checkpointed tape calculations are checked
+projected scenarios with unknown Epic I overhead explicitly excluded. This
+host-only implementation imports neither Warp, NumPy, nor `gpu_resources`,
+allocates or inspects no device state, serializes no artifact, and changes no
+production API.
+
 ```text
 validated BenchmarkCase + qualified CUDA device
           |

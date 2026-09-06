@@ -51,16 +51,19 @@
     forwarding; availability memoization; binding reuse/cleanup; aggregate
     writer behavior; and no fallback.
 
-- [ ] **E8-F6-P4:** Build analytical resident memory-budget model with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add <=100-LOC checked byte-category aggregation that imports the E8-F3
-    report once and separately accounts for primary, inactive capacity,
-    diagnostics, communication, checkpoint host copies, and tape projections.
-  - Files: `particula/execution/tests/resident_benchmark_support.py`,
-    `particula/execution/tests/resident_benchmark_support_test.py`,
-    `particula/execution/gpu_resources.py`
-  - Tests: Closed-form fixtures, checked arithmetic, category reconciliation,
-    duplicate-category rejection, and zero dimensions.
+- [x] **E8-F6-P4:** Build analytical resident memory-budget model with unit tests
+  - Issue: #1584 | Size: S | Status: Shipped
+  - Delivered: Checked, ceiling-bounded Python-integer arithmetic; immutable
+    ordered categories/models; exact primary, registry, diagnostic,
+    communication-selection, inactive-capacity, and checkpoint accounting; and
+    full-retention/checkpointed projected tape formulas. The E8-F3 report enters
+    once as a validated integer; unknown Epic I overhead is explicitly excluded.
+  - Files: `particula/execution/tests/resident_benchmark_support.py` and
+    `particula/execution/tests/resident_benchmark_support_test.py`.
+  - Tests: Comprehensive host-only closed-form and zero fixtures; input/type,
+    overflow, uniqueness, reconciliation, immutability, tape, and subprocess
+    import-isolation coverage. No Warp, NumPy, or production resource module is
+    imported.
 
 - [ ] **E8-F6-P5:** Compare analytical and observed peak device memory with integration tests
   - Issue: TBD | Size: S | Status: Not Started

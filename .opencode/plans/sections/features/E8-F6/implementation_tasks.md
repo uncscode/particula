@@ -31,20 +31,19 @@
 
 ## Memory Model
 
-- [ ] Implement `checked_dense_array_bytes()` and `aggregate_memory_categories()`
-  in `resident_benchmark_support.py`; reject negative dimensions and arithmetic
-  overflow without relying on NumPy fixed-width multiplication.
-- [ ] Implement `build_resident_memory_model()` from exact primary-array
-  shapes/dtypes, including fixed inactive capacity rather than active population.
-- [ ] Accept one E8-F3 `ResourceByteReport` in
-  `build_resident_memory_model()` and include its total exactly once.
-- [ ] Model selected diagnostics, GAS/PARTICLES communication, checkpoint host
-  copies, and projected tape storage as named optional categories with distinct
-  logical-versus-observed labels.
-- [ ] Implement symbolic tape scenarios using explicit `S`, `C`, `T`, and `K`
-  inputs: full retention `T * S` and checkpointed working storage
-  `ceil(T / K) * C + K * S`. Label both projected and exclude unknown Epic I
-  operation/intermediate overhead.
+- [x] Implement checked `checked_dense_array_bytes()` and category aggregation
+  in `resident_benchmark_support.py`; reject invalid/overflowing Python-integer
+  inputs without NumPy fixed-width arithmetic.
+- [x] Implement `build_resident_memory_model()` from exact primary-array
+  shapes/dtypes, with visible non-additive fixed inactive-capacity attribution.
+- [x] Accept the E8-F3 logical-byte aggregate as one validated integer category
+  and include it exactly once without importing `gpu_resources`.
+- [x] Model selected diagnostics, communication selection, checkpoint host-copy
+  scenarios, and projected tape storage as named categories with distinct
+  steady-state/checkpoint/tape scenarios and provenance.
+- [x] Implement symbolic full-retention `T * S` and checkpointed
+  `ceil(T / K) * C + K * S` tape projections with checked arithmetic; label
+  them projected and exclude unknown Epic I operation/intermediate overhead.
 - [ ] Implement `probe_device_memory()` behind the optional CUDA benchmark path;
   accept only a documented, version-qualified public allocator high-water API,
   record its coverage, method, versions, availability, and before/peak/after
@@ -70,8 +69,8 @@
   after all rows complete.
 - [x] Forward validated exact `n_boxes`, `n_particles`, and `n_species` through
   the P2 fixture/request seam without changing its default 16-by-2 callers.
-- [ ] Keep default test collection unchanged and add regression coverage for
-  malformed dimensions, overflow, duplicate categories, unavailable probes,
-  and artifact path safety.
+- [x] Keep default test collection unchanged and add regression coverage for
+  malformed dimensions, overflow, duplicate categories, memory-category
+  reconciliation, tape projections, and import isolation.
 - [ ] Update documentation contract tests for commands, axes, categories,
   limitations, and artifact provenance.

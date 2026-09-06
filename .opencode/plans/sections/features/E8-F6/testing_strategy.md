@@ -29,9 +29,13 @@ supplemental evidence, not an assertion threshold, and remains opt-in.
   exact nondefault dimension forwarding, one availability probe across eligible
   rows, structured unavailable outcomes, one binding per approved row, cleanup,
   one aggregate writer call, and no CPU/Warp-CPU fallback.
-- **P4:** Formula tests cover each memory category, zero dimensions, inactive
-  fixed capacity, E8-F3 total reconciliation, communication alternatives,
-  checkpoint scenarios, projected tape scaling, and checked integer arithmetic.
+- **P4 (delivered, issue #1584):** Default-collection host-only tests in
+  `resident_benchmark_support_test.py` cover exact primary/diagnostic,
+  registry, communication, inactive-capacity, and checkpoint formulas; zero,
+  type, value, and overflow boundaries; immutable category/model invariants,
+  ordering, uniqueness, and reconciliation; and full-retention/checkpointed
+  tape projections. Subprocess import isolation confirms the support module
+  loads neither Warp, NumPy, nor `particula.execution.gpu_resources`.
 - **P5:** Integration tests exercise observed-memory probe availability and a
   representative CUDA fixture. Assertions cover schema and nonnegative deltas,
   not a machine-independent allocator ratio.
@@ -48,6 +52,7 @@ Focused fix checks are assertion-only and coverage disabled:
 
 ```bash
 pytest particula/execution/tests/resident_benchmark_support_test.py -q --no-cov
+pytest particula/execution/tests/ -q -k "benchmark or memory_budget" --no-cov
 pytest particula/execution/tests/resident_benchmark_cuda_support_test.py -q --no-cov
 pytest particula/execution/tests/multi_box_loop_test.py -q --no-cov
 pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov

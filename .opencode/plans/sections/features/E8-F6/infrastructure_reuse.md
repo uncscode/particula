@@ -15,9 +15,9 @@
   fast default-suite tests without running CUDA timings; extend this pattern.
 - `particula/conftest.py:19-62` and `particula/_pytest_support.py` own benchmark
   option propagation and marker gating; do not introduce another CLI flag.
-- E8-F3's planned `CaptureResourceSet` and `CaptureResourceByteReport` are the
-  authority for reusable logical bytes; consume their canonical records rather
-  than duplicate process-sidecar formulas.
+- E8-F3's `LogicalResourceReport.logical_byte_count` is consumed as one
+  caller-supplied validated integer by P4. The host-only model does not import
+  the resource module or reconstruct its process-sidecar formulas.
 - E8-F4's captured replay boundary and E8-F5's three-way full-loop fixtures are
   the execution/correctness seams. Benchmark setup must reuse them rather than
   constructing a second scheduler or weakening validation.

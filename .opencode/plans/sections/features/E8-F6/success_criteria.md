@@ -11,20 +11,20 @@
 - [x] P2 timing evidence records setup/capture separately from replay, explicit
   synchronization, timer, samples, summary statistics, command, versions,
   device, dimensions, seed, and UTC timestamps in schema v2.
-- [ ] The memory model accounts separately for primary state, inactive fixed
-  slots, E8-F3 reusable resources, diagnostics, communication, checkpoints, and
-  projected autodiff tape without double counting.
-- [ ] Full-retention and checkpoint-interval tape scenarios use documented
-  symbolic inputs and formulas and are never labeled measured or complete Epic I
-  tape storage.
+- [x] The memory model separately accounts for primary state, visible
+  non-additive inactive fixed slots and communication selection, one E8-F3
+  reusable-resource aggregate, selected diagnostics, checkpoints, and projected
+  autodiff tape without double counting.
+- [x] Full-retention and checkpoint-interval tape scenarios use documented,
+  checked symbolic inputs/formulas and are never labeled measured or complete
+  Epic I tape storage.
 - [ ] Analytical logical bytes are compared with observed peak device-memory
   deltas for representative executed rows only when a documented allocator API
   is version-qualified with sufficient coverage; otherwise observed peaks are
   explicitly unavailable. Probe method, coverage, and unexplained delta are
   retained and allocator equality is not claimed.
-- [ ] Sizing is deterministic and overflow-safe, and identical case/resource
-  inputs produce byte-identical normalized evidence aside from timestamps and
-  raw measured values.
+- [x] P4 sizing is deterministic and overflow-safe; identical memory-model
+  inputs retain ordered, immutable byte-category accounting.
 - [x] Default pytest collection remains unchanged; P3 is opt-in behind
   `--benchmark`, preserves exact requested/actual capacity, emits structured
   nonexecution rows after artifact entry, and no performance number gates CI.

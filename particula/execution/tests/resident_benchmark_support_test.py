@@ -845,13 +845,17 @@ def test_memory_model_accounts_primary_diagnostics_and_scenarios() -> None:
         "primary.environment.pressure": 2 * 8,
         "primary.environment.saturation_ratio": 2 * 4 * 8,
     }
+    primary_total = sum(primary.values())
+    diagnostic_total = 64 + 16
+    steady_state_total = primary_total + 101 + diagnostic_total
+    checkpoint_total = primary_total + 11 + 13
     assert {key: values[key] for key in primary} == primary
-    assert model.steady_state_bytes == sum(primary.values()) + 101 + 64 + 16
+    assert model.steady_state_bytes == steady_state_total
     assert values["inactive_particle_capacity_attribution"] == 2 * 2 * (
         4 * 8 + 16
     )
     assert values["communication.gas"] == 0
-    assert model.checkpoint_bytes == sum(primary.values()) + 11 + 13
+    assert model.checkpoint_bytes == checkpoint_total
     assert model.inactive_particle_capacity_bytes == 2 * 2 * (4 * 8 + 16)
     assert [item.name for item in model.categories].count(
         "registry.resource_manifest"
@@ -1060,29 +1064,43 @@ def test_memory_model_rejects_duplicate_and_invalid_selections(
         )
 
 
-def test_memory_model_retains_zero_dimension_categories_and_full_activity() -> (
+def test_memory_model_full_activity_retains_nonzero_accounted_resources() -> (
     None
 ):
-    """Retain zero-byte fields and a zero inactive attribution at boundaries."""
+    """Keep zero inactive attribution separate from nonzero resource totals."""
     model = build_resident_memory_model(
-        n_boxes=0,
+        n_boxes=2,
         n_particles=4,
-        n_species=0,
+        n_species=3,
         active_slots_per_box=4,
-        registry_logical_byte_count=0,
+        registry_logical_byte_count=17,
         diagnostics=RESIDENT_DIAGNOSTIC_OPERATIONS,
         communication="none",
-        checkpoint_sidecar_copy_bytes=0,
-        checkpoint_inspection_copy_bytes=0,
+        checkpoint_sidecar_copy_bytes=19,
+        checkpoint_inspection_copy_bytes=23,
     )
 
     values = {item.name: item.byte_count for item in model.categories}
-    assert values["inactive_particle_capacity_attribution"] == 0
-    assert values["primary.particles.masses"] == 0
-    assert all(
-        values[f"diagnostic.{name}"] == 0
-        for name in RESIDENT_DIAGNOSTIC_OPERATIONS
+    inactive = next(
+        item
+        for item in model.categories
+        if item.name == "inactive_particle_capacity_attribution"
     )
+    primary_total = sum(
+        item.byte_count
+        for item in model.categories
+        if item.name.startswith("primary.")
+    )
+    diagnostic_total = sum(
+        values[f"diagnostic.{name}"] for name in RESIDENT_DIAGNOSTIC_OPERATIONS
+    )
+    assert inactive.byte_count == 0
+    assert not inactive.included_in_steady_state
+    assert primary_total > 0
+    assert model.steady_state_bytes == primary_total + 17 + diagnostic_total
+    assert model.steady_state_bytes > 0
+    assert model.checkpoint_bytes == primary_total + 19 + 23
+    assert model.checkpoint_bytes > 0
 
 
 def test_memory_model_requires_one_inactive_attribution() -> None:
@@ -1146,6 +1164,45 @@ def test_checkpointed_tape_projection_uses_ceiling_count(
         )
         == expected
     )
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"registry_logical_byte_count": MAX_RESIDENT_MEMORY_BYTES},
+        {"checkpoint_sidecar_copy_bytes": MAX_RESIDENT_MEMORY_BYTES},
+    ],
+)
+def test_memory_model_rejects_aggregate_category_addition_overflow(
+    kwargs: dict[str, int],
+) -> None:
+    """Reject totals that overflow after every individual category is valid."""
+    arguments = dict(
+        n_boxes=1,
+        n_particles=1,
+        n_species=1,
+        active_slots_per_box=1,
+        registry_logical_byte_count=0,
+        diagnostics=(),
+        communication="none",
+        checkpoint_sidecar_copy_bytes=0,
+        checkpoint_inspection_copy_bytes=0,
+    )
+    arguments.update(kwargs)
+
+    with pytest.raises(ValueError, match="analytical byte count exceeds limit"):
+        build_resident_memory_model(**arguments)
+
+
+def test_checkpointed_tape_projection_rejects_final_addition_overflow() -> None:
+    """Reject valid checkpoint and state terms whose final sum overflows."""
+    with pytest.raises(ValueError, match="analytical byte count exceeds limit"):
+        project_checkpointed_tape_bytes(
+            timesteps=1,
+            state_bytes=1,
+            checkpoint_bytes=MAX_RESIDENT_MEMORY_BYTES,
+            interval=1,
+        )
 
 
 @pytest.mark.parametrize(

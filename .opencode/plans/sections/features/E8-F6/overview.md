@@ -61,8 +61,24 @@ The P2 CUDA fixture seam now receives exact box, particle, and species
 dimensions. The opt-in resident artifact consumer preflights all matrix rows,
 memoizes availability across eligible rows, reuses one binding per approved
 row, and writes one aggregate artifact only after all rows complete. This is
-test-only evidence: P4/P5 byte-category, allocator, and observed-memory work
-remain unimplemented, and no production API changed.
+test-only evidence: P5 allocator and observed-memory work remains
+unimplemented, and no production API changed.
+
+## Delivered P4 Analytical Memory Model (Issue #1584)
+
+Issue #1584 delivered a private, standard-library-only analytical
+resident-memory model in
+`particula/execution/tests/resident_benchmark_support.py`, with comprehensive
+host-only tests in `resident_benchmark_support_test.py`. Checked Python-integer
+arithmetic and immutable categories account for exact primary storage, one
+E8-F3 registry logical-byte input, selected diagnostics, visible non-additive
+communication and inactive-capacity attribution, and checkpoint-copy scenarios.
+
+Checked full-retention and checkpointed tape projections explicitly exclude
+unknown Epic I overhead. The model imports neither Warp, NumPy, nor
+`particula.execution.gpu_resources`; it allocates or observes no device memory,
+changes no production API/export, and creates no artifact. P5 remains
+responsible for observed peak-memory evidence.
 
 ## User Stories
 

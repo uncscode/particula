@@ -21,6 +21,13 @@ matrix/preflight and opt-in artifact-consumer evidence, including structured
 budget and preconstruction-unavailable rows. P4/P5 allocator/byte accounting
 and P6 publication/documentation remain future work.
 
+## P4 status
+
+Issue #1584 makes no public documentation change. The analytical memory model
+and its docstrings are private co-located execution test support; it creates no
+artifact or public API. P5 observed-memory evidence and P6 publication remain
+future work.
+
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` under Epic H Performance
   and Memory with the exact plain reproduction command, date, Warp/Python
   versions, qualified device, matrix, raw artifact path, summary table, memory
