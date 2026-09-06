@@ -1740,7 +1740,15 @@ def _require_analysis_mode(value: object) -> str:
 
 @dataclass(frozen=True, slots=True)
 class ArtifactReference:
-    """Explicit metadata-only artifact and raw-report binding."""
+    """Bind analysis input to explicit metadata-only artifact provenance.
+
+    Attributes:
+        artifact_key: Canonical artifact filename derived from its mode and
+            measurement method.
+        generation: Bounded analysis-supplied artifact generation identifier.
+        raw_reports: Ordered immutable provenance for the artifact's raw
+            reports.
+    """
 
     artifact_key: str
     generation: str
@@ -1784,7 +1792,15 @@ def _artifact_key(reference: ArtifactReference, mode: str, method: str) -> None:
 
 @dataclass(frozen=True, slots=True)
 class HostEvidenceBinding:
-    """One explicitly mode-bound P2 measurement."""
+    """Bind one executed P2 host measurement to an explicit mode and artifact.
+
+    Attributes:
+        evidence: Complete executed host-launch or synchronized-elapsed
+            evidence.
+        mode: Explicit profiling mode; it is never inferred from evidence.
+        reference: Artifact metadata and raw-report provenance matching
+            ``evidence``.
+    """
 
     evidence: ExecutedEvidence
     mode: str
@@ -1817,7 +1833,15 @@ class HostEvidenceBinding:
 
 @dataclass(frozen=True, slots=True)
 class MachineBoundKernelEvidence:
-    """One explicitly mode- and machine-bound P3 export."""
+    """Bind one P3 Nsight export to explicit mode, machine, and artifact data.
+
+    Attributes:
+        evidence: Qualified resident-process Nsight evidence for the frozen
+            small workload.
+        mode: Explicit profiling mode; it is never inferred from the export.
+        machine: Complete provenance for the machine that produced the export.
+        reference: Artifact metadata and ordered provenance matching the rows.
+    """
 
     evidence: NsightEvidence
     mode: str
@@ -1871,7 +1895,15 @@ class MachineBoundKernelEvidence:
 
 @dataclass(frozen=True, slots=True)
 class EvidenceUnavailable:
-    """Unavailable P2 or P3 evidence without a fabricated measurement."""
+    """Record unavailable P2 or P3 evidence without fabricating measurement.
+
+    Attributes:
+        workload: Requested workload for which evidence is unavailable.
+        mode: Explicit requested profiling mode.
+        machine: Known machine provenance, when available.
+        reference: Known artifact metadata and provenance, when available.
+        reason: Bounded deterministic explanation for the unavailable evidence.
+    """
 
     workload: ProfilingWorkload
     mode: str
@@ -1903,7 +1935,17 @@ class EvidenceUnavailable:
 
 @dataclass(frozen=True, slots=True)
 class KernelContribution:
-    """One ranked attributed Nsight duration contribution."""
+    """Store one ranked attributed Nsight duration contribution.
+
+    Attributes:
+        process: Resident process attributed to the profiler row.
+        kernel_name: Native kernel name reported for the contribution.
+        value: Attributed duration in ``unit``.
+        provenance: Raw report supplying the contribution.
+        row_position: Source-order position of the profiler row.
+        metric: Closed duration metric name.
+        unit: Closed duration unit, ``"ns"``.
+    """
 
     process: str
     kernel_name: str
@@ -1932,7 +1974,15 @@ class KernelContribution:
 
 @dataclass(frozen=True, slots=True)
 class Reconciliation:
-    """Synchronized-elapsed versus attributed-Nsight duration comparison."""
+    """Store synchronized elapsed and attributed Nsight duration comparison.
+
+    Attributes:
+        status: Closed reconciliation outcome.
+        host_total_ns: Mean normalized synchronized-elapsed duration in ns.
+        profiler_total_ns: Sum of attributed Nsight durations in ns.
+        signed_difference_ns: Profiler total minus host total in ns.
+        absolute_difference_ns: Absolute host/profiler difference in ns.
+    """
 
     status: str
     host_total_ns: float
@@ -1968,7 +2018,20 @@ class Reconciliation:
 
 @dataclass(frozen=True, slots=True)
 class PerformanceDecision:
-    """Immutable machine- and workload-bounded analysis outcome."""
+    """Store an immutable, machine- and workload-bounded analysis outcome.
+
+    Attributes:
+        status: Closed availability or reconciliation outcome.
+        confidence: Closed confidence derived from evidence compatibility.
+        workload: Exact workload bounded by this decision.
+        mode: Explicit profiling mode used for the analysis.
+        machine: Complete machine provenance, when evidence provides it.
+        contributions: Deterministically ranked attributed kernel durations.
+        reconciliation: Host/profiler duration comparison, when available.
+        limitations: Immutable bounded evidence limitations.
+        host_references: Artifact references for retained P2 evidence.
+        kernel_references: Artifact references for retained P3 evidence.
+    """
 
     status: str
     confidence: str
@@ -1980,6 +2043,8 @@ class PerformanceDecision:
     limitations: tuple[str, ...]
     host_references: tuple[ArtifactReference, ...] = ()
     kernel_references: tuple[ArtifactReference, ...] = ()
+    host_bindings: tuple[HostEvidenceBinding, ...] = ()
+    kernel_bindings: tuple[MachineBoundKernelEvidence, ...] = ()
 
     def __post_init__(self) -> None:
         """Validate an immutable bounded performance-analysis decision.
@@ -2012,6 +2077,139 @@ class PerformanceDecision:
                 raise TypeError(f"{name} are invalid.")
             if len(values) != len(set(values)):
                 raise ValueError(f"{name} must be unique.")
+        self._validate_binding_fields()
+        if self.status == "reconciled" or self.confidence == "sufficient":
+            self._validate_reconciled_evidence()
+
+    def _validate_binding_fields(self) -> None:
+        """Validate optional source bindings retained by actionable results."""
+        for name, bindings, expected_type in (
+            ("host_bindings", self.host_bindings, HostEvidenceBinding),
+            (
+                "kernel_bindings",
+                self.kernel_bindings,
+                MachineBoundKernelEvidence,
+            ),
+        ):
+            values = _analysis_tuple(bindings, name)
+            if not all(isinstance(x, expected_type) for x in values):
+                raise TypeError(f"{name} are invalid.")
+            if len(values) != len(set(values)):
+                raise ValueError(f"{name} must be unique.")
+
+    def _validate_reconciled_evidence(self) -> None:
+        """Validate the complete provenance required for actionable evidence."""
+        if self.status != "reconciled" or self.confidence != "sufficient":
+            raise ValueError(
+                "sufficient confidence requires reconciled decision status."
+            )
+        if not isinstance(self.machine, MachineProvenance):
+            raise ValueError("reconciled decision machine is invalid.")
+        if (
+            self.reconciliation is None
+            or self.reconciliation.status != "reconciled"
+        ):
+            raise ValueError("reconciled decision requires reconciliation.")
+        if not self.contributions:
+            raise ValueError("reconciled decision requires contributions.")
+        self._validate_reconciled_bindings()
+        self._validate_reconciled_totals()
+
+    def _validate_reconciled_bindings(self) -> None:
+        """Validate source bindings and context for actionable evidence."""
+        expected_host_keys = {
+            f"{self.mode}_host_launch.json",
+            f"{self.mode}_synchronized_elapsed.json",
+        }
+        if {x.artifact_key for x in self.host_references} != expected_host_keys:
+            raise ValueError(
+                "reconciled decision host references are incomplete."
+            )
+        if not self.kernel_references:
+            raise ValueError("reconciled decision requires kernel references.")
+        if not self.host_bindings or not self.kernel_bindings:
+            raise ValueError("reconciled decision requires evidence bindings.")
+        if (
+            tuple(x.reference for x in self.host_bindings)
+            != self.host_references
+        ):
+            raise ValueError("host references do not match evidence bindings.")
+        if (
+            tuple(x.reference for x in self.kernel_bindings)
+            != self.kernel_references
+        ):
+            raise ValueError(
+                "kernel references do not match evidence bindings."
+            )
+        if any(
+            x.mode != self.mode
+            or x.evidence.workload != self.workload
+            or x.evidence.machine != self.machine
+            for x in self.host_bindings
+        ):
+            raise ValueError("host evidence does not match decision context.")
+        if any(
+            x.mode != self.mode
+            or x.evidence.workload_id != self.workload.workload_id
+            or x.machine != self.machine
+            for x in self.kernel_bindings
+        ):
+            raise ValueError("kernel evidence does not match decision context.")
+        references = (*self.host_references, *self.kernel_references)
+        if len({x.generation for x in references}) != 1:
+            raise ValueError("reconciled decision references span generations.")
+        kernel_reports = {
+            report
+            for reference in self.kernel_references
+            for report in reference.raw_reports
+        }
+        if any(x.provenance not in kernel_reports for x in self.contributions):
+            raise ValueError(
+                "contribution provenance must belong to kernel references."
+            )
+
+    def _validate_reconciled_totals(self) -> None:
+        """Validate contribution and reconciliation totals."""
+        profiler_total = sum(x.value for x in self.contributions)
+        reconciliation = self.reconciliation
+        if reconciliation is None:
+            raise ValueError("reconciled decision requires reconciliation.")
+        if (
+            reconciliation.profiler_total_ns != profiler_total
+            or reconciliation.host_total_ns <= 0.0
+            or reconciliation.profiler_total_ns <= 0.0
+            or reconciliation.absolute_difference_ns
+            > max(1.0, 0.05 * reconciliation.host_total_ns)
+        ):
+            raise ValueError("reconciled decision totals are inconsistent.")
+
+
+def _unavailable_analysis_decision(
+    unavailable: EvidenceUnavailable,
+) -> PerformanceDecision:
+    """Return the fail-closed decision for one unavailable source."""
+    workload = unavailable.workload
+    if unavailable.mode != "captured_replay":
+        return PerformanceDecision(
+            "insufficient",
+            "low",
+            workload,
+            unavailable.mode,
+            unavailable.machine,
+            (),
+            None,
+            ("unavailable evidence is not captured replay",),
+        )
+    return PerformanceDecision(
+        "unavailable",
+        "none",
+        workload,
+        unavailable.mode,
+        unavailable.machine,
+        (),
+        None,
+        (unavailable.reason,),
+    )
 
 
 def analyze_machine_bounded_performance(
@@ -2059,27 +2257,7 @@ def analyze_machine_bounded_performance(
         else cast(HostEvidenceBinding, hosts[0]).evidence.workload
     )
     if unavailable:
-        if unavailable.mode != "captured_replay":
-            return PerformanceDecision(
-                "insufficient",
-                "low",
-                workload,
-                unavailable.mode,
-                unavailable.machine,
-                (),
-                None,
-                ("unavailable evidence is not captured replay",),
-            )
-        return PerformanceDecision(
-            "unavailable",
-            "none",
-            workload,
-            unavailable.mode,
-            unavailable.machine,
-            (),
-            None,
-            (unavailable.reason,),
-        )
+        return _unavailable_analysis_decision(unavailable)
     bound_hosts = cast(tuple[HostEvidenceBinding, ...], hosts)
     bound_kernels = cast(tuple[MachineBoundKernelEvidence, ...], kernels)
     if (
@@ -2117,6 +2295,20 @@ def analyze_machine_bounded_performance(
             (),
             None,
             ("workload or machine mismatch",),
+        )
+    generations = {binding.reference.generation for binding in bound_hosts} | {
+        binding.reference.generation for binding in bound_kernels
+    }
+    if len(generations) != 1:
+        return PerformanceDecision(
+            "insufficient",
+            "low",
+            workload,
+            "captured_replay",
+            machine,
+            (),
+            None,
+            ("artifact generation mismatch",),
         )
     kernel_identities = tuple(
         (
@@ -2279,6 +2471,8 @@ def _analyze_bound_machine_performance(
         ),
         tuple(binding.reference for binding in bound_hosts),
         tuple(binding.reference for binding in bound_kernels),
+        bound_hosts,
+        bound_kernels,
     )
 
 
@@ -2288,24 +2482,40 @@ GUARDED_PROPOSAL_CATEGORIES = frozenset(
         "host_launch",
         "memory",
         "scientific",
+        "numerical",
         "ownership",
         "order",
         "rng",
     )
 )
-_CORRECTNESS_CATEGORIES = frozenset(("scientific", "ownership", "order", "rng"))
+_CORRECTNESS_CATEGORIES = frozenset(
+    ("scientific", "numerical", "ownership", "order", "rng")
+)
 _PORTABLE_WORDING = re.compile(
     r"\b(portable|universal|all machines|always)\b", re.I
 )
 _CORRECTNESS_TEXT = re.compile(
-    r"\b(scientific|equation|numerical\s+tolerance|ownership|transfer|process\s+order|rng)\b",
+    r"\b("
+    r"scientific|equation|"
+    r"(?:numerical|solver)\s*[- ]?toleran(?:ce|ces)|"
+    r"\btoleran(?:ce|ces)\b|"
+    r"ownership|transfer|(?:process|execution)\s*[- ]?order(?:ing)?|rng"
+    r")\b",
     re.I,
 )
 
 
 @dataclass(frozen=True, slots=True)
 class PerformanceProposal:
-    """Evidence-linked, machine- and workload-bounded proposed change."""
+    """Store a guarded, machine- and workload-bounded proposed change.
+
+    Attributes:
+        category: Closed affected-category vocabulary.
+        text: Bounded proposal text that explicitly limits scope to machine and
+            workload.
+        correctness_plan_reference: Required nonempty plan reference for
+            correctness-sensitive changes.
+    """
 
     category: str
     text: str
@@ -2328,20 +2538,27 @@ class PerformanceProposal:
                 "proposal text must be machine- and workload-bounded."
             )
         plan = self.correctness_plan_reference
-        if plan is not None:
-            _require_text(plan, "correctness_plan_reference")
-        if (
+        requires_plan = (
             self.category in _CORRECTNESS_CATEGORIES
             or _CORRECTNESS_TEXT.search(text)
-        ) and not plan:
+        )
+        if requires_plan and (not isinstance(plan, str) or not plan.strip()):
             raise ValueError(
                 "guarded proposal requires a correctness plan reference."
             )
+        if plan is not None:
+            _require_text(plan, "correctness_plan_reference")
 
 
 @dataclass(frozen=True, slots=True)
 class Recommendation:
-    """A retained proposal emitted only from reconciled sufficient evidence."""
+    """Store a proposal retained only from reconciled sufficient evidence.
+
+    Attributes:
+        decision: Reconciled sufficient-confidence analysis decision.
+        proposal: Machine- and workload-bounded proposed change.
+        contribution: Highest-ranked kernel contribution retained by decision.
+    """
 
     decision: PerformanceDecision
     proposal: PerformanceProposal

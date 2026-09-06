@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 from typing import cast
 
@@ -760,6 +761,81 @@ def test_analysis_reconciles_explicit_evidence_and_ranks_recommendation() -> (
         ),
     )
     assert recommendation.contribution is decision.contributions[0]
+
+
+@pytest.mark.parametrize(
+    "replacement",
+    (
+        lambda decision: replace(decision, host_references=()),
+        lambda decision: replace(
+            decision,
+            kernel_references=(
+                replace(decision.kernel_references[0], generation="two"),
+            ),
+        ),
+        lambda decision: replace(
+            decision,
+            reconciliation=support.Reconciliation(
+                "reconciled", 100.0, 99.0, -1.0, 1.0
+            ),
+        ),
+    ),
+)
+def test_reconciled_decision_rejects_forged_provenance(
+    replacement: object,
+) -> None:
+    """Test actionable decisions cannot omit or contradict provenance."""
+    decision = support.analyze_machine_bounded_performance(
+        (
+            _analysis_host_evidence("host_launch"),
+            _analysis_host_evidence("synchronized_elapsed"),
+        ),
+        (_analysis_kernel_evidence("attributed"),),
+    )
+    with pytest.raises(ValueError):
+        replacement(decision)  # type: ignore[operator]
+
+
+def test_analysis_rejects_cross_generation_evidence() -> None:
+    """Test P2/P3 evidence from different generations never reconciles."""
+    kernel = _analysis_kernel_evidence("attributed")
+    different_generation = replace(
+        kernel,
+        reference=replace(kernel.reference, generation="two"),
+    )
+    decision = support.analyze_machine_bounded_performance(
+        (
+            _analysis_host_evidence("host_launch"),
+            _analysis_host_evidence("synchronized_elapsed"),
+        ),
+        (different_generation,),
+    )
+    assert decision.status == "insufficient"
+    assert decision.confidence == "low"
+    assert decision.contributions == ()
+    assert decision.reconciliation is None
+    assert decision.limitations == ("artifact generation mismatch",)
+
+
+@pytest.mark.parametrize(
+    ("category", "wording"),
+    (
+        ("numerical", "change this machine workload implementation"),
+        ("kernel", "adjust solver tolerance for this machine workload"),
+        ("kernel", "change process-order for this machine workload"),
+    ),
+)
+@pytest.mark.parametrize("plan", (None, "", "   "))
+def test_protected_proposals_require_nonempty_correctness_plan(
+    category: str,
+    wording: str,
+    plan: str | None,
+) -> None:
+    """Test metadata and normalized protected wording cannot bypass plans."""
+    with pytest.raises(ValueError, match="correctness plan"):
+        support.PerformanceProposal(category, wording, plan)
+    proposal = support.PerformanceProposal(category, wording, "correctness-1")
+    assert proposal.correctness_plan_reference == "correctness-1"
 
 
 def test_analysis_rejects_unattributed_kernel_evidence() -> None:

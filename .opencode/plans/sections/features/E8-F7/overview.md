@@ -61,7 +61,27 @@ Hardware-free coverage exercises parsing, commands, failure bounds, path safety,
 worker argv/call order, and smoke composition. Real collection remains opt-in
 and CUDA-only, with no CPU or Warp-CPU fallback. This phase adds no public API,
 user-facing documentation, production scheduler behavior, benchmark result, or
-recommendation.
+ recommendation.
+
+## P4 Delivered
+
+Issue #1592 delivered a host-only, machine-bounded performance-analysis layer
+in `particula/gpu/tests/profiling_support.py`, with regression coverage in
+`particula/gpu/tests/profiling_support_test.py`. Explicit immutable bindings
+join P2 host evidence and P3 Nsight evidence only for the frozen small
+captured-replay workload and identical complete machine/software provenance.
+Host-launch remains distinct; only replay-normalized synchronized elapsed is
+reconciled with complete attributed `nsys` duration rows.
+
+The analyzer deterministically ranks retained kernel contributions with artifact
+and row provenance. Unavailable, incomplete, zero-total, mismatched, or
+non-reconcilable input produces a bounded unavailable/insufficient decision
+without estimates, percentages, actionable ranking, or recommendation.
+Recommendations require sufficient reconciled evidence, explicit workload and
+machine bounds, a non-portability limitation, and correctness-plan references
+for guarded scientific, tolerance, ownership, process-order, or RNG changes.
+It performs no artifact I/O, collection, profiler/CUDA/Warp use, production
+change, public export, documentation publication, or measured result.
 
 ## User Stories
 

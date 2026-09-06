@@ -19,16 +19,22 @@
 - [ ] Dominant kernels have duration and invocation evidence plus occupancy and
   memory-access or achieved-bandwidth metrics with documented units; a row
   missing this floor is explicitly unavailable and never synthesized.
-- [ ] Kernel contributions and host-launch contribution reconcile within the
-  documented method limits, with unattributed time retained rather than hidden.
+- [x] P4 deterministically ranks complete attributed `nsys` duration rows with
+  provenance and retains host-launch separately. It reconciles only
+  replay-normalized captured-replay synchronized elapsed; incomplete,
+  zero-total, or materially discrepant evidence emits a no-percentage,
+  unavailable/insufficient decision rather than hiding or estimating time.
 - [x] P2 raw local reports are confined to the gitignored
   `.artifacts/benchmarks/profiling/raw/` subtree; normalized evidence and checksum
   manifests remain reviewable and no raw binary report is committed.
 - [ ] Documentation states that raw reports are local-only and not retrievable by
   collaborators; every published conclusion remains supported by bounded
   committed normalized evidence.
-- [ ] Each recommendation cites workload, machine, metric, raw artifact, and
-  confidence/limitation, and no recommendation changes scientific contracts.
+- [x] P4 recommendations retain workload, complete machine/software provenance,
+  metric, artifact references, confidence, reconciliation, and explicit
+  non-portability limitation. Portable wording rejects, and guarded scientific,
+  tolerance, ownership/transfer, process-order, or RNG changes require a
+  correctness-plan reference.
 - [x] Missing CUDA, capture, qualification, or reset capability records complete
   P2 unavailable evidence without CPU fallback or timing callbacks. Profiler
   tools, permissions, and counters remain P3 requirements.

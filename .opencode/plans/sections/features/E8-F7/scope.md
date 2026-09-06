@@ -27,7 +27,18 @@ follows the explicit assignment and tracks reconciliation as an open question.
 - P3 delivered strict, version-gated Nsight Systems/Compute evidence records and
   parsers, bounded external-process orchestration, a fixed-argv native-CUDA
   workload worker, and an opt-in CUDA smoke test. It is limited to test-support
-  modules and their fixtures/tests.
+   modules and their fixtures/tests.
+- P4 delivered host-only analysis of explicit immutable P2/P3 bindings in
+  `particula/gpu/tests/profiling_support.py`, with hardware-free regression
+  coverage in `profiling_support_test.py`. It admits only the frozen small
+  captured-replay workload with complete matching machine/software provenance,
+  ranks complete attributed `nsys` duration evidence deterministically, and
+  reconciles only replay-normalized synchronized elapsed.
+- P4 returns explicit unavailable or insufficient outcomes for unavailable,
+  incomplete, zero-total, mismatched, or non-reconcilable evidence. It emits a
+  recommendation only from reconciled sufficient evidence with retained
+  provenance, explicit non-portability, and machine/workload bounds; guarded
+  contract-changing proposals require correctness-plan references.
 - Define small and medium representative resident workloads using fixed boxes,
   particles, species, process order, communication mode, and canonical replay
   counts of `1`, `10`, `100`, and `1000`.
@@ -57,7 +68,11 @@ follows the explicit assignment and tracks reconciliation as an open question.
 - Treating P2's optional collection implementation or unavailable artifact row
   as measured CUDA evidence. P2 does not collect Nsight kernel metrics.
 - Treating P3's parser, orchestration, or opt-in smoke capability as a collected
-  profile, benchmark result, bottleneck ranking, or recommendation.
+   profile, benchmark result, bottleneck ranking, or recommendation.
+- Treating P4's host-only analysis support as a collected profile, measured
+  result, portable performance claim, production optimization, or published
+  recommendation. P4 performs no artifact I/O, collection, filesystem access,
+  subprocess execution, CUDA/Warp/profiler use, or timing.
 - Any public API/export, production scheduler change, user-facing documentation,
   CPU/Warp-CPU fallback, or default-suite profiler execution.
 - Replacing E8-F6 scaling and memory-budget evidence or re-measuring setup and

@@ -53,14 +53,26 @@
     CPU/Warp-CPU fallback. No production scheduler/API behavior, user
     documentation, or measured result was added.
 
-- [ ] **E8-F7-P4:** Analyze bottlenecks and generate machine-bounded recommendations with tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Rank measured launch and kernel contributions and generate an
-    evidence-linked decision table with explicit scope and confidence limits.
+- [x] **E8-F7-P4:** Analyze bottlenecks and generate machine-bounded recommendations with tests
+  - Issue: #1592 | Size: S | Status: Shipped
+  - Delivered: Host-only immutable P2/P3 source bindings, unavailable outcomes,
+    deterministic attributed-`nsys` contribution ranking, and fail-closed
+    machine/workload-bounded decisions. Only normalized captured-replay
+    synchronized elapsed reconciles with complete attributed duration; host
+    launch remains a separate family. Missing, mismatched, incomplete, zero, or
+    materially discrepant evidence emits unavailable/insufficient outcomes
+    without estimates or actionable recommendations.
+  - Guardrails: Recommendations retain evidence/provenance and require explicit
+    non-portability and machine/workload bounds. Portable claims reject; guarded
+    scientific, tolerance, ownership/transfer, process-order, and RNG proposals
+    require a nonempty correctness-plan reference.
   - Files: `particula/gpu/tests/profiling_support.py`,
     `particula/gpu/tests/profiling_support_test.py`
-  - Tests: Deterministic ranking, ties, unavailable inputs, percentage
-    reconciliation, recommendation guardrails, and no portable-claim language.
+  - Tests: Hardware-free strict-record/no-mutation coverage plus deterministic
+    ranking/ties, normalized reconciliation, unavailable/insufficient branches,
+    provenance/mode/workload/machine mismatch handling, and recommendation
+    guardrails. No CUDA, Warp, profiler, timer, artifact file, public API, or
+    production behavior was added.
 
 - [ ] **E8-F7-P5:** Update development documentation and publish reproducible profiling results
   - Issue: TBD | Size: XS | Status: Not Started
