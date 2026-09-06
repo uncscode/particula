@@ -565,7 +565,11 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
             "build",
             (
                 ("cuda:7", 2, 0.5, 3),
-                {"n_particles": 16, "n_species": 2},
+                {
+                    "n_particles": 16,
+                    "n_species": 2,
+                    "full_activity": True,
+                },
             ),
         ),
         ("sync", None),
@@ -580,11 +584,11 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
                 ("adapter", (fake_warp, "cuda:7")),
             ),
         ),
+        ("clock", None),
         ("capture", "qualification"),
         ("sync", None),
         ("clock", None),
         ("monitor_snapshot", None),
-        ("clock", None),
         ("sync", None),
         ("close", loop),
     ]

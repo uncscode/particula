@@ -46,6 +46,7 @@ from particula.execution.tests.resident_benchmark_support import (
     ResidentMemoryObservation,
     build_default_resident_benchmark_matrix,
     build_resident_benchmark_metadata,
+    build_resident_case_provenance_digest,
     build_resident_memory_comparison,
     build_resident_memory_model,
     collect_paired_device_timings,
@@ -1918,8 +1919,8 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C9
             availability_result = cuda_capture_availability()
         return availability_result
 
-    digest = "unavailable"
-    device = {"status": "unavailable", "identity": None, "memory": None}
+    case_provenance: dict[str, dict[str, Any]] = {}
+    executed_devices: list[dict[str, Any]] = []
 
     for case in cases:
         preflight = preflight_resident_benchmark_case(
@@ -1931,6 +1932,10 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C9
             availability=availability,
         )
         if preflight.status is not ResidentBenchmarkStatus.EXECUTED:
+            case_provenance[case.case_id] = {
+                "status": preflight.status.value,
+                "duration_seconds": case.duration,
+            }
             results.append(
                 ResidentBenchmarkResult(
                     case_id=case.case_id,
@@ -1940,12 +1945,17 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C9
                     reason=preflight.reason,
                     samples=(),
                     summary=None,
-                    provenance={"binding": "preconstruction"},
+                    provenance={
+                        "binding": "preconstruction",
+                        "case_id": case.case_id,
+                        "duration_seconds": case.duration,
+                    },
                 )
             )
             continue
         try:
             context = qualified_cuda_resident_benchmark(
+                duration=case.duration,
                 n_boxes=case.requested_shape[0],
                 n_particles=case.requested_shape[1],
                 n_species=case.requested_shape[2],
@@ -1968,9 +1978,13 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C9
                 prepared_signature_digest, selected_device = (
                     resident_benchmark_provenance(binding)
                 )
-                if digest == "unavailable":
-                    digest = prepared_signature_digest
-                    device = selected_device
+                case_provenance[case.case_id] = {
+                    "status": "executed",
+                    "prepared_signature_digest": prepared_signature_digest,
+                    "device": selected_device,
+                    "duration_seconds": case.duration,
+                }
+                executed_devices.append(selected_device)
                 active_slots = case.active_fraction * dimensions.n_particles
                 if not active_slots.is_integer():
                     raise ValueError(
@@ -2006,6 +2020,11 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C9
             ResidentBenchmarkUnavailableError,
             pytest.skip.Exception,
         ) as error:
+            case_provenance[case.case_id] = {
+                "status": "unavailable",
+                "duration_seconds": case.duration,
+                "reason": str(error),
+            }
             results.append(
                 ResidentBenchmarkResult(
                     case_id=case.case_id,
@@ -2015,7 +2034,11 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C9
                     reason=str(error),
                     samples=(),
                     summary=None,
-                    provenance={"binding": "preconstruction"},
+                    provenance={
+                        "binding": "preconstruction",
+                        "case_id": case.case_id,
+                        "duration_seconds": case.duration,
+                    },
                 )
             )
             continue
@@ -2040,8 +2063,12 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C9
         )
         provenance = {
             "binding": "native_cuda_capture",
+            "case_id": case.case_id,
+            "duration_seconds": case.duration,
             "prepared_signature_digest": prepared_signature_digest,
             "device": selected_device,
+            "processes": case.processes,
+            "sampling_order_policy": "balanced_ab_ba",
         }
         for timing_mode, samples in (
             ("prepared_uncaptured_device_synchronized", uncaptured),
@@ -2061,6 +2088,12 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C9
                     summary=summarize_timing_samples(samples),
                 )
             )
+    digest = build_resident_case_provenance_digest(case_provenance)
+    device = {"status": "unavailable", "identity": None, "memory": None}
+    if executed_devices and all(
+        candidate == executed_devices[0] for candidate in executed_devices
+    ):
+        device = executed_devices[0]
     return ResidentBenchmarkArtifact(
         metadata=build_resident_benchmark_metadata(
             timestamp_utc=datetime.now(timezone.utc),

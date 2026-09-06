@@ -148,6 +148,7 @@ def _cpu_carriers(
     *,
     n_particles: int = 16,
     n_species: int = 2,
+    full_activity: bool = False,
 ) -> tuple[ParticleData, GasData, EnvironmentData]:
     """Build exact-dimension independent rows at manifest lanes."""
     if isinstance(n_particles, bool) or not isinstance(n_particles, int):
@@ -156,6 +157,8 @@ def _cpu_carriers(
         raise TypeError("n_species must be a non-bool integer.")
     if n_particles <= 0 or n_species <= 0:
         raise ValueError("n_particles and n_species must be positive.")
+    if not isinstance(full_activity, bool):
+        raise TypeError("full_activity must be a bool.")
     n_boxes = len(manifest)
     masses = np.zeros((n_boxes, n_particles, n_species), dtype=np.float64)
     concentration = np.zeros((n_boxes, n_particles), dtype=np.float64)
@@ -167,9 +170,13 @@ def _cpu_carriers(
     for logical_id, lane in manifest:
         # ``box-3`` and ``free`` are valid no-work rows in every arrangement.
         active_slots = (
-            0
-            if logical_id in {"box-3", "free"}
-            else 1 + (sum(ord(character) for character in logical_id) % 2)
+            n_particles
+            if full_activity
+            else (
+                0
+                if logical_id in {"box-3", "free"}
+                else 1 + (sum(ord(character) for character in logical_id) % 2)
+            )
         )
         value = float(sum(ord(character) for character in logical_id))
         active_slots = min(active_slots, n_particles)
@@ -194,7 +201,7 @@ def _cpu_carriers(
         name=[f"species-{index}" for index in range(n_species)],
         molar_mass=np.linspace(0.018, 0.098, n_species, dtype=np.float64),
         concentration=gas_concentration,
-        partitioning=np.zeros(n_species, dtype=bool),
+        partitioning=np.full(n_species, full_activity, dtype=bool),
     )
     environment = EnvironmentData(
         temperature=temperature,
@@ -214,10 +221,14 @@ def _binding(
     *,
     n_particles: int = 16,
     n_species: int = 2,
+    full_activity: bool = False,
 ) -> tuple[Any, GPUResourceRegistry, ResidentStepGuard]:
     """Upload one manifest fixture and bind its exact registry and guard."""
     particles, gas, environment = _cpu_carriers(
-        manifest, n_particles=n_particles, n_species=n_species
+        manifest,
+        n_particles=n_particles,
+        n_species=n_species,
+        full_activity=full_activity,
     )
     wp = _require_device(device)
     ids, lanes = zip(*manifest, strict=True)
@@ -232,6 +243,21 @@ def _binding(
     )
     registry = GPUResourceRegistry(session)
     return session, registry, ResidentStepGuard(session, registry)
+
+
+def test_full_activity_carriers_fill_slots_and_enable_partitioning() -> None:
+    """Validate the dedicated benchmark workload before device allocation."""
+    manifest = (("box-0", 0), ("box-2", 1))
+    particles, gas, _ = _cpu_carriers(
+        manifest,
+        n_particles=4,
+        n_species=3,
+        full_activity=True,
+    )
+
+    assert np.count_nonzero(particles.concentration > 0.0) == 8
+    assert np.all(np.sum(particles.masses, axis=2) > 0.0)
+    assert np.array_equal(gas.partitioning, np.ones(3, dtype=bool))
 
 
 @pytest.fixture

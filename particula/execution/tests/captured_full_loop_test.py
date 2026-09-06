@@ -1152,16 +1152,18 @@ def _capture_communication_configuration(session: Any, wp: Any) -> Any:
     )
 
 
-def _build_prepared_loop(
+def _build_prepared_loop_impl(
     device: str,
     n_boxes: int,
     duration: float,
     root_seed: int,
+    cleanup_binding: list[tuple[Any, Any, Any]],
     *,
     n_particles: int = 16,
     n_species: int = 2,
     selected_wall_loss_boxes: tuple[int, ...] = (),
     single_active_particle: bool = False,
+    full_activity: bool = False,
 ) -> _PreparedLoop:
     """Build one real all-operation resident loop on the requested device."""
     manifest = tuple((f"box-{2 * index}", index) for index in range(n_boxes))
@@ -1171,7 +1173,9 @@ def _build_prepared_loop(
         root_seed,
         n_particles=n_particles,
         n_species=n_species,
+        full_activity=full_activity,
     )
+    cleanup_binding.append((session, registry, guard))
     wp = pytest.importorskip("warp")
     if single_active_particle:
         warp_device = session.particles.masses.device
@@ -1229,7 +1233,7 @@ def _build_prepared_loop(
     )
     _attach_resident_graph_capture_binding(request, binding)
     prepared = prepare_resident_simulation(request, duration)
-    return _PreparedLoop(
+    result = _PreparedLoop(
         wp=wp,
         session=session,
         registry=registry,
@@ -1240,6 +1244,45 @@ def _build_prepared_loop(
         coagulation_resources=coagulation,
         wall_loss_resources=wall_loss,
     )
+    cleanup_binding.clear()
+    return result
+
+
+def _build_prepared_loop(
+    device: str,
+    n_boxes: int,
+    duration: float,
+    root_seed: int,
+    *,
+    n_particles: int = 16,
+    n_species: int = 2,
+    selected_wall_loss_boxes: tuple[int, ...] = (),
+    single_active_particle: bool = False,
+    full_activity: bool = False,
+) -> _PreparedLoop:
+    """Build a prepared loop and close its exact binding after setup failure."""
+    cleanup_binding: list[tuple[Any, Any, Any]] = []
+    try:
+        return _build_prepared_loop_impl(
+            device,
+            n_boxes,
+            duration,
+            root_seed,
+            cleanup_binding,
+            n_particles=n_particles,
+            n_species=n_species,
+            selected_wall_loss_boxes=selected_wall_loss_boxes,
+            single_active_particle=single_active_particle,
+            full_activity=full_activity,
+        )
+    except BaseException as setup_error:
+        if cleanup_binding:
+            session, registry, guard = cleanup_binding[0]
+            try:
+                session.close(registry, guard)
+            except BaseException as cleanup_error:
+                raise setup_error from cleanup_error
+        raise
 
 
 @dataclass
@@ -1791,6 +1834,37 @@ def test_scenario_builder_closes_session_when_preparation_fails(
     with pytest.raises(RuntimeError, match="prepared setup failed"):
         _build_scenario_prepared_loop(monkeypatch, 0.0)
     assert len(closed) == 1
+
+
+@pytest.mark.warp
+def test_prepared_loop_builder_closes_session_after_partial_setup_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Close the benchmark binding when setup fails after session creation."""
+    closed: list[tuple[Any, Any]] = []
+    registry = object()
+    guard = object()
+    session = SimpleNamespace(
+        close=lambda actual_registry, actual_guard: closed.append(
+            (actual_registry, actual_guard)
+        )
+    )
+
+    monkeypatch.setattr(
+        sys.modules[__name__],
+        "_binding",
+        lambda *_args, **_kwargs: (session, registry, guard),
+    )
+    monkeypatch.setattr(
+        sys.modules[__name__],
+        "_capture_communication_configuration",
+        lambda *_args: (_ for _ in ()).throw(RuntimeError("setup failed")),
+    )
+
+    with pytest.raises(RuntimeError, match="setup failed"):
+        _build_prepared_loop("cpu", 1, 0.5, 7)
+
+    assert closed == [(registry, guard)]
 
 
 def test_close_prepared_loop_attempts_session_cleanup_after_graph_failure(

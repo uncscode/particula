@@ -38,6 +38,7 @@ from particula.execution.tests.resident_benchmark_support import (
     build_default_resident_benchmark_matrix,
     build_resident_benchmark_case_id,
     build_resident_benchmark_metadata,
+    build_resident_case_provenance_digest,
     build_resident_memory_comparison,
     build_resident_memory_model,
     checked_dense_array_bytes,
@@ -142,6 +143,8 @@ def test_default_matrix_preserves_all_exact_box_first_requests() -> None:
         case.processes
         == (
             "communication",
+            "environment",
+            "gas",
             "condensation",
             "coagulation",
             "dilution",
@@ -153,9 +156,73 @@ def test_default_matrix_preserves_all_exact_box_first_requests() -> None:
     )
     assert all(case.communication == "gas" for case in cases)
     assert all(case.diagnostics == ("gas", "saturation") for case in cases)
+    assert all(case.duration == 0.5 for case in cases)
     assert all(
         case.case_id.startswith(f"r{case.requested_shape[0]}x")
         for case in cases
+    )
+
+
+def test_case_rejects_zero_duration_and_serializes_positive_duration() -> None:
+    """Keep physical timestep duration positive and in artifact provenance."""
+    with pytest.raises(ValueError, match="duration must be positive"):
+        build_resident_benchmark_case_id(
+            requested_shape=(1, 1, 1),
+            actual_shape=(1, 1, 1),
+            active_fraction=1.0,
+            processes=("condensation",),
+            communication="none",
+            diagnostics=(),
+            warmup=0,
+            timestep_count=1,
+            seed=1,
+            duration=0.0,
+        )
+
+    case_id = build_resident_benchmark_case_id(
+        requested_shape=(1, 1, 1),
+        actual_shape=(1, 1, 1),
+        active_fraction=1.0,
+        processes=("condensation",),
+        communication="none",
+        diagnostics=(),
+        warmup=0,
+        timestep_count=1,
+        seed=1,
+        duration=0.25,
+    )
+    case = ResidentBenchmarkCase(
+        case_id=case_id,
+        requested_shape=(1, 1, 1),
+        actual_shape=(1, 1, 1),
+        active_fraction=1.0,
+        processes=("condensation",),
+        communication="none",
+        diagnostics=(),
+        warmup=0,
+        timestep_count=1,
+        seed=1,
+        duration=0.25,
+    )
+    assert '"duration": 0.25' in serialize_resident_benchmark_artifact(
+        ResidentBenchmarkArtifact(_metadata(), (case,), ())
+    )
+
+
+def test_aggregate_provenance_digest_covers_every_case() -> None:
+    """Hash all case-specific signatures and devices deterministically."""
+    first: dict[str, dict[str, Any]] = {
+        "case-b": {"signature": "two", "device": {"identity": "cuda:1"}},
+        "case-a": {"signature": "one", "device": {"identity": "cuda:0"}},
+    }
+    reordered = {"case-a": first["case-a"], "case-b": first["case-b"]}
+    changed = {**reordered, "case-b": {"signature": "changed"}}
+
+    assert build_resident_case_provenance_digest(first) == (
+        build_resident_case_provenance_digest(reordered)
+    )
+    assert build_resident_case_provenance_digest(first) != (
+        build_resident_case_provenance_digest(changed)
     )
 
 
@@ -727,8 +794,8 @@ def test_write_json_artifact_rejects_directory_swap_to_external_symlink(
     assert not (outside / "result.json").exists()
 
 
-def test_paired_collector_alternates_without_warmup_synchronization() -> None:
-    """Measure paired operations with exactly one sync per measured path."""
+def test_paired_collector_synchronizes_warmup_and_balances_order() -> None:
+    """Synchronize warmup and alternate measured path ordering."""
     calls: list[str] = []
     ticks = iter((0.0, 1.0, 2.0, 4.0, 5.0, 8.0, 10.0, 14.0))
     uncaptured, replay = collect_paired_device_timings(
@@ -739,18 +806,19 @@ def test_paired_collector_alternates_without_warmup_synchronization() -> None:
         warmup_count=1,
         sample_count=2,
     )
-    assert uncaptured == (1.0, 3.0)
-    assert replay == (2.0, 4.0)
+    assert uncaptured == (1.0, 4.0)
+    assert replay == (2.0, 3.0)
     assert calls == [
         "uncaptured",
         "replay",
-        "uncaptured",
-        "sync",
-        "replay",
         "sync",
         "uncaptured",
         "sync",
         "replay",
+        "sync",
+        "replay",
+        "sync",
+        "uncaptured",
         "sync",
     ]
 
@@ -999,9 +1067,9 @@ def test_cuda_high_water_adapter_uses_only_used_high_attribute_and_caches(
     }
     assert loads == ["libcudart.so"]
     assert [call[2] for call in calls if call[0] in {"get", "set"}] == [
-        3,
-        3,
-        3,
+        8,
+        8,
+        8,
     ]
 
 
@@ -1023,8 +1091,8 @@ def _memory_model() -> ResidentMemoryModel:
     )
 
 
-def test_memory_model_accounts_primary_diagnostics_and_scenarios() -> None:
-    """Account exact primary fields without double-counting attribution."""
+def test_memory_model_uses_registry_as_diagnostic_byte_authority() -> None:
+    """Account diagnostics once through the complete registry report."""
     model = _memory_model()
     values = {item.name: item.byte_count for item in model.categories}
     primary = {
@@ -1042,8 +1110,7 @@ def test_memory_model_accounts_primary_diagnostics_and_scenarios() -> None:
         "primary.environment.saturation_ratio": 2 * 4 * 8,
     }
     primary_total = sum(primary.values())
-    diagnostic_total = 64 + 16
-    steady_state_total = primary_total + 101 + diagnostic_total
+    steady_state_total = primary_total + 101
     checkpoint_total = primary_total + 11 + 13
     assert {key: values[key] for key in primary} == primary
     assert model.steady_state_bytes == steady_state_total
@@ -1056,6 +1123,7 @@ def test_memory_model_accounts_primary_diagnostics_and_scenarios() -> None:
     assert [item.name for item in model.categories].count(
         "registry.resource_manifest"
     ) == 1
+    assert not any(name.startswith("diagnostic.") for name in values)
 
 
 @pytest.mark.parametrize(
@@ -1096,8 +1164,10 @@ def test_checked_dense_array_bytes_rejects_invalid_or_overflow(
         RESIDENT_DIAGNOSTIC_OPERATIONS,
     ],
 )
-def test_memory_model_accepts_canonical_diagnostic_subsets(diagnostics) -> None:
-    """Size scalar and matrix diagnostic outputs in canonical order only."""
+def test_memory_model_validates_but_does_not_recount_diagnostics(
+    diagnostics,
+) -> None:
+    """Keep the registry report authoritative for diagnostic bytes."""
     model = build_resident_memory_model(
         n_boxes=2,
         n_particles=0,
@@ -1110,9 +1180,7 @@ def test_memory_model_accepts_canonical_diagnostic_subsets(diagnostics) -> None:
         checkpoint_inspection_copy_bytes=0,
     )
     values = {item.name: item.byte_count for item in model.categories}
-    for operation in diagnostics:
-        expected = 16 if operation == "particle_number_concentration" else 48
-        assert values[f"diagnostic.{operation}"] == expected
+    assert not any(name.startswith("diagnostic.") for name in values)
 
 
 @pytest.mark.parametrize(
@@ -1276,7 +1344,6 @@ def test_memory_model_full_activity_retains_nonzero_accounted_resources() -> (
         checkpoint_inspection_copy_bytes=23,
     )
 
-    values = {item.name: item.byte_count for item in model.categories}
     inactive = next(
         item
         for item in model.categories
@@ -1287,13 +1354,10 @@ def test_memory_model_full_activity_retains_nonzero_accounted_resources() -> (
         for item in model.categories
         if item.name.startswith("primary.")
     )
-    diagnostic_total = sum(
-        values[f"diagnostic.{name}"] for name in RESIDENT_DIAGNOSTIC_OPERATIONS
-    )
     assert inactive.byte_count == 0
     assert not inactive.included_in_steady_state
     assert primary_total > 0
-    assert model.steady_state_bytes == primary_total + 17 + diagnostic_total
+    assert model.steady_state_bytes == primary_total + 17
     assert model.steady_state_bytes > 0
     assert model.checkpoint_bytes == primary_total + 19 + 23
     assert model.checkpoint_bytes > 0

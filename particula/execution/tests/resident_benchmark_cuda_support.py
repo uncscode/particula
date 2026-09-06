@@ -326,6 +326,16 @@ def _require_positive_dimension(value: object, name: str) -> int:
     return value
 
 
+def _require_positive_duration(value: object) -> float:
+    """Validate a finite, non-boolean positive physical duration."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError("duration must be a non-bool real number.")
+    duration = float(value)
+    if not math.isfinite(duration) or duration <= 0.0:
+        raise ValueError("duration must be positive and finite.")
+    return duration
+
+
 def _close_loop_preserving_error(
     close_loop: Callable[[Any], None], loop: Any, error: BaseException | None
 ) -> None:
@@ -343,7 +353,7 @@ def _close_loop_preserving_error(
 @contextmanager
 def qualified_cuda_resident_benchmark(
     *,
-    duration: float = 0.0,
+    duration: float = 0.5,
     n_boxes: int = 1,
     n_particles: int = 16,
     n_species: int = 2,
@@ -377,6 +387,7 @@ def qualified_cuda_resident_benchmark(
             prepared resident loop.
         RuntimeError: If native CUDA capture setup fails after qualification.
     """
+    duration = _require_positive_duration(duration)
     n_boxes = _require_positive_dimension(n_boxes, "n_boxes")
     n_particles = _require_positive_dimension(n_particles, "n_particles")
     n_species = _require_positive_dimension(n_species, "n_species")
@@ -416,17 +427,19 @@ def qualified_cuda_resident_benchmark(
         wp=wp,
         native=device.native,
     )
-    monitor.begin()
-    setup_start = perf_counter()
-    loop = _build_prepared_loop(
-        device.native,
-        n_boxes,
-        duration,
-        root_seed,
-        n_particles=n_particles,
-        n_species=n_species,
-    )
+    loop = None
     try:
+        monitor.begin()
+        setup_start = perf_counter()
+        loop = _build_prepared_loop(
+            device.native,
+            n_boxes,
+            duration,
+            root_seed,
+            n_particles=n_particles,
+            n_species=n_species,
+            full_activity=True,
+        )
         wp.synchronize()
         setup_elapsed = perf_counter() - setup_start
         adapter = _WarpNativeCaptureAdapter(wp, device.native)
@@ -441,11 +454,11 @@ def qualified_cuda_resident_benchmark(
             if _qualification_is_explicitly_unavailable(error):
                 raise ResidentBenchmarkUnavailableError(str(error)) from error
             raise
+        capture_start = perf_counter()
         captured = capture_prepared_resident_graph(qualification)
         wp.synchronize()
-        capture_start = perf_counter()
-        monitor.snapshot_peak()
         capture_elapsed = perf_counter() - capture_start
+        monitor.snapshot_peak()
         benchmark_binding = ResidentCaptureBenchmarkBinding(
             loop=loop,
             captured=captured,
@@ -467,6 +480,10 @@ def qualified_cuda_resident_benchmark(
         benchmark_binding.validate_identities()
         yield benchmark_binding
     except BaseException as error:
+        if loop is None:
+            raise
         _close_loop_preserving_error(_close_prepared_loop, loop, error)
     else:
+        if loop is None:
+            raise RuntimeError("benchmark loop was not created.")
         _close_loop_preserving_error(_close_prepared_loop, loop, None)

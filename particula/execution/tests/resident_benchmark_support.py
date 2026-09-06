@@ -13,6 +13,7 @@ execution, adds package exports, nor supplies a user-facing API.
 from __future__ import annotations
 
 import ctypes
+import hashlib
 import json
 import math
 import os
@@ -247,7 +248,7 @@ def build_resident_memory_comparison(
 
 
 CUDA_USED_MEM_HIGH_METHOD = "cuda_runtime.default_pool.used_mem_high.v1"
-_CUDA_MEM_POOL_ATTR_USED_MEM_HIGH = 3
+_CUDA_MEM_POOL_ATTR_USED_MEM_HIGH = 8
 
 
 class CudaDefaultPoolHighWater:
@@ -695,8 +696,9 @@ def build_resident_memory_model(
     """Build host-only resident logical-memory accounting scenarios.
 
     The primary categories follow the fixed resident particle, gas, and
-    environment schemas. Diagnostic values count only caller-owned outputs;
-    the registry value is accepted as one already-aggregated logical report.
+    environment schemas. The registry value is accepted as one already-
+    aggregated logical report, including published diagnostic outputs.
+    Diagnostic selections are validated but are not counted a second time.
     Checkpoint values are separate host-copy scenarios. Allocator reservations
     and tape storage are excluded until an explicit projection is attached.
 
@@ -811,17 +813,6 @@ def build_resident_memory_model(
             "registry.resource_manifest", registry_bytes, "registry_logical"
         )
     )
-    for operation in diagnostics:
-        shape = (
-            (boxes,)
-            if operation == "particle_number_concentration"
-            else (boxes, species)
-        )
-        categories.append(
-            _memory_category(
-                f"diagnostic.{operation}", checked_dense_array_bytes(shape, 8)
-            )
-        )
     categories.append(
         _memory_category(f"communication.{communication}", 0, included=False)
     )
@@ -1229,6 +1220,22 @@ def _canonical_processes(value: object) -> tuple[str, ...]:
     return value
 
 
+def build_resident_case_provenance_digest(
+    case_provenance: Mapping[str, Mapping[str, Any]],
+) -> str:
+    """Hash the complete deterministic per-case provenance mapping."""
+    if not isinstance(case_provenance, Mapping) or not case_provenance:
+        raise ValueError("case_provenance must be a nonempty mapping.")
+    payload = json.dumps(
+        _normalize_json(case_provenance),
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
 def build_resident_benchmark_case_id(
     *,
     requested_shape: tuple[int, int, int],
@@ -1240,6 +1247,7 @@ def build_resident_benchmark_case_id(
     warmup: int,
     timestep_count: int,
     seed: int,
+    duration: float = 1.0,
 ) -> str:
     """Build the canonical identifier for a resident benchmark configuration.
 
@@ -1253,6 +1261,7 @@ def build_resident_benchmark_case_id(
         warmup: Number of warmup timesteps.
         timestep_count: Positive number of measured timesteps.
         seed: Nonnegative deterministic benchmark seed.
+        duration: Positive physical timestep duration in seconds.
 
     Returns:
         The exact configuration-derived case identifier.
@@ -1287,12 +1296,15 @@ def build_resident_benchmark_case_id(
     _require_int(warmup, "warmup")
     _require_int(timestep_count, "timestep_count", positive=True)
     _require_int(seed, "seed")
+    duration = _require_float(duration, "duration", minimum=0.0)
+    if duration == 0.0:
+        raise ValueError("duration must be positive.")
     return (
         f"r{requested_shape[0]}x{requested_shape[1]}x{requested_shape[2]}"
         f"-a{actual_shape[0]}x{actual_shape[1]}x{actual_shape[2]}"
         f"-f{active_fraction:.17g}-p{'-'.join(processes)}"
         f"-c{communication}-d{''.join(f'{len(item)}:{item}' for item in diagnostics) or 'none'}"
-        f"-w{warmup}-t{timestep_count}-s{seed}"
+        f"-w{warmup}-t{timestep_count}-s{seed}-u{duration:.17g}"
     )
 
 
@@ -1315,6 +1327,7 @@ class ResidentBenchmarkCase:
         warmup: Nonnegative count of warmup timesteps.
         timestep_count: Positive count of measured timesteps.
         seed: Nonnegative deterministic benchmark seed.
+        duration: Positive physical timestep duration in seconds.
     """
 
     case_id: str
@@ -1327,6 +1340,7 @@ class ResidentBenchmarkCase:
     warmup: int
     timestep_count: int
     seed: int
+    duration: float = 1.0
 
     def __post_init__(self) -> None:
         """Validate the canonical configuration after frozen construction.
@@ -1358,6 +1372,7 @@ class ResidentBenchmarkCase:
             warmup=self.warmup,
             timestep_count=self.timestep_count,
             seed=self.seed,
+            duration=self.duration,
         )
         if not isinstance(self.case_id, str):
             raise TypeError("case_id must be a string.")
@@ -1385,6 +1400,8 @@ def build_default_resident_benchmark_matrix() -> tuple[
         "active_fraction": 1.0,
         "processes": (
             "communication",
+            "environment",
+            "gas",
             "condensation",
             "coagulation",
             "dilution",
@@ -1397,6 +1414,7 @@ def build_default_resident_benchmark_matrix() -> tuple[
         "warmup": 2,
         "timestep_count": 3,
         "seed": 1582,
+        "duration": 0.5,
     }
     cases = []
     for n_boxes in RESIDENT_BOX_COUNTS:
@@ -1939,8 +1957,9 @@ def collect_paired_device_timings(
 ) -> tuple[tuple[float, ...], tuple[float, ...]]:
     """Collect alternating paired completed-device timings.
 
-    Warmups alternate uncaptured then replay without synchronization. Each
-    measured operation follows ``clock, operation, synchronize, clock``;
+    Warmups alternate uncaptured then replay and finish with synchronization.
+    Measured pairs use balanced AB/BA ordering. Each measured operation follows
+    ``clock, operation, synchronize, clock``;
     synchronization therefore measures completed device work rather than only
     host enqueue time. Setup and capture timing are intentionally outside this
     collector.
@@ -1950,7 +1969,7 @@ def collect_paired_device_timings(
         replay_operation: Zero-argument captured-replay callback.
         synchronize: Callback that waits for the device operation to complete.
         clock: Monotonic clock returning elapsed seconds.
-        warmup_count: Number of unsynchronized paired warmup iterations.
+        warmup_count: Number of paired warmup iterations.
         sample_count: Number of synchronized samples to collect per operation.
 
     Returns:
@@ -1973,21 +1992,33 @@ def collect_paired_device_timings(
     for _ in range(warmup_count):
         uncaptured_operation()
         replay_operation()
+    if warmup_count:
+        synchronize()
     uncaptured_samples: list[float] = []
     replay_samples: list[float] = []
-    for _ in range(sample_count):
+
+    def measure(operation: Any, name: str) -> float:
+        """Measure one completed device operation."""
         start = clock()
-        uncaptured_operation()
+        operation()
         synchronize()
-        uncaptured_samples.append(
-            _require_float(clock() - start, "uncaptured elapsed", minimum=0.0)
+        return _require_float(
+            clock() - start,
+            f"{name} elapsed",
+            minimum=0.0,
         )
-        start = clock()
-        replay_operation()
-        synchronize()
-        replay_samples.append(
-            _require_float(clock() - start, "replay elapsed", minimum=0.0)
-        )
+
+    for sample_index in range(sample_count):
+        if sample_index % 2 == 0:
+            uncaptured_samples.append(
+                measure(uncaptured_operation, "uncaptured")
+            )
+            replay_samples.append(measure(replay_operation, "replay"))
+        else:
+            replay_samples.append(measure(replay_operation, "replay"))
+            uncaptured_samples.append(
+                measure(uncaptured_operation, "uncaptured")
+            )
     return tuple(uncaptured_samples), tuple(replay_samples)
 
 
@@ -2132,6 +2163,7 @@ def deserialize_resident_benchmark_artifact(
                 warmup=item["warmup"],
                 timestep_count=item["timestep_count"],
                 seed=item["seed"],
+                duration=item.get("duration", 1.0),
             )
         )
     results = []
