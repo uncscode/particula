@@ -7,6 +7,7 @@ import sys
 from dataclasses import FrozenInstanceError
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -961,7 +962,7 @@ def test_memory_records_enforce_reconciliation_and_immutability() -> None:
     model = ResidentMemoryModel((category,))
     assert model.categories == (category,)
     with pytest.raises(FrozenInstanceError):
-        category.name = "changed"
+        cast(Any, category).name = "changed"
     with pytest.raises(ValueError):
         ResidentMemoryModel((category, category))
     with pytest.raises(ValueError):
