@@ -1,4 +1,4 @@
-"""Opt-in GPU benchmarks for condensation and coagulation kernels.
+"""Opt-in GPU benchmarks and resident profiling evidence.
 
 Run with:
     pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s
@@ -11,6 +11,10 @@ Condensation benchmarks use a generic deterministic particle fixture.
 Coagulation benchmarks use a dedicated mixed-scale fixture so the timed
 path reflects the shipped NPF/droplet regression baseline without
 changing condensation setup.
+
+Resident launch profiling uses native CUDA capture only and publishes
+separate host-launch and synchronized-completion evidence. It does not
+provide a CPU or Warp-CPU fallback.
 """
 
 # pyright: reportGeneralTypeIssues=false
@@ -1528,6 +1532,7 @@ def test_condensation_scaling(
     )
 
     def gpu_step() -> None:
+        """Execute one GPU condensation step for the timed loop."""
         condensation_step_gpu(
             gpu_particles,
             gpu_gas,
@@ -1567,6 +1572,7 @@ def test_condensation_scaling(
         cpu_mass_transfer = np.zeros_like(cpu_particles.masses)
 
         def cpu_step() -> None:
+            """Execute one CPU condensation step for the timed loop."""
             _cpu_condensation_step(
                 cpu_particles,
                 gas,
@@ -1662,6 +1668,7 @@ def test_coagulation_scaling(
     )
 
     def gpu_step() -> None:
+        """Execute one GPU coagulation step for the timed loop."""
         coagulation_step_gpu(
             gpu_particles,
             temperature=DEFAULT_TEMPERATURE,
@@ -1704,6 +1711,7 @@ def test_coagulation_scaling(
         kernel_radius = _build_kernel_radius(cpu_particles.radii)
 
         def cpu_step() -> None:
+            """Execute one CPU coagulation step for the timed loop."""
             _cpu_coagulation_step(
                 cpu_particles,
                 DEFAULT_TEMPERATURE,
@@ -2220,6 +2228,7 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C9
     availability_result = None
 
     def availability():
+        """Lazily cache the CUDA capture availability result."""
         nonlocal availability_result
         if availability_result is None:
             availability_result = cuda_capture_availability()
