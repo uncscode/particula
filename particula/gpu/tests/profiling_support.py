@@ -1826,9 +1826,9 @@ class MachineBoundKernelEvidence:
             raise ValueError(
                 "kernel evidence must describe the frozen small workload."
             )
-        reports = tuple(
-            dict.fromkeys(row.provenance for row in self.evidence.rows)
-        )
+        reports = tuple(row.provenance for row in self.evidence.rows)
+        if len(reports) != len(set(reports)):
+            raise ValueError("row identities must be unique.")
         if reports != self.reference.raw_reports:
             raise ValueError(
                 "reference provenance must equal ordered row provenance."
@@ -1937,6 +1937,11 @@ class Reconciliation:
             float,
         ) or not math.isfinite(self.signed_difference_ns):
             raise ValueError("signed_difference_ns must be finite.")
+        expected_difference = self.profiler_total_ns - self.host_total_ns
+        if self.signed_difference_ns != expected_difference:
+            raise ValueError("signed_difference_ns is inconsistent.")
+        if self.absolute_difference_ns != abs(expected_difference):
+            raise ValueError("absolute_difference_ns is inconsistent.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -1951,6 +1956,8 @@ class PerformanceDecision:
     contributions: tuple[KernelContribution, ...]
     reconciliation: Reconciliation | None
     limitations: tuple[str, ...]
+    host_references: tuple[ArtifactReference, ...] = ()
+    kernel_references: tuple[ArtifactReference, ...] = ()
 
     def __post_init__(self) -> None:
         """Validate an immutable bounded performance-analysis decision.
@@ -1974,6 +1981,15 @@ class PerformanceDecision:
             raise TypeError("contributions are invalid.")
         for limitation in _analysis_tuple(self.limitations, "limitations"):
             _require_text(limitation, "limitation")
+        for name, references in (
+            ("host_references", self.host_references),
+            ("kernel_references", self.kernel_references),
+        ):
+            values = _analysis_tuple(references, name)
+            if not all(isinstance(x, ArtifactReference) for x in values):
+                raise TypeError(f"{name} are invalid.")
+            if len(values) != len(set(values)):
+                raise ValueError(f"{name} must be unique.")
 
 
 def analyze_machine_bounded_performance(
@@ -2061,6 +2077,31 @@ def analyze_machine_bounded_performance(
             None,
             ("workload or machine mismatch",),
         )
+    kernel_identities = tuple(
+        (
+            binding.evidence.qualification,
+            binding.evidence.workload_id,
+            binding.evidence.process,
+            binding.evidence.rows,
+        )
+        for binding in bound_kernels
+    )
+    if len(kernel_identities) != len(set(kernel_identities)):
+        raise ValueError("duplicate kernel evidence.")
+    row_identities = tuple(
+        (
+            binding.evidence.process,
+            row.tool,
+            row.kernel_name,
+            row.correlation_id,
+            row.metric_name,
+            row.provenance,
+        )
+        for binding in bound_kernels
+        for row in binding.evidence.rows
+    )
+    if len(row_identities) != len(set(row_identities)):
+        raise ValueError("duplicate kernel row identity.")
     return _analyze_bound_machine_performance(
         workload,
         machine,
@@ -2182,9 +2223,11 @@ def _analyze_bound_machine_performance(
         contributions,
         reconciliation,
         (
-            "not portable bounded to workload machine software source metric "
-            "and artifacts",
+            "not portable bounded to workload CUDA machine software source "
+            "metric and artifacts",
         ),
+        tuple(binding.reference for binding in bound_hosts),
+        tuple(binding.reference for binding in bound_kernels),
     )
 
 
@@ -2286,6 +2329,22 @@ class Recommendation:
         ):
             raise ValueError(
                 "recommendation requires a non-portability limitation."
+            )
+        required_limit_terms = (
+            "workload",
+            "CUDA machine",
+            "software",
+            "source",
+            "metric",
+            "artifacts",
+        )
+        limitation_text = " ".join(self.decision.limitations)
+        if not all(
+            term.lower() in limitation_text.lower()
+            for term in required_limit_terms
+        ):
+            raise ValueError(
+                "recommendation requires a complete bounded limitation."
             )
 
 
