@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import hashlib
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -36,8 +38,15 @@ def _executed() -> support.ExecutedEvidence:
         _workloads()[0],
         _machine(),
         _method(),
-        (support.RawDurationSample(1, 10),),
-        (support.NormalizedMetric("profiler_gpu_duration", 10.0, "ns"),),
+        tuple(
+            support.RawDurationSample(replay_count, 10)
+            for replay_count in support.REPLAY_COUNTS
+            for _ in range(_workloads()[0].sample_count)
+        ),
+        (
+            support.NormalizedMetric("profiler_gpu_duration", 10.0, "ns"),
+            support.NormalizedMetric("profiler_gpu_memory", 20.0, "bytes"),
+        ),
         (support.RawReportProvenance("trace.json", 5, "a" * 64),),
     )
 
@@ -59,6 +68,22 @@ def test_default_matrix_preserves_frozen_e8_f6_settings() -> None:
         assert item.seed == 1582
         assert item.duration_seconds == 0.5
         assert item.replay_counts == (1, 10, 100, 1000)
+
+
+def test_host_only_import_does_not_load_warp() -> None:
+    """Test isolated profiling-support import leaves Warp unloaded."""
+    result = subprocess.run(  # noqa: S603
+        [
+            sys.executable,
+            "-c",
+            "import sys; import particula.gpu.tests.profiling_support; "
+            "assert 'warp' not in sys.modules",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
 
 
 def test_artifact_round_trips_to_byte_identical_canonical_json() -> None:
@@ -173,10 +198,55 @@ def test_workloads_and_executed_rows_fail_closed() -> None:
             workload,
             _machine(),
             _method(),
-            (support.RawDurationSample(1, 1),),
+            _executed().raw_samples,
             (metric, metric),
             (support.RawReportProvenance("trace", 1, "a" * 64),),
         )
+
+
+def test_fixed_rows_reject_altered_workloads_and_incomplete_evidence() -> None:
+    """Test workload settings and replay samples remain frozen and complete."""
+    workload = _workloads()[0]
+    with pytest.raises(ValueError):
+        support.ProfilingWorkload(
+            "profiling-any",
+            "small",
+            workload.shape,
+            0.5,
+            workload.processes,
+            workload.communication,
+            workload.diagnostics,
+            workload.warmup,
+            workload.sample_count,
+            workload.seed,
+            workload.duration_seconds,
+            workload.replay_counts,
+        )
+    with pytest.raises(ValueError):
+        support.ExecutedEvidence(
+            "executed",
+            workload,
+            _machine(),
+            _method(),
+            _executed().raw_samples[:-1],
+            _executed().metrics,
+            _executed().raw_reports,
+        )
+    with pytest.raises(ValueError):
+        support.ProfilingArtifact((_executed(),))
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        '{"schema_version":1,"schema_version":1,"artifact":{"evidence":[]}}',
+        '{"schema_version":1,"artifact":{"evidence":[],"evidence":[]}}',
+    ],
+)
+def test_deserialization_rejects_duplicate_json_keys(payload: str) -> None:
+    """Test duplicate JSON object keys fail before schema interpretation."""
+    with pytest.raises(ValueError, match="valid JSON"):
+        support.deserialize_profiling_artifact(payload)
 
 
 def test_raw_provenance_is_contained_streamed_and_reverified(

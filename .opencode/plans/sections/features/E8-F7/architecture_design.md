@@ -39,7 +39,10 @@ E8-F5 fixture + E8-F6 matrix + qualified CUDA device
   workload dimensions, replay mode, machine/software identity, timing method,
   raw samples, kernel metrics, unavailability, bottleneck ranking, and
   recommendation provenance. Durations use integer nanoseconds where possible;
-  percentages are derived, never primary evidence.
+   percentages are derived, never primary evidence.
+  P1 implemented this host-only schema in
+  `particula/gpu/tests/profiling_support.py`, including the closed
+  `executed`/`unavailable` union and canonical workload IDs.
 - **Artifact model:** Keep normalized JSON under `.artifacts/benchmarks` and
   stage uncommitted raw profiler exports only under the gitignored
   `.artifacts/benchmarks/profiling/raw/` subtree. Reference local raw exports by
@@ -48,7 +51,10 @@ E8-F5 fixture + E8-F6 matrix + qualified CUDA device
   summaries cannot provide shared full-report inspection.
 - **API surface:** No package or top-level export. Extend only opt-in pytest
   benchmark/profiling support and documented external commands. `--benchmark`
-  remains the sole collection-affecting switch.
+   remains the sole collection-affecting switch.
+- **P1 boundary:** The delivered support performs no Warp/CUDA import or probe,
+  profiler invocation, process execution, or timing collection. Collection and
+  profiler parsing remain later phases.
 - **Process boundary:** Python test-support orchestration invokes `nsys` and
   `ncu` as optional external executables with explicit argument vectors,
   `shell=False`, bounded timeouts, captured exit status, and bounded stdout and

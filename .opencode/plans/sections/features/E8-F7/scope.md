@@ -9,6 +9,11 @@ follows the explicit assignment and tracks reconciliation as an open question.
 
 ## In Scope
 
+- P1 delivered strict host-only records for the frozen workload matrix,
+  executed/unavailable evidence union, canonical bounded JSON, and safe
+  injected `.artifacts` raw-report provenance in
+  `particula/gpu/tests/profiling_support.py`, with hardware-free tests in
+  `particula/gpu/tests/profiling_support_test.py`.
 - Define small and medium representative resident workloads using fixed boxes,
   particles, species, process order, communication mode, and canonical replay
   counts of `1`, `10`, `100`, and `1000`.
@@ -32,6 +37,9 @@ follows the explicit assignment and tracks reconciliation as an open question.
   workloads, box counts, or particle distributions.
 - Adding a public profiler API, runtime auto-tuner, automatic kernel selection,
   hidden synchronization, CPU fallback, or default-CI benchmark execution.
+- Treating the P1 workload definition or synthetic evidence records as an
+  executed CUDA timing/profile result. P1 neither invokes Warp/CUDA/profilers
+  nor collects timing evidence.
 - Replacing E8-F6 scaling and memory-budget evidence or re-measuring setup and
   graph-capture construction as replay cost.
 - Implementing recommendations whose production changes belong in follow-up

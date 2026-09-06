@@ -69,19 +69,6 @@ def _check_warp_available() -> bool:
         return False
 
 
-WARP_AVAILABLE = _check_warp_available()
-
-from particula.gpu.conversion import (
-    from_warp_environment_data,
-    from_warp_gas_data,
-    from_warp_particle_data,
-    gpu_context,
-    to_per_box_partitioning,
-    to_warp_environment_data,
-    to_warp_gas_data,
-    to_warp_particle_data,
-)
-
 __all__ = [
     "WARP_AVAILABLE",
     "to_warp_particle_data",
@@ -92,20 +79,33 @@ __all__ = [
     "from_warp_environment_data",
     "gpu_context",
     "to_per_box_partitioning",
+    "WarpParticleData",
+    "WarpGasData",
+    "WarpEnvironmentData",
 ]
-
-if WARP_AVAILABLE:
-    __all__.extend(
-        [
-            "WarpParticleData",
-            "WarpGasData",
-            "WarpEnvironmentData",
-        ]
-    )
 
 
 def __getattr__(name: str) -> Any:
-    """Lazily resolve optional Warp-backed container types."""
+    """Lazily resolve optional Warp-backed support and transfer symbols."""
+    if name == "WARP_AVAILABLE":
+        value = _check_warp_available()
+        globals()[name] = value
+        return value
+    conversion_names = {
+        "to_warp_particle_data",
+        "to_warp_gas_data",
+        "to_warp_environment_data",
+        "from_warp_particle_data",
+        "from_warp_gas_data",
+        "from_warp_environment_data",
+        "gpu_context",
+        "to_per_box_partitioning",
+    }
+    if name in conversion_names:
+        conversion = import_module("particula.gpu.conversion")
+        value = getattr(conversion, name)
+        globals()[name] = value
+        return value
     warp_type_names = {
         "WarpParticleData",
         "WarpGasData",
@@ -113,7 +113,7 @@ def __getattr__(name: str) -> Any:
     }
     if name not in warp_type_names:
         raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-    if not WARP_AVAILABLE:
+    if not _check_warp_available():
         raise _warp_unavailable_error() from _WARP_IMPORT_ERROR
 
     warp_types = import_module("particula.gpu.warp_types")

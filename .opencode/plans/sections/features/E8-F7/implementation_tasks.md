@@ -2,17 +2,16 @@
 
 ## Profiling and Analysis Support
 
-- [ ] Add versioned profiling records and strict validators in
+- [x] Add versioned profiling records and strict validators in
   `particula/gpu/tests/profiling_support.py`.
-- [ ] Define deterministic small and medium workloads with fixed box, particle,
+- [x] Define deterministic small and medium workloads with fixed box, particle,
   species, communication, replay-count, warmup, and sample parameters.
-- [ ] Select those workload IDs once from shipped E8-F6 evidence: the smallest
-  launch-sensitive executed row and largest repeatably feasible executed row.
-  Freeze their exact dimensions; later devices must execute them unchanged or
-  record them unavailable.
-- [ ] Reuse the benchmark artifact root and safe filename rules; add checksums
+- [x] Freeze the configured E8-F6 matrix as small `(1, 16, 2)` and medium
+  `(1000, 16, 2)` with canonical IDs. These are not asserted to be executed or
+  feasible; later collection must use them unchanged or record unavailable.
+- [x] Reuse the benchmark artifact-root and safe filename rules; add checksums
   and relative references for raw profiler exports.
-- [ ] Create `.artifacts/benchmarks/profiling/raw/` on demand as the only local
+- [x] Create `.artifacts/benchmarks/profiling/raw/` on demand as the only local
   raw-report staging directory. Enforce canonical containment, reject symlink or
   traversal escape, and keep its narrow `.gitignore` rule from hiding normalized
   evidence elsewhere in `.artifacts/benchmarks`.
@@ -47,8 +46,8 @@
 
 ## Tooling / Tests
 
-- [ ] Add `particula/gpu/tests/profiling_support_test.py` for schema, parser,
-  aggregation, ranking, path safety, and recommendation guardrails.
+- [x] Add `particula/gpu/tests/profiling_support_test.py` for schema, canonical
+  JSON, workload, evidence-union, and raw-provenance path-safety coverage.
 - [ ] Extend `particula/gpu/tests/benchmark_helpers_test.py` with timer-spy tests
   proving warmup/setup exclusion and synchronization boundaries.
 - [ ] Add CUDA-gated opt-in rows to `benchmark_test.py`; retain `benchmark`,

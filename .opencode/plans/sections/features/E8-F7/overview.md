@@ -18,6 +18,17 @@ Raw samples, profiler commands, unavailable rows, and provenance make every
 claim auditable without turning profiling into a runtime feature or a portable
 performance guarantee.
 
+## P1 Delivered
+
+Issue #1589 delivered host-only profiling-evidence support in
+`particula/gpu/tests/profiling_support.py` and hardware-free coverage in
+`particula/gpu/tests/profiling_support_test.py`. The implementation freezes the
+small `(1, 16, 2)` and medium `(1000, 16, 2)` resident workload matrix, its
+executed/unavailable evidence union, bounded canonical JSON, and injected
+`.artifacts` raw-report provenance. It does not import Warp, probe CUDA, start
+a profiler process, add a public export, or claim that timing evidence was
+collected.
+
 ## User Stories
 
 - As a performance engineer, I want host launch and device execution costs

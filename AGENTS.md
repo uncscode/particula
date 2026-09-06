@@ -35,6 +35,9 @@ pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m
 # Focused deterministic GPU mass-precision baseline tests
 pytest particula/gpu/tests/mass_precision_cases_test.py -q
 
+# Host-only resident profiling-evidence schema tests (no profiler or GPU)
+pytest particula/gpu/tests/profiling_support_test.py -q --no-cov
+
 # Opt-in native-CUDA resident benchmark collection (not standard CI)
 pytest particula/gpu/tests/benchmark_test.py --benchmark -k resident -v -s --no-cov
 
@@ -54,6 +57,13 @@ fallback. Its source of record is
 artifact is checked in, so the current resident timing and allocator evidence is
 unavailable and unmeasured; see
 [resident benchmark and memory-budget record](docs/Features/resident_benchmark_memory_budget.md).
+
+`particula/gpu/tests/profiling_support.py` is concrete, host-only test support.
+It freezes the small `(1, 16, 2)` and medium `(1000, 16, 2)` profiling
+workloads and validates bounded evidence/provenance records. It neither imports
+Warp nor probes hardware, runs a profiler, records measurements, or provides a
+public API. Passing its tests confirms schema handling only; it does not change
+the unmeasured resident-evidence status above.
 
 ### Installation
 

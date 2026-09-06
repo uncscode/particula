@@ -7,9 +7,11 @@ assertion thresholds.
 
 ## Per-Phase Approach
 
-- **P1:** Unit tests cover exact types, schema versions, canonical ordering,
-  workload IDs, machine metadata allow-lists, safe paths, checksums, invalid
-  dimensions/units, and explicit unavailable records.
+- **P1 (delivered):** `particula/gpu/tests/profiling_support_test.py` covers
+  strict records, canonical ordering and JSON round-trips, workload IDs,
+  machine metadata allow-lists, safe injected-root paths and streaming
+  checksums, invalid dimensions/units, and explicit unavailable records. These
+  tests are hardware-free and do not import Warp or invoke CUDA/profiler tools.
 - **P2:** Timer and synchronizer spies prove setup/capture/warmup are excluded,
   captured and uncaptured paths use identical fixture identities and step
   counts, each raw sample is retained, and absent CUDA skips without fallback.

@@ -1,13 +1,18 @@
 # Phase Details
 
-- [ ] **E8-F7-P1:** Define profiling artifact schema and representative workload matrix with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Freeze versioned workload, machine, method, raw-sample, metric, and
-    unavailable-row records for small and medium resident cases.
+- [x] **E8-F7-P1:** Define profiling artifact schema and representative workload matrix with unit tests
+  - Issue: #1589 | Size: S | Status: Shipped
+  - Delivered: Host-only versioned workload, machine, method, raw-sample,
+    metric, and executed/unavailable evidence records for the exact small
+    `(1, 16, 2)` and medium `(1000, 16, 2)` matrix. Bounded canonical JSON and
+    safe injected `.artifacts` raw-report provenance are included; no timing or
+    profiler evidence was collected.
   - Files: `particula/gpu/tests/profiling_support.py`,
     `particula/gpu/tests/profiling_support_test.py`
-  - Tests: Exact schema validation, canonical serialization, safe paths,
-    deterministic workload IDs, malformed metrics, and unavailable evidence.
+  - Tests: Hardware-free exact schema validation, canonical serialization, safe
+    paths and changed-report detection, deterministic workload IDs, malformed
+    metrics, and unavailable evidence. No Warp/CUDA/profiler process or public
+    export was added.
 
 - [ ] **E8-F7-P2:** Measure captured and uncaptured host launch costs with unit tests
   - Issue: TBD | Size: S | Status: Not Started
