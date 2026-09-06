@@ -1147,7 +1147,12 @@ def deserialize_profiling_artifact(payload: str) -> ProfilingArtifact:
 
 @dataclass(frozen=True, slots=True)
 class NsightToolQualification:
-    """Store one exact Nsight executable qualification result."""
+    """Store one exact Nsight executable qualification result.
+
+    Attributes:
+        tool: Qualified executable name, either ``"nsys"`` or ``"ncu"``.
+        banner: Exact allow-listed version banner returned by the executable.
+    """
 
     tool: str
     banner: str
@@ -1161,7 +1166,15 @@ class NsightToolQualification:
 
 @dataclass(frozen=True, slots=True)
 class NsightCommandOutcome:
-    """Store a bounded command result without retaining command paths."""
+    """Store a bounded command result without retaining command paths.
+
+    Attributes:
+        tool: Command owner, such as ``"nsys"``, ``"ncu"``, or ``"worker"``.
+        stage: Process stage that produced the result.
+        returncode: Native process return code.
+        stdout: Bounded standard output captured from the process.
+        stderr: Bounded standard error captured from the process.
+    """
 
     tool: str
     stage: str
@@ -1187,7 +1200,12 @@ class NsightCommandOutcome:
 
 @dataclass(frozen=True, slots=True)
 class NsightUnavailable:
-    """Represent unavailable profiling without fabricated metrics."""
+    """Represent unavailable profiling without fabricated metrics.
+
+    Attributes:
+        tool: Tool or worker that could not provide evidence.
+        reason: Bounded explanation for the unavailable result.
+    """
 
     tool: str
     reason: str
@@ -1201,7 +1219,11 @@ class NsightUnavailable:
 
 @dataclass(frozen=True, slots=True)
 class NsightFailed:
-    """Represent one bounded failed process stage."""
+    """Represent one bounded failed process stage.
+
+    Attributes:
+        outcome: Captured command result with a nonzero return code.
+    """
 
     outcome: NsightCommandOutcome
 
@@ -1213,7 +1235,19 @@ class NsightFailed:
 
 @dataclass(frozen=True, slots=True)
 class NsightKernelRow:
-    """Store one strict attributed or unattributed native profiler row."""
+    """Store one strict attributed or unattributed native profiler row.
+
+    Attributes:
+        tool: Profiler that produced the row.
+        kernel_name: Exact native kernel name reported by the profiler.
+        correlation_id: Positive process-to-kernel correlation identifier.
+        metric_name: Allow-listed Compute metric, or ``None`` for Systems rows.
+        value: Normalized duration or metric value.
+        unit: Unit associated with ``value``.
+        invocations: Positive invocation count represented by the row.
+        attribution: Exact mapping status for the resident process.
+        provenance: Contained raw report that supplied the row.
+    """
 
     tool: str
     kernel_name: str
@@ -1250,7 +1284,14 @@ class NsightKernelRow:
 
 @dataclass(frozen=True, slots=True)
 class NsightEvidence:
-    """Store ordered Nsight rows for one exact workload and process."""
+    """Store ordered Nsight rows for one exact workload and process.
+
+    Attributes:
+        qualification: Exact version qualification for the source tool.
+        workload_id: Canonical workload identifier associated with the rows.
+        process: Resident process represented by the evidence.
+        rows: Nonempty bounded profiler rows in source order.
+    """
 
     qualification: NsightToolQualification
     workload_id: str
@@ -1268,7 +1309,19 @@ class NsightEvidence:
 
 
 def _parse_csv(text: str, columns: tuple[str, ...]) -> list[dict[str, str]]:
-    """Parse an exact comma-only CSV schema with bounded rows."""
+    """Parse an exact comma-only CSV schema with bounded rows.
+
+    Args:
+        text: Exported CSV text, including its required final newline.
+        columns: Exact ordered header names required by the export schema.
+
+    Returns:
+        Parsed rows represented as string-valued dictionaries.
+
+    Raises:
+        ValueError: If the export is oversized, malformed, or has the wrong
+            header or row shape.
+    """
     import csv
 
     if len(text.encode()) > MAX_RAW_REPORT_BYTES or not text.endswith("\n"):
@@ -1293,7 +1346,19 @@ def _parse_csv(text: str, columns: tuple[str, ...]) -> list[dict[str, str]]:
 def parse_nsys_timeline_csv(
     text: str, provenance: RawReportProvenance, process_ids: dict[int, str]
 ) -> tuple[NsightKernelRow, ...]:
-    """Parse strict Systems timeline CSV rows with exact ID attribution."""
+    """Parse strict Systems timeline CSV rows with exact ID attribution.
+
+    Args:
+        text: Bounded Systems CSV export.
+        provenance: Contained raw report that produced the export.
+        process_ids: Exact correlation-to-kernel mapping evidence.
+
+    Returns:
+        Parsed duration rows with attributed or unattributed status.
+
+    Raises:
+        ValueError: If the CSV schema or a duration or identifier is invalid.
+    """
     rows = []
     for row in _parse_csv(text, NSYS_COLUMNS):
         correlation = _require_int(
@@ -1326,7 +1391,20 @@ def parse_nsys_timeline_csv(
 def parse_ncu_metrics_csv(
     text: str, provenance: RawReportProvenance, process_ids: dict[int, str]
 ) -> tuple[NsightKernelRow, ...]:
-    """Parse strict Compute CSV rows with exact ID attribution."""
+    """Parse strict Compute CSV rows with exact ID attribution.
+
+    Args:
+        text: Bounded Compute CSV export.
+        provenance: Contained raw report that produced the export.
+        process_ids: Exact correlation-to-kernel mapping evidence.
+
+    Returns:
+        Parsed metric rows with attributed or unattributed status.
+
+    Raises:
+        ValueError: If the CSV schema, metric, unit, or numeric field is
+            invalid.
+    """
     rows = []
     for row in _parse_csv(text, NCU_COLUMNS):
         try:
@@ -1364,7 +1442,17 @@ Runner = Callable[[tuple[str, ...]], subprocess.CompletedProcess[str]]
 
 
 def _bounded_text(value: str | bytes | None) -> str:
-    """Decode and bound process diagnostics before records are constructed."""
+    """Decode and bound process diagnostics before records are constructed.
+
+    Args:
+        value: Text, bytes, or ``None`` returned by a process runner.
+
+    Returns:
+        UTF-8-decoded bounded diagnostic text.
+
+    Raises:
+        ValueError: If the decoded diagnostics exceed the byte limit.
+    """
     if value is None:
         return ""
     text = value.decode(errors="replace") if isinstance(value, bytes) else value
@@ -1376,7 +1464,19 @@ def _bounded_text(value: str | bytes | None) -> str:
 def run_profile_command(
     command: tuple[str, ...],
 ) -> subprocess.CompletedProcess[str]:
-    """Run an internally-created immutable argument tuple without a shell."""
+    """Run an internally-created immutable argument tuple without a shell.
+
+    Args:
+        command: Nonempty tuple of internally constructed process arguments.
+
+    Returns:
+        Completed subprocess result with captured text output.
+
+    Raises:
+        TypeError: If ``command`` is not a nonempty string tuple.
+        FileNotFoundError: If the requested executable is unavailable.
+        subprocess.TimeoutExpired: If the fixed process timeout is exceeded.
+    """
     if (
         not isinstance(command, tuple)
         or not command
@@ -1396,7 +1496,18 @@ def run_profile_command(
 def qualify_nsight_tool(
     tool: str, runner: Runner = run_profile_command
 ) -> NsightToolQualification | NsightUnavailable | NsightFailed:
-    """Probe one allow-listed tool and accept only its exact banner."""
+    """Probe one allow-listed tool and accept only its exact banner.
+
+    Args:
+        tool: Executable name, either ``"nsys"`` or ``"ncu"``.
+        runner: Injectable process runner used for the version probe.
+
+    Returns:
+        Exact qualification, unavailable outcome, or failed outcome.
+
+    Raises:
+        ValueError: If ``tool`` is not allow-listed.
+    """
     if tool not in {"nsys", "ncu"}:
         raise ValueError("tool must be nsys or ncu.")
     command = (tool, "--version")
@@ -1424,7 +1535,18 @@ def qualify_nsight_tool(
 
 
 def _plain_report_path(raw_root: Path, filename: str) -> Path:
-    """Return one plain contained report path before a profiler can run."""
+    """Return one plain contained report path before a profiler can run.
+
+    Args:
+        raw_root: Nonsymlink directory reserved for raw reports.
+        filename: Plain report filename supplied by the collector.
+
+    Returns:
+        Contained report path beneath ``raw_root``.
+
+    Raises:
+        ValueError: If the filename or destination is unsafe or symlinked.
+    """
     filename = _validate_raw_filename(filename)
     path = raw_root / filename
     if path.parent != raw_root or raw_root.is_symlink() or path.is_symlink():
@@ -1435,7 +1557,17 @@ def _plain_report_path(raw_root: Path, filename: str) -> Path:
 def _run_outcome(
     tool: str, stage: str, command: tuple[str, ...], runner: Runner
 ) -> NsightCommandOutcome | NsightUnavailable:
-    """Execute a bounded command and normalize expected process absence."""
+    """Execute a bounded command and normalize expected process absence.
+
+    Args:
+        tool: Logical tool or worker name for the result.
+        stage: Orchestration stage being executed.
+        command: Immutable internally-created process arguments.
+        runner: Injectable process runner.
+
+    Returns:
+        Bounded command outcome or explicit unavailability result.
+    """
     try:
         result = runner(command)
         return NsightCommandOutcome(

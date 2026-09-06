@@ -15,7 +15,14 @@ EXPECTED_ARGUMENTS = (
 
 
 def _arguments_are_valid(arguments: Sequence[str]) -> bool:
-    """Return whether arguments match the one closed workload invocation."""
+    """Return whether arguments match the one closed workload invocation.
+
+    Args:
+        arguments: Command-line arguments excluding the executable name.
+
+    Returns:
+        ``True`` only for the exact small captured-replay invocation.
+    """
     return tuple(arguments) == EXPECTED_ARGUMENTS
 
 
@@ -23,6 +30,13 @@ def run(arguments: Sequence[str]) -> int:
     """Run the closed worker or return a bounded unavailable status.
 
     CUDA imports deliberately occur only after strict argument validation.
+
+    Args:
+        arguments: Command-line arguments excluding the executable name.
+
+    Returns:
+        Zero on successful replay, two for invalid arguments, or three when
+        native CUDA capture is unavailable.
     """
     if not _arguments_are_valid(arguments):
         print("Invalid profiling worker arguments.", file=sys.stderr)
@@ -65,7 +79,11 @@ def run(arguments: Sequence[str]) -> int:
 
 
 def main() -> None:
-    """Exit with the closed worker result."""
+    """Exit with the closed worker result.
+
+    Raises:
+        SystemExit: With the status returned by :func:`run`.
+    """
     raise SystemExit(run(sys.argv[1:]))
 
 
