@@ -869,12 +869,12 @@ def test_cuda_high_water_adapter_uses_only_used_high_attribute_and_caches(
     """Resolve CUDA Runtime once while reading/resetting each exact pool."""
     calls: list[tuple[object, ...]] = []
 
-    def runtime_version(pointer: object) -> int:
+    def runtime_version(pointer: Any) -> int:
         """Provide the version Runtime symbol result."""
         ctypes.cast(pointer, ctypes.POINTER(ctypes.c_int))[0] = 12000
         return 0
 
-    def default_pool(pointer: object, device: int) -> int:
+    def default_pool(pointer: Any, device: int) -> int:
         """Provide the exact selected-device default pool handle."""
         calls.append(("pool", device))
         ctypes.cast(pointer, ctypes.POINTER(ctypes.c_void_p))[0] = (
@@ -882,13 +882,13 @@ def test_cuda_high_water_adapter_uses_only_used_high_attribute_and_caches(
         )
         return 0
 
-    def get_attribute(pool: object, attribute: int, pointer: object) -> int:
+    def get_attribute(pool: Any, attribute: int, pointer: Any) -> int:
         """Record the requested pool attribute and supply a scalar reading."""
         calls.append(("get", pool, attribute))
         ctypes.cast(pointer, ctypes.POINTER(ctypes.c_size_t))[0] = 17
         return 0
 
-    def set_attribute(pool: object, attribute: int, pointer: object) -> int:
+    def set_attribute(pool: Any, attribute: int, pointer: Any) -> int:
         """Require a zero high-water reset on the selected pool."""
         calls.append(("set", pool, attribute))
         assert ctypes.cast(pointer, ctypes.POINTER(ctypes.c_size_t))[0] == 0

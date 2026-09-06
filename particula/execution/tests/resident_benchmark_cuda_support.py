@@ -201,6 +201,7 @@ def _build_memory_monitor(
     adapter_factory: Any = CudaDefaultPoolHighWater,
 ) -> CudaFixtureMemoryMonitor:
     """Build an uncached per-fixture monitor with a bounded Warp sentinel."""
+    reason: str | None
     try:
         ordinal = _cuda_device_ordinal(native)
     except ValueError as error:

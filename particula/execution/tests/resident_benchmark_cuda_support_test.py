@@ -39,9 +39,24 @@ def test_memory_monitor_records_only_case_scoped_scalar_snapshots() -> None:
     """Require sentinel coverage before emitting valid high-water evidence."""
     calls: list[str] = []
     readings = iter((0, 8, 2, 12, 3))
+
+    def record_reset(device: Any) -> None:
+        calls.append(f"reset:{device}")
+
+    def record_read(device: Any) -> int:
+        calls.append(f"read:{device}")
+        return next(readings)
+
+    def record_sync() -> None:
+        calls.append("sync")
+
+    def allocate_sentinel() -> object:
+        calls.append("sentinel")
+        return object()
+
     adapter = SimpleNamespace(
-        reset=lambda device: calls.append(f"reset:{device}"),
-        read=lambda device: (calls.append(f"read:{device}"), next(readings))[1],
+        reset=record_reset,
+        read=record_read,
         metadata={"runtime_version": 12000},
     )
     monitor = CudaFixtureMemoryMonitor(
@@ -49,8 +64,8 @@ def test_memory_monitor_records_only_case_scoped_scalar_snapshots() -> None:
         "cuda:7",
         7,
         adapter,
-        lambda: calls.append("sync"),
-        lambda: calls.append("sentinel") or object(),
+        record_sync,
+        allocate_sentinel,
     )
     monitor.begin()
     monitor.snapshot_peak()

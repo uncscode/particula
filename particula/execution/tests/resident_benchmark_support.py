@@ -212,11 +212,14 @@ def build_resident_memory_comparison(
         return observation
     from dataclasses import replace
 
+    observed_delta_bytes = observation.observed_delta_bytes
+    if observed_delta_bytes is None:
+        raise ValueError("available observation requires an observed delta.")
     return replace(
         observation,
         analytical_steady_state_bytes=model.steady_state_bytes,
         signed_difference_bytes=(
-            observation.observed_delta_bytes - model.steady_state_bytes
+            observed_delta_bytes - model.steady_state_bytes
         ),
     )
 
@@ -236,7 +239,10 @@ class CudaDefaultPoolHighWater:
 
     def _functions(self) -> tuple[Any, Any, Any, Any, int]:
         if type(self)._resolved is not None:
-            return type(self)._resolved
+            resolved = type(self)._resolved
+            if resolved is None:
+                raise RuntimeError("CUDA Runtime functions were not resolved.")
+            return resolved
         library = self._loader("libcudart.so")
         version, default_pool = (
             library.cudaRuntimeGetVersion,
