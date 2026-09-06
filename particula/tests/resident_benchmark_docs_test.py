@@ -286,7 +286,7 @@ def test_module_imports_are_stdlib_only() -> None:
     """Keep this hardware-free documentation contract test dependency-free."""
     tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
 
-    imported_modules = set()
+    imported_modules: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             imported_modules.update(
