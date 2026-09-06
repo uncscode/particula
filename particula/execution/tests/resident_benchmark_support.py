@@ -201,7 +201,21 @@ RESIDENT_MEMORY_COMMUNICATIONS = ("none", "gas", "particles")
 
 
 def _require_memory_bytes(value: object, name: str) -> int:
-    """Validate a bounded nonnegative analytical byte count."""
+    """Validate a nonnegative logical byte count within the model ceiling.
+
+    Args:
+        value: Candidate byte count. Booleans and negative integers are
+            rejected rather than coerced.
+        name: Field name used in validation errors.
+
+    Returns:
+        The validated byte count in bytes.
+
+    Raises:
+        TypeError: If ``value`` is not a non-boolean integer.
+        ValueError: If ``value`` is negative or exceeds the signed 64-bit
+            analytical limit.
+    """
     value = _require_int(value, name)
     if value > MAX_RESIDENT_MEMORY_BYTES:
         raise ValueError(f"{name} exceeds MAX_RESIDENT_MEMORY_BYTES.")
@@ -258,7 +272,22 @@ def _checked_add(left: int, right: int) -> int:
 
 @dataclass(frozen=True, slots=True)
 class ResidentMemoryCategory:
-    """Name one analytical memory category in bytes and its scenario role."""
+    """Describe one logical memory category and its accounting role.
+
+    All byte counts represent logical storage in bytes, not allocator-reserved
+    memory. Categories are retained in construction order by
+    :class:`ResidentMemoryModel`; checkpoint and tape categories are always
+    excluded from steady-state device totals.
+
+    Attributes:
+        name: Unique category name, such as ``primary.gas.concentration``.
+        byte_count: Bounded logical byte count.
+        provenance: Source classification: analytical, registry logical, or
+            projected.
+        included_in_steady_state: Whether the category contributes to the
+            steady-state total.
+        scenario: Accounting scenario: steady state, checkpoint, or tape.
+    """
 
     name: str
     byte_count: int
@@ -289,10 +318,22 @@ class ResidentMemoryCategory:
 
 @dataclass(frozen=True, slots=True)
 class ResidentMemoryModel:
-    """Store validated resident, checkpoint, and tape byte scenarios.
+    """Store reconciled resident-memory scenarios.
 
-    Totals are logical bytes; allocator reservations and unknown Epic I overhead
-    are excluded.
+    Totals are logical bytes. The inactive-capacity attribution is visible but
+    non-additive because it is a subset of primary particle storage. Allocator
+    reservations, autodiff tape overhead, and unknown Epic I overhead are not
+    inferred; tape bytes are added only by explicit projection.
+
+    Attributes:
+        categories: Ordered, unique category records used for reconciliation.
+        excluded_epic_i_overhead: Fixed label documenting excluded unknown
+            overhead.
+        steady_state_bytes: Sum of included steady-state categories in bytes.
+        checkpoint_bytes: Sum of checkpoint-scenario categories in bytes.
+        tape_bytes: Sum of tape-scenario categories in bytes.
+        inactive_particle_capacity_bytes: Non-additive inactive-slot
+            attribution in bytes.
     """
 
     categories: tuple[ResidentMemoryCategory, ...]
@@ -420,9 +461,35 @@ def build_resident_memory_model(
 ) -> ResidentMemoryModel:
     """Build host-only resident logical-memory accounting scenarios.
 
-    Primary and diagnostic storage are logical device bytes. Checkpoint values
-    are separate host-copy scenarios; allocator reservations and tape storage
-    are excluded until an explicit projection is attached.
+    The primary categories follow the fixed resident particle, gas, and
+    environment schemas. Diagnostic values count only caller-owned outputs;
+    the registry value is accepted as one already-aggregated logical report.
+    Checkpoint values are separate host-copy scenarios. Allocator reservations
+    and tape storage are excluded until an explicit projection is attached.
+
+    Args:
+        n_boxes: Number of resident boxes.
+        n_particles: Fixed particle capacity per box.
+        n_species: Number of species per box.
+        active_slots_per_box: Active particle slots attributed in each box.
+        registry_logical_byte_count: Validated logical bytes from the resource
+            registry report.
+        diagnostics: Ordered tuple of selected diagnostic operation names.
+        communication: Selected communication family: ``none``, ``gas``, or
+            ``particles``.
+        checkpoint_sidecar_copy_bytes: Host bytes copied for checkpoint
+            sidecars.
+        checkpoint_inspection_copy_bytes: Host bytes copied for inspection
+            carriers.
+
+    Returns:
+        A validated immutable model with reconciled scenario totals.
+
+    Raises:
+        TypeError: If a dimension, byte value, selection, or container has an
+            unsupported type.
+        ValueError: If a value is negative, oversized, out of range, or not in
+            canonical diagnostic order.
     """
     boxes = _require_memory_bytes(n_boxes, "n_boxes")
     particles = _require_memory_bytes(n_particles, "n_particles")
@@ -566,7 +633,24 @@ def build_resident_memory_model(
 def project_full_retention_tape_bytes(
     timesteps: object, state_bytes: object
 ) -> int:
-    """Return checked full-retention tape bytes for timesteps and state bytes."""
+    """Calculate checked tape bytes when every state is retained.
+
+    The projection is ``timesteps × state_bytes`` and is measured in bytes.
+    Zero timesteps or zero state bytes produce zero without fixed-width
+    arithmetic.
+
+    Args:
+        timesteps: Number of retained simulation timesteps.
+        state_bytes: Logical bytes in one retained state.
+
+    Returns:
+        Bounded projected tape storage in bytes.
+
+    Raises:
+        TypeError: If either argument is not a non-boolean integer.
+        ValueError: If an argument is negative or the product exceeds the
+            analytical memory limit.
+    """
     steps = _require_memory_bytes(timesteps, "timesteps")
     state = _require_memory_bytes(state_bytes, "state_bytes")
     return 0 if state == 0 else checked_dense_array_bytes((steps,), state)
@@ -578,7 +662,26 @@ def project_checkpointed_tape_bytes(
     checkpoint_bytes: object,
     interval: object,
 ) -> int:
-    """Return checked checkpointed-tape bytes using ceiling checkpoint count."""
+    """Calculate checked tape bytes for periodic checkpoint retention.
+
+    The projection is ``ceil(timesteps / interval) × checkpoint_bytes`` plus
+    ``interval × state_bytes``. All quantities are logical bytes or counts;
+    arithmetic is checked against the analytical memory limit.
+
+    Args:
+        timesteps: Number of simulation timesteps.
+        state_bytes: Logical bytes in one retained state.
+        checkpoint_bytes: Logical bytes in one checkpoint.
+        interval: Positive checkpoint interval in timesteps.
+
+    Returns:
+        Bounded projected tape storage in bytes.
+
+    Raises:
+        TypeError: If an argument is not a non-boolean integer.
+        ValueError: If a count is negative, ``interval`` is not positive, or
+            the projected total exceeds the analytical memory limit.
+    """
     steps = _require_memory_bytes(timesteps, "timesteps")
     state = _require_memory_bytes(state_bytes, "state_bytes")
     checkpoint = _require_memory_bytes(checkpoint_bytes, "checkpoint_bytes")
@@ -599,7 +702,25 @@ def project_checkpointed_tape_bytes(
 def with_tape_projection(
     model: object, tape_bytes: object
 ) -> ResidentMemoryModel:
-    """Return a new model with one projected tape scenario in logical bytes."""
+    """Return a fresh model with one excluded projected tape category.
+
+    The original model and its ordered categories are left unchanged. The
+    projected category contributes only to ``tape_bytes`` and does not alter
+    steady-state or checkpoint totals.
+
+    Args:
+        model: Validated resident-memory model without a tape category.
+        tape_bytes: Projected tape storage in bytes.
+
+    Returns:
+        A new immutable model containing ``tape.projected``.
+
+    Raises:
+        TypeError: If ``model`` is not a :class:`ResidentMemoryModel` or the
+            byte count is not a non-boolean integer.
+        ValueError: If a tape category already exists or the byte count is
+            negative or exceeds the analytical memory limit.
+    """
     if not isinstance(model, ResidentMemoryModel):
         raise TypeError("model must be a ResidentMemoryModel.")
     if any(item.scenario == "tape" for item in model.categories):
