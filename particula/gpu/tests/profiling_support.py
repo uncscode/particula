@@ -480,7 +480,20 @@ def _validate_executed_sequences(  # noqa: C901
     method: MeasurementMethod,
     workload: ProfilingWorkload,
 ) -> None:
-    """Validate bounded executed evidence sequences and their identities."""
+    """Validate the complete sample, metric, and report sequences.
+
+    Args:
+        raw_samples: Ordered duration samples for every replay count.
+        metrics: Ordered absolute metrics required by the measurement method.
+        raw_reports: Unique raw-report provenance records.
+        method: Measurement method that determines the metric sequence.
+        workload: Workload that determines the required sample count.
+
+    Raises:
+        TypeError: If a sequence or sequence item has the wrong type.
+        ValueError: If a sequence is empty, duplicated, incomplete, or
+            inconsistent with the workload or method.
+    """
     if (
         not isinstance(raw_samples, tuple)
         or not isinstance(metrics, tuple)
@@ -816,7 +829,17 @@ def _scan_json_character(
     quoted: bool,
     escaped: bool,
 ) -> tuple[int, bool, bool]:
-    """Advance JSON string and bracket state for one character."""
+    """Advance JSON quoting and bracket state for one character.
+
+    Args:
+        character: JSON character to inspect.
+        depth: Current unmatched opening-bracket depth.
+        quoted: Whether the scanner is inside a JSON string.
+        escaped: Whether the previous string character was a backslash.
+
+    Returns:
+        Updated ``(depth, quoted, escaped)`` scanner state.
+    """
     if quoted:
         if escaped:
             return depth, quoted, False
@@ -835,7 +858,15 @@ def _scan_json_character(
 
 
 def _validate_json_nesting(payload: str) -> None:
-    """Make one predecode scan that bounds JSON bracket nesting."""
+    """Make one predecode scan that bounds JSON bracket nesting.
+
+    Args:
+        payload: JSON text to scan before decoding.
+
+    Raises:
+        ValueError: If the payload exceeds the depth bound or has unbalanced
+            brackets or quotes.
+    """
     depth = 0
     quoted = False
     escaped = False
@@ -855,7 +886,14 @@ def _validate_json_nesting(payload: str) -> None:
 
 
 def _validate_structure(value: object) -> None:
-    """Bound decoded container sizes with one iterative walk."""
+    """Bound decoded container sizes with one iterative walk.
+
+    Args:
+        value: Decoded JSON value whose nested mappings and lists are checked.
+
+    Raises:
+        ValueError: If a nested container or value depth exceeds its bound.
+    """
     pending = [(value, 0)]
     while pending:
         current, depth = pending.pop()
@@ -874,7 +912,17 @@ def _validate_structure(value: object) -> None:
 def _reject_duplicate_object_keys(
     pairs: list[tuple[str, object]],
 ) -> dict[str, object]:
-    """Build a JSON object while rejecting duplicate keys at every depth."""
+    """Build a JSON object while rejecting duplicate keys at every depth.
+
+    Args:
+        pairs: Object key-value pairs supplied by ``json.loads``.
+
+    Returns:
+        A dictionary containing the unique object members.
+
+    Raises:
+        ValueError: If an object contains a duplicate key.
+    """
     result: dict[str, object] = {}
     for key, value in pairs:
         if key in result:
@@ -884,7 +932,17 @@ def _reject_duplicate_object_keys(
 
 
 def _workload_from_json(value: object) -> ProfilingWorkload:
-    """Reconstruct one workload with its exact schema."""
+    """Reconstruct one workload with its exact schema.
+
+    Args:
+        value: Decoded workload mapping from an artifact payload.
+
+    Returns:
+        A validated profiling workload.
+
+    Raises:
+        ValueError: If the mapping has unexpected fields or invalid values.
+    """
     raw = _require_exact_keys(
         value, set(ProfilingWorkload.__dataclass_fields__), "workload"
     )
