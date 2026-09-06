@@ -1,11 +1,11 @@
 """Provide concrete host-only support for resident benchmark evidence.
 
 This test-support module defines the bounded artifact schema used by resident
-benchmark tests. It validates immutable host records, produces deterministic
-JSON, and atomically writes generic JSON below an explicit ``.artifacts``
-root. It neither imports nor probes Warp or CUDA, allocates device resources,
-changes resident execution, adds package exports, nor supplies a user-facing
-API.
+benchmark tests and an analytical resident-memory accounting model. It
+validates immutable host records, produces deterministic JSON, and atomically
+writes generic JSON below an explicit ``.artifacts`` root. It neither imports
+nor probes Warp or CUDA, allocates device resources, changes resident
+execution, adds package exports, nor supplies a user-facing API.
 """
 
 # ruff: noqa: C901, E501
