@@ -44,6 +44,10 @@ class ResidentCaptureBenchmarkBinding:
         enqueue_operation: Prepared uncaptured operation callback.
         replay_operation: Captured replay operation callback.
         capture_set: Published capture-resource set retained by identity.
+        prepared_signature_digest: Digest of the retained prepared signature.
+        selected_device: Qualified CUDA device metadata for provenance.
+        reset_fixture: Callback that restores state without replacing objects.
+        memory_monitor: Optional fixture-scoped CUDA memory monitor.
     """
 
     loop: Any
@@ -119,19 +123,37 @@ class ResidentCaptureBenchmarkBinding:
             raise ValueError("resident benchmark binding identity drifted.")
 
     def reset(self) -> None:
-        """Restore the qualified fixture outside a benchmark timing interval."""
+        """Restore the qualified fixture outside a timing interval.
+
+        The callback restores mutable resident payloads and validates that the
+        qualified binding identities remain unchanged.
+        """
         self.reset_fixture()
 
 
 def _is_device_array(value: Any) -> bool:
-    """Return whether ``value`` has the minimum Warp-array metadata."""
+    """Check whether a value has the minimum Warp-array metadata.
+
+    Args:
+        value: Object to inspect for array-like device attributes.
+
+    Returns:
+        ``True`` when the object exposes shape, dtype, and device attributes.
+    """
     return all(
         hasattr(value, attribute) for attribute in ("shape", "dtype", "device")
     )
 
 
 def _nested_values(value: Any) -> tuple[Any, ...]:
-    """Return direct nested values without invoking arbitrary properties."""
+    """Extract direct nested values without invoking arbitrary properties.
+
+    Args:
+        value: Container or object whose direct values should be traversed.
+
+    Returns:
+        Tuple of directly stored child values, or an empty tuple for leaves.
+    """
     if isinstance(value, dict):
         return tuple(value.values())
     if isinstance(value, (tuple, list)):
@@ -148,7 +170,14 @@ def _nested_values(value: Any) -> tuple[Any, ...]:
 
 
 def _mutable_resident_arrays(loop: Any) -> tuple[Any, ...]:
-    """Return mutable primaries and acquired sidecars without duplicates."""
+    """Collect mutable primaries and sidecars without duplicate identities.
+
+    Args:
+        loop: Prepared resident loop whose retained state is traversed.
+
+    Returns:
+        Tuple of unique device-array objects reachable from the loop state.
+    """
     arrays: list[Any] = []
     pending = [
         getattr(loop, "request", None),
@@ -180,7 +209,17 @@ def _build_fixture_reset(
     loop: Any,
     validate_identities: Callable[[], None] | None = None,
 ) -> Callable[[], None]:
-    """Return a reset callback that preserves mutable-state identities."""
+    """Build a reset callback that preserves mutable-state identities.
+
+    Args:
+        wp: Warp module used for device allocation, copying, and
+            synchronization.
+        loop: Prepared resident loop whose mutable arrays are snapshotted.
+        validate_identities: Optional callback to run after each restoration.
+
+    Returns:
+        Callback that restores all snapshotted arrays in place.
+    """
     arrays = _mutable_resident_arrays(loop)
     snapshots = tuple(
         wp.zeros(array.shape, dtype=array.dtype, device=array.device)
@@ -326,7 +365,17 @@ class CudaFixtureMemoryMonitor:
 
 
 def _cuda_device_ordinal(native: object) -> int:
-    """Return the exact CUDA ordinal accepted by the CUDA Runtime adapter."""
+    """Extract the exact CUDA ordinal accepted by the runtime adapter.
+
+    Args:
+        native: Opaque native device value expected in ``cuda:<ordinal>`` form.
+
+    Returns:
+        Integer CUDA runtime ordinal.
+
+    Raises:
+        ValueError: If ``native`` is not an exact CUDA ordinal string.
+    """
     value = str(native)
     if not value.startswith("cuda:") or not value[5:].isdigit():
         raise ValueError("selected native device is not an exact CUDA ordinal.")
@@ -373,7 +422,14 @@ def _build_memory_monitor(
 
 
 def _prepared_signature_digest(loop: Any) -> str:
-    """Return a stable digest for the actual retained prepared signature."""
+    """Compute a stable digest for the retained prepared signature.
+
+    Args:
+        loop: Prepared resident loop containing the signature to identify.
+
+    Returns:
+        Hexadecimal SHA-256 digest of signature identity metadata.
+    """
     signature = loop.prepared.signature
     device = signature.device
     dimensions = signature.dimensions
@@ -393,7 +449,15 @@ def _prepared_signature_digest(loop: Any) -> str:
 
 
 def _selected_device_metadata(wp: Any, native: object) -> dict[str, Any]:
-    """Return identity and memory for the selected native CUDA device."""
+    """Collect identity and memory metadata for the selected CUDA device.
+
+    Args:
+        wp: Warp module used to resolve the selected device.
+        native: Opaque native device identifier.
+
+    Returns:
+        JSON-compatible device identity and total-memory metadata.
+    """
     selected = wp.get_device(native)
     total_memory = getattr(selected, "total_memory", None)
     if (
@@ -414,12 +478,23 @@ def _selected_device_metadata(wp: Any, native: object) -> dict[str, Any]:
 def resident_benchmark_provenance(
     binding: ResidentCaptureBenchmarkBinding,
 ) -> tuple[str, dict[str, Any]]:
-    """Return fixture-authoritative signature and device provenance."""
+    """Return fixture-authoritative signature and device provenance.
+
+    Args:
+        binding: Qualified benchmark binding to describe.
+
+    Returns:
+        The retained prepared-signature digest and selected-device metadata.
+    """
     return binding.prepared_signature_digest, binding.selected_device
 
 
 def cuda_capture_availability() -> ResidentBenchmarkAvailability:
-    """Probe P2's CUDA/capture gate and normalize only its absence result."""
+    """Probe the CUDA/capture gate and normalize only absence results.
+
+    Returns:
+        Structured availability metadata for native CUDA capture.
+    """
     import pytest
 
     from particula.execution.tests.captured_full_loop_test import (
@@ -434,7 +509,19 @@ def cuda_capture_availability() -> ResidentBenchmarkAvailability:
 
 
 def _require_positive_dimension(value: object, name: str) -> int:
-    """Validate a preconstruction non-boolean positive dimension."""
+    """Validate and return a non-boolean positive dimension.
+
+    Args:
+        value: Candidate dimension value.
+        name: Dimension name used in validation errors.
+
+    Returns:
+        Validated positive integer dimension.
+
+    Raises:
+        TypeError: If ``value`` is not an integer or is boolean.
+        ValueError: If ``value`` is not positive.
+    """
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be a non-bool integer.")
     if value <= 0:
@@ -443,7 +530,18 @@ def _require_positive_dimension(value: object, name: str) -> int:
 
 
 def _require_positive_duration(value: object) -> float:
-    """Validate a finite, non-boolean positive physical duration."""
+    """Validate and return a finite, non-boolean positive duration.
+
+    Args:
+        value: Candidate duration in seconds.
+
+    Returns:
+        Validated duration in seconds as a float.
+
+    Raises:
+        TypeError: If ``value`` is not a real number or is boolean.
+        ValueError: If the duration is non-finite or not positive.
+    """
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError("duration must be a non-bool real number.")
     duration = float(value)
@@ -455,7 +553,17 @@ def _require_positive_duration(value: object) -> float:
 def _close_loop_preserving_error(
     close_loop: Callable[[Any], None], loop: Any, error: BaseException | None
 ) -> None:
-    """Close a loop without allowing teardown to mask a primary failure."""
+    """Close a loop while preserving any initiating failure.
+
+    Args:
+        close_loop: Teardown callback for the prepared loop.
+        loop: Loop instance to close.
+        error: Original failure, if teardown follows an unsuccessful operation.
+
+    Raises:
+        BaseException: The initiating error, or the cleanup error when no
+            initiating error exists.
+    """
     if error is None:
         close_loop(loop)
         return
