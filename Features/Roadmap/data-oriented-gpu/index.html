@@ -12539,6 +12539,8 @@
       
         
       
+        
+      
     
     
     
@@ -12827,6 +12829,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../resident_benchmark_memory_budget/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resident benchmark and memory-budget record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../slot_exhaustion_policies/" class="md-nav__link">
         
   
@@ -12919,7 +12949,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -12941,14 +12971,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_12" id="__nav_4_12_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_13" id="__nav_4_13_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13697,6 +13727,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#e8-f6-p6-resident-benchmark-and-memory-budget-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F6-P6 resident benchmark and memory-budget evidence
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -13840,7 +13881,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -13862,14 +13903,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_13" id="__nav_4_13_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_14" id="__nav_4_14_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17177,6 +17218,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#e8-f6-p6-resident-benchmark-and-memory-budget-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8-F6-P6 resident benchmark and memory-budget evidence
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -19890,6 +19942,27 @@ decision.</p>
   as the current decision record for the shipped one-thread-per-box design,
   not as a final acceptance decision on the long-term scaling strategy.</li>
 </ul>
+<h4 id="e8-f6-p6-resident-benchmark-and-memory-budget-evidence">E8-F6-P6 resident benchmark and memory-budget evidence<a class="headerlink" href="#e8-f6-p6-resident-benchmark-and-memory-budget-evidence" title="Permanent link">&para;</a></h4>
+<p>The resident source of record is the machine-generated schema-v3 artifact
+<code>.artifacts/benchmarks/resident_capture_comparison.json</code>; see the
+<a href="../../resident_benchmark_memory_budget/">resident benchmark and memory-budget record</a>.
+That artifact is absent in this revision. The adjacent legacy
+<code>.artifacts/benchmarks/gpu_benchmark_results.json</code> contains coagulation-only
+rows and is not resident evidence.</p>
+<p>Collect resident evidence only with:</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/tests/benchmark_test.py<span class="w"> </span>--benchmark<span class="w"> </span>-k<span class="w"> </span>resident<span class="w"> </span>-v<span class="w"> </span>-s<span class="w"> </span>--no-cov
+</code></pre></div>
+<p>This opt-in command is CUDA/native-capture-only, with no CPU or Warp-CPU
+fallback. Its fixed matrix uses 1, 10, 100, and 1000 boxes with <code>(B, 16, 2)</code>
+shape, 100% activity, gas communication, gas/saturation diagnostics, seed
+1582, two warmups, and three measured timesteps. The configured planning
+inputs are a 2 GiB budget and request estimates of 64 MiB, 256 MiB, 1 GiB,
+and 4 GiB for 1, 10, 100, and 1000 boxes, respectively. These are planning
+inputs, not measured allocator consumption.</p>
+<p>Every resident row is currently unavailable because no reviewed schema-v3
+resident artifact is checked in: it is not measured and is not zero. This
+revision does not claim an artifact-recorded status, including
+<code>skipped_budget</code>.</p>
 <h2 id="epic-i-differentiability-and-global-optimization">Epic I: Differentiability and Global Optimization<a class="headerlink" href="#epic-i-differentiability-and-global-optimization" title="Permanent link">&para;</a></h2>
 <p>A longer-term goal is gradient-based global optimization: using Warp automatic
 differentiation to fit model parameters to experiments or observations.
