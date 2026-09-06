@@ -59,6 +59,25 @@ class ResidentCaptureBenchmarkBinding:
     selected_device: dict[str, Any]
     reset_fixture: Callable[[], None] = lambda: None
     memory_monitor: Any = None
+    _identity_snapshot: tuple[int, ...] = ()
+
+    def __post_init__(self) -> None:
+        """Capture every qualified object and mutable-array identity."""
+        arrays = _mutable_resident_arrays(self.loop)
+        object.__setattr__(
+            self,
+            "_identity_snapshot",
+            (
+                id(self.loop),
+                id(self.captured),
+                id(self.capture_set),
+                id(getattr(self.loop, "request", None)),
+                id(getattr(self.loop, "session", None)),
+                id(getattr(self.loop, "registry", None)),
+                id(getattr(self.loop, "guard", None)),
+                *(id(array) for array in arrays),
+            ),
+        )
 
     def enqueue(self) -> None:
         """Enqueue one prepared uncaptured timestep without synchronization."""
@@ -77,6 +96,17 @@ class ResidentCaptureBenchmarkBinding:
                 during qualification.
         """
         binding = self.loop.binding
+        arrays = _mutable_resident_arrays(self.loop)
+        current_snapshot = (
+            id(self.loop),
+            id(self.captured),
+            id(self.capture_set),
+            id(getattr(self.loop, "request", None)),
+            id(getattr(self.loop, "session", None)),
+            id(getattr(self.loop, "registry", None)),
+            id(getattr(self.loop, "guard", None)),
+            *(id(array) for array in arrays),
+        )
         if (
             binding.request is not self.loop.request
             or binding.session is not self.loop.session
@@ -84,6 +114,7 @@ class ResidentCaptureBenchmarkBinding:
             or binding.guard is not self.loop.guard
             or self.loop.request.capture_resource_requirements is None
             or self.capture_set is None
+            or current_snapshot != self._identity_snapshot
         ):
             raise ValueError("resident benchmark binding identity drifted.")
 

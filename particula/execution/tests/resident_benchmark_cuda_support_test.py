@@ -314,6 +314,45 @@ def test_binding_identity_gate_rejects_drift_before_timing_callbacks() -> None:
     assert calls == []
 
 
+def test_binding_identity_gate_rejects_primary_array_replacement() -> None:
+    """Reject replacement of a resident array even when graph metadata agrees."""
+    primary = SimpleNamespace(shape=(1,), dtype="float64", device="cuda:0")
+    loop = SimpleNamespace(
+        binding=None,
+        request=SimpleNamespace(
+            capture_resource_requirements=object(), primary=primary
+        ),
+        session=object(),
+        registry=object(),
+        guard=object(),
+    )
+    loop.binding = SimpleNamespace(
+        request=loop.request,
+        session=loop.session,
+        registry=loop.registry,
+        guard=loop.guard,
+    )
+    binding = ResidentCaptureBenchmarkBinding(
+        loop=loop,
+        captured=object(),
+        duration=0.5,
+        setup_elapsed_seconds=0.0,
+        capture_elapsed_seconds=0.0,
+        synchronize=lambda: None,
+        enqueue_operation=lambda: None,
+        replay_operation=lambda: None,
+        capture_set=object(),
+        prepared_signature_digest="signature",
+        selected_device={"status": "available", "identity": "cuda:0"},
+    )
+    loop.request.primary = SimpleNamespace(
+        shape=(1,), dtype="float64", device="cuda:0"
+    )
+
+    with pytest.raises(ValueError, match="identity drifted"):
+        binding.validate_identities()
+
+
 def test_cleanup_runs_in_release_then_close_order_after_setup_failure() -> None:
     """Clean up acquired capture resources after a setup failure."""
     calls: list[str] = []
