@@ -38,41 +38,6 @@ permission:
   websearch: deny
   codesearch: deny
   bash: deny
-agent_contract_version: e37-m3-p5-v1
-declared_scope:
-  roots: [docs, .opencode/plans, .opencode/agent]
-  file_kinds: [.md, .json]
-subagent_type_allowlist: [docstring, docs, plan-update-full, examples, adw-docs-notebook, architecture, theory, features, docs-validator, adw-commit]
-task_routes:
-  - child: docstring
-    required_handoff_fields: [adw_id, changed_targets, worktree_path]
-  - child: docs
-    required_handoff_fields: [adw_id, changed_targets, worktree_path]
-  - child: plan-update-full
-    required_handoff_fields: [adw_id, target_id, worktree_path]
-  - child: examples
-    required_handoff_fields: [adw_id, changed_targets, worktree_path]
-  - child: adw-docs-notebook
-    required_handoff_fields: [adw_id, changed_targets, worktree_path]
-  - child: architecture
-    required_handoff_fields: [adw_id, changed_targets, worktree_path]
-  - child: theory
-    required_handoff_fields: [adw_id, changed_targets, worktree_path]
-  - child: features
-    required_handoff_fields: [adw_id, changed_targets, worktree_path]
-  - child: docs-validator
-    required_handoff_fields: [adw_id, changed_targets, worktree_path]
-  - child: adw-commit
-    required_handoff_fields: [adw_id, changed_targets, worktree_path]
-completion_contract:
-  id: e37-m3-p5-v1
-  role: consumer
-  allowed_owners: [docs, plan-update-full, docs-validator]
-  reject_invalid_success: true
-  required_fields: [outcome, status, owner, target_id, adw_id, worktree_path, summary, evidence]
-  failure_fields: [failure_reason, rerun_guidance]
-  statuses: [success, failed, blocked]
-  nonempty_success_fields: [evidence]
 ---
 
 
@@ -129,13 +94,6 @@ to use `build_mkdocs_validate` (validation-only path).
 | **linter** | Code quality validation | Python files |
 
 **Safety:** Use atomic wrappers for git interactions. This orchestrator should use `git_diff` for read-only inspection and delegate all commit/push behavior to `adw-commit`.
-
-## Static P5 Handoff Metadata
-
-The versioned frontmatter declarations are closed static validation metadata for
-scope, routes, required handoff fields, and completion-envelope shape. They
-grant no runtime authority, do not parse or admit live child results, and only
-describe the static handoff contract.
 
 # Execution Steps
 
@@ -261,7 +219,7 @@ task({
   "description": "Update Python docstrings",
   "prompt": f"""Update docstrings for changed Python files.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={list_of_changed_py_files} worktree_path={worktree_path}
 
 Changed files:
 {list_of_changed_py_files}
@@ -283,7 +241,7 @@ task({
   "description": "Update general documentation",
   "prompt": f"""Update documentation to reflect implementation changes.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Changes made:
 {summary_of_implementation}
@@ -305,7 +263,7 @@ task({
   "description": "Update plan sections",
   "prompt": f"""Update plan section content for implementation changes.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} target_id={target_id} worktree_path={worktree_path}
 
 Context: {summary_of_implementation}
 """,
@@ -324,7 +282,7 @@ task({
   "description": "Create examples for feature",
   "prompt": f"""Create practical examples.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Feature: {feature_name}
 Usage: {how_users_interact}
@@ -358,7 +316,7 @@ task({
   "description": "Create tutorial notebook",
   "prompt": f"""Create tutorial notebook.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Task: create
 Notebook: docs/Examples/feature-tutorial.ipynb
@@ -372,7 +330,7 @@ task({
   "description": "Edit notebook",
   "prompt": f"""Edit notebook.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Task: edit
 Notebook: docs/Examples/setup.ipynb
@@ -386,7 +344,7 @@ task({
   "description": "Validate notebooks",
   "prompt": f"""Validate notebooks.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Task: batch-validate
 Notebook: docs/Examples/
@@ -400,7 +358,7 @@ task({
   "description": "Execute notebook",
   "prompt": f"""Execute notebook.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Task: execute
 Notebook: docs/Examples/tutorial.ipynb
@@ -414,7 +372,7 @@ task({
   "description": "Fix corrupted notebook",
   "prompt": f"""Fix corrupted notebook.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Task: fix
 Notebook: docs/Examples/broken.ipynb
@@ -442,7 +400,7 @@ task({
   "description": "Update architecture documentation",
   "prompt": f"""Update architecture docs.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 New modules: {list_new_modules}
 Modified components: {list_changes}
@@ -464,7 +422,7 @@ task({
   "description": "Update theoretical documentation",
   "prompt": f"""Update conceptual documentation.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 New concepts: {conceptual_changes}
 """,
@@ -483,7 +441,7 @@ task({
   "description": "Update high-level feature docs",
   "prompt": f"""Document major feature.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Feature: {feature_name}
 Impact: {user_impact}
@@ -503,7 +461,7 @@ task({
   "description": "Validate all documentation",
   "prompt": f"""Validate documentation quality.
 
-Arguments: adw_id={adw_id}
+Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Check all markdown links, formatting, and cross-references.
 """,
@@ -527,7 +485,7 @@ task({
   "description": "Commit documentation changes",
   "prompt": f"""Create commit for documentation updates.
 
-Arguments: adw_id={adw_id} commit_type=docs
+Arguments: adw_id={adw_id} changed_targets={approved_files} worktree_path={worktree_path} commit_type=docs
 
 Approved files (validated and explicitly confirmed):
 {approved_files}

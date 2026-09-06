@@ -35,18 +35,6 @@ permission:
   adw_plans_mutate: allow
   feedback_log: allow
   get_datetime: allow
-agent_contract_version: e37-m3-p5-v1
-declared_scope:
-  roots: [.opencode/plans/templates/maintenance, .opencode/plans/sections/maintenance, .opencode/agent, .opencode/plans]
-  file_kinds: [.md, .json]
-completion_contract:
-  id: e37-m3-p5-v1
-  role: producer
-  owner: plan-maintenance-drafter
-  required_fields: [outcome, status, owner, target_id, adw_id, worktree_path, summary, evidence]
-  failure_fields: [failure_reason, rerun_guidance]
-  statuses: [success, failed, blocked]
-  nonempty_success_fields: [evidence]
 ---
 
 # Plan Maintenance Drafter

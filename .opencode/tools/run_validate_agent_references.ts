@@ -1,5 +1,5 @@
 import { tool } from "@opencode-ai/plugin";
-import { existsSync, realpathSync, statSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 
 const S_IFMT = 0o170000;
@@ -16,13 +16,68 @@ const BASELINE_TRUST_HINT =
 
 const REPO_ROOT = realpathSync(path.resolve(import.meta.dir, "../.."));
 
+function readGitDirPointer(dotGitPath: string): string | undefined {
+  try {
+    const stat = lstatSync(dotGitPath);
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 4096) return undefined;
+    const content = readFileSync(dotGitPath, "utf8").trim();
+    const prefix = "gitdir:";
+    if (!content.startsWith(prefix)) return undefined;
+    const value = content.slice(prefix.length).trim();
+    if (!value || value.includes("\0")) return undefined;
+    return realpathSync(path.resolve(path.dirname(dotGitPath), value));
+  } catch {
+    return undefined;
+  }
+}
+
+function resolveCommonGitDir(repoRoot: string): string | undefined {
+  const dotGitPath = path.join(repoRoot, ".git");
+  try {
+    const stat = lstatSync(dotGitPath);
+    if (stat.isDirectory() && !stat.isSymbolicLink()) return realpathSync(dotGitPath);
+  } catch {
+    return undefined;
+  }
+  const worktreeGitDir = readGitDirPointer(dotGitPath);
+  if (!worktreeGitDir) return undefined;
+  try {
+    const commonDirValue = readFileSync(path.join(worktreeGitDir, "commondir"), "utf8").trim();
+    if (!commonDirValue || commonDirValue.includes("\0")) return undefined;
+    return realpathSync(path.resolve(worktreeGitDir, commonDirValue));
+  } catch {
+    return undefined;
+  }
+}
+
+function isOwnedLinkedWorktree(resolvedCwd: string, repoRoot: string): boolean {
+  const relativeCandidate = path.relative(repoRoot, resolvedCwd);
+  const parts = relativeCandidate.split(path.sep);
+  if (parts.length !== 2 || parts[0] !== "trees" || !parts[1]) return false;
+
+  const candidateGitDir = readGitDirPointer(path.join(resolvedCwd, ".git"));
+  const commonGitDir = resolveCommonGitDir(repoRoot);
+  if (!candidateGitDir || !commonGitDir) return false;
+  const worktreesRoot = path.join(commonGitDir, "worktrees");
+  const relativeGitDir = path.relative(worktreesRoot, candidateGitDir);
+  return Boolean(
+    relativeGitDir &&
+      !relativeGitDir.startsWith("..") &&
+      !path.isAbsolute(relativeGitDir) &&
+      !relativeGitDir.includes(path.sep),
+  );
+}
+
 function isStatDirectory(s: ReturnType<typeof statSync>): boolean {
   if (typeof s.isDirectory === "function") return s.isDirectory();
   if (typeof s.isDirectory === "boolean") return s.isDirectory;
   return (((s as any).mode ?? 0) & S_IFMT) === S_IFDIR;
 }
 
-function validateCwdWithinRepo(cwd: string | undefined, repoRoot: string): string | undefined {
+export function validateCwdWithinRepo(
+  cwd: string | undefined,
+  repoRoot: string,
+): string | undefined {
   if (cwd === undefined) {
     return undefined;
   }
@@ -36,12 +91,12 @@ function validateCwdWithinRepo(cwd: string | undefined, repoRoot: string): strin
     }
 
     const resolvedCwd = realpathSync(cwd);
-    if (resolvedCwd !== repoRoot) {
+    if (resolvedCwd !== repoRoot && !isOwnedLinkedWorktree(resolvedCwd, repoRoot)) {
       const rel = path.relative(repoRoot, resolvedCwd);
       if (rel.startsWith("..") || path.isAbsolute(rel)) {
         return `ERROR: cwd path resolves outside repository root: ${cwd} (canonical: ${resolvedCwd})`;
       }
-      return `ERROR: cwd must resolve to the current repository/worktree root: ${cwd} (canonical: ${resolvedCwd}, expected: ${repoRoot})`;
+      return `ERROR: cwd must resolve to the current repository root or an owned linked worktree under trees/: ${cwd} (canonical: ${resolvedCwd}, repository: ${repoRoot})`;
     }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
@@ -160,7 +215,7 @@ EXAMPLES:
 IMPORTANT:
 - This wrapper only runs scripts/validate_agent_references.py via python3.
 - It does not allow arbitrary script paths or shell arguments.
-- Optional cwd must resolve to the current repository/worktree root exactly.
+- Optional cwd must resolve to the current repository root or an owned linked worktree under trees/ exactly.
 - Optional baselinePath must be repo-relative and stay under .opencode/guides/.
 - Optional baselinePath must point to a committed clean file under .opencode/guides/.
 - The wrapper refuses to run if scripts/validate_agent_references.py has local modifications.`,
@@ -168,7 +223,7 @@ IMPORTANT:
     cwd: tool.schema
       .string()
       .optional()
-      .describe("Repository/worktree root to validate. Must resolve to the current repository/worktree root exactly."),
+      .describe("Repository root or owned linked worktree under trees/ to validate."),
     baselinePath: tool.schema
       .string()
       .optional()
@@ -185,16 +240,16 @@ IMPORTANT:
     if (cwdError) {
       return cwdError;
     }
-    const baselineError = validateBaselinePath(baselinePath, REPO_ROOT);
+    const validationRoot = cwd ? realpathSync(cwd) : REPO_ROOT;
+    const baselineError = validateBaselinePath(baselinePath, validationRoot);
     if (baselineError) {
       return baselineError;
     }
-    const baselineTrustError = validateTrustedBaseline(REPO_ROOT, baselinePath);
+    const baselineTrustError = validateTrustedBaseline(validationRoot, baselinePath);
     if (baselineTrustError) {
       return baselineTrustError;
     }
 
-    const validationRoot = cwd ? realpathSync(cwd) : REPO_ROOT;
     const scriptPath = path.join(REPO_ROOT, VALIDATOR_SCRIPT_RELATIVE_PATH);
     const trustError = validateTrustedValidatorScript(REPO_ROOT, scriptPath);
     if (trustError) {

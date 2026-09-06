@@ -34,22 +34,6 @@ permission:
   adw_plans_mutate: allow
   feedback_log: allow
   get_datetime: allow
-agent_contract_version: e37-m3-p5-v1
-declared_scope:
-  roots: [.opencode/plans/templates/feature, .opencode/plans/sections/features, .opencode/agent, .opencode/plans]
-  file_kinds: [.md, .json]
-subagent_type_allowlist: [codebase-researcher]
-task_routes:
-  - child: codebase-researcher
-    required_handoff_fields: [adw_id, target_id]
-completion_contract:
-  id: e37-m3-p5-v1
-  role: producer
-  owner: plan-feature-drafter
-  required_fields: [outcome, status, owner, target_id, adw_id, worktree_path, summary, evidence]
-  failure_fields: [failure_reason, rerun_guidance]
-  statuses: [success, failed, blocked]
-  nonempty_success_fields: [evidence]
 ---
 
 # Plan Feature Drafter
@@ -229,7 +213,7 @@ Delegation policy: this agent may use `task` only with
 ```python
 task({
   "description": "Research feature implementation context",
-  "prompt": "Gather architecture and module context for feature drafting.\n\nArguments: adw_id={adw_id} feature_id={target_id}",
+  "prompt": "Gather architecture and module context for feature drafting.\n\nArguments: adw_id={adw_id} target_id={target_id}",
   "subagent_type": "codebase-researcher"
 })
 ```

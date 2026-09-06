@@ -244,9 +244,45 @@ describe("run_validate_agent_references wrapper", () => {
     const result = await execute({ cwd: nestedPath });
 
     assertErrorPrefix(String(result), "ERROR:");
-    expect(result).toContain("cwd must resolve to the current repository/worktree root");
+    expect(result).toContain("cwd must resolve to the current repository root or an owned linked worktree");
     expect(result).toContain(`canonical: ${nestedPath}`);
     expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("admits an owned linked worktree directly under trees", async () => {
+    const { validateCwdWithinRepo } = await import("../run_validate_agent_references.ts");
+    mkdirSync(REPO_TMP_ROOT, { recursive: true });
+    const fixtureRoot = mkdtempSync(path.join(REPO_TMP_ROOT, "agent-reference-worktree-"));
+    const commonGitDir = path.join(fixtureRoot, ".git");
+    const worktreeGitDir = path.join(commonGitDir, "worktrees", "workflow-id");
+    const worktreeRoot = path.join(fixtureRoot, "trees", "workflow-id");
+    mkdirSync(worktreeGitDir, { recursive: true });
+    mkdirSync(worktreeRoot, { recursive: true });
+    writeFileSync(path.join(worktreeRoot, ".git"), `gitdir: ${worktreeGitDir}\n`, "utf8");
+
+    expect(validateCwdWithinRepo(worktreeRoot, fixtureRoot)).toBeUndefined();
+
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  });
+
+  it("rejects a trees candidate owned by a foreign Git common directory", async () => {
+    const { validateCwdWithinRepo } = await import("../run_validate_agent_references.ts");
+    mkdirSync(REPO_TMP_ROOT, { recursive: true });
+    const fixtureRoot = mkdtempSync(path.join(REPO_TMP_ROOT, "agent-reference-repo-"));
+    const foreignRoot = mkdtempSync(path.join(REPO_TMP_ROOT, "agent-reference-foreign-"));
+    const foreignWorktreeGitDir = path.join(foreignRoot, ".git", "worktrees", "workflow-id");
+    const worktreeRoot = path.join(fixtureRoot, "trees", "workflow-id");
+    mkdirSync(path.join(fixtureRoot, ".git"), { recursive: true });
+    mkdirSync(foreignWorktreeGitDir, { recursive: true });
+    mkdirSync(worktreeRoot, { recursive: true });
+    writeFileSync(path.join(worktreeRoot, ".git"), `gitdir: ${foreignWorktreeGitDir}\n`, "utf8");
+
+    expect(validateCwdWithinRepo(worktreeRoot, fixtureRoot)).toContain(
+      "cwd must resolve to the current repository root or an owned linked worktree",
+    );
+
+    rmSync(fixtureRoot, { recursive: true, force: true });
+    rmSync(foreignRoot, { recursive: true, force: true });
   });
 
   it("rejects missing cwd paths before subprocess execution", async () => {

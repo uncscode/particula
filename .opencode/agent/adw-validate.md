@@ -49,10 +49,6 @@ permission:
   websearch: deny
   codesearch: deny
   bash: deny
-agent_contract_version: e37-m3-p5-v1
-declared_scope:
-  roots: [adw, scripts]
-  file_kinds: [.py, .md, .json]
 ---
 
 # ADW Validate Agent

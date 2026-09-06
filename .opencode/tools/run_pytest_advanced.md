@@ -43,6 +43,7 @@ Keep advanced payload-bearing fields explicit.
 - `cov-report=<csv>`
 - `durations=<n>`
 - `durations-min=<n>`
+- `benchmark-plugin` (the sole runner-owned trusted benchmark activation path)
 
 ## Examples
 
@@ -92,14 +93,29 @@ Keep advanced payload-bearing fields explicit.
   publication is atomic, state paths reject symlinks, and stale recovery and
   release are serialized with ownership-safe transitions.
   It never queues, polls, or exposes lease paths, holder identifiers, or tokens.
-- `pytestArgs` is a literal ordered array. Accepted entries are transported once as a compact JSON
-  array; they are never trimmed, split, joined, or appended as runner arguments.
-- The permitted caller grammar is confined path/node-id targets, `-k VALUE`, `-m VALUE`,
-  `--benchmark`, `--collect-only`, `-q`, `-v`, `--verbose`, and
-  `--tb=short|long|line|native|no`. Caller plugin, `-o`, `addopts`, and other ini
-  controls are rejected.
-- Raw coverage and runner controls (output, timeout, cwd, targeting, fail-fast, durations, and
-  transport controls) are prohibited in `pytestArgs`; use their dedicated fields/tokens instead.
+- `pytestArgs` is a literal ordered array. Accepted entries are transported once
+  as a compact JSON array; they are never trimmed, split, joined, or appended as
+  runner arguments.
+- `pytestArgs` accepts at most 64 tokens, 1,024 UTF-16 code units per token, and
+  16,384 aggregate UTF-16 code units. C0 controls, DEL, and lone UTF-16
+  surrogates are rejected; rejected excerpts are escaped and bounded.
+- The permitted caller grammar is confined path/node-id targets, `-k VALUE`,
+  `-m VALUE`, `--collect-only`, verbosity/traceback controls, and the reviewed
+  benchmark controls `--benchmark-only`, `--benchmark-skip`,
+  `--benchmark-disable`, `--benchmark-enable`, and bounded
+  `--benchmark-min-rounds=<1-999>`. `-m` always consumes its following marker
+  expression; all other long options are denied, including file-output
+  (`--junitxml`), network (`--pastebin`), resource-expansion
+  (`--numprocesses`), and unknown plugin options.
+- Caller plugin loading (`-p` and its aliases), separators, `-o`, configuration,
+  root, and import controls, raw coverage controls, and runner transport
+  controls are rejected. `benchmark-plugin` is the sole trusted benchmark
+  activation path: it removes only the exact configured `-p no:benchmark` pair
+  and loads the fixed `benchmark` plugin.
+- Raw coverage and runner controls (including the complete `--cov*` namespace,
+  `--no-cov`, and `--coverage-files-only`), output, timeout, cwd, targeting,
+  fail-fast, durations, and transport controls are prohibited in `pytestArgs`; use their
+  dedicated fields or `options` tokens instead.
 - `testPath` and `test-filter` use runner-owned named transport. `testPath` stays repository-relative
   even when `cwd` is nested; the runner converts it safely for execution.
 - `testPaths` accepts one through seven ordered canonical, repository-confined POSIX

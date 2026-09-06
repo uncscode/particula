@@ -1,7 +1,7 @@
 ---
 description: >-
   Subagent that populates an epic plan record created by plan-orchestrator.
-  Adds phases, drafts all 15 canonical section files, enriches content with
+  Adds phases, drafts all 13 canonical section files, enriches content with
   codebase research, and reports completion via workflow messages.
 
   This agent:
@@ -9,7 +9,7 @@ description: >-
   - Adds phases to the epic plan via adw_plans_mutate add-phase
   - Scaffolds and populates canonical section files
   - Calls codebase-researcher for architecture/file-context enrichment
-  - Drafts first-pass content for all 15 epic sections
+  - Drafts first-pass content for all 13 epic sections
   - Reports drafted sections, thin sections, and challenges via adw_spec_messages messages-write
 
   Examples:
@@ -35,22 +35,6 @@ permission:
   adw_plans_mutate: allow
   feedback_log: allow
   get_datetime: allow
-agent_contract_version: e37-m3-p5-v1
-declared_scope:
-  roots: [.opencode/plans/templates/epic, .opencode/plans/sections/epics, .opencode/agent, .opencode/plans]
-  file_kinds: [.md, .json]
-subagent_type_allowlist: [codebase-researcher]
-task_routes:
-  - child: codebase-researcher
-    required_handoff_fields: [adw_id, target_id]
-completion_contract:
-  id: e37-m3-p5-v1
-  role: producer
-  owner: plan-epic-drafter
-  required_fields: [outcome, status, owner, target_id, adw_id, worktree_path, summary, evidence]
-  failure_fields: [failure_reason, rerun_guidance]
-  statuses: [success, failed, blocked]
-  nonempty_success_fields: [evidence]
 ---
 
 # Plan Epic Drafter
@@ -104,7 +88,7 @@ cwd: "."
 4. Read workflow context from prior messages
 5. Enrich technical context via `codebase-researcher`
 6. Add phases to the plan via `adw_plans_mutate add-phase`
-7. Draft first-pass content for all 15 section files
+7. Draft first-pass content for all 13 section files
 8. Write completion summary
 
 # Todo Tracking (Required)
@@ -212,7 +196,7 @@ Delegation policy: this agent may use `task` only with
 ```python
 task({
   "description": "Research epic implementation context",
-  "prompt": "Gather architecture and module context for epic drafting.\n\nArguments: adw_id={adw_id} epic_id={target_id}",
+  "prompt": "Gather architecture and module context for epic drafting.\n\nArguments: adw_id={adw_id} target_id={target_id}",
   "subagent_type": "codebase-researcher"
 })
 ```
@@ -265,7 +249,7 @@ must include co-located unit tests for those functions.
 
 ## Step 7: Draft All Section Content
 
-Draft first-pass content for all 15 required epic sections. Write each section
+Draft first-pass content for all 13 required epic sections. Write each section
 file using the paths from Step 3.
 
 ### Required Epic Sections
@@ -310,7 +294,7 @@ adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-epic-drafter",
-  "message": "status: drafted\ntarget_id: E18\nsections_drafted: 15\nthin_sections: ...\nchallenges: ..."
+  "message": "status: drafted\ntarget_id: E18\nsections_drafted: 13\nthin_sections: ...\nchallenges: ..."
 })
 ```
 

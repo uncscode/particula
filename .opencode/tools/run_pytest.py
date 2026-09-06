@@ -100,10 +100,10 @@ COVERAGE_ADDOPT_PATTERN = re.compile(
     r"^(--cov(?:=|\b)|--cov-report(?:=|\b)|--cov-fail-under(?:=|\b)|"
     r"--cov-config(?:=|\b)|--cov-context(?:=|\b))"
 )
-COVERAGE_PYTEST_ARG_PATTERN = re.compile(
-    r"^(--cov(?:=|\b)|--cov-report(?:=|\b)|--cov-fail-under(?:=|\b)|"
-    r"--cov-config(?:=|\b)|--cov-context(?:=|\b))"
-)
+# ``pytest-cov`` owns the entire ``--cov*`` namespace.  Treating only its
+# currently documented spellings as protected would let future coverage flags
+# bypass runner-owned coverage policy.
+COVERAGE_PYTEST_ARG_PATTERN = re.compile(r"^--(?:cov|no-cov$)")
 COVERAGE_HEADER_PATTERN = re.compile(r"^-+\s+coverage:.*-+$", re.IGNORECASE)
 MAX_COVERAGE_FILES = 500
 COVERAGE_LOCK_FILENAME = ".run_pytest_coverage.lock"
@@ -115,34 +115,62 @@ MAX_DIAGNOSTIC_NODE_IDS = 50
 MAX_DIAGNOSTIC_NODE_ID_LENGTH = 512
 MAX_FAILURE_SCAN_TEXT = 20_000
 PYTEST_ARG_VALUE_OPTIONS = {"-k", "-m"}
-PYTEST_ARG_STANDALONE_OPTIONS = {
-    "--benchmark",
-    "--collect-only",
-    "-q",
-    "-v",
-    "--verbose",
-}
+PYTEST_ARG_STANDALONE_OPTIONS = {"--collect-only", "-q", "-v", "--verbose"}
 PYTEST_ARG_TB_VALUES = {"short", "long", "line", "native", "no"}
-PYTEST_ARG_RESERVED_PREFIXES = (
-    "--output",
-    "--min-tests",
-    "--timeout",
-    "--cwd",
-    "--test-path",
-    "--test-filter",
-    "--coverage",
-    "--no-coverage",
-    "--coverage-source",
-    "--coverage-threshold",
-    "--cov-report",
-    "--fail-fast",
-    "--durations",
-    "--durations-min",
-    "--pytest-argv-json",
-    "--override-ini-json",
-    "--override-ini",
-    "--coverage-files-only",
-)
+PYTEST_ARG_REVIEWED_LONG_OPTIONS = {
+    "benchmark-only",
+    "benchmark-skip",
+    "benchmark-disable",
+    "benchmark-enable",
+}
+PYTEST_ARG_REVIEWED_VALUE_OPTIONS = {"benchmark-min-rounds"}
+PYTEST_ARG_RESERVED_NAMES = {
+    "output",
+    "min-tests",
+    "timeout",
+    "cwd",
+    "test-path",
+    "test-filter",
+    "coverage",
+    "no-coverage",
+    "coverage-source",
+    "coverage-threshold",
+    "cov-report",
+    "fail-fast",
+    "durations",
+    "durations-min",
+    "pytest-argv-json",
+    "override-ini-json",
+    "override-ini",
+    "coverage-files-only",
+    "enable-benchmark-plugin",
+    "test-paths-json",
+    "rootdir",
+    "confcutdir",
+    "pyargs",
+    "config-file",
+    "basetemp",
+    "cache-clear",
+    "import-mode",
+    "continue-on-collection-errors",
+    "noconftest",
+    "collect-in-virtualenv",
+    "ignore",
+    "ignore-glob",
+    "deselect",
+    "keep-duplicates",
+    "doctest-modules",
+    "doctest-glob",
+    "trace-config",
+    "debug",
+    "setup-only",
+    "fixtures",
+    "fixtures-per-test",
+}
+PYTEST_ARG_LONG_NAME_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
+MAX_PYTEST_ARG_TOKENS = 64
+MAX_PYTEST_ARG_TOKEN_LENGTH = 1024
+MAX_PYTEST_ARG_TOTAL_LENGTH = 16384
 UNUSABLE_COVERAGE_FRAGMENTS = (
     "no data collected",
     "no data was collected",
@@ -157,6 +185,25 @@ COVERAGE_SOURCE_INFO = (
 
 class PytestArgumentValidationError(ValueError):
     """Raised when caller-owned advanced pytest argv violates the fixed grammar."""
+
+
+def _safe_pytest_token(value: str) -> str:
+    """Return a bounded, escaped representation suitable for validation errors."""
+
+    return repr(value[:160])
+
+
+def _has_lone_surrogate(value: str) -> bool:
+    """Return whether a Python string contains a non-transportable surrogate."""
+
+    return any(0xD800 <= ord(char) <= 0xDFFF for char in value)
+
+
+def _utf16_code_units(value: str) -> int:
+    """Return the transport-equivalent UTF-16 code-unit length for one token."""
+    if _has_lone_surrogate(value):
+        raise PytestArgumentValidationError("pytest argument contains a lone surrogate")
+    return len(value.encode("utf-16-le")) // 2
 
 
 def _bounded_diagnostic(value: str, limit: int = MAX_DIAGNOSTIC_TEXT) -> tuple[str, int]:
@@ -317,6 +364,10 @@ def _validate_confined_target(value: str, cwd: str, name: str) -> str:
 def _validate_pytest_argv(pytest_argv: object, cwd: str) -> list[str]:
     """Validate the ordered caller-owned argv suffix for the advanced route.
 
+    Long options remain literal, including attached values, but controls owned by
+    the runner (coverage, plugin loading, transport, and configuration) are
+    rejected before pytest can interpret them.
+
     Args:
         pytest_argv: Decoded JSON value expected to be a list of strings.
         cwd: Requested runner working directory used for target confinement.
@@ -331,34 +382,83 @@ def _validate_pytest_argv(pytest_argv: object, cwd: str) -> list[str]:
 
     if not isinstance(pytest_argv, list) or any(not isinstance(item, str) for item in pytest_argv):
         raise PytestArgumentValidationError("pytest argv JSON must decode to an array of strings")
+    if len(pytest_argv) > MAX_PYTEST_ARG_TOKENS:
+        raise PytestArgumentValidationError(
+            f"pytest argv must contain at most {MAX_PYTEST_ARG_TOKENS} tokens"
+        )
     validated: list[str] = []
+    total_length = 0
     index = 0
     while index < len(pytest_argv):
         token = pytest_argv[index]
-        if token == "--" or token.startswith("--cov"):
-            raise PytestArgumentValidationError(f"pytest argument {token!r} is not permitted")
+        token_length = _utf16_code_units(token)
+        total_length += token_length
+        if (
+            token_length > MAX_PYTEST_ARG_TOKEN_LENGTH
+            or total_length > MAX_PYTEST_ARG_TOTAL_LENGTH
+            or any(ord(char) < 32 or ord(char) == 127 for char in token)
+        ):
+            raise PytestArgumentValidationError(
+                f"pytest argument {_safe_pytest_token(token)} is not permitted"
+            )
+        if token == "--" or token in {"-p", "-o", "-c"} or COVERAGE_PYTEST_ARG_PATTERN.match(token):
+            raise PytestArgumentValidationError(
+                f"pytest argument {_safe_pytest_token(token)} is not permitted"
+            )
         if token in PYTEST_ARG_STANDALONE_OPTIONS:
             validated.append(token)
         elif token.startswith("--tb="):
             if token.removeprefix("--tb=") not in PYTEST_ARG_TB_VALUES:
-                raise PytestArgumentValidationError(f"pytest argument {token!r} is not permitted")
+                raise PytestArgumentValidationError(
+                    f"pytest argument {_safe_pytest_token(token)} is not permitted"
+                )
             validated.append(token)
-        elif token.startswith("--override-ini="):
-            raise PytestArgumentValidationError(f"pytest argument {token!r} is not permitted")
         elif token in PYTEST_ARG_VALUE_OPTIONS:
             if index + 1 >= len(pytest_argv):
-                raise PytestArgumentValidationError(f"pytest argument {token!r} requires a value")
-            value = pytest_argv[index + 1]
-            if value.startswith("-") or not value:
                 raise PytestArgumentValidationError(
-                    f"pytest argument {token!r} has an invalid value"
+                    f"pytest argument {_safe_pytest_token(token)} requires a value"
                 )
-            if token == "-o":
-                raise PytestArgumentValidationError("pytest argument '-o' is not permitted")
+            value = pytest_argv[index + 1]
+            value_length = _utf16_code_units(value)
+            total_length += value_length
+            if (
+                not value
+                or value.startswith("-")
+                or value_length > MAX_PYTEST_ARG_TOKEN_LENGTH
+                or total_length > MAX_PYTEST_ARG_TOTAL_LENGTH
+                or any(ord(char) < 32 or ord(char) == 127 for char in value)
+                or _has_lone_surrogate(value)
+            ):
+                raise PytestArgumentValidationError(
+                    f"pytest argument {_safe_pytest_token(token)} has an invalid value"
+                )
             validated.extend((token, value))
             index += 1
-        elif token.startswith("-") or token.startswith(PYTEST_ARG_RESERVED_PREFIXES):
-            raise PytestArgumentValidationError(f"pytest argument {token!r} is not permitted")
+        elif token.startswith("--"):
+            option_name = token[2:].split("=", 1)[0]
+            has_value = "=" in token
+            option_value = token.split("=", 1)[1] if has_value else None
+            if (
+                not PYTEST_ARG_LONG_NAME_PATTERN.fullmatch(option_name)
+                or option_name in PYTEST_ARG_RESERVED_NAMES
+                or (has_value and option_name not in PYTEST_ARG_REVIEWED_VALUE_OPTIONS)
+                or (not has_value and option_name not in PYTEST_ARG_REVIEWED_LONG_OPTIONS)
+                or (
+                    option_name == "benchmark-min-rounds"
+                    and (
+                        option_value is None
+                        or re.fullmatch(r"[1-9][0-9]{0,2}", option_value) is None
+                    )
+                )
+            ):
+                raise PytestArgumentValidationError(
+                    f"pytest argument {_safe_pytest_token(token)} is not permitted"
+                )
+            validated.append(token)
+        elif token.startswith("-"):
+            raise PytestArgumentValidationError(
+                f"pytest argument {_safe_pytest_token(token)} is not permitted"
+            )
         else:
             validated.append(_validate_confined_target(token, cwd, "pytest argument"))
         index += 1
@@ -729,6 +829,30 @@ def _filter_non_coverage_addopts(addopts: Union[str, List[str]]) -> List[str]:
             index += 1
             continue
         filtered.append(token)
+        index += 1
+    return filtered
+
+
+def _enable_benchmark_plugin_addopts(addopts: list[str]) -> list[str]:
+    """Enable only the trusted benchmark plugin after exact disable-pair removal.
+
+    The configured ``-p no:benchmark`` pair is removed only when adjacent so
+    unrelated plugin policy and lookalike tokens cannot be changed by activation.
+
+    Args:
+        addopts: Previously tokenized configured pytest addopts.
+
+    Returns:
+        The retained addopts in order, excluding exact adjacent benchmark-disable
+        pairs. The caller appends the fixed trusted plugin separately.
+    """
+    filtered: list[str] = []
+    index = 0
+    while index < len(addopts):
+        if addopts[index : index + 2] == ["-p", "no:benchmark"]:
+            index += 2
+            continue
+        filtered.append(addopts[index])
         index += 1
     return filtered
 
@@ -1820,6 +1944,7 @@ def _build_pytest_command(
     test_path: Optional[str] = None,
     test_paths: Optional[list[str]] = None,
     test_filter: Optional[str] = None,
+    enable_benchmark_plugin: bool = False,
 ) -> tuple[List[str], List[str], List[str], str]:
     """Build the pytest command and derived coverage and ini state.
 
@@ -1840,6 +1965,9 @@ def _build_pytest_command(
         test_path: Validated runner-owned test target, if supplied.
         test_paths: Validated ordered runner-owned targets, if supplied.
         test_filter: Runner-owned pytest selection expression, if supplied.
+        enable_benchmark_plugin: Whether to remove only exact configured
+            ``-p no:benchmark`` pairs and load the fixed trusted ``benchmark``
+            plugin. Caller-owned argv cannot select plugins.
 
     Returns:
         The command, generated coverage arguments, effective ini overrides, and
@@ -1861,6 +1989,8 @@ def _build_pytest_command(
     root_dir = root_dir or Path.cwd()
     # Replace configured addopts only after retaining their non-coverage policy.
     configured_addopts = _filter_non_coverage_addopts(_load_pyproject_addopts(root_dir))
+    if enable_benchmark_plugin:
+        configured_addopts = _enable_benchmark_plugin_addopts(configured_addopts)
     if configured_addopts:
         # ``addopts`` is parsed by pytest as a shell-style argument string.  Re-quote
         # retained tokens so values such as the configured marker expression remain
@@ -1886,6 +2016,8 @@ def _build_pytest_command(
 
     if cov_args:
         cmd.extend(cov_args)
+    if enable_benchmark_plugin:
+        cmd.extend(["-p", "benchmark"])
 
     if test_filter:
         cmd.extend(["-k", test_filter])
@@ -1908,7 +2040,19 @@ def _execution_target(target: str, *, cwd: str) -> str:
 
 
 def _execution_pytest_args(args: list[str], *, cwd: str) -> list[str]:
-    """Relativize only validated caller target tokens for a nested execution cwd."""
+    """Relativize only validated caller target tokens for a nested execution cwd.
+
+    Only ``-k`` and ``-m`` consume a following value under the caller grammar.
+    All other admitted long options are retained literally rather than being
+    misclassified as targets.
+
+    Args:
+        args: Validated caller-owned pytest suffix.
+        cwd: Nested directory from which pytest will execute.
+
+    Returns:
+        The suffix with positional test targets made relative to ``cwd``.
+    """
 
     converted: list[str] = []
     value_follows = False
@@ -1991,6 +2135,7 @@ def run_pytest(
     test_path: Optional[str] = None,
     test_paths: Optional[list[str]] = None,
     test_filter: Optional[str] = None,
+    enable_benchmark_plugin: bool = False,
 ) -> Tuple[int, str]:
     """Run pytest with independently evaluated assertions and coverage.
 
@@ -2042,6 +2187,9 @@ def run_pytest(
             targets. Supply one through seven canonical, confined POSIX targets;
             this is mutually exclusive with ``test_path``.
         test_filter: Runner-owned pytest ``-k`` selection expression.
+        enable_benchmark_plugin: Enables only the fixed trusted ``benchmark``
+            plugin after removing exact configured disable pairs. This does not
+            grant caller-owned plugin-loading authority.
 
     Returns:
         Tuple of exit code and rendered output. JSON output includes the
@@ -2120,6 +2268,7 @@ def run_pytest(
             test_path=test_path,
             test_paths=execution_test_paths,
             test_filter=test_filter,
+            enable_benchmark_plugin=enable_benchmark_plugin,
         )
         cmd = [*_resolve_python_tool_command("pytest", "pytest", cwd), *cmd[1:]]
 
@@ -2460,27 +2609,19 @@ NOTE: -v and --tb=short are always included. Do NOT pass these.
         help="Legacy repository-relative pytest targets only (use --test-filter for filtering).",
     )
     parser.add_argument(
-        "--override-ini",
-        action="append",
-        default=[],
-        help=(
-            "Override ini option (passed through to pytest). Can be repeated,"
-            " e.g., --override-ini=addopts=."
-        ),
-    )
-    parser.add_argument(
         "--pytest-argv-json",
         help="Compact JSON array containing the validated caller-owned pytest argv suffix.",
-    )
-    parser.add_argument(
-        "--override-ini-json",
-        help="Compact JSON array containing runner-owned override-ini entries.",
     )
     parser.add_argument("--test-path", help="Repository-relative test target owned by the runner.")
     parser.add_argument(
         "--test-paths-json", help="Compact JSON array of runner-owned test targets."
     )
     parser.add_argument("--test-filter", help="Test filter owned by the runner.")
+    parser.add_argument(
+        "--enable-benchmark-plugin",
+        action="store_true",
+        help="Runner-owned activation of the trusted pytest benchmark plugin.",
+    )
 
     args = parser.parse_args(argv)
 
@@ -2489,7 +2630,6 @@ NOTE: -v and --tb=short are always included. Do NOT pass these.
 
     try:
         json_pytest_args = _decode_string_array(args.pytest_argv_json, "pytest argv JSON")
-        json_override_ini = _decode_string_array(args.override_ini_json, "override ini JSON")
         json_test_paths = _decode_string_array(args.test_paths_json, "testPaths JSON")
         if json_pytest_args is not None and args.pytest_args:
             raise PytestArgumentValidationError(
@@ -2501,13 +2641,10 @@ NOTE: -v and --tb=short are always included. Do NOT pass these.
             if json_pytest_args is not None
             else list(args.pytest_args)
         )
-        override_ini = json_override_ini if json_override_ini is not None else args.override_ini
         if args.test_path is not None and json_test_paths is not None:
             raise PytestArgumentValidationError("testPath and testPaths cannot be combined")
         if json_test_paths is not None:
             _validate_test_paths(json_test_paths, cwd_for_validation)
-        if override_ini:
-            raise PytestArgumentValidationError("override ini controls are not permitted")
     except PytestArgumentValidationError as exc:
         if not args.coverage_files_only:
             if args.output == "json":
@@ -2533,10 +2670,11 @@ NOTE: -v and --tb=short are always included. Do NOT pass these.
         fail_fast=args.fail_fast,
         durations=args.durations,
         durations_min=args.durations_min,
-        override_ini=override_ini,
+        override_ini=None,
         test_path=args.test_path,
         test_paths=json_test_paths,
         test_filter=args.test_filter,
+        enable_benchmark_plugin=args.enable_benchmark_plugin,
     )
 
     if args.coverage_files_only:

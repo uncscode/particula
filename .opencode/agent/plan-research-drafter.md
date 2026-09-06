@@ -33,22 +33,6 @@ permission:
   adw_plans_mutate: allow
   feedback_log: allow
   get_datetime: allow
-agent_contract_version: e37-m3-p5-v1
-declared_scope:
-  roots: [.opencode/plans/templates/research, .opencode/plans/sections/research, .opencode/agent, .opencode/plans]
-  file_kinds: [.md, .json]
-subagent_type_allowlist: [codebase-researcher]
-task_routes:
-  - child: codebase-researcher
-    required_handoff_fields: [adw_id, target_id]
-completion_contract:
-  id: e37-m3-p5-v1
-  role: producer
-  owner: plan-research-drafter
-  required_fields: [outcome, status, owner, target_id, adw_id, worktree_path, summary, evidence]
-  failure_fields: [failure_reason, rerun_guidance]
-  statuses: [success, failed, blocked]
-  nonempty_success_fields: [evidence]
 ---
 
 # Plan Research Drafter
@@ -279,21 +263,21 @@ completion summary.
 
 ## Step 5: Enrich Context via Researcher Subagent
 
-Delegation policy: this agent may use `task` only with
-`subagent_type: "codebase-researcher"`. The frontmatter `subagent_type_allowlist` must remain
-exactly `[codebase-researcher]`; fail closed if that allowlist is absent, modified, or broadened.
-Do not dispatch any other subagent type.
+Delegation policy: use `task` only for the explicit
+`subagent_type: "codebase-researcher"` call below. Do not dispatch any other
+child type.
 
 ```python
 task({
   "description": "Research research-plan implementation context",
-  "prompt": "Gather architecture, module, data-source, and evaluation context for research drafting.\n\nArguments: adw_id={adw_id} research_id={target_id}",
+  "prompt": "Gather architecture, module, data-source, and evaluation context for research drafting.\n\nArguments: adw_id={adw_id} target_id={target_id}",
   "subagent_type": "codebase-researcher"
 })
 ```
 
-If `codebase-researcher` fails or returns thin output, continue drafting using prompt context +
-prior messages + template structure. Record this in reduced-context notes or challenges.
+If `codebase-researcher` fails or returns thin output, continue reduced-context
+drafting using prompt context, prior messages, and template structure. Record
+this in reduced-context notes or challenges.
 
 ## Step 6: Add Phases to the Research Plan
 

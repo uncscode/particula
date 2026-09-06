@@ -35,29 +35,6 @@ permission:
   adw_plans_mutate: allow
   feedback_log: allow
   get_datetime: allow
-agent_contract_version: e37-m3-p5-v1
-declared_scope:
-  roots: [.opencode/plans, .opencode/agent]
-  file_kinds: [.md, .json]
-subagent_type_allowlist: [plan-epic-drafter, plan-feature-drafter, plan-research-drafter, plan-maintenance-drafter]
-task_routes:
-  - child: plan-epic-drafter
-    required_handoff_fields: [adw_id, target_id, plan_type]
-  - child: plan-feature-drafter
-    required_handoff_fields: [adw_id, target_id, plan_type, parent_id]
-  - child: plan-research-drafter
-    required_handoff_fields: [adw_id, target_id, plan_type, parent_id]
-  - child: plan-maintenance-drafter
-    required_handoff_fields: [adw_id, target_id, plan_type, parent_id]
-completion_contract:
-  id: e37-m3-p5-v1
-  role: consumer
-  allowed_owners: [plan-epic-drafter, plan-feature-drafter, plan-research-drafter, plan-maintenance-drafter]
-  reject_invalid_success: true
-  required_fields: [outcome, status, owner, target_id, adw_id, worktree_path, summary, evidence]
-  failure_fields: [failure_reason, rerun_guidance]
-  statuses: [success, failed, blocked]
-  nonempty_success_fields: [evidence]
 ---
 
 # Plan Orchestrator
@@ -98,15 +75,12 @@ input: $ARGUMENTS
 Drafters are responsible for adding phases (`adw_plans_mutate add-phase`) and populating
 section content. The orchestrator only creates the plan shell records.
 
-## Static P5 Handoff Metadata
-
-The versioned frontmatter declarations are closed static validation metadata for
-scope, routes, required handoff fields, and completion-envelope shape. They
-grant no runtime authority, do not parse or admit live child results, and only
-describe the static handoff contract.
-
 Research is a first-class plan track. This agent must parse, validate, create,
 and dispatch `research` / `research_tracks` deterministically:
+
+For feature, research, and maintenance routes, `parent_id` is conditional: include
+it for a child plan and omit it for a standalone plan. The three fields declared
+in `required_handoff_fields` are mandatory for both variants.
 
 - standalone `plan_type: research` creates a standalone research plan (`R{n}`)
   and dispatches exactly one `plan-research-drafter` call;

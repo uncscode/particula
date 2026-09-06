@@ -35,7 +35,9 @@ must point to git-tracked, committed, clean, reviewable JSON under
 
 ## Notes
 
-- `cwd` must resolve to the current repository/worktree root exactly.
+- `cwd` must resolve exactly to the current repository root or to an owned linked
+  worktree directly under its `trees/` directory. Linked-worktree admission uses
+  the canonical Git common directory and rejects ordinary nested directories.
 - `baselinePath` must be repo-relative and resolve under `.opencode/guides/`.
 - `baselinePath` must also be git-tracked and free of local modifications.
 - The wrapper only runs `scripts/validate_agent_references.py` via `python3`.

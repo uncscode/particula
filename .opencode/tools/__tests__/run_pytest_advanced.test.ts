@@ -224,14 +224,57 @@ describe("run_pytest_advanced wrapper", () => {
     expect(await execute({ coverage: false, pytestArgs: ["--collect-only"] })).toContain("collected_count");
   });
 
-  it("forwards the benchmark opt-in through the validated pytest suffix", async () => {
+  it("transports reviewed benchmark options once without shell splitting", async () => {
     setDollarText(buildSuccessOutput("ok"));
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+    const pytestArgs = ["-m", "performance and not slow", "--benchmark-only", "--benchmark-min-rounds=5"];
 
-    expect(await execute({ coverage: false, pytestArgs: ["--benchmark", "-q"] })).toBe("ok");
-    expect(getInvocations().at(-1)?.args).toContain(
-      '--pytest-argv-json=["--benchmark","-q"]',
-    );
+    expect(await execute({ coverage: false, pytestArgs, options: "benchmark-plugin" })).toBe("ok");
+    expect(getInvocations().at(-1)?.args).toContain(`--pytest-argv-json=${JSON.stringify(pytestArgs)}`);
+    expect(getInvocations().at(-1)?.args).toContain("--enable-benchmark-plugin");
+  });
+
+  it("rejects protected, malformed, and oversized caller tokens before spawn", async () => {
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+    for (const [pytestArgs, expectedMessage] of [
+      [["-p", "benchmark"], "not permitted"],
+      [["--cov-context=test"], "not permitted"],
+      [["--coverage-files-only"], "not permitted"],
+      [["--junitxml=report.xml"], "not permitted"],
+      [["--pastebin=all"], "not permitted"],
+      [["--numprocesses=8"], "not permitted"],
+      [["--unknown-option"], "not permitted"],
+      [["--test-paths-json=[]"], "not permitted"],
+      [["--rootdir=."], "not permitted"],
+      [["--bad.name"], "not permitted"],
+      [["--gpu\n"], "not permitted"],
+      [["x".repeat(1025)], "not permitted"],
+      [Array.from({ length: 65 }, () => "--gpu"), "at most 64 tokens"],
+    ]) {
+      expect(String(await execute({ pytestArgs }))).toContain(expectedMessage);
+    }
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("escapes unsafe token diagnostics without multiline reflection", async () => {
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    for (const token of ["--unknown\noption", "--unknown\u007foption", "\ud800", "x".repeat(1025)]) {
+      const result = String(await execute({ pytestArgs: [token] }));
+      expect(result).not.toContain("\n");
+      expect(result.length).toBeLessThan(300);
+    }
+  });
+
+  it("enforces pytest argument limits in UTF-16 code units", async () => {
+    setDollarText(buildSuccessOutput("ok"));
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+    const maximumToken = "😀".repeat(512);
+
+    expect(await execute({ coverage: false, pytestArgs: [maximumToken] })).toBe("ok");
+    expect(await execute({ coverage: false, pytestArgs: ["😀".repeat(513)] })).toContain("not permitted");
+    expect(await execute({ coverage: false, pytestArgs: Array.from({ length: 16 }, () => maximumToken) })).toBe("ok");
+    expect(await execute({ coverage: false, pytestArgs: Array.from({ length: 17 }, () => maximumToken) })).toContain("not permitted");
   });
 
   it("preserves stdout/stderr/message failure precedence", async () => {
@@ -431,7 +474,7 @@ describe("run_pytest_advanced wrapper", () => {
 
     const result = await execute({ coverage: false, pytestArgs: ["--cov=adw"] });
 
-    expect(String(result)).toContain("pytestArgs token '--cov=adw' is not permitted.");
+    expect(String(result)).toContain("pytestArgs token \"--cov=adw\" is not permitted.");
     expect(getInvocations()).toHaveLength(0);
   });
 
@@ -440,7 +483,7 @@ describe("run_pytest_advanced wrapper", () => {
 
     const result = await execute({ pytestArgs: ["--no-cov"] });
 
-    expect(String(result)).toContain("set the wrapper field coverage: false instead");
+    expect(String(result)).toContain("pytestArgs token \"--no-cov\" is not permitted.");
     expect(getInvocations()).toHaveLength(0);
   });
 

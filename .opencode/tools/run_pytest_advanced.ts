@@ -15,6 +15,7 @@ type ParsedAdvancedOptions = {
   covReport?: string[];
   durations?: number;
   durationsMin?: number;
+  benchmarkPlugin?: true;
 };
 
 type ParsedAdvancedOptionsResult =
@@ -31,6 +32,7 @@ const ADVANCED_OPTION_RULES = new Set([
   "cov-report",
   "durations",
   "durations-min",
+  "benchmark-plugin",
 ]);
 const OUTPUT_MODES = new Set<OutputMode>(["summary", "full", "json"]);
 const LEGACY_DIRECT_KEYS = new Set([
@@ -132,13 +134,14 @@ const parseAdvancedOptions = (options: unknown): ParsedAdvancedOptionsResult => 
       if (!ADVANCED_OPTION_RULES.has(token)) {
         return { ok: false, error: `ERROR: Invalid options token '${token}': token is not supported.` };
       }
-      if (token !== "fail-fast") {
+      if (token !== "fail-fast" && token !== "benchmark-plugin") {
         return { ok: false, error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.` };
       }
-      if (parsed.failFast) {
+      if ((token === "fail-fast" && parsed.failFast) || (token === "benchmark-plugin" && parsed.benchmarkPlugin)) {
         return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate token.` };
       }
-      parsed.failFast = true;
+      if (token === "fail-fast") parsed.failFast = true;
+      else parsed.benchmarkPlugin = true;
       continue;
     }
 
@@ -150,7 +153,7 @@ const parseAdvancedOptions = (options: unknown): ParsedAdvancedOptionsResult => 
     if (!rawValue) {
       return { ok: false, error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.` };
     }
-    if (name === "fail-fast") {
+    if (name === "fail-fast" || name === "benchmark-plugin") {
       return { ok: false, error: `ERROR: Invalid options token '${token}': token does not accept a value.` };
     }
 
@@ -243,47 +246,87 @@ const validateTestPathWithinRepo = (
   return validatePathWithinRepo(testPath, "testPath", cwd);
 };
 
-const COVERAGE_PYTEST_ARG_PATTERN = /^(--cov(?:=|\b)|--cov-report(?:=|\b)|--cov-fail-under(?:=|\b)|--cov-config(?:=|\b)|--cov-context(?:=|\b))/;
+// pytest-cov reserves its complete ``--cov*`` namespace so new plugin
+// controls cannot bypass the runner-owned coverage policy.
+const COVERAGE_PYTEST_ARG_PATTERN = /^--(?:cov|no-cov$)/;
 const PYTEST_VALUE_OPTIONS = new Set(["-k", "-m"]);
-const PYTEST_STANDALONE_OPTIONS = new Set([
-  "--benchmark",
-  "--collect-only",
-  "-q",
-  "-v",
-  "--verbose",
+const PYTEST_STANDALONE_OPTIONS = new Set(["--collect-only", "-q", "-v", "--verbose"]);
+const PYTEST_REVIEWED_LONG_OPTIONS = new Set([
+  "benchmark-only", "benchmark-skip", "benchmark-disable", "benchmark-enable",
 ]);
-const PYTEST_RESERVED_PREFIXES = [
-  "--output", "--min-tests", "--timeout", "--cwd", "--test-path", "--test-filter",
-  "--coverage", "--no-coverage", "--coverage-source", "--coverage-threshold", "--cov-report",
-  "--fail-fast", "--durations", "--durations-min", "--pytest-argv-json", "--override-ini-json",
-  "--override-ini", "--test-paths-json",
-];
+const PYTEST_REVIEWED_VALUE_OPTIONS = new Set(["benchmark-min-rounds"]);
+const PYTEST_RESERVED_NAMES = new Set([
+  "output", "min-tests", "timeout", "cwd", "test-path", "test-filter", "coverage",
+  "no-coverage", "coverage-source", "coverage-threshold", "cov-report", "fail-fast",
+  "durations", "durations-min", "pytest-argv-json", "override-ini-json", "override-ini", "coverage-files-only",
+  "test-paths-json", "enable-benchmark-plugin", "rootdir", "confcutdir", "pyargs", "config-file",
+  "basetemp", "cache-clear", "import-mode", "continue-on-collection-errors", "noconftest",
+  "collect-in-virtualenv", "ignore", "ignore-glob", "deselect", "keep-duplicates",
+  "doctest-modules", "doctest-glob",
+  "trace-config", "debug", "setup-only", "fixtures", "fixtures-per-test",
+]);
+const PYTEST_LONG_NAME = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
+const MAX_PYTEST_ARG_TOKENS = 64;
+const MAX_PYTEST_ARG_TOKEN_LENGTH = 1024;
+const MAX_PYTEST_ARG_TOTAL_LENGTH = 16384;
 const MAX_TEST_PATHS = 7;
+
+const containsControlCharacter = (token: string): boolean => /[\x00-\x1f\x7f]/.test(token);
+
+const containsLoneSurrogate = (token: string): boolean => {
+  for (let index = 0; index < token.length; index += 1) {
+    const code = token.charCodeAt(index);
+    if (code >= 0xd800 && code <= 0xdbff) {
+      if (index + 1 >= token.length || token.charCodeAt(index + 1) < 0xdc00 || token.charCodeAt(index + 1) > 0xdfff) return true;
+      index += 1;
+    } else if (code >= 0xdc00 && code <= 0xdfff) return true;
+  }
+  return false;
+};
+
+const pytestTokenDiagnostic = (token: string): string => JSON.stringify(token.slice(0, 160));
+
+const parseLongPytestOption = (token: string): { name: string } | undefined => {
+  if (!token.startsWith("--")) return undefined;
+  const separator = token.indexOf("=");
+  const name = token.slice(2, separator === -1 ? undefined : separator);
+  return PYTEST_LONG_NAME.test(name) ? { name } : undefined;
+};
 
 const validatePytestArgs = (value: unknown, cwd: string | undefined): { ok: true; value: string[] } | { ok: false; error: string } => {
   if (value === undefined) return { ok: true, value: [] };
   if (!Array.isArray(value) || value.some((entry) => typeof entry !== "string")) {
     return { ok: false, error: "ERROR: pytestArgs must be an array of strings." };
   }
+  if (value.length > MAX_PYTEST_ARG_TOKENS) return { ok: false, error: `ERROR: pytestArgs must contain at most ${MAX_PYTEST_ARG_TOKENS} tokens.` };
+  let totalLength = 0;
   for (let index = 0; index < value.length; index += 1) {
     const token = value[index] as string;
-    if (token === "--no-cov") {
-      return { ok: false, error: "ERROR: pytestArgs token '--no-cov' is not permitted; set the wrapper field coverage: false instead." };
+    totalLength += token.length;
+    if (token.length > MAX_PYTEST_ARG_TOKEN_LENGTH || totalLength > MAX_PYTEST_ARG_TOTAL_LENGTH || containsControlCharacter(token) || containsLoneSurrogate(token)) {
+      return { ok: false, error: `ERROR: pytestArgs token ${pytestTokenDiagnostic(token)} is not permitted.` };
     }
-    if (token === "--" || COVERAGE_PYTEST_ARG_PATTERN.test(token) || PYTEST_RESERVED_PREFIXES.some((prefix) => token.startsWith(prefix))) {
-      return { ok: false, error: `ERROR: pytestArgs token '${token}' is not permitted.` };
+    if (token === "--" || token === "-p" || token === "-o" || token === "-c" || COVERAGE_PYTEST_ARG_PATTERN.test(token)) {
+      return { ok: false, error: `ERROR: pytestArgs token ${pytestTokenDiagnostic(token)} is not permitted.` };
     }
     if (PYTEST_STANDALONE_OPTIONS.has(token) || (/^--tb=(short|long|line|native|no)$/).test(token)) continue;
-    if (token.startsWith("--override-ini=") || token === "-o") {
-      return { ok: false, error: `ERROR: pytestArgs token '${token}' is not permitted.` };
-    }
     if (PYTEST_VALUE_OPTIONS.has(token)) {
       const option = value[index + 1];
-      if (typeof option !== "string" || option.startsWith("-") || !option) return { ok: false, error: `ERROR: pytestArgs token '${token}' has an invalid value.` };
+      if (typeof option !== "string" || !option || option.startsWith("-") || containsControlCharacter(option) || containsLoneSurrogate(option)) return { ok: false, error: `ERROR: pytestArgs token ${pytestTokenDiagnostic(token)} has an invalid value.` };
+      totalLength += option.length;
+      if (option.length > MAX_PYTEST_ARG_TOKEN_LENGTH || totalLength > MAX_PYTEST_ARG_TOTAL_LENGTH) return { ok: false, error: `ERROR: pytestArgs token ${pytestTokenDiagnostic(token)} has an invalid value.` };
       index += 1;
       continue;
     }
-    if (token.startsWith("-") || path.isAbsolute(token) || validatePathWithinRepo(token, "pytestArgs", cwd)) return { ok: false, error: `ERROR: pytestArgs token '${token}' is not permitted.` };
+    const longOption = parseLongPytestOption(token);
+    if (longOption) {
+      const hasValue = token.includes("=");
+      if (PYTEST_RESERVED_NAMES.has(longOption.name)
+        || (hasValue ? !PYTEST_REVIEWED_VALUE_OPTIONS.has(longOption.name) : !PYTEST_REVIEWED_LONG_OPTIONS.has(longOption.name))
+        || (longOption.name === "benchmark-min-rounds" && !/^[1-9][0-9]{0,2}$/.test(token.split("=", 2)[1] ?? ""))) return { ok: false, error: `ERROR: pytestArgs token ${pytestTokenDiagnostic(token)} is not permitted.` };
+      continue;
+    }
+    if (token.startsWith("-") || path.isAbsolute(token) || validatePathWithinRepo(token, "pytestArgs", cwd)) return { ok: false, error: `ERROR: pytestArgs token ${pytestTokenDiagnostic(token)} is not permitted.` };
   }
   return { ok: true, value: value as string[] };
 };
@@ -648,6 +691,7 @@ export default tool({
     }
 
     if (pytestArgs.length > 0) cmdParts.push(`--pytest-argv-json=${JSON.stringify(pytestArgs)}`);
+    if (parsedOptions.options.benchmarkPlugin) cmdParts.push("--enable-benchmark-plugin");
 
     const outputMode = getRoutineArgs(args as Record<string, unknown>, parsedOptions.options).outputMode;
     const output = await executePytestCommand(cmdParts, outputMode);

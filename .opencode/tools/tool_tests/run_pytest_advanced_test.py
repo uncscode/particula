@@ -63,23 +63,7 @@ def test_runner_cli_rejects_pytest_argv_json_with_legacy_passthrough_before_spaw
     assert runner.main(["--pytest-argv-json", "[]", "tests/"]) == 1
 
 
-def test_runner_cli_accepts_benchmark_pytest_argument(monkeypatch) -> None:
-    """The explicit benchmark opt-in reaches the pytest execution suffix."""
-    runner = _load_runner()
-    captured: dict[str, object] = {}
-
-    def fake_run(args, **kwargs):
-        captured["args"] = args
-        captured.update(kwargs)
-        return 0, "ok"
-
-    monkeypatch.setattr(runner, "run_pytest", fake_run)
-
-    assert runner.main(["--pytest-argv-json", '["--benchmark", "-q"]']) == 0
-    assert captured["args"] == ["--benchmark", "-q"]
-
-
-def test_runner_cli_rejects_invalid_json_and_empty_override_ini_before_spawn(monkeypatch) -> None:
+def test_runner_cli_rejects_invalid_json_before_spawn(monkeypatch) -> None:
     runner = _load_runner()
     monkeypatch.setattr(
         runner,
@@ -88,7 +72,6 @@ def test_runner_cli_rejects_invalid_json_and_empty_override_ini_before_spawn(mon
     )
 
     assert runner.main(["--pytest-argv-json", "null"]) == 1
-    assert runner.main(["--override-ini-json", '[""]']) == 1
 
 
 @pytest.mark.parametrize(
@@ -96,7 +79,6 @@ def test_runner_cli_rejects_invalid_json_and_empty_override_ini_before_spawn(mon
     [
         ["--pytest-argv-json", "null"],
         ["--pytest-argv-json", "[]", "tests/"],
-        ["--override-ini-json", '[""]'],
     ],
 )
 def test_runner_cli_json_argument_failures_use_canonical_prelaunch_envelope(
@@ -154,7 +136,7 @@ def test_runner_cli_forwards_named_target_and_filter_without_pytest_suffix(
     assert captured["args"] == []
     assert captured["test_path"] == "tests/run_pytest_default_test.py"
     assert captured["test_filter"] == "transport"
-    assert captured["override_ini"] == []
+    assert captured["override_ini"] is None
 
 
 def test_runner_cli_forwards_ordered_plural_targets(monkeypatch) -> None:
@@ -447,12 +429,11 @@ def test_runner_unexpected_json_failure_is_sanitized(monkeypatch, tmp_path: Path
 
 
 @pytest.mark.parametrize("entry", ["addopts=/outside", "pythonpath=/outside"])
-def test_runner_cli_rejects_all_override_ini_before_spawn(monkeypatch, entry: str) -> None:
+def test_runner_cli_does_not_expose_override_ini_transport(entry: str) -> None:
+    """Caller override ini controls are not a supported runner transport."""
     runner = _load_runner()
-    monkeypatch.setattr(
-        runner, "run_pytest", lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError())
-    )
-    assert runner.main(["--override-ini-json", json.dumps([entry])]) == 1
+    with pytest.raises(SystemExit, match="2"):
+        runner.main(["--override-ini-json", json.dumps([entry])])
 
 
 @pytest.mark.parametrize("argv", [["-p", "unsafe_plugin"], ["--override-ini=pythonpath=/outside"]])
@@ -463,6 +444,43 @@ def test_runner_cli_rejects_plugin_and_ini_pytest_args_before_spawn(monkeypatch,
         runner, "run_pytest", lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError())
     )
     assert runner.main(["--pytest-argv-json", json.dumps(argv)]) == 1
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["--coverage-files-only"],
+        ["--junitxml=report.xml"],
+        ["--pastebin=all"],
+        ["--numprocesses=8"],
+        ["--unknown-option"],
+    ],
+)
+def test_runner_cli_rejects_unreviewed_or_runner_owned_long_options(monkeypatch, argv) -> None:
+    """Long-option syntax alone must not admit output, resource, or unknown controls."""
+    runner = _load_runner()
+    monkeypatch.setattr(
+        runner, "run_pytest", lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError())
+    )
+    assert runner.main(["--pytest-argv-json", json.dumps(argv)]) == 1
+
+
+@pytest.mark.parametrize(
+    "token",
+    [
+        "--unknown\noption",
+        "--unknown\x7foption",
+        "\ud800",
+        "x" * 1025,
+    ],
+)
+def test_runner_pytest_argv_diagnostics_are_escaped_and_bounded(token: str, tmp_path: Path) -> None:
+    """Unsafe caller bytes cannot create multiline or unbounded validation errors."""
+    runner = _load_runner()
+    with pytest.raises(runner.PytestArgumentValidationError) as error:
+        runner._validate_pytest_argv([token], str(tmp_path))
+    assert "\n" not in str(error.value)
+    assert len(str(error.value)) < 300
 
 
 def test_runner_relativizes_root_target_for_nested_execution_cwd(tmp_path: Path) -> None:
@@ -835,6 +853,52 @@ def test_command_preserves_quoted_non_coverage_addopts_values(tmp_path: Path) ->
     )
 
     assert overrides == ["addopts=-m 'not slow and not visual' -n auto"]
+
+
+def test_benchmark_activation_removes_only_configured_disable_pair(tmp_path: Path) -> None:
+    """Benchmark mode retains unrelated addopts and loads the fixed plugin."""
+    runner = _load_runner()
+    (tmp_path / "pyproject.toml").write_text(
+        "[tool.pytest.ini_options]\n"
+        "addopts = '-p no:benchmark -p no:benchmark-extra no:benchmark --cov=adw'\n"
+    )
+
+    command, cov_args, overrides, _ = runner._build_pytest_command(
+        args=[],
+        fail_fast=False,
+        durations=None,
+        durations_min=None,
+        coverage=True,
+        normalized_sources=[],
+        cov_report="term-missing",
+        override_ini=None,
+        root_dir=tmp_path,
+        enable_benchmark_plugin=True,
+    )
+
+    assert cov_args == ["--cov", "--cov-report=term-missing"]
+    assert overrides == ["addopts=-p no:benchmark-extra no:benchmark"]
+    assert command[-2:] == ["-p", "benchmark"]
+
+
+def test_runner_cli_forwards_benchmark_activation_without_caller_argv(monkeypatch) -> None:
+    """The activation control remains runner-owned at the CLI boundary."""
+    runner = _load_runner()
+    captured: dict[str, object] = {}
+
+    def fake_run(args, **kwargs):
+        captured["args"] = args
+        captured.update(kwargs)
+        return 0, "ok"
+
+    monkeypatch.setattr(runner, "run_pytest", fake_run)
+
+    assert (
+        runner.main(["--enable-benchmark-plugin", "--pytest-argv-json", '["--benchmark-only"]'])
+        == 0
+    )
+    assert captured["args"] == ["--benchmark-only"]
+    assert captured["enable_benchmark_plugin"] is True
 
 
 def test_command_does_not_inject_empty_addopts_override_when_repo_has_none(tmp_path: Path) -> None:
