@@ -16,24 +16,33 @@ from particula.execution.tests.resident_benchmark_support import (
     MAX_ARTIFACT_NESTING_DEPTH,
     MAX_ARTIFACT_PAYLOAD_BYTES,
     MAX_ARTIFACT_ROWS,
+    MAX_RESIDENT_MEMORY_BYTES,
     MAX_TIMING_SAMPLES,
     MAX_WARMUP_SAMPLES,
     RESIDENT_BOX_COUNTS,
     RESIDENT_CAPTURE_COMPARISON_DESTINATION,
+    RESIDENT_DIAGNOSTIC_OPERATIONS,
     ResidentBenchmarkArtifact,
     ResidentBenchmarkAvailability,
     ResidentBenchmarkCase,
     ResidentBenchmarkPreflight,
     ResidentBenchmarkResult,
     ResidentBenchmarkStatus,
+    ResidentMemoryCategory,
+    ResidentMemoryModel,
     build_default_resident_benchmark_matrix,
     build_resident_benchmark_case_id,
     build_resident_benchmark_metadata,
+    build_resident_memory_model,
+    checked_dense_array_bytes,
     collect_paired_device_timings,
     deserialize_resident_benchmark_artifact,
     preflight_resident_benchmark_case,
+    project_checkpointed_tape_bytes,
+    project_full_retention_tape_bytes,
     serialize_resident_benchmark_artifact,
     summarize_timing_samples,
+    with_tape_projection,
     write_json_artifact,
     write_resident_capture_comparison_artifact,
 )
@@ -235,8 +244,9 @@ def test_records_summaries_metadata_and_round_trip_are_deterministic():
         [
             sys.executable,
             "-c",
-            "import sys; import particula.execution.tests.resident_benchmark_support; "
-            "assert 'warp' not in sys.modules",
+            "import sys; import particula; sys.modules.pop('numpy', None); "
+            "import particula.execution.tests.resident_benchmark_support; "
+            "assert {'warp', 'numpy', 'particula.execution.gpu_resources'}.isdisjoint(sys.modules)",
         ],
         check=False,
         capture_output=True,
@@ -796,3 +806,326 @@ def test_schema_v1_decode_populates_absent_timing_provenance_with_none() -> (
     assert all(
         result.capture_elapsed_seconds is None for result in decoded.results
     )
+
+
+def _memory_model() -> ResidentMemoryModel:
+    """Return a representative host-only resident-memory model."""
+    return build_resident_memory_model(
+        n_boxes=2,
+        n_particles=3,
+        n_species=4,
+        active_slots_per_box=1,
+        registry_logical_byte_count=101,
+        diagnostics=(
+            "gas_concentration_snapshot",
+            "particle_number_concentration",
+        ),
+        communication="gas",
+        checkpoint_sidecar_copy_bytes=11,
+        checkpoint_inspection_copy_bytes=13,
+    )
+
+
+def test_memory_model_accounts_primary_diagnostics_and_scenarios() -> None:
+    """Account exact primary fields without double-counting attribution."""
+    model = _memory_model()
+    values = {item.name: item.byte_count for item in model.categories}
+    primary = {
+        "primary.particles.masses": 2 * 3 * 4 * 8,
+        "primary.particles.concentration": 2 * 3 * 8,
+        "primary.particles.charge": 2 * 3 * 8,
+        "primary.particles.density": 4 * 8,
+        "primary.particles.volume": 2 * 8,
+        "primary.gas.molar_mass": 4 * 8,
+        "primary.gas.concentration": 2 * 4 * 8,
+        "primary.gas.vapor_pressure": 2 * 4 * 8,
+        "primary.gas.partitioning": 2 * 4 * 4,
+        "primary.environment.temperature": 2 * 8,
+        "primary.environment.pressure": 2 * 8,
+        "primary.environment.saturation_ratio": 2 * 4 * 8,
+    }
+    assert {key: values[key] for key in primary} == primary
+    assert model.steady_state_bytes == sum(primary.values()) + 101 + 64 + 16
+    assert values["inactive_particle_capacity_attribution"] == 2 * 2 * (
+        4 * 8 + 16
+    )
+    assert values["communication.gas"] == 0
+    assert model.checkpoint_bytes == sum(primary.values()) + 11 + 13
+    assert model.inactive_particle_capacity_bytes == 2 * 2 * (4 * 8 + 16)
+    assert [item.name for item in model.categories].count(
+        "registry.resource_manifest"
+    ) == 1
+
+
+@pytest.mark.parametrize(
+    "shape, itemsize, expected",
+    [((2, 3), 8, 48), ((0, 3), 8, 0), ((), 8, 8)],
+)
+def test_checked_dense_array_bytes(shape, itemsize, expected) -> None:
+    """Accept valid exact tuple shapes including zero extents."""
+    assert checked_dense_array_bytes(shape, itemsize) == expected
+
+
+@pytest.mark.parametrize(
+    "shape, itemsize",
+    [
+        ([1], 8),
+        ((True,), 8),
+        ((-1,), 8),
+        ((0, True), 8),
+        ((0, MAX_RESIDENT_MEMORY_BYTES + 1), 8),
+        ((1,), True),
+        ((1,), 0),
+        ((MAX_RESIDENT_MEMORY_BYTES, 2), 1),
+    ],
+)
+def test_checked_dense_array_bytes_rejects_invalid_or_overflow(
+    shape, itemsize
+) -> None:
+    """Reject non-exact, invalid, and over-limit dense schemas."""
+    with pytest.raises((TypeError, ValueError)):
+        checked_dense_array_bytes(shape, itemsize)
+
+
+@pytest.mark.parametrize(
+    "diagnostics",
+    [
+        (),
+        *[(item,) for item in RESIDENT_DIAGNOSTIC_OPERATIONS],
+        RESIDENT_DIAGNOSTIC_OPERATIONS,
+    ],
+)
+def test_memory_model_accepts_canonical_diagnostic_subsets(diagnostics) -> None:
+    """Size scalar and matrix diagnostic outputs in canonical order only."""
+    model = build_resident_memory_model(
+        n_boxes=2,
+        n_particles=0,
+        n_species=3,
+        active_slots_per_box=0,
+        registry_logical_byte_count=0,
+        diagnostics=diagnostics,
+        communication="none",
+        checkpoint_sidecar_copy_bytes=0,
+        checkpoint_inspection_copy_bytes=0,
+    )
+    values = {item.name: item.byte_count for item in model.categories}
+    for operation in diagnostics:
+        expected = 16 if operation == "particle_number_concentration" else 48
+        assert values[f"diagnostic.{operation}"] == expected
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"diagnostics": ["gas_concentration_snapshot"]},
+        {"diagnostics": ("unknown",)},
+        {
+            "diagnostics": (
+                "saturation_ratio_snapshot",
+                "gas_concentration_snapshot",
+            )
+        },
+        {"communication": object()},
+        {"n_boxes": True},
+        {"active_slots_per_box": 4},
+        {"registry_logical_byte_count": MAX_RESIDENT_MEMORY_BYTES + 1},
+    ],
+)
+def test_memory_model_rejects_invalid_public_inputs(kwargs) -> None:
+    """Reject invalid memory-model inputs before returning a model."""
+    arguments = dict(
+        n_boxes=2,
+        n_particles=3,
+        n_species=1,
+        active_slots_per_box=1,
+        registry_logical_byte_count=0,
+        diagnostics=(),
+        communication="none",
+        checkpoint_sidecar_copy_bytes=0,
+        checkpoint_inspection_copy_bytes=0,
+    )
+    arguments.update(kwargs)
+    with pytest.raises((TypeError, ValueError)):
+        build_resident_memory_model(**arguments)
+
+
+def test_memory_records_enforce_reconciliation_and_immutability() -> None:
+    """Require unique categories and a sole nonadditive inactive attribution."""
+    category = ResidentMemoryCategory(
+        "inactive_particle_capacity_attribution",
+        0,
+        "analytical",
+        False,
+        "steady_state",
+    )
+    model = ResidentMemoryModel((category,))
+    assert model.categories == (category,)
+    with pytest.raises(FrozenInstanceError):
+        category.name = "changed"
+    with pytest.raises(ValueError):
+        ResidentMemoryModel((category, category))
+    with pytest.raises(ValueError):
+        ResidentMemoryModel(())
+    with pytest.raises(ValueError):
+        ResidentMemoryCategory(
+            "checkpoint.bad", 0, "analytical", True, "checkpoint"
+        )
+
+
+@pytest.mark.parametrize("communication", ("none", "gas", "particles"))
+def test_memory_model_records_each_communication_selection_without_bytes(
+    communication: str,
+) -> None:
+    """Keep each selected communication alternative visible but nonadditive."""
+    model = build_resident_memory_model(
+        n_boxes=0,
+        n_particles=0,
+        n_species=0,
+        active_slots_per_box=0,
+        registry_logical_byte_count=0,
+        diagnostics=(),
+        communication=communication,
+        checkpoint_sidecar_copy_bytes=0,
+        checkpoint_inspection_copy_bytes=0,
+    )
+
+    selection = next(
+        item
+        for item in model.categories
+        if item.name == f"communication.{communication}"
+    )
+    assert selection.byte_count == 0
+    assert not selection.included_in_steady_state
+    assert model.steady_state_bytes == 0
+    assert model.checkpoint_bytes == 0
+
+
+@pytest.mark.parametrize(
+    "diagnostics, communication",
+    [
+        (("gas_concentration_snapshot", "gas_concentration_snapshot"), "none"),
+        (("gas_concentration_snapshot", 1), "none"),
+        (("gas_concentration_snapshot",), "invalid"),
+    ],
+)
+def test_memory_model_rejects_duplicate_and_invalid_selections(
+    diagnostics: tuple[object, ...], communication: object
+) -> None:
+    """Reject duplicate diagnostic and unsupported communication selections."""
+    with pytest.raises((TypeError, ValueError)):
+        build_resident_memory_model(
+            n_boxes=1,
+            n_particles=1,
+            n_species=1,
+            active_slots_per_box=0,
+            registry_logical_byte_count=0,
+            diagnostics=diagnostics,
+            communication=communication,
+            checkpoint_sidecar_copy_bytes=0,
+            checkpoint_inspection_copy_bytes=0,
+        )
+
+
+def test_memory_model_retains_zero_dimension_categories_and_full_activity() -> (
+    None
+):
+    """Retain zero-byte fields and a zero inactive attribution at boundaries."""
+    model = build_resident_memory_model(
+        n_boxes=0,
+        n_particles=4,
+        n_species=0,
+        active_slots_per_box=4,
+        registry_logical_byte_count=0,
+        diagnostics=RESIDENT_DIAGNOSTIC_OPERATIONS,
+        communication="none",
+        checkpoint_sidecar_copy_bytes=0,
+        checkpoint_inspection_copy_bytes=0,
+    )
+
+    values = {item.name: item.byte_count for item in model.categories}
+    assert values["inactive_particle_capacity_attribution"] == 0
+    assert values["primary.particles.masses"] == 0
+    assert all(
+        values[f"diagnostic.{name}"] == 0
+        for name in RESIDENT_DIAGNOSTIC_OPERATIONS
+    )
+
+
+def test_memory_model_requires_one_inactive_attribution() -> None:
+    """Reject models that omit the required nonadditive inactive record."""
+    model = _memory_model()
+    categories = model.categories
+    inactive_index = next(
+        index
+        for index, category in enumerate(categories)
+        if category.name == "inactive_particle_capacity_attribution"
+    )
+    without_inactive = (
+        categories[:inactive_index] + categories[inactive_index + 1 :]
+    )
+    with pytest.raises(ValueError):
+        ResidentMemoryModel(without_inactive)
+
+    with pytest.raises(ValueError):
+        ResidentMemoryModel(categories, "unexpected overhead")
+
+
+def test_tape_projections_are_checked_and_nonadditive() -> None:
+    """Keep tape projections separate from resident and checkpoint totals."""
+    model = _memory_model()
+    assert project_full_retention_tape_bytes(3, 4) == 12
+    assert project_full_retention_tape_bytes(0, 4) == 0
+    assert project_full_retention_tape_bytes(3, 0) == 0
+    assert project_checkpointed_tape_bytes(5, 4, 10, 2) == 38
+    assert project_checkpointed_tape_bytes(0, 0, 0, 2) == 0
+    projected = with_tape_projection(model, 19)
+    assert projected.tape_bytes == 19
+    assert projected.steady_state_bytes == model.steady_state_bytes
+    assert projected.checkpoint_bytes == model.checkpoint_bytes
+    with pytest.raises(ValueError):
+        with_tape_projection(projected, 1)
+    with pytest.raises((TypeError, ValueError)):
+        project_checkpointed_tape_bytes(1, 1, 1, 0)
+
+
+@pytest.mark.parametrize(
+    "timesteps, state_bytes, checkpoint_bytes, interval, expected",
+    [
+        (4, 3, 10, 2, 26),
+        (5, 4, 10, 2, 38),
+        (0, 4, 10, 2, 8),
+        (5, 0, 10, 2, 30),
+        (5, 4, 0, 2, 8),
+    ],
+)
+def test_checkpointed_tape_projection_uses_ceiling_count(
+    timesteps: int,
+    state_bytes: int,
+    checkpoint_bytes: int,
+    interval: int,
+    expected: int,
+) -> None:
+    """Keep checkpoint and retained-window tape terms independently checked."""
+    assert (
+        project_checkpointed_tape_bytes(
+            timesteps, state_bytes, checkpoint_bytes, interval
+        )
+        == expected
+    )
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        (True, 1),
+        (-1, 1),
+        (1, -1),
+        (MAX_RESIDENT_MEMORY_BYTES, 2),
+    ],
+)
+def test_full_retention_tape_projection_rejects_invalid_or_overflow(
+    arguments: tuple[object, object],
+) -> None:
+    """Reject invalid full-retention inputs before returning a byte count."""
+    with pytest.raises((TypeError, ValueError)):
+        project_full_retention_tape_bytes(*arguments)

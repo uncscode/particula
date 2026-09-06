@@ -20,7 +20,7 @@ import secrets
 import stat
 import statistics
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
@@ -182,6 +182,428 @@ def _require_int(value: object, name: str, *, positive: bool = False) -> int:
         qualifier = "positive" if positive else "nonnegative"
         raise ValueError(f"{name} must be {qualifier}.")
     return value
+
+
+MAX_RESIDENT_MEMORY_BYTES = (1 << 63) - 1
+"""Largest supported analytical resident-memory quantity in bytes."""
+
+MEMORY_PROVENANCES = frozenset({"analytical", "registry_logical", "projected"})
+MEMORY_SCENARIOS = frozenset({"steady_state", "checkpoint", "tape"})
+RESIDENT_DIAGNOSTIC_OPERATIONS = (
+    "gas_concentration_snapshot",
+    "saturation_ratio_snapshot",
+    "total_species_mass",
+    "particle_number_concentration",
+    "latent_heat_energy",
+    "conservation_residual",
+)
+RESIDENT_MEMORY_COMMUNICATIONS = ("none", "gas", "particles")
+
+
+def _require_memory_bytes(value: object, name: str) -> int:
+    """Validate a bounded nonnegative analytical byte count."""
+    value = _require_int(value, name)
+    if value > MAX_RESIDENT_MEMORY_BYTES:
+        raise ValueError(f"{name} exceeds MAX_RESIDENT_MEMORY_BYTES.")
+    return value
+
+
+def checked_dense_array_bytes(shape: object, itemsize: object) -> int:
+    """Return bounded dense-array bytes without fixed-width arithmetic.
+
+    Args:
+        shape: Exact tuple of nonnegative Python integer extents.
+        itemsize: Positive Python integer item width in bytes.
+
+    Returns:
+        The checked logical byte count.
+
+    Raises:
+        TypeError: If arguments are not exact required container/value types.
+        ValueError: If an extent, item width, or product exceeds the limit.
+    """
+    if type(shape) is not tuple:
+        raise TypeError("shape must be a tuple.")
+    result = _require_memory_bytes(itemsize, "itemsize")
+    if result == 0:
+        raise ValueError("itemsize must be positive.")
+    extents = tuple(
+        _require_memory_bytes(extent, f"shape[{index}]")
+        for index, extent in enumerate(shape)
+    )
+    if 0 in extents:
+        return 0
+    for extent in extents:
+        if result > MAX_RESIDENT_MEMORY_BYTES // extent:
+            raise ValueError("dense array byte count exceeds limit.")
+        result *= extent
+    return result
+
+
+def _checked_sum(values: tuple[int, ...] | list[int]) -> int:
+    """Return a bounded sum of already validated analytical byte counts."""
+    total = 0
+    for value in values:
+        value = _require_memory_bytes(value, "byte count")
+        if total > MAX_RESIDENT_MEMORY_BYTES - value:
+            raise ValueError("analytical byte count exceeds limit.")
+        total += value
+    return total
+
+
+def _checked_add(left: int, right: int) -> int:
+    """Return a bounded sum of two validated analytical byte quantities."""
+    return _checked_sum([left, right])
+
+
+@dataclass(frozen=True, slots=True)
+class ResidentMemoryCategory:
+    """Name one analytical memory category in bytes and its scenario role."""
+
+    name: str
+    byte_count: int
+    provenance: str
+    included_in_steady_state: bool
+    scenario: str
+
+    def __post_init__(self) -> None:
+        """Validate category units, provenance, and scenario exclusion rules."""
+        if not isinstance(self.name, str) or not self.name:
+            raise ValueError("memory category name must be a nonempty string.")
+        _require_memory_bytes(self.byte_count, "memory category byte_count")
+        if (
+            not isinstance(self.provenance, str)
+            or self.provenance not in MEMORY_PROVENANCES
+        ):
+            raise ValueError("memory category provenance is invalid.")
+        if (
+            not isinstance(self.scenario, str)
+            or self.scenario not in MEMORY_SCENARIOS
+        ):
+            raise ValueError("memory category scenario is invalid.")
+        if not isinstance(self.included_in_steady_state, bool):
+            raise TypeError("included_in_steady_state must be a bool.")
+        if self.scenario != "steady_state" and self.included_in_steady_state:
+            raise ValueError("checkpoint and tape categories are excluded.")
+
+
+@dataclass(frozen=True, slots=True)
+class ResidentMemoryModel:
+    """Store validated resident, checkpoint, and tape byte scenarios.
+
+    Totals are logical bytes; allocator reservations and unknown Epic I overhead
+    are excluded.
+    """
+
+    categories: tuple[ResidentMemoryCategory, ...]
+    excluded_epic_i_overhead: str = "unknown Epic I overhead excluded"
+    steady_state_bytes: int = field(init=False)
+    checkpoint_bytes: int = field(init=False)
+    tape_bytes: int = field(init=False)
+    inactive_particle_capacity_bytes: int = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Validate category reconciliation and store checked scenario totals."""
+        if not isinstance(self.categories, tuple):
+            raise TypeError("categories must be a tuple.")
+        if self.excluded_epic_i_overhead != "unknown Epic I overhead excluded":
+            raise ValueError("excluded_epic_i_overhead is invalid.")
+        if not all(
+            isinstance(item, ResidentMemoryCategory) for item in self.categories
+        ):
+            raise TypeError(
+                "categories must contain ResidentMemoryCategory values."
+            )
+        names = tuple(item.name for item in self.categories)
+        if len(names) != len(set(names)):
+            raise ValueError("memory category names must be unique.")
+        excluded = [
+            item
+            for item in self.categories
+            if item.scenario == "steady_state"
+            and not item.included_in_steady_state
+        ]
+        if any(
+            item.name != "inactive_particle_capacity_attribution"
+            and not item.name.startswith("communication.")
+            for item in excluded
+        ):
+            raise ValueError("steady-state exclusion name is invalid.")
+        communication = [
+            item for item in excluded if item.name.startswith("communication.")
+        ]
+        if len(communication) > 1 or any(
+            item.name.removeprefix("communication.")
+            not in RESIDENT_MEMORY_COMMUNICATIONS
+            or item.byte_count
+            for item in communication
+        ):
+            raise ValueError("communication selection must have zero bytes.")
+        inactive = [
+            item
+            for item in self.categories
+            if item.name == "inactive_particle_capacity_attribution"
+        ]
+        if len(inactive) != 1 or inactive[0] not in excluded:
+            raise ValueError(
+                "inactive capacity attribution is required and excluded."
+            )
+        if inactive[0].provenance != "analytical":
+            raise ValueError(
+                "inactive capacity attribution must be analytical."
+            )
+        totals = {
+            "steady_state": _checked_sum(
+                [
+                    item.byte_count
+                    for item in self.categories
+                    if item.scenario == "steady_state"
+                    and item.included_in_steady_state
+                ]
+            ),
+            "checkpoint": _checked_sum(
+                [
+                    item.byte_count
+                    for item in self.categories
+                    if item.scenario == "checkpoint"
+                ]
+            ),
+            "tape": _checked_sum(
+                [
+                    item.byte_count
+                    for item in self.categories
+                    if item.scenario == "tape"
+                ]
+            ),
+        }
+        for scenario, value in totals.items():
+            object.__setattr__(self, f"{scenario}_bytes", value)
+        object.__setattr__(
+            self, "inactive_particle_capacity_bytes", inactive[0].byte_count
+        )
+
+
+def _memory_category(
+    name: str,
+    byte_count: int,
+    provenance: str = "analytical",
+    included: bool = True,
+    scenario: str = "steady_state",
+) -> ResidentMemoryCategory:
+    """Build one internal resident-memory category with explicit defaults."""
+    return ResidentMemoryCategory(
+        name, byte_count, provenance, included, scenario
+    )
+
+
+def build_resident_memory_model(
+    *,
+    n_boxes: object,
+    n_particles: object,
+    n_species: object,
+    active_slots_per_box: object,
+    registry_logical_byte_count: object,
+    diagnostics: object,
+    communication: object,
+    checkpoint_sidecar_copy_bytes: object,
+    checkpoint_inspection_copy_bytes: object,
+) -> ResidentMemoryModel:
+    """Build host-only resident logical-memory accounting scenarios.
+
+    Primary and diagnostic storage are logical device bytes. Checkpoint values
+    are separate host-copy scenarios; allocator reservations and tape storage
+    are excluded until an explicit projection is attached.
+    """
+    boxes = _require_memory_bytes(n_boxes, "n_boxes")
+    particles = _require_memory_bytes(n_particles, "n_particles")
+    species = _require_memory_bytes(n_species, "n_species")
+    active = _require_memory_bytes(active_slots_per_box, "active_slots_per_box")
+    if active > particles:
+        raise ValueError("active_slots_per_box must not exceed n_particles.")
+    registry_bytes = _require_memory_bytes(
+        registry_logical_byte_count, "registry_logical_byte_count"
+    )
+    sidecar_bytes = _require_memory_bytes(
+        checkpoint_sidecar_copy_bytes, "checkpoint_sidecar_copy_bytes"
+    )
+    inspection_bytes = _require_memory_bytes(
+        checkpoint_inspection_copy_bytes, "checkpoint_inspection_copy_bytes"
+    )
+    if not isinstance(diagnostics, tuple):
+        raise TypeError("diagnostics must be a tuple.")
+    if any(not isinstance(item, str) for item in diagnostics):
+        raise TypeError("diagnostics must contain strings.")
+    positions = tuple(
+        RESIDENT_DIAGNOSTIC_OPERATIONS.index(item)
+        if item in RESIDENT_DIAGNOSTIC_OPERATIONS
+        else -1
+        for item in diagnostics
+    )
+    if -1 in positions or len(set(diagnostics)) != len(diagnostics):
+        raise ValueError("diagnostics are invalid.")
+    if positions != tuple(sorted(positions)):
+        raise ValueError("diagnostics must use canonical order.")
+    if not isinstance(communication, str):
+        raise TypeError("communication must be a string.")
+    if communication not in RESIDENT_MEMORY_COMMUNICATIONS:
+        raise ValueError("communication is invalid.")
+    categories = [
+        _memory_category(
+            "primary.particles.masses",
+            checked_dense_array_bytes((boxes, particles, species), 8),
+        ),
+        _memory_category(
+            "primary.particles.concentration",
+            checked_dense_array_bytes((boxes, particles), 8),
+        ),
+        _memory_category(
+            "primary.particles.charge",
+            checked_dense_array_bytes((boxes, particles), 8),
+        ),
+        _memory_category(
+            "primary.particles.density",
+            checked_dense_array_bytes((species,), 8),
+        ),
+        _memory_category(
+            "primary.particles.volume", checked_dense_array_bytes((boxes,), 8)
+        ),
+        _memory_category(
+            "primary.gas.molar_mass", checked_dense_array_bytes((species,), 8)
+        ),
+        _memory_category(
+            "primary.gas.concentration",
+            checked_dense_array_bytes((boxes, species), 8),
+        ),
+        _memory_category(
+            "primary.gas.vapor_pressure",
+            checked_dense_array_bytes((boxes, species), 8),
+        ),
+        _memory_category(
+            "primary.gas.partitioning",
+            checked_dense_array_bytes((boxes, species), 4),
+        ),
+        _memory_category(
+            "primary.environment.temperature",
+            checked_dense_array_bytes((boxes,), 8),
+        ),
+        _memory_category(
+            "primary.environment.pressure",
+            checked_dense_array_bytes((boxes,), 8),
+        ),
+        _memory_category(
+            "primary.environment.saturation_ratio",
+            checked_dense_array_bytes((boxes, species), 8),
+        ),
+    ]
+    primary_bytes = _checked_sum([item.byte_count for item in categories])
+    categories.append(
+        _memory_category(
+            "registry.resource_manifest", registry_bytes, "registry_logical"
+        )
+    )
+    for operation in diagnostics:
+        shape = (
+            (boxes,)
+            if operation == "particle_number_concentration"
+            else (boxes, species)
+        )
+        categories.append(
+            _memory_category(
+                f"diagnostic.{operation}", checked_dense_array_bytes(shape, 8)
+            )
+        )
+    categories.append(
+        _memory_category(f"communication.{communication}", 0, included=False)
+    )
+    particle_slot_bytes = _checked_add(
+        checked_dense_array_bytes((species,), 8), 16
+    )
+    inactive_bytes = checked_dense_array_bytes(
+        (boxes, particles - active), particle_slot_bytes
+    )
+    categories.append(
+        _memory_category(
+            "inactive_particle_capacity_attribution",
+            inactive_bytes,
+            included=False,
+        )
+    )
+    categories.extend(
+        (
+            _memory_category(
+                "checkpoint.primary_copy",
+                primary_bytes,
+                included=False,
+                scenario="checkpoint",
+            ),
+            _memory_category(
+                "checkpoint.sidecar_copy",
+                sidecar_bytes,
+                included=False,
+                scenario="checkpoint",
+            ),
+            _memory_category(
+                "checkpoint.inspection_copy",
+                inspection_bytes,
+                included=False,
+                scenario="checkpoint",
+            ),
+        )
+    )
+    return ResidentMemoryModel(tuple(categories))
+
+
+def project_full_retention_tape_bytes(
+    timesteps: object, state_bytes: object
+) -> int:
+    """Return checked full-retention tape bytes for timesteps and state bytes."""
+    steps = _require_memory_bytes(timesteps, "timesteps")
+    state = _require_memory_bytes(state_bytes, "state_bytes")
+    return 0 if state == 0 else checked_dense_array_bytes((steps,), state)
+
+
+def project_checkpointed_tape_bytes(
+    timesteps: object,
+    state_bytes: object,
+    checkpoint_bytes: object,
+    interval: object,
+) -> int:
+    """Return checked checkpointed-tape bytes using ceiling checkpoint count."""
+    steps = _require_memory_bytes(timesteps, "timesteps")
+    state = _require_memory_bytes(state_bytes, "state_bytes")
+    checkpoint = _require_memory_bytes(checkpoint_bytes, "checkpoint_bytes")
+    every = _require_memory_bytes(interval, "interval")
+    if every == 0:
+        raise ValueError("interval must be positive.")
+    checkpoint_count = steps // every + int(steps % every != 0)
+    return _checked_sum(
+        [
+            0
+            if checkpoint == 0
+            else checked_dense_array_bytes((checkpoint_count,), checkpoint),
+            0 if state == 0 else checked_dense_array_bytes((every,), state),
+        ]
+    )
+
+
+def with_tape_projection(
+    model: object, tape_bytes: object
+) -> ResidentMemoryModel:
+    """Return a new model with one projected tape scenario in logical bytes."""
+    if not isinstance(model, ResidentMemoryModel):
+        raise TypeError("model must be a ResidentMemoryModel.")
+    if any(item.scenario == "tape" for item in model.categories):
+        raise ValueError("model already has a tape projection.")
+    value = _require_memory_bytes(tape_bytes, "tape_bytes")
+    return ResidentMemoryModel(
+        model.categories
+        + (
+            _memory_category(
+                "tape.projected", value, "projected", False, "tape"
+            ),
+        ),
+        model.excluded_epic_i_overhead,
+    )
 
 
 def _require_float(
