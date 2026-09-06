@@ -1712,6 +1712,18 @@ ANALYSIS_CONFIDENCE = frozenset(("sufficient", "low", "none"))
 
 
 def _analysis_tuple(value: object, name: str) -> tuple[object, ...]:
+    """Require an immutable tuple for analysis-only input data.
+
+    Args:
+        value: Candidate analysis sequence.
+        name: Field name used in the validation error.
+
+    Returns:
+        The unchanged tuple value.
+
+    Raises:
+        TypeError: If ``value`` is not a tuple.
+    """
     if not isinstance(value, tuple):
         raise TypeError(f"{name} must be a tuple.")
     return value
@@ -1754,6 +1766,16 @@ class ArtifactReference:
 
 
 def _artifact_key(reference: ArtifactReference, mode: str, method: str) -> None:
+    """Validate the filename convention for a mode and measurement method.
+
+    Args:
+        reference: Artifact metadata whose key is being checked.
+        mode: Explicit analysis mode.
+        method: Explicit measurement method.
+
+    Raises:
+        ValueError: If the artifact key does not match the supplied context.
+    """
     if reference.artifact_key != f"{mode}_{method}.json":
         raise ValueError(
             "artifact_key must match the explicit mode and method."
@@ -1996,7 +2018,26 @@ def analyze_machine_bounded_performance(
     host_inputs: tuple[HostEvidenceBinding | EvidenceUnavailable, ...],
     kernel_inputs: tuple[MachineBoundKernelEvidence | EvidenceUnavailable, ...],
 ) -> PerformanceDecision:
-    """Pure fail-closed analysis of explicit captured-replay evidence."""
+    """Analyze explicit captured-replay evidence without collecting data.
+
+    The analysis keeps host-launch and synchronized-elapsed measurements
+    separate, joins only compatible small-workload evidence, and returns an
+    insufficient or unavailable decision rather than estimating missing data.
+
+    Args:
+        host_inputs: Immutable P2 host-evidence bindings or unavailable
+            outcomes.
+        kernel_inputs: Immutable P3 machine-bound Nsight bindings or
+            unavailable outcomes.
+
+    Returns:
+        A deterministic machine- and workload-bounded performance decision.
+
+    Raises:
+        TypeError: If either input is not a tuple of supported records.
+        ValueError: If an input family is empty or contains duplicate evidence
+            identities.
+    """
     hosts = _analysis_tuple(host_inputs, "host_inputs")
     kernels = _analysis_tuple(kernel_inputs, "kernel_inputs")
     if not hosts or not kernels:
@@ -2116,7 +2157,17 @@ def _analyze_bound_machine_performance(
     bound_hosts: tuple[HostEvidenceBinding, ...],
     bound_kernels: tuple[MachineBoundKernelEvidence, ...],
 ) -> PerformanceDecision:
-    """Analyze already validated, machine-matched captured-replay evidence."""
+    """Analyze validated, machine-matched captured-replay evidence.
+
+    Args:
+        workload: Frozen small profiling workload shared by all inputs.
+        machine: Complete machine provenance shared by all inputs.
+        bound_hosts: Validated host-evidence bindings.
+        bound_kernels: Validated machine-bound Nsight evidence bindings.
+
+    Returns:
+        A reconciled sufficient decision or a fail-closed insufficient result.
+    """
     synchronized = [
         x
         for x in bound_hosts
@@ -2352,7 +2403,21 @@ def build_machine_bounded_recommendation(
     decision: PerformanceDecision,
     proposal: PerformanceProposal,
 ) -> Recommendation:
-    """Emit one guarded recommendation from the top retained contribution."""
+    """Build a guarded recommendation from the top retained contribution.
+
+    Args:
+        decision: Reconciled, sufficient-confidence performance decision.
+        proposal: Evidence-linked, machine- and workload-bounded proposal.
+
+    Returns:
+        Recommendation retaining the decision, proposal, and highest-ranked
+        kernel contribution.
+
+    Raises:
+        TypeError: If either argument is not its required analysis record.
+        ValueError: If the decision has no ranked contribution or fails the
+            recommendation guardrails.
+    """
     if not isinstance(decision, PerformanceDecision):
         raise TypeError("decision must be PerformanceDecision.")
     if not isinstance(proposal, PerformanceProposal):
