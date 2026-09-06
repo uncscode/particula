@@ -1974,7 +1974,10 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
                     warmup_count=case.warmup,
                     sample_count=case.timestep_count,
                 )
-        except ResidentBenchmarkUnavailableError as error:
+        except (
+            ResidentBenchmarkUnavailableError,
+            pytest.skip.Exception,
+        ) as error:
             results.append(
                 ResidentBenchmarkResult(
                     case_id=case.case_id,
@@ -2031,9 +2034,7 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
     )
 
 
-@pytest.mark.warp
-@pytest.mark.cuda
-def test_resident_captured_replay_comparison() -> None:
+def test_resident_scaling_memory_captured_replay_comparison() -> None:
     """Publish one aggregate opt-in matrix artifact after every row completes."""
     artifact = _collect_resident_capture_matrix()
     root = Path(".artifacts")

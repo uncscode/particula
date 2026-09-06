@@ -130,6 +130,39 @@ def test_resident_matrix_records_unavailability_with_one_probe(
     assert all(result.reason == "no CUDA" for result in artifact.results)
 
 
+def test_resident_matrix_records_fixture_skip_as_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Keep an optional CUDA fixture skip inside the aggregate artifact."""
+
+    @contextmanager
+    def skipped_fixture(**_kwargs: object):
+        pytest.skip("native capture unavailable")
+        yield None
+
+    monkeypatch.setattr(
+        benchmark_test,
+        "cuda_capture_availability",
+        lambda: ResidentBenchmarkAvailability(True),
+    )
+    monkeypatch.setattr(
+        benchmark_test,
+        "qualified_cuda_resident_benchmark",
+        skipped_fixture,
+    )
+    monkeypatch.setenv("BENCHMARK_MAX_BYTES", str(8 * 1024 * 1024 * 1024))
+
+    artifact = benchmark_test._collect_resident_capture_matrix()
+
+    assert {result.status for result in artifact.results} == {
+        benchmark_test.ResidentBenchmarkStatus.UNAVAILABLE
+    }
+    assert all(
+        result.reason == "native capture unavailable"
+        for result in artifact.results
+    )
+
+
 def test_resident_matrix_forwards_exact_dimensions_and_reuses_bindings(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -375,3 +408,25 @@ def test_resident_matrix_failure_closes_once_without_an_artifact(
         benchmark_test._collect_resident_capture_matrix()
 
     assert cleanup == ["closed"]
+
+
+def test_resident_comparison_does_not_write_after_matrix_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Defer the sole artifact writer until every matrix row succeeds."""
+    writer_calls: list[tuple[object, object]] = []
+    monkeypatch.setattr(
+        benchmark_test,
+        "_collect_resident_capture_matrix",
+        lambda: (_ for _ in ()).throw(RuntimeError("capture failed")),
+    )
+    monkeypatch.setattr(
+        benchmark_test,
+        "write_resident_capture_comparison_artifact",
+        lambda root, artifact: writer_calls.append((root, artifact)),
+    )
+
+    with pytest.raises(RuntimeError, match="capture failed"):
+        benchmark_test.test_resident_scaling_memory_captured_replay_comparison()
+
+    assert writer_calls == []

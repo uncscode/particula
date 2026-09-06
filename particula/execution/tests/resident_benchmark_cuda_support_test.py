@@ -291,6 +291,33 @@ def test_qualified_cuda_binding_propagates_unknown_qualification_error(
             pass
 
 
+def test_qualified_cuda_binding_closes_once_after_capture_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Release the constructed loop once when native capture fails."""
+    _install_qualification_failure_modules(
+        monkeypatch, ValueError("qualification invariant failed")
+    )
+    closed: list[object] = []
+    graph_capture = sys.modules["particula.execution.graph_capture"]
+    graph_capture.qualify_prepared_resident_graph_capture = (  # type: ignore[attr-defined]
+        lambda *_args: object()
+    )
+    graph_capture.capture_prepared_resident_graph = (  # type: ignore[attr-defined]
+        lambda _qualification: (_ for _ in ()).throw(
+            RuntimeError("capture failed")
+        )
+    )
+    helpers = sys.modules["particula.execution.tests.captured_full_loop_test"]
+    helpers._close_prepared_loop = closed.append  # type: ignore[attr-defined]
+
+    with pytest.raises(RuntimeError, match="capture failed"):
+        with qualified_cuda_resident_benchmark():
+            pass
+
+    assert len(closed) == 1
+
+
 def test_qualified_cuda_binding_captures_and_closes_after_context(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

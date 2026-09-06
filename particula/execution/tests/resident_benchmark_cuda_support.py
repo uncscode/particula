@@ -211,6 +211,8 @@ def qualified_cuda_resident_benchmark(
     if not resolved_availability.available:
         raise ResidentBenchmarkUnavailableError(resolved_availability.reason)
 
+    import pytest
+
     from particula.execution.graph_capture import (
         capture_prepared_resident_graph,
         qualify_prepared_resident_graph_capture,
@@ -227,7 +229,10 @@ def qualified_cuda_resident_benchmark(
         _WarpNativeCaptureAdapter,
     )
 
-    wp, candidates = _require_native_cuda_capture()
+    try:
+        wp, candidates = _require_native_cuda_capture()
+    except pytest.skip.Exception as error:
+        raise ResidentBenchmarkUnavailableError(str(error)) from error
     device = candidates[0]
     setup_start = perf_counter()
     loop = _build_prepared_loop(
