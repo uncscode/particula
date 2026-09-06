@@ -113,6 +113,16 @@ def test_records_reject_invalid_scalar_and_closed_vocabularies(
         factory()  # type: ignore[operator]
 
 
+def test_machine_provenance_rejects_path_like_metadata() -> None:
+    """Test machine metadata cannot carry absolute or nested paths."""
+    values = ["/etc/hostname", "device/name"]
+    for value in values:
+        with pytest.raises(ValueError):
+            support.MachineProvenance(
+                value, "linux", "3.12", "12.0", "550", "gpu-0", "abc123"
+            )
+
+
 def test_workloads_and_executed_rows_fail_closed() -> None:
     """Test invalid IDs, shapes, duplicate metrics, and missing samples."""
     workload = _workloads()[0]
@@ -219,6 +229,17 @@ def test_raw_provenance_rejects_oversized_and_external_symlink(
         pytest.skip("platform does not permit symlink creation")
     with pytest.raises(ValueError):
         support.build_raw_report_provenance(root, "outside")
+
+
+def test_raw_root_rejects_symlinked_parent(tmp_path: Path) -> None:
+    """Test raw staging cannot escape through a symlinked directory parent."""
+    root = tmp_path / ".artifacts"
+    root.mkdir()
+    external = tmp_path / "external"
+    external.mkdir()
+    (root / "benchmarks").symlink_to(external, target_is_directory=True)
+    with pytest.raises(ValueError):
+        support.ensure_profiling_raw_root(root)
 
 
 def test_unavailable_evidence_retains_requested_workload_only() -> None:

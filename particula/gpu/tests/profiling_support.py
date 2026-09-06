@@ -49,6 +49,14 @@ def _require_text(value: object, name: str) -> str:
     return value
 
 
+def _require_machine_text(value: object, name: str) -> str:
+    """Validate machine metadata without permitting path-like values."""
+    text = _require_text(value, name)
+    if Path(text).is_absolute() or "/" in text or "\\" in text:
+        raise ValueError(f"{name} must not contain a filesystem path.")
+    return text
+
+
 def _require_int(value: object, name: str, *, positive: bool = False) -> int:
     """Return an integer while rejecting Boolean values."""
     if type(value) is not int:
@@ -198,7 +206,7 @@ class MachineProvenance:
     def __post_init__(self) -> None:
         """Validate all bounded metadata fields."""
         for field in self.__dataclass_fields__:
-            _require_text(getattr(self, field), field)
+            _require_machine_text(getattr(self, field), field)
 
 
 @dataclass(frozen=True, slots=True)
@@ -434,11 +442,20 @@ def ensure_profiling_raw_root(artifact_root: str | Path) -> Path:
         raise ValueError(
             "artifact_root must be an existing nonsymlink .artifacts."
         )
+    resolved_root = root.resolve(strict=True)
     raw_root = root / "benchmarks" / "profiling" / "raw"
+    for parent in (root / "benchmarks", root / "benchmarks" / "profiling"):
+        if parent.exists() and parent.is_symlink():
+            raise ValueError("raw root parents must not be symlinks.")
     raw_root.mkdir(parents=True, exist_ok=True)
     if raw_root.is_symlink():
         raise ValueError("raw root must not be a symlink.")
-    return raw_root.resolve(strict=True)
+    resolved_raw_root = raw_root.resolve(strict=True)
+    try:
+        resolved_raw_root.relative_to(resolved_root)
+    except ValueError:
+        raise ValueError("raw root must remain below artifact_root.") from None
+    return resolved_raw_root
 
 
 def _validate_raw_filename(raw_filename: object) -> str:
@@ -453,6 +470,7 @@ def _validate_raw_filename(raw_filename: object) -> str:
         or len(path.parts) != 1
         or "/" in raw_filename
         or "\\" in raw_filename
+        or not _SAFE_TEXT.fullmatch(raw_filename)
     ):
         raise ValueError("raw_filename must be one contained filename.")
     return raw_filename
