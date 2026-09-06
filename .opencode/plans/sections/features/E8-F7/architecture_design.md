@@ -88,7 +88,23 @@ E8-F5 fixture + E8-F6 matrix + qualified CUDA device
   warmups and one measured replay, and closes once. It writes no report, selects
   no device, and has no CPU/Warp-CPU fallback. `profiling_smoke_test.py` composes
   that worker with one opt-in collection per independently qualified tool; it is
-  evidence capability, not production scheduling or published performance data.
+   evidence capability, not production scheduling or published performance data.
+- **P4 analysis boundary:** `profiling_support.py` now consumes only explicit,
+  immutable P2 host-evidence bindings or unavailable outcomes and P3
+  machine-bound Nsight bindings or unavailable outcomes. It analyzes only the
+  frozen small captured-replay workload with identical complete machine/software
+  provenance; it neither reads artifacts nor invokes filesystems, subprocesses,
+  Warp, CUDA, timers, or profilers.
+- **P4 decision boundary:** Host-launch and synchronized-elapsed samples remain
+  separate. Only replay-normalized synchronized elapsed is reconciled against
+  complete attributed `nsys` duration rows. Missing, zero, incomplete, or
+  materially discrepant evidence returns an unavailable or insufficient decision
+  without estimated metrics, percentages, rankings, or recommendations.
+- **P4 recommendation boundary:** Deterministic ranked contributions retain row
+  provenance and artifact references. Recommendations require reconciled,
+  sufficient evidence, explicit non-portability wording, and machine/workload
+  bounds; scientific, ownership, process-order, and RNG changes require a
+  correctness-plan reference.
 - **Workflow hooks:** Consume E8-F3 resource identities, E8-F4 captured replay,
   E8-F5 validated fixtures, and E8-F6 scaling/timing/memory artifacts. Feed
   bounded findings to Epic H documentation and explicitly created follow-ups.

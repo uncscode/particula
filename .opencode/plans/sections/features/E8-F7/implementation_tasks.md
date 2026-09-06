@@ -43,11 +43,15 @@
 - [x] Aggregate duration and invocation counts and retain occupancy, achieved
   bandwidth, memory-transaction, and stall metrics only when the profiler
   reports them with documented units.
-- [ ] Rank host-launch and device-kernel contributions deterministically and
-  produce recommendations containing workload, machine, metric, evidence, and
-  explicit non-portability language.
-- [ ] Refuse recommendations that propose scientific-contract, tolerance,
-  ownership, process-order, or RNG changes without a separate correctness plan.
+- [x] Rank attributed `nsys` device-kernel contributions deterministically from
+  explicit captured-replay evidence, while retaining host-launch separately from
+  synchronized elapsed and reconciling only the latter.
+- [x] Produce only machine- and workload-bounded recommendations with retained
+  metric/artifact provenance and explicit non-portability language; return
+  unavailable or insufficient decisions without fabricated measurements.
+- [x] Refuse portable wording and recommendations that propose scientific,
+  numerical-tolerance, ownership/transfer, process-order, or RNG changes without
+  a nonempty correctness-plan reference.
 
 ## Tooling / Tests
 
@@ -61,7 +65,11 @@
   do not require NVIDIA tooling for default unit tests.
 - [x] Unit-test subprocess argument construction, version rejection, timeout,
   nonzero exit, truncated diagnostics, path safety, and fixture parsing without
-  launching `nsys`, `ncu`, or a GPU workload.
+   launching `nsys`, `ncu`, or a GPU workload.
+- [x] Add hardware-free analysis tests for immutable explicit bindings,
+  deterministic ties/ranking, replay normalization, synchronized-only
+  reconciliation, unavailable/insufficient outcomes, provenance/machine/mode
+  mismatches, no-mutation behavior, and recommendation guardrails.
 - [x] Add `particula/gpu/tests/profiling_smoke_test.py` as an explicit
   `--benchmark` CUDA smoke test. It must invoke the installed `nsys` and `ncu`
   binaries, verify the selected version identities, profile one bounded CUDA

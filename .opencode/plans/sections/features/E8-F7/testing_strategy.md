@@ -35,9 +35,13 @@ assertion thresholds.
   row that profiles the closed worker once per independently qualified tool.
   Missing prerequisites skip without fallback; post-qualification collection,
   export, schema, parser, or mapping failures fail.
-- **P4:** Unit tests cover contribution reconciliation, deterministic ranking,
-  ties, low-confidence/missing evidence, machine-bound wording, and rejection
-  of recommendations that alter scientific or ownership contracts.
+- **P4 (delivered):** `profiling_support_test.py` uses local immutable builders
+  only; it requires no CUDA, Warp, Nsight, timers, subprocesses, or artifact
+  files. Coverage exercises explicit source bindings and unavailable outcomes,
+  strict types/values and no mutation, deterministic contribution/tie ordering,
+  replay-normalized synchronized-only reconciliation, complete provenance and
+  compatibility failures, zero/incomplete/non-reconcilable evidence, and
+  machine/workload/non-portability/correctness-plan recommendation guardrails.
 - **P5:** Documentation contract tests verify commands, machine and workload
   bounds, raw evidence links, limitations, and the T7/E8-F7 reconciliation;
   strict MkDocs validates rendering and links.
@@ -48,11 +52,10 @@ P3 test locations are `particula/gpu/tests/profiling_support_test.py`,
 
 ## Focused Assertion Checks
 
-Focused fix checks run without coverage:
+Focused P4 assertion checks run without coverage:
 
 ```bash
-pytest particula/gpu/tests/profiling_support_test.py \
-  particula/gpu/tests/profiling_workload_runner_test.py -q --no-cov
+pytest particula/gpu/tests/profiling_support_test.py -q --no-cov
 pytest particula/gpu/tests/profiling_smoke_test.py --benchmark \
   -m "warp and cuda" -q --no-cov
 ```
