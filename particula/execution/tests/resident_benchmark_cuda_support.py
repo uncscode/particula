@@ -8,6 +8,7 @@ before closing the resident session; timing callers own synchronization.
 from __future__ import annotations
 
 import json
+import math
 from contextlib import contextmanager
 from dataclasses import dataclass
 from hashlib import sha256
@@ -104,14 +105,18 @@ def _selected_device_metadata(wp: Any, native: object) -> dict[str, Any]:
     """Return identity and memory for the selected native CUDA device."""
     selected = wp.get_device(native)
     total_memory = getattr(selected, "total_memory", None)
+    if (
+        isinstance(total_memory, bool)
+        or not isinstance(total_memory, int | float)
+        or not math.isfinite(float(total_memory))
+        or total_memory < 0
+    ):
+        return {"status": "unavailable", "identity": None, "memory": None}
     metadata: dict[str, Any] = {
         "status": "available",
         "identity": str(getattr(selected, "alias", native)),
     }
-    if isinstance(total_memory, int | float):
-        metadata["memory"] = int(total_memory)
-    else:
-        metadata["memory"] = {"status": "unavailable"}
+    metadata["memory"] = int(total_memory)
     return metadata
 
 
@@ -217,6 +222,7 @@ def qualified_cuda_resident_benchmark(
     from particula.execution.tests.captured_full_loop_test import (
         _build_prepared_loop,
         _close_prepared_loop,
+        _qualification_is_explicitly_unavailable,
         _require_native_cuda_capture,
         _WarpNativeCaptureAdapter,
     )
@@ -239,9 +245,14 @@ def qualified_cuda_resident_benchmark(
         capture_set = loop.registry.validate_capture_resource_set(
             loop.request.capture_resource_requirements
         )
-        qualification = qualify_prepared_resident_graph_capture(
-            loop.binding, loop.prepared, capture_set, adapter
-        )
+        try:
+            qualification = qualify_prepared_resident_graph_capture(
+                loop.binding, loop.prepared, capture_set, adapter
+            )
+        except ValueError as error:
+            if _qualification_is_explicitly_unavailable(error):
+                raise ResidentBenchmarkUnavailableError(str(error)) from error
+            raise
         capture_start = perf_counter()
         captured = capture_prepared_resident_graph(qualification)
         wp.synchronize()

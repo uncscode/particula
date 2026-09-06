@@ -157,7 +157,14 @@ DEFAULT_MASS_ACCOMMODATION = 1.0
 DEFAULT_DIFFUSION_COEFFICIENT = 2.0e-5
 MAX_COLLISIONS = 256
 DEFAULT_BENCHMARK_MAX_BYTES = 2 * 1024 * 1024 * 1024
-RESIDENT_BENCHMARK_REQUESTED_BYTES = DEFAULT_BENCHMARK_MAX_BYTES
+# P1/P2 configured conservative requested-case estimates. These are explicit
+# matrix inputs, not P3 byte formulas or allocator observations.
+RESIDENT_BENCHMARK_REQUESTED_BYTES_BY_SHAPE = {
+    (1, 16, 2): 64 * 1024 * 1024,
+    (10, 16, 2): 256 * 1024 * 1024,
+    (100, 16, 2): 1024 * 1024 * 1024,
+    (1000, 16, 2): 4 * 1024 * 1024 * 1024,
+}
 BENCHMARK_ARTIFACT_DIR = Path(".artifacts") / "benchmarks"
 DEFAULT_BENCHMARK_OUTPUT_NAME = "gpu_benchmark_results.json"
 
@@ -1885,6 +1892,16 @@ def test_mass_precision_projection_benchmark(
     _save_results()
 
 
+def _estimate_resident_requested_bytes(case: Any) -> int:
+    """Return the configured conservative estimate for one exact row."""
+    try:
+        return RESIDENT_BENCHMARK_REQUESTED_BYTES_BY_SHAPE[case.requested_shape]
+    except KeyError as error:
+        raise ValueError(
+            "resident benchmark case has no configured requested estimate."
+        ) from error
+
+
 def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
     """Collect the exact P3 matrix, with no downscale, fallback, or partial write."""
     cases = build_default_resident_benchmark_matrix()
@@ -1899,13 +1916,14 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
 
     digest = "unavailable"
     device = {"status": "unavailable", "identity": None, "memory": None}
+
     for case in cases:
         preflight = preflight_resident_benchmark_case(
             case,
             budget_bytes=_parse_positive_int_env(
                 "BENCHMARK_MAX_BYTES", DEFAULT_BENCHMARK_MAX_BYTES
             ),
-            estimate_requested_bytes=lambda _: RESIDENT_BENCHMARK_REQUESTED_BYTES,
+            estimate_requested_bytes=_estimate_resident_requested_bytes,
             availability=availability,
         )
         if preflight.status is not ResidentBenchmarkStatus.EXECUTED:
@@ -1945,8 +1963,9 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
                 prepared_signature_digest, selected_device = (
                     resident_benchmark_provenance(binding)
                 )
-                digest = prepared_signature_digest
-                device = selected_device
+                if digest == "unavailable":
+                    digest = prepared_signature_digest
+                    device = selected_device
                 uncaptured, replay = collect_paired_device_timings(
                     uncaptured_operation=binding.enqueue,
                     replay_operation=binding.replay,
@@ -1969,7 +1988,11 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
                 )
             )
             continue
-        provenance = {"binding": "native_cuda_capture"}
+        provenance = {
+            "binding": "native_cuda_capture",
+            "prepared_signature_digest": prepared_signature_digest,
+            "device": selected_device,
+        }
         for timing_mode, samples in (
             ("prepared_uncaptured_device_synchronized", uncaptured),
             ("captured_replay_device_synchronized", replay),

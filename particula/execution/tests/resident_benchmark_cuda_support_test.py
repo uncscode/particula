@@ -175,6 +175,122 @@ def test_provenance_uses_real_signature_and_nondefault_device() -> None:
     assert selected_device is device
 
 
+def _install_qualification_failure_modules(
+    monkeypatch: pytest.MonkeyPatch, error: ValueError
+) -> None:
+    """Install minimal CUDA fixture doubles that fail during qualification."""
+    request = SimpleNamespace(capture_resource_requirements=object())
+    registry = SimpleNamespace(
+        validate_capture_resource_set=lambda _requirements: object()
+    )
+    loop = SimpleNamespace(
+        request=request,
+        session=object(),
+        registry=registry,
+        guard=object(),
+        prepared=SimpleNamespace(
+            signature=SimpleNamespace(
+                device=SimpleNamespace(backend="warp", native="cuda:0"),
+                dimensions=SimpleNamespace(
+                    n_boxes=1, n_particles=16, n_species=2
+                ),
+            )
+        ),
+    )
+    loop.binding = SimpleNamespace(
+        request=loop.request,
+        session=loop.session,
+        registry=loop.registry,
+        guard=loop.guard,
+    )
+    graph_capture = ModuleType("particula.execution.graph_capture")
+    graph_capture.qualify_prepared_resident_graph_capture = (  # type: ignore[attr-defined]
+        lambda *_args: (_ for _ in ()).throw(error)
+    )
+    graph_capture.capture_prepared_resident_graph = lambda _value: object()  # type: ignore[attr-defined]
+    graph_capture.replay_captured_resident_graph = lambda *_args: None  # type: ignore[attr-defined]
+    scheduler = ModuleType("particula.execution.resident_scheduler")
+    scheduler.enqueue_prepared_resident_simulation = lambda _value: None  # type: ignore[attr-defined]
+    helpers = ModuleType("particula.execution.tests.captured_full_loop_test")
+    helpers._require_native_cuda_capture = lambda: (  # type: ignore[attr-defined]
+        SimpleNamespace(
+            synchronize=lambda: None,
+            get_device=lambda native: SimpleNamespace(
+                alias=native, total_memory=1024
+            ),
+        ),
+        [SimpleNamespace(native="cuda:0")],
+    )
+    helpers._build_prepared_loop = lambda *_args, **_kwargs: loop  # type: ignore[attr-defined]
+    helpers._close_prepared_loop = lambda _loop: None  # type: ignore[attr-defined]
+    helpers._WarpNativeCaptureAdapter = lambda *_args: object()  # type: ignore[attr-defined]
+    helpers._qualification_is_explicitly_unavailable = (  # type: ignore[attr-defined]
+        lambda value: str(value)
+        in {
+            "graph capture runtime is unavailable.",
+            "graph capture device is unavailable.",
+            "graph capture API is unsupported.",
+        }
+    )
+    monkeypatch.setitem(sys.modules, graph_capture.__name__, graph_capture)
+    monkeypatch.setitem(sys.modules, scheduler.__name__, scheduler)
+    monkeypatch.setitem(sys.modules, helpers.__name__, helpers)
+
+
+@pytest.mark.parametrize("total_memory", (None, "unknown", float("nan")))
+def test_selected_device_missing_or_nonnumeric_memory_is_unavailable(
+    total_memory: object,
+) -> None:
+    """Keep absent or invalid CUDA memory metadata schema-valid."""
+    fake_warp = SimpleNamespace(
+        get_device=lambda _native: SimpleNamespace(
+            alias="cuda:0", total_memory=total_memory
+        )
+    )
+
+    metadata = resident_benchmark_cuda_support._selected_device_metadata(
+        fake_warp, "cuda:0"
+    )
+
+    assert metadata == {
+        "status": "unavailable",
+        "identity": None,
+        "memory": None,
+    }
+
+
+@pytest.mark.parametrize(
+    "message",
+    (
+        "graph capture runtime is unavailable.",
+        "graph capture device is unavailable.",
+        "graph capture API is unsupported.",
+    ),
+)
+def test_qualified_cuda_binding_normalizes_known_qualification_absence(
+    monkeypatch: pytest.MonkeyPatch, message: str
+) -> None:
+    """Translate only documented qualification absence into unavailability."""
+    _install_qualification_failure_modules(monkeypatch, ValueError(message))
+
+    with pytest.raises(ResidentBenchmarkUnavailableError, match=message):
+        with qualified_cuda_resident_benchmark():
+            pass
+
+
+def test_qualified_cuda_binding_propagates_unknown_qualification_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Preserve unexpected qualification errors as implementation failures."""
+    _install_qualification_failure_modules(
+        monkeypatch, ValueError("qualification invariant failed")
+    )
+
+    with pytest.raises(ValueError, match="qualification invariant failed"):
+        with qualified_cuda_resident_benchmark():
+            pass
+
+
 def test_qualified_cuda_binding_captures_and_closes_after_context(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
