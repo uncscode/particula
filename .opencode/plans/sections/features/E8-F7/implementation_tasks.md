@@ -28,19 +28,19 @@
 - [x] Add a private identity-preserving CUDA fixture reset that snapshots and
   restores mutable primary and acquired continuation arrays, including RNG
   sidecars, between warmups and independent batches.
-- [ ] Add parsers for selected machine-readable Nsight Systems/Compute exports;
+- [x] Add parsers for selected machine-readable Nsight Systems/Compute exports;
   fail closed on unsupported schema or units and retain raw source references.
-- [ ] Qualify the Arch Linux `nsight-systems 2026.1.3.425-1` and
+- [x] Qualify the Arch Linux `nsight-systems 2026.1.3.425-1` and
   `nsight-compute 2026.2.1.5-1` package pair, persist literal CLI version
   output, and keep both profilers as optional external tools rather than Python
   dependencies.
-- [ ] Add bounded Python subprocess orchestration for version probes, collection,
+- [x] Add bounded Python subprocess orchestration for version probes, collection,
   and export. Use explicit argument vectors with `shell=False`, capture exit
   status and bounded diagnostics, and write only beneath the controlled artifact
   root; do not launch external tools from the default test suite.
-- [ ] Map observed kernel names to canonical resident process IDs where the
+- [x] Map observed kernel names to canonical resident process IDs where the
   mapping is evidenced; preserve an `unattributed` category otherwise.
-- [ ] Aggregate duration and invocation counts and retain occupancy, achieved
+- [x] Aggregate duration and invocation counts and retain occupancy, achieved
   bandwidth, memory-transaction, and stall metrics only when the profiler
   reports them with documented units.
 - [ ] Rank host-launch and device-kernel contributions deterministically and
@@ -57,23 +57,23 @@
   proving warmup/setup exclusion and synchronization boundaries.
 - [x] Add CUDA-gated opt-in rows to `benchmark_test.py`; retain `benchmark`,
   `slow`, `performance`, `warp`, and `cuda` intent markers as applicable.
-- [ ] Store compact text/JSON parser fixtures in a bounded test-data directory;
+- [x] Store compact text/JSON parser fixtures in a bounded test-data directory;
   do not require NVIDIA tooling for default unit tests.
-- [ ] Unit-test subprocess argument construction, version rejection, timeout,
+- [x] Unit-test subprocess argument construction, version rejection, timeout,
   nonzero exit, truncated diagnostics, path safety, and fixture parsing without
   launching `nsys`, `ncu`, or a GPU workload.
-- [ ] Add `particula/gpu/tests/profiling_smoke_test.py` as an explicit
+- [x] Add `particula/gpu/tests/profiling_smoke_test.py` as an explicit
   `--benchmark` CUDA smoke test. It must invoke the installed `nsys` and `ncu`
   binaries, verify the selected version identities, profile one bounded CUDA
   workload, export both supported machine-readable formats, and parse them with
   the production profiling parser.
-- [ ] Keep smoke artifacts beneath `.artifacts/benchmarks`, retain command and
+- [x] Keep smoke artifacts beneath `.artifacts/benchmarks`, retain command and
   exit-status provenance, and report missing binaries, unsupported versions,
   denied counters, export failures, or missing metrics without changing host
   permissions or using CPU fallback.
-- [ ] Record exact profiler commands, selected metric sets, exit codes, and
-  literal result summaries; unavailable required rows remain unshipped.
-- [ ] Require a qualified NVIDIA CUDA GPU for real profiler rows; missing CUDA,
+- [x] Record exact profiler commands, selected metric sets, exit codes, and
+  literal result summaries; unavailable outcomes never invent evidence.
+- [x] Require a qualified NVIDIA CUDA GPU for real profiler rows; missing CUDA,
   profiler access, or hardware counters must not route to Warp CPU.
 
 ## Documentation

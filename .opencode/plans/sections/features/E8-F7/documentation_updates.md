@@ -1,5 +1,12 @@
 # Documentation Updates
 
+## P3 Status
+
+Issue #1591 intentionally made no user-facing documentation update. It delivers
+test-only Nsight evidence collection support and opt-in CUDA smoke validation,
+not a measured profile or user workflow. The listed P5 documentation and
+result-publication work remains deferred.
+
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` with E8-F7 status,
   measured machine/software identity, exact workload matrix, commands, raw
   local-artifact checksums, the local-only retention limitation, and the

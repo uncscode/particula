@@ -14,7 +14,7 @@ follows the explicit assignment and tracks reconciliation as an open question.
   injected `.artifacts` raw-report provenance in
   `particula/gpu/tests/profiling_support.py`, with hardware-free tests in
   `particula/gpu/tests/profiling_support_test.py`.
- - P2 delivered native-CUDA-only collection for the unchanged small `(1, 16, 2)`
+- P2 delivered native-CUDA-only collection for the unchanged small `(1, 16, 2)`
   and medium `(1000, 16, 2)` workloads. It emits four artifacts for the explicit
   `prepared_uncaptured`/`captured_replay` × `host_launch`/
   `synchronized_elapsed` pairs and a four-entry manifest below
@@ -24,6 +24,10 @@ follows the explicit assignment and tracks reconciliation as an open question.
   restoring snapshot primary/continuation/RNG state without replacing the loop,
   graph, capture set, or resident identities. Reset incapability publishes
   complete unavailable evidence.
+- P3 delivered strict, version-gated Nsight Systems/Compute evidence records and
+  parsers, bounded external-process orchestration, a fixed-argv native-CUDA
+  workload worker, and an opt-in CUDA smoke test. It is limited to test-support
+  modules and their fixtures/tests.
 - Define small and medium representative resident workloads using fixed boxes,
   particles, species, process order, communication mode, and canonical replay
   counts of `1`, `10`, `100`, and `1000`.
@@ -50,8 +54,12 @@ follows the explicit assignment and tracks reconciliation as an open question.
 - Treating the P1 workload definition or synthetic evidence records as an
   executed CUDA timing/profile result. P1 neither invokes Warp/CUDA/profilers
   nor collects timing evidence.
- - Treating P2's optional collection implementation or unavailable artifact row
+- Treating P2's optional collection implementation or unavailable artifact row
   as measured CUDA evidence. P2 does not collect Nsight kernel metrics.
+- Treating P3's parser, orchestration, or opt-in smoke capability as a collected
+  profile, benchmark result, bottleneck ranking, or recommendation.
+- Any public API/export, production scheduler change, user-facing documentation,
+  CPU/Warp-CPU fallback, or default-suite profiler execution.
 - Replacing E8-F6 scaling and memory-budget evidence or re-measuring setup and
   graph-capture construction as replay cost.
 - Implementing recommendations whose production changes belong in follow-up

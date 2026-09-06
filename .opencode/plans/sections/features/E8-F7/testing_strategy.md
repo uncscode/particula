@@ -25,16 +25,16 @@ assertion thresholds.
   primary/RNG snapshot restoration, empty registries, validation order, and
   propagated reset errors. The opt-in CUDA row asserts artifact structure, never
   a speedup threshold.
-- **P3:** Parser tests use checked-in bounded text/JSON fixtures for supported
-  profiler exports. Cover unit conversion, duplicate invocations, unattributed
-  kernels, missing counters, unsupported versions, bounded errors, and stable
-  aggregation. Process-runner tests mock `nsys` and `ncu` and cover argument
-  vectors, `shell=False`, version probes, timeouts, exit status, bounded output,
-  and safe export paths. A separate opt-in smoke test invokes both installed
-  binaries around one bounded CUDA workload, exports real reports, and passes
-  those reports through the production parser. It may pass or report explicit
-  unavailable evidence; a schema or parser mismatch for the selected installed
-  versions is a failure.
+- **P3 (delivered):** `profiling_support_test.py` uses bounded fixtures and a
+  mock runner to cover strict version/CSV/JSON parsing, unit conversion,
+  attribution, aggregation, command vectors, `shell=False`, timeouts, bounded
+  diagnostics, failures, and contained paths. `profiling_workload_runner_test.py`
+  covers argv rejection before CUDA imports, exact qualified-worker call order,
+  unavailable handling, and one-time cleanup. `profiling_smoke_test.py` adds a
+  hardware-free composition seam plus an opt-in `benchmark`/`warp`/`cuda` smoke
+  row that profiles the closed worker once per independently qualified tool.
+  Missing prerequisites skip without fallback; post-qualification collection,
+  export, schema, parser, or mapping failures fail.
 - **P4:** Unit tests cover contribution reconciliation, deterministic ranking,
   ties, low-confidence/missing evidence, machine-bound wording, and rejection
   of recommendations that alter scientific or ownership contracts.
@@ -42,9 +42,9 @@ assertion thresholds.
   bounds, raw evidence links, limitations, and the T7/E8-F7 reconciliation;
   strict MkDocs validates rendering and links.
 
-Likely test locations are `particula/gpu/tests/profiling_support_test.py`,
-`particula/gpu/tests/benchmark_helpers_test.py`, and opt-in rows in
-`particula/gpu/tests/benchmark_test.py`.
+P3 test locations are `particula/gpu/tests/profiling_support_test.py`,
+`particula/gpu/tests/profiling_workload_runner_test.py`, and
+`particula/gpu/tests/profiling_smoke_test.py`.
 
 ## Focused Assertion Checks
 
@@ -52,18 +52,15 @@ Focused fix checks run without coverage:
 
 ```bash
 pytest particula/gpu/tests/profiling_support_test.py \
-  particula/gpu/tests/benchmark_helpers_test.py -q
-pytest particula/gpu/tests/benchmark_test.py --benchmark \
-  -k "resident and (launch or profile)" -v -s
+  particula/gpu/tests/profiling_workload_runner_test.py -q --no-cov
 pytest particula/gpu/tests/profiling_smoke_test.py --benchmark \
-  -m "warp and cuda" -q -Werror
+  -m "warp and cuda" -q --no-cov
 ```
 
-The second and third commands are CUDA-only and may pass or cleanly report an
-unavailable prerequisite. A skip is not a measurement and must remain an
-unavailable artifact row. Neither command may route to Warp CPU. The smoke test
-runs vendor profilers only to verify executable, export, and parser integration;
-its overhead-tainted timings are not benchmark thresholds.
+The second command is CUDA-only and may pass or cleanly skip an unavailable
+prerequisite. A skip is not a measurement. Neither command may route to Warp
+CPU. The smoke test verifies executable, export, and parser integration only;
+it is not a benchmark threshold or published profile result.
 
 ## Coverage and Final Validation
 

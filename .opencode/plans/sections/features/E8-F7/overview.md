@@ -47,6 +47,22 @@ continuation sidecars, including RNG state, in
 reset drains, restores pre-bound same-device storage, drains again, and validates
 the retained identities before the next batch; it never rebuilds or recaptures.
 
+## P3 Delivered
+
+Issue #1591 delivered test-only, closed native-CUDA Nsight evidence collection.
+`particula/gpu/tests/profiling_support.py` now owns strict versioned evidence
+records and parsers, bounded `shell=False` subprocess orchestration, exact tool
+qualification, contained export handling, and explicit unavailable/failed
+outcomes. `profiling_workload_runner.py` accepts only the fixed small
+captured-replay worker argv before lazy CUDA imports; `profiling_smoke_test.py`
+adds an opt-in CUDA smoke path for `nsys` and `ncu`.
+
+Hardware-free coverage exercises parsing, commands, failure bounds, path safety,
+worker argv/call order, and smoke composition. Real collection remains opt-in
+and CUDA-only, with no CPU or Warp-CPU fallback. This phase adds no public API,
+user-facing documentation, production scheduler behavior, benchmark result, or
+recommendation.
+
 ## User Stories
 
 - As a performance engineer, I want host launch and device execution costs

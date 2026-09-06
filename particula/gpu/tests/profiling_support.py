@@ -17,6 +17,7 @@ import re
 import stat
 import subprocess
 import sys
+import threading
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Callable, cast
@@ -1438,7 +1439,10 @@ def parse_ncu_metrics_csv(
     return tuple(rows)
 
 
-Runner = Callable[[tuple[str, ...]], subprocess.CompletedProcess[str]]
+# Injected test runners may accept the optional ``cwd`` keyword used for
+# profiler collection, while probe and worker fakes commonly accept only the
+# command tuple.
+Runner = Callable[..., subprocess.CompletedProcess[str]]
 
 
 def _bounded_text(value: str | bytes | None) -> str:
@@ -1463,6 +1467,8 @@ def _bounded_text(value: str | bytes | None) -> str:
 
 def run_profile_command(
     command: tuple[str, ...],
+    *,
+    cwd: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """Run an internally-created immutable argument tuple without a shell.
 
@@ -1470,11 +1476,11 @@ def run_profile_command(
         command: Nonempty tuple of internally constructed process arguments.
 
     Returns:
-        Completed subprocess result with captured text output.
+        Completed subprocess result with bounded text output.
 
     Raises:
         TypeError: If ``command`` is not a nonempty string tuple.
-        FileNotFoundError: If the requested executable is unavailable.
+        OSError: If the requested executable cannot be launched.
         subprocess.TimeoutExpired: If the fixed process timeout is exceeded.
     """
     if (
@@ -1483,13 +1489,51 @@ def run_profile_command(
         or not all(isinstance(item, str) for item in command)
     ):
         raise TypeError("command must be a nonempty immutable string tuple.")
-    return subprocess.run(  # noqa: S603 - command is internally constructed.
+    process = subprocess.Popen(  # noqa: S603 - command is internally constructed.
         command,
         shell=False,
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=PROCESS_TIMEOUT_SECONDS,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=cwd,
+    )
+    outputs: dict[str, bytes] = {"stdout": b"", "stderr": b""}
+    overflowed = threading.Event()
+
+    def read_stream(name: str, stream: Any) -> None:
+        """Read a stream and terminate at the output cap."""
+        chunks: list[bytes] = []
+        size = 0
+        while chunk := stream.read(4096):
+            size += len(chunk)
+            if size > MAX_PROCESS_OUTPUT_BYTES:
+                overflowed.set()
+                process.terminate()
+                break
+            chunks.append(chunk)
+        outputs[name] = b"".join(chunks)
+
+    threads = [
+        threading.Thread(target=read_stream, args=("stdout", process.stdout)),
+        threading.Thread(target=read_stream, args=("stderr", process.stderr)),
+    ]
+    for thread in threads:
+        thread.start()
+    try:
+        process.wait(timeout=PROCESS_TIMEOUT_SECONDS)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        process.wait()
+        raise
+    finally:
+        for thread in threads:
+            thread.join()
+    if overflowed.is_set():
+        raise ValueError("process diagnostics exceed the byte limit.")
+    return subprocess.CompletedProcess(
+        command,
+        process.returncode,
+        outputs["stdout"].decode(errors="replace"),
+        outputs["stderr"].decode(errors="replace"),
     )
 
 
@@ -1520,7 +1564,7 @@ def qualify_nsight_tool(
             _bounded_text(result.stdout),
             _bounded_text(result.stderr),
         )
-    except FileNotFoundError:
+    except OSError:
         return NsightUnavailable(tool, "binary not found")
     except subprocess.TimeoutExpired:
         return NsightUnavailable(tool, "probe timed out")
@@ -1555,7 +1599,11 @@ def _plain_report_path(raw_root: Path, filename: str) -> Path:
 
 
 def _run_outcome(
-    tool: str, stage: str, command: tuple[str, ...], runner: Runner
+    tool: str,
+    stage: str,
+    command: tuple[str, ...],
+    runner: Runner,
+    cwd: Path | None = None,
 ) -> NsightCommandOutcome | NsightUnavailable:
     """Execute a bounded command and normalize expected process absence.
 
@@ -1569,7 +1617,7 @@ def _run_outcome(
         Bounded command outcome or explicit unavailability result.
     """
     try:
-        result = runner(command)
+        result = runner(command) if cwd is None else runner(command, cwd=cwd)
         return NsightCommandOutcome(
             tool,
             stage,
@@ -1577,7 +1625,7 @@ def _run_outcome(
             _bounded_text(result.stdout),
             _bounded_text(result.stderr),
         )
-    except FileNotFoundError:
+    except OSError:
         return NsightUnavailable(tool, f"{stage} binary not found")
     except subprocess.TimeoutExpired:
         return NsightUnavailable(tool, f"{stage} timed out")
@@ -1607,6 +1655,10 @@ def collect_nsight_evidence(
     worker = _run_outcome("worker", "worker", WORKER_COMMAND, runner)
     if isinstance(worker, NsightUnavailable):
         return worker
+    if worker.returncode == 3 and worker.stdout.startswith(
+        "PROFILING_WORKLOAD_UNAVAILABLE: "
+    ):
+        return NsightUnavailable("worker", worker.stdout.rstrip())
     if worker.returncode:
         return NsightFailed(worker)
     # The tools receive only a fixed collection mode and the contained basename.
@@ -1624,7 +1676,7 @@ def collect_nsight_evidence(
         )
         + WORKER_COMMAND
     )
-    collected = _run_outcome(tool, "collect", collection, runner)
+    collected = _run_outcome(tool, "collect", collection, runner, raw_root)
     if isinstance(collected, NsightUnavailable):
         return collected
     if collected.returncode:
@@ -1634,7 +1686,7 @@ def collect_nsight_evidence(
         if tool == "nsys"
         else ("ncu", "--import", report.name, "--csv")
     )
-    exported = _run_outcome(tool, "export", export, runner)
+    exported = _run_outcome(tool, "export", export, runner, raw_root)
     if isinstance(exported, NsightUnavailable):
         return exported
     if exported.returncode:

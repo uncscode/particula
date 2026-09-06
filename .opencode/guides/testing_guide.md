@@ -209,6 +209,28 @@ evidence for both frozen workloads. Do not treat this as CPU or Warp-CPU timing
 success, and do not use these test artifacts to claim a public API, scheduler
 change, or general performance result.
 
+Nsight Systems and Nsight Compute evidence is separate, internal test support.
+Its host-only schema, parser, subprocess orchestration, and closed CUDA worker
+have hardware-free coverage:
+
+```bash
+pytest particula/gpu/tests/profiling_support_test.py \
+  particula/gpu/tests/profiling_workload_runner_test.py -q --no-cov
+```
+
+The opt-in smoke test collects one fixed small native-CUDA captured-replay
+workload per qualified tool. Run it only when `nsys`, `ncu`, native CUDA capture,
+and the required profiler permissions are available:
+
+```bash
+pytest particula/gpu/tests/profiling_smoke_test.py --benchmark \
+  -m "warp and cuda" -q --no-cov
+```
+
+Missing CUDA capture, tools, permissions, or denied counters skip this evidence
+without fallback. The records are test-only and do not provide a public
+profiling workflow or a performance claim.
+
 ## Wall Loss Coverage
 
 The full suite collects wall-loss strategy coverage from:

@@ -79,7 +79,16 @@ E8-F5 fixture + E8-F6 matrix + qualified CUDA device
   stderr. It records literal version output before collection, writes exports
   only beneath the controlled artifact root, and parses only the selected
   machine-readable schemas. Default tests mock process execution or parse
-  checked-in fixtures; they never launch a profiler or require CUDA.
+   checked-in fixtures; they never launch a profiler or require CUDA.
+- **P3 delivery boundary:** `profiling_support.py` owns immutable argv templates,
+  exact version qualification, bounded diagnostics, contained export/provenance
+  handoff, and fail-closed parser outcomes. The separate
+  `profiling_workload_runner.py` validates only the fixed small captured-replay
+  invocation before lazy CUDA imports, resets a qualified binding, performs two
+  warmups and one measured replay, and closes once. It writes no report, selects
+  no device, and has no CPU/Warp-CPU fallback. `profiling_smoke_test.py` composes
+  that worker with one opt-in collection per independently qualified tool; it is
+  evidence capability, not production scheduling or published performance data.
 - **Workflow hooks:** Consume E8-F3 resource identities, E8-F4 captured replay,
   E8-F5 validated fixtures, and E8-F6 scaling/timing/memory artifacts. Feed
   bounded findings to Epic H documentation and explicitly created follow-ups.

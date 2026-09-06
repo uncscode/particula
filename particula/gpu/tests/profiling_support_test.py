@@ -345,18 +345,99 @@ def test_nsight_qualification_requires_exact_literal_banner() -> None:
     assert calls == [("nsys", "--version")]
 
 
+@pytest.mark.parametrize("error", (PermissionError(), OSError("blocked")))
+def test_nsight_qualification_normalizes_launch_os_errors(
+    error: OSError,
+) -> None:
+    """Test launch failures become unavailable probe outcomes."""
+
+    def failing_runner(
+        command: tuple[str, ...],
+    ) -> subprocess.CompletedProcess[str]:
+        raise error
+
+    result = support.qualify_nsight_tool("nsys", failing_runner)
+
+    assert result == support.NsightUnavailable("nsys", "binary not found")
+
+
+@pytest.mark.parametrize("error", (PermissionError(), OSError("blocked")))
+def test_command_outcome_normalizes_launch_os_errors(error: OSError) -> None:
+    """Test collection-stage launch failures become unavailable outcomes."""
+
+    def failing_runner(
+        command: tuple[str, ...],
+    ) -> subprocess.CompletedProcess[str]:
+        raise error
+
+    outcome = support._run_outcome(
+        "nsys", "collect", ("nsys", "profile"), failing_runner
+    )
+
+    assert outcome == support.NsightUnavailable(
+        "nsys", "collect binary not found"
+    )
+
+
+def test_profile_runner_terminates_when_one_stream_exceeds_cap(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test streaming diagnostics terminate and reap an overflowing process."""
+
+    class FakeStream:
+        """Return one fixed payload and then EOF."""
+
+        def __init__(self, payload: bytes) -> None:
+            self.payload = payload
+
+        def read(self, _: int) -> bytes:
+            payload, self.payload = self.payload, b""
+            return payload
+
+    class FakeProcess:
+        """Expose the minimal process API used by the streaming runner."""
+
+        def __init__(self) -> None:
+            self.stdout = FakeStream(b"ok")
+            self.stderr = FakeStream(
+                b"x" * (support.MAX_PROCESS_OUTPUT_BYTES + 1)
+            )
+            self.returncode = -15
+            self.terminated = False
+
+        def terminate(self) -> None:
+            self.terminated = True
+
+        def wait(self, timeout: int | None = None) -> int:
+            del timeout
+            return self.returncode
+
+        def kill(self) -> None:
+            self.terminated = True
+
+    process = FakeProcess()
+    monkeypatch.setattr(
+        support.subprocess, "Popen", lambda *args, **kwargs: process
+    )
+
+    with pytest.raises(ValueError, match="diagnostics exceed"):
+        support.run_profile_command(("nsys", "--version"))
+
+    assert process.terminated
+
+
 def test_collect_nsight_evidence_uses_closed_commands_and_parser(
     tmp_path: Path,
 ) -> None:
     """Test collection has fixed stages, bounded commands, and parser handoff."""
     root = tmp_path / ".artifacts"
     root.mkdir()
-    calls: list[tuple[str, ...]] = []
+    calls: list[tuple[tuple[str, ...], Path | None]] = []
 
     def fake_runner(
-        command: tuple[str, ...],
+        command: tuple[str, ...], *, cwd: Path | None = None
     ) -> subprocess.CompletedProcess[str]:
-        calls.append(command)
+        calls.append((command, cwd))
         if command == ("nsys", "--version"):
             return subprocess.CompletedProcess(
                 command, 0, "2026.1.3.425-1\n", ""
@@ -384,9 +465,11 @@ def test_collect_nsight_evidence_uses_closed_commands_and_parser(
 
     assert isinstance(result, support.NsightEvidence)
     assert result.rows[0].attribution == "attributed"
-    assert calls[0] == ("nsys", "--version")
-    assert calls[1] == support.WORKER_COMMAND
-    assert all(isinstance(command, tuple) for command in calls)
+    assert calls[0] == (("nsys", "--version"), None)
+    assert calls[1] == (support.WORKER_COMMAND, None)
+    assert calls[2][1] == root / "benchmarks" / "profiling" / "raw"
+    assert calls[3][1] == root / "benchmarks" / "profiling" / "raw"
+    assert all(isinstance(command, tuple) for command, _ in calls)
 
 
 def test_collect_ncu_evidence_uses_closed_metrics_and_parser(
@@ -395,12 +478,12 @@ def test_collect_ncu_evidence_uses_closed_metrics_and_parser(
     """Test Compute collection exports one allow-listed attributed metric."""
     root = tmp_path / ".artifacts"
     root.mkdir()
-    calls: list[tuple[str, ...]] = []
+    calls: list[tuple[tuple[str, ...], Path | None]] = []
 
     def fake_runner(
-        command: tuple[str, ...],
+        command: tuple[str, ...], *, cwd: Path | None = None
     ) -> subprocess.CompletedProcess[str]:
-        calls.append(command)
+        calls.append((command, cwd))
         if command == ("ncu", "--version"):
             return subprocess.CompletedProcess(command, 0, "2026.2.1.5-1\n", "")
         if command[:2] == ("ncu", "--import"):
@@ -424,10 +507,45 @@ def test_collect_ncu_evidence_uses_closed_metrics_and_parser(
     assert isinstance(result, support.NsightEvidence)
     assert result.rows[0].attribution == "attributed"
     assert result.rows[0].metric_name == "dram__throughput.avg"
-    assert calls[0] == ("ncu", "--version")
-    assert calls[1] == support.WORKER_COMMAND
-    assert calls[2][:2] == ("ncu", "--csv")
-    assert calls[3] == ("ncu", "--import", "compute.csv", "--csv")
+    assert calls[0] == (("ncu", "--version"), None)
+    assert calls[1] == (support.WORKER_COMMAND, None)
+    assert calls[2][0][:2] == ("ncu", "--csv")
+    assert calls[2][1] == root / "benchmarks" / "profiling" / "raw"
+    assert calls[3] == (
+        ("ncu", "--import", "compute.csv", "--csv"),
+        root / "benchmarks" / "profiling" / "raw",
+    )
+
+
+def test_collect_nsight_normalizes_documented_worker_unavailable(
+    tmp_path: Path,
+) -> None:
+    """Test the closed worker's unavailable status does not become a failure."""
+    root = tmp_path / ".artifacts"
+    root.mkdir()
+
+    def fake_runner(
+        command: tuple[str, ...],
+    ) -> subprocess.CompletedProcess[str]:
+        if command == ("nsys", "--version"):
+            return subprocess.CompletedProcess(
+                command, 0, "2026.1.3.425-1\n", ""
+            )
+        return subprocess.CompletedProcess(
+            command, 3, "PROFILING_WORKLOAD_UNAVAILABLE: no CUDA\n", ""
+        )
+
+    result = support.collect_nsight_evidence(
+        tool="nsys",
+        artifact_root=root,
+        report_filename="systems.csv",
+        process_ids={},
+        runner=fake_runner,
+    )
+
+    assert result == support.NsightUnavailable(
+        "worker", "PROFILING_WORKLOAD_UNAVAILABLE: no CUDA"
+    )
 
 
 def test_collect_nsight_rejects_unsafe_report_before_worker(

@@ -36,18 +36,22 @@
     publication rollback. CUDA-support tests cover primary/RNG restoration,
     empty registries, validation ordering, and error propagation.
 
-- [ ] **E8-F7-P3:** Collect per-kernel CUDA timing occupancy and memory-access evidence with tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add bounded Python orchestration for the selected Nsight
-    Systems/Compute baseline and normalize exported dominant-kernel metrics
-    without fabricating values when a tool or metric is unavailable.
+- [x] **E8-F7-P3:** Collect CUDA kernel profiling evidence with tests
+  - Issue: #1591 | Size: S | Status: Shipped
+  - Delivered: Strict versioned Nsight evidence records/parsers, bounded
+    `shell=False` orchestration, typed unavailable/failed outcomes, a closed
+    fixed-argv native-CUDA worker, and opt-in CUDA smoke composition.
   - Files: `particula/gpu/tests/profiling_support.py`,
     `particula/gpu/tests/profiling_support_test.py`,
-    `particula/gpu/tests/profiling_smoke_test.py`, `.opencode/tools/`
-  - Tests: Mocked subprocess boundaries, export parsing fixtures, unit
-    normalization, kernel-name mapping, invocation aggregation, missing metric
-    handling, bounded diagnostics, and opt-in real-binary export/parser smoke
-    coverage on a qualified CUDA device.
+    `particula/gpu/tests/profiling_workload_runner.py`,
+    `particula/gpu/tests/profiling_workload_runner_test.py`, and
+    `particula/gpu/tests/profiling_smoke_test.py`.
+  - Tests: Hardware-free fixtures and mock runners cover parsing, conversion,
+    mapping/aggregation, argv, timeouts, diagnostics, paths, and failures;
+    worker tests cover pre-import validation, call order, unavailable status, and
+    cleanup. The CUDA smoke is opt-in and skips unavailable prerequisites with no
+    CPU/Warp-CPU fallback. No production scheduler/API behavior, user
+    documentation, or measured result was added.
 
 - [ ] **E8-F7-P4:** Analyze bottlenecks and generate machine-bounded recommendations with tests
   - Issue: TBD | Size: S | Status: Not Started
