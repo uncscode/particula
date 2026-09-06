@@ -6,6 +6,7 @@ load benchmark artifacts, import GPU dependencies, or execute benchmarks.
 
 from __future__ import annotations
 
+import ast
 import re
 from pathlib import Path
 
@@ -18,6 +19,7 @@ COMMAND = (
     "pytest particula/gpu/tests/benchmark_test.py --benchmark -k resident "
     "-v -s --no-cov"
 )
+STDLIB_IMPORTS = {"__future__", "ast", "pathlib", "re"}
 
 
 def _section(content: str, heading: str) -> str:
@@ -105,6 +107,14 @@ def _markdown_destinations(content: str, source_path: Path) -> list[Path]:
     return destinations
 
 
+def _resident_roadmap_section() -> str:
+    """Return the resident benchmark publication section from the roadmap."""
+    return _section(
+        ROADMAP_PATH.read_text(encoding="utf-8"),
+        "#### E8-F6-P6 resident benchmark and memory-budget evidence",
+    )
+
+
 def test_roadmap_links_once_to_resident_benchmark_report() -> None:
     """Validate the roadmap names the artifact and links once to the report."""
     roadmap = ROADMAP_PATH.read_text(encoding="utf-8")
@@ -148,6 +158,39 @@ def test_report_reproduces_the_fixed_unavailable_benchmark_configuration() -> (
         assert requirement in normalized
 
 
+def test_roadmap_reproduces_resident_artifact_and_configuration_boundary() -> (
+    None
+):
+    """Validate roadmap publication preserves resident evidence safeguards."""
+    normalized = " ".join(_resident_roadmap_section().split())
+
+    for requirement in (
+        ARTIFACT_PATH,
+        ".artifacts/benchmarks/gpu_benchmark_results.json",
+        "coagulation-only",
+        "not resident evidence",
+        "absent in this revision",
+        COMMAND,
+        "CUDA/native-capture-only",
+        "no CPU or Warp-CPU fallback",
+        "1, 10, 100, and 1000 boxes",
+        "`(B, 16, 2)` shape",
+        "100% activity",
+        "gas communication",
+        "gas/saturation diagnostics",
+        "seed 1582",
+        "two warmups",
+        "three measured timesteps",
+        "2 GiB budget",
+        "64 MiB, 256 MiB, 1 GiB, and 4 GiB",
+        "planning inputs, not measured allocator consumption",
+        "unavailable",
+        "not measured and is not zero",
+        "`skipped_budget`",
+    ):
+        assert requirement in normalized
+
+
 def test_current_evidence_table_publishes_only_unavailable_rows() -> None:
     """Validate current evidence has only unavailable, nonnumeric case rows."""
     report = REPORT_PATH.read_text(encoding="utf-8")
@@ -181,10 +224,37 @@ def test_report_distinguishes_accounting_terms_and_unimplemented_tape() -> None:
         "checkpoint host-copy scenario",
         "Allocator-observed CUDA default-pool high-water delta",
         "signed observed-minus-analytical difference",
+        "method, version, coverage, and machine context",
         "`timesteps × state_bytes`",
         "`ceil(timesteps / interval) × checkpoint_bytes + interval ×",
         "state_bytes`",
         "Autodiff tape is not implemented or measured",
+    ):
+        assert requirement in normalized
+
+
+def test_report_preserves_paired_timing_modes_and_provenance_vocabulary() -> (
+    None
+):
+    """Validate future benchmark records use the fixed evidence vocabulary."""
+    section = _section(
+        REPORT_PATH.read_text(encoding="utf-8"),
+        "## Timing and memory evidence schema",
+    )
+    normalized = " ".join(section.split())
+
+    for requirement in (
+        "alternating, device-synchronized modes",
+        "`prepared_uncaptured_device_synchronized`",
+        "`captured_replay_device_synchronized`",
+        "count, minimum, median, mean, and p95",
+        "Setup and capture provenance",
+        "excluded from timing samples",
+        "UTC timestamp, Python/platform, Warp, device, synchronization, "
+        "signature, seed, warmups, and sample count",
+        "timing and allocator values are unavailable in this revision",
+        "unavailable readings are not zero",
+        "unknown Epic I overhead is excluded",
     ):
         assert requirement in normalized
 
@@ -210,3 +280,19 @@ def test_report_states_all_documentation_scope_limitations() -> None:
         "implemented autodiff storage",
     ):
         assert limitation in normalized
+
+
+def test_module_imports_are_stdlib_only() -> None:
+    """Keep this hardware-free documentation contract test dependency-free."""
+    tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+
+    imported_modules = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported_modules.update(
+                alias.name.split(".")[0] for alias in node.names
+            )
+        elif isinstance(node, ast.ImportFrom) and node.module is not None:
+            imported_modules.add(node.module.split(".")[0])
+
+    assert imported_modules <= STDLIB_IMPORTS
