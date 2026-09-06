@@ -9,6 +9,7 @@ import pytest
 
 from particula.execution.tests import resident_benchmark_cuda_support
 from particula.execution.tests.resident_benchmark_cuda_support import (
+    CudaFixtureMemoryMonitor,
     ResidentBenchmarkUnavailableError,
     ResidentCaptureBenchmarkBinding,
     _close_loop_preserving_error,
@@ -32,6 +33,67 @@ def test_cuda_support_import_does_not_import_warp() -> None:
         text=True,
     )
     assert result.returncode == 0, result.stderr
+
+
+def test_memory_monitor_records_only_case_scoped_scalar_snapshots() -> None:
+    """Require sentinel coverage before emitting valid high-water evidence."""
+    calls: list[str] = []
+    readings = iter((0, 8, 2, 12, 3))
+    adapter = SimpleNamespace(
+        reset=lambda device: calls.append(f"reset:{device}"),
+        read=lambda device: (calls.append(f"read:{device}"), next(readings))[1],
+        metadata={"runtime_version": 12000},
+    )
+    monitor = CudaFixtureMemoryMonitor(
+        "case",
+        "cuda:7",
+        7,
+        adapter,
+        lambda: calls.append("sync"),
+        lambda: calls.append("sentinel") or object(),
+    )
+    monitor.begin()
+    monitor.snapshot_peak()
+    observation = monitor.finalize()
+    assert observation.available
+    assert observation.before_bytes == 2
+    assert observation.peak_bytes == 12
+    assert observation.after_bytes == 3
+    assert calls == [
+        "sync",
+        "reset:7",
+        "sync",
+        "read:7",
+        "sentinel",
+        "sync",
+        "read:7",
+        "sync",
+        "reset:7",
+        "sync",
+        "read:7",
+        "sync",
+        "read:7",
+        "sync",
+        "read:7",
+    ]
+
+
+def test_memory_monitor_returns_unavailable_when_sentinel_does_not_change() -> (
+    None
+):
+    """Never infer default-pool coverage from an unchanged counter."""
+    adapter = SimpleNamespace(
+        reset=lambda _device: None,
+        read=lambda _device: 0,
+        metadata={"runtime_version": 12000},
+    )
+    monitor = CudaFixtureMemoryMonitor(
+        "case", "cuda:0", 0, adapter, lambda: None, lambda: object()
+    )
+    monitor.begin()
+    observation = monitor.finalize()
+    assert not observation.available
+    assert observation.before_bytes is observation.peak_bytes is None
 
 
 def test_binding_delegates_prepared_enqueue_and_captured_replay(
@@ -439,6 +501,7 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
         binding.synchronize()
 
     assert calls == [
+        ("sync", None),
         (
             "build",
             (

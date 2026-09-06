@@ -190,6 +190,9 @@ def test_resident_matrix_forwards_exact_dimensions_and_reuses_bindings(
             setup_elapsed_seconds=0.0,
             capture_elapsed_seconds=0.0,
             prepared_signature_digest="exact",
+            capture_set=SimpleNamespace(
+                report=SimpleNamespace(logical_byte_count=0)
+            ),
             selected_device={
                 "status": "available",
                 "identity": "cuda:0",
@@ -286,6 +289,9 @@ def test_resident_matrix_retains_provenance_for_each_executed_case(
             setup_elapsed_seconds=0.0,
             capture_elapsed_seconds=0.0,
             prepared_signature_digest=signature,
+            capture_set=SimpleNamespace(
+                report=SimpleNamespace(logical_byte_count=0)
+            ),
             selected_device={
                 "status": "available",
                 "identity": identity,
@@ -371,6 +377,9 @@ def test_resident_matrix_failure_closes_once_without_an_artifact(
             setup_elapsed_seconds=0.0,
             capture_elapsed_seconds=0.0,
             prepared_signature_digest="signature",
+            capture_set=SimpleNamespace(
+                report=SimpleNamespace(logical_byte_count=0)
+            ),
             selected_device={
                 "status": "available",
                 "identity": "cuda:0",

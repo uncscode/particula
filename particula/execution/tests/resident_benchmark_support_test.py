@@ -1,5 +1,6 @@
 """Host-only tests for resident benchmark evidence support."""
 
+import ctypes
 import json
 import os
 import subprocess
@@ -7,6 +8,7 @@ import sys
 from dataclasses import FrozenInstanceError
 from datetime import datetime, timezone
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
@@ -23,6 +25,7 @@ from particula.execution.tests.resident_benchmark_support import (
     RESIDENT_BOX_COUNTS,
     RESIDENT_CAPTURE_COMPARISON_DESTINATION,
     RESIDENT_DIAGNOSTIC_OPERATIONS,
+    CudaDefaultPoolHighWater,
     ResidentBenchmarkArtifact,
     ResidentBenchmarkAvailability,
     ResidentBenchmarkCase,
@@ -31,9 +34,11 @@ from particula.execution.tests.resident_benchmark_support import (
     ResidentBenchmarkStatus,
     ResidentMemoryCategory,
     ResidentMemoryModel,
+    ResidentMemoryObservation,
     build_default_resident_benchmark_matrix,
     build_resident_benchmark_case_id,
     build_resident_benchmark_metadata,
+    build_resident_memory_comparison,
     build_resident_memory_model,
     checked_dense_array_bytes,
     collect_paired_device_timings,
@@ -233,7 +238,7 @@ def test_records_summaries_metadata_and_round_trip_are_deterministic():
         artifact.cases[0].seed = 8
     first = serialize_resident_benchmark_artifact(artifact)
     assert first.endswith("\n")
-    assert json.loads(first)["schema_version"] == 2
+    assert json.loads(first)["schema_version"] == 3
     assert deserialize_resident_benchmark_artifact(first) == artifact
     assert (
         serialize_resident_benchmark_artifact(
@@ -797,6 +802,7 @@ def test_schema_v1_decode_populates_absent_timing_provenance_with_none() -> (
     """Retain backwards decoding while v2 remains the only emitted schema."""
     payload = json.loads(serialize_resident_benchmark_artifact(_artifact()))
     payload["schema_version"] = 1
+    payload["artifact"].pop("memory_observations")
     for result in payload["artifact"]["results"]:
         result.pop("setup_elapsed_seconds")
         result.pop("capture_elapsed_seconds")
@@ -807,6 +813,118 @@ def test_schema_v1_decode_populates_absent_timing_provenance_with_none() -> (
     assert all(
         result.capture_elapsed_seconds is None for result in decoded.results
     )
+
+
+def test_memory_observation_comparison_is_immutable_and_consistent() -> None:
+    """Attach the logical model total without inventing allocator readings."""
+    observation = ResidentMemoryObservation(
+        case_id=_case().case_id,
+        available=True,
+        reason=None,
+        method="cuda_runtime.default_pool.used_mem_high.v1",
+        coverage={"complete": True},
+        version={"runtime_version": 12000},
+        before_bytes=4,
+        peak_bytes=14,
+        after_bytes=6,
+        observed_delta_bytes=10,
+    )
+    comparison = build_resident_memory_comparison(observation, _memory_model())
+    assert comparison.observed_delta_bytes == 10
+    assert (
+        comparison.signed_difference_bytes
+        == 10 - _memory_model().steady_state_bytes
+    )
+    with pytest.raises(ValueError, match="inconsistent"):
+        ResidentMemoryObservation(
+            _case().case_id,
+            True,
+            None,
+            "method",
+            {"complete": True},
+            {"version": 1},
+            4,
+            3,
+            2,
+            0,
+        )
+    unavailable = ResidentMemoryObservation(
+        _case().case_id,
+        False,
+        "counter inaccessible",
+        "method",
+        {"complete": False},
+        {"version": 1},
+        None,
+        None,
+        None,
+        None,
+    )
+    assert not unavailable.available
+
+
+def test_cuda_high_water_adapter_uses_only_used_high_attribute_and_caches(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Resolve CUDA Runtime once while reading/resetting each exact pool."""
+    calls: list[tuple[object, ...]] = []
+
+    def runtime_version(pointer: object) -> int:
+        """Provide the version Runtime symbol result."""
+        ctypes.cast(pointer, ctypes.POINTER(ctypes.c_int))[0] = 12000
+        return 0
+
+    def default_pool(pointer: object, device: int) -> int:
+        """Provide the exact selected-device default pool handle."""
+        calls.append(("pool", device))
+        ctypes.cast(pointer, ctypes.POINTER(ctypes.c_void_p))[0] = (
+            ctypes.c_void_p(42)
+        )
+        return 0
+
+    def get_attribute(pool: object, attribute: int, pointer: object) -> int:
+        """Record the requested pool attribute and supply a scalar reading."""
+        calls.append(("get", pool, attribute))
+        ctypes.cast(pointer, ctypes.POINTER(ctypes.c_size_t))[0] = 17
+        return 0
+
+    def set_attribute(pool: object, attribute: int, pointer: object) -> int:
+        """Require a zero high-water reset on the selected pool."""
+        calls.append(("set", pool, attribute))
+        assert ctypes.cast(pointer, ctypes.POINTER(ctypes.c_size_t))[0] == 0
+        return 0
+
+    library = SimpleNamespace(
+        cudaRuntimeGetVersion=runtime_version,
+        cudaDeviceGetDefaultMemPool=default_pool,
+        cudaMemPoolGetAttribute=get_attribute,
+        cudaMemPoolSetAttribute=set_attribute,
+    )
+
+    loads: list[str] = []
+
+    def loader(name: str) -> SimpleNamespace:
+        """Return the fake Runtime library and retain its lookup request."""
+        loads.append(name)
+        return library
+
+    monkeypatch.setattr(CudaDefaultPoolHighWater, "_resolved", None)
+    first = CudaDefaultPoolHighWater(loader)
+    second = CudaDefaultPoolHighWater(lambda _: pytest.fail("loaded twice"))
+
+    assert first.read(7) == 17
+    first.reset(7)
+    assert second.read(8) == 17
+    assert dict(first.metadata) == {
+        "method": "cuda_runtime.default_pool.used_mem_high.v1",
+        "runtime_version": 12000,
+    }
+    assert loads == ["libcudart.so"]
+    assert [call[2] for call in calls if call[0] in {"get", "set"}] == [
+        3,
+        3,
+        3,
+    ]
 
 
 def _memory_model() -> ResidentMemoryModel:

@@ -12,6 +12,7 @@ execution, adds package exports, nor supplies a user-facing API.
 
 from __future__ import annotations
 
+import ctypes
 import json
 import math
 import os
@@ -27,7 +28,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Mapping
 
-RESIDENT_BENCHMARK_SCHEMA_VERSION = 2
+RESIDENT_BENCHMARK_SCHEMA_VERSION = 3
 """Version of the resident benchmark JSON envelope."""
 
 MAX_TIMING_SAMPLES = 10_000
@@ -114,6 +115,190 @@ class ResidentBenchmarkStatus(str, Enum):
     EXECUTED = "executed"
     UNAVAILABLE = "unavailable"
     SKIPPED_BUDGET = "skipped_budget"
+
+
+@dataclass(frozen=True, slots=True)
+class ResidentMemoryObservation:
+    """Store one case-scoped CUDA default-pool high-water observation."""
+
+    case_id: str
+    available: bool
+    reason: str | None
+    method: str
+    coverage: Mapping[str, Any]
+    version: Mapping[str, Any]
+    before_bytes: int | None
+    peak_bytes: int | None
+    after_bytes: int | None
+    observed_delta_bytes: int | None
+    analytical_steady_state_bytes: int | None = None
+    signed_difference_bytes: int | None = None
+
+    def __post_init__(self) -> None:
+        """Validate immutable measurement context and scalar evidence."""
+        if not isinstance(self.case_id, str) or not self.case_id:
+            raise ValueError("memory observation case_id must be nonempty.")
+        if not isinstance(self.available, bool):
+            raise TypeError("memory observation available must be a bool.")
+        if not isinstance(self.method, str) or not self.method:
+            raise ValueError("memory observation method must be nonempty.")
+        object.__setattr__(
+            self,
+            "coverage",
+            _freeze_mapping(self.coverage, "coverage", nonempty=True),
+        )
+        object.__setattr__(
+            self,
+            "version",
+            _freeze_mapping(self.version, "version", nonempty=True),
+        )
+        numeric_names = (
+            "before_bytes",
+            "peak_bytes",
+            "after_bytes",
+            "observed_delta_bytes",
+            "analytical_steady_state_bytes",
+            "signed_difference_bytes",
+        )
+        values = tuple(getattr(self, name) for name in numeric_names)
+        if not self.available:
+            if not isinstance(self.reason, str) or not self.reason:
+                raise ValueError(
+                    "unavailable memory observation requires a reason."
+                )
+            if any(value is not None for value in values):
+                raise ValueError(
+                    "unavailable memory observation cannot contain numbers."
+                )
+            return
+        if self.reason is not None:
+            raise ValueError(
+                "available memory observation cannot have a reason."
+            )
+        if any(value is None for value in values[:4]):
+            raise ValueError("available memory observation requires readings.")
+        before, peak, after, delta = (
+            _require_memory_bytes(value, name)
+            for value, name in zip(values[:4], numeric_names[:4], strict=True)
+        )
+        if peak < before or peak < after or delta != peak - before:
+            raise ValueError("memory observation readings are inconsistent.")
+        comparison = values[4:]
+        if (comparison[0] is None) != (comparison[1] is None):
+            raise ValueError("memory comparison values must be paired.")
+        if comparison[0] is not None:
+            analytical = _require_memory_bytes(comparison[0], numeric_names[4])
+            if not isinstance(comparison[1], int) or isinstance(
+                comparison[1], bool
+            ):
+                raise TypeError(
+                    "signed_difference_bytes must be a non-bool integer."
+                )
+            if comparison[1] != delta - analytical:
+                raise ValueError(
+                    "memory comparison signed difference is inconsistent."
+                )
+
+
+def build_resident_memory_comparison(
+    observation: ResidentMemoryObservation, model: "ResidentMemoryModel"
+) -> ResidentMemoryObservation:
+    """Attach a validated model steady-state total to an observation."""
+    if not isinstance(observation, ResidentMemoryObservation):
+        raise TypeError("observation must be a ResidentMemoryObservation.")
+    if not isinstance(model, ResidentMemoryModel):
+        raise TypeError("model must be a ResidentMemoryModel.")
+    if not observation.available:
+        return observation
+    from dataclasses import replace
+
+    return replace(
+        observation,
+        analytical_steady_state_bytes=model.steady_state_bytes,
+        signed_difference_bytes=(
+            observation.observed_delta_bytes - model.steady_state_bytes
+        ),
+    )
+
+
+CUDA_USED_MEM_HIGH_METHOD = "cuda_runtime.default_pool.used_mem_high.v1"
+_CUDA_MEM_POOL_ATTR_USED_MEM_HIGH = 3
+
+
+class CudaDefaultPoolHighWater:
+    """Lazily resolve documented CUDA Runtime default-pool high-water calls."""
+
+    _resolved: tuple[Any, Any, Any, Any, int] | None = None
+
+    def __init__(self, loader: Any = ctypes.CDLL) -> None:
+        """Store an injectable lazy CUDA Runtime library loader."""
+        self._loader = loader
+
+    def _functions(self) -> tuple[Any, Any, Any, Any, int]:
+        if type(self)._resolved is not None:
+            return type(self)._resolved
+        library = self._loader("libcudart.so")
+        version, default_pool = (
+            library.cudaRuntimeGetVersion,
+            library.cudaDeviceGetDefaultMemPool,
+        )
+        get_attribute, set_attribute = (
+            library.cudaMemPoolGetAttribute,
+            library.cudaMemPoolSetAttribute,
+        )
+        runtime_version = ctypes.c_int()
+        if (
+            version(ctypes.byref(runtime_version))
+            or runtime_version.value < 11020
+        ):
+            raise RuntimeError("unsupported CUDA Runtime (< 11.2).")
+        resolved = (
+            default_pool,
+            get_attribute,
+            set_attribute,
+            library,
+            runtime_version.value,
+        )
+        type(self)._resolved = resolved
+        return resolved
+
+    @property
+    def metadata(self) -> Mapping[str, Any]:
+        """Return immutable runtime metadata after explicit resolution."""
+        version = self._functions()[4]
+        return MappingProxyType(
+            {"method": CUDA_USED_MEM_HIGH_METHOD, "runtime_version": version}
+        )
+
+    def _pool(self, device: int) -> Any:
+        default_pool = self._functions()[0]
+        pool = ctypes.c_void_p()
+        if default_pool(ctypes.byref(pool), device):
+            raise RuntimeError("CUDA default pool is inaccessible.")
+        return pool
+
+    def read(self, device: int) -> int:
+        """Read ``cudaMemPoolAttrUsedMemHigh`` for one CUDA device."""
+        get_attribute = self._functions()[1]
+        value = ctypes.c_size_t()
+        if get_attribute(
+            self._pool(device),
+            _CUDA_MEM_POOL_ATTR_USED_MEM_HIGH,
+            ctypes.byref(value),
+        ):
+            raise RuntimeError("CUDA used-high counter is inaccessible.")
+        return int(value.value)
+
+    def reset(self, device: int) -> None:
+        """Reset ``cudaMemPoolAttrUsedMemHigh`` for one CUDA device."""
+        set_attribute = self._functions()[2]
+        value = ctypes.c_size_t(0)
+        if set_attribute(
+            self._pool(device),
+            _CUDA_MEM_POOL_ATTR_USED_MEM_HIGH,
+            ctypes.byref(value),
+        ):
+            raise RuntimeError("CUDA used-high counter is inaccessible.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -1432,6 +1617,7 @@ class ResidentBenchmarkArtifact:
     metadata: Mapping[str, Any]
     cases: tuple[ResidentBenchmarkCase, ...]
     results: tuple[ResidentBenchmarkResult, ...]
+    memory_observations: tuple[ResidentMemoryObservation, ...] = ()
 
     def __post_init__(self) -> None:
         """Validate complete metadata and cross-record artifact references.
@@ -1471,6 +1657,31 @@ class ResidentBenchmarkArtifact:
                     "results must have unique case_id/timing_mode rows."
                 )
             identities.add(identity)
+        if not isinstance(self.memory_observations, tuple) or not all(
+            isinstance(item, ResidentMemoryObservation)
+            for item in self.memory_observations
+        ):
+            raise TypeError(
+                "memory_observations must be a tuple of ResidentMemoryObservation records."
+            )
+        observation_ids = set()
+        for observation in self.memory_observations:
+            if observation.case_id not in case_map:
+                raise ValueError(
+                    "memory observation references an unknown case_id."
+                )
+            if observation.case_id in observation_ids:
+                raise ValueError(
+                    "memory observations must have unique case_id values."
+                )
+            if observation.available and (
+                observation.analytical_steady_state_bytes is None
+                or observation.signed_difference_bytes is None
+            ):
+                raise ValueError(
+                    "available artifact observations require a comparison."
+                )
+            observation_ids.add(observation.case_id)
 
 
 def build_resident_benchmark_metadata(
@@ -1585,6 +1796,11 @@ def _normalize_json(value: object) -> Any:
             for name in value.__dataclass_fields__
         }
     if isinstance(value, ResidentBenchmarkResult):
+        return {
+            name: _normalize_json(getattr(value, name))
+            for name in value.__dataclass_fields__
+        }
+    if isinstance(value, ResidentMemoryObservation):
         return {
             name: _normalize_json(getattr(value, name))
             for name in value.__dataclass_fields__
@@ -1823,12 +2039,15 @@ def deserialize_resident_benchmark_artifact(
         envelope, {"schema_version", "artifact"}, "envelope"
     )
     schema_version = envelope["schema_version"]
-    if schema_version not in {1, RESIDENT_BENCHMARK_SCHEMA_VERSION}:
+    if schema_version not in {1, 2, RESIDENT_BENCHMARK_SCHEMA_VERSION}:
         raise ValueError("unsupported schema_version.")
-    raw = _require_fields(
-        envelope["artifact"], {"metadata", "cases", "results"}, "artifact"
-    )
-    for name in ("cases", "results"):
+    artifact_fields = {"metadata", "cases", "results"}
+    if schema_version == RESIDENT_BENCHMARK_SCHEMA_VERSION:
+        artifact_fields.add("memory_observations")
+    raw = _require_fields(envelope["artifact"], artifact_fields, "artifact")
+    for name in ("cases", "results", "memory_observations"):
+        if name not in raw:
+            continue
         if not isinstance(raw[name], list):
             raise ValueError(f"artifact {name} must be a list.")
         if len(raw[name]) > MAX_ARTIFACT_ROWS:
@@ -1889,8 +2108,19 @@ def deserialize_resident_benchmark_artifact(
                 ),
             )
         )
+    observations = []
+    for item in raw.get("memory_observations", []):
+        item = _require_fields(
+            item,
+            set(ResidentMemoryObservation.__dataclass_fields__),
+            "memory observation",
+        )
+        observations.append(ResidentMemoryObservation(**item))
     return ResidentBenchmarkArtifact(
-        metadata=raw["metadata"], cases=tuple(cases), results=tuple(results)
+        metadata=raw["metadata"],
+        cases=tuple(cases),
+        results=tuple(results),
+        memory_observations=tuple(observations),
     )
 
 

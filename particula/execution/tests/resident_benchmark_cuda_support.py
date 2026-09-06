@@ -16,7 +16,10 @@ from time import perf_counter
 from typing import Any, Callable, Iterator
 
 from particula.execution.tests.resident_benchmark_support import (
+    CUDA_USED_MEM_HIGH_METHOD,
+    CudaDefaultPoolHighWater,
     ResidentBenchmarkAvailability,
+    ResidentMemoryObservation,
 )
 
 
@@ -52,6 +55,7 @@ class ResidentCaptureBenchmarkBinding:
     capture_set: Any
     prepared_signature_digest: str
     selected_device: dict[str, Any]
+    memory_monitor: Any = None
 
     def enqueue(self) -> None:
         """Enqueue one prepared uncaptured timestep without synchronization."""
@@ -79,6 +83,142 @@ class ResidentCaptureBenchmarkBinding:
             or self.capture_set is None
         ):
             raise ValueError("resident benchmark binding identity drifted.")
+
+
+@dataclass(slots=True)
+class CudaFixtureMemoryMonitor:
+    """Measure one exact CUDA fixture outside its timing collector."""
+
+    case_id: str
+    native: object
+    device_ordinal: int
+    adapter: Any
+    synchronize: Callable[[], None]
+    sentinel_allocate: Callable[[], Any]
+    before: int | None = None
+    peak: int | None = None
+    reason: str | None = None
+
+    def _unavailable(self, reason: object) -> None:
+        self.reason = str(reason) or "incomplete CUDA allocator coverage"
+
+    def begin(self) -> None:
+        """Prove pool coverage and take the pre-allocation snapshot."""
+        if self.reason is not None:
+            return
+        try:
+            self.synchronize()
+            self.adapter.reset(self.device_ordinal)
+            self.synchronize()
+            sentinel_before = self.adapter.read(self.device_ordinal)
+            sentinel = self.sentinel_allocate()
+            self.synchronize()
+            sentinel_peak = self.adapter.read(self.device_ordinal)
+            del sentinel
+            self.synchronize()
+            if sentinel_peak <= sentinel_before:
+                raise RuntimeError(
+                    "default-pool sentinel did not change UsedMemHigh"
+                )
+            self.adapter.reset(self.device_ordinal)
+            self.synchronize()
+            self.before = self.adapter.read(self.device_ordinal)
+        except Exception as error:  # monitor failure must not block timing
+            self._unavailable(error)
+
+    def snapshot_peak(self) -> None:
+        """Read the high-water mark after build, prepare, and capture."""
+        if self.reason is not None:
+            return
+        try:
+            self.synchronize()
+            self.peak = self.adapter.read(self.device_ordinal)
+        except Exception as error:
+            self._unavailable(error)
+
+    def finalize(self) -> ResidentMemoryObservation:
+        """Read after cleanup and return scalar evidence or unavailability."""
+        coverage = {
+            "began_before_fixture_allocation": True,
+            "default_pool_exact_device": str(self.native),
+            "ended_after_binding_cleanup": True,
+            "coverage_complete": self.reason is None,
+        }
+        version: dict[str, Any] = {"warp_device": str(self.native)}
+        try:
+            version.update(dict(self.adapter.metadata))
+            self.synchronize()
+            after = self.adapter.read(self.device_ordinal)
+            if (
+                self.reason is not None
+                or self.before is None
+                or self.peak is None
+            ):
+                raise RuntimeError(
+                    self.reason or "incomplete CUDA allocator coverage"
+                )
+            return ResidentMemoryObservation(
+                self.case_id,
+                True,
+                None,
+                CUDA_USED_MEM_HIGH_METHOD,
+                coverage,
+                version,
+                self.before,
+                self.peak,
+                after,
+                self.peak - self.before,
+            )
+        except Exception as error:
+            coverage["coverage_complete"] = False
+            return ResidentMemoryObservation(
+                self.case_id,
+                False,
+                str(error) or "incomplete CUDA allocator coverage",
+                CUDA_USED_MEM_HIGH_METHOD,
+                coverage,
+                version,
+                None,
+                None,
+                None,
+                None,
+            )
+
+
+def _cuda_device_ordinal(native: object) -> int:
+    """Return the exact CUDA ordinal accepted by the CUDA Runtime adapter."""
+    value = str(native)
+    if not value.startswith("cuda:") or not value[5:].isdigit():
+        raise ValueError("selected native device is not an exact CUDA ordinal.")
+    return int(value[5:])
+
+
+def _build_memory_monitor(
+    *,
+    case_id: str,
+    wp: Any,
+    native: object,
+    adapter_factory: Any = CudaDefaultPoolHighWater,
+) -> CudaFixtureMemoryMonitor:
+    """Build an uncached per-fixture monitor with a bounded Warp sentinel."""
+    try:
+        ordinal = _cuda_device_ordinal(native)
+    except ValueError as error:
+        ordinal = 0
+        reason = str(error)
+    else:
+        reason = None
+    monitor = CudaFixtureMemoryMonitor(
+        case_id=case_id,
+        native=native,
+        device_ordinal=ordinal,
+        adapter=adapter_factory(),
+        synchronize=wp.synchronize,
+        sentinel_allocate=lambda: wp.zeros(1, dtype=wp.uint8, device=native),
+    )
+    if reason is not None:
+        monitor._unavailable(reason)
+    return monitor
 
 
 def _prepared_signature_digest(loop: Any) -> str:
@@ -173,6 +313,7 @@ def qualified_cuda_resident_benchmark(
     n_particles: int = 16,
     n_species: int = 2,
     root_seed: int = 1582,
+    case_id: str = "resident-fixture",
     availability: ResidentBenchmarkAvailability | None = None,
 ) -> Iterator[ResidentCaptureBenchmarkBinding]:
     """Build, qualify, capture, and clean up one real native CUDA binding.
@@ -234,6 +375,12 @@ def qualified_cuda_resident_benchmark(
     except pytest.skip.Exception as error:
         raise ResidentBenchmarkUnavailableError(str(error)) from error
     device = candidates[0]
+    monitor = _build_memory_monitor(
+        case_id=case_id,
+        wp=wp,
+        native=device.native,
+    )
+    monitor.begin()
     setup_start = perf_counter()
     loop = _build_prepared_loop(
         device.native,
@@ -261,6 +408,7 @@ def qualified_cuda_resident_benchmark(
         capture_start = perf_counter()
         captured = capture_prepared_resident_graph(qualification)
         wp.synchronize()
+        monitor.snapshot_peak()
         capture_elapsed = perf_counter() - capture_start
         benchmark_binding = ResidentCaptureBenchmarkBinding(
             loop=loop,
@@ -278,6 +426,7 @@ def qualified_cuda_resident_benchmark(
             capture_set=capture_set,
             prepared_signature_digest=_prepared_signature_digest(loop),
             selected_device=_selected_device_metadata(wp, device.native),
+            memory_monitor=monitor,
         )
         benchmark_binding.validate_identities()
         yield benchmark_binding

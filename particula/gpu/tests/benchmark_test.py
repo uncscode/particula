@@ -43,8 +43,11 @@ from particula.execution.tests.resident_benchmark_support import (
     ResidentBenchmarkArtifact,
     ResidentBenchmarkResult,
     ResidentBenchmarkStatus,
+    ResidentMemoryObservation,
     build_default_resident_benchmark_matrix,
     build_resident_benchmark_metadata,
+    build_resident_memory_comparison,
+    build_resident_memory_model,
     collect_paired_device_timings,
     preflight_resident_benchmark_case,
     summarize_timing_samples,
@@ -1902,10 +1905,11 @@ def _estimate_resident_requested_bytes(case: Any) -> int:
         ) from error
 
 
-def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
+def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C901
     """Collect the exact P3 matrix, with no downscale, fallback, or partial write."""
     cases = build_default_resident_benchmark_matrix()
     results: list[ResidentBenchmarkResult] = []
+    memory_observations: list[ResidentMemoryObservation] = []
     availability_result = None
 
     def availability():
@@ -1946,6 +1950,7 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
                 n_particles=case.requested_shape[1],
                 n_species=case.requested_shape[2],
                 root_seed=case.seed,
+                case_id=case.case_id,
                 availability=availability(),
             )
             with context as binding:
@@ -1966,6 +1971,29 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
                 if digest == "unavailable":
                     digest = prepared_signature_digest
                     device = selected_device
+                active_slots = case.active_fraction * dimensions.n_particles
+                if not active_slots.is_integer():
+                    raise ValueError(
+                        "resident benchmark active slots must be integral."
+                    )
+                diagnostics = tuple(
+                    {
+                        "gas": "gas_concentration_snapshot",
+                        "saturation": "saturation_ratio_snapshot",
+                    }[name]
+                    for name in case.diagnostics
+                )
+                model = build_resident_memory_model(
+                    n_boxes=dimensions.n_boxes,
+                    n_particles=dimensions.n_particles,
+                    n_species=dimensions.n_species,
+                    active_slots_per_box=int(active_slots),
+                    registry_logical_byte_count=binding.capture_set.report.logical_byte_count,
+                    diagnostics=diagnostics,
+                    communication=case.communication,
+                    checkpoint_sidecar_copy_bytes=0,
+                    checkpoint_inspection_copy_bytes=0,
+                )
                 uncaptured, replay = collect_paired_device_timings(
                     uncaptured_operation=binding.enqueue,
                     replay_operation=binding.replay,
@@ -1991,6 +2019,25 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
                 )
             )
             continue
+        monitor = getattr(binding, "memory_monitor", None)
+        if monitor is None:
+            observation = ResidentMemoryObservation(
+                case.case_id,
+                False,
+                "CUDA allocator monitor unavailable",
+                "cuda_runtime.default_pool.used_mem_high.v1",
+                {"coverage_complete": False},
+                {"warp_device": "unknown"},
+                None,
+                None,
+                None,
+                None,
+            )
+        else:
+            observation = monitor.finalize()
+        memory_observations.append(
+            build_resident_memory_comparison(observation, model)
+        )
         provenance = {
             "binding": "native_cuda_capture",
             "prepared_signature_digest": prepared_signature_digest,
@@ -2031,9 +2078,12 @@ def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:
         ),
         cases=cases,
         results=tuple(results),
+        memory_observations=tuple(memory_observations),
     )
 
 
+@pytest.mark.warp
+@pytest.mark.cuda
 def test_resident_scaling_memory_captured_replay_comparison() -> None:
     """Publish one aggregate opt-in matrix artifact after every row completes."""
     artifact = _collect_resident_capture_matrix()
