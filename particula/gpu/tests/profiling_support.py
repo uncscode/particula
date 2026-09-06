@@ -2026,7 +2026,8 @@ def analyze_machine_bounded_performance(
     bound_hosts = cast(tuple[HostEvidenceBinding, ...], hosts)
     bound_kernels = cast(tuple[MachineBoundKernelEvidence, ...], kernels)
     if (
-        any(x.mode != "captured_replay" for x in (*bound_hosts, *bound_kernels))
+        any(x.mode != "captured_replay" for x in bound_hosts)
+        or any(x.mode != "captured_replay" for x in bound_kernels)
         or workload.label != "small"
     ):
         return PerformanceDecision(

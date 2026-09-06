@@ -6,6 +6,7 @@ import hashlib
 import subprocess
 import sys
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -93,7 +94,9 @@ def test_analysis_records_reject_mutable_provenance_and_portable_proposals() -> 
     report = support.RawReportProvenance("trace.json", 5, "a" * 64)
     with pytest.raises(TypeError, match="raw_reports must be a tuple"):
         support.ArtifactReference(
-            "captured_replay_host_launch.json", "one", [report]
+            "captured_replay_host_launch.json",
+            "one",
+            [report],  # type: ignore[arg-type]
         )
     with pytest.raises(ValueError, match="portable claims"):
         support.PerformanceProposal(
@@ -123,13 +126,20 @@ def test_analysis_records_reject_wrong_type_modes() -> None:
         ("limited",),
     )
     for factory in (
-        lambda: support.HostEvidenceBinding(host.evidence, 1, host.reference),
+        lambda: support.HostEvidenceBinding(
+            host.evidence,
+            cast(str, 1),
+            host.reference,
+        ),
         lambda: support.MachineBoundKernelEvidence(
-            kernel.evidence, 1, kernel.machine, kernel.reference
+            kernel.evidence,
+            1,  # type: ignore[arg-type]
+            kernel.machine,
+            kernel.reference,
         ),
         lambda: support.EvidenceUnavailable(
             unavailable.workload,
-            1,
+            1,  # type: ignore[arg-type]
             unavailable.machine,
             None,
             unavailable.reason,
@@ -138,7 +148,7 @@ def test_analysis_records_reject_wrong_type_modes() -> None:
             decision.status,
             decision.confidence,
             decision.workload,
-            1,
+            1,  # type: ignore[arg-type]
             decision.machine,
             decision.contributions,
             decision.reconciliation,
