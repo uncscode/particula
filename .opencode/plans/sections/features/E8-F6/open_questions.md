@@ -22,7 +22,12 @@
     - `.opencode/plans/sections/epics/E8/open_questions.md:47` - The epic-level
       policy keeps analytical/registry accounting portable and observed peaks
       conditional on a version-qualified API.
-  - Resolved by: user decision
+  - Implementation confirmation (issue #1585): The selected source is the
+    lazy CUDA Runtime default-pool `cudaMemPoolAttrUsedMemHigh` adapter. A
+    per-fixture reset sentinel establishes coverage; failures retain structured
+    unavailable evidence rather than substituting NVML, current-used, or
+    reserved counters.
+  - Resolved by: user decision and implementation
 
 - [x] Should the 1000-box row use one canonical particle/species fixture or a
   budget-derived smaller capacity?

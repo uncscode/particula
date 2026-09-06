@@ -80,6 +80,32 @@ unknown Epic I overhead. The model imports neither Warp, NumPy, nor
 changes no production API/export, and creates no artifact. P5 remains
 responsible for observed peak-memory evidence.
 
+## Delivered P5 Observed CUDA Memory Evidence (Issue #1585)
+
+Issue #1585 delivered schema-v3, case-scoped observed-memory evidence for
+executed native-CUDA resident-capture fixtures. The private benchmark support
+adds immutable available/unavailable observations with synchronized default-pool
+`before`, post-capture `peak`, and post-cleanup `after` readings; available
+observations retain the derived allocation delta, P4 logical steady-state
+bytes, and their signed difference. Schema-v1/v2 artifacts decode with no
+observations.
+
+`resident_benchmark_support.py` supplies the lazy `ctypes` CUDA Runtime adapter
+for documented `cudaMemPoolAttrUsedMemHigh` access only. The private
+`resident_benchmark_cuda_support.py` monitor runs a fixed same-device sentinel
+after reset, then takes its three snapshots outside unchanged timing loops.
+Failed API access, sentinel coverage, or snapshots produce structured
+unavailable evidence rather than fabricated values. The matrix collector builds
+the P4 model once from live fixture dimensions, capture-report bytes,
+diagnostics, and communication, then attaches exactly one comparison per
+executed case after cleanup. Hardware-free support and injected benchmark-safety
+tests cover schema, lifecycle ordering, unavailable routing, and one-per-case
+attachment; the opt-in CUDA row remains supplemental.
+
+This is test/benchmark support only: it adds no production API/export, timing or
+budget policy, CPU/Warp-CPU fallback, NVML, current/reserved-counter substitute,
+or allocator equality/ratio claim.
+
 ## User Stories
 
 - As a performance engineer, I want captured and uncaptured resident loops run

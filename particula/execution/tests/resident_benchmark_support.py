@@ -119,7 +119,29 @@ class ResidentBenchmarkStatus(str, Enum):
 
 @dataclass(frozen=True, slots=True)
 class ResidentMemoryObservation:
-    """Store one case-scoped CUDA default-pool high-water observation."""
+    """Store one case-scoped CUDA default-pool high-water observation.
+
+    Available observations retain synchronized ``before``, ``peak``, and
+    post-cleanup ``after`` byte readings from one exact device default pool.
+    They may additionally compare the observed allocation delta with the
+    analytical steady-state logical-byte total. Unavailable observations retain
+    method, coverage, and version context but deliberately contain no readings
+    or derived values.
+
+    Attributes:
+        case_id: Canonical identifier of the measured benchmark case.
+        available: Whether complete pool coverage and valid readings exist.
+        reason: Deterministic unavailability explanation, if unavailable.
+        method: Stable identifier for the allocator-counter method.
+        coverage: Immutable declaration of the monitored lifecycle boundaries.
+        version: Immutable runtime and device version metadata.
+        before_bytes: Used-high reading before fixture allocation in bytes.
+        peak_bytes: Used-high reading after fixture capture in bytes.
+        after_bytes: Used-high reading after fixture cleanup in bytes.
+        observed_delta_bytes: ``peak_bytes - before_bytes`` in bytes.
+        analytical_steady_state_bytes: Optional logical steady-state total.
+        signed_difference_bytes: Observed delta minus the analytical total.
+    """
 
     case_id: str
     available: bool
@@ -229,7 +251,13 @@ _CUDA_MEM_POOL_ATTR_USED_MEM_HIGH = 3
 
 
 class CudaDefaultPoolHighWater:
-    """Lazily resolve documented CUDA Runtime default-pool high-water calls."""
+    """Lazily access a CUDA default pool's documented used-high counter.
+
+    Constructing this adapter imports and probes neither Warp nor CUDA. The
+    first explicit metadata, read, or reset operation resolves and caches only
+    the CUDA Runtime library, its required symbols, and a supported runtime
+    version. Fixture lifecycle ownership remains in CUDA benchmark support.
+    """
 
     _resolved: tuple[Any, Any, Any, Any, int] | None = None
 
@@ -247,20 +275,14 @@ class CudaDefaultPoolHighWater:
         Raises:
             RuntimeError: If CUDA Runtime is unavailable or older than 11.2.
         """
-        if type(self)._resolved is not None:
-            resolved = type(self)._resolved
-            if resolved is None:
-                raise RuntimeError("CUDA Runtime functions were not resolved.")
+        resolved = type(self)._resolved
+        if resolved is not None:
             return resolved
         library = self._loader("libcudart.so")
-        version, default_pool = (
-            library.cudaRuntimeGetVersion,
-            library.cudaDeviceGetDefaultMemPool,
-        )
-        get_attribute, set_attribute = (
-            library.cudaMemPoolGetAttribute,
-            library.cudaMemPoolSetAttribute,
-        )
+        version = library.cudaRuntimeGetVersion
+        default_pool = library.cudaDeviceGetDefaultMemPool
+        get_attribute = library.cudaMemPoolGetAttribute
+        set_attribute = library.cudaMemPoolSetAttribute
         runtime_version = ctypes.c_int()
         if (
             version(ctypes.byref(runtime_version))
@@ -1693,10 +1715,19 @@ class ResidentBenchmarkArtifact:
                 "memory_observations must be a tuple of ResidentMemoryObservation records."
             )
         observation_ids = set()
+        executed_case_ids = {
+            result.case_id
+            for result in self.results
+            if result.status is ResidentBenchmarkStatus.EXECUTED
+        }
         for observation in self.memory_observations:
             if observation.case_id not in case_map:
                 raise ValueError(
                     "memory observation references an unknown case_id."
+                )
+            if observation.case_id not in executed_case_ids:
+                raise ValueError(
+                    "memory observation requires an executed benchmark case."
                 )
             if observation.case_id in observation_ids:
                 raise ValueError(
@@ -2067,7 +2098,11 @@ def deserialize_resident_benchmark_artifact(
         envelope, {"schema_version", "artifact"}, "envelope"
     )
     schema_version = envelope["schema_version"]
-    if schema_version not in {1, 2, RESIDENT_BENCHMARK_SCHEMA_VERSION}:
+    if type(schema_version) is not int or schema_version not in {
+        1,
+        2,
+        RESIDENT_BENCHMARK_SCHEMA_VERSION,
+    }:
         raise ValueError("unsupported schema_version.")
     artifact_fields = {"metadata", "cases", "results"}
     if schema_version == RESIDENT_BENCHMARK_SCHEMA_VERSION:

@@ -815,6 +815,84 @@ def test_schema_v1_decode_populates_absent_timing_provenance_with_none() -> (
     )
 
 
+def test_schema_v2_decode_preserves_populated_timing_without_observations() -> (
+    None
+):
+    """Decode a representative populated v2 payload without v3 observations."""
+    artifact = _artifact()
+    payload = json.loads(serialize_resident_benchmark_artifact(artifact))
+    payload["schema_version"] = 2
+    payload["artifact"].pop("memory_observations")
+
+    decoded = deserialize_resident_benchmark_artifact(json.dumps(payload))
+
+    assert decoded.results == artifact.results
+    assert decoded.memory_observations == ()
+
+
+def test_memory_observation_requires_an_executed_case_result() -> None:
+    """Reject observations whose known case has no executed result."""
+    artifact = _artifact()
+    observation = ResidentMemoryObservation(
+        case_id=artifact.cases[0].case_id,
+        available=False,
+        reason="counter unavailable",
+        method="method",
+        coverage={"complete": False},
+        version={"runtime_version": None},
+        before_bytes=None,
+        peak_bytes=None,
+        after_bytes=None,
+        observed_delta_bytes=None,
+    )
+    unavailable_result = artifact.results[1]
+
+    with pytest.raises(ValueError, match="requires an executed"):
+        ResidentBenchmarkArtifact(
+            metadata=artifact.metadata,
+            cases=artifact.cases,
+            results=(unavailable_result,),
+            memory_observations=(observation,),
+        )
+
+    validated = ResidentBenchmarkArtifact(
+        metadata=artifact.metadata,
+        cases=artifact.cases,
+        results=(artifact.results[0],),
+        memory_observations=(observation,),
+    )
+    assert validated.memory_observations == (observation,)
+
+
+@pytest.mark.parametrize("schema_version", (True, False, 1.0))
+def test_deserialize_rejects_noninteger_schema_versions(
+    schema_version: object,
+) -> None:
+    """Reject boolean and floating schema-version lookalikes."""
+    payload = json.loads(serialize_resident_benchmark_artifact(_artifact()))
+    payload["schema_version"] = schema_version
+
+    with pytest.raises(ValueError, match="unsupported schema_version"):
+        deserialize_resident_benchmark_artifact(json.dumps(payload))
+
+
+@pytest.mark.parametrize("schema_version", (1, 2, 3))
+def test_deserialize_accepts_supported_integer_schema_versions(
+    schema_version: int,
+) -> None:
+    """Retain decoding for each supported exact integer schema version."""
+    payload = json.loads(serialize_resident_benchmark_artifact(_artifact()))
+    payload["schema_version"] = schema_version
+    if schema_version < 3:
+        payload["artifact"].pop("memory_observations")
+    if schema_version == 1:
+        for result in payload["artifact"]["results"]:
+            result.pop("setup_elapsed_seconds")
+            result.pop("capture_elapsed_seconds")
+
+    assert deserialize_resident_benchmark_artifact(json.dumps(payload)).cases
+
+
 def test_memory_observation_comparison_is_immutable_and_consistent() -> None:
     """Attach the logical model total without inventing allocator readings."""
     observation = ResidentMemoryObservation(

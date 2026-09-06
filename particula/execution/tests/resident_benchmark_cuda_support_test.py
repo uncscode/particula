@@ -93,6 +93,27 @@ def test_memory_monitor_records_only_case_scoped_scalar_snapshots() -> None:
     ]
 
 
+def test_memory_monitor_synchronizes_the_exact_selected_cuda_device() -> None:
+    """Bind every monitor synchronization to its fixture's native device."""
+    calls: list[object] = []
+    fake_warp = SimpleNamespace(
+        synchronize_device=lambda native: calls.append(native),
+        zeros=lambda *_args, **_kwargs: object(),
+        uint8="uint8",
+    )
+
+    monitor = resident_benchmark_cuda_support._build_memory_monitor(
+        case_id="case",
+        wp=fake_warp,
+        native="cuda:7",
+        adapter_factory=lambda: SimpleNamespace(),
+    )
+
+    monitor.synchronize()
+
+    assert calls == ["cuda:7"]
+
+
 def test_memory_monitor_returns_unavailable_when_sentinel_does_not_change() -> (
     None
 ):
@@ -465,6 +486,9 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
     helpers = ModuleType("particula.execution.tests.captured_full_loop_test")
     fake_warp = SimpleNamespace(
         synchronize=lambda: calls.append(("sync", None)),
+        synchronize_device=lambda native: calls.append(
+            ("monitor_sync", native)
+        ),
         get_device=lambda native: SimpleNamespace(
             alias=native, total_memory=1024
         ),
@@ -494,10 +518,29 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
     monkeypatch.setitem(sys.modules, graph_capture.__name__, graph_capture)
     monkeypatch.setitem(sys.modules, scheduler.__name__, scheduler)
     monkeypatch.setitem(sys.modules, helpers.__name__, helpers)
-    ticks = iter((1.0, 3.0, 10.0, 15.0))
+
+    class Monitor:
+        """Record snapshot ordering without affecting benchmark timing."""
+
+        def begin(self) -> None:
+            calls.append(("monitor_begin", None))
+
+        def snapshot_peak(self) -> None:
+            calls.append(("monitor_snapshot", None))
+
     monkeypatch.setattr(
-        resident_benchmark_cuda_support, "perf_counter", lambda: next(ticks)
+        resident_benchmark_cuda_support,
+        "_build_memory_monitor",
+        lambda **_kwargs: Monitor(),
     )
+    ticks = iter((1.0, 3.0, 10.0, 15.0))
+
+    def clock() -> float:
+        """Record timing boundaries around the monitor snapshot seam."""
+        calls.append(("clock", None))
+        return next(ticks)
+
+    monkeypatch.setattr(resident_benchmark_cuda_support, "perf_counter", clock)
 
     with qualified_cuda_resident_benchmark(
         duration=0.5, n_boxes=2, root_seed=3
@@ -516,7 +559,8 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
         binding.synchronize()
 
     assert calls == [
-        ("sync", None),
+        ("monitor_begin", None),
+        ("clock", None),
         (
             "build",
             (
@@ -525,6 +569,7 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
             ),
         ),
         ("sync", None),
+        ("clock", None),
         ("validate", "requirements"),
         (
             "qualify",
@@ -537,6 +582,9 @@ def test_qualified_cuda_binding_captures_and_closes_after_context(
         ),
         ("capture", "qualification"),
         ("sync", None),
+        ("clock", None),
+        ("monitor_snapshot", None),
+        ("clock", None),
         ("sync", None),
         ("close", loop),
     ]

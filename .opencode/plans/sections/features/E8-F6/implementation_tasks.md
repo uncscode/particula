@@ -44,15 +44,18 @@
 - [x] Implement symbolic full-retention `T * S` and checkpointed
   `ceil(T / K) * C + K * S` tape projections with checked arithmetic; label
   them projected and exclude unknown Epic I operation/intermediate overhead.
-- [ ] Implement `probe_device_memory()` behind the optional CUDA benchmark path;
-  accept only a documented, version-qualified public allocator high-water API,
-  record its coverage, method, versions, availability, and before/peak/after
-  values, and never treat allocator reservation as logical bytes.
-- [ ] Add a local opt-in allocator-probe smoke test. Unsupported Warp/CUDA
-  versions, incomplete graph/non-Warp coverage, or inaccessible counters must
-  produce an unavailable observed-memory record without NVML substitution.
-- [ ] Implement `compare_memory_evidence()` to retain the analytical total,
-  observed delta, and unexplained difference rather than forcing equality.
+- [x] Implement the lazy `CudaDefaultPoolHighWater` CUDA Runtime adapter and
+  private fixture monitor behind the optional CUDA benchmark path. They use only
+  documented default-pool `cudaMemPoolAttrUsedMemHigh`, retain method/version/
+  coverage context and synchronized before/peak/after values, and never treat
+  allocator reservation as logical bytes.
+- [x] Add hardware-free adapter/monitor and opt-in CUDA-row coverage. Unsupported
+  Runtime/API, incomplete sentinel coverage, inaccessible counters, and failed
+  snapshots produce all-null unavailable observations without NVML substitution
+  or timing-row failure.
+- [x] Implement P4 comparison attachment: retain analytical steady-state bytes,
+  observed delta, and signed difference without equality enforcement, once per
+  executed fixture after cleanup.
 
 ## Tooling / Tests
 

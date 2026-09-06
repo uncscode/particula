@@ -18,11 +18,13 @@
 - [x] Full-retention and checkpoint-interval tape scenarios use documented,
   checked symbolic inputs/formulas and are never labeled measured or complete
   Epic I tape storage.
-- [ ] Analytical logical bytes are compared with observed peak device-memory
+- [x] Analytical logical bytes are compared with observed peak device-memory
   deltas for representative executed rows only when a documented allocator API
   is version-qualified with sufficient coverage; otherwise observed peaks are
   explicitly unavailable. Probe method, coverage, and unexplained delta are
-  retained and allocator equality is not claimed.
+  retained and allocator equality is not claimed. Issue #1585 provides
+  schema-v3 default-pool `UsedMemHigh` observations with per-fixture sentinel
+  coverage and synchronized before/peak/after boundaries.
 - [x] P4 sizing is deterministic and overflow-safe; identical memory-model
   inputs retain ordered, immutable byte-category accounting.
 - [x] Default pytest collection remains unchanged; P3 is opt-in behind

@@ -1,8 +1,10 @@
-"""Lazy CUDA-only support for resident capture timing evidence.
+"""Lazy CUDA-only support for resident capture benchmark evidence.
 
 Importing this test-only module neither imports Warp nor probes CUDA. Builder
 calls qualify one exact prepared/captured binding and release graph provenance
-before closing the resident session; timing callers own synchronization.
+before closing the resident session. A private monitor records one
+case-scoped CUDA default-pool high-water observation outside unchanged timing
+loops; benchmark callers own timing synchronization.
 """
 
 from __future__ import annotations
@@ -87,7 +89,24 @@ class ResidentCaptureBenchmarkBinding:
 
 @dataclass(slots=True)
 class CudaFixtureMemoryMonitor:
-    """Measure one exact CUDA fixture outside its timing collector."""
+    """Measure one exact CUDA fixture outside its timing collector.
+
+    The monitor proves default-pool coverage with a bounded same-device
+    sentinel, resets the high-water counter, and records pre-build,
+    post-capture, and post-cleanup readings. Monitoring failures produce
+    structured unavailable evidence rather than timing failures or deltas.
+
+    Attributes:
+        case_id: Canonical identifier for the measured benchmark fixture.
+        native: Exact native CUDA device selected for the fixture.
+        device_ordinal: CUDA Runtime ordinal for ``native``.
+        adapter: Lazy default-pool high-water counter adapter.
+        synchronize: Callback that completes work on the selected device.
+        sentinel_allocate: Bounded same-device allocation used for coverage.
+        before: Used-high bytes recorded before fixture construction.
+        peak: Used-high bytes recorded after fixture capture.
+        reason: Structured unavailability reason, if monitoring failed.
+    """
 
     case_id: str
     native: object
@@ -205,7 +224,17 @@ def _build_memory_monitor(
     native: object,
     adapter_factory: Any = CudaDefaultPoolHighWater,
 ) -> CudaFixtureMemoryMonitor:
-    """Build an uncached per-fixture monitor with a bounded Warp sentinel."""
+    """Build an uncached per-fixture monitor with a bounded Warp sentinel.
+
+    Args:
+        case_id: Canonical identifier for the fixture being monitored.
+        wp: Lazily imported Warp module used only for device operations.
+        native: Exact native device selected by capture qualification.
+        adapter_factory: Factory for the lazy CUDA Runtime counter adapter.
+
+    Returns:
+        A fresh monitor whose per-fixture coverage has not yet begun.
+    """
     reason: str | None
     try:
         ordinal = _cuda_device_ordinal(native)
@@ -219,7 +248,7 @@ def _build_memory_monitor(
         native=native,
         device_ordinal=ordinal,
         adapter=adapter_factory(),
-        synchronize=wp.synchronize,
+        synchronize=lambda: wp.synchronize_device(native),
         sentinel_allocate=lambda: wp.zeros(1, dtype=wp.uint8, device=native),
     )
     if reason is not None:
@@ -337,6 +366,7 @@ def qualified_cuda_resident_benchmark(
         n_particles: Particle capacity per resident box.
         n_species: Species capacity per resident box.
         root_seed: Root seed for resident random-number streams.
+        case_id: Canonical identifier attached to allocator evidence.
         availability: Optional validated preflight availability result.
 
     Yields:
@@ -411,9 +441,9 @@ def qualified_cuda_resident_benchmark(
             if _qualification_is_explicitly_unavailable(error):
                 raise ResidentBenchmarkUnavailableError(str(error)) from error
             raise
-        capture_start = perf_counter()
         captured = capture_prepared_resident_graph(qualification)
         wp.synchronize()
+        capture_start = perf_counter()
         monitor.snapshot_peak()
         capture_elapsed = perf_counter() - capture_start
         benchmark_binding = ResidentCaptureBenchmarkBinding(

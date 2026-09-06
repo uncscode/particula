@@ -36,9 +36,17 @@ supplemental evidence, not an assertion threshold, and remains opt-in.
   ordering, uniqueness, and reconciliation; and full-retention/checkpointed
   tape projections. Subprocess import isolation confirms the support module
   loads neither Warp, NumPy, nor `particula.execution.gpu_resources`.
-- **P5:** Integration tests exercise observed-memory probe availability and a
-  representative CUDA fixture. Assertions cover schema and nonnegative deltas,
-  not a machine-independent allocator ratio.
+- **P5 (delivered, issue #1585):** Default-collection tests in
+  `resident_benchmark_support_test.py` and
+  `resident_benchmark_cuda_support_test.py` cover schema-v3 round trips and
+  v1/v2 empty-observation reads, immutable/consistent available and
+  unavailable records, lazy adapter resolution, Runtime/API failures,
+  reset-sentinel coverage, exact synchronized snapshot order, and failed or
+  non-monotonic snapshots. Injected `benchmark_safety_test.py` coverage checks
+  live-fixture P4 inputs, exactly one observation/comparison per executed case,
+  unavailable routing, and no snapshot during timing collection. The opt-in
+  native-CUDA row accepts complete valid evidence or structured unavailable
+  evidence; it asserts no allocator ratio or machine-independent budget.
 - **P6:** Documentation contract tests verify exact commands, provenance,
   limitations, and unavailable rows; strict MkDocs validates links/rendering.
 

@@ -78,7 +78,33 @@ to the exact E8 resource inventory.
   is explicitly excluded rather than estimated.
 - Comprehensive default-collection host-only formula, boundary, invariant,
   reconciliation, immutability, and import-isolation tests. No production or
-  public documentation files changed.
+   public documentation files changed.
+
+## Delivered in P5 (Issue #1585)
+
+- Schema-v3 `memory_observations` in
+  `particula/execution/tests/resident_benchmark_support.py`: immutable,
+  case-scoped available/unavailable records; deterministic serialization and
+  v1/v2 empty-observation compatibility; validated observed deltas and P4
+  steady-state signed differences.
+- A lazy, standard-library `ctypes` CUDA Runtime adapter for the documented
+  default-pool `cudaMemPoolAttrUsedMemHigh` counter, version-qualified for CUDA
+  Runtime 11.2 or later. It caches only successful library/symbol/version
+  resolution and imports/probes neither Warp nor CUDA until explicitly used.
+- Private CUDA fixture monitoring in
+  `particula/execution/tests/resident_benchmark_cuda_support.py`: per-fixture
+  exact-device monitor state, reset-sentinel coverage, and synchronized
+  before/post-capture/post-cleanup snapshots outside timing loops. Incomplete
+  coverage and counter failures remain structured unavailable observations.
+- One P4 comparison per executed fixture in
+  `particula/gpu/tests/benchmark_test.py`, derived from live dimensions,
+  capture-report logical bytes, diagnostic mapping, communication, and zero
+  checkpoint-copy inputs. Preflight-unavailable and budget-skipped cases retain
+  no observation.
+- Default-collection support/CUDA-support and injected benchmark-safety tests
+  cover schema compatibility, adapter and monitor failure paths, lifecycle
+  order, comparison routing, and no timing-loop snapshots. The native-CUDA row
+  remains opt-in and accepts valid evidence or structured unavailability.
 
 ## Out of Scope
 
@@ -92,6 +118,5 @@ to the exact E8 resource inventory.
   projections for Epic I until measured evidence exists.
 - CUDA occupancy/kernel profiling, which belongs to E8-F7, and the runnable
   lifecycle example, runbook, and final Epic H closeout, which belong to E8-F8.
-- P5 allocator high-water probing and
-  analytical-versus-observed memory comparisons; published documentation; and
-  any speed threshold or general performance conclusion.
+- Published documentation, any speed threshold, or general performance
+  conclusion.

@@ -65,16 +65,28 @@
     import-isolation coverage. No Warp, NumPy, or production resource module is
     imported.
 
-- [ ] **E8-F6-P5:** Compare analytical and observed peak device memory with integration tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add one <=100-LOC optional CUDA probe adapter that records comparable
-    before/peak/after readings and the unexplained analytical-to-observed delta
-    without relabeling allocator reservation as logical bytes.
+- [x] **E8-F6-P5:** Compare analytical and observed peak device memory with integration tests
+  - Issue: #1585 | Size: S | Status: Shipped
+  - Delivered: Schema-v3 case-scoped artifact observations compare P4 logical
+    steady-state bytes with the exact-device default-pool used-high allocation
+    delta and retain the signed difference only. A lazy `ctypes` CUDA Runtime
+    adapter uses only `cudaMemPoolAttrUsedMemHigh`; a private per-fixture monitor
+    proves coverage with a reset sentinel and records synchronized before,
+    post-capture peak, and post-cleanup after snapshots. Monitor faults retain
+    deterministic all-null unavailable evidence without altering timing rows.
+    The collector derives P4 inputs from the live fixture and appends exactly
+    one finalized observation after cleanup for each executed case.
   - Files: `particula/execution/tests/resident_benchmark_support.py`,
     `particula/execution/tests/resident_benchmark_support_test.py`,
-    `particula/gpu/tests/benchmark_test.py`
-  - Tests: Probe availability, nonnegative readings, unavailable-evidence rows,
-    and representative fixture integration.
+    `particula/execution/tests/resident_benchmark_cuda_support.py`,
+    `particula/execution/tests/resident_benchmark_cuda_support_test.py`,
+    `particula/gpu/tests/benchmark_test.py`, and
+    `particula/gpu/tests/benchmark_safety_test.py`.
+  - Tests: Hardware-free schema/adapter/monitor contracts cover import
+    isolation, Runtime/API and snapshot failures, sentinel coverage, lifecycle
+    ordering, and unavailable records. Injected collector tests cover live P4
+    inputs, one observation per fixture, and no timing-loop monitor work; the
+    optional CUDA row accepts valid evidence or structured unavailability.
 
 - [ ] **E8-F6-P6:** Publish benchmark and memory-budget evidence with documentation validation
   - Issue: TBD | Size: XS | Status: Not Started

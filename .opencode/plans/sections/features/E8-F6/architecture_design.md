@@ -74,6 +74,30 @@ host-only implementation imports neither Warp, NumPy, nor `gpu_resources`,
 allocates or inspects no device state, serializes no artifact, and changes no
 production API.
 
+### P5 implementation boundary
+
+Schema-v3 adds an artifact-only collection of at most one memory observation
+per executed case. `CudaDefaultPoolHighWater` lazily resolves only CUDA Runtime
+symbols through `ctypes`, requires Runtime 11.2 or later, and accesses only the
+selected device default pool's documented `cudaMemPoolAttrUsedMemHigh` value.
+It caches successful runtime resolution, never Warp APIs or fixture state.
+
+The private `CudaFixtureMemoryMonitor` is created after exact native-device
+selection and before resident fixture allocation. It synchronizes, resets the
+counter, proves exact-pool coverage with one bounded same-device sentinel, then
+resets again and records `before`. It records `peak` after build/prepare/capture
+and `after` after binding cleanup. All readings are scalar and remain outside
+warmup/repetition collection. API, counter, sentinel, snapshot, or monotonicity
+failure yields an all-null structured unavailable observation without changing
+successful timing evidence.
+
+While the qualified fixture is live, the collector derives one P4 model from
+the fixture-authoritative dimensions and capture report, selected diagnostics,
+communication, and zero checkpoint-copy inputs. After context exit it attaches
+the finalized observation and comparison exactly once; preflight-unavailable
+and budget-skipped cases receive none. This is diagnostic evidence only, with
+no allocator-equality, ratio, budget, or timing-policy decision.
+
 ```text
 validated BenchmarkCase + qualified CUDA device
           |
@@ -90,7 +114,7 @@ E8-F5 validated fixture -> E8-F2 prepared loop -> E8-F4 capture
                                       \             /
                                 explicit synchronize
                                          |
-                         raw samples + summaries + peak memory
+                          raw samples + summaries + one case-scoped memory observation
                                          |
                          versioned reproducible JSON artifact
 ```
