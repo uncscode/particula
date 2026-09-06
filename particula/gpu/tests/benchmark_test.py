@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import os
+import platform
 import sys
 import time
 from contextlib import contextmanager
@@ -61,6 +62,20 @@ from particula.gpu.tests.cuda_availability import (
 from particula.gpu.tests.mass_precision_study_support import (
     _build_mass_precision_cases,
     _project_candidate,
+)
+from particula.gpu.tests.profiling_support import (
+    REPLAY_COUNTS,
+    ExecutedEvidence,
+    MachineProvenance,
+    MeasurementMethod,
+    NormalizedMetric,
+    ProfilingArtifact,
+    RawDurationSample,
+    UnavailableEvidence,
+    build_default_profiling_workload_matrix,
+    build_raw_report_provenance,
+    ensure_profiling_raw_root,
+    serialize_profiling_artifact,
 )
 
 
@@ -171,6 +186,19 @@ RESIDENT_BENCHMARK_REQUESTED_BYTES_BY_SHAPE = {
 }
 BENCHMARK_ARTIFACT_DIR = Path(".artifacts") / "benchmarks"
 DEFAULT_BENCHMARK_OUTPUT_NAME = "gpu_benchmark_results.json"
+PROFILING_ARTIFACT_NAMES = {
+    (
+        "prepared_uncaptured",
+        "host_launch",
+    ): "prepared_uncaptured_host_launch.json",
+    ("prepared_uncaptured", "synchronized_elapsed"): (
+        "prepared_uncaptured_synchronized_elapsed.json"
+    ),
+    ("captured_replay", "host_launch"): "captured_replay_host_launch.json",
+    ("captured_replay", "synchronized_elapsed"): (
+        "captured_replay_synchronized_elapsed.json"
+    ),
+}
 
 # ---------------------------------------------------------------------------
 # Scaling configurations
@@ -1904,6 +1932,284 @@ def _estimate_resident_requested_bytes(case: Any) -> int:
         raise ValueError(
             "resident benchmark case has no configured requested estimate."
         ) from error
+
+
+def _profiling_machine(binding: Any) -> MachineProvenance:
+    """Build bounded provenance from an already-qualified CUDA binding."""
+    device = binding.selected_device
+    identity = device.get("identity")
+    if device.get("status") != "available" or not isinstance(identity, str):
+        raise ValueError("qualified profiling binding lacks device provenance.")
+    return MachineProvenance(
+        machine_id=platform.node() or "unknown",
+        platform=sys.platform,
+        python_version=platform.python_version(),
+        cuda_version=str(getattr(wp, "__version__", "unknown")),
+        driver_version="qualified",
+        device=identity,
+        source_revision="working-tree",
+    )
+
+
+def _profiling_method(source: str) -> MeasurementMethod:
+    """Build one P1 measurement-method record."""
+    return MeasurementMethod(
+        method_id=source,
+        source=source,
+        command=" ".join(sys.argv) or "pytest",
+        version="perf_counter_ns",
+        duration_unit="ns",
+    )
+
+
+def _positive_duration_ns(start: int, end: int) -> int:
+    """Require a strictly positive integer nanosecond timing delta."""
+    if type(start) is not int or type(end) is not int or end <= start:
+        raise ValueError("benchmark clock must produce increasing integer ns.")
+    return end - start
+
+
+def _validate_profiling_binding(binding: Any, workload: Any) -> None:
+    """Reject a fixture that is not the exact frozen workload binding."""
+    binding.validate_identities()
+    dimensions = binding.loop.prepared.signature.dimensions
+    if (
+        dimensions.n_boxes,
+        dimensions.n_particles,
+        dimensions.n_species,
+    ) != workload.shape or binding.duration != workload.duration_seconds:
+        raise ValueError("profiling fixture does not match frozen workload.")
+    if not callable(binding.reset) or not callable(binding.synchronize):
+        raise TypeError("profiling fixture callbacks are invalid.")
+
+
+def _collect_profile_row(
+    binding: Any,
+    workload: Any,
+    *,
+    mode: str,
+    source: str,
+    clock: Any = time.perf_counter_ns,
+) -> tuple[RawDurationSample, ...]:
+    """Collect one replay-count-major method row with reset outside clocks."""
+    operation = (
+        binding.enqueue if mode == "prepared_uncaptured" else binding.replay
+    )
+    if not callable(operation) or source not in {
+        "host_launch",
+        "synchronized_elapsed",
+    }:
+        raise ValueError("profiling mode or method is invalid.")
+    for _ in range(workload.warmup):
+        binding.reset()
+        binding.validate_identities()
+        operation()
+    binding.synchronize()
+    samples: list[RawDurationSample] = []
+    for replay_count in workload.replay_counts:
+        if replay_count not in REPLAY_COUNTS:
+            raise ValueError("profiling replay count is invalid.")
+        for _ in range(workload.sample_count):
+            binding.reset()
+            binding.validate_identities()
+            start = clock()
+            for _ in range(replay_count):
+                operation()
+            if source == "synchronized_elapsed":
+                binding.synchronize()
+            end = clock()
+            samples.append(
+                RawDurationSample(
+                    replay_count, _positive_duration_ns(start, end)
+                )
+            )
+            if source == "host_launch":
+                binding.synchronize()
+    return tuple(samples)
+
+
+def _stage_profile_artifacts(
+    profiling_root: Path,
+    artifacts: dict[tuple[str, str], ProfilingArtifact],
+) -> list[tuple[Path, Path]]:
+    """Serialize and stage every profiling artifact and its manifest."""
+    serialized = {
+        key: serialize_profiling_artifact(value) + "\n"
+        for key, value in artifacts.items()
+    }
+    manifest = (
+        json.dumps(
+            {
+                f"{mode}/{method}": PROFILING_ARTIFACT_NAMES[(mode, method)]
+                for mode, method in PROFILING_ARTIFACT_NAMES
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    )
+    staged: list[tuple[Path, Path]] = []
+    for key, payload in serialized.items():
+        final = profiling_root / PROFILING_ARTIFACT_NAMES[key]
+        temporary = final.with_suffix(final.suffix + ".tmp")
+        temporary.write_text(payload, encoding="utf-8")
+        staged.append((temporary, final))
+    manifest_final = profiling_root / "manifest.json"
+    manifest_temporary = manifest_final.with_suffix(".json.tmp")
+    manifest_temporary.write_text(manifest, encoding="utf-8")
+    staged.append((manifest_temporary, manifest_final))
+    return staged
+
+
+def _restore_profile_artifacts(
+    staged: list[tuple[Path, Path]],
+    backups: list[tuple[Path, Path]],
+    published: list[Path],
+) -> None:
+    """Remove partial output and restore the previous complete publication."""
+    for final in published:
+        final.unlink(missing_ok=True)
+    for backup, final in backups:
+        if backup.exists():
+            os.replace(backup, final)
+    for temporary, _ in staged:
+        temporary.unlink(missing_ok=True)
+
+
+def _write_profile_artifacts(
+    artifact_root: Path,
+    artifacts: dict[tuple[str, str], ProfilingArtifact],
+) -> None:
+    """Publish the complete profiling association or restore prior output."""
+    artifact_root.mkdir(parents=True, exist_ok=True)
+    profiling_root = artifact_root / "benchmarks" / "profiling"
+    profiling_root.mkdir(parents=True, exist_ok=True)
+    staged: list[tuple[Path, Path]] = []
+    backups: list[tuple[Path, Path]] = []
+    published: list[Path] = []
+    try:
+        staged = _stage_profile_artifacts(profiling_root, artifacts)
+        for _, final in staged:
+            if final.exists():
+                backup = final.with_suffix(final.suffix + ".bak")
+                os.replace(final, backup)
+                backups.append((backup, final))
+        for temporary, final in staged:
+            os.replace(temporary, final)
+            published.append(final)
+    except BaseException:
+        _restore_profile_artifacts(staged, backups, published)
+        raise
+    for backup, _ in backups:
+        backup.unlink(missing_ok=True)
+
+
+def _collect_resident_launch_profile_artifacts(
+    artifact_root: Path = Path(".artifacts"),
+    *,
+    clock: Any = time.perf_counter_ns,
+) -> dict[tuple[str, str], ProfilingArtifact]:
+    """Collect native-CUDA-only launch evidence or complete unavailable rows."""
+    artifact_root.mkdir(parents=True, exist_ok=True)
+    workloads = build_default_profiling_workload_matrix()
+    pairs = tuple(PROFILING_ARTIFACT_NAMES)
+    try:
+        availability = cuda_capture_availability()
+        if not availability.available:
+            raise ResidentBenchmarkUnavailableError(availability.reason)
+        rows: dict[tuple[str, str], list[Any]] = {pair: [] for pair in pairs}
+        for workload in workloads:
+            with qualified_cuda_resident_benchmark(
+                duration=workload.duration_seconds,
+                n_boxes=workload.shape[0],
+                n_particles=workload.shape[1],
+                n_species=workload.shape[2],
+                root_seed=workload.seed,
+                case_id=workload.workload_id,
+                availability=availability,
+            ) as binding:
+                _validate_profiling_binding(binding, workload)
+                try:
+                    binding.reset()
+                    binding.validate_identities()
+                except BaseException as error:
+                    raise ResidentBenchmarkUnavailableError(
+                        "identity-preserving fixture reset is unavailable: "
+                        f"{error}"
+                    ) from error
+                machine = _profiling_machine(binding)
+                raw_root = ensure_profiling_raw_root(artifact_root)
+                for mode, source in pairs:
+                    samples = _collect_profile_row(
+                        binding, workload, mode=mode, source=source, clock=clock
+                    )
+                    raw_filename = f"{workload.label}_{mode}_{source}.json"
+                    (raw_root / raw_filename).write_text(
+                        json.dumps(
+                            {
+                                "capture_elapsed_seconds": binding.capture_elapsed_seconds,
+                                "mode": mode,
+                                "raw_samples": [
+                                    {
+                                        "duration_ns": sample.duration_ns,
+                                        "replay_count": sample.replay_count,
+                                    }
+                                    for sample in samples
+                                ],
+                                "setup_elapsed_seconds": binding.setup_elapsed_seconds,
+                                "workload_id": workload.workload_id,
+                            },
+                            sort_keys=True,
+                        ),
+                        encoding="utf-8",
+                    )
+                    provenance = build_raw_report_provenance(
+                        artifact_root, raw_filename
+                    )
+                    metric_name = f"{source}_duration"
+                    metric = NormalizedMetric(
+                        metric_name,
+                        sum(
+                            sample.duration_ns / sample.replay_count
+                            for sample in samples
+                        )
+                        / len(samples),
+                        "ns",
+                    )
+                    rows[(mode, source)].append(
+                        ExecutedEvidence(
+                            "executed",
+                            workload,
+                            machine,
+                            _profiling_method(source),
+                            samples,
+                            (metric,),
+                            (provenance,),
+                        )
+                    )
+        artifacts = {
+            key: ProfilingArtifact(tuple(value)) for key, value in rows.items()
+        }
+    except (ResidentBenchmarkUnavailableError, pytest.skip.Exception) as error:
+        artifacts = {
+            pair: ProfilingArtifact(
+                tuple(
+                    UnavailableEvidence("unavailable", workload, str(error))
+                    for workload in workloads
+                )
+            )
+            for pair in pairs
+        }
+    _write_profile_artifacts(artifact_root, artifacts)
+    return artifacts
+
+
+@pytest.mark.warp
+@pytest.mark.cuda
+def test_resident_launch_profile_evidence() -> None:
+    """Publish separate native-CUDA launch and completion evidence artifacts."""
+    artifacts = _collect_resident_launch_profile_artifacts()
+    assert set(artifacts) == set(PROFILING_ARTIFACT_NAMES)
 
 
 def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C901

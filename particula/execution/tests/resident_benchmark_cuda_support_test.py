@@ -12,6 +12,7 @@ from particula.execution.tests.resident_benchmark_cuda_support import (
     CudaFixtureMemoryMonitor,
     ResidentBenchmarkUnavailableError,
     ResidentCaptureBenchmarkBinding,
+    _build_fixture_reset,
     _close_loop_preserving_error,
     qualified_cuda_resident_benchmark,
     resident_benchmark_provenance,
@@ -130,6 +131,115 @@ def test_memory_monitor_returns_unavailable_when_sentinel_does_not_change() -> (
     observation = monitor.finalize()
     assert not observation.available
     assert observation.before_bytes is observation.peak_bytes is None
+
+
+def test_fixture_reset_restores_mutable_arrays_before_each_sample() -> None:
+    """Restore primary and RNG state without replacing resident identities."""
+
+    class Array:
+        """Minimal device-array double with observable storage identity."""
+
+        def __init__(self, values: list[int]) -> None:
+            self.values = values
+            self.shape = (len(values),)
+            self.dtype = "uint32"
+            self.device = "cuda:0"
+
+    calls: list[str] = []
+
+    def zeros(shape, *, dtype, device):
+        assert shape == (2,)
+        assert dtype == "uint32"
+        assert device == "cuda:0"
+        return Array([0, 0])
+
+    def copy(destination: Array, source: Array) -> None:
+        calls.append("copy")
+        destination.values[:] = source.values
+
+    wp = SimpleNamespace(
+        zeros=zeros,
+        copy=copy,
+        synchronize=lambda: calls.append("synchronize"),
+    )
+    primary = Array([1, 2])
+    rng = Array([3, 4])
+    loop = SimpleNamespace(
+        request=SimpleNamespace(primary=primary),
+        session=SimpleNamespace(),
+        coagulation_resources=SimpleNamespace(rng=rng),
+        wall_loss_resources=SimpleNamespace(),
+    )
+    validations: list[str] = []
+    reset = _build_fixture_reset(
+        wp,
+        loop,
+        lambda: validations.append("validated"),
+    )
+    primary.values[:] = [9, 9]
+    rng.values[:] = [8, 8]
+    reset()
+
+    assert primary.values == [1, 2]
+    assert rng.values == [3, 4]
+    assert calls == [
+        "copy",
+        "copy",
+        "synchronize",
+        "synchronize",
+        "copy",
+        "copy",
+        "synchronize",
+    ]
+    assert validations == ["validated"]
+
+
+def test_fixture_reset_handles_empty_mutable_array_registry() -> None:
+    """Drain and validate an empty fixture without allocating snapshots."""
+    calls: list[str] = []
+    wp = SimpleNamespace(
+        zeros=lambda *_args, **_kwargs: pytest.fail("unexpected snapshot"),
+        copy=lambda *_args, **_kwargs: pytest.fail("unexpected restore"),
+        synchronize=lambda: calls.append("synchronize"),
+    )
+    loop = SimpleNamespace(
+        request=SimpleNamespace(),
+        session=SimpleNamespace(),
+        coagulation_resources=SimpleNamespace(),
+        wall_loss_resources=SimpleNamespace(),
+    )
+
+    reset = _build_fixture_reset(wp, loop, lambda: calls.append("validated"))
+    reset()
+
+    assert calls == ["synchronize", "synchronize", "validated"]
+
+
+def test_fixture_reset_propagates_final_identity_validation_error() -> None:
+    """Preserve validation failures after restoring the captured state."""
+    calls: list[str] = []
+    wp = SimpleNamespace(
+        zeros=lambda *_args, **_kwargs: pytest.fail("unexpected snapshot"),
+        copy=lambda *_args, **_kwargs: pytest.fail("unexpected restore"),
+        synchronize=lambda: calls.append("synchronize"),
+    )
+    loop = SimpleNamespace(
+        request=SimpleNamespace(),
+        session=SimpleNamespace(),
+        coagulation_resources=SimpleNamespace(),
+        wall_loss_resources=SimpleNamespace(),
+    )
+
+    reset = _build_fixture_reset(
+        wp,
+        loop,
+        lambda: (_ for _ in ()).throw(ValueError("identity drift")),
+    )
+
+    with pytest.raises(ValueError, match="identity drift"):
+        reset()
+
+    assert calls == ["synchronize", "synchronize"]
 
 
 def test_binding_delegates_prepared_enqueue_and_captured_replay(
@@ -255,6 +365,36 @@ def test_qualified_cuda_binding_rejects_unavailable_before_import(
             pass
 
     assert calls == []
+
+
+@pytest.mark.parametrize("duration", (0.0, float("nan"), True))
+def test_qualified_cuda_binding_validates_duration_before_cuda_preflight(
+    duration: object,
+) -> None:
+    """Reject invalid timing inputs before any CUDA availability handling."""
+    with pytest.raises((TypeError, ValueError), match="duration"):
+        with qualified_cuda_resident_benchmark(
+            duration=duration,
+            availability=resident_benchmark_cuda_support.ResidentBenchmarkAvailability(
+                False, "no CUDA"
+            ),
+        ):
+            pass
+
+
+@pytest.mark.parametrize("dimension", (0, -1, True))
+def test_qualified_cuda_binding_validates_dimensions_before_cuda_preflight(
+    dimension: object,
+) -> None:
+    """Reject invalid fixture shapes before any CUDA availability handling."""
+    with pytest.raises((TypeError, ValueError), match="n_boxes"):
+        with qualified_cuda_resident_benchmark(
+            n_boxes=dimension,
+            availability=resident_benchmark_cuda_support.ResidentBenchmarkAvailability(
+                False, "no CUDA"
+            ),
+        ):
+            pass
 
 
 def test_provenance_uses_real_signature_and_nondefault_device() -> None:

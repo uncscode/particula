@@ -1230,6 +1230,213 @@ def test_benchmark_gpu_wp_funcs_uses_fake_warp_backend(
     assert all(value >= 0.0 for value in result.values())
 
 
+def test_profile_row_keeps_host_launch_synchronization_outside_clocks(
+    benchmark_module,
+) -> None:
+    """Host-launch samples have only clocks and operations in their interval."""
+    workload = benchmark_module.build_default_profiling_workload_matrix()[0]
+    events: list[str] = []
+    ticks = iter(range(1, 10_000))
+    binding = types.SimpleNamespace(
+        enqueue=lambda: events.append("operation"),
+        replay=lambda: events.append("replay"),
+        reset=lambda: events.append("reset"),
+        synchronize=lambda: events.append("synchronize"),
+        validate_identities=lambda: events.append("validate"),
+    )
+
+    samples = benchmark_module._collect_profile_row(
+        binding,
+        workload,
+        mode="prepared_uncaptured",
+        source="host_launch",
+        clock=lambda: events.append("clock") or next(ticks),
+    )
+
+    assert [sample.replay_count for sample in samples] == [
+        count
+        for count in workload.replay_counts
+        for _ in range(workload.sample_count)
+    ]
+    for index, event in enumerate(events):
+        if event == "clock":
+            assert (
+                events[index + 1] == "operation"
+                or events[index - 1] == "operation"
+            )
+
+
+def test_profile_row_synchronizes_once_inside_elapsed_interval(
+    benchmark_module,
+) -> None:
+    """Completion samples place their single synchronizer before the end clock."""
+    workload = benchmark_module.build_default_profiling_workload_matrix()[0]
+    events: list[str] = []
+    ticks = iter(range(1, 10_000))
+    binding = types.SimpleNamespace(
+        enqueue=lambda: events.append("operation"),
+        replay=lambda: events.append("replay"),
+        reset=lambda: events.append("reset"),
+        synchronize=lambda: events.append("synchronize"),
+        validate_identities=lambda: events.append("validate"),
+    )
+
+    benchmark_module._collect_profile_row(
+        binding,
+        workload,
+        mode="captured_replay",
+        source="synchronized_elapsed",
+        clock=lambda: events.append("clock") or next(ticks),
+    )
+
+    assert any(
+        events[index : index + 3] == ["replay", "synchronize", "clock"]
+        for index in range(len(events) - 2)
+    )
+
+
+def test_profile_row_retains_replay_major_order_and_normalized_durations(
+    benchmark_module,
+) -> None:
+    """Retain exact positive clock deltas in replay-count-major sample order."""
+    workload = benchmark_module.build_default_profiling_workload_matrix()[0]
+    ticks = iter(range(100, 200))
+    binding = types.SimpleNamespace(
+        enqueue=lambda: None,
+        replay=lambda: None,
+        reset=lambda: None,
+        synchronize=lambda: None,
+        validate_identities=lambda: None,
+    )
+
+    samples = benchmark_module._collect_profile_row(
+        binding,
+        workload,
+        mode="prepared_uncaptured",
+        source="host_launch",
+        clock=lambda: next(ticks),
+    )
+
+    expected_counts = tuple(
+        count
+        for count in workload.replay_counts
+        for _ in range(workload.sample_count)
+    )
+    assert tuple(sample.replay_count for sample in samples) == expected_counts
+    assert tuple(sample.duration_ns for sample in samples) == (1,) * len(
+        samples
+    )
+    assert sum(
+        sample.duration_ns / sample.replay_count for sample in samples
+    ) / len(samples) == pytest.approx(0.27775)
+
+
+@pytest.mark.parametrize("ticks", ((1, 1), (2, 1)))
+def test_profile_row_rejects_nonincreasing_clock_without_samples(
+    benchmark_module,
+    ticks: tuple[int, int],
+) -> None:
+    """Reject invalid timing intervals before an evidence row can be built."""
+    workload = benchmark_module.build_default_profiling_workload_matrix()[0]
+    tick_values = iter(ticks)
+    binding = types.SimpleNamespace(
+        enqueue=lambda: None,
+        replay=lambda: None,
+        reset=lambda: None,
+        synchronize=lambda: None,
+        validate_identities=lambda: None,
+    )
+
+    with pytest.raises(ValueError, match="increasing integer ns"):
+        benchmark_module._collect_profile_row(
+            binding,
+            workload,
+            mode="prepared_uncaptured",
+            source="host_launch",
+            clock=lambda: next(tick_values),
+        )
+
+
+def test_profile_artifact_publication_restores_complete_previous_set(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Failed replacement leaves each previously published artifact unchanged."""
+    workloads = benchmark_module.build_default_profiling_workload_matrix()
+    artifacts = {
+        pair: benchmark_module.ProfilingArtifact(
+            tuple(
+                benchmark_module.UnavailableEvidence(
+                    "unavailable", workload, "CUDA absent"
+                )
+                for workload in workloads
+            )
+        )
+        for pair in benchmark_module.PROFILING_ARTIFACT_NAMES
+    }
+    profiling_root = tmp_path / "benchmarks" / "profiling"
+    profiling_root.mkdir(parents=True)
+    final_paths = [
+        profiling_root / name
+        for name in benchmark_module.PROFILING_ARTIFACT_NAMES.values()
+    ] + [profiling_root / "manifest.json"]
+    previous = {path: f"previous:{path.name}\n" for path in final_paths}
+    for path, contents in previous.items():
+        path.write_text(contents, encoding="utf-8")
+
+    replace = benchmark_module.os.replace
+
+    def fail_first_publish(source: Path, destination: Path) -> None:
+        if source.suffix == ".tmp":
+            raise OSError("replacement failed")
+        replace(source, destination)
+
+    monkeypatch.setattr(benchmark_module.os, "replace", fail_first_publish)
+
+    with pytest.raises(OSError, match="replacement failed"):
+        benchmark_module._write_profile_artifacts(tmp_path, artifacts)
+
+    assert {
+        path: path.read_text(encoding="utf-8") for path in final_paths
+    } == previous
+
+
+def test_unavailable_profile_collection_never_invokes_fixture_or_clock(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Publish complete unavailable artifacts before any fixture timing work."""
+    artifact_root = tmp_path / ".artifacts"
+    artifact_root.mkdir()
+    calls: list[str] = []
+    monkeypatch.setattr(
+        benchmark_module,
+        "cuda_capture_availability",
+        lambda: types.SimpleNamespace(available=False, reason="CUDA absent"),
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "qualified_cuda_resident_benchmark",
+        lambda **_: calls.append("fixture"),
+    )
+
+    artifacts = benchmark_module._collect_resident_launch_profile_artifacts(
+        artifact_root,
+        clock=lambda: calls.append("clock") or 1,
+    )
+
+    assert calls == []
+    assert all(
+        row.status == "unavailable"
+        for artifact in artifacts.values()
+        for row in artifact.evidence
+    )
+    manifest = artifact_root / "benchmarks" / "profiling" / "manifest.json"
+    assert manifest.is_file()
+
+
 def test_condensation_scaling_records_cpu_and_gpu_paths(
     benchmark_module,
     monkeypatch: pytest.MonkeyPatch,

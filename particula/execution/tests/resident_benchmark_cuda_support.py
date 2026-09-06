@@ -57,6 +57,7 @@ class ResidentCaptureBenchmarkBinding:
     capture_set: Any
     prepared_signature_digest: str
     selected_device: dict[str, Any]
+    reset_fixture: Callable[[], None] = lambda: None
     memory_monitor: Any = None
 
     def enqueue(self) -> None:
@@ -85,6 +86,90 @@ class ResidentCaptureBenchmarkBinding:
             or self.capture_set is None
         ):
             raise ValueError("resident benchmark binding identity drifted.")
+
+    def reset(self) -> None:
+        """Restore the qualified fixture outside a benchmark timing interval."""
+        self.reset_fixture()
+
+
+def _is_device_array(value: Any) -> bool:
+    """Return whether ``value`` has the minimum Warp-array metadata."""
+    return all(
+        hasattr(value, attribute) for attribute in ("shape", "dtype", "device")
+    )
+
+
+def _nested_values(value: Any) -> tuple[Any, ...]:
+    """Return direct nested values without invoking arbitrary properties."""
+    if isinstance(value, dict):
+        return tuple(value.values())
+    if isinstance(value, (tuple, list)):
+        return tuple(value)
+    if callable(value):
+        return ()
+    if hasattr(value, "__dict__"):
+        return tuple(vars(value).values())
+    return tuple(
+        getattr(value, name)
+        for name in getattr(type(value), "__slots__", ())
+        if hasattr(value, name)
+    )
+
+
+def _mutable_resident_arrays(loop: Any) -> tuple[Any, ...]:
+    """Return mutable primaries and acquired sidecars without duplicates."""
+    arrays: list[Any] = []
+    pending = [
+        getattr(loop, "request", None),
+        getattr(loop, "session", None),
+        getattr(loop, "coagulation_resources", None),
+        getattr(loop, "wall_loss_resources", None),
+    ]
+    visited: set[int] = set()
+    while pending:
+        value = pending.pop()
+        if id(value) in visited:
+            continue
+        visited.add(id(value))
+        if _is_device_array(value):
+            arrays.append(value)
+            continue
+        pending.extend(_nested_values(value))
+    unique: list[Any] = []
+    seen: set[int] = set()
+    for array in arrays:
+        if id(array) not in seen:
+            unique.append(array)
+            seen.add(id(array))
+    return tuple(unique)
+
+
+def _build_fixture_reset(
+    wp: Any,
+    loop: Any,
+    validate_identities: Callable[[], None] | None = None,
+) -> Callable[[], None]:
+    """Return a reset callback that preserves mutable-state identities."""
+    arrays = _mutable_resident_arrays(loop)
+    snapshots = tuple(
+        wp.zeros(array.shape, dtype=array.dtype, device=array.device)
+        for array in arrays
+    )
+    for snapshot, array in zip(snapshots, arrays, strict=True):
+        wp.copy(snapshot, array)
+    if arrays:
+        wp.synchronize()
+
+    def reset() -> None:
+        """Drain, restore pre-bound arrays, drain, then validate identities."""
+        wp.synchronize()
+        for array, snapshot in zip(arrays, snapshots, strict=True):
+            wp.copy(array, snapshot)
+        wp.synchronize()
+        if validate_identities is not None:
+            validate_identities()
+
+    return reset
 
 
 @dataclass(slots=True)
@@ -475,7 +560,14 @@ def qualified_cuda_resident_benchmark(
             capture_set=capture_set,
             prepared_signature_digest=_prepared_signature_digest(loop),
             selected_device=_selected_device_metadata(wp, device.native),
+            reset_fixture=lambda: None,
             memory_monitor=monitor,
+        )
+        validate_identities = benchmark_binding.validate_identities
+        object.__setattr__(
+            benchmark_binding,
+            "reset_fixture",
+            _build_fixture_reset(wp, loop, validate_identities),
         )
         benchmark_binding.validate_identities()
         yield benchmark_binding
