@@ -325,3 +325,131 @@ def test_unavailable_evidence_retains_requested_workload_only() -> None:
     }
     with pytest.raises(ValueError):
         support.ProfilingArtifact((unavailable, _executed()))
+
+
+def test_nsight_qualification_requires_exact_literal_banner() -> None:
+    """Test a suffix or stderr prevents tool qualification."""
+    calls: list[tuple[str, ...]] = []
+
+    def fake_runner(
+        command: tuple[str, ...],
+    ) -> subprocess.CompletedProcess[str]:
+        calls.append(command)
+        return subprocess.CompletedProcess(
+            command, 0, "2026.1.3.425-1 extra\n", ""
+        )
+
+    result = support.qualify_nsight_tool("nsys", fake_runner)
+
+    assert isinstance(result, support.NsightUnavailable)
+    assert calls == [("nsys", "--version")]
+
+
+def test_collect_nsight_evidence_uses_closed_commands_and_parser(
+    tmp_path: Path,
+) -> None:
+    """Test collection has fixed stages, bounded commands, and parser handoff."""
+    root = tmp_path / ".artifacts"
+    root.mkdir()
+    calls: list[tuple[str, ...]] = []
+
+    def fake_runner(
+        command: tuple[str, ...],
+    ) -> subprocess.CompletedProcess[str]:
+        calls.append(command)
+        if command == ("nsys", "--version"):
+            return subprocess.CompletedProcess(
+                command, 0, "2026.1.3.425-1\n", ""
+            )
+        if command[0] == "worker":
+            return subprocess.CompletedProcess(command, 0, "", "")
+        if command[:2] == ("nsys", "export"):
+            return subprocess.CompletedProcess(
+                command,
+                0,
+                "kernel_name,start_ns,duration_ns,correlation_id\nresident,1,5,1\n",
+                "",
+            )
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    # The fixed worker invocation begins with the Python interpreter, so map it
+    # to a successful child process without allowing arbitrary arguments.
+    result = support.collect_nsight_evidence(
+        tool="nsys",
+        artifact_root=root,
+        report_filename="systems.csv",
+        process_ids={1: "resident"},
+        runner=fake_runner,
+    )
+
+    assert isinstance(result, support.NsightEvidence)
+    assert result.rows[0].attribution == "attributed"
+    assert calls[0] == ("nsys", "--version")
+    assert calls[1] == support.WORKER_COMMAND
+    assert all(isinstance(command, tuple) for command in calls)
+
+
+def test_collect_ncu_evidence_uses_closed_metrics_and_parser(
+    tmp_path: Path,
+) -> None:
+    """Test Compute collection exports one allow-listed attributed metric."""
+    root = tmp_path / ".artifacts"
+    root.mkdir()
+    calls: list[tuple[str, ...]] = []
+
+    def fake_runner(
+        command: tuple[str, ...],
+    ) -> subprocess.CompletedProcess[str]:
+        calls.append(command)
+        if command == ("ncu", "--version"):
+            return subprocess.CompletedProcess(command, 0, "2026.2.1.5-1\n", "")
+        if command[:2] == ("ncu", "--import"):
+            return subprocess.CompletedProcess(
+                command,
+                0,
+                "kernel_name,invocations,metric_name,metric_value,unit,correlation_id\n"
+                "resident,1,dram__throughput.avg,2.5,GB/s,1\n",
+                "",
+            )
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    result = support.collect_nsight_evidence(
+        tool="ncu",
+        artifact_root=root,
+        report_filename="compute.csv",
+        process_ids={1: "resident"},
+        runner=fake_runner,
+    )
+
+    assert isinstance(result, support.NsightEvidence)
+    assert result.rows[0].attribution == "attributed"
+    assert result.rows[0].metric_name == "dram__throughput.avg"
+    assert calls[0] == ("ncu", "--version")
+    assert calls[1] == support.WORKER_COMMAND
+    assert calls[2][:2] == ("ncu", "--csv")
+    assert calls[3] == ("ncu", "--import", "compute.csv", "--csv")
+
+
+def test_collect_nsight_rejects_unsafe_report_before_worker(
+    tmp_path: Path,
+) -> None:
+    """Test report paths fail closed before a worker or profiler launches."""
+    root = tmp_path / ".artifacts"
+    root.mkdir()
+    calls: list[tuple[str, ...]] = []
+
+    def fake_runner(
+        command: tuple[str, ...],
+    ) -> subprocess.CompletedProcess[str]:
+        calls.append(command)
+        return subprocess.CompletedProcess(command, 0, "2026.1.3.425-1\n", "")
+
+    with pytest.raises(ValueError):
+        support.collect_nsight_evidence(
+            tool="nsys",
+            artifact_root=root,
+            report_filename="../outside.csv",
+            process_ids={},
+            runner=fake_runner,
+        )
+    assert calls == [("nsys", "--version")]

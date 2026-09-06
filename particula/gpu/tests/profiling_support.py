@@ -15,9 +15,11 @@ import math
 import os
 import re
 import stat
+import subprocess
+import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Callable, cast
 
 PROFILING_SCHEMA_VERSION = 1
 MAX_STRING_LENGTH = 256
@@ -47,6 +49,46 @@ FROZEN_WORKLOAD_FIELDS = {
 }
 _SAFE_TEXT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 ._:/+\-]*$")
 _DIGEST = re.compile(r"^[0-9a-f]{64}$")
+
+# E8-F7-P3 intentionally uses a schema independent of the P1 timing artifact.
+NSIGHT_EVIDENCE_SCHEMA_VERSION = 1
+PROCESS_TIMEOUT_SECONDS = 30
+MAX_PROCESS_OUTPUT_BYTES = 16_384
+MAX_EXPORT_ROWS = 4_096
+NSYS_BANNER = "2026.1.3.425-1"
+NCU_BANNER = "2026.2.1.5-1"
+NSYS_COLUMNS = ("kernel_name", "start_ns", "duration_ns", "correlation_id")
+NCU_COLUMNS = (
+    "kernel_name",
+    "invocations",
+    "metric_name",
+    "metric_value",
+    "unit",
+    "correlation_id",
+)
+NSIGHT_METRICS = frozenset(
+    (
+        "sm__warps_active.avg.pct_of_peak_sustained_active",
+        "dram__throughput.avg",
+        "l1tex__t_sectors_pipe_lsu_mem_global_op_ld.sum",
+        "smsp__warp_issue_stalled_long_scoreboard_per_warp_active.pct",
+    )
+)
+NSIGHT_METRIC_UNITS = {
+    "sm__warps_active.avg.pct_of_peak_sustained_active": "%",
+    "dram__throughput.avg": "GB/s",
+    "l1tex__t_sectors_pipe_lsu_mem_global_op_ld.sum": "transactions",
+    "smsp__warp_issue_stalled_long_scoreboard_per_warp_active.pct": "%",
+}
+WORKER_COMMAND = (
+    sys.executable,
+    "-m",
+    "particula.gpu.tests.profiling_workload_runner",
+    "--workload",
+    "small",
+    "--mode",
+    "captured-replay",
+)
 
 
 def _require_text(value: object, name: str) -> str:
@@ -1101,3 +1143,379 @@ def deserialize_profiling_artifact(payload: str) -> ProfilingArtifact:
         else:
             raise ValueError("evidence status is not supported.")
     return ProfilingArtifact(tuple(evidence))
+
+
+@dataclass(frozen=True, slots=True)
+class NsightToolQualification:
+    """Store one exact Nsight executable qualification result."""
+
+    tool: str
+    banner: str
+
+    def __post_init__(self) -> None:
+        """Validate the closed tool and literal version banner."""
+        expected = {"nsys": NSYS_BANNER, "ncu": NCU_BANNER}
+        if self.tool not in expected or self.banner != expected[self.tool]:
+            raise ValueError("Nsight tool qualification is not supported.")
+
+
+@dataclass(frozen=True, slots=True)
+class NsightCommandOutcome:
+    """Store a bounded command result without retaining command paths."""
+
+    tool: str
+    stage: str
+    returncode: int
+    stdout: str
+    stderr: str
+
+    def __post_init__(self) -> None:
+        """Validate the bounded command-result fields."""
+        if self.tool not in {"nsys", "ncu", "worker"}:
+            raise ValueError("unknown command tool.")
+        if self.stage not in {"probe", "worker", "collect", "export"}:
+            raise ValueError("unknown command stage.")
+        if type(self.returncode) is not int:
+            raise TypeError("returncode must be an integer.")
+        for value in (self.stdout, self.stderr):
+            if (
+                not isinstance(value, str)
+                or len(value.encode()) > MAX_PROCESS_OUTPUT_BYTES
+            ):
+                raise ValueError("command diagnostics exceed the byte limit.")
+
+
+@dataclass(frozen=True, slots=True)
+class NsightUnavailable:
+    """Represent unavailable profiling without fabricated metrics."""
+
+    tool: str
+    reason: str
+
+    def __post_init__(self) -> None:
+        """Validate the unavailable tool and bounded reason."""
+        if self.tool not in {"nsys", "ncu", "worker"}:
+            raise ValueError("unknown unavailable tool.")
+        _require_text(self.reason, "reason")
+
+
+@dataclass(frozen=True, slots=True)
+class NsightFailed:
+    """Represent one bounded failed process stage."""
+
+    outcome: NsightCommandOutcome
+
+    def __post_init__(self) -> None:
+        """Require an outcome representing a failed process."""
+        if self.outcome.returncode == 0:
+            raise ValueError("failed outcome must have a nonzero return code.")
+
+
+@dataclass(frozen=True, slots=True)
+class NsightKernelRow:
+    """Store one strict attributed or unattributed native profiler row."""
+
+    tool: str
+    kernel_name: str
+    correlation_id: int
+    metric_name: str | None
+    value: float | int
+    unit: str
+    invocations: int
+    attribution: str
+    provenance: RawReportProvenance
+
+    def __post_init__(self) -> None:
+        """Validate the profiler-specific metric row schema."""
+        if self.tool not in {"nsys", "ncu"}:
+            raise ValueError("unknown profiler tool.")
+        _require_text(self.kernel_name, "kernel_name")
+        _require_int(self.correlation_id, "correlation_id", positive=True)
+        _require_int(self.invocations, "invocations", positive=True)
+        if self.attribution not in {"attributed", "unattributed", "ambiguous"}:
+            raise ValueError("invalid row attribution.")
+        if not isinstance(self.provenance, RawReportProvenance):
+            raise TypeError("provenance must be raw report provenance.")
+        if self.tool == "nsys":
+            if self.metric_name is not None or self.unit != "ns":
+                raise ValueError("timeline rows require duration nanoseconds.")
+            _require_int(self.value, "duration_ns", positive=True)
+            return
+        if self.metric_name not in NSIGHT_METRICS:
+            raise ValueError("metric is not allow-listed.")
+        if self.unit != NSIGHT_METRIC_UNITS[self.metric_name]:
+            raise ValueError("metric unit is not supported.")
+        _require_number(self.value, "metric_value")
+
+
+@dataclass(frozen=True, slots=True)
+class NsightEvidence:
+    """Store ordered Nsight rows for one exact workload and process."""
+
+    qualification: NsightToolQualification
+    workload_id: str
+    process: str
+    rows: tuple[NsightKernelRow, ...]
+
+    def __post_init__(self) -> None:
+        """Validate the bounded evidence rows for one qualified tool."""
+        _require_text(self.workload_id, "workload_id")
+        _require_text(self.process, "process")
+        if not self.rows or len(self.rows) > MAX_EXPORT_ROWS:
+            raise ValueError("Nsight evidence rows are invalid.")
+        if any(row.tool != self.qualification.tool for row in self.rows):
+            raise ValueError("rows must match evidence tool.")
+
+
+def _parse_csv(text: str, columns: tuple[str, ...]) -> list[dict[str, str]]:
+    """Parse an exact comma-only CSV schema with bounded rows."""
+    import csv
+
+    if len(text.encode()) > MAX_RAW_REPORT_BYTES or not text.endswith("\n"):
+        raise ValueError("CSV export has invalid bounds or line ending.")
+    try:
+        rows = list(csv.reader(text.splitlines(), strict=True))
+    except csv.Error as error:
+        raise ValueError("CSV export is malformed.") from error
+    if (
+        not rows
+        or tuple(rows[0]) != columns
+        or len(set(rows[0])) != len(columns)
+    ):
+        raise ValueError("CSV export schema is not supported.")
+    if len(rows) - 1 > MAX_EXPORT_ROWS or any(
+        len(row) != len(columns) for row in rows[1:]
+    ):
+        raise ValueError("CSV export rows are invalid.")
+    return [dict(zip(columns, row, strict=True)) for row in rows[1:]]
+
+
+def parse_nsys_timeline_csv(
+    text: str, provenance: RawReportProvenance, process_ids: dict[int, str]
+) -> tuple[NsightKernelRow, ...]:
+    """Parse strict Systems timeline CSV rows with exact ID attribution."""
+    rows = []
+    for row in _parse_csv(text, NSYS_COLUMNS):
+        correlation = _require_int(
+            int(row["correlation_id"]), "correlation_id", positive=True
+        )
+        name = row["kernel_name"]
+        attribution = (
+            "attributed"
+            if process_ids.get(correlation) == name
+            else "unattributed"
+        )
+        rows.append(
+            NsightKernelRow(
+                "nsys",
+                name,
+                correlation,
+                None,
+                _require_int(
+                    int(row["duration_ns"]), "duration_ns", positive=True
+                ),
+                "ns",
+                1,
+                attribution,
+                provenance,
+            )
+        )
+    return tuple(rows)
+
+
+def parse_ncu_metrics_csv(
+    text: str, provenance: RawReportProvenance, process_ids: dict[int, str]
+) -> tuple[NsightKernelRow, ...]:
+    """Parse strict Compute CSV rows with exact ID attribution."""
+    rows = []
+    for row in _parse_csv(text, NCU_COLUMNS):
+        try:
+            value = float(row["metric_value"])
+        except ValueError as error:
+            raise ValueError("metric value is invalid.") from error
+        correlation = _require_int(
+            int(row["correlation_id"]), "correlation_id", positive=True
+        )
+        name = row["kernel_name"]
+        attribution = (
+            "attributed"
+            if process_ids.get(correlation) == name
+            else "unattributed"
+        )
+        rows.append(
+            NsightKernelRow(
+                "ncu",
+                name,
+                correlation,
+                row["metric_name"],
+                value,
+                row["unit"],
+                _require_int(
+                    int(row["invocations"]), "invocations", positive=True
+                ),
+                attribution,
+                provenance,
+            )
+        )
+    return tuple(rows)
+
+
+Runner = Callable[[tuple[str, ...]], subprocess.CompletedProcess[str]]
+
+
+def _bounded_text(value: str | bytes | None) -> str:
+    """Decode and bound process diagnostics before records are constructed."""
+    if value is None:
+        return ""
+    text = value.decode(errors="replace") if isinstance(value, bytes) else value
+    if len(text.encode()) > MAX_PROCESS_OUTPUT_BYTES:
+        raise ValueError("process diagnostics exceed the byte limit.")
+    return text
+
+
+def run_profile_command(
+    command: tuple[str, ...],
+) -> subprocess.CompletedProcess[str]:
+    """Run an internally-created immutable argument tuple without a shell."""
+    if (
+        not isinstance(command, tuple)
+        or not command
+        or not all(isinstance(item, str) for item in command)
+    ):
+        raise TypeError("command must be a nonempty immutable string tuple.")
+    return subprocess.run(  # noqa: S603 - command is internally constructed.
+        command,
+        shell=False,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=PROCESS_TIMEOUT_SECONDS,
+    )
+
+
+def qualify_nsight_tool(
+    tool: str, runner: Runner = run_profile_command
+) -> NsightToolQualification | NsightUnavailable | NsightFailed:
+    """Probe one allow-listed tool and accept only its exact banner."""
+    if tool not in {"nsys", "ncu"}:
+        raise ValueError("tool must be nsys or ncu.")
+    command = (tool, "--version")
+    try:
+        result = runner(command)
+        outcome = NsightCommandOutcome(
+            tool,
+            "probe",
+            result.returncode,
+            _bounded_text(result.stdout),
+            _bounded_text(result.stderr),
+        )
+    except FileNotFoundError:
+        return NsightUnavailable(tool, "binary not found")
+    except subprocess.TimeoutExpired:
+        return NsightUnavailable(tool, "probe timed out")
+    except ValueError:
+        return NsightUnavailable(tool, "probe diagnostics rejected")
+    if outcome.returncode:
+        return NsightFailed(outcome)
+    expected = NSYS_BANNER if tool == "nsys" else NCU_BANNER
+    if outcome.stdout != expected + "\n" or outcome.stderr:
+        return NsightUnavailable(tool, "unexpected version banner")
+    return NsightToolQualification(tool, expected)
+
+
+def _plain_report_path(raw_root: Path, filename: str) -> Path:
+    """Return one plain contained report path before a profiler can run."""
+    filename = _validate_raw_filename(filename)
+    path = raw_root / filename
+    if path.parent != raw_root or raw_root.is_symlink():
+        raise ValueError("report destination is not contained.")
+    return path
+
+
+def _run_outcome(
+    tool: str, stage: str, command: tuple[str, ...], runner: Runner
+) -> NsightCommandOutcome | NsightUnavailable:
+    """Execute a bounded command and normalize expected process absence."""
+    try:
+        result = runner(command)
+        return NsightCommandOutcome(
+            tool,
+            stage,
+            result.returncode,
+            _bounded_text(result.stdout),
+            _bounded_text(result.stderr),
+        )
+    except FileNotFoundError:
+        return NsightUnavailable(tool, f"{stage} binary not found")
+    except subprocess.TimeoutExpired:
+        return NsightUnavailable(tool, f"{stage} timed out")
+    except ValueError:
+        return NsightUnavailable(tool, f"{stage} diagnostics rejected")
+
+
+def collect_nsight_evidence(
+    *,
+    tool: str,
+    artifact_root: str | Path,
+    report_filename: str,
+    process_ids: dict[int, str],
+    runner: Runner = run_profile_command,
+) -> NsightEvidence | NsightUnavailable | NsightFailed:
+    """Collect one closed worker report with bounded per-tool orchestration.
+
+    The caller can inject only the runner.  Tool paths, worker arguments and
+    profiler templates remain fixed here; arbitrary environment and arguments
+    never cross this boundary.
+    """
+    qualification = qualify_nsight_tool(tool, runner)
+    if not isinstance(qualification, NsightToolQualification):
+        return qualification
+    raw_root = ensure_profiling_raw_root(artifact_root)
+    report = _plain_report_path(raw_root, report_filename)
+    worker = _run_outcome("worker", "worker", WORKER_COMMAND, runner)
+    if isinstance(worker, NsightUnavailable):
+        return worker
+    if worker.returncode:
+        return NsightFailed(worker)
+    # The tools receive only a fixed collection mode and the contained basename.
+    collection = (
+        ("nsys", "profile", "--force-overwrite=true", "--output", report.name)
+        + WORKER_COMMAND
+        if tool == "nsys"
+        else (
+            "ncu",
+            "--csv",
+            "--log-file",
+            report.name,
+            "--metrics",
+            ",".join(sorted(NSIGHT_METRICS)),
+        )
+        + WORKER_COMMAND
+    )
+    collected = _run_outcome(tool, "collect", collection, runner)
+    if isinstance(collected, NsightUnavailable):
+        return collected
+    if collected.returncode:
+        return NsightFailed(collected)
+    export = (
+        ("nsys", "export", "--type", "csv", report.name)
+        if tool == "nsys"
+        else ("ncu", "--import", report.name, "--csv")
+    )
+    exported = _run_outcome(tool, "export", export, runner)
+    if isinstance(exported, NsightUnavailable):
+        return exported
+    if exported.returncode:
+        return NsightFailed(exported)
+    # Export stdout is intentionally bounded before parsing and provenance is
+    # created only after the collector's contained file exists successfully.
+    report.write_text(exported.stdout, encoding="ascii")
+    provenance = build_raw_report_provenance(artifact_root, report.name)
+    parser = (
+        parse_nsys_timeline_csv if tool == "nsys" else parse_ncu_metrics_csv
+    )
+    rows = parser(exported.stdout, provenance, process_ids)
+    if not rows:
+        return NsightUnavailable(tool, "export contains no kernel rows")
+    workload = build_default_profiling_workload_matrix()[0]
+    return NsightEvidence(qualification, workload.workload_id, "resident", rows)
