@@ -44,6 +44,16 @@ pytest particula/gpu/tests/benchmark_helpers_test.py -q --no-cov
 # Opt-in native-CUDA resident benchmark collection (not standard CI)
 pytest particula/gpu/tests/benchmark_test.py --benchmark -k resident -v -s --no-cov
 
+# Opt-in native-CUDA resident profiling smoke test
+pytest particula/gpu/tests/profiling_smoke_test.py --benchmark -q --no-cov
+
+# Hardware-free graph-capture profiling documentation contract
+pytest particula/tests/gpu_graph_capture_performance_docs_test.py -q --no-cov
+
+# Repository-wide coverage and strict documentation rendering
+.opencode/tools/run_pytest.py
+mkdocs build --strict
+
 # ADW tools
 .opencode/tools/run_pytest.py      # Run tests with validation
 .opencode/tools/run_linters.py     # Run linters following CI workflow
@@ -61,20 +71,17 @@ artifact is checked in, so the current resident timing and allocator evidence is
 unavailable and unmeasured; see
 [resident benchmark and memory-budget record](docs/Features/resident_benchmark_memory_budget.md).
 
-`particula/gpu/tests/profiling_support.py` is concrete, host-only test support.
-It freezes the small `(1, 16, 2)` and medium `(1000, 16, 2)` profiling
-workloads and validates bounded evidence/provenance records. It neither imports
-Warp nor probes hardware, runs a profiler, records measurements, or provides a
-public API. The opt-in resident collection may publish four separate P1-valid
-profiling artifacts beneath `.artifacts/benchmarks/profiling/`: prepared
-uncaptured and captured replay, each measured as host launch and synchronized
-elapsed time. A private manifest maps those mode/method pairs to their files;
-raw samples and provenance remain under its `raw/` directory. Native CUDA
-capture qualification is mandatory. If it is unavailable, the collection
-records workload-complete unavailable evidence in all four artifacts without
-timing CPU or Warp-CPU execution. This test-support evidence changes no public
-API, scheduler behavior, or user workflow, and does not change the separate
-unmeasured schema-v3 resident timing and allocator status above.
+E8-F7/T7 owns graph-capture profiling and machine-bounded recommendations; E8-F8
+is limited to the example, limitations, and closeout. The
+[GPU graph-capture profiling record](docs/Features/gpu_graph_capture_performance.md)
+freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
+gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
+without CPU or Warp-CPU fallback. No reviewed normalized artifact or manifest is
+checked in, so results and recommendations are unavailable and unshipped. Future
+reviewed rows need provenance, a manifest pointer, and contained relative raw
+filenames with byte-size and lowercase SHA-256 references. Host launch has no
+in-interval synchronization, synchronized elapsed has one post-dispatch
+completion boundary, and Nsight overhead is not unprofiled throughput.
 
 ### Installation
 
@@ -1128,8 +1135,9 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   frozen-control drift requires new preparation and rejects before token entry.
   Writer-capable failure retains
   E8-F1 FAULTED/no-rollback/no-retry/no-fallback recovery limits. E8-F3 owns
-  resource work; E8-F4 native capture/replay and captured parity; E8-F5--F7
-  parity/performance/memory/profiling; and E8-F8 example/limitations/closeout.
+  resource work; E8-F4 native capture/replay and captured parity; E8-F5--F6
+  parity/performance/memory; E8-F7/T7 profiling and machine-bounded
+  recommendations; and E8-F8 only the example, limitations, and closeout.
   No automatic recapture, native/full-loop capture or replay, hidden
   allocation/transfer/synchronization, or user example is claimed by this
   prepared-path contract.

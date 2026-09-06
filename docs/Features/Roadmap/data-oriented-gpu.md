@@ -1692,6 +1692,14 @@ and preserve the initiating exception.
 E8-F4 P5 supplies bounded three-way full-loop NumPy/Warp-CPU/native-CUDA
 validation. This work remains concrete-only and provides no public workflow.
 
+E8-F7/T7 owns profiling and machine-bounded recommendations. The
+[GPU graph-capture profiling record](../gpu_graph_capture_performance.md)
+freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
+gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
+with no CPU or Warp-CPU fallback. No reviewed normalized artifact or manifest
+is checked in, so profiling results and recommendations are unavailable and
+unshipped. E8-F8 is limited to the example, limitations, and closeout.
+
 ### E8-F1 shipped contract
 
 E8-F1 ships host metadata and scheduler admission only. Its concrete-only
@@ -1734,8 +1742,9 @@ synchronization, checkpointed native graph handles, cross-device replay,
 captured numerical parity, benchmark/profiling/memory claims, root-README
 changes, and user examples. E8-F2 owns the shipped concrete prepared enqueue
 seams; E8-F3 owns resource work, E8-F4 native capture/replay and captured
-parity, E8-F5--E8-F7 parity/performance/memory/profiling, and E8-F8 the
-example, limitations, and closeout.
+parity, E8-F5--E8-F6 parity/performance/memory, E8-F7/T7 profiling and
+machine-bounded recommendations, and E8-F8 only the example, limitations,
+and closeout.
 
 Work on E8-F4 restarted on September 3, 2026.
 
@@ -1779,8 +1788,10 @@ P5 provides no public exports or runnable graph-capture example. There is no
 fallback (including Warp-CPU capture), recovery, retry, or rollback; no hidden
 transfer/readback/synchronization; no checkpointed handle; and no cross-device
 replay.
-It makes no performance, profiling, or memory claim; E8-F5--E8-F8 retain those
-ownership boundaries.
+It makes no performance, profiling, or memory claim; E8-F5--E8-F6 retain
+parity/performance/memory ownership, E8-F7/T7 owns profiling and
+machine-bounded recommendations, and E8-F8 only the example, limitations,
+and closeout.
 
 ### E8-F5-P5 integrated validation closeout
 
