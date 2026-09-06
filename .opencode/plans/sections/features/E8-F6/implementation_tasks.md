@@ -75,5 +75,10 @@
 - [x] Keep default test collection unchanged and add regression coverage for
   malformed dimensions, overflow, duplicate categories, memory-category
   reconciliation, tape projections, and import isolation.
-- [ ] Update documentation contract tests for commands, axes, categories,
-  limitations, and artifact provenance.
+- [x] Add `particula/tests/resident_benchmark_docs_test.py` to verify the
+  roadmap/report link, exact source artifact path, fixed configuration,
+  unavailable/not-measured evidence state, accounting vocabulary, and
+  documentation-only limitations without reading an artifact or importing Warp.
+- [x] Publish `docs/Features/resident_benchmark_memory_budget.md` and its single
+  roadmap link; preserve the explicit absence of reviewed resident evidence and
+  do not publish fabricated timing, allocator, or provenance values.

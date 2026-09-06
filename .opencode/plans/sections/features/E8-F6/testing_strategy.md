@@ -47,8 +47,12 @@ supplemental evidence, not an assertion threshold, and remains opt-in.
   unavailable routing, and no snapshot during timing collection. The opt-in
   native-CUDA row accepts complete valid evidence or structured unavailable
   evidence; it asserts no allocator ratio or machine-independent budget.
-- **P6:** Documentation contract tests verify exact commands, provenance,
-  limitations, and unavailable rows; strict MkDocs validates links/rendering.
+- **P6 (delivered, issue #1586):** The stdlib-only, hardware-free
+  `particula/tests/resident_benchmark_docs_test.py` reads only the roadmap and
+  resident report. It verifies their one local link, the source artifact path,
+  fixed configuration, four unavailable/not-measured rows, accounting terms,
+  and non-claims. It neither reads the absent artifact nor imports Warp or runs
+  a benchmark.
 
 Likely locations are `particula/execution/tests/` for resident support and
 integration tests and `particula/gpu/tests/benchmark_helpers_test.py` plus

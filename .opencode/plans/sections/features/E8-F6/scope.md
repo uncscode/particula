@@ -104,7 +104,22 @@ to the exact E8 resource inventory.
 - Default-collection support/CUDA-support and injected benchmark-safety tests
   cover schema compatibility, adapter and monitor failure paths, lifecycle
   order, comparison routing, and no timing-loop snapshots. The native-CUDA row
-  remains opt-in and accepts valid evidence or structured unavailability.
+   remains opt-in and accepts valid evidence or structured unavailability.
+
+## Delivered in P6 (Issue #1586)
+
+- Published the unavailable-state record in
+  `docs/Features/resident_benchmark_memory_budget.md` and one roadmap link in
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
+- Identified only `.artifacts/benchmarks/resident_capture_comparison.json` as
+  the resident schema-v3 source of record; explicitly rejected the legacy
+  coagulation-only artifact.
+- Published the fixed 1/10/100/1000-box configuration, planning inputs, memory
+  vocabulary, and limitations while marking all current evidence unavailable and
+  not measured because no reviewed schema-v3 artifact is checked in.
+- Added the stdlib-only, hardware-free publication contract test at
+  `particula/tests/resident_benchmark_docs_test.py`; it reads the two documents
+  only and does not parse an artifact, import Warp, or execute a benchmark.
 
 ## Out of Scope
 
@@ -118,5 +133,6 @@ to the exact E8 resource inventory.
   projections for Epic I until measured evidence exists.
 - CUDA occupancy/kernel profiling, which belongs to E8-F7, and the runnable
   lifecycle example, runbook, and final Epic H closeout, which belong to E8-F8.
-- Published documentation, any speed threshold, or general performance
-  conclusion.
+- Published or inferred timing/allocator values, any speed threshold, or a
+  general performance conclusion. The P6 documentation record is deliberately
+  an unavailable-evidence publication, not a result artifact.

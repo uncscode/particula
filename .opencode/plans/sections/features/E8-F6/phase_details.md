@@ -88,8 +88,17 @@
     inputs, one observation per fixture, and no timing-loop monitor work; the
     optional CUDA row accepts valid evidence or structured unavailability.
 
-- [ ] **E8-F6-P6:** Publish benchmark and memory-budget evidence with documentation validation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Publish exact commands, executed/unavailable rows, limitations, and reviewed artifacts.
-  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, feature report, artifact metadata
-  - Tests: documentation contract assertions and `mkdocs build --strict`
+- [x] **E8-F6-P6:** Publish benchmark and memory-budget evidence with documentation validation
+  - Issue: #1586 | Size: XS | Status: Shipped
+  - Delivered: Published the roadmap-linked resident benchmark/memory-budget
+    record with the exact collection command, fixed matrix, planning inputs,
+    accounting vocabulary, tape projections, and bounded non-claims. The only
+    resident source is the schema-v3 artifact path; because it is absent, all
+    current rows are explicitly unavailable and not measured.
+  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
+    `docs/Features/resident_benchmark_memory_budget.md`, and
+    `particula/tests/resident_benchmark_docs_test.py`.
+  - Tests: Hardware-free stdlib-only documentation assertions cover the roadmap
+    link, source provenance, fixed configuration, unavailable rows, accounting
+    terms, and limitations without artifact parsing, Warp import, or benchmark
+    execution.

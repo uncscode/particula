@@ -35,6 +35,9 @@ pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m
 # Focused deterministic GPU mass-precision baseline tests
 pytest particula/gpu/tests/mass_precision_cases_test.py -q
 
+# Opt-in native-CUDA resident benchmark collection (not standard CI)
+pytest particula/gpu/tests/benchmark_test.py --benchmark -k resident -v -s --no-cov
+
 # ADW tools
 .opencode/tools/run_pytest.py      # Run tests with validation
 .opencode/tools/run_linters.py     # Run linters following CI workflow
@@ -43,6 +46,14 @@ Performance benchmarks verify O(n) scaling at 1k/10k/100k particles, theta-mode
 comparisons (half/random/batch), and deterministic seeds. Note: staggered uses
 Gauss-Seidel per-particle loops (sequential), so high overhead vs simultaneous
 (vectorized) is expected and not enforced as a target.
+
+The resident collection is CUDA/native-capture-only, with no CPU or Warp-CPU
+fallback. Its source of record is
+`.artifacts/benchmarks/resident_capture_comparison.json`; the legacy
+`gpu_benchmark_results.json` is coagulation-only. No reviewed schema-v3 resident
+artifact is checked in, so the current resident timing and allocator evidence is
+unavailable and unmeasured; see
+[resident benchmark and memory-budget record](docs/Features/resident_benchmark_memory_budget.md).
 
 ### Installation
 

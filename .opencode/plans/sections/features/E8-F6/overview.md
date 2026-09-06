@@ -106,6 +106,22 @@ This is test/benchmark support only: it adds no production API/export, timing or
 budget policy, CPU/Warp-CPU fallback, NVML, current/reserved-counter substitute,
 or allocator equality/ratio claim.
 
+## Delivered P6 Publication Record (Issue #1586)
+
+Issue #1586 published the resident benchmark and memory-budget record at
+`docs/Features/resident_benchmark_memory_budget.md` and linked it once from the
+GPU roadmap. The record names
+`.artifacts/benchmarks/resident_capture_comparison.json` as the sole schema-v3
+resident source of record and explicitly rejects the legacy coagulation-only
+artifact as a substitute.
+
+No reviewed resident artifact is checked in. Consequently, all four canonical
+box rows are published as `unavailable` and `not measured`, rather than as zero
+or inferred timing/allocator evidence. The hardware-free, stdlib-only
+`particula/tests/resident_benchmark_docs_test.py` protects this documentation
+contract without reading an artifact or running CUDA collection. This delivery
+does not add benchmark results, source artifacts, APIs, CI gates, or fallback.
+
 ## User Stories
 
 - As a performance engineer, I want captured and uncaptured resident loops run

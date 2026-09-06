@@ -1,4 +1,8 @@
-"""Regression tests for resident benchmark evidence publication."""
+"""Validate the hardware-free resident benchmark evidence publication contract.
+
+These tests read only the roadmap and resident benchmark report. They do not
+load benchmark artifacts, import GPU dependencies, or execute benchmarks.
+"""
 
 from __future__ import annotations
 
@@ -17,7 +21,16 @@ COMMAND = (
 
 
 def _section(content: str, heading: str) -> str:
-    """Return an exact level-two section through the next level-one/two heading."""
+    """Extract one exact level-two Markdown section.
+
+    Args:
+        content: Complete Markdown document content.
+        heading: Exact level-two heading that starts the requested section.
+
+    Returns:
+        The requested heading and its content through the next level-one or
+        level-two heading.
+    """
     lines = content.splitlines()
     matches = [index for index, line in enumerate(lines) if line == heading]
     assert len(matches) == 1, f"Expected one heading: {heading}"
@@ -34,13 +47,28 @@ def _section(content: str, heading: str) -> str:
 
 
 def _split_row(line: str) -> list[str]:
-    """Return trimmed cells from a Markdown table row."""
+    """Split a pipe-terminated Markdown table row into trimmed cells.
+
+    Args:
+        line: One Markdown table row.
+
+    Returns:
+        Table-cell text without surrounding whitespace or delimiter pipes.
+    """
     assert line.rstrip().endswith("|"), f"Malformed table row: {line}"
     return [cell.strip() for cell in line.strip().split("|")[1:-1]]
 
 
 def _current_evidence_rows(content: str) -> list[list[str]]:
-    """Return the canonical rows in the current-evidence table."""
+    """Extract canonical case rows from the current-evidence table.
+
+    Args:
+        content: Complete resident benchmark report content.
+
+    Returns:
+        Parsed cells for each contiguous data row in the current-evidence
+        table.
+    """
     lines = _section(content, "## Current evidence status").splitlines()[1:]
     table_start = next(
         index for index, line in enumerate(lines) if line.startswith("|")
@@ -56,7 +84,16 @@ def _current_evidence_rows(content: str) -> list[list[str]]:
 
 
 def _markdown_destinations(content: str, source_path: Path) -> list[Path]:
-    """Return normalized local Markdown-link destinations."""
+    """Extract normalized local Markdown-link destinations.
+
+    Args:
+        content: Markdown content whose links are inspected.
+        source_path: Path of the Markdown file that contains ``content``.
+
+    Returns:
+        Absolute paths for local Markdown link destinations, excluding external
+        URLs and fragment-only links.
+    """
     destinations = []
     for destination in re.findall(r"(?<!!)\[[^]]*\]\(([^)]+)\)", content):
         destination = destination.split(maxsplit=1)[0].strip("<>")
@@ -69,7 +106,7 @@ def _markdown_destinations(content: str, source_path: Path) -> list[Path]:
 
 
 def test_roadmap_links_once_to_resident_benchmark_report() -> None:
-    """Roadmap names the artifact and links once to the local report."""
+    """Validate the roadmap names the artifact and links once to the report."""
     roadmap = ROADMAP_PATH.read_text(encoding="utf-8")
     report = REPORT_PATH.read_text(encoding="utf-8")
 
@@ -86,7 +123,7 @@ def test_roadmap_links_once_to_resident_benchmark_report() -> None:
 def test_report_reproduces_the_fixed_unavailable_benchmark_configuration() -> (
     None
 ):
-    """Report records the fixed benchmark configuration and planning inputs."""
+    """Validate the report records fixed configuration and planning inputs."""
     section = _section(
         REPORT_PATH.read_text(encoding="utf-8"),
         "## Reproduction command and fixed matrix",
@@ -112,7 +149,7 @@ def test_report_reproduces_the_fixed_unavailable_benchmark_configuration() -> (
 
 
 def test_current_evidence_table_publishes_only_unavailable_rows() -> None:
-    """Current evidence has four unavailable, nonnumeric rows only."""
+    """Validate current evidence has only unavailable, nonnumeric case rows."""
     report = REPORT_PATH.read_text(encoding="utf-8")
     rows = _current_evidence_rows(report)
 
@@ -129,7 +166,7 @@ def test_current_evidence_table_publishes_only_unavailable_rows() -> None:
 
 
 def test_report_distinguishes_accounting_terms_and_unimplemented_tape() -> None:
-    """Report separates accounting vocabulary from projected tape scenarios."""
+    """Validate the report separates accounting and projected tape vocabulary."""
     section = _section(
         REPORT_PATH.read_text(encoding="utf-8"),
         "## Timing and memory evidence schema",
@@ -153,7 +190,7 @@ def test_report_distinguishes_accounting_terms_and_unimplemented_tape() -> None:
 
 
 def test_report_states_all_documentation_scope_limitations() -> None:
-    """Report limits publication to documentation without unsupported claims."""
+    """Validate the report states documentation-only scope and limitations."""
     section = _section(
         REPORT_PATH.read_text(encoding="utf-8"),
         "## Supported limitations",

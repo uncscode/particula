@@ -25,28 +25,21 @@ and P6 publication/documentation remain future work.
 
 Issue #1584 makes no public documentation change. The analytical memory model
 and its docstrings are private co-located execution test support; it creates no
-artifact or public API. P5 observed-memory evidence and P6 publication remain
-future work.
+artifact or public API.
 
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` under Epic H Performance
-  and Memory with the exact plain reproduction command, date, Warp/Python
-  versions, qualified device, matrix, raw artifact path, summary table, memory
-  categories, analytical/observed comparison, and machine-bounded caveats.
-- Add or update a focused feature report under `docs/Features/` describing the
-  benchmark schema, fair captured/uncaptured timing boundary, configured budget,
-  structured unavailable rows, and how to interpret logical versus observed
-  versus projected bytes.
-- Hand the published evidence to E8-F7 for profiling and link E8-F8's
-  graph-capture example/limits page to it; leave runnable lifecycle ownership
-  in E8-F8.
-- Update `.opencode/guides/testing_guide.md` only if the concrete resident
-  benchmark command or artifact convention adds a reusable repository policy;
-  preserve `--benchmark` as the only collection-affecting option.
-- Update `AGENTS.md` with the focused reproduction command and evidence location
-  only when useful for future contributors; do not paste machine-specific
-  timings into general quick-start text.
-- Keep `.artifacts/benchmarks/` results machine-generated and identify the
-  reviewed source-of-record artifact explicitly. Never present unavailable rows
-  as zero time or zero memory.
-- Reconcile these plan sections and phase states after implementation and run
-  documentation contract tests plus `mkdocs build --strict`.
+## P6 delivered publication (Issue #1586)
+
+- Added `docs/Features/resident_benchmark_memory_budget.md`, an explicit
+  unavailable-state record for the resident benchmark schema, fixed matrix,
+  planning inputs, timing/memory vocabulary, tape projections, and limitations.
+- Added one roadmap link in `docs/Features/Roadmap/data-oriented-gpu.md`.
+- Both documents identify
+  `.artifacts/benchmarks/resident_capture_comparison.json` as the only resident
+  source of record and reject legacy `gpu_benchmark_results.json` as
+  coagulation-only.
+- No reviewed source artifact exists in this revision: all evidence is stated as
+  unavailable and not measured, with no timing, allocator, provenance, or zero
+  values fabricated.
+- Added `particula/tests/resident_benchmark_docs_test.py`, a hardware-free,
+  stdlib-only contract test that reads only the roadmap and report; it neither
+  reads the absent artifact nor imports Warp or runs benchmarks.
