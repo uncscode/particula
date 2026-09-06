@@ -2030,6 +2030,34 @@ decision.
   as the current decision record for the shipped one-thread-per-box design,
   not as a final acceptance decision on the long-term scaling strategy.
 
+#### E8-F6-P6 resident benchmark and memory-budget evidence
+
+The resident source of record is the machine-generated schema-v3 artifact
+`.artifacts/benchmarks/resident_capture_comparison.json`; see the
+[resident benchmark and memory-budget record](../resident_benchmark_memory_budget.md).
+That artifact is absent in this revision. The adjacent legacy
+`.artifacts/benchmarks/gpu_benchmark_results.json` contains coagulation-only
+rows and is not resident evidence.
+
+Collect resident evidence only with:
+
+```bash
+pytest particula/gpu/tests/benchmark_test.py --benchmark -k resident -v -s --no-cov
+```
+
+This opt-in command is CUDA/native-capture-only, with no CPU or Warp-CPU
+fallback. Its fixed matrix uses 1, 10, 100, and 1000 boxes with `(B, 16, 2)`
+shape, 100% activity, gas communication, gas/saturation diagnostics, seed
+1582, two warmups, and three measured timesteps. The configured planning
+inputs are a 2 GiB budget and request estimates of 64 MiB, 256 MiB, 1 GiB,
+and 4 GiB for 1, 10, 100, and 1000 boxes, respectively. These are planning
+inputs, not measured allocator consumption.
+
+Every resident row is currently unavailable because no reviewed schema-v3
+resident artifact is checked in: it is not measured and is not zero. This
+revision does not claim an artifact-recorded status, including
+`skipped_budget`.
+
 ## Epic I: Differentiability and Global Optimization
 
 A longer-term goal is gradient-based global optimization: using Warp automatic
