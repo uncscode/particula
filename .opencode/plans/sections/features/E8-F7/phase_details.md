@@ -74,10 +74,17 @@
     guardrails. No CUDA, Warp, profiler, timer, artifact file, public API, or
     production behavior was added.
 
-- [ ] **E8-F7-P5:** Update development documentation and publish reproducible profiling results
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Publish exact commands, raw-artifact references, machine metadata,
-    findings, limitations, and bounded follow-up recommendations.
-  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
-    `docs/Features/gpu_graph_capture_performance.md`, `AGENTS.md`
-  - Tests: Documentation contract assertions and `mkdocs build --strict`.
+- [x] **E8-F7-P5:** Update development documentation and publish reproducible profiling record
+  - Issue: #1593 | Size: XS | Status: Shipped
+  - Delivered: Published the canonical unavailable record, frozen reproduction
+    matrix and commands, native-CUDA-only qualification, provenance and
+    local-raw-artifact rules, timing methodology, and evidence guardrails. No
+    reviewed normalized artifact or manifest is checked in, so results, rankings,
+    and recommendations remain unavailable and unshipped.
+  - Ownership: Reconciled E8-F7/T7 as the profiling and machine-bounded
+    recommendation owner; E8-F8 is only the example, limitations, and closeout.
+  - Files: `docs/Features/gpu_graph_capture_performance.md`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`, and
+    `particula/tests/gpu_graph_capture_performance_docs_test.py`.
+  - Tests: Hardware-free cross-document assertions and `mkdocs build --strict`;
+    no CUDA/Nsight collection was run or interpreted as P5 evidence.

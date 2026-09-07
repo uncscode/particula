@@ -83,6 +83,23 @@ for guarded scientific, tolerance, ownership, process-order, or RNG changes.
 It performs no artifact I/O, collection, profiler/CUDA/Warp use, production
 change, public export, documentation publication, or measured result.
 
+## P5 Delivered
+
+Issue #1593 published the unavailable CUDA profiling record in
+`docs/Features/gpu_graph_capture_performance.md`. It freezes the workload and
+command matrix, provenance and local-raw-artifact rules, timing methodology,
+and evidence limits without fabricating a machine, result, ranking, or
+recommendation. No reviewed normalized artifact or manifest is checked in, so
+results and recommendations remain unavailable and unshipped.
+
+`AGENTS.md` and `docs/Features/Roadmap/data-oriented-gpu.md` now assign
+profiling and machine-bounded recommendations to E8-F7/T7 and restrict E8-F8
+to the example, limitations, and closeout. The hardware-free cross-document
+contract at `particula/tests/gpu_graph_capture_performance_docs_test.py`
+regression-checks this ownership, the canonical record, commands, provenance,
+and evidence limits. This delivery adds no CUDA collection, artifact, public
+API, or performance claim.
+
 ## User Stories
 
 - As a performance engineer, I want host launch and device execution costs

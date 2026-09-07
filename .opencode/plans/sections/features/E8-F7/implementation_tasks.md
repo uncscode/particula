@@ -86,9 +86,12 @@
 
 ## Documentation
 
-- [ ] Publish the measured machine/software table, workload matrix, raw sample
-  references, synchronization method, and profiler overhead caveat.
-- [ ] Publish bottleneck and recommendation tables with evidence links and
-  explicit machine/workload bounds.
-- [ ] Reconcile the T7/E8-F7 assignment with stale parent references that label
-  profiling as E8-F8 before epic closeout.
+- [x] Publish the unavailable canonical record with the frozen workload matrix,
+  synchronization method, profiler-overhead caveat, provenance requirements,
+  and explicit absence of reviewed CUDA evidence.
+- [x] Reconcile T7/E8-F7 profiling ownership and E8-F8's restricted closeout
+  role in `AGENTS.md` and the GPU roadmap.
+- [x] Add the hardware-free cross-document publication contract in
+  `particula/tests/gpu_graph_capture_performance_docs_test.py`.
+- [ ] Publish a measured machine/software table, raw sample references, and
+  bottleneck/recommendation tables only after reviewed CUDA evidence exists.

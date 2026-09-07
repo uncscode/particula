@@ -3,9 +3,8 @@
 E8-F7 adds an opt-in, CUDA-only profiling workflow around the final captured
 and uncaptured resident timestep. It consumes upstream correctness, timing, and
 memory artifacts; emits a stable machine-readable profile; and publishes a
-machine-bounded interpretation. The orchestrator assigns this plan to T7
-profiling even though older E8 parent text labels profiling as E8-F8; this plan
-follows the explicit assignment and tracks reconciliation as an open question.
+machine-bounded interpretation. E8-F7/T7 owns profiling and machine-bounded
+recommendations; E8-F8 is restricted to the example, limitations, and closeout.
 
 ## In Scope
 
@@ -38,7 +37,12 @@ follows the explicit assignment and tracks reconciliation as an open question.
   incomplete, zero-total, mismatched, or non-reconcilable evidence. It emits a
   recommendation only from reconciled sufficient evidence with retained
   provenance, explicit non-portability, and machine/workload bounds; guarded
-  contract-changing proposals require correctness-plan references.
+   contract-changing proposals require correctness-plan references.
+- P5 published `docs/Features/gpu_graph_capture_performance.md` as the
+  canonical unavailable record, reconciled E8-F7/T7 ownership in `AGENTS.md`
+  and `docs/Features/Roadmap/data-oriented-gpu.md`, and added the hardware-free
+  cross-document contract in
+  `particula/tests/gpu_graph_capture_performance_docs_test.py`.
 - Define small and medium representative resident workloads using fixed boxes,
   particles, species, process order, communication mode, and canonical replay
   counts of `1`, `10`, `100`, and `1000`.
@@ -73,8 +77,8 @@ follows the explicit assignment and tracks reconciliation as an open question.
   result, portable performance claim, production optimization, or published
   recommendation. P4 performs no artifact I/O, collection, filesystem access,
   subprocess execution, CUDA/Warp/profiler use, or timing.
-- Any public API/export, production scheduler change, user-facing documentation,
-  CPU/Warp-CPU fallback, or default-suite profiler execution.
+- Any public API/export, production scheduler change, CPU/Warp-CPU fallback, or
+  default-suite profiler execution.
 - Replacing E8-F6 scaling and memory-budget evidence or re-measuring setup and
   graph-capture construction as replay cost.
 - Implementing recommendations whose production changes belong in follow-up
