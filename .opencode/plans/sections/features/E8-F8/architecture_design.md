@@ -12,14 +12,14 @@ not mutate runtime policy.
 ACTIVE resident binding + prepared plan + pinned resources + qualified CUDA
                               |
                               v
-example: validate -> initialize RNG -> capture -> replay N times
+example: publish -> initialize RNG once -> capture -> replay exactly twice
                               |
                  +------------+-------------+
                  | compatible                | structural/lifecycle drift
                  v                           v
               replay                    reject + invalidate
                                               |
-                                 explicit teardown/setup/recapture
+                           retire -> renew -> fresh capture -> ordered teardown
 
 E8-F1..F7 implementation and evidence
               -> dated closeout manifest
@@ -44,6 +44,12 @@ identities, explicit teardown, or terminal session/capture lifecycle do.
 - **API surface:** No package or top-level exports. The example imports
   concrete resident and graph-capture seams directly and preserves opaque graph
   handles in process memory only.
+- **P1 implementation:** `docs/Examples/gpu_resident_graph_capture.py` performs
+  lazy native-CUDA qualification before resident setup, publishes one exact
+  resource set, and initializes streams once. Its two-replay loop contains only
+  replay calls; it explicitly synchronizes before bounded host observations,
+  demonstrates structural rejection, then retires, renews, and freshly captures
+  before closing the graph binding and session.
 - **Workflow hooks:** P1 and P2 turn E8-F1--E8-F4 contracts into executable
   guidance. P3 consumes E8-F5--E8-F7 artifacts and runs closeout commands. P4
   updates the Epic H roadmap and E8 plan only after P3 passes.

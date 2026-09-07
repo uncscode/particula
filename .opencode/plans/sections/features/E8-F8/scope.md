@@ -26,6 +26,19 @@ profiling outputs from E8-F1 through E8-F7; it does not redesign capture.
 - Update roadmap, feature indexes, durable operator guidance, and E8 parent
   sections to reconcile the T7 profiling/T8 closeout assignment.
 
+## Delivered in P1 (#1595)
+
+- `docs/Examples/gpu_resident_graph_capture.py` lazily qualifies native CUDA,
+  publishes resources, initializes streams once, captures, replays exactly
+  twice, synchronizes before observation, invalidates structurally, retires,
+  renews, freshly captures, and closes in order.
+- `docs/Examples/index.md` publishes the source link and native-CUDA-only
+  command/limitation summary.
+- `particula/tests/gpu_resident_graph_capture_docs_test.py` adds hardware-free
+  contract coverage and an optional native-CUDA smoke row.
+
+P2--P4 runbook, evidence-matrix, and roadmap-closeout work remains pending.
+
 ## Out of Scope
 
 - New capture/replay runtime semantics, public package exports, kernels,

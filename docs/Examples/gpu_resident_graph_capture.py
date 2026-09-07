@@ -1,11 +1,11 @@
-"""Run one qualified native-CUDA resident graph-capture walkthrough.
+"""Demonstrate qualified native-CUDA resident graph capture.
 
-This fixed-identity example is native-CUDA-only: CPU and Warp-CPU are not
-fallback or emulation paths. It demonstrates explicit capture, two replays,
-structural invalidation, retirement, and renewal. It does not provide automatic
-recapture, migration, resize/compaction, hidden transfer or synchronization,
-retry/rollback, checkpointed or serialized opaque handles, or performance
-claims.
+Lazy qualification runs before CPU-state construction, resident imports, or
+device allocation. This fixed-identity example explicitly captures once,
+replays twice, invalidates, retires, and renews a graph. CPU and Warp-CPU are
+not fallback or emulation paths. It provides no automatic recapture, migration,
+resize/compaction, hidden transfer or synchronization, retry/rollback,
+checkpointed or serialized opaque handles, or performance claims.
 """
 
 from __future__ import annotations
@@ -77,9 +77,16 @@ def _disabled_output() -> list[str]:
 def _qualified_native_cuda() -> str | None:
     """Find the first capture-capable native CUDA device without setup work.
 
+    Only a missing Warp module, no native CUDA device, or missing capture API is
+    treated as unavailable. Other import, loader, or probe failures propagate.
+
     Returns:
         The selected opaque native device name, or ``None`` when the explicit
         unavailable conditions are met.
+
+    Raises:
+        Exception: Propagates unexpected Warp import, device enumeration, or
+            capture-API probe failures.
     """
     if os.getenv(_FORCE_NO_NATIVE_CAPTURE_ENV) == "1":
         return None
@@ -113,6 +120,9 @@ def _load_enabled_runtime() -> SimpleNamespace:
 
     Returns:
         A namespace containing the lazily loaded runtime modules.
+
+    Raises:
+        ImportError: If an enabled-path concrete module cannot be imported.
     """
     names = (
         "warp",
@@ -155,7 +165,8 @@ class _WarpNativeCaptureAdapter:
         """Return the completed preflight result without another probe.
 
         Returns:
-            ``True`` because construction occurs only after successful preflight.
+            ``True`` because construction occurs only after successful
+            preflight.
         """
         return True
 
@@ -188,7 +199,7 @@ class _WarpNativeCaptureAdapter:
             device: Device whose native name is passed to Warp capture.
 
         Returns:
-            Concrete graph-capture callables for the selected device.
+            Concrete graph-capture callables for the preflight-selected device.
         """
 
         def begin() -> None:
@@ -204,12 +215,17 @@ class _WarpNativeCaptureAdapter:
             if callable(destroy):
                 destroy()
 
+        def abort() -> object:
+            """End incomplete capture and return its cleanup handle."""
+            return self._warp.capture_end()
+
         return self._graph_capture.GraphCaptureNativeCallables(
             begin,
             self._warp.capture_end,
             lambda: None,
             self._warp.capture_launch,
             release,
+            abort,
         )
 
 
@@ -229,6 +245,7 @@ def _compose_request(
     guard: Any,
     gas: GasData,
     environment: EnvironmentData,
+    initial_total_mass: np.ndarray,
 ) -> tuple[Any, Any, Any]:
     """Compose the canonical twelve-node request and publish its resources.
 
@@ -239,22 +256,42 @@ def _compose_request(
         guard: Closed step guard bound to ``session`` and ``registry``.
         gas: CPU gas container used to construct the request.
         environment: CPU environment container used to construct the request.
+        initial_total_mass: CPU-derived particle-plus-gas inventory.
 
     Returns:
         The resident request and its gas and saturation diagnostic outputs.
     """
-    particles = session.particles
-    initial_total_mass = particles.volume.numpy()[:, None] * (
-        np.sum(
-            particles.masses.numpy()
-            * particles.concentration.numpy()[:, :, None],
-            axis=1,
-        )
-        + session.gas.concentration.numpy()
-    )
     resident_runtime = runtime.resident_example._load_enabled_runtime()
+    communication = SimpleNamespace(**vars(resident_runtime.communication))
+
+    def graph_capture_map(
+        _form: Any,
+        transport_mode: Any,
+        edge_capacity: int,
+        source_indices: Any,
+        destination_indices: Any,
+        species_indices: Any,
+        edge_rates: Any,
+    ) -> Any:
+        """Construct the required closed one-dimensional map before
+        publication.
+        """
+        return resident_runtime.communication.CommunicationMap(
+            resident_runtime.communication.CommunicationMapForm.ONE_DIMENSIONAL,
+            transport_mode,
+            edge_capacity,
+            source_indices,
+            destination_indices,
+            species_indices,
+            edge_rates,
+        )
+
+    communication.CommunicationMap = graph_capture_map
+    capture_runtime = SimpleNamespace(
+        **vars(resident_runtime), communication=communication
+    )
     request, gas_output, saturation_output = runtime.resident_example._request(
-        resident_runtime,
+        capture_runtime,
         session,
         registry,
         guard,
@@ -263,52 +300,82 @@ def _compose_request(
         environment,
         initial_total_mass,
     )
-    # Resident capture accepts the fixed closed one-dimensional map form.
-    object.__setattr__(
-        request.communication.resources.configuration.communication_map,
-        "form",
-        resident_runtime.communication.CommunicationMapForm.ONE_DIMENSIONAL,
-    )
     return request, gas_output, saturation_output
+
+
+def _close_enabled_binding(
+    graph_capture: Any | None,
+    binding: Any | None,
+    session: Any | None,
+    registry: Any | None,
+    guard: Any | None,
+) -> None:
+    """Close capture and session independently, retaining teardown failures."""
+    failures: list[BaseException] = []
+    if graph_capture is not None and binding is not None:
+        try:
+            graph_capture.close_resident_graph_capture(binding)
+        except BaseException as error:
+            failures.append(error)
+    if session is not None and registry is not None and guard is not None:
+        try:
+            session.close(registry, guard)
+        except BaseException as error:
+            failures.append(error)
+    if failures:
+        if len(failures) > 1:
+            raise failures[0] from failures[1]
+        raise failures[0]
 
 
 def run_example() -> ExampleRun:  # noqa: C901
     """Capture and replay a qualified native CUDA graph without fallback.
 
-    The only host read boundary is one explicit synchronization after the two
-    replay calls.  Enabled-path failures propagate after exact teardown.
+    Unavailable native capture returns deterministic status lines without
+    fixture construction, resident setup, upload, or capture. The enabled path
+    has one host-read boundary: explicit synchronization after two replays.
+    It then deliberately invalidates, retires, and renews the fixed binding.
 
     Returns:
-        Bounded status and observation data from the capture walkthrough.
+        Bounded status and synchronized observations from the walkthrough.
 
     Raises:
-        Exception: Propagates enabled-path setup, capture, replay, or teardown
-            failures after attempting the required cleanup.
+        Exception: Propagates unexpected qualification, enabled-path setup,
+            capture, replay, renewal, or teardown failures after cleanup.
     """
     native = _qualified_native_cuda()
     if native is None:
         return ExampleRun(output=_disabled_output())
     runtime = _load_enabled_runtime()
     execution = runtime.execution
-    graph_capture = runtime.graph_capture
+    graph_capture: Any | None = runtime.graph_capture
     device = execution.Device(execution.Backend.WARP, native)
     particles, gas, environment = _build_cpu_state()
+    initial_total_mass = particles.volume[:, None] * (
+        np.sum(particles.masses * particles.concentration[:, :, None], axis=1)
+        + gas.concentration
+    )
     session = None
     binding = None
     registry = None
     guard = None
     try:
-        session = runtime.resident_example._load_enabled_runtime().gpu_session.setup_resident_session(
+        resident_runtime = runtime.resident_example._load_enabled_runtime()
+        session = resident_runtime.gpu_session.setup_resident_session(
             particles, gas, environment, device
         )
-        registry = runtime.resident_example._load_enabled_runtime().gpu_resources.GPUResourceRegistry(
-            session
-        )
-        guard = runtime.resident_example._load_enabled_runtime().gpu_session.ResidentStepGuard(
+        registry = resident_runtime.gpu_resources.GPUResourceRegistry(session)
+        guard = resident_runtime.gpu_session.ResidentStepGuard(
             session, registry
         )
         request, gas_output, saturation_output = _compose_request(
-            runtime, session, registry, guard, gas, environment
+            runtime,
+            session,
+            registry,
+            guard,
+            gas,
+            environment,
+            initial_total_mass,
         )
         signature = graph_capture.create_resident_graph_capture_signature(
             request
@@ -344,11 +411,12 @@ def run_example() -> ExampleRun:  # noqa: C901
         object.__setattr__(request, "environment_update", object())
         try:
             try:
-                runtime.resident_scheduler.prepare_resident_simulation(
-                    request, 1.0
-                )
+                graph_capture.replay_captured_resident_graph(captured, 1.0)
             except ValueError:
-                invalidated = True
+                invalidated = (
+                    binding.lifecycle.state
+                    is graph_capture.GraphCaptureLifecycleState.INVALIDATED
+                )
             else:
                 raise RuntimeError("structural signature drift was accepted.")
         finally:
@@ -379,8 +447,10 @@ def run_example() -> ExampleRun:  # noqa: C901
         return ExampleRun(
             output=[
                 "Qualified native CUDA capture completed without fallback.",
-                "Captured once, replayed twice, then explicitly retired and renewed.",
-                "Opaque handles are not serialized; no performance claim is made.",
+                "Captured once, replayed twice, then explicitly retired and "
+                "renewed.",
+                "Opaque handles are not serialized; no performance claim is "
+                "made.",
             ],
             session=session,
             registry=registry,
@@ -397,14 +467,15 @@ def run_example() -> ExampleRun:  # noqa: C901
             synchronized=True,
         )
     finally:
-        if binding is not None:
-            graph_capture.close_resident_graph_capture(binding)
-        if session is not None and registry is not None and guard is not None:
-            session.close(registry, guard)
+        _close_enabled_binding(graph_capture, binding, session, registry, guard)
 
 
 def main() -> None:
-    """Run the example and print deterministic status lines."""
+    """Run the example and print its deterministic status lines.
+
+    The unavailable path prints the fixed capability status. The enabled path
+    prints the bounded native-CUDA capture walkthrough status.
+    """
     for line in run_example().output:
         print(line)
 

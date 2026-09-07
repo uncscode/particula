@@ -1030,8 +1030,10 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 - The bounded P5 evidence distinguishes deterministic parity, independent
   conservation, persistent RNG continuation, and aggregate stochastic criteria;
   it does not compare cross-device RNG words or per-seed trajectories. It makes
-  no performance, profiling, or memory claim and supplies no runnable user
-  workflow or example.
+  no performance, profiling, or memory claim. The separate native-CUDA-only
+  source `docs/Examples/gpu_resident_graph_capture.py` demonstrates the bounded
+  capture, two-replay, invalidation, retirement, and renewal lifecycle without
+  adding a public API or a CPU/Warp-CPU fallback.
 
   Validate the P5 evidence boundary with focused assertions before the
   untargeted coverage runner; CUDA selection is optional pass-or-clean-skip

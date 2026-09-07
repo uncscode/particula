@@ -1,11 +1,14 @@
 # Success Criteria
 
-- [ ] The canonical example demonstrates supported setup, explicit RNG
-  initialization, capture, multiple replays, synchronization, invalidation,
-  teardown, and fresh recapture using concrete-only production boundaries.
-- [ ] Hardware-free contract tests validate the example and runbook; qualified
-  CUDA execution passes, or absence is reported as a clean skip without CPU
-  fallback or an unsupported claim of captured evidence.
+- [x] P1 (#1595) canonical example demonstrates supported setup, one explicit RNG
+  initialization, capture, exactly two replays, synchronization, structural
+  invalidation, retirement, renewal, fresh capture, and ordered teardown using
+  concrete-only production boundaries.
+- [x] P1 (#1595) hardware-free contract tests and an optional native-CUDA smoke
+  row cover the example without substituting CPU or Warp-CPU capture evidence.
+- [ ] P2 must extend hardware-free contract tests to validate the runbook;
+  qualified CUDA execution remains optional evidence and must never be replaced
+  by CPU fallback or an unsupported captured-evidence claim.
 - [ ] The runbook distinguishes every structural recapture trigger from mutable
   payload changes that remain valid in pinned arrays.
 - [ ] Limitations explicitly exclude dynamic shapes/order/maps, automatic
