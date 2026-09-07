@@ -10,7 +10,7 @@ Calendar dates require owner scheduling; ordering and exit evidence are fixed.
 | Three-way correctness gate passes | TBD | 2026-09-05 | Shipped | E8-F5 #1579: focused, coverage, and documentation assertions passed; approved strict-equivalent worktree validation passed with exit status 0. |
 | Scaling and memory evidence published | TBD | - | Not Started | E8-F6; dated artifacts with environment metadata |
 | Profiling evidence published | TBD | - | Not Started | E8-F7/T7; native-CUDA profiling and machine-bounded recommendations. |
-| User workflow and closeout accepted | TBD | - | Blocked | E8-F8/T8 delivered the native-CUDA example, runbook, limitations, non-promoting P3 `UNSHIPPED/BLOCKED` ledger, and P4 documentation reconciliation. P4 focused closeout/runbook contracts passed (16 passed), and `mkdocs build --strict` passed (exit 0). Epic H remains Active/unshipped: E8-F2, E8-F6, E8-F7/T7, and designated-device final-revision H1--H11 rows still block closeout; no CUDA evidence is claimed. |
+| User workflow and closeout accepted | TBD | - | Blocked | E8-F8/T8 delivered the native-CUDA example, runbook, limitations, and non-promoting P3 `UNSHIPPED/BLOCKED` ledger. P4 documentation reconciliation remains in progress pending consistent validation evidence. Epic H remains Active/unshipped: E8-F2, E8-F3, E8-F6, E8-F7/T7, and designated-device final-revision H1--H11 rows still block closeout; no CUDA evidence is claimed. |
 
 No milestone is considered shipped from benchmark output alone. Each milestone
 must include its implementation tests, focused validation command, and any

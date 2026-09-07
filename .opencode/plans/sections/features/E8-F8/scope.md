@@ -25,10 +25,9 @@ profiling outputs from E8-F1 through E8-F7; it does not redesign capture.
   every Epic H exit criterion; unavailable required commands keep the epic open.
 - Reconcile plan and durable documentation labels so T7 owns profiling and
   machine-bounded recommendations, while T8 owns the example, runbook,
-  limitations, documentation reconciliation, and closeout. P4 is implemented
-  after focused closeout/runbook contracts passed (16 passed). Active split-plan
-  validation and `mkdocs build --strict` remain required but unavailable and
-  pending in this worktree.
+  limitations, documentation reconciliation, and closeout. P4 remains in
+  progress pending consistent focused, active split-plan, and strict MkDocs
+  validation evidence for the current revision.
 
 ## Delivered in P1 (#1595)
 
@@ -60,12 +59,11 @@ profiling outputs from E8-F1 through E8-F7; it does not redesign capture.
   closeout schema and evidence traceability without requiring CUDA, Warp,
   artifacts, Git history, or plan-file reads.
 
-P4 roadmap-closeout documentation reconciliation is implemented. Its focused
-closeout/runbook contracts passed (16 passed). Active split-plan validation and
-`mkdocs build --strict` remain required but unavailable and pending in this
-worktree. P3 records blocked evidence only and neither P3 nor P4 promotes Epic
+P4 roadmap-closeout documentation reconciliation remains in progress pending
+consistent current-revision validation evidence. P3 records blocked evidence
+only and neither P3 nor P4 promotes Epic
 H or claims CUDA evidence;
-E8-F2, E8-F6, E8-F7/T7, and designated-device final-revision H1--H11 evidence
+E8-F2, E8-F3, E8-F6, E8-F7/T7, and designated-device final-revision H1--H11 evidence
 remain required.
 
 ## Out of Scope

@@ -39,8 +39,8 @@
     derivation, optional-CUDA labeling, unsafe provenance rejection, and
     fail-closed missing-row checks.
 
-- [x] **E8-F8-P4:** Roadmap and development documentation closeout
-  - Issue: #1598 | Size: XS | Status: Implemented 2026-09-07 (non-promoting)
+- [ ] **E8-F8-P4:** Roadmap and development documentation closeout
+  - Issue: #1598 | Size: XS | Status: In progress (non-promoting)
   - Goal: Reconcile T7/T8 labels (T7 profiling and machine-bounded
     recommendations; T8 example/runbook/limitations/documentation/closeout),
     publish only supported conclusions, and promote Epic H only when P3 proves
@@ -48,10 +48,9 @@
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Features/Roadmap/index.md`, `docs/index.md`, `AGENTS.md`, E8 parent and
     child plan sections
-  - Validation status: focused closeout/runbook documentation contracts passed
-    (16 passed). Active split-plan validation and `mkdocs build --strict` are
-    required but unavailable and pending in this worktree. P4 implements
+  - Validation status: focused closeout/runbook documentation contracts and
+    `mkdocs build --strict` are pending for the current revision. P4 implements
     documentation reconciliation only and does not promote the epic or claim
     CUDA evidence.
-  - Remaining closeout blockers: E8-F2, E8-F6, E8-F7/T7, and every H1--H11
+  - Remaining closeout blockers: E8-F2, E8-F3, E8-F6, E8-F7/T7, and every H1--H11
     required row at the final revision on one designated qualified CUDA device.

@@ -58,13 +58,13 @@ The implementation should keep three explicit boundaries:
   recommendations. E8-F8/T8 owns the native-CUDA example, operator runbook,
   limitations, documentation reconciliation, and closeout.
 - E8-F8 P3 delivered a fail-closed `UNSHIPPED/BLOCKED` evidence ledger. It is
-  non-promoting and must retain missing E8-F2, E8-F6, E8-F7, and designated
+  non-promoting and must retain missing E8-F2, E8-F3, E8-F6, E8-F7, and designated
   final-revision H1--H11 evidence as blockers.
-- E8-F8 P4 documentation reconciliation is implemented: focused
-  closeout/runbook contracts passed (16 passed), `mkdocs build --strict` passed
-  (exit 0), and the active split-plan validator is required for this worktree.
+- E8-F8 P4 documentation reconciliation remains in progress until focused,
+  strict MkDocs, and active split-plan validation evidence is consistently
+  recorded for the current revision.
   This non-promoting documentation result leaves Epic H Active/unshipped until
-  E8-F2, E8-F6, E8-F7/T7, and all designated-device final-revision H1--H11
+  E8-F2, E8-F3, E8-F6, E8-F7/T7, and all designated-device final-revision H1--H11
   blockers are resolved; it claims no CUDA evidence.
 
 ## Testing Requirements

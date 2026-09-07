@@ -19,6 +19,17 @@ SOURCE = ROOT / "docs/Examples/gpu_resident_graph_capture.py"
 MODULE_NAME = "docs.Examples.gpu_resident_graph_capture"
 
 
+class _NativeDevice:
+    """Provide a hardware-free Warp-like device descriptor."""
+
+    def __init__(self, name: str, *, is_cuda: bool) -> None:
+        self.name = name
+        self.is_cuda = is_cuda
+
+    def __str__(self) -> str:
+        return self.name
+
+
 def _fresh_example() -> Any:
     """Import a fresh example module without retaining prior test patches."""
     sys.modules.pop(MODULE_NAME, None)
@@ -96,18 +107,27 @@ def test_force_disabled_subprocess_has_exact_address_free_output() -> None:
     "warp, expected",
     [
         (None, None),
-        (SimpleNamespace(get_devices=lambda: ["cpu"]), None),
         (
             SimpleNamespace(
-                get_devices=lambda: ["cpu", "cuda:1"],
-                capture_begin=lambda: None,
-                capture_end=lambda: None,
+                get_devices=lambda: [_NativeDevice("cpu", is_cuda=False)]
             ),
             None,
         ),
         (
             SimpleNamespace(
-                get_devices=lambda: ["cpu", "cuda:1", "cuda:2"],
+                get_devices=lambda: [_NativeDevice("cuda:1", is_cuda=True)],
+                capture_begin=lambda: None,
+                capture_end=lambda: None,
+            ),
+            "cuda:1",
+        ),
+        (
+            SimpleNamespace(
+                get_devices=lambda: [
+                    _NativeDevice("cpu", is_cuda=False),
+                    _NativeDevice("cuda:1", is_cuda=True),
+                    _NativeDevice("cuda:2", is_cuda=True),
+                ],
                 capture_begin=lambda: None,
                 capture_end=lambda: None,
                 capture_launch=lambda: None,
@@ -225,7 +245,10 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
     )
     session.close = lambda *_args: events.append("session-close")
     registry = SimpleNamespace(
-        validate_capture_resource_set=lambda _requirements: "capture-set"
+        validate_capture_resource_set=lambda _requirements: "capture-set",
+        prepare_capture_resources=lambda requirements: events.append(
+            f"publish-{requirements}"
+        ),
     )
     guard = object()
     resident_runtime = SimpleNamespace(
@@ -264,7 +287,6 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
             raise ValueError("structural drift")
 
     graph_capture = SimpleNamespace(
-        GraphCaptureCapability=lambda *_args: object(),
         GraphCaptureAvailability=SimpleNamespace(AVAILABLE="available"),
         GraphCaptureLifecycleState=SimpleNamespace(
             INVALIDATED=invalidated_state
@@ -274,6 +296,10 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
             "attach"
         ),
         create_resident_graph_capture_signature=lambda _request: object(),
+        resolve_graph_capture_capability=lambda device, adapter: (
+            events.append(f"resolve-{device.native}")
+            or SimpleNamespace(device=device, availability="available")
+        ),
         create_graph_capture_lifecycle=lambda *_args: object(),
         qualify_prepared_resident_graph_capture=lambda *_args: object(),
         capture_prepared_resident_graph=lambda _qualification: next(captures),
@@ -284,6 +310,44 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
             "capture-close"
         ),
     )
+    communication = SimpleNamespace(
+        CommunicationMapForm=SimpleNamespace(ONE_DIMENSIONAL="one-dimensional")
+    )
+
+    def communication_map(*args: Any) -> tuple[Any, ...]:
+        events.append("communication-map")
+        return args
+
+    communication.CommunicationMap = communication_map
+
+    def compose_request(
+        composed_runtime: Any,
+        _session: Any,
+        composed_registry: Any,
+        _guard: Any,
+        *_args: Any,
+    ) -> tuple[Any, Any, Any]:
+        mapped = composed_runtime.communication.CommunicationMap(
+            "ignored",
+            "gas",
+            1,
+            object(),
+            object(),
+            object(),
+            object(),
+        )
+        assert mapped[0] == "one-dimensional"
+        composed_registry.prepare_capture_resources(
+            request.capture_resource_requirements
+        )
+        return request, gas_output, saturation_output
+
+    resident_example = SimpleNamespace(
+        _load_enabled_runtime=lambda: SimpleNamespace(
+            **vars(resident_runtime), communication=communication
+        ),
+        _request=compose_request,
+    )
     runtime = SimpleNamespace(
         execution=SimpleNamespace(
             Backend=SimpleNamespace(WARP="warp"),
@@ -291,14 +355,13 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
         ),
         graph_capture=graph_capture,
         resident_scheduler=SimpleNamespace(prepare_resident_simulation=prepare),
-        resident_example=SimpleNamespace(
-            _load_enabled_runtime=lambda: resident_runtime
-        ),
+        resident_example=resident_example,
         warp=SimpleNamespace(
             synchronize_device=lambda _device: events.append("synchronize")
         ),
     )
     monkeypatch.setattr(example, "_qualified_native_cuda", lambda: "cuda:1")
+    monkeypatch.setattr(example, "_load_capability_runtime", lambda: runtime)
     monkeypatch.setattr(example, "_load_enabled_runtime", lambda: runtime)
     monkeypatch.setattr(
         example,
@@ -312,16 +375,6 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
             SimpleNamespace(concentration=np.ones((1, 1), dtype=np.float64)),
             object(),
         ),
-    )
-    monkeypatch.setattr(
-        example,
-        "_compose_request",
-        lambda *_args: (request, gas_output, saturation_output),
-    )
-    monkeypatch.setattr(
-        example,
-        "_WarpNativeCaptureAdapter",
-        lambda *_args: object(),
     )
 
     result = example.run_example()
@@ -337,6 +390,9 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
         result.saturation_snapshot, saturation_snapshot
     )
     assert events == [
+        "resolve-cuda:1",
+        "communication-map",
+        f"publish-{request.capture_resource_requirements}",
         "attach",
         "initialize",
         "prepare",
@@ -377,14 +433,62 @@ def test_native_adapter_aborts_and_releases_post_begin_failure() -> None:
             capture_abort=args[5],
         )
     )
-    adapter = example._WarpNativeCaptureAdapter(warp, "cuda:1", graph_capture)
-    callables = adapter.capture_callables(SimpleNamespace(native="cuda:1"))
+    device = SimpleNamespace(native="cuda:1")
+    adapter = example._WarpNativeCaptureAdapter(warp, device, graph_capture)
+    callables = adapter.capture_callables(device)
 
     callables.capture_begin()
     aborted = callables.capture_abort()
     callables.capture_release(aborted)
 
     assert events == ["begin", "end", "release"]
+
+
+def test_native_adapter_rejects_unsupported_handle_release() -> None:
+    """Never silently retain a native graph lacking destruction support."""
+    example = _fresh_example()
+    graph_capture = SimpleNamespace(
+        GraphCaptureNativeCallables=lambda *args: SimpleNamespace(
+            capture_release=args[4]
+        )
+    )
+    device = SimpleNamespace(native="cuda:1")
+    adapter = example._WarpNativeCaptureAdapter(
+        SimpleNamespace(
+            capture_begin=lambda **_kwargs: None,
+            capture_end=lambda: object(),
+            capture_launch=lambda *_args: None,
+        ),
+        device,
+        graph_capture,
+    )
+    with pytest.raises(TypeError, match="callable destroy"):
+        adapter.capture_callables(device).capture_release(object())
+
+
+def test_native_adapter_requires_exact_device_identity() -> None:
+    """Reject an equal-looking device that is not the selected declaration."""
+    example = _fresh_example()
+    selected = SimpleNamespace(native="cuda:1")
+    adapter = example._WarpNativeCaptureAdapter(object(), selected, object())
+    assert adapter.device_available(selected)
+    assert adapter.capture_api_available(selected)
+    assert not adapter.device_available(SimpleNamespace(native="cuda:1"))
+    assert not adapter.capture_api_available(SimpleNamespace(native="cuda:1"))
+
+
+def test_capability_resolution_rejects_device_mismatch() -> None:
+    """Reject a canonical resolver result bound to another device identity."""
+    example = _fresh_example()
+    selected = object()
+    graph_capture = SimpleNamespace(
+        GraphCaptureAvailability=SimpleNamespace(AVAILABLE=object()),
+        resolve_graph_capture_capability=lambda *_args: SimpleNamespace(
+            device=object(), availability=object()
+        ),
+    )
+    with pytest.raises(RuntimeError, match="different device"):
+        example._resolve_exact_capability(graph_capture, selected, object())
 
 
 def test_teardown_attempts_session_close_after_graph_close_failure() -> None:
@@ -412,6 +516,70 @@ def test_teardown_attempts_session_close_after_graph_close_failure() -> None:
     assert events == ["graph-close", "session-close"]
     assert error.value.__cause__ is not None
     assert str(error.value.__cause__) == "session close failed"
+
+
+def test_operation_failure_remains_primary_when_teardown_fails(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Chain cleanup failure without replacing the enabled-path failure."""
+    example = _fresh_example()
+    device = SimpleNamespace(native="cuda:1")
+    session = SimpleNamespace(
+        close=lambda *_args: (_ for _ in ()).throw(
+            RuntimeError("cleanup failed")
+        )
+    )
+    registry = object()
+    guard = object()
+    resident_runtime = SimpleNamespace(
+        gpu_session=SimpleNamespace(
+            setup_resident_session=lambda *_args: session,
+            ResidentStepGuard=lambda *_args: guard,
+        ),
+        gpu_resources=SimpleNamespace(
+            GPUResourceRegistry=lambda _session: registry
+        ),
+    )
+    runtime = SimpleNamespace(
+        execution=SimpleNamespace(
+            Backend=SimpleNamespace(WARP="warp"),
+            Device=lambda *_args: device,
+        ),
+        graph_capture=SimpleNamespace(),
+        warp=SimpleNamespace(),
+        resident_example=SimpleNamespace(
+            _load_enabled_runtime=lambda: resident_runtime
+        ),
+    )
+    monkeypatch.setattr(example, "_qualified_native_cuda", lambda: "cuda:1")
+    monkeypatch.setattr(example, "_load_capability_runtime", lambda: runtime)
+    monkeypatch.setattr(example, "_load_enabled_runtime", lambda: runtime)
+    monkeypatch.setattr(
+        example, "_resolve_exact_capability", lambda *_args: object()
+    )
+    monkeypatch.setattr(
+        example,
+        "_build_cpu_state",
+        lambda: (
+            SimpleNamespace(
+                volume=np.ones(1),
+                masses=np.ones((1, 1, 1)),
+                concentration=np.ones((1, 1)),
+            ),
+            SimpleNamespace(concentration=np.ones((1, 1))),
+            object(),
+        ),
+    )
+    monkeypatch.setattr(
+        example,
+        "_compose_request",
+        lambda *_args: (_ for _ in ()).throw(RuntimeError("operation failed")),
+    )
+
+    with pytest.raises(RuntimeError, match="operation failed") as error:
+        example.run_example()
+    assert isinstance(error.value.__cause__, RuntimeError)
+    assert str(error.value.__cause__) == "cleanup failed"
 
 
 @pytest.mark.warp
