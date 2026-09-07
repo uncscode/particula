@@ -12579,6 +12579,8 @@
       
         
       
+        
+      
     
     
     
@@ -12808,6 +12810,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../Features/gpu_graph_capture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU resident graph capture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../Features/gpu_graph_capture_performance/" class="md-nav__link">
         
   
@@ -12994,6 +13024,8 @@
       
         
       
+        
+      
     
     
     
@@ -13007,7 +13039,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -13029,14 +13061,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13167,6 +13199,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../Features/Roadmap/graph-capture-closeout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Epic H graph-capture closeout record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../Features/Roadmap/mass-precision-study/" class="md-nav__link">
         
   
@@ -13256,7 +13316,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -13278,14 +13338,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_16" id="__nav_4_16_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16199,6 +16259,12 @@ CPU-only and optional Warp CPU-backend flow.</p>
 - <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py">Direct GPU coagulation source</a> — a standalone explicit-transfer, Warp CPU-default, low-level particle-resolved Brownian path: two supported direct calls reuse caller-owned collision and persistent RNG sidecars before an explicit CPU checkpoint restore. When Warp is unavailable or disabled, it does no conversion or kernel work and has no CPU fallback.
 - <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_session.py">GPU-resident session lifecycle source</a> — a lazy, concrete-only lifecycle and in-memory checkpoint walkthrough. It demonstrates resident ownership, explicit same-device restart, and terminal finalization without scheduling, transport, fallback, or physics orchestration. Run <code>python docs/Examples/gpu_resident_session.py</code>; set <code>PARTICULA_EXAMPLE_FORCE_NO_WARP=1</code> to verify its no-Warp path.
 - <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py">GPU-resident multi-timestep source</a> — a lazy resident-loop walkthrough with resolver-produced scheduling, two completed source steps, caller-owned diagnostics, manual same-device restart, and cached source finalization. Run <code>python docs/Examples/gpu_resident_multi_timestep.py</code>; set <code>PARTICULA_EXAMPLE_FORCE_NO_WARP=1</code> to verify its no-Warp path.
+- <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py">GPU-resident graph-capture source</a>
+  — a lazy native-CUDA-only walkthrough that explicitly captures, replays
+  twice, invalidates, retires, and renews one fixed resident binding. Run
+  <code>python docs/Examples/gpu_resident_graph_capture.py</code>; set
+  <code>PARTICULA_EXAMPLE_FORCE_NO_NATIVE_CAPTURE=1</code> to verify that no CPU or
+  Warp-CPU fallback runs.
 - <a href="../Features/coagulation_strategy_system/">GPU coagulation strategy guide</a> — supported direct-kernel mechanisms, validation boundaries, and release evidence.
 - <a href="../Features/data-containers-and-gpu-foundations/">Canonical low-level direct-condensation contract</a>
   — supported low-level scope and boundaries

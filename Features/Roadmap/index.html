@@ -12543,6 +12543,8 @@
       
         
       
+        
+      
     
     
     
@@ -12775,6 +12777,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../gpu_graph_capture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU resident graph capture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../gpu_graph_capture_performance/" class="md-nav__link">
         
   
@@ -12963,6 +12993,8 @@
       
         
       
+        
+      
     
     
     
@@ -12979,7 +13011,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -13001,14 +13033,14 @@
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_4_14" id="__nav_4_14_label" tabindex="">
+              <label class="md-nav__link md-nav__link--active" for="__nav_4_15" id="__nav_4_15_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13139,6 +13171,34 @@
   
   
     <li class="md-nav__item">
+      <a href="graph-capture-closeout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Epic H graph-capture closeout record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="mass-precision-study/" class="md-nav__link">
         
   
@@ -13231,7 +13291,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -13253,14 +13313,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_15" id="__nav_4_15_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_16" id="__nav_4_16_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16214,10 +16274,16 @@ schedule.</p>
   resident scheduling, communication, checkpoint/restart, diagnostics, and RNG
   contracts from
   <a href="data-oriented-gpu/#epic-g-backend-selection-and-gpu-resident-simulation">Epic G</a>.</li>
-<li><strong>Graph capture and performance</strong>: Begin active
-  <a href="data-oriented-gpu/#epic-h-graph-capture-and-performance">Epic H</a> with an
-  ADW plan and feature decomposition, then address capture boundaries,
-  preallocated buffers, scaling benchmarks, profiling, and memory budgets.</li>
+<li><strong>Graph capture and performance</strong>: Maintain active, unshipped
+  <a href="data-oriented-gpu/#epic-h-graph-capture-and-performance">Epic H</a>'s bounded
+  capture/replay and documentation tracks. Use the <a href="../../Examples/gpu_resident_graph_capture/">native-CUDA
+  example</a>, <a href="../gpu_graph_capture/">operator
+  runbook</a>, and <a href="graph-capture-closeout/">closeout
+  record</a>. E8-F7/T7 owns profiling and
+  machine-bounded recommendations; E8-F8 owns the example, runbook,
+  limitations, and closeout. The closeout remains the sole P3 evidence authority
+  while E8-F2, E8-F6, and E8-F7/T7 blockers remain; no CPU or Warp-CPU fallback
+  is provided.</li>
 <li><strong>Documentation and examples</strong>: Expand practical examples that connect feature
   guides, theory pages, and runnable notebooks.</li>
 </ul>
@@ -16559,9 +16625,14 @@ document an explicit five-call sequence. Its <code>condensation_step_gpu</code>,
 <h3 id="active">Active<a class="headerlink" href="#active" title="Permanent link">&para;</a></h3>
 <ul>
 <li><a href="data-oriented-gpu/#epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance</a>
-  follows shipped Epic G. Its ADW plan is not yet scheduled; the first step is
-  to create the E8 feature decomposition and define graph-capture, benchmark,
-  profiling, and memory-budget boundaries.</li>
+  follows shipped Epic G and remains active/unshipped. E8 delivers bounded
+  capture/replay and documentation tracks, but E8-F2 completion, E8-F6
+  scaling/memory evidence, E8-F7/T7 profiling and machine-bounded
+  recommendations, and the final designated-device evidence gate remain
+  blockers. E8-F8 owns the example, runbook, limitations, and closeout, with no
+  CPU or Warp-CPU fallback. The <a href="../../Examples/gpu_resident_graph_capture/">native-CUDA example</a>,
+  <a href="../gpu_graph_capture/">operator runbook</a>, and <a href="graph-capture-closeout/">P3 closeout record</a>
+  are the discoverable references; the closeout alone owns P3 status/evidence.</li>
 </ul>
 <h3 id="pending">Pending<a class="headerlink" href="#pending" title="Permanent link">&para;</a></h3>
 <p>Listed in execution order; each becomes active when the previous epic ships.</p>

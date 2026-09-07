@@ -14,7 +14,7 @@
         <link rel="prev" href="../condensation-stiffness-study/">
       
       
-        <link rel="next" href="../mass-precision-study/">
+        <link rel="next" href="../graph-capture-closeout/">
       
       
         
@@ -12543,6 +12543,8 @@
       
         
       
+        
+      
     
     
     
@@ -12775,6 +12777,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../gpu_graph_capture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU resident graph capture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../gpu_graph_capture_performance/" class="md-nav__link">
         
   
@@ -12963,6 +12993,8 @@
       
         
       
+        
+      
     
     
     
@@ -12979,7 +13011,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -13001,14 +13033,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_14" id="__nav_4_14_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_15" id="__nav_4_15_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13819,6 +13851,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../graph-capture-closeout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Epic H graph-capture closeout record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../mass-precision-study/" class="md-nav__link">
         
   
@@ -13911,7 +13971,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -13933,14 +13993,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_15" id="__nav_4_15_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_16" id="__nav_4_16_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17396,8 +17456,8 @@ documentation conventions.</p>
 <tr>
 <td>8</td>
 <td><a href="#epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance</a></td>
-<td>Active</td>
-<td>not scheduled</td>
+<td>Active / unshipped</td>
+<td>E8</td>
 </tr>
 <tr>
 <td>9</td>
@@ -17419,6 +17479,9 @@ Milestone 2.75 (differentiable condensation) is Epic I, and Milestone 3
 <li><a href="#authoritative-field-ownership-decisions">Authoritative field ownership decisions</a></li>
 <li><a href="../../data-containers-and-gpu-foundations/">Shipped foundation guide</a></li>
 <li><a href="../../../Examples/Data_Containers/">Runnable Data Containers example</a></li>
+<li><a href="../../../Examples/gpu_resident_graph_capture/">Native-CUDA resident graph-capture example</a></li>
+<li><a href="../../gpu_graph_capture/">Resident graph-capture operator runbook</a></li>
+<li><a href="../graph-capture-closeout/">Graph-capture closeout record</a></li>
 <li><a href="#final-downstream-handoff-map-for-sibling-features">Final downstream handoff map for sibling features</a></li>
 </ul>
 <h2 id="motivation-and-target-workloads">Motivation and Target Workloads<a class="headerlink" href="#motivation-and-target-workloads" title="Permanent link">&para;</a></h2>
@@ -19615,7 +19678,10 @@ Native graph capture/replay beyond E8-F1 host admission, performance profiling
 and targets, memory-budget evidence, distributed execution, and autodiff remain
 deferred to the later Epic H tracks and Epic I.</p>
 <h2 id="epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance<a class="headerlink" href="#epic-h-graph-capture-and-performance" title="Permanent link">&para;</a></h2>
-<p>Status: active. E8-F1, E8-F2 P1--P6/P8, and E8-F4 P1--P5 are shipped.
+<p>Status: active and unshipped. E8-F1, E8-F2 P1--P6/P8, and E8-F4 P1--P5
+deliver bounded capture/replay and prepared-path tracks; they do not satisfy
+Epic H's final evidence gate. E8-F2 completion, E8-F6 scaling/memory evidence,
+and E8-F7/T7 profiling and machine-bounded recommendations remain blockers.
 E8-F4 keeps opaque native handles in private LIVE/RELEASING/RELEASED
 provenance. Per-record launch leases prevent release races, native callbacks
 run outside the global provenance lock, and the shared session lifecycle
@@ -19630,7 +19696,12 @@ freezes small <code>(1, 16, 2)</code> and medium <code>(1000, 16, 2)</code> work
 gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
 with no CPU or Warp-CPU fallback. No reviewed normalized artifact or manifest
 is checked in, so profiling results and recommendations are unavailable and
-unshipped. E8-F8 is limited to the example, limitations, and closeout.</p>
+unshipped. E8-F8 owns the <a href="../../../Examples/gpu_resident_graph_capture/">native-CUDA example</a>,
+<a href="../../gpu_graph_capture/">operator runbook</a>, limitations, documentation
+reconciliation, and <a href="../graph-capture-closeout/">closeout record</a>. The closeout
+record is the sole P3 status and evidence authority: unavailable, stale, failed,
+missing, or clean-skipped evidence remains <code>UNSHIPPED/BLOCKED</code> and never
+promotes Epic H.</p>
 <h3 id="e8-f1-shipped-contract">E8-F1 shipped contract<a class="headerlink" href="#e8-f1-shipped-contract" title="Permanent link">&para;</a></h3>
 <p>E8-F1 ships host metadata and scheduler admission only. Its concrete-only
 direct-import boundary is <code>particula.execution.graph_capture</code>; its carriers and
