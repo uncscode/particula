@@ -90,7 +90,8 @@ metadata only.
 ## Command ledger
 
 Rows C1–C6 are validation commands. Focused rows are assertion-only, not
-coverage evidence; C5 is this record's sole repository coverage command.
+coverage evidence; C4 is this record's sole repository coverage command, and
+C5 is its strict MkDocs documentation-rendering command.
 Rows C7–C9 are opt-in, availability-only native-CUDA evidence:
 pass-or-clean-skip is not required measured evidence and cannot discharge
 H1–H9.

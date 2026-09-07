@@ -49,8 +49,9 @@
     `docs/Features/Roadmap/index.md`, `docs/index.md`, `AGENTS.md`, E8 parent and
     child plan sections
   - Validation status: focused closeout/runbook documentation contracts passed
-    (16 passed), `mkdocs build --strict` passed (exit 0), and active split-plan
-    validation is recorded for this worktree. P4 implements documentation
-    reconciliation only and does not promote the epic or claim CUDA evidence.
+    (16 passed). Active split-plan validation and `mkdocs build --strict` are
+    required but unavailable and pending in this worktree. P4 implements
+    documentation reconciliation only and does not promote the epic or claim
+    CUDA evidence.
   - Remaining closeout blockers: E8-F2, E8-F6, E8-F7/T7, and every H1--H11
     required row at the final revision on one designated qualified CUDA device.
