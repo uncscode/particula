@@ -6,12 +6,12 @@
   concrete-only production boundaries.
 - [x] P1 (#1595) hardware-free contract tests and an optional native-CUDA smoke
   row cover the example without substituting CPU or Warp-CPU capture evidence.
-- [ ] P2 must extend hardware-free contract tests to validate the runbook;
-  qualified CUDA execution remains optional evidence and must never be replaced
-  by CPU fallback or an unsupported captured-evidence claim.
-- [ ] The runbook distinguishes every structural recapture trigger from mutable
+- [x] P2 (#1596) adds a hardware-free runbook contract; qualified CUDA execution
+  remains optional evidence and is never replaced by CPU fallback or an
+  unsupported captured-evidence claim.
+- [x] The runbook distinguishes every structural recapture trigger from mutable
   payload changes that remain valid in pinned arrays.
-- [ ] Limitations explicitly exclude dynamic shapes/order/maps, automatic
+- [x] The runbook explicitly excludes dynamic shapes/order/maps, automatic
   recapture, migration, fallback, retry, rollback, graph serialization,
   checkpointed handles, and portable performance guarantees.
 - [ ] Closeout records date, revision, software/runtime/device identity, derived

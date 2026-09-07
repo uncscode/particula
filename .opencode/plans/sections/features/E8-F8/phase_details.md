@@ -14,13 +14,16 @@
   - Tests added: hardware-free AST/text/import/unavailable/lifecycle contracts
     and optional CUDA-gated replay smoke coverage.
 
-- [ ] **E8-F8-P2:** Operator runbook with recapture triggers and limitation checks
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Give operators a fail-closed lifecycle procedure and complete
-    recapture/limitation decision tables.
-  - Files: `docs/Features/gpu_graph_capture.md`, documentation contract test
-  - Tests: Required trigger, failure, no-fallback, no-automatic-recapture,
-    checkpoint, RNG, and reproduction-command assertions.
+- [x] **E8-F8-P2:** Operator runbook with recapture triggers and limitation checks
+  - Issue: #1596 | Size: S | Status: Implemented 2026-09-07
+  - Delivered files: `docs/Features/gpu_graph_capture.md` and
+    `particula/tests/gpu_graph_capture_runbook_docs_test.py`.
+  - Delivered behavior: fail-closed native-CUDA-qualified setup, replay,
+    invalidation, retirement, renewal, explicit fresh recapture, teardown,
+    failure handling, and lifecycle/recapture/limitation tables.
+  - Tests added: hardware-free assertions for the ordered structural triggers,
+    mutable-value non-triggers, lifecycle failures, checkpoint/RNG boundaries,
+    literal commands and links, and stdlib-only imports.
 
 - [ ] **E8-F8-P3:** Epic closeout evidence matrix and publication checks
   - Issue: TBD | Size: S | Status: Not Started

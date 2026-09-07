@@ -13,9 +13,11 @@ second runnable recipe. Checkpoint and restart limits are defined by the
 
 Fail closed in this order:
 
-1. Lazily qualify native CUDA before CPU fixture construction, resident imports,
-   CPU upload, or allocation. An unavailable qualification is a clean skip: do
-   no setup or capture and do not fall back.
+1. Resolve native-CUDA capability and probes before CPU fixture construction,
+   resident imports, CPU upload, or allocation. Only an unavailable capability
+   or probe outcome is a clean skip: do no setup or capture and do not fall
+   back. Once `qualify_prepared_resident_graph_capture()` is attempted, a
+   qualification rejection raises `ValueError`; it is not a clean skip.
 2. Construct the exact ACTIVE resident session, pinned resource registry, and
    closed step guard.
 3. Register the complete fixed inventory; build exact views, capacities, and
@@ -28,9 +30,9 @@ Fail closed in this order:
     streams; an explicit resident-stream lifecycle operation is the only reset
     boundary.
 5. Prepare the resident simulation, validate the published resource set,
-   qualify the exact READY binding, and explicitly capture it to reach
-   CAPTURED. Qualification is read-only and a rejected qualification or
-   admission does not require recovery.
+    qualify the exact READY binding, and explicitly capture it to reach
+    CAPTURED. Qualification is read-only and its rejected `ValueError` leaves
+    the existing lifecycle available as defined by that lifecycle.
 
 Replay requires an authentic issued record; the exact attached request, session,
 registry, and closed guard; an ACTIVE session; qualified CUDA availability; a
@@ -41,8 +43,9 @@ One call is one replay. Before `.numpy()` or any other host observation, call
 ## Structural changes require fresh capture
 
 Compatibility is identity based and checks the following first-drift order.
-Replacing any listed item fails closed, invalidates replay, and requires
-retirement followed by fresh capture.
+Replacing any listed item fails closed and invalidates replay. Recovery is
+ordered: retire the invalidated metadata, renew it to `READY`, prepare and
+qualify the renewed binding, then explicitly capture before replay is possible.
 
 | First-drift group | Representative replacement |
 | --- | --- |
@@ -70,10 +73,10 @@ identities have not changed.
 | State | Replay | Next action |
 | --- | --- | --- |
 | `READY` | No | Prepare, qualify, and explicitly capture. |
-| `CAPTURED` | Yes, after every replay precondition | Replay or retire before replacement. |
-| `INVALIDATED` | No | Retire stale metadata, then make a fresh capture. |
+| `CAPTURED` | Yes, after every replay precondition | Replay, or replace an identity to invalidate before retirement. |
+| `INVALIDATED` | No | Retire stale metadata, renew it to `READY`, then prepare, qualify, and explicitly capture. |
 | `FAULTED` | No | Do not retry; close and create fresh setup as needed. |
-| `RETIRED` | No | Renew the retired binding, then prepare, qualify, and capture. |
+| `RETIRED` | No | Renew the retired binding to `READY`, then prepare, qualify, and explicitly capture. |
 | `CLOSED` | No | Terminal; create a fresh session and binding. |
 
 Structural drift invalidates capture. A writer-capable capture or replay failure
@@ -89,6 +92,19 @@ close, discard, or finalize changes stale the capture binding.
 Retire stale or invalidated metadata. Renew only a retired binding. Renewal
 creates READY metadata only: it is neither replay nor recapture. Re-prepare,
 re-qualify, and explicitly capture after renewal.
+
+## Concrete operations
+
+Import these operations directly from `particula.execution.graph_capture`; none
+is a package or top-level export. Resolve capability with
+`resolve_graph_capture_capability()`, then qualify a prepared `READY` binding
+with `qualify_prepared_resident_graph_capture()`. Capture the qualification with
+`capture_prepared_resident_graph()` and replay its authentic issued record with
+`replay_captured_resident_graph()`. For an invalidated resident binding, call
+`retire_resident_graph_capture()`, then
+`renew_resident_graph_capture()` to produce its fresh `READY` lifecycle. Use
+`close_resident_graph_capture()` for ordered teardown before closing the
+resident session.
 
 Checkpoint restart and terminal closure require a fresh session, resource and
 array identities, qualification, setup, and capture. Restart restores resident
@@ -120,7 +136,8 @@ pytest particula/execution/tests/captured_full_loop_test.py -q \
 mkdocs build --strict
 ```
 
-Relevant sources are [graph-capture lifecycle tests](../../particula/execution/tests/graph_capture_test.py),
-[captured full-loop tests](../../particula/execution/tests/captured_full_loop_test.py),
-[this runbook contract](../../particula/tests/gpu_graph_capture_runbook_docs_test.py),
-and the [P1 documentation contract](../../particula/tests/gpu_resident_graph_capture_docs_test.py).
+Relevant repository sources are
+`particula/execution/tests/graph_capture_test.py`,
+`particula/execution/tests/captured_full_loop_test.py`,
+`particula/tests/gpu_graph_capture_runbook_docs_test.py`, and
+`particula/tests/gpu_resident_graph_capture_docs_test.py`.
