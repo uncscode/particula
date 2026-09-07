@@ -11,7 +11,7 @@
   deterministic teardown.
 - [x] Demonstrate a structural incompatibility rejection and fresh explicit
   recapture without reusing the retired native handle.
-- [ ] Write `docs/Features/gpu_graph_capture.md` with setup/replay/teardown
+- [x] Write `docs/Features/gpu_graph_capture.md` with setup/replay/teardown
   procedures, ownership table, state machine, trigger matrix, failure recovery,
   clean-skip policy, limitations, and exact commands.
 
@@ -31,7 +31,7 @@
 - [ ] Accept only committed normalized E8-F6/E8-F7 artifacts whose schema,
   source revision, workload IDs, provenance, and SHA-256 match the closeout
   manifest; reject latest-path selection and manually copied summary values.
-- [ ] Create `docs/Features/Roadmap/graph-capture-closeout.md` and leave status
+- [x] Create `docs/Features/Roadmap/graph-capture-closeout.md` and leave status
   unshipped whenever any required row is failed, unavailable, or stale.
 - [ ] Reconcile E8 parent child labels with the orchestrator assignment: E8-F7
   owns profiling and E8-F8 owns example/runbook/closeout.
@@ -42,7 +42,7 @@
 
 - [x] Add `particula/tests/gpu_resident_graph_capture_docs_test.py` for example
   sequence, concrete imports, lifecycle, limitations, and unsupported behavior.
-- [ ] Add `particula/tests/gpu_graph_capture_closeout_docs_test.py` for report
+- [x] Add `particula/tests/gpu_graph_capture_closeout_docs_test.py` for report
   schema, required rows, exact commands, evidence links, and fail-closed status.
 - [x] Add CUDA-gated example execution coverage that never substitutes Warp CPU
   for capture evidence and cleanly skips only recognized capability absence.

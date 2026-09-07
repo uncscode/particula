@@ -75,23 +75,23 @@ metadata only.
 
 | ID | Required evidence | Final revision | Designated device | Status | Evidence / blocker |
 | --- | --- | --- | --- | --- | --- |
-| H1 | Qualified capture/replay with no replay-time allocation, host transfer, or bulk synchronization | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2, C6; F2/F3 incomplete; A1 |
-| H2 | Deterministic rejection or explicit recapture for structural changes | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2; F2/F3 incomplete; A1 |
-| H3 | CPU, uncaptured Warp, and captured CUDA parity plus tight concentration-weighted conservation | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2, C6; F2/F3 incomplete; A1 |
-| H4 | Persistent nonaliasing RNG continuation, reset, and restart behavior | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2; F2/F3 incomplete; A1 |
+| H1 | Qualified capture/replay with no replay-time allocation, host transfer, or bulk synchronization | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2, C7; E8-F2 incomplete; A1 |
+| H2 | Deterministic rejection or explicit recapture for structural changes | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2; E8-F2 incomplete; A1 |
+| H3 | CPU, uncaptured Warp, and captured CUDA parity plus tight concentration-weighted conservation | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2, C7; E8-F2 incomplete; A1 |
+| H4 | Persistent nonaliasing RNG continuation, reset, and restart behavior | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2; E8-F2 incomplete; A1 |
 | H5 | Co-located tests and configured `>=80%` coverage | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C4; frozen targets and aggregate gate unavailable |
-| H6 | 1/10/100/1000-box scaling evidence or explicit unavailable rows | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C7; F6 artifact unavailable; A1 |
-| H7 | Small/medium captured-versus-uncaptured launch-overhead provenance | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C7; F6 artifact unavailable; A1 |
-| H8 | Logical memory model and observed peak-memory comparison | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C7; F6 artifact unavailable; A1 |
-| H9 | Nsight occupancy/memory-access evidence and bounded follow-up | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; F7 artifact unavailable; A2 |
-| H10 | Example/runbook/limitations and strict MkDocs result | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C5; final closeout output unavailable |
-| H11 | Exact closeout command matrix and literal results before promotion | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C1–C8; literal results unavailable |
+| H6 | 1/10/100/1000-box scaling evidence or explicit unavailable rows | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; F6 artifact unavailable; A1 |
+| H7 | Small/medium captured-versus-uncaptured launch-overhead provenance | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; F6 artifact unavailable; A1 |
+| H8 | Logical memory model and observed peak-memory comparison | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; F6 artifact unavailable; A1 |
+| H9 | Nsight occupancy/memory-access evidence and bounded follow-up | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C9; F7 artifact unavailable; A2 |
+| H10 | Example/runbook/limitations and strict MkDocs result | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C5, C6; final closeout output unavailable |
+| H11 | Exact closeout command matrix and literal results before promotion | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C1–C9; literal results unavailable |
 
 ## Command ledger
 
-Rows C1–C5 are validation commands. Focused rows are assertion-only, not
-coverage evidence; C4 is this record's sole repository coverage command.
-Rows C6–C8 are opt-in, availability-only native-CUDA evidence:
+Rows C1–C6 are validation commands. Focused rows are assertion-only, not
+coverage evidence; C5 is this record's sole repository coverage command.
+Rows C7–C9 are opt-in, availability-only native-CUDA evidence:
 pass-or-clean-skip is not required measured evidence and cannot discharge
 H1–H9.
 
@@ -131,20 +131,27 @@ NOT RUN — output must be pasted verbatim after execution
 ```
 
 ### C6
-`pytest particula/execution/tests/captured_full_loop_test.py -q -m "warp and cuda" --no-cov`
+`pytest particula/tests/gpu_graph_capture_runbook_docs_test.py -q --no-cov`
 
 ```text
 NOT RUN — output must be pasted verbatim after execution
 ```
 
 ### C7
-`pytest particula/gpu/tests/benchmark_test.py --benchmark -k resident -v -s --no-cov`
+`pytest particula/execution/tests/captured_full_loop_test.py -q -m "warp and cuda" --no-cov`
 
 ```text
 NOT RUN — output must be pasted verbatim after execution
 ```
 
 ### C8
+`pytest particula/gpu/tests/benchmark_test.py --benchmark -k resident -v -s --no-cov`
+
+```text
+NOT RUN — output must be pasted verbatim after execution
+```
+
+### C9
 `pytest particula/gpu/tests/profiling_smoke_test.py --benchmark -q --no-cov`
 
 ```text
@@ -166,11 +173,12 @@ and copied summaries.
 
 ## Blockers and promotion rule
 
-Absent reviewed F6/F7 CUDA artifacts and outstanding F2/F3 work block this
-record. Promotion requires H1–H11 `PASS` on one final revision and designated
-qualified CUDA device, reviewed safe artifacts where applicable, all literal
-command outputs, and frozen coverage targets/gate. Otherwise retain
-`UNSHIPPED/BLOCKED`.
+Absent reviewed F6/F7 CUDA artifacts and outstanding E8-F2 work block this
+record. E8-F2 still has incomplete prepared-enqueue implementation work;
+E8-F3 implementation metadata is complete and is not an implementation blocker.
+Promotion requires H1–H11 `PASS` on one final revision and designated qualified
+CUDA device, reviewed safe artifacts where applicable, all literal command
+outputs, and frozen coverage targets/gate. Otherwise retain `UNSHIPPED/BLOCKED`.
 
 A later evidence update must preserve row and command ordering, validate
 manifest consistency before changing statuses, and remain blocked if any

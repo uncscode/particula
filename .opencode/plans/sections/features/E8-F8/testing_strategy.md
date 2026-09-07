@@ -19,10 +19,12 @@ that must pass or cleanly skip and never falls back to CPU.
   validates the runbook's ordered recapture triggers, mutable-value
   non-triggers, lifecycle states, limitations, failure procedures,
   reproduction commands, relative links, and stdlib-only imports.
-- **P3:** Add `particula/tests/gpu_graph_capture_closeout_docs_test.py` to parse
-  the closeout schema, map every E8 success criterion to evidence, require
-  literal results and target derivation, distinguish required from optional
-  rows, and reject a Shipped status with missing/failed evidence.
+- **P3 (implemented, #1597):**
+  `particula/tests/gpu_graph_capture_closeout_docs_test.py` hardware-freely
+  validates the closeout schema, maps every E8 success criterion to evidence,
+  requires literal results and target derivation, distinguishes required from
+  optional rows, and rejects promotion when evidence is missing or failed. The
+  committed closeout disposition remains `UNSHIPPED/BLOCKED`.
 - **P4:** Validate roadmap/index/AGENTS cross-references, T7/T8 reconciliation,
   E8 plan consistency, and the strict MkDocs build.
 

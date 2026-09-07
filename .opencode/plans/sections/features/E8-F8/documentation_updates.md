@@ -8,9 +8,10 @@
 - Completed P2 (#1596): Added `docs/Features/gpu_graph_capture.md` as the
   operator runbook covering setup, ownership, RNG, replay, synchronization,
   invalidation, recapture, teardown, failures, limitations, and clean skips.
-- Create `docs/Features/Roadmap/graph-capture-closeout.md` with dated
-  environment metadata, exact commands, literal results, artifact links,
-  changed executable targets, metric disposition, and final blockers/status.
+- Completed P3 (#1597): Added
+  `docs/Features/Roadmap/graph-capture-closeout.md` with dated environment
+  metadata, exact commands, literal-result placeholders, artifact provenance,
+  changed-target disposition, and fail-closed blockers/status.
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` to replace future-tense
   Epic H statements only where supported, preserve unsupported limitations,
   publish the exit-bar disposition, and link the example/runbook/evidence.
@@ -27,5 +28,9 @@
   smoke coverage in `particula/tests/gpu_resident_graph_capture_docs_test.py`.
 - Completed P2 (#1596): Added hardware-free runbook contract coverage in
   `particula/tests/gpu_graph_capture_runbook_docs_test.py`.
-- P3--P4 closeout documentation updates remain pending; no closeout report,
-  roadmap/status update, or parent-plan reconciliation was completed.
+- Completed P3 (#1597): Added
+  `docs/Features/Roadmap/graph-capture-closeout.md` and its hardware-free
+  contract in `particula/tests/gpu_graph_capture_closeout_docs_test.py`.
+  The record is explicitly `UNSHIPPED/BLOCKED`: it captures unavailable
+  E8-F2/E8-F3/F6/F7 closeout evidence without promoting Epic H.
+- P4 roadmap/status updates and parent-plan reconciliation remain pending.
