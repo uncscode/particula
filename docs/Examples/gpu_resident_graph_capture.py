@@ -75,10 +75,12 @@ def _disabled_output() -> list[str]:
 
 
 def _qualified_native_cuda() -> str | None:
-    """Find the first capture-capable native CUDA device without setup work.
+    """Find the first native CUDA device without setup work.
 
-    Only a missing Warp module, no native CUDA device, or missing capture API is
-    treated as unavailable. Other import, loader, or probe failures propagate.
+    Capability qualification is deliberately delegated to the canonical graph
+    capture resolver after the opaque device declaration is constructed. Only a
+    missing Warp module or no native CUDA device is treated as unavailable.
+    Other import, loader, or enumeration failures propagate.
 
     Returns:
         The selected opaque native device name, or ``None`` when the explicit
@@ -101,16 +103,11 @@ def _qualified_native_cuda() -> str | None:
         (
             str(device)
             for device in native_devices
-            if str(device).startswith("cuda")
+            if bool(getattr(device, "is_cuda", False))
         ),
         None,
     )
     if native is None:
-        return None
-    if not all(
-        callable(getattr(warp, name, None))
-        for name in ("capture_begin", "capture_end", "capture_launch")
-    ):
         return None
     return native
 
@@ -140,6 +137,19 @@ def _load_enabled_runtime() -> SimpleNamespace:
     return SimpleNamespace(**loaded)
 
 
+def _load_capability_runtime() -> SimpleNamespace:
+    """Load only modules required for canonical capability qualification."""
+    names = (
+        "warp",
+        "particula.execution",
+        "particula.execution.graph_capture",
+    )
+    loaded = {
+        name.rsplit(".", 1)[-1]: importlib.import_module(name) for name in names
+    }
+    return SimpleNamespace(**loaded)
+
+
 class _WarpNativeCaptureAdapter:
     """Expose only the selected Warp native capture vocabulary.
 
@@ -149,16 +159,16 @@ class _WarpNativeCaptureAdapter:
         _graph_capture: Concrete graph-capture module providing callables.
     """
 
-    def __init__(self, warp: Any, native: str, graph_capture: Any) -> None:
+    def __init__(self, warp: Any, device: Any, graph_capture: Any) -> None:
         """Bind Warp and graph-capture objects for one native device.
 
         Args:
             warp: Lazily imported Warp module.
-            native: Opaque native CUDA device selected during preflight.
+            device: Exact CUDA device selected during preflight.
             graph_capture: Concrete graph-capture module.
         """
         self._warp = warp
-        self._native = native
+        self._device = device
         self._graph_capture = graph_capture
 
     def runtime_available(self) -> bool:
@@ -179,7 +189,7 @@ class _WarpNativeCaptureAdapter:
         Returns:
             Whether ``device`` has the exact preflight-selected native name.
         """
-        return device.native == self._native
+        return device is self._device
 
     def capture_api_available(self, device: Any) -> bool:
         """Accept APIs only for the selected native CUDA device.
@@ -190,7 +200,7 @@ class _WarpNativeCaptureAdapter:
         Returns:
             Whether ``device`` has the exact preflight-selected native name.
         """
-        return device.native == self._native
+        return device is self._device
 
     def capture_callables(self, device: Any) -> Any:
         """Return direct Warp capture callables and opaque-handle cleanup.
@@ -210,10 +220,13 @@ class _WarpNativeCaptureAdapter:
             )
 
         def release(handle: object) -> None:
-            """Release an opaque native handle when it exposes cleanup."""
+            """Release an opaque native handle or reject unsupported cleanup."""
             destroy = getattr(handle, "destroy", None)
-            if callable(destroy):
-                destroy()
+            if not callable(destroy):
+                raise TypeError(
+                    "native capture handle must provide callable destroy()."
+                )
+            destroy()
 
         def abort() -> object:
             """End incomplete capture and return its cleanup handle."""
@@ -227,6 +240,23 @@ class _WarpNativeCaptureAdapter:
             release,
             abort,
         )
+
+
+def _resolve_exact_capability(
+    graph_capture: Any, device: Any, adapter: Any
+) -> Any:
+    """Resolve and validate capability for the exact selected device."""
+    capability = graph_capture.resolve_graph_capture_capability(device, adapter)
+    if capability.device is not device:
+        raise RuntimeError(
+            "graph-capture capability resolved for a different device."
+        )
+    if (
+        capability.availability
+        is not graph_capture.GraphCaptureAvailability.AVAILABLE
+    ):
+        raise RuntimeError("selected CUDA device is not capture-capable.")
+    return capability
 
 
 def _build_cpu_state() -> tuple[ParticleData, GasData, EnvironmentData]:
@@ -287,9 +317,9 @@ def _compose_request(
         )
 
     communication.CommunicationMap = graph_capture_map
-    capture_runtime = SimpleNamespace(
-        **vars(resident_runtime), communication=communication
-    )
+    capture_runtime_values = vars(resident_runtime).copy()
+    capture_runtime_values["communication"] = communication
+    capture_runtime = SimpleNamespace(**capture_runtime_values)
     request, gas_output, saturation_output = runtime.resident_example._request(
         capture_runtime,
         session,
@@ -346,9 +376,18 @@ def run_example() -> ExampleRun:  # noqa: C901
     native = _qualified_native_cuda()
     if native is None:
         return ExampleRun(output=_disabled_output())
+    capability_runtime = _load_capability_runtime()
+    execution = capability_runtime.execution
+    graph_capture = capability_runtime.graph_capture
+    device = execution.Device(execution.Backend.WARP, native)
+    capability_adapter = _WarpNativeCaptureAdapter(
+        capability_runtime.warp, device, graph_capture
+    )
+    capability = _resolve_exact_capability(
+        graph_capture, device, capability_adapter
+    )
     runtime = _load_enabled_runtime()
-    execution = runtime.execution
-    graph_capture: Any | None = runtime.graph_capture
+    graph_capture = runtime.graph_capture
     device = execution.Device(execution.Backend.WARP, native)
     particles, gas, environment = _build_cpu_state()
     initial_total_mass = particles.volume[:, None] * (
@@ -380,10 +419,9 @@ def run_example() -> ExampleRun:  # noqa: C901
         signature = graph_capture.create_resident_graph_capture_signature(
             request
         )
+        adapter = _WarpNativeCaptureAdapter(runtime.warp, device, graph_capture)
         lifecycle = graph_capture.create_graph_capture_lifecycle(
-            graph_capture.GraphCaptureCapability(
-                device, graph_capture.GraphCaptureAvailability.AVAILABLE
-            ),
+            capability,
             signature,
         )
         binding = graph_capture.ResidentGraphCaptureBinding(
@@ -397,7 +435,6 @@ def run_example() -> ExampleRun:  # noqa: C901
         capture_set = registry.validate_capture_resource_set(
             request.capture_resource_requirements
         )
-        adapter = _WarpNativeCaptureAdapter(runtime.warp, native, graph_capture)
         qualification = graph_capture.qualify_prepared_resident_graph_capture(
             binding, prepared, capture_set, adapter
         )
@@ -444,7 +481,7 @@ def run_example() -> ExampleRun:  # noqa: C901
         renewed_capture = graph_capture.capture_prepared_resident_graph(
             renewed_qualification
         )
-        return ExampleRun(
+        result = ExampleRun(
             output=[
                 "Qualified native CUDA capture completed without fallback.",
                 "Captured once, replayed twice, then explicitly retired and "
@@ -466,8 +503,17 @@ def run_example() -> ExampleRun:  # noqa: C901
             renewed=True,
             synchronized=True,
         )
-    finally:
+    except BaseException as primary_error:
+        try:
+            _close_enabled_binding(
+                graph_capture, binding, session, registry, guard
+            )
+        except BaseException as cleanup_error:
+            raise primary_error from cleanup_error
+        raise
+    else:
         _close_enabled_binding(graph_capture, binding, session, registry, guard)
+        return result
 
 
 def main() -> None:

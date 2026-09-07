@@ -87,7 +87,9 @@ HEADINGS = (
 COMMANDS = (
     "pytest particula/tests/gpu_graph_capture_closeout_docs_test.py -q --no-cov",
     "pytest particula/execution/tests/graph_capture_test.py "
-    "particula/execution/tests/captured_full_loop_test.py -q --no-cov",
+    "particula/execution/tests/captured_full_loop_test.py "
+    "particula/execution/tests/rng_invariance_test.py "
+    "particula/execution/tests/checkpoint_test.py -q --no-cov",
     ".opencode/tools/run_linters.py",
     ".opencode/tools/run_pytest.py",
     "mkdocs build --strict",
@@ -106,6 +108,8 @@ BLOCKING_STATUSES = {
     "CLEAN-SKIP",
 }
 STDLIB_IMPORTS = {"__future__", "ast", "pathlib", "re"}
+COMMAND_ID_PATTERN = re.compile(r"(?<![A-Za-z0-9])C[1-9](?![A-Za-z0-9])")
+ARTIFACT_ID_PATTERN = re.compile(r"(?<![A-Za-z0-9])A[12](?![A-Za-z0-9])")
 
 
 def _normalized(content: str) -> str:
@@ -186,7 +190,7 @@ def _has_command_reference(row: str) -> bool:
     Returns:
         ``True`` when the row contains a C1--C9 command-ledger identifier.
     """
-    return any(f"C{number}" in row for number in range(1, 10))
+    return COMMAND_ID_PATTERN.search(row) is not None
 
 
 def _has_artifact_reference(row: str) -> bool:
@@ -198,7 +202,7 @@ def _has_artifact_reference(row: str) -> bool:
     Returns:
         ``True`` when the row contains an A1 or A2 artifact-ledger identifier.
     """
-    return any(f"A{number}" in row for number in range(1, 3))
+    return ARTIFACT_ID_PATTERN.search(row) is not None
 
 
 def _parse_evidence_matrix(matrix: str) -> dict[str, dict[str, str]]:
@@ -270,7 +274,11 @@ def _valid_provenance_filename(
         or filename.startswith(("/", "\\"))
         or "\\" in filename
         or re.match(r"^[A-Za-z]:", filename) is not None
+        or _is_nonlocal_markdown_target(filename)
     ):
+        return False
+    parts = filename.split("/")
+    if any(part in {"", ".", ".."} for part in parts):
         return False
     if any(part in filename.lower() for part in unsafe):
         return False
@@ -438,6 +446,10 @@ def test_evidence_matrix_fails_closed_and_traces_all_criteria() -> None:
     assert _row_permits_promotion(synthetic_rows[0])
     assert not _row_permits_promotion(synthetic_rows[1])
     assert not _all_required_rows_pass(synthetic_rows)
+    assert not _has_command_reference("C10 only")
+    assert _has_command_reference("C1; C10")
+    assert not _has_artifact_reference("A10 only")
+    assert _has_artifact_reference("A1; A10")
 
 
 def test_command_ledger_preserves_order_and_literal_output_placeholders() -> (
@@ -495,12 +507,17 @@ def test_provenance_rules_and_unshipped_state_are_safe() -> None:
         ("symlink/record.json", "a" * 64, "12"),
         ("raw/record.json", "a" * 64, "12"),
         ("copy-summary.json", "a" * 64, "12"),
+        ("https://example.com/record.json", "a" * 64, "12"),
+        ("file:///record.json", "a" * 64, "12"),
+        ("records/./record.json", "a" * 64, "12"),
         ("record.json", "A" * 64, "12"),
         ("record.json", "a" * 64, "0"),
     ):
         assert not _valid_provenance_filename(filename, digest, size)
     assert "Disposition: UNSHIPPED/BLOCKED" in content
-    assert "outstanding E8-F2 work block this" in content
+    assert "outstanding E8-F2 and E8-F3 work block" in content
+    assert "E8-F3 remains `In Progress`" in content
+    assert "P2 and P5 phases are `Not Started`" in content
     assert "outstanding F2/F3 work block this" not in content
     assert "UNAVAILABLE — no designated qualified CUDA device" in content
     normalized_content = _normalized(content)

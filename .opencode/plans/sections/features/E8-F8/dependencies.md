@@ -35,10 +35,10 @@ list before running the command matrix. P4 is last and may mark Epic H Shipped
 only when every required P3 row passes; otherwise it publishes blockers and
 leaves the roadmap and plan Active.
 
-The delivered P3 ledger is explicitly non-promoting. E8-F2, E8-F6, E8-F7/T7,
+The delivered P3 ledger is explicitly non-promoting. E8-F2, E8-F3, E8-F6,
+E8-F7/T7,
 and all H1--H11 final-revision rows on a single designated qualified CUDA device
-are still required. P4 documentation reconciliation is implemented after focused
-closeout/runbook contracts passed (16 passed). Active split-plan validation and
-`mkdocs build --strict` remain required but unavailable and pending in this
-worktree. These documentation results neither satisfy the CUDA rows nor promote
+are still required. P4 documentation reconciliation remains in progress until
+focused, active split-plan, and strict MkDocs evidence is consistently recorded.
+These documentation results neither satisfy the CUDA rows nor promote
 Epic H.

@@ -52,9 +52,9 @@ identities, explicit teardown, or terminal session/capture lifecycle do.
   before closing the graph binding and session.
 - **Workflow hooks:** P1 and P2 turn E8-F1--E8-F4 contracts into executable
   guidance. P3 consumes E8-F5--E8-F7 artifacts and runs closeout commands. P4
-  reconciles the Epic H roadmap and E8 plan after focused closeout/runbook
-  contracts pass (16 passed), `mkdocs build --strict` passes (exit 0), and
-  active split-plan validation is recorded. P4 is non-promoting and does not
+  reconciles the Epic H roadmap and E8 plan after focused, strict MkDocs, and
+  active split-plan validation is consistently recorded. P4 is non-promoting
+  and does not
   treat missing CUDA evidence as passing.
 - **Failure policy:** Known unavailable CUDA/capture capability may cleanly skip
   optional hardware rows. Missing or failed required rows, missing literal

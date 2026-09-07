@@ -34,11 +34,10 @@
   contract in `particula/tests/gpu_graph_capture_closeout_docs_test.py`.
   The record is explicitly `UNSHIPPED/BLOCKED`: it captures unavailable
   E8-F2/E8-F3/F6/F7 closeout evidence without promoting Epic H.
-- Completed P4 (#1598): Reconciled durable roadmap/status and E8 plan content
-  for T7/T8 ownership. Focused closeout/runbook documentation contracts passed
-  (16 passed). Active split-plan validation and `mkdocs build --strict` remain
-  required but unavailable and pending in this worktree. P4 is documentation-
-  only and non-promoting: P3 remains `UNSHIPPED/BLOCKED`, while E8-F2, E8-F6,
+- P4 (#1598) remains in progress while durable roadmap/status and E8 plan
+  content are reconciled for T7/T8 ownership. Focused, active split-plan, and
+  strict MkDocs evidence must be recorded consistently. P4 is documentation-
+  only and non-promoting: P3 remains `UNSHIPPED/BLOCKED`, while E8-F2, E8-F3, E8-F6,
   E8-F7/T7, and
   designated-device final-revision H1--H11 evidence remain blockers. No CUDA
   evidence is claimed.
