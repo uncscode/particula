@@ -286,6 +286,10 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
             events.append("invalidated")
             raise ValueError("structural drift")
 
+    def resolve_capability(device: Any, _adapter: Any) -> Any:
+        events.append(f"resolve-{device.native}")
+        return SimpleNamespace(device=device, availability="available")
+
     graph_capture = SimpleNamespace(
         GraphCaptureAvailability=SimpleNamespace(AVAILABLE="available"),
         GraphCaptureLifecycleState=SimpleNamespace(
@@ -296,10 +300,7 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
             "attach"
         ),
         create_resident_graph_capture_signature=lambda _request: object(),
-        resolve_graph_capture_capability=lambda device, adapter: (
-            events.append(f"resolve-{device.native}")
-            or SimpleNamespace(device=device, availability="available")
-        ),
+        resolve_graph_capture_capability=resolve_capability,
         create_graph_capture_lifecycle=lambda *_args: object(),
         qualify_prepared_resident_graph_capture=lambda *_args: object(),
         capture_prepared_resident_graph=lambda _qualification: next(captures),
