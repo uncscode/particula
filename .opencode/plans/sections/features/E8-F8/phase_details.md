@@ -25,14 +25,19 @@
     mutable-value non-triggers, lifecycle failures, checkpoint/RNG boundaries,
     literal commands and links, and stdlib-only imports.
 
-- [ ] **E8-F8-P3:** Epic closeout evidence matrix and publication checks
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Record dated environment metadata, exact executable targets, literal
-    required command results, artifact links, and pass/block disposition.
-  - Files: `docs/Features/Roadmap/graph-capture-closeout.md`,
-    `particula/tests/gpu_graph_capture_closeout_docs_test.py`
-  - Tests: Evidence schema/completeness, command ordering, coverage-target
-    derivation, optional-CUDA labeling, and fail-closed missing-row checks.
+- [x] **E8-F8-P3:** Epic closeout evidence matrix and publication checks
+  - Issue: #1597 | Size: S | Status: Implemented 2026-09-07
+  - Delivered files: `docs/Features/Roadmap/graph-capture-closeout.md` and
+    `particula/tests/gpu_graph_capture_closeout_docs_test.py`.
+  - Delivered behavior: records a fail-closed `UNSHIPPED/BLOCKED` closeout
+    disposition, unavailable final-revision/device/artifact evidence, ordered
+    command and provenance ledgers, and the H1--H11 promotion requirements.
+    It does not promote Epic H or treat missing E8-F2/E8-F3/F6/F7 evidence as
+    passing evidence.
+  - Tests added: hardware-free documentation contract coverage for the closeout
+    schema, evidence traceability, command ordering, coverage-target
+    derivation, optional-CUDA labeling, unsafe provenance rejection, and
+    fail-closed missing-row checks.
 
 - [ ] **E8-F8-P4:** Roadmap and development documentation closeout
   - Issue: TBD | Size: XS | Status: Not Started

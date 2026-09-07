@@ -47,7 +47,17 @@ profiling outputs from E8-F1 through E8-F7; it does not redesign capture.
   runbook contract covering lifecycle, recapture triggers and non-triggers,
   failure boundaries, limitations, commands, links, and stdlib-only imports.
 
-P3--P4 evidence-matrix and roadmap-closeout work remains pending.
+## Delivered in P3 (#1597)
+
+- `docs/Features/Roadmap/graph-capture-closeout.md` records the dated,
+  fail-closed closeout ledger as `UNSHIPPED/BLOCKED`, with unavailable evidence
+  and promotion requirements for H1--H11.
+- `particula/tests/gpu_graph_capture_closeout_docs_test.py` validates the
+  closeout schema and evidence traceability without requiring CUDA, Warp,
+  artifacts, Git history, or plan-file reads.
+
+P4 roadmap-closeout work remains pending. P3 records blocked evidence only and
+does not promote Epic H.
 
 ## Out of Scope
 
