@@ -25,8 +25,12 @@ that must pass or cleanly skip and never falls back to CPU.
   requires literal results and target derivation, distinguishes required from
   optional rows, and rejects promotion when evidence is missing or failed. The
   committed closeout disposition remains `UNSHIPPED/BLOCKED`.
-- **P4:** Validate roadmap/index/AGENTS cross-references, T7/T8 reconciliation,
-  E8 plan consistency, and the strict MkDocs build.
+- **P4 (implemented, #1598; non-promoting):** Reconciled
+  roadmap/index/AGENTS cross-references, T7/T8 ownership, and E8 plan
+  consistency. Focused closeout/runbook documentation contracts passed (16
+  passed), `mkdocs build --strict` passed (exit 0), and active split-plan
+  validation is required and recorded for this worktree. These documentation
+  checks do not provide CUDA evidence or promote Epic H.
 
 ## Focused Development Checks (Coverage Disabled)
 
@@ -62,3 +66,7 @@ the untargeted full-package run.
 Record optional CUDA commands separately with device qualification. A clean
 skip is availability evidence only and cannot satisfy an exit criterion that
 requires measured CUDA capture, scaling, memory, or profiling results.
+
+P3's fail-closed ledger tests are non-promoting evidence. Completion still
+requires E8-F2, E8-F6, E8-F7/T7, and all H1--H11 final-revision rows on the one
+designated qualified CUDA device.

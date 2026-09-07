@@ -72,7 +72,14 @@ unavailable and unmeasured; see
 [resident benchmark and memory-budget record](docs/Features/resident_benchmark_memory_budget.md).
 
 E8-F7/T7 owns graph-capture profiling and machine-bounded recommendations; E8-F8
-is limited to the example, limitations, and closeout. The
+owns the [native-CUDA example](docs/Examples/gpu_resident_graph_capture.py),
+[operator runbook](docs/Features/gpu_graph_capture.md), limitations,
+documentation reconciliation, and the
+[P3 closeout record](docs/Features/Roadmap/graph-capture-closeout.md). The
+closeout is the sole P3 status/evidence authority and remains
+`UNSHIPPED/BLOCKED` until its designated-device final-revision gate passes. The
+[canonical data-oriented GPU roadmap](docs/Features/Roadmap/data-oriented-gpu.md)
+records Epic H's active/unshipped delivery tracks and blockers. The
 [GPU graph-capture profiling record](docs/Features/gpu_graph_capture_performance.md)
 freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
 gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence

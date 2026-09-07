@@ -41,7 +41,7 @@ documentation conventions.
 | 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Shipped | E5 |
 | 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Shipped | E6 |
 | 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Shipped | E7 |
-| 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Active | not scheduled |
+| 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Active / unshipped | E8 |
 | 9 | [Epic I: Differentiability and Global Optimization](#epic-i-differentiability-and-global-optimization) | Pending | not scheduled |
 
 The former suggested milestones are absorbed into the per-epic exit bars:
@@ -57,6 +57,9 @@ Quick links:
 - [Authoritative field ownership decisions](#authoritative-field-ownership-decisions)
 - [Shipped foundation guide](../data-containers-and-gpu-foundations.md)
 - [Runnable Data Containers example](../../Examples/Data_Containers/index.md)
+- [Native-CUDA resident graph-capture example](../../Examples/gpu_resident_graph_capture.py)
+- [Resident graph-capture operator runbook](../gpu_graph_capture.md)
+- [Graph-capture closeout record](graph-capture-closeout.md)
 - [Final downstream handoff map for sibling features](#final-downstream-handoff-map-for-sibling-features)
 
 ## Motivation and Target Workloads
@@ -1682,7 +1685,10 @@ deferred to the later Epic H tracks and Epic I.
 
 ## Epic H: Graph Capture and Performance
 
-Status: active. E8-F1, E8-F2 P1--P6/P8, and E8-F4 P1--P5 are shipped.
+Status: active and unshipped. E8-F1, E8-F2 P1--P6/P8, and E8-F4 P1--P5
+deliver bounded capture/replay and prepared-path tracks; they do not satisfy
+Epic H's final evidence gate. E8-F2 completion, E8-F6 scaling/memory evidence,
+and E8-F7/T7 profiling and machine-bounded recommendations remain blockers.
 E8-F4 keeps opaque native handles in private LIVE/RELEASING/RELEASED
 provenance. Per-record launch leases prevent release races, native callbacks
 run outside the global provenance lock, and the shared session lifecycle
@@ -1698,7 +1704,12 @@ freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
 gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
 with no CPU or Warp-CPU fallback. No reviewed normalized artifact or manifest
 is checked in, so profiling results and recommendations are unavailable and
-unshipped. E8-F8 is limited to the example, limitations, and closeout.
+unshipped. E8-F8 owns the [native-CUDA example](../../Examples/gpu_resident_graph_capture.py),
+[operator runbook](../gpu_graph_capture.md), limitations, documentation
+reconciliation, and [closeout record](graph-capture-closeout.md). The closeout
+record is the sole P3 status and evidence authority: unavailable, stale, failed,
+missing, or clean-skipped evidence remains `UNSHIPPED/BLOCKED` and never
+promotes Epic H.
 
 ### E8-F1 shipped contract
 

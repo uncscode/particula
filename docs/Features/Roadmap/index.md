@@ -19,10 +19,16 @@ schedule.
   resident scheduling, communication, checkpoint/restart, diagnostics, and RNG
   contracts from
   [Epic G](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation).
-- **Graph capture and performance**: Begin active
-  [Epic H](data-oriented-gpu.md#epic-h-graph-capture-and-performance) with an
-  ADW plan and feature decomposition, then address capture boundaries,
-  preallocated buffers, scaling benchmarks, profiling, and memory budgets.
+- **Graph capture and performance**: Maintain active, unshipped
+  [Epic H](data-oriented-gpu.md#epic-h-graph-capture-and-performance)'s bounded
+  capture/replay and documentation tracks. Use the [native-CUDA
+  example](../../Examples/gpu_resident_graph_capture.py), [operator
+  runbook](../gpu_graph_capture.md), and [closeout
+  record](graph-capture-closeout.md). E8-F7/T7 owns profiling and
+  machine-bounded recommendations; E8-F8 owns the example, runbook,
+  limitations, and closeout. The closeout remains the sole P3 evidence authority
+  while E8-F2, E8-F6, and E8-F7/T7 blockers remain; no CPU or Warp-CPU fallback
+  is provided.
 - **Documentation and examples**: Expand practical examples that connect feature
   guides, theory pages, and runnable notebooks.
 
@@ -222,9 +228,14 @@ E5, E6, E7, and all of their feature plans are shipped. Epic H is active next.
 ### Active
 
 - [Epic H: Graph Capture and Performance](data-oriented-gpu.md#epic-h-graph-capture-and-performance)
-  follows shipped Epic G. Its ADW plan is not yet scheduled; the first step is
-  to create the E8 feature decomposition and define graph-capture, benchmark,
-  profiling, and memory-budget boundaries.
+  follows shipped Epic G and remains active/unshipped. E8 delivers bounded
+  capture/replay and documentation tracks, but E8-F2 completion, E8-F6
+  scaling/memory evidence, E8-F7/T7 profiling and machine-bounded
+  recommendations, and the final designated-device evidence gate remain
+  blockers. E8-F8 owns the example, runbook, limitations, and closeout, with no
+  CPU or Warp-CPU fallback. The [native-CUDA example](../../Examples/gpu_resident_graph_capture.py),
+  [operator runbook](../gpu_graph_capture.md), and [P3 closeout record](graph-capture-closeout.md)
+  are the discoverable references; the closeout alone owns P3 status/evidence.
 
 ### Pending
 

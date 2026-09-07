@@ -13,8 +13,8 @@ must ship its own co-located unit and contract tests.
 | E8-F4 | Resident Graph Capture and Guarded Replay Lifecycle | Shipped | P1--P5 delivered; private handle provenance, guarded replay, teardown, and three-way validation are covered. |
 | E8-F5 | Captured Full-Loop Parity and Lifecycle Validation | Shipped | P1--P5 shipped; #1579 focused, coverage, documentation, and approved strict-equivalent worktree validation passed. |
 | E8-F6 | Multi-Box Scaling Benchmarks and Memory-Budget Evidence | Pending | Measure scaling and publish reproducible memory-budget evidence behind opt-in CUDA gates |
-| E8-F7 | CUDA Profiling and Machine-Bounded Performance Decisions | Pending | Record occupancy, memory access, and captured-versus-uncaptured launch overhead |
-| E8-F8 | Graph-Capture Example, Runbook, Limitations, and Closeout | Pending | Publish the runnable workflow and close the epic with literal evidence |
+| E8-F7 | CUDA Profiling and Machine-Bounded Performance Decisions | Pending | T7 owns native-CUDA profiling and machine-bounded recommendations; record occupancy, memory access, and captured-versus-uncaptured launch overhead. |
+| E8-F8 | Graph-Capture Example, Runbook, Limitations, and Closeout | In Progress | T8 owns the native-CUDA example, operator runbook, limitations, documentation reconciliation, and fail-closed closeout. P1--P4 are implemented; P4 focused closeout/runbook contracts passed (16 passed) and `mkdocs build --strict` passed (exit 0). E8-F8 and Epic H remain active/unshipped pending E8-F2, E8-F6, E8-F7/T7, and all designated-device final-revision H1--H11 evidence; no CUDA evidence is claimed. |
 
 ### Maintenance Tracks
 
