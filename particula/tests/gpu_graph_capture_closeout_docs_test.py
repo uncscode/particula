@@ -1,14 +1,15 @@
 """Validate hardware-free graph-capture closeout and discovery contracts.
 
-This documentation contract reads only the committed closeout record. It
-rejects incomplete, unsafe, or inferred promotion evidence without importing
-pytest, Warp, CUDA, artifact tooling, Git tooling, planning files, or runtime
-code.
+This documentation contract reads the committed closeout record and its scoped
+discovery surfaces. It rejects incomplete, unsafe, or inferred promotion
+evidence without importing pytest, Warp, CUDA, artifact tooling, Git tooling,
+planning files, or runtime code.
 """
 
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -22,6 +23,57 @@ DISCOVERY_PATHS = (
     ROOT / "docs/Features/Roadmap/index.md",
     ROOT / "docs/index.md",
     ROOT / "AGENTS.md",
+)
+DISCOVERY_LINKS = (
+    (
+        ROADMAP_PATH,
+        "../../Examples/gpu_resident_graph_capture.py",
+        EXAMPLE_PATH,
+    ),
+    (ROADMAP_PATH, "../gpu_graph_capture.md", RUNBOOK_PATH),
+    (ROADMAP_PATH, "graph-capture-closeout.md", RECORD_PATH),
+    (
+        ROOT / "docs/Features/Roadmap/index.md",
+        "../../Examples/gpu_resident_graph_capture.py",
+        EXAMPLE_PATH,
+    ),
+    (
+        ROOT / "docs/Features/Roadmap/index.md",
+        "../gpu_graph_capture.md",
+        RUNBOOK_PATH,
+    ),
+    (
+        ROOT / "docs/Features/Roadmap/index.md",
+        "graph-capture-closeout.md",
+        RECORD_PATH,
+    ),
+    (
+        ROOT / "docs/index.md",
+        "Examples/gpu_resident_graph_capture.py",
+        EXAMPLE_PATH,
+    ),
+    (ROOT / "docs/index.md", "Features/gpu_graph_capture.md", RUNBOOK_PATH),
+    (
+        ROOT / "docs/index.md",
+        "Features/Roadmap/graph-capture-closeout.md",
+        RECORD_PATH,
+    ),
+    (
+        ROOT / "AGENTS.md",
+        "docs/Examples/gpu_resident_graph_capture.py",
+        EXAMPLE_PATH,
+    ),
+    (ROOT / "AGENTS.md", "docs/Features/gpu_graph_capture.md", RUNBOOK_PATH),
+    (
+        ROOT / "AGENTS.md",
+        "docs/Features/Roadmap/graph-capture-closeout.md",
+        RECORD_PATH,
+    ),
+    (
+        ROOT / "AGENTS.md",
+        "docs/Features/Roadmap/data-oriented-gpu.md",
+        ROADMAP_PATH,
+    ),
 )
 HEADINGS = (
     "Scope and current disposition",
@@ -53,7 +105,7 @@ BLOCKING_STATUSES = {
     "UNAVAILABLE",
     "CLEAN-SKIP",
 }
-STDLIB_IMPORTS = {"__future__", "ast", "pathlib"}
+STDLIB_IMPORTS = {"__future__", "ast", "pathlib", "re"}
 
 
 def _normalized(content: str) -> str:
@@ -213,7 +265,12 @@ def _valid_provenance_filename(
         positive, and the digest is lowercase hexadecimal SHA-256.
     """
     unsafe = ("..", "latest", "symlink", "raw", "copy-summary")
-    if not filename or filename.startswith("/"):
+    if (
+        not filename
+        or filename.startswith(("/", "\\"))
+        or "\\" in filename
+        or re.match(r"^[A-Za-z]:", filename) is not None
+    ):
         return False
     if any(part in filename.lower() for part in unsafe):
         return False
@@ -221,6 +278,23 @@ def _valid_provenance_filename(
         return False
     return len(digest) == 64 and all(
         char in "0123456789abcdef" for char in digest
+    )
+
+
+def _markdown_destination(link_content: str) -> str:
+    """Extract a Markdown link destination without an optional title."""
+    link_content = link_content.strip()
+    if link_content.startswith("<"):
+        end = link_content.find(">")
+        return "" if end == -1 else link_content[1:end].strip()
+    return link_content.split(maxsplit=1)[0] if link_content else ""
+
+
+def _is_nonlocal_markdown_target(target: str) -> bool:
+    """Return whether a target is a URI or protocol-relative reference."""
+    return (
+        target.startswith("//")
+        or re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", target) is not None
     )
 
 
@@ -240,8 +314,9 @@ def _local_markdown_targets(content: str) -> list[str]:
         end = content.find(")", target_start)
         if end == -1:
             break
-        target = content[target_start:end].split("#", maxsplit=1)[0]
-        if target and not target.startswith(("http://", "https://")):
+        target = _markdown_destination(content[target_start:end])
+        target = target.split("#", maxsplit=1)[0]
+        if target and not _is_nonlocal_markdown_target(target):
             targets.append(target)
         cursor = end + 1
     return targets
@@ -255,7 +330,7 @@ def _resolve_local_markdown_target(
     """Resolve one local target to a regular file under an allowed root.
 
     Args:
-        target: Anchor-free relative Markdown target.
+        target: Relative Markdown target, optionally with an anchor or title.
         source: Document containing the target.
         allowed_root: Root that contains permitted resolved files.
 
@@ -265,24 +340,15 @@ def _resolve_local_markdown_target(
     Raises:
         AssertionError: If a target escapes, is missing, or is not a file.
     """
-    resolved = (source.parent / target.split("#", maxsplit=1)[0]).resolve()
+    target = _markdown_destination(target).split("#", maxsplit=1)[0]
+    assert target and not _is_nonlocal_markdown_target(target)
+    assert not target.startswith(("/", "\\"))
+    assert "\\" not in target
+    assert re.match(r"^[A-Za-z]:", target) is None
+    resolved = (source.parent / target).resolve()
     assert resolved.is_relative_to(allowed_root.resolve())
     assert resolved.is_file()
     return resolved
-
-
-def _assert_local_markdown_links_resolve(
-    source: Path,
-    allowed_root: Path,
-) -> None:
-    """Require every local Markdown link in a source document to resolve.
-
-    Args:
-        source: Markdown source document.
-        allowed_root: Root that bounds its local links.
-    """
-    for target in _local_markdown_targets(source.read_text(encoding="utf-8")):
-        _resolve_local_markdown_target(target, source, allowed_root)
 
 
 def test_closeout_schema_and_frozen_target_placeholders() -> None:
@@ -388,7 +454,14 @@ def test_command_ledger_preserves_order_and_literal_output_placeholders() -> (
     )
     normalized_ledger = _normalized(ledger)
     assert "assertion-only, not coverage evidence" in normalized_ledger
-    assert "sole repository coverage command" in normalized_ledger
+    assert (
+        "c4 is this record's sole repository coverage command"
+        in normalized_ledger
+    )
+    assert (
+        "c5 is its strict mkdocs documentation-rendering command"
+        in normalized_ledger
+    )
     assert "availability-only native-cuda evidence" in normalized_ledger
     assert (
         "pass-or-clean-skip is not required measured evidence"
@@ -438,41 +511,16 @@ def test_provenance_rules_and_unshipped_state_are_safe() -> None:
 def test_discovery_links_resolve_to_the_canonical_graph_capture_sources() -> (
     None
 ):
-    """Require changed discovery surfaces to link to canonical regular files."""
-    for source in DISCOVERY_PATHS:
+    """Require only Step-1 discovery links to resolve to canonical files."""
+    for source, target, expected in DISCOVERY_LINKS:
         allowed_root = ROOT if source == ROOT / "AGENTS.md" else DOCS_ROOT
-        _assert_local_markdown_links_resolve(source, allowed_root)
-
-    expected_targets = {
-        EXAMPLE_PATH.resolve(),
-        RUNBOOK_PATH.resolve(),
-        RECORD_PATH.resolve(),
-        ROADMAP_PATH.resolve(),
-    }
-    for source in DISCOVERY_PATHS[1:]:
-        targets = {
-            _resolve_local_markdown_target(
-                target,
-                source,
-                ROOT if source == ROOT / "AGENTS.md" else DOCS_ROOT,
-            )
-            for target in _local_markdown_targets(
-                source.read_text(encoding="utf-8"),
-            )
-        }
-        assert expected_targets <= targets
-
-    roadmap_targets = {
-        _resolve_local_markdown_target(target, ROADMAP_PATH, DOCS_ROOT)
-        for target in _local_markdown_targets(
-            ROADMAP_PATH.read_text(encoding="utf-8"),
+        assert target in _local_markdown_targets(
+            source.read_text(encoding="utf-8")
         )
-    }
-    assert {
-        EXAMPLE_PATH.resolve(),
-        RUNBOOK_PATH.resolve(),
-        RECORD_PATH.resolve(),
-    } <= (roadmap_targets)
+        assert (
+            _resolve_local_markdown_target(target, source, allowed_root)
+            == expected.resolve()
+        )
 
 
 def test_link_resolution_rejects_escapes_directories_and_missing_files(
@@ -494,11 +542,17 @@ def test_link_resolution_rejects_escapes_directories_and_missing_files(
         )
         == target.resolve()
     )
-    for invalid_target in (
+    invalid_targets = (
         "../../../outside.md",
         "../Examples",
         "../Examples/missing.md",
-    ):
+        "C:\\outside.md",
+        "\\\\server\\share\\file.md",
+        "//server/share/file.md",
+        "https://example.com/file.md",
+        "mailto:docs@example.com",
+    )
+    for invalid_target in invalid_targets:
         try:
             _resolve_local_markdown_target(invalid_target, source, docs_root)
         except AssertionError:
@@ -521,6 +575,26 @@ def test_link_resolution_rejects_escapes_directories_and_missing_files(
         pass
     else:
         raise AssertionError("invalid repository-root link was accepted")
+
+
+def test_local_markdown_parser_skips_uris_and_titles() -> None:
+    """Keep non-file URLs and titles outside local filesystem resolution."""
+    content = "\n".join(
+        (
+            "[anchored](guide.md#anchor)",
+            '[titled](guide.md "Guide title")',
+            "[angle](<guide with spaces.md> 'Guide title')",
+            "[https](https://example.com/guide.md)",
+            "[mailto](mailto:docs@example.com)",
+            "[custom](vscode://file/guide.md)",
+            "[protocol](//example.com/guide.md)",
+        )
+    )
+    assert _local_markdown_targets(content) == [
+        "guide.md",
+        "guide.md",
+        "guide with spaces.md",
+    ]
 
 
 def test_discovery_surfaces_preserve_ownership_and_blocked_limitations() -> (
