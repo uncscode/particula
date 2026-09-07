@@ -14,9 +14,11 @@ that must pass or cleanly skip and never falls back to CPU.
   Examples-index link. It includes hardware-free contracts and an optional
   native-CUDA smoke row for the one-capture/two-replay lifecycle; no CPU or
   Warp-CPU capture substitution is permitted.
-- **P2:** Extend the documentation contract test to require every recapture
-  trigger, mutable-value non-trigger, lifecycle state, limitation, failure
-  procedure, and reproduction command. Validate internal links.
+- **P2 (implemented, #1596):**
+  `particula/tests/gpu_graph_capture_runbook_docs_test.py` hardware-freely
+  validates the runbook's ordered recapture triggers, mutable-value
+  non-triggers, lifecycle states, limitations, failure procedures,
+  reproduction commands, relative links, and stdlib-only imports.
 - **P3:** Add `particula/tests/gpu_graph_capture_closeout_docs_test.py` to parse
   the closeout schema, map every E8 success criterion to evidence, require
   literal results and target derivation, distinguish required from optional
@@ -29,8 +31,8 @@ that must pass or cleanly skip and never falls back to CPU.
 Use direct pytest for affected assertions:
 
 ```bash
-pytest particula/tests/gpu_resident_graph_capture_docs_test.py \
-  particula/tests/gpu_graph_capture_closeout_docs_test.py -q
+pytest particula/tests/gpu_graph_capture_runbook_docs_test.py \
+  particula/tests/gpu_resident_graph_capture_docs_test.py -q --no-cov
 pytest particula/execution/tests/ -q
 ```
 

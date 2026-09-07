@@ -12,11 +12,11 @@ this plan follows the explicit assignment and reconciles those stale labels.
 
 ## Value Proposition
 
-P1 now provides one tested, lazily qualified native-CUDA-only path from resident
+P1 provides one tested, lazily qualified native-CUDA-only path from resident
 setup through capture, exactly two replays, structural invalidation, retirement,
-renewal, fresh capture, and ordered teardown. Operators still need the P2
-decision tables and fail-closed closeout procedure. Maintainers will gain the
-dated, auditable E8-F1--E8-F7 evidence record in P3 without turning
+renewal, fresh capture, and ordered teardown. P2 (#1596) now supplies the
+operator runbook and its hardware-free documentation contract. Maintainers still
+need the dated, auditable E8-F1--E8-F7 evidence record in P3 without turning
 machine-specific benchmark results into portable guarantees.
 
 ## User Stories

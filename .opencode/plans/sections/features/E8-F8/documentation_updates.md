@@ -5,9 +5,9 @@
   qualified native-CUDA-only fixed-identity capture/replay walkthrough.
 - Completed P1 (#1595): Added its link and native-CUDA-only invocation summary
   to `docs/Examples/index.md`.
-- Create `docs/Features/gpu_graph_capture.md` as the operator runbook covering
-  setup, ownership, RNG, replay, synchronization, diagnostics, invalidation,
-  recapture, teardown, failures, limitations, and clean skips.
+- Completed P2 (#1596): Added `docs/Features/gpu_graph_capture.md` as the
+  operator runbook covering setup, ownership, RNG, replay, synchronization,
+  invalidation, recapture, teardown, failures, limitations, and clean skips.
 - Create `docs/Features/Roadmap/graph-capture-closeout.md` with dated
   environment metadata, exact commands, literal results, artifact links,
   changed executable targets, metric disposition, and final blockers/status.
@@ -25,5 +25,7 @@
   example/runbook/closeout, then update shipped phase/status evidence.
 - Completed P1 (#1595): Added hardware-free contract and optional native-CUDA
   smoke coverage in `particula/tests/gpu_resident_graph_capture_docs_test.py`.
-- P2--P4 documentation and closeout updates remain pending; no runbook,
-  closeout report, roadmap/status, or parent-plan reconciliation was completed.
+- Completed P2 (#1596): Added hardware-free runbook contract coverage in
+  `particula/tests/gpu_graph_capture_runbook_docs_test.py`.
+- P3--P4 closeout documentation updates remain pending; no closeout report,
+  roadmap/status update, or parent-plan reconciliation was completed.

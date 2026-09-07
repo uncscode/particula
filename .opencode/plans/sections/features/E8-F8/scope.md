@@ -37,7 +37,17 @@ profiling outputs from E8-F1 through E8-F7; it does not redesign capture.
 - `particula/tests/gpu_resident_graph_capture_docs_test.py` adds hardware-free
   contract coverage and an optional native-CUDA smoke row.
 
-P2--P4 runbook, evidence-matrix, and roadmap-closeout work remains pending.
+## Delivered in P2 (#1596)
+
+- `docs/Features/gpu_graph_capture.md` documents the concrete-only,
+  native-CUDA-qualified operator lifecycle: setup, resource publication,
+  stream initialization, capture, replay, structural invalidation, retirement,
+  renewal, fresh recapture, teardown, failure handling, and limitations.
+- `particula/tests/gpu_graph_capture_runbook_docs_test.py` adds a hardware-free
+  runbook contract covering lifecycle, recapture triggers and non-triggers,
+  failure boundaries, limitations, commands, links, and stdlib-only imports.
+
+P3--P4 evidence-matrix and roadmap-closeout work remains pending.
 
 ## Out of Scope
 
