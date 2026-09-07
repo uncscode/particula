@@ -1,8 +1,8 @@
 """Run one qualified native-CUDA resident graph-capture walkthrough.
 
 This fixed-identity example is native-CUDA-only: CPU and Warp-CPU are not
-fallback or emulation paths.  It demonstrates explicit capture, two replays,
-structural invalidation, retirement, and renewal.  It does not provide automatic
+fallback or emulation paths. It demonstrates explicit capture, two replays,
+structural invalidation, retirement, and renewal. It does not provide automatic
 recapture, migration, resize/compaction, hidden transfer or synchronization,
 retry/rollback, checkpointed or serialized opaque handles, or performance
 claims.
@@ -30,7 +30,24 @@ _UNAVAILABLE_OUTPUT = (
 
 @dataclass
 class ExampleRun:
-    """Retain bounded address-free observations from the capture walkthrough."""
+    """Retain bounded, address-free observations from the walkthrough.
+
+    Attributes:
+        output: Deterministic status lines produced by the example.
+        session: Resident session created by the enabled execution path.
+        registry: Resource registry bound to ``session``.
+        guard: Step guard bound to ``session`` and ``registry``.
+        binding: Graph-capture binding used for the execution.
+        captured: Retired graph-capture record from the first capture.
+        renewed_capture: Fresh graph-capture record from renewal.
+        gas_snapshot: Synchronized gas diagnostic observation, if enabled.
+        saturation_snapshot: Synchronized saturation observation, if enabled.
+        replay_count: Number of replays performed before retirement.
+        invalidated: Whether structural drift invalidated the first capture.
+        retired: Whether the first capture was explicitly retired.
+        renewed: Whether a fresh lifecycle was created after retirement.
+        synchronized: Whether the enabled path synchronized before host reads.
+    """
 
     output: list[str]
     session: Any | None = None
@@ -49,12 +66,21 @@ class ExampleRun:
 
 
 def _disabled_output() -> list[str]:
-    """Return deterministic output for intentional unavailable execution."""
+    """Return deterministic output for intentionally unavailable execution.
+
+    Returns:
+        The fixed status lines used when native CUDA capture is unavailable.
+    """
     return list(_UNAVAILABLE_OUTPUT)
 
 
 def _qualified_native_cuda() -> str | None:
-    """Return the first capture-capable native CUDA device without setup work."""
+    """Find the first capture-capable native CUDA device without setup work.
+
+    Returns:
+        The selected opaque native device name, or ``None`` when the explicit
+        unavailable conditions are met.
+    """
     if os.getenv(_FORCE_NO_NATIVE_CAPTURE_ENV) == "1":
         return None
     try:
@@ -83,7 +109,11 @@ def _qualified_native_cuda() -> str | None:
 
 
 def _load_enabled_runtime() -> SimpleNamespace:
-    """Load only concrete resident and graph-capture seams after preflight."""
+    """Load concrete resident and graph-capture seams after preflight.
+
+    Returns:
+        A namespace containing the lazily loaded runtime modules.
+    """
     names = (
         "warp",
         "particula.execution",
@@ -101,35 +131,75 @@ def _load_enabled_runtime() -> SimpleNamespace:
 
 
 class _WarpNativeCaptureAdapter:
-    """Expose only the selected Warp native capture vocabulary."""
+    """Expose only the selected Warp native capture vocabulary.
+
+    Attributes:
+        _warp: Lazily imported Warp module.
+        _native: Opaque native device selected during preflight.
+        _graph_capture: Concrete graph-capture module providing callables.
+    """
 
     def __init__(self, warp: Any, native: str, graph_capture: Any) -> None:
+        """Bind Warp and graph-capture objects for one native device.
+
+        Args:
+            warp: Lazily imported Warp module.
+            native: Opaque native CUDA device selected during preflight.
+            graph_capture: Concrete graph-capture module.
+        """
         self._warp = warp
         self._native = native
         self._graph_capture = graph_capture
 
     def runtime_available(self) -> bool:
-        """Return the completed preflight result without another probe."""
+        """Return the completed preflight result without another probe.
+
+        Returns:
+            ``True`` because construction occurs only after successful preflight.
+        """
         return True
 
     def device_available(self, device: Any) -> bool:
-        """Accept only the preflight-selected native CUDA device."""
+        """Accept only the preflight-selected native CUDA device.
+
+        Args:
+            device: Candidate graph-capture device.
+
+        Returns:
+            Whether ``device`` has the exact preflight-selected native name.
+        """
         return device.native == self._native
 
     def capture_api_available(self, device: Any) -> bool:
-        """Accept APIs only for the preflight-selected native CUDA device."""
+        """Accept APIs only for the selected native CUDA device.
+
+        Args:
+            device: Candidate graph-capture device.
+
+        Returns:
+            Whether ``device`` has the exact preflight-selected native name.
+        """
         return device.native == self._native
 
     def capture_callables(self, device: Any) -> Any:
-        """Return direct Warp capture callables and exact opaque-handle cleanup."""
+        """Return direct Warp capture callables and opaque-handle cleanup.
+
+        Args:
+            device: Device whose native name is passed to Warp capture.
+
+        Returns:
+            Concrete graph-capture callables for the selected device.
+        """
 
         def begin() -> None:
+            """Begin capture on the selected opaque native device."""
             self._warp.capture_begin(
                 device=device.native,
                 force_module_load=True,
             )
 
         def release(handle: object) -> None:
+            """Release an opaque native handle when it exposes cleanup."""
             destroy = getattr(handle, "destroy", None)
             if callable(destroy):
                 destroy()
@@ -144,7 +214,11 @@ class _WarpNativeCaptureAdapter:
 
 
 def _build_cpu_state() -> tuple[ParticleData, GasData, EnvironmentData]:
-    """Build the fixed float64 resident state used for the bounded walkthrough."""
+    """Build the fixed float64 resident state for the bounded walkthrough.
+
+    Returns:
+        Particle, gas, and environment containers for the resident setup.
+    """
     return _load_enabled_runtime().resident_example._build_cpu_state()
 
 
@@ -156,7 +230,19 @@ def _compose_request(
     gas: GasData,
     environment: EnvironmentData,
 ) -> tuple[Any, Any, Any]:
-    """Compose the canonical twelve-node request and publish its resources."""
+    """Compose the canonical twelve-node request and publish its resources.
+
+    Args:
+        runtime: Lazily loaded runtime modules.
+        session: Active resident session.
+        registry: Resource registry bound to ``session``.
+        guard: Closed step guard bound to ``session`` and ``registry``.
+        gas: CPU gas container used to construct the request.
+        environment: CPU environment container used to construct the request.
+
+    Returns:
+        The resident request and its gas and saturation diagnostic outputs.
+    """
     particles = session.particles
     initial_total_mass = particles.volume.numpy()[:, None] * (
         np.sum(
@@ -191,6 +277,13 @@ def run_example() -> ExampleRun:  # noqa: C901
 
     The only host read boundary is one explicit synchronization after the two
     replay calls.  Enabled-path failures propagate after exact teardown.
+
+    Returns:
+        Bounded status and observation data from the capture walkthrough.
+
+    Raises:
+        Exception: Propagates enabled-path setup, capture, replay, or teardown
+            failures after attempting the required cleanup.
     """
     native = _qualified_native_cuda()
     if native is None:
