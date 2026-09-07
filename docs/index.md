@@ -333,3 +333,10 @@ print(result)
   evidence, the accepted unchanged `fp64`/`wp.float64` production baseline,
   study-only candidate fidelity checks, executable P3 thresholds, clamp
   accounting, memory-footprint examples, and focused reproduction commands.
+- **Resident graph capture** uses a qualified native CUDA device with fixed
+  identities and shapes plus explicit capture, retirement, and renewal actions.
+  It is concrete-only, has no CPU or Warp-CPU fallback, and remains unshipped
+  pending final evidence. E8-F7/T7 owns profiling and machine-bounded
+  recommendations; E8-F8 owns the example, runbook, limitations, and closeout.
+  See the [native-CUDA example](Examples/gpu_resident_graph_capture.py),
+  [operator runbook](Features/gpu_graph_capture.md), and [roadmap closeout record](Features/Roadmap/graph-capture-closeout.md).

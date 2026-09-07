@@ -36,6 +36,9 @@ The implementation should keep three explicit boundaries:
   remains governed by the shipped schema-v3 contract.
 - Benchmark and profiling artifacts are evidence, not runtime configuration or
   a promise of equivalent performance on other hardware.
+- Native handles remain opaque lifecycle provenance: they are not serializable
+  or checkpointed. Recapture is explicit after retirement or incompatibility;
+  there is no migration, fallback, hidden transfer, or hidden synchronization.
 
 ## Reusable Codebase Patterns
 
@@ -48,6 +51,21 @@ The implementation should keep three explicit boundaries:
   default pytest collection.
 - Record explicit tolerances, conservation checks, deterministic fixtures, and
   aggregate stochastic bounds following current GPU parity policy.
+
+## Delivery Ownership and Closeout
+
+- E8-F7/T7 exclusively owns native-CUDA profiling and machine-bounded
+  recommendations. E8-F8/T8 owns the native-CUDA example, operator runbook,
+  limitations, documentation reconciliation, and closeout.
+- E8-F8 P3 delivered a fail-closed `UNSHIPPED/BLOCKED` evidence ledger. It is
+  non-promoting and must retain missing E8-F2, E8-F6, E8-F7, and designated
+  final-revision H1--H11 evidence as blockers.
+- E8-F8 P4 documentation reconciliation is implemented: focused
+  closeout/runbook contracts passed (16 passed), `mkdocs build --strict` passed
+  (exit 0), and the active split-plan validator is required for this worktree.
+  This non-promoting documentation result leaves Epic H Active/unshipped until
+  E8-F2, E8-F6, E8-F7/T7, and all designated-device final-revision H1--H11
+  blockers are resolved; it claims no CUDA evidence.
 
 ## Testing Requirements
 

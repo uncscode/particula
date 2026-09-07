@@ -34,10 +34,17 @@
 5. E8-F5 validates CPU, uncaptured GPU, and captured GPU correctness after
    E8-F4; E8-F6 may proceed after the executable path and resource inventory
    are fixed and gates benchmark rows on E8-F5 correctness evidence.
-6. E8-F7 profiles only the correctness-qualified path and consumes E8-F6
-   timing and memory evidence.
-7. E8-F8 publishes the runnable workflow, runbook, and epic closeout; it
-   depends on all preceding tracks.
+6. E8-F7/T7 profiles only the correctness-qualified path, consumes E8-F6
+   timing and memory evidence, and owns machine-bounded recommendations.
+7. E8-F8/T8 publishes the native-CUDA example, operator runbook, limitations,
+   documentation reconciliation, and fail-closed epic closeout; it depends on
+   all preceding tracks.
 
 P5 #1579 passed focused, coverage, documentation, and approved strict-equivalent
 worktree validation; E8-F6/E8-F7/E8-F8 may consume its correctness evidence.
+
+P3 closeout-ledger documentation is delivered evidence only: its
+`UNSHIPPED/BLOCKED` disposition is non-promoting. E8-F2 prepared-path completion,
+E8-F6 scaling/memory artifacts, E8-F7/T7 profiling and recommendations, and all
+H1--H11 final-revision rows on one designated qualified CUDA device remain
+blocking dependencies for epic promotion.

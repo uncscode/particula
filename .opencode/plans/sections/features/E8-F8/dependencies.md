@@ -13,8 +13,8 @@
 - **E8-F5:** CPU/uncaptured/captured correctness, conservation, communication,
   diagnostics, RNG, and recapture-trigger validation.
 - **E8-F6:** opt-in multi-box timing and memory-budget evidence.
-- **E8-F7:** CUDA profiling, bottleneck analysis, machine metadata, and bounded
-  recommendations.
+- **E8-F7 / T7:** CUDA profiling, bottleneck analysis, machine metadata, and
+  machine-bounded recommendations.
 - Existing E7 resident example, testing policy, roadmap, MkDocs configuration,
   and plan validation tooling.
 
@@ -34,3 +34,10 @@ P1/P2 and all upstream evidence, and must derive the executable coverage target
 list before running the command matrix. P4 is last and may mark Epic H Shipped
 only when every required P3 row passes; otherwise it publishes blockers and
 leaves the roadmap and plan Active.
+
+The delivered P3 ledger is explicitly non-promoting. E8-F2, E8-F6, E8-F7/T7,
+and all H1--H11 final-revision rows on a single designated qualified CUDA device
+are still required. P4 documentation reconciliation is implemented after focused
+closeout/runbook contracts passed (16 passed), `mkdocs build --strict` passed
+(exit 0), and active split-plan validation is recorded. These documentation
+results neither satisfy the CUDA rows nor promote Epic H.
