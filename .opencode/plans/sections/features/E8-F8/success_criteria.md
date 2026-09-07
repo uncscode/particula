@@ -31,14 +31,14 @@
 - [ ] The changed-module coverage list is frozen from shipped implementation
   records plus the final production diff, and every listed module has a literal
   per-target result.
-- [ ] Parent/sibling labels consistently assign profiling to E8-F7 and the T8
+- [x] Parent/sibling labels consistently assign profiling to E8-F7 and the T8
   example, runbook, limitations, documentation reconciliation, roadmap, and
   closeout to E8-F8; T7 also owns machine-bounded recommendations.
 - [x] P4 documentation reconciliation is implemented: focused
-  closeout/runbook documentation contracts passed (16 passed), `mkdocs build
-  --strict` passed (exit 0), and active split-plan validation is recorded for
-  this worktree. This is documentation-only, non-promoting evidence and is not
-  CUDA evidence.
+  closeout/runbook documentation contracts passed (16 passed). Active split-plan
+  validation and `mkdocs build --strict` remain required but unavailable and
+  pending in this worktree. This is documentation-only, non-promoting evidence
+  and is not CUDA evidence.
 - [ ] P3's `UNSHIPPED/BLOCKED` ledger remains non-promoting until E8-F2, E8-F6,
   E8-F7/T7, and each final-revision H1--H11 row passes on one designated
   qualified CUDA device.

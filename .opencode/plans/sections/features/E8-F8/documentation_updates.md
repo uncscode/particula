@@ -36,8 +36,9 @@
   E8-F2/E8-F3/F6/F7 closeout evidence without promoting Epic H.
 - Completed P4 (#1598): Reconciled durable roadmap/status and E8 plan content
   for T7/T8 ownership. Focused closeout/runbook documentation contracts passed
-  (16 passed), `mkdocs build --strict` passed (exit 0), and active split-plan
-  validation is recorded. P4 is documentation-only and non-promoting: P3
-  remains `UNSHIPPED/BLOCKED`, while E8-F2, E8-F6, E8-F7/T7, and
+  (16 passed). Active split-plan validation and `mkdocs build --strict` remain
+  required but unavailable and pending in this worktree. P4 is documentation-
+  only and non-promoting: P3 remains `UNSHIPPED/BLOCKED`, while E8-F2, E8-F6,
+  E8-F7/T7, and
   designated-device final-revision H1--H11 evidence remain blockers. No CUDA
   evidence is claimed.

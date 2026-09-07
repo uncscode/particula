@@ -33,12 +33,12 @@
   manifest; reject latest-path selection and manually copied summary values.
 - [x] Create `docs/Features/Roadmap/graph-capture-closeout.md` and leave status
   unshipped whenever any required row is failed, unavailable, or stale.
-- [ ] Reconcile E8 parent and durable documentation labels with the T7/T8
+- [x] Reconcile E8 parent and durable documentation labels with the T7/T8
   assignment: E8-F7 owns profiling and machine-bounded recommendations; E8-F8
   owns the example, runbook, limitations, documentation reconciliation, and
   closeout. Do not mark complete until focused docs checks and strict MkDocs
   both pass.
-- [ ] Update `data-oriented-gpu.md`, roadmap/docs indexes, `AGENTS.md`, and E8
+- [x] Update `data-oriented-gpu.md`, roadmap/docs indexes, `AGENTS.md`, and E8
   plan statuses with only stable, evidence-bounded conclusions.
 
 ## Tooling / Tests

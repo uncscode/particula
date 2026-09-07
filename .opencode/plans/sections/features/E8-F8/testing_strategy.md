@@ -26,25 +26,26 @@ that must pass or cleanly skip and never falls back to CPU.
   optional rows, and rejects promotion when evidence is missing or failed. The
   committed closeout disposition remains `UNSHIPPED/BLOCKED`.
 - **P4 (implemented, #1598; non-promoting):** Reconciled
-  roadmap/index/AGENTS cross-references, T7/T8 ownership, and E8 plan
-  consistency. Focused closeout/runbook documentation contracts passed (16
-  passed), `mkdocs build --strict` passed (exit 0), and active split-plan
-  validation is required and recorded for this worktree. These documentation
-  checks do not provide CUDA evidence or promote Epic H.
+  roadmap/index/AGENTS cross-references, T7/T8 ownership, and E8 parent/child
+  plan consistency. Focused closeout/runbook documentation contracts passed (16
+  passed). Active split-plan validation and `mkdocs build --strict` are required
+  but unavailable and pending in this worktree. These documentation checks do
+  not provide CUDA evidence or promote Epic H.
 
 ## Focused Development Checks (Coverage Disabled)
 
 Use direct pytest for affected assertions:
 
 ```bash
-pytest particula/tests/gpu_graph_capture_runbook_docs_test.py \
-  particula/tests/gpu_resident_graph_capture_docs_test.py -q --no-cov
-pytest particula/execution/tests/ -q
+pytest particula/tests/gpu_graph_capture_closeout_docs_test.py -q --no-cov
+pytest particula/tests/gpu_graph_capture_runbook_docs_test.py -q --no-cov
 ```
 
 These targeted commands intentionally provide no coverage evidence. A focused
 target combined with coverage is invalid evidence under repository policy; it
-is a validation-infrastructure mistake, not a feature test failure.
+is a validation-infrastructure mistake, not a feature test failure. P4's
+hardware-free documentation results do not provide CUDA evidence or promote
+Epic H.
 
 ## Full Validation and Closeout Evidence
 
