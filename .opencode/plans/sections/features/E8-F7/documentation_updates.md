@@ -1,33 +1,22 @@
 # Documentation Updates
 
-## P3 Status
+## P5 Delivered
 
-Issue #1591 intentionally made no user-facing documentation update. It delivers
-test-only Nsight evidence collection support and opt-in CUDA smoke validation,
-not a measured profile or user workflow. The listed P5 documentation and
-result-publication work remains deferred.
+Issue #1593 (commit `dd3b0b55f`) published the canonical unavailable profiling
+record at `docs/Features/gpu_graph_capture_performance.md`. It documents the
+frozen small/medium matrix, exact reproduction commands, qualified native-CUDA
+boundary, provenance/manifest/checksum rules, host-launch versus synchronized
+elapsed versus Nsight methodology, and safety limits. No reviewed normalized
+artifact or manifest is checked in; therefore no CUDA result, ranking, or
+recommendation was published.
 
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` with E8-F7 status,
-  measured machine/software identity, exact workload matrix, commands, raw
-  local-artifact checksums, the local-only retention limitation, and the
-  distinction between launch and kernel costs.
-- Create or update `docs/Features/gpu_graph_capture_performance.md` with the
-  profiling method, warmup/synchronization rules, captured-versus-uncaptured
-  results, dominant-kernel metrics, bottleneck table, recommendations, and
-  explicit machine/workload limits.
-- Update `docs/Features/Roadmap/index.md` if the Epic H progress summary or link
-  set changes.
-- Update `AGENTS.md` only with stable reproduction commands and supported
-  conclusions; do not paste volatile raw profiles or imply portable guarantees.
-- Update `.opencode/guides/testing_guide.md` only if the repository-wide
-  profiling procedure becomes a lasting policy beyond this feature.
-- Reconcile `.opencode/plans/sections/epics/E8/child_plans.md`,
-  `dependency_map.md`, and milestone text so T7/E8-F7 profiling does not conflict
-  with stale E8-F8 labels.
-- Update all E8-F7 plan sections with shipped phase status and final evidence
-  links during closeout.
-- Add a documentation contract test under `particula/tests/` that asserts the
-  exact command, CUDA-only qualification, launch/kernel separation,
-  machine-bounded language, and no-fallback limitation.
-- Run `mkdocs build --strict`; broken links or missing required evidence block
-  publication.
+- Updated `docs/Features/Roadmap/data-oriented-gpu.md` and `AGENTS.md` to make
+  E8-F7/T7 the profiling and recommendation owner and limit E8-F8 to the
+  example, limitations, and closeout.
+- Added `particula/tests/gpu_graph_capture_performance_docs_test.py`, a
+  hardware-free cross-document contract for ownership, canonical content,
+  commands, provenance, unavailable status, and no-fallback limits.
+- Validated the document contract with `--no-cov` and rendering with
+  `mkdocs build --strict`. The record intentionally contains no measured
+  machine/software table, raw sample reference, bottleneck table, or
+  recommendation until reviewed CUDA evidence exists.

@@ -22,6 +22,22 @@ warmups, three samples, seed 1582, a duration of 0.5 s, and replay counts
 1/10/100/1000. Kernel profiling is limited to compatible complete
 captured-replay small evidence.
 
+The four required measurement rows use that frozen workload, warmup, sample,
+duration, and replay-count control matrix. Setup, reset, capture construction,
+and warmups are excluded from every interval. The captured-replay rows use the
+specified replay counts; those counts do not alter any excluded interval.
+
+The explicit measurement rows are:
+
+- `prepared_uncaptured` / `host_launch`: Time dispatch submission only;
+  exclude in-interval synchronization.
+- `prepared_uncaptured` / `synchronized_elapsed`: Time dispatch through one
+  post-dispatch completion boundary.
+- `captured_replay` / `host_launch`: Time replay submission only; exclude
+  in-interval synchronization.
+- `captured_replay` / `synchronized_elapsed`: Time replay dispatch through
+  one post-dispatch completion boundary.
+
 The first two commands, the documentation test, the repository runner, and
 MkDocs build are hardware-free:
 

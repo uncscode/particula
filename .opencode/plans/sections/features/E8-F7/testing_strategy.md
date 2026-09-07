@@ -42,9 +42,13 @@ assertion thresholds.
   replay-normalized synchronized-only reconciliation, complete provenance and
   compatibility failures, zero/incomplete/non-reconcilable evidence, and
   machine/workload/non-portability/correctness-plan recommendation guardrails.
-- **P5:** Documentation contract tests verify commands, machine and workload
-  bounds, raw evidence links, limitations, and the T7/E8-F7 reconciliation;
-  strict MkDocs validates rendering and links.
+- **P5 (delivered):** The hardware-free
+  `particula/tests/gpu_graph_capture_performance_docs_test.py` reads only
+  `AGENTS.md`, the E8 roadmap, and the canonical record. It checks ownership,
+  frozen controls, all seven exact commands, provenance and checksum rules,
+  unavailable/unshipped status, timing and safety limits, and its standard-
+  library-only import boundary. It neither reads artifacts nor invokes CUDA,
+  Warp, Nsight, or commands. `mkdocs build --strict` validates published links.
 
 P3 test locations are `particula/gpu/tests/profiling_support_test.py`,
 `particula/gpu/tests/profiling_workload_runner_test.py`, and
@@ -52,18 +56,16 @@ P3 test locations are `particula/gpu/tests/profiling_support_test.py`,
 
 ## Focused Assertion Checks
 
-Focused P4 assertion checks run without coverage:
+Focused P5 documentation assertions run without coverage:
 
 ```bash
-pytest particula/gpu/tests/profiling_support_test.py -q --no-cov
-pytest particula/gpu/tests/profiling_smoke_test.py --benchmark \
-  -m "warp and cuda" -q --no-cov
+pytest particula/tests/gpu_graph_capture_performance_docs_test.py -q --no-cov
+mkdocs build --strict
 ```
 
-The second command is CUDA-only and may pass or cleanly skip an unavailable
-prerequisite. A skip is not a measurement. Neither command may route to Warp
-CPU. The smoke test verifies executable, export, and parser integration only;
-it is not a benchmark threshold or published profile result.
+These checks are hardware-free publication validation, not CUDA evidence. The
+native collection and smoke commands remain opt-in and CUDA-only; unavailable
+prerequisites do not route to Warp CPU and do not constitute a measurement.
 
 ## Coverage and Final Validation
 
