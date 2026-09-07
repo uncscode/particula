@@ -357,9 +357,14 @@ def test_native_adapter_aborts_and_releases_post_begin_failure() -> None:
     example = _fresh_example()
     events: list[str] = []
     handle = SimpleNamespace(destroy=lambda: events.append("release"))
+
+    def capture_end() -> SimpleNamespace:
+        events.append("end")
+        return handle
+
     warp = SimpleNamespace(
         capture_begin=lambda **_kwargs: events.append("begin"),
-        capture_end=lambda: (events.append("end"), handle)[1],
+        capture_end=capture_end,
         capture_launch=lambda *_args: events.append("launch"),
     )
     graph_capture = SimpleNamespace(
