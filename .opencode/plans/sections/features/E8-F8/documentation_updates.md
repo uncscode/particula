@@ -1,7 +1,10 @@
 # Documentation Updates
 
-- Create `docs/Examples/gpu_resident_graph_capture.py` as the canonical runnable
-  fixed-shape capture/replay example.
+- Completed P1 (#1595): Added
+  `docs/Examples/gpu_resident_graph_capture.py` as the canonical lazily
+  qualified native-CUDA-only fixed-identity capture/replay walkthrough.
+- Completed P1 (#1595): Added its link and native-CUDA-only invocation summary
+  to `docs/Examples/index.md`.
 - Create `docs/Features/gpu_graph_capture.md` as the operator runbook covering
   setup, ownership, RNG, replay, synchronization, diagnostics, invalidation,
   recapture, teardown, failures, limitations, and clean skips.
@@ -20,5 +23,7 @@
 - Reconcile `.opencode/plans/sections/epics/E8/child_plans.md`, dependency and
   milestone sections so E8-F7 is profiling and E8-F8 is T8
   example/runbook/closeout, then update shipped phase/status evidence.
-- Add and maintain hardware-free documentation contract tests under
-  `particula/tests/`; run `mkdocs build --strict` before publication.
+- Completed P1 (#1595): Added hardware-free contract and optional native-CUDA
+  smoke coverage in `particula/tests/gpu_resident_graph_capture_docs_test.py`.
+- P2--P4 documentation and closeout updates remain pending; no runbook,
+  closeout report, roadmap/status, or parent-plan reconciliation was completed.

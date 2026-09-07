@@ -26,7 +26,7 @@ def _fresh_example() -> Any:
 
 
 def test_import_is_lazy_about_warp_and_concrete_capture_modules() -> None:
-    """Keep optional native capture and concrete composition out of import time."""
+    """Keep optional capture and concrete composition out of import time."""
     sys.modules.pop(MODULE_NAME, None)
     before = set(sys.modules)
     example = importlib.import_module(MODULE_NAME)
@@ -41,9 +41,17 @@ def test_import_is_lazy_about_warp_and_concrete_capture_modules() -> None:
 def test_force_disabled_path_is_deterministic_and_has_no_setup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Force disabling capture avoids Warp loading, fixture creation, and fallback."""
+    """Force disabling avoids Warp loading, fixture creation, and fallback."""
     example = _fresh_example()
+    original_import = example.importlib.import_module
+
+    def fail_warp_import(name: str) -> Any:
+        if name == "warp":
+            pytest.fail("force-disabled path imported Warp")
+        return original_import(name)
+
     monkeypatch.setenv("PARTICULA_EXAMPLE_FORCE_NO_NATIVE_CAPTURE", "1")
+    monkeypatch.setattr(example.importlib, "import_module", fail_warp_import)
     monkeypatch.setattr(
         example,
         "_load_enabled_runtime",
@@ -62,7 +70,7 @@ def test_force_disabled_path_is_deterministic_and_has_no_setup(
 
 
 def test_force_disabled_subprocess_has_exact_address_free_output() -> None:
-    """The script's explicit unavailable branch exits normally without a device."""
+    """The unavailable branch exits normally without a device."""
     environment = os.environ | {
         "PARTICULA_EXAMPLE_FORCE_NO_NATIVE_CAPTURE": "1"
     }
@@ -111,7 +119,7 @@ def test_force_disabled_subprocess_has_exact_address_free_output() -> None:
 def test_preflight_handles_only_explicit_unavailable_cases(
     monkeypatch: pytest.MonkeyPatch, warp: Any, expected: str | None
 ) -> None:
-    """Missing Warp, CUDA, or capture callables return the one unavailable result."""
+    """Missing Warp, CUDA, or capture callables return the unavailable result."""
     example = _fresh_example()
 
     def fake_import(name: str) -> Any:
@@ -131,7 +139,7 @@ def test_preflight_handles_only_explicit_unavailable_cases(
 def test_preflight_propagates_unexpected_errors(
     monkeypatch: pytest.MonkeyPatch, failure: RuntimeError
 ) -> None:
-    """Unexpected optional-runtime failures do not become unavailable fallbacks."""
+    """Unexpected optional-runtime failures do not become fallbacks."""
     example = _fresh_example()
     monkeypatch.setattr(
         example.importlib,
@@ -162,13 +170,16 @@ def test_source_contract_preserves_lazy_native_capture_lifecycle() -> None:
     assert source.index("session.initialize_streams") < source.index(
         "prepare_resident_simulation"
     )
-    assert source.count("replay_captured_resident_graph(captured, 1.0)") == 1
+    assert source.count("replay_captured_resident_graph(captured, 1.0)") == 2
     assert source.index("for _ in range(2):") < source.index(
         "synchronize_device"
     )
     assert source.index("synchronize_device") < source.index(
         "gas_output.numpy()"
     )
+    assert "session.particles.numpy" not in source
+    assert "session.gas.concentration.numpy" not in source
+    assert 'configuration.communication_map,\n        "form"' not in source
     assert source.index("object.__setattr__") < source.index(
         "retire_resident_graph_capture"
     )
@@ -190,7 +201,7 @@ def test_source_contract_preserves_lazy_native_capture_lifecycle() -> None:
     index = (ROOT / "docs/Examples/index.md").read_text(encoding="utf-8")
     assert "gpu_resident_graph_capture.py" in index
     assert "python docs/Examples/gpu_resident_graph_capture.py" in index
-    assert "no CPU or Warp-CPU fallback" in index
+    assert "no CPU or Warp-CPU fallback" in " ".join(index.split())
 
 
 def test_enabled_lifecycle_retires_and_closes_without_cuda(
@@ -234,11 +245,31 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
         events.append("prepare")
         return object()
 
-    captures = iter(("captured", "renewed-capture"))
+    captured_state = object()
+    invalidated_state = object()
+    first_capture = SimpleNamespace(
+        lifecycle=SimpleNamespace(state=captured_state), name="captured"
+    )
+    renewed_capture = SimpleNamespace(
+        lifecycle=SimpleNamespace(state=captured_state), name="renewed-capture"
+    )
+    captures = iter((first_capture, renewed_capture))
+    binding = SimpleNamespace(lifecycle=SimpleNamespace(state=captured_state))
+
+    def replay(captured: Any, _duration: float) -> None:
+        events.append(f"replay-{captured.name}")
+        if request.environment_update is not original_update:
+            binding.lifecycle.state = invalidated_state
+            events.append("invalidated")
+            raise ValueError("structural drift")
+
     graph_capture = SimpleNamespace(
         GraphCaptureCapability=lambda *_args: object(),
         GraphCaptureAvailability=SimpleNamespace(AVAILABLE="available"),
-        ResidentGraphCaptureBinding=lambda *_args: object(),
+        GraphCaptureLifecycleState=SimpleNamespace(
+            INVALIDATED=invalidated_state
+        ),
+        ResidentGraphCaptureBinding=lambda *_args: binding,
         _attach_resident_graph_capture_binding=lambda *_args: events.append(
             "attach"
         ),
@@ -246,8 +277,7 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
         create_graph_capture_lifecycle=lambda *_args: object(),
         qualify_prepared_resident_graph_capture=lambda *_args: object(),
         capture_prepared_resident_graph=lambda _qualification: next(captures),
-        replay_captured_resident_graph=lambda captured,
-        _duration: events.append(f"replay-{captured}"),
+        replay_captured_resident_graph=replay,
         retire_resident_graph_capture=lambda _binding: events.append("retire"),
         renew_resident_graph_capture=lambda *_args: object(),
         close_resident_graph_capture=lambda _binding: events.append(
@@ -273,7 +303,15 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
     monkeypatch.setattr(
         example,
         "_build_cpu_state",
-        lambda: (object(), object(), object()),
+        lambda: (
+            SimpleNamespace(
+                volume=np.ones(1, dtype=np.float64),
+                masses=np.ones((1, 1, 1), dtype=np.float64),
+                concentration=np.ones((1, 1), dtype=np.float64),
+            ),
+            SimpleNamespace(concentration=np.ones((1, 1), dtype=np.float64)),
+            object(),
+        ),
     )
     monkeypatch.setattr(
         example,
@@ -291,8 +329,8 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
     assert result.replay_count == 2
     assert result.invalidated and result.retired and result.renewed
     assert result.synchronized
-    assert result.captured == "captured"
-    assert result.renewed_capture == "renewed-capture"
+    assert result.captured is first_capture
+    assert result.renewed_capture is renewed_capture
     assert result.captured is not result.renewed_capture
     np.testing.assert_array_equal(result.gas_snapshot, gas_snapshot)
     np.testing.assert_array_equal(
@@ -305,12 +343,70 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
         "replay-captured",
         "replay-captured",
         "synchronize",
+        "replay-captured",
         "invalidated",
         "retire",
         "prepare",
         "capture-close",
         "session-close",
     ]
+
+
+def test_native_adapter_aborts_and_releases_post_begin_failure() -> None:
+    """End and release an incomplete native capture through the adapter."""
+    example = _fresh_example()
+    events: list[str] = []
+    handle = SimpleNamespace(destroy=lambda: events.append("release"))
+    warp = SimpleNamespace(
+        capture_begin=lambda **_kwargs: events.append("begin"),
+        capture_end=lambda: (events.append("end"), handle)[1],
+        capture_launch=lambda *_args: events.append("launch"),
+    )
+    graph_capture = SimpleNamespace(
+        GraphCaptureNativeCallables=lambda *args: SimpleNamespace(
+            capture_begin=args[0],
+            capture_end=args[1],
+            capture_instantiate=args[2],
+            capture_launch=args[3],
+            capture_release=args[4],
+            capture_abort=args[5],
+        )
+    )
+    adapter = example._WarpNativeCaptureAdapter(warp, "cuda:1", graph_capture)
+    callables = adapter.capture_callables(SimpleNamespace(native="cuda:1"))
+
+    callables.capture_begin()
+    aborted = callables.capture_abort()
+    callables.capture_release(aborted)
+
+    assert events == ["begin", "end", "release"]
+
+
+def test_teardown_attempts_session_close_after_graph_close_failure() -> None:
+    """Attempt both teardown operations and chain a second teardown failure."""
+    example = _fresh_example()
+    events: list[str] = []
+
+    def fail_graph_close(_binding: Any) -> None:
+        events.append("graph-close")
+        raise RuntimeError("graph close failed")
+
+    def fail_session_close(_registry: Any, _guard: Any) -> None:
+        events.append("session-close")
+        raise RuntimeError("session close failed")
+
+    with pytest.raises(RuntimeError, match="graph close failed") as error:
+        example._close_enabled_binding(
+            SimpleNamespace(close_resident_graph_capture=fail_graph_close),
+            object(),
+            SimpleNamespace(close=fail_session_close),
+            object(),
+            object(),
+        )
+
+    assert events == ["graph-close", "session-close"]
+    assert error.value.__cause__ is not None
+    assert str(error.value.__cause__) == "session close failed"
 
 
 @pytest.mark.warp

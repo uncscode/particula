@@ -1,13 +1,18 @@
 # Phase Details
 
-- [ ] **E8-F8-P1:** Runnable graph-capture example with hardware-free contract tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E8-F8-P1:** Runnable graph-capture example with hardware-free contract tests
+  - Issue: #1595 | Size: S | Status: Implemented 2026-09-07
   - Goal: Publish one canonical setup/capture/replay/invalidate/teardown example
     that defaults to a clear unsupported path and runs on qualified CUDA.
-  - Files: `docs/Examples/gpu_resident_graph_capture.py`,
-    `particula/tests/gpu_resident_graph_capture_docs_test.py`
-  - Tests: AST/text ownership and sequence checks, import-boundary checks,
-    subprocess unsupported-path check, and CUDA-gated replay smoke coverage.
+  - Delivered files: `docs/Examples/gpu_resident_graph_capture.py`,
+    `docs/Examples/index.md`, and
+    `particula/tests/gpu_resident_graph_capture_docs_test.py`.
+  - Delivered behavior: lazy native-CUDA qualification; one resource
+    publication/stream initialization; capture; exactly two replays; explicit
+    synchronization before observation; structural invalidation, retirement,
+    renewal, fresh capture, and ordered teardown.
+  - Tests added: hardware-free AST/text/import/unavailable/lifecycle contracts
+    and optional CUDA-gated replay smoke coverage.
 
 - [ ] **E8-F8-P2:** Operator runbook with recapture triggers and limitation checks
   - Issue: TBD | Size: S | Status: Not Started

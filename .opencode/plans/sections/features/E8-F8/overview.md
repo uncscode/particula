@@ -12,16 +12,17 @@ this plan follows the explicit assignment and reconciles those stale labels.
 
 ## Value Proposition
 
-Users gain one tested path from resident setup through capture, repeated replay,
-invalidation, teardown, and explicit recapture. Operators gain deterministic
-decision tables and a fail-closed closeout procedure. Maintainers gain a dated,
-auditable record that links E8-F1 through E8-F7 evidence without turning
+P1 now provides one tested, lazily qualified native-CUDA-only path from resident
+setup through capture, exactly two replays, structural invalidation, retirement,
+renewal, fresh capture, and ordered teardown. Operators still need the P2
+decision tables and fail-closed closeout procedure. Maintainers will gain the
+dated, auditable E8-F1--E8-F7 evidence record in P3 without turning
 machine-specific benchmark results into portable guarantees.
 
 ## User Stories
 
-- As a GPU user, I want a runnable graph-capture example so that I can adopt the
-  supported fixed-shape resident workflow without relying on private tests.
+- As a GPU user, I can run the indexed native-CUDA-only graph-capture example
+  without relying on private tests; unavailable capability reports no fallback.
 - As an operator, I want explicit recapture triggers and failure procedures so
   that stale native graph handles are never replayed or silently replaced.
 - As a maintainer, I want a literal closeout matrix so that Epic H is promoted

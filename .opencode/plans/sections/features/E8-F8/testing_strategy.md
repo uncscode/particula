@@ -7,11 +7,13 @@ that must pass or cleanly skip and never falls back to CPU.
 
 ## Per-Phase Checks
 
-- **P1:** Add `particula/tests/gpu_resident_graph_capture_docs_test.py`. Parse
-  the example to assert concrete-only imports, setup-before-capture, explicit RNG
-  initialization, repeated replay, synchronization, teardown, no fallback, and
-  no hidden automatic recapture. Run the unsupported path in a subprocess and
-  add a CUDA-gated smoke row for qualified capture/replay.
+- **P1 (implemented, #1595):**
+  `particula/tests/gpu_resident_graph_capture_docs_test.py` covers lazy imports,
+  force-disabled and capability-unavailable paths, propagated failures, source
+  ordering, result observations, lifecycle/teardown, limitations, and the
+  Examples-index link. It includes hardware-free contracts and an optional
+  native-CUDA smoke row for the one-capture/two-replay lifecycle; no CPU or
+  Warp-CPU capture substitution is permitted.
 - **P2:** Extend the documentation contract test to require every recapture
   trigger, mutable-value non-trigger, lifecycle state, limitation, failure
   procedure, and reproduction command. Validate internal links.

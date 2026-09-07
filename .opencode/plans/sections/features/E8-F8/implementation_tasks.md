@@ -2,14 +2,14 @@
 
 ## Example and Operations Documentation
 
-- [ ] Create `docs/Examples/gpu_resident_graph_capture.py` using upstream
+- [x] Create `docs/Examples/gpu_resident_graph_capture.py` using upstream
   concrete-only setup, registry, prepared-plan, graph-capture, and teardown APIs.
-- [ ] Keep Warp-dependent imports inside the qualified execution branch and
+- [x] Keep Warp-dependent imports inside the qualified execution branch and
   report a precise unsupported result when CUDA capture is unavailable.
-- [ ] Demonstrate explicit resident RNG initialization before capture, repeated
+- [x] Demonstrate explicit resident RNG initialization before capture, repeated
   replay without reseeding, caller synchronization before host inspection, and
   deterministic teardown.
-- [ ] Demonstrate a structural incompatibility rejection and fresh explicit
+- [x] Demonstrate a structural incompatibility rejection and fresh explicit
   recapture without reusing the retired native handle.
 - [ ] Write `docs/Features/gpu_graph_capture.md` with setup/replay/teardown
   procedures, ownership table, state machine, trigger matrix, failure recovery,
@@ -40,11 +40,11 @@
 
 ## Tooling / Tests
 
-- [ ] Add `particula/tests/gpu_resident_graph_capture_docs_test.py` for example
+- [x] Add `particula/tests/gpu_resident_graph_capture_docs_test.py` for example
   sequence, concrete imports, lifecycle, limitations, and unsupported behavior.
 - [ ] Add `particula/tests/gpu_graph_capture_closeout_docs_test.py` for report
   schema, required rows, exact commands, evidence links, and fail-closed status.
-- [ ] Add CUDA-gated example execution coverage that never substitutes Warp CPU
+- [x] Add CUDA-gated example execution coverage that never substitutes Warp CPU
   for capture evidence and cleanly skips only recognized capability absence.
 - [ ] Run focused checks without coverage, then linters, the untargeted full
   coverage runner, plan validation, and `mkdocs build --strict` sequentially.
