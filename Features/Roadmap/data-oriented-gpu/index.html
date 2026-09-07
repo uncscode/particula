@@ -12541,6 +12541,8 @@
       
         
       
+        
+      
     
     
     
@@ -12773,6 +12775,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../gpu_graph_capture_performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU graph-capture profiling record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../gpu_resident_checkpoints/" class="md-nav__link">
         
   
@@ -12949,7 +12979,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -12971,14 +13001,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_13" id="__nav_4_13_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_14" id="__nav_4_14_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13881,7 +13911,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -13903,14 +13933,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_14" id="__nav_4_14_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_15" id="__nav_4_15_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19594,6 +19624,13 @@ callbacks. Post-begin capture failures abort, fault resident and graph state,
 and preserve the initiating exception.
 E8-F4 P5 supplies bounded three-way full-loop NumPy/Warp-CPU/native-CUDA
 validation. This work remains concrete-only and provides no public workflow.</p>
+<p>E8-F7/T7 owns profiling and machine-bounded recommendations. The
+<a href="../../gpu_graph_capture_performance/">GPU graph-capture profiling record</a>
+freezes small <code>(1, 16, 2)</code> and medium <code>(1000, 16, 2)</code> workloads, 100% activity,
+gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
+with no CPU or Warp-CPU fallback. No reviewed normalized artifact or manifest
+is checked in, so profiling results and recommendations are unavailable and
+unshipped. E8-F8 is limited to the example, limitations, and closeout.</p>
 <h3 id="e8-f1-shipped-contract">E8-F1 shipped contract<a class="headerlink" href="#e8-f1-shipped-contract" title="Permanent link">&para;</a></h3>
 <p>E8-F1 ships host metadata and scheduler admission only. Its concrete-only
 direct-import boundary is <code>particula.execution.graph_capture</code>; its carriers and
@@ -19630,8 +19667,9 @@ synchronization, checkpointed native graph handles, cross-device replay,
 captured numerical parity, benchmark/profiling/memory claims, root-README
 changes, and user examples. E8-F2 owns the shipped concrete prepared enqueue
 seams; E8-F3 owns resource work, E8-F4 native capture/replay and captured
-parity, E8-F5--E8-F7 parity/performance/memory/profiling, and E8-F8 the
-example, limitations, and closeout.</p>
+parity, E8-F5--E8-F6 parity/performance/memory, E8-F7/T7 profiling and
+machine-bounded recommendations, and E8-F8 only the example, limitations,
+and closeout.</p>
 <p>Work on E8-F4 restarted on September 3, 2026.</p>
 <h3 id="e8-f4-p1-prepared-qualification-contract">E8-F4-P1 prepared qualification contract<a class="headerlink" href="#e8-f4-p1-prepared-qualification-contract" title="Permanent link">&para;</a></h3>
 <p>E8-F4-P1 adds a developer-only, concrete-module qualification seam in
@@ -19667,8 +19705,10 @@ renewal require fresh preparation and capture; there is no automatic recapture.<
 fallback (including Warp-CPU capture), recovery, retry, or rollback; no hidden
 transfer/readback/synchronization; no checkpointed handle; and no cross-device
 replay.
-It makes no performance, profiling, or memory claim; E8-F5--E8-F8 retain those
-ownership boundaries.</p>
+It makes no performance, profiling, or memory claim; E8-F5--E8-F6 retain
+parity/performance/memory ownership, E8-F7/T7 owns profiling and
+machine-bounded recommendations, and E8-F8 only the example, limitations,
+and closeout.</p>
 <h3 id="e8-f5-p5-integrated-validation-closeout">E8-F5-P5 integrated validation closeout<a class="headerlink" href="#e8-f5-p5-integrated-validation-closeout" title="Permanent link">&para;</a></h3>
 <p>This separately labelled closeout records E8-F5 P1--P4 correctness evidence; it
 does not replace the preceding E8-F4-P5 full-loop validation contract. The
