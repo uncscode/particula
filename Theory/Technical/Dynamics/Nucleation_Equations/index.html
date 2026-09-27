@@ -16581,19 +16581,19 @@
 <p>r* = (2 × σ × v₁) / (k_B × T × ln S)</p>
 <p><strong>Where:</strong></p>
 <ul>
-<li><strong>r*</strong>: Critical cluster radius.</li>
+<li><strong>r</strong>*: Critical cluster radius.</li>
 </ul>
 <p><strong>Description:</strong></p>
-<p>The critical radius is where <strong>dΔG/dr = 0</strong>. It is the same Kelvin relation that governs the equilibrium vapor pressure over curved surfaces in condensation (see the <a href="../Condensation_Equations/#kelvin-effect-correction-factor">condensation equations</a>). A cluster of radius <strong>r*</strong> is in unstable equilibrium with the vapor: any fluctuation pushes it toward growth or evaporation.</p>
+<p>The critical radius is where <strong>dΔG/dr = 0</strong>. It is the same Kelvin relation that governs the equilibrium vapor pressure over curved surfaces in condensation (see the <a href="../Condensation_Equations/#kelvin-effect-correction-factor">condensation equations</a>). A cluster of radius <strong>r</strong>* is in unstable equilibrium with the vapor: any fluctuation pushes it toward growth or evaporation.</p>
 <h3 id="nucleation-barrier">Nucleation Barrier<a class="headerlink" href="#nucleation-barrier" title="Permanent link">&para;</a></h3>
 <p><strong>Equation 4: Free-Energy Barrier</strong></p>
 <p>ΔG* = (16 × π × σ³ × v₁²) / [3 × (k_B × T × ln S)²] = (4/3) × π × σ × (r*)²</p>
 <p><strong>Where:</strong></p>
 <ul>
-<li><strong>ΔG*</strong>: Free-energy barrier at the critical radius.</li>
+<li><strong>ΔG</strong>*: Free-energy barrier at the critical radius.</li>
 </ul>
 <p><strong>Description:</strong></p>
-<p>The barrier height controls the nucleation rate exponentially. Because <strong>ΔG*</strong> scales as <strong>σ³ / (ln S)²</strong>, nucleation rates are extraordinarily sensitive to both surface tension and saturation ratio: small changes in either can shift the rate by many orders of magnitude. This sensitivity is the main practical difficulty in applying CNT quantitatively.</p>
+<p>The barrier height controls the nucleation rate exponentially. Because <strong>ΔG</strong>* scales as <strong>σ³ / (ln S)²</strong>, nucleation rates are extraordinarily sensitive to both surface tension and saturation ratio: small changes in either can shift the rate by many orders of magnitude. This sensitivity is the main practical difficulty in applying CNT quantitatively.</p>
 <h3 id="nucleation-rate">Nucleation Rate<a class="headerlink" href="#nucleation-rate" title="Permanent link">&para;</a></h3>
 <p><strong>Equation 5: Classical Homogeneous Nucleation Rate</strong></p>
 <p>J = z × β* × N₁ × exp( −ΔG* / (k_B × T) )</p>
@@ -16601,11 +16601,11 @@
 <ul>
 <li><strong>J</strong>: Nucleation rate (new stable clusters per unit volume per unit time).</li>
 <li><strong>z</strong>: Zeldovich non-equilibrium factor (typically ~0.01-1), accounting for the fact that some clusters at the barrier top still evaporate.</li>
-<li><strong>β*</strong>: Rate at which vapor molecules collide with the critical cluster (condensation flux onto the critical cluster).</li>
+<li><strong>β</strong>*: Rate at which vapor molecules collide with the critical cluster (condensation flux onto the critical cluster).</li>
 <li><strong>N₁</strong>: Number concentration of vapor monomers.</li>
 </ul>
 <p><strong>Description:</strong></p>
-<p>The prefactor <strong>z × β* × N₁</strong> is kinetic: how often clusters at the critical size are hit by another monomer, weighted by the population of monomers available. The exponential is thermodynamic: the probability of fluctuating over the barrier. A commonly used closed form for a single species (Seinfeld &amp; Pandis, 2016, Eq. 11.47) is:</p>
+<p>The prefactor <em><em>z × β</em> × N₁</em>* is kinetic: how often clusters at the critical size are hit by another monomer, weighted by the population of monomers available. The exponential is thermodynamic: the probability of fluctuating over the barrier. A commonly used closed form for a single species (Seinfeld &amp; Pandis, 2016, Eq. 11.47) is:</p>
 <p>J = ( (2 × σ) / (π × m₁) )^(&frac12;) × v₁ × N₁² × exp( −ΔG* / (k_B × T) )</p>
 <p>where <strong>m₁</strong> is the molecular mass of the nucleating species.</p>
 <h2 id="binary-and-multicomponent-nucleation">Binary and Multicomponent Nucleation<a class="headerlink" href="#binary-and-multicomponent-nucleation" title="Permanent link">&para;</a></h2>
@@ -16696,16 +16696,16 @@ strategies, their builders, factory, and source-selection configuration through
 <code>particula.dynamics.nucleation</code> and <code>particula.dynamics</code>; it is not a runnable
 or GPU capability.</p>
 <h2 id="survival-to-detectable-and-model-resolved-sizes">Survival to Detectable and Model-Resolved Sizes<a class="headerlink" href="#survival-to-detectable-and-model-resolved-sizes" title="Permanent link">&para;</a></h2>
-<p>Freshly nucleated clusters must grow through the smallest sizes, where coagulational scavenging by pre-existing particles is fastest, before they matter for the resolved aerosol population. The apparent formation rate at a larger diameter <strong>d</strong> is related to the "true" nucleation rate at diameter <strong>d*</strong> by a survival probability.</p>
+<p>Freshly nucleated clusters must grow through the smallest sizes, where coagulational scavenging by pre-existing particles is fastest, before they matter for the resolved aerosol population. The apparent formation rate at a larger diameter <strong>d</strong> is related to the "true" nucleation rate at diameter <strong>d</strong>* by a survival probability.</p>
 <p><strong>Equation 10: Kerminen-Kulmala Survival Relation</strong></p>
 <p>J_d = J_d* × exp( γ × (1/d − 1/d*) × CS' / GR )</p>
 <p><strong>Where:</strong></p>
 <ul>
 <li><strong>J_d</strong>: Apparent particle formation rate at diameter <strong>d</strong>.</li>
-<li><strong>J_d*</strong>: Nucleation rate at the initial cluster diameter <strong>d*</strong>.</li>
+<li><strong>J_d</strong><em>: Nucleation rate at the initial cluster diameter <strong>d</strong></em>.</li>
 <li><strong>γ</strong>: Proportionality constant expressed in units compatible with the
   selected diameter, condensation-sink, and growth-rate units. For SI
-  substitution, use meters for <strong>d</strong> and <strong>d*</strong> and choose <strong>γ</strong> so that
+  substitution, use meters for <strong>d</strong> and <strong>d</strong>* and choose <strong>γ</strong> so that
   <code>γ × CS' / GR</code> has units of meters; do not mix the original fitted-unit
   coefficient with SI inputs without converting it.</li>
 <li><strong>CS'</strong>: Condensation sink of the pre-existing particle population
@@ -16714,7 +16714,7 @@ or GPU capability.</p>
   <strong>γ</strong> and <strong>CS'</strong>.</li>
 </ul>
 <p><strong>Description:</strong></p>
-<p>The exponential expresses the competition between growth (<strong>GR</strong>, escape to safety at larger sizes) and coagulational loss to the existing aerosol surface (<strong>CS'</strong>). High pre-existing surface area suppresses observable NPF even when the nucleation rate itself is large. In a simulation, this relation is a consistency check: if the model injects particles at a size larger than the true cluster size, the injection rate should be the survival-corrected <strong>J_d</strong>, not the raw <strong>J_d*</strong>. P4 does not evaluate this relation; its survival factor is an externally selected value whose scientific justification remains the caller's responsibility.</p>
+<p>The exponential expresses the competition between growth (<strong>GR</strong>, escape to safety at larger sizes) and coagulational loss to the existing aerosol surface (<strong>CS'</strong>). High pre-existing surface area suppresses observable NPF even when the nucleation rate itself is large. In a simulation, this relation is a consistency check: if the model injects particles at a size larger than the true cluster size, the injection rate should be the survival-corrected <strong>J_d</strong>, not the raw <strong>J_d</strong>*. P4 does not evaluate this relation; its survival factor is an externally selected value whose scientific justification remains the caller's responsibility.</p>
 <p>For supported execution, see the <a href="../../../../Examples/Nucleation/cpu_nucleation/">CPU nucleation example</a>
 and <a href="../../../../Features/nucleation_strategy_system/">CPU Nucleation Strategy System</a>.
 The hand-built <a href="../../../../Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species/">custom single-species notebook</a>
@@ -16877,7 +16877,7 @@ and <a href="../../../../Features/nucleation_strategy_system/">feature contract<
 <p>Condensed-phase volume per molecule; links the molar mass and liquid density of the nucleating species.</p>
 </li>
 <li>
-<p><strong>Critical Radius (r*):</strong></p>
+<p><em><em>Critical Radius (r</em>):</em>*</p>
 </li>
 <li>
 <p>Typically ~0.5-2 nm for atmospheric conditions; clusters at this size contain only tens to hundreds of molecules.</p>
