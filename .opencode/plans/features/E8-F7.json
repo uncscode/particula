@@ -2,14 +2,14 @@
   "id": "E8-F7",
   "type": "feature",
   "title": "CUDA Profiling and Machine-Bounded Performance Decisions",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-09-07",
+  "completion_date": "2026-09-27",
+  "last_updated": "2026-09-27",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E8-F7/architecture_design.md",
@@ -46,11 +46,11 @@
     {
       "id": "E8-F7-P2",
       "title": "Measure captured and uncaptured host launch costs with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-27",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -60,11 +60,11 @@
     {
       "id": "E8-F7-P3",
       "title": "Collect per-kernel CUDA timing occupancy and memory-access evidence with tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-27",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -74,11 +74,11 @@
     {
       "id": "E8-F7-P4",
       "title": "Analyze bottlenecks and generate machine-bounded recommendations with tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-27",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -101,5 +101,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

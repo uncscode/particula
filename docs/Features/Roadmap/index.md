@@ -4,6 +4,25 @@ This roadmap summarizes the current direction for Particula feature
 development. It is a guide for users and contributors, not a fixed release
 schedule.
 
+## Release and migration sequence
+
+Maintainer decision, 2026-09-27: E8 and E8-F1 through E8-F8 are Shipped.
+The next milestones are:
+
+1. Merge the E8 closeout and roadmap update.
+2. Release **0.2.13**, retaining both the legacy `ParticleRepresentation` /
+   `GasSpecies` facades and the `ParticleData` / `GasData` / `EnvironmentData`
+   container workflow.
+3. Deliver **0.3.0** as the breaking container-first migration: remove the
+   legacy facades, migrate dependent workflows, and update all affected
+   documentation, examples, imports, and tests.
+4. Continue Epic I, differentiability and initial-state optimization, after
+   the migration milestone.
+
+These are planned releases; this roadmap update does not publish a release.
+The [closeout record](graph-capture-closeout.md) records the maintainer's
+plan closure separately from unavailable CUDA measurement evidence.
+
 ## Current Focus
 
 - **Strategy-based physics systems**: Continue standardizing dynamics modules
@@ -19,16 +38,16 @@ schedule.
   resident scheduling, communication, checkpoint/restart, diagnostics, and RNG
   contracts from
   [Epic G](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation).
-- **Graph capture and performance**: Maintain active, unshipped
+- **Graph capture and performance**: Maintain shipped
   [Epic H](data-oriented-gpu.md#epic-h-graph-capture-and-performance)'s bounded
   capture/replay and documentation tracks. Use the [native-CUDA
   example](../../Examples/gpu_resident_graph_capture.py), [operator
   runbook](../gpu_graph_capture.md), and [closeout
   record](graph-capture-closeout.md). E8-F7/T7 owns profiling and
   machine-bounded recommendations; E8-F8 owns the example, runbook,
-  limitations, and closeout. The closeout remains the sole P3 evidence authority
-  while E8-F2, E8-F6, and E8-F7/T7 blockers remain; no CPU or Warp-CPU fallback
-  is provided.
+  limitations, and closeout. The closeout remains the sole P3 evidence authority;
+  measured performance results remain unavailable and unshipped until reviewed.
+  No CPU or Warp-CPU fallback is provided.
 - **Documentation and examples**: Expand practical examples that connect feature
   guides, theory pages, and runnable notebooks.
 
@@ -223,23 +242,34 @@ All E5 features are shipped. The public E5 cross-links are:
 | `E7-F8` | Persistent Per-Box RNG Streams and Restart Semantics | Shipped |
 | `E7-F9` | Diagnostics, Full-Loop Regressions, Documentation, and Closeout | Shipped |
 
-E5, E6, E7, and all of their feature plans are shipped. Epic H is active next.
+E5, E6, E7, E8, and all of their feature plans are shipped.
 
-### Active
+### E8 roadmap inventory
+
+| ID | Title | Status text |
+| --- | --- | --- |
+| `E8` | Graph Capture and Performance | Shipped |
+| `E8-F1` | Graph-Capture Capability and Lifecycle Contracts | Shipped |
+| `E8-F2` | Capture-Ready Device Enqueue Paths | Shipped |
+| `E8-F3` | Registry Preallocation, Identity Reuse, and Byte Accounting | Shipped |
+| `E8-F4` | Resident Graph Capture and Guarded Replay Lifecycle | Shipped |
+| `E8-F5` | Captured Full-Loop Parity and Lifecycle Validation | Shipped |
+| `E8-F6` | Multi-Box Scaling Benchmarks and Memory-Budget Evidence | Shipped |
+| `E8-F7` | CUDA Profiling and Machine-Bounded Performance Decisions | Shipped |
+| `E8-F8` | Graph-Capture Example, Runbook, Limitations, and Closeout | Shipped |
 
 - [Epic H: Graph Capture and Performance](data-oriented-gpu.md#epic-h-graph-capture-and-performance)
-  follows shipped Epic G and remains active/unshipped. E8 delivers bounded
-  capture/replay and documentation tracks, but E8-F2 completion, E8-F6
-  scaling/memory evidence, E8-F7/T7 profiling and machine-bounded
-  recommendations, and the final designated-device evidence gate remain
-  blockers. E8-F8 owns the example, runbook, limitations, and closeout, with no
+  and its eight features were closed as Shipped by maintainer decision on
+  2026-09-27. Reviewed CUDA measurements remain unavailable; plan closure
+  does not establish a measured performance claim. E8-F8 owns the example,
+  runbook, limitations, and closeout, with no
   CPU or Warp-CPU fallback. The [native-CUDA example](../../Examples/gpu_resident_graph_capture.py),
   [operator runbook](../gpu_graph_capture.md), and [P3 closeout record](graph-capture-closeout.md)
   are the discoverable references; the closeout alone owns P3 status/evidence.
 
 ### Pending
 
-Listed in execution order; each becomes active when the previous epic ships.
+The 0.2.13 release and 0.3.0 migration take precedence over the next epic.
 
 - [Epic I: Differentiability and Global Optimization](data-oriented-gpu.md#epic-i-differentiability-and-global-optimization)
   — implementation companion:

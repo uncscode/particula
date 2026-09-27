@@ -47,9 +47,6 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k resident -v -s --no-
 # Opt-in native-CUDA resident profiling smoke test
 pytest particula/gpu/tests/profiling_smoke_test.py --benchmark -q --no-cov
 
-# Hardware-free graph-capture profiling documentation contract
-pytest particula/tests/gpu_graph_capture_performance_docs_test.py -q --no-cov
-
 # Repository-wide coverage and strict documentation rendering
 .opencode/tools/run_pytest.py
 mkdocs build --strict
@@ -76,10 +73,15 @@ owns the [native-CUDA example](docs/Examples/gpu_resident_graph_capture.py),
 [operator runbook](docs/Features/gpu_graph_capture.md), limitations,
 documentation reconciliation, and the
 [P3 closeout record](docs/Features/Roadmap/graph-capture-closeout.md). The
-closeout is the sole P3 status/evidence authority and remains
+closeout is the sole P3 evidence authority. E8 and all eight feature plans are
+Shipped by maintainer decision on 2026-09-27; measured evidence remains
 `UNSHIPPED/BLOCKED` until its designated-device final-revision gate passes. The
 [canonical data-oriented GPU roadmap](docs/Features/Roadmap/data-oriented-gpu.md)
-records Epic H's active/unshipped delivery tracks and blockers. The
+records Epic H's Shipped plan status and outstanding measurement gaps.
+Release 0.2.13 is planned after this closeout merges and retains both facades
+and containers. Version 0.3.0 is the planned breaking migration that removes
+`ParticleRepresentation` and `GasSpecies` and updates dependent workflows,
+documentation, examples, and tests; Epic I follows that migration. The
 [GPU graph-capture profiling record](docs/Features/gpu_graph_capture_performance.md)
 freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
 gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
@@ -1054,8 +1056,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   pytest particula/execution/tests/captured_full_loop_test.py -q \
     -m "warp and cuda" --no-cov
   .opencode/tools/run_pytest.py
-  pytest particula/execution/tests/graph_capture_docs_test.py \
-    particula/tests/execution_selection_docs_test.py -q --no-cov
+  pytest particula/tests/execution_selection_docs_test.py -q --no-cov
   mkdocs build --strict
   ```
 
@@ -1154,8 +1155,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   pass-or-clean-skip evidence. Validate this contract with:
 
   ```bash
-  pytest particula/execution/tests/graph_capture_docs_test.py \
-    particula/tests/execution_selection_docs_test.py -q --no-cov
+  pytest particula/tests/execution_selection_docs_test.py -q --no-cov
   mkdocs build --strict
   ```
 

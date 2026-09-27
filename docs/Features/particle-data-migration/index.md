@@ -74,9 +74,15 @@ in strategies and runnables:
 
 ## Deprecation timeline
 
-- **v0.3.0**: `ParticleRepresentation` and `GasSpecies` are deprecated and
-  emit log warnings.
-- **v1.0**: planned removal of the legacy facades.
+- **v0.2.13** (planned after the E8 closeout merges): retain both the legacy
+  `ParticleRepresentation` and `GasSpecies` facades and the data containers.
+  Existing facade migration warnings remain applicable.
+- **v0.3.0** (planned breaking migration): remove the legacy facades, migrate
+  dependent workflows to the data containers, and update all affected
+  documentation, examples, imports, and tests.
+
+This 2026-09-27 maintainer decision supersedes the previous v1.0 removal
+target. The versions above are release plans, not announcements of publication.
 
 ## Related references
 

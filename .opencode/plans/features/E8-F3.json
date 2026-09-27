@@ -2,14 +2,14 @@
   "id": "E8-F3",
   "type": "feature",
   "title": "Registry Preallocation, Identity Reuse, and Byte Accounting",
-  "status": "In Progress",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-09-02",
+  "completion_date": "2026-09-27",
+  "last_updated": "2026-09-27",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E8-F3/architecture_design.md",
@@ -46,11 +46,11 @@
     {
       "id": "E8-F3-P2",
       "title": "Complete process and control sidecar preallocation with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-27",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -88,11 +88,11 @@
     {
       "id": "E8-F3-P5",
       "title": "Prepared-timestep integration, accounting validation, and documentation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-27",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -101,5 +101,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
