@@ -1,0 +1,97 @@
+{
+  "id": "E9",
+  "type": "epic",
+  "title": "v0.3.0 data-native Aerosol migration and legacy facade removal",
+  "status": "Draft",
+  "priority": "P2",
+  "size": "M",
+  "owners": [],
+  "start_date": null,
+  "target_date": null,
+  "completion_date": null,
+  "last_updated": "2026-09-27",
+  "dependencies": [],
+  "section_files": {
+    "appendix": ".opencode/plans/sections/epics/E9/appendix.md",
+    "change_log": ".opencode/plans/sections/epics/E9/change_log.md",
+    "child_plans": ".opencode/plans/sections/epics/E9/child_plans.md",
+    "dependency_map": ".opencode/plans/sections/epics/E9/dependency_map.md",
+    "governance": ".opencode/plans/sections/epics/E9/governance.md",
+    "implementation_strategy": ".opencode/plans/sections/epics/E9/implementation_strategy.md",
+    "milestones_timeline": ".opencode/plans/sections/epics/E9/milestones_timeline.md",
+    "open_questions": ".opencode/plans/sections/epics/E9/open_questions.md",
+    "outcomes_guardrails": ".opencode/plans/sections/epics/E9/outcomes_guardrails.md",
+    "risk_register": ".opencode/plans/sections/epics/E9/risk_register.md",
+    "scope_constraints": ".opencode/plans/sections/epics/E9/scope_constraints.md",
+    "success_metrics": ".opencode/plans/sections/epics/E9/success_metrics.md",
+    "vision_problem": ".opencode/plans/sections/epics/E9/vision_problem.md"
+  },
+  "schema_version": "1.0",
+  "child_plans": [
+    {
+      "id": "E9-M1",
+      "type": "maintenance"
+    },
+    {
+      "id": "E9-M2",
+      "type": "maintenance"
+    },
+    {
+      "id": "E9-M3",
+      "type": "maintenance"
+    },
+    {
+      "id": "E9-M4",
+      "type": "maintenance"
+    },
+    {
+      "id": "E9-M5",
+      "type": "maintenance"
+    },
+    {
+      "id": "E9-M6",
+      "type": "maintenance"
+    }
+  ],
+  "milestones": [
+    {
+      "name": "T1 / E9-M1: data contracts, accessors and co-located tests (M)",
+      "planned_date": null,
+      "actual_date": null,
+      "status": "Not Started"
+    },
+    {
+      "name": "T2 / E9-M2: construction, flat Aerosol and co-located tests (L)",
+      "planned_date": null,
+      "actual_date": null,
+      "status": "Not Started"
+    },
+    {
+      "name": "T3 / E9-M3: CPU scientific processes and regression tests (L)",
+      "planned_date": null,
+      "actual_date": null,
+      "status": "Not Started"
+    },
+    {
+      "name": "T4 / E9-M4: runnables, CPU adapters and integration tests (L)",
+      "planned_date": null,
+      "actual_date": null,
+      "status": "Not Started"
+    },
+    {
+      "name": "T5 / E9-M5: supported examples, notebook pairs and documentation (L)",
+      "planned_date": null,
+      "actual_date": null,
+      "status": "Not Started"
+    },
+    {
+      "name": "T6 / E9-M6: legacy removal, integration validation and release documentation (L)",
+      "planned_date": null,
+      "actual_date": null,
+      "status": "Not Started"
+    }
+  ],
+  "governance_log": [],
+  "risk_register": [],
+  "lifecycle": "active"
+}
