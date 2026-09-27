@@ -19,8 +19,8 @@ This page tracks the status of the data-oriented container migration and the
 Warp-backed GPU work for particle-resolved aerosol simulations.
 
 The roadmap is a single ordered sequence of epics with explicit boundaries.
-Epics are worked in the order below: when an epic meets its exit bar, the
-next pending epic in the sequence becomes the active one. Cross-cutting
+Epics are worked in the order below. Following E8, the 0.2.13 release and
+0.3.0 container migration take precedence over activating Epic I. Cross-cutting
 documentation, validation-infrastructure, and API-stability work is folded
 into each epic's feature list rather than running as a separate parallel
 epic.
@@ -41,7 +41,7 @@ documentation conventions.
 | 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Shipped | E5 |
 | 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Shipped | E6 |
 | 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Shipped | E7 |
-| 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Active / unshipped | E8 |
+| 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Shipped | E8 |
 | 9 | [Epic I: Differentiability and Global Optimization](#epic-i-differentiability-and-global-optimization) | Pending | not scheduled |
 
 The former suggested milestones are absorbed into the per-epic exit bars:
@@ -309,12 +309,25 @@ E2 closed the foundation scope needed by later GPU roadmap epics:
   boundary docs now distinguish multi-box-capable storage from still-limited
   CPU process execution.
 
+### Release and migration milestones
+
+Maintainer decision (2026-09-27): close E8 and all eight feature plans as
+Shipped, then merge this closeout before releasing **0.2.13**. That release
+retains both legacy facades and the data containers.
+
+**0.3.0** is the planned breaking container-first migration. Remove
+`ParticleRepresentation` and `GasSpecies`, migrate their dependent workflows,
+and update all affected documentation, examples, imports, and tests. Preserve
+the established container ownership, shape, and fp64 contracts. This supersedes
+the previous v1.0 facade-removal target. Epic I remains pending until after
+this migration. Neither version is released by this documentation update.
+
 ### Post-E2 Data-Oriented Work
 
 - Finish reducing dependence on legacy facade objects in new examples and
   documentation.
-- Decide when `ParticleRepresentation` and `GasSpecies` should move from
-  compatibility facades to deprecated APIs.
+- Retain `ParticleRepresentation` and `GasSpecies` through 0.2.13 and remove
+  them in the 0.3.0 migration.
 - Keep strategy APIs consistent when accepting either legacy facades or data
   containers.
 - Expand examples that start directly from `ParticleData` and `GasData` instead
@@ -1685,10 +1698,11 @@ deferred to the later Epic H tracks and Epic I.
 
 ## Epic H: Graph Capture and Performance
 
-Status: active and unshipped. E8-F1, E8-F2 P1--P6/P8, and E8-F4 P1--P5
-deliver bounded capture/replay and prepared-path tracks; they do not satisfy
-Epic H's final evidence gate. E8-F2 completion, E8-F6 scaling/memory evidence,
-and E8-F7/T7 profiling and machine-bounded recommendations remain blockers.
+Status: **Shipped**, together with E8-F1 through E8-F8, by maintainer closeout
+decision on 2026-09-27. The decision reconciles plan completion and separates
+it from the outstanding measured-evidence gate. Reviewed CUDA scaling,
+memory, and profiling artifacts remain unavailable; no passing measurement
+is inferred from plan status.
 E8-F4 keeps opaque native handles in private LIVE/RELEASING/RELEASED
 provenance. Per-record launch leases prevent release races, native callbacks
 run outside the global provenance lock, and the shared session lifecycle
@@ -1707,9 +1721,9 @@ is checked in, so profiling results and recommendations are unavailable and
 unshipped. E8-F8 owns the [native-CUDA example](../../Examples/gpu_resident_graph_capture.py),
 [operator runbook](../gpu_graph_capture.md), limitations, documentation
 reconciliation, and [closeout record](graph-capture-closeout.md). The closeout
-record is the sole P3 status and evidence authority: unavailable, stale, failed,
-missing, or clean-skipped evidence remains `UNSHIPPED/BLOCKED` and never
-promotes Epic H.
+record is the sole P3 evidence authority. Its measured-evidence disposition
+remains `UNSHIPPED/BLOCKED` until the required evidence passes, independently
+of the maintainer's Shipped plan disposition.
 
 ### E8-F1 shipped contract
 
@@ -1922,9 +1936,12 @@ Planned features:
 8. CUDA kernel profiling (occupancy, memory access patterns) and
    captured-vs-uncaptured launch-overhead benchmarks.
 
-**Exit bar:** A multi-box GPU-resident simulation runs graph-captured
+**Original measured-evidence exit bar:** A multi-box GPU-resident simulation runs graph-captured
 timesteps, matches CPU and uncaptured GPU references, and has published
 scaling numbers across box counts plus a recorded memory-budget model.
+
+The 2026-09-27 maintainer decision closes the plans without asserting that
+this measured-evidence bar passed; the closeout ledger preserves its gaps.
 
 ### Warp Graph Capture
 
@@ -2081,6 +2098,8 @@ revision does not claim an artifact-recorded status, including
 `skipped_budget`.
 
 ## Epic I: Differentiability and Global Optimization
+
+Status: pending, following the 0.2.13 release and 0.3.0 container migration.
 
 A longer-term goal is gradient-based global optimization: using Warp automatic
 differentiation to fit model parameters to experiments or observations.

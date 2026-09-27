@@ -38,7 +38,7 @@ The explicit measurement rows are:
 - `captured_replay` / `synchronized_elapsed`: Time replay dispatch through
   one post-dispatch completion boundary.
 
-The first two commands, the documentation test, the repository runner, and
+The first two commands, the repository runner, and
 MkDocs build are hardware-free:
 
 ```bash
@@ -46,7 +46,6 @@ pytest particula/gpu/tests/profiling_support_test.py -q --no-cov
 pytest particula/gpu/tests/benchmark_helpers_test.py -q --no-cov
 pytest particula/gpu/tests/benchmark_test.py --benchmark -k resident -v -s --no-cov
 pytest particula/gpu/tests/profiling_smoke_test.py --benchmark -q --no-cov
-pytest particula/tests/gpu_graph_capture_performance_docs_test.py -q --no-cov
 .opencode/tools/run_pytest.py
 mkdocs build --strict
 ```

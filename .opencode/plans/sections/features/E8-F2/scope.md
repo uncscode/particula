@@ -1,5 +1,8 @@
 # Scope
 
+2026-09-27 maintainer closeout: E8-F2 and all phases are Shipped. Any pending
+P7 references below describe the earlier P8 handoff, superseded by this decision.
+
 E8-F2 delivers the T2 setup/enqueue split for the complete resident timestep.
 One-time setup performs host-side validation, normalization, dependency
 resolution, and prepared-plan construction. The prepared path enqueues only

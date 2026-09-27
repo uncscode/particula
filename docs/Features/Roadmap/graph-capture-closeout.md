@@ -2,11 +2,20 @@
 
 ## Scope and current disposition
 
-**Disposition: UNSHIPPED/BLOCKED.** E8-F7/T7 owns profiling and
-machine-bounded recommendations. F8-P3 only records closeout evidence; it does
-not promote Epic H, change runtime APIs, or duplicate the F8-P1 example or P2
-runbook. Epic H remains unpromoted. Missing evidence is unavailable and
-unmeasured, not zero or passing evidence.
+**Plan disposition: Shipped by maintainer decision on 2026-09-27.** E8 and
+E8-F1 through E8-F8 are closed based on the maintainer's completion report.
+The decision supersedes the original requirement to keep plan metadata open
+until the designated-device evidence gate passes. It does not supply or
+certify missing measurements.
+
+**Measured-evidence disposition: UNSHIPPED/BLOCKED.** E8-F7/T7 owns profiling
+and machine-bounded recommendations. F8-P3 records the evidence ledger;
+missing evidence remains unavailable and unmeasured, not zero or passing.
+The original 2026-09-07 evidence snapshot below is retained for follow-up.
+
+Release sequence: merge this closeout, then publish 0.2.13 with both facades
+and containers. The planned 0.3.0 migration removes the facades and updates
+dependent workflows and all affected documentation and examples.
 
 The committed record has no populated final revision, designated qualified CUDA
 device, measurement, or reviewed artifact. Measurement fields remain
@@ -88,6 +97,14 @@ metadata only.
 | H11 | Exact closeout command matrix and literal results before promotion | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C1–C9; literal results unavailable |
 
 ## Command ledger
+
+Historical command snapshot (2026-09-07): C1 and C6 refer to work-specific
+documentation tests removed on 2026-09-27 at maintainer request because they
+pinned mutable prose and plan status. They are retained below only as historical
+entries, not runnable instructions or future gates. Use strict MkDocs (C5) for
+documentation validation and the plan-schema validator for plan metadata.
+Future evidence collection must revise this ledger and its H-row mappings
+before applying the measured-evidence promotion rule.
 
 Rows C1–C6 are validation commands. Focused rows are assertion-only, not
 coverage evidence; C4 is this record's sole repository coverage command, and
@@ -174,12 +191,14 @@ and copied summaries.
 
 ## Blockers and promotion rule
 
-Absent reviewed F6/F7 CUDA artifacts and outstanding E8-F2 and E8-F3 work block
-this record. E8-F2 still has incomplete prepared-enqueue implementation work.
-E8-F3 remains `In Progress`; its P2 and P5 phases are `Not Started`.
-Promotion requires H1–H11 `PASS` on one final revision and designated qualified
+The original evidence snapshot cited outstanding E8-F2 and E8-F3 work.
+Those plan statuses are superseded by the 2026-09-27 maintainer closeout;
+historical matrix references are not current implementation status.
+Absent reviewed F6/F7 CUDA artifacts still block measured-evidence promotion.
+Measured-evidence promotion requires H1–H11 `PASS` on one final revision and designated qualified
 CUDA device, reviewed safe artifacts where applicable, all literal command
-outputs, and frozen coverage targets/gate. Otherwise retain `UNSHIPPED/BLOCKED`.
+outputs, and frozen coverage targets/gate. Otherwise retain the measured-evidence
+disposition `UNSHIPPED/BLOCKED`, independently of Shipped plan metadata.
 
 A later evidence update must preserve row and command ordering, validate
 manifest consistency before changing statuses, and remain blocked if any

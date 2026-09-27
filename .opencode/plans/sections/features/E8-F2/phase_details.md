@@ -1,5 +1,9 @@
 # Phase Details
 
+2026-09-27 maintainer closeout: E8-F2 and all phases are Shipped. The phase
+notes below preserve historical implementation and validation handoffs;
+earlier pending P7 references are superseded by the current plan metadata.
+
 - [x] **E8-F2-P1:** Define validated resident enqueue plans and setup contract with unit tests
   - Issue: #1552 | Size: S | Status: Implemented
   - Delivered: Added concrete-only `particula.execution.resident_enqueue` with

@@ -335,8 +335,9 @@ print(result)
   accounting, memory-footprint examples, and focused reproduction commands.
 - **Resident graph capture** uses a qualified native CUDA device with fixed
   identities and shapes plus explicit capture, retirement, and renewal actions.
-  It is concrete-only, has no CPU or Warp-CPU fallback, and remains unshipped
-  pending final evidence. E8-F7/T7 owns profiling and machine-bounded
+  It is concrete-only and has no CPU or Warp-CPU fallback. E8 and its features
+  are Shipped by maintainer decision; measured results remain unshipped
+  pending reviewed evidence. E8-F7/T7 owns profiling and machine-bounded
   recommendations; E8-F8 owns the example, runbook, limitations, and closeout.
   See the [native-CUDA example](Examples/gpu_resident_graph_capture.py),
   [operator runbook](Features/gpu_graph_capture.md), and [roadmap closeout record](Features/Roadmap/graph-capture-closeout.md).

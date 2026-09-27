@@ -2,14 +2,14 @@
   "id": "E8-F8",
   "type": "feature",
   "title": "Graph-Capture Example, Runbook, Limitations, and Closeout",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-09-07",
+  "completion_date": "2026-09-27",
+  "last_updated": "2026-09-27",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E8-F8/architecture_design.md",
@@ -74,11 +74,11 @@
     {
       "id": "E8-F8-P4",
       "title": "Roadmap and development documentation closeout",
-      "status": "In Progress",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-09-27",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -87,5 +87,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
