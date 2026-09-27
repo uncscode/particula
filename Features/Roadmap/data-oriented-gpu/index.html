@@ -13312,6 +13312,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#release-and-migration-milestones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Release and migration milestones
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#post-e2-data-oriented-work" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -16831,6 +16842,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#release-and-migration-milestones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Release and migration milestones
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#post-e2-data-oriented-work" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -17391,8 +17413,8 @@ saturation-ratio outputs, not callback registration or optional update wiring.</
 <p>This page tracks the status of the data-oriented container migration and the
 Warp-backed GPU work for particle-resolved aerosol simulations.</p>
 <p>The roadmap is a single ordered sequence of epics with explicit boundaries.
-Epics are worked in the order below: when an epic meets its exit bar, the
-next pending epic in the sequence becomes the active one. Cross-cutting
+Epics are worked in the order below. Following E8, the 0.2.13 release and
+0.3.0 container migration take precedence over activating Epic I. Cross-cutting
 documentation, validation-infrastructure, and API-stability work is folded
 into each epic's feature list rather than running as a separate parallel
 epic.</p>
@@ -17456,7 +17478,7 @@ documentation conventions.</p>
 <tr>
 <td>8</td>
 <td><a href="#epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance</a></td>
-<td>Active / unshipped</td>
+<td>Shipped</td>
 <td>E8</td>
 </tr>
 <tr>
@@ -17718,12 +17740,22 @@ must build on.</p>
   boundary docs now distinguish multi-box-capable storage from still-limited
   CPU process execution.</li>
 </ul>
+<h3 id="release-and-migration-milestones">Release and migration milestones<a class="headerlink" href="#release-and-migration-milestones" title="Permanent link">&para;</a></h3>
+<p>Maintainer decision (2026-09-27): close E8 and all eight feature plans as
+Shipped, then merge this closeout before releasing <strong>0.2.13</strong>. That release
+retains both legacy facades and the data containers.</p>
+<p><strong>0.3.0</strong> is the planned breaking container-first migration. Remove
+<code>ParticleRepresentation</code> and <code>GasSpecies</code>, migrate their dependent workflows,
+and update all affected documentation, examples, imports, and tests. Preserve
+the established container ownership, shape, and fp64 contracts. This supersedes
+the previous v1.0 facade-removal target. Epic I remains pending until after
+this migration. Neither version is released by this documentation update.</p>
 <h3 id="post-e2-data-oriented-work">Post-E2 Data-Oriented Work<a class="headerlink" href="#post-e2-data-oriented-work" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Finish reducing dependence on legacy facade objects in new examples and
   documentation.</li>
-<li>Decide when <code>ParticleRepresentation</code> and <code>GasSpecies</code> should move from
-  compatibility facades to deprecated APIs.</li>
+<li>Retain <code>ParticleRepresentation</code> and <code>GasSpecies</code> through 0.2.13 and remove
+  them in the 0.3.0 migration.</li>
 <li>Keep strategy APIs consistent when accepting either legacy facades or data
   containers.</li>
 <li>Expand examples that start directly from <code>ParticleData</code> and <code>GasData</code> instead
@@ -19678,10 +19710,11 @@ Native graph capture/replay beyond E8-F1 host admission, performance profiling
 and targets, memory-budget evidence, distributed execution, and autodiff remain
 deferred to the later Epic H tracks and Epic I.</p>
 <h2 id="epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance<a class="headerlink" href="#epic-h-graph-capture-and-performance" title="Permanent link">&para;</a></h2>
-<p>Status: active and unshipped. E8-F1, E8-F2 P1--P6/P8, and E8-F4 P1--P5
-deliver bounded capture/replay and prepared-path tracks; they do not satisfy
-Epic H's final evidence gate. E8-F2 completion, E8-F6 scaling/memory evidence,
-and E8-F7/T7 profiling and machine-bounded recommendations remain blockers.
+<p>Status: <strong>Shipped</strong>, together with E8-F1 through E8-F8, by maintainer closeout
+decision on 2026-09-27. The decision reconciles plan completion and separates
+it from the outstanding measured-evidence gate. Reviewed CUDA scaling,
+memory, and profiling artifacts remain unavailable; no passing measurement
+is inferred from plan status.
 E8-F4 keeps opaque native handles in private LIVE/RELEASING/RELEASED
 provenance. Per-record launch leases prevent release races, native callbacks
 run outside the global provenance lock, and the shared session lifecycle
@@ -19699,9 +19732,9 @@ is checked in, so profiling results and recommendations are unavailable and
 unshipped. E8-F8 owns the <a href="../../../Examples/gpu_resident_graph_capture/">native-CUDA example</a>,
 <a href="../../gpu_graph_capture/">operator runbook</a>, limitations, documentation
 reconciliation, and <a href="../graph-capture-closeout/">closeout record</a>. The closeout
-record is the sole P3 status and evidence authority: unavailable, stale, failed,
-missing, or clean-skipped evidence remains <code>UNSHIPPED/BLOCKED</code> and never
-promotes Epic H.</p>
+record is the sole P3 evidence authority. Its measured-evidence disposition
+remains <code>UNSHIPPED/BLOCKED</code> until the required evidence passes, independently
+of the maintainer's Shipped plan disposition.</p>
 <h3 id="e8-f1-shipped-contract">E8-F1 shipped contract<a class="headerlink" href="#e8-f1-shipped-contract" title="Permanent link">&para;</a></h3>
 <p>E8-F1 ships host metadata and scheduler admission only. Its concrete-only
 direct-import boundary is <code>particula.execution.graph_capture</code>; its carriers and
@@ -19924,9 +19957,11 @@ targets aligned with the multi-box scaling goal.</p>
 <li>CUDA kernel profiling (occupancy, memory access patterns) and
    captured-vs-uncaptured launch-overhead benchmarks.</li>
 </ol>
-<p><strong>Exit bar:</strong> A multi-box GPU-resident simulation runs graph-captured
+<p><strong>Original measured-evidence exit bar:</strong> A multi-box GPU-resident simulation runs graph-captured
 timesteps, matches CPU and uncaptured GPU references, and has published
 scaling numbers across box counts plus a recorded memory-budget model.</p>
+<p>The 2026-09-27 maintainer decision closes the plans without asserting that
+this measured-evidence bar passed; the closeout ledger preserves its gaps.</p>
 <h3 id="warp-graph-capture">Warp Graph Capture<a class="headerlink" href="#warp-graph-capture" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
@@ -20075,6 +20110,7 @@ resident artifact is checked in: it is not measured and is not zero. This
 revision does not claim an artifact-recorded status, including
 <code>skipped_budget</code>.</p>
 <h2 id="epic-i-differentiability-and-global-optimization">Epic I: Differentiability and Global Optimization<a class="headerlink" href="#epic-i-differentiability-and-global-optimization" title="Permanent link">&para;</a></h2>
+<p>Status: pending, following the 0.2.13 release and 0.3.0 container migration.</p>
 <p>A longer-term goal is gradient-based global optimization: using Warp automatic
 differentiation to fit model parameters to experiments or observations.
 Differentiability constrains how kernels are written, so it must be considered

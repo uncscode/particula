@@ -16045,6 +16045,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#release-and-migration-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Release and migration sequence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#current-focus" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -16173,10 +16184,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#active" class="md-nav__link">
+  <a href="#e8-roadmap-inventory" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Active
+        E8 roadmap inventory
       
     </span>
   </a>
@@ -16259,6 +16270,23 @@
 <p>This roadmap summarizes the current direction for Particula feature
 development. It is a guide for users and contributors, not a fixed release
 schedule.</p>
+<h2 id="release-and-migration-sequence">Release and migration sequence<a class="headerlink" href="#release-and-migration-sequence" title="Permanent link">&para;</a></h2>
+<p>Maintainer decision, 2026-09-27: E8 and E8-F1 through E8-F8 are Shipped.
+The next milestones are:</p>
+<ol>
+<li>Merge the E8 closeout and roadmap update.</li>
+<li>Release <strong>0.2.13</strong>, retaining both the legacy <code>ParticleRepresentation</code> /
+   <code>GasSpecies</code> facades and the <code>ParticleData</code> / <code>GasData</code> / <code>EnvironmentData</code>
+   container workflow.</li>
+<li>Deliver <strong>0.3.0</strong> as the breaking container-first migration: remove the
+   legacy facades, migrate dependent workflows, and update all affected
+   documentation, examples, imports, and tests.</li>
+<li>Continue Epic I, differentiability and initial-state optimization, after
+   the migration milestone.</li>
+</ol>
+<p>These are planned releases; this roadmap update does not publish a release.
+The <a href="graph-capture-closeout/">closeout record</a> records the maintainer's
+plan closure separately from unavailable CUDA measurement evidence.</p>
 <h2 id="current-focus">Current Focus<a class="headerlink" href="#current-focus" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Strategy-based physics systems</strong>: Continue standardizing dynamics modules
@@ -16274,16 +16302,16 @@ schedule.</p>
   resident scheduling, communication, checkpoint/restart, diagnostics, and RNG
   contracts from
   <a href="data-oriented-gpu/#epic-g-backend-selection-and-gpu-resident-simulation">Epic G</a>.</li>
-<li><strong>Graph capture and performance</strong>: Maintain active, unshipped
+<li><strong>Graph capture and performance</strong>: Maintain shipped
   <a href="data-oriented-gpu/#epic-h-graph-capture-and-performance">Epic H</a>'s bounded
   capture/replay and documentation tracks. Use the <a href="../../Examples/gpu_resident_graph_capture/">native-CUDA
   example</a>, <a href="../gpu_graph_capture/">operator
   runbook</a>, and <a href="graph-capture-closeout/">closeout
   record</a>. E8-F7/T7 owns profiling and
   machine-bounded recommendations; E8-F8 owns the example, runbook,
-  limitations, and closeout. The closeout remains the sole P3 evidence authority
-  while E8-F2, E8-F6, and E8-F7/T7 blockers remain; no CPU or Warp-CPU fallback
-  is provided.</li>
+  limitations, and closeout. The closeout remains the sole P3 evidence authority;
+  measured performance results remain unavailable and unshipped until reviewed.
+  No CPU or Warp-CPU fallback is provided.</li>
 <li><strong>Documentation and examples</strong>: Expand practical examples that connect feature
   guides, theory pages, and runnable notebooks.</li>
 </ul>
@@ -16621,21 +16649,76 @@ document an explicit five-call sequence. Its <code>condensation_step_gpu</code>,
 </tr>
 </tbody>
 </table>
-<p>E5, E6, E7, and all of their feature plans are shipped. Epic H is active next.</p>
-<h3 id="active">Active<a class="headerlink" href="#active" title="Permanent link">&para;</a></h3>
+<p>E5, E6, E7, E8, and all of their feature plans are shipped.</p>
+<h3 id="e8-roadmap-inventory">E8 roadmap inventory<a class="headerlink" href="#e8-roadmap-inventory" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Status text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>E8</code></td>
+<td>Graph Capture and Performance</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E8-F1</code></td>
+<td>Graph-Capture Capability and Lifecycle Contracts</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E8-F2</code></td>
+<td>Capture-Ready Device Enqueue Paths</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E8-F3</code></td>
+<td>Registry Preallocation, Identity Reuse, and Byte Accounting</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E8-F4</code></td>
+<td>Resident Graph Capture and Guarded Replay Lifecycle</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E8-F5</code></td>
+<td>Captured Full-Loop Parity and Lifecycle Validation</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E8-F6</code></td>
+<td>Multi-Box Scaling Benchmarks and Memory-Budget Evidence</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E8-F7</code></td>
+<td>CUDA Profiling and Machine-Bounded Performance Decisions</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E8-F8</code></td>
+<td>Graph-Capture Example, Runbook, Limitations, and Closeout</td>
+<td>Shipped</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li><a href="data-oriented-gpu/#epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance</a>
-  follows shipped Epic G and remains active/unshipped. E8 delivers bounded
-  capture/replay and documentation tracks, but E8-F2 completion, E8-F6
-  scaling/memory evidence, E8-F7/T7 profiling and machine-bounded
-  recommendations, and the final designated-device evidence gate remain
-  blockers. E8-F8 owns the example, runbook, limitations, and closeout, with no
+  and its eight features were closed as Shipped by maintainer decision on
+  2026-09-27. Reviewed CUDA measurements remain unavailable; plan closure
+  does not establish a measured performance claim. E8-F8 owns the example,
+  runbook, limitations, and closeout, with no
   CPU or Warp-CPU fallback. The <a href="../../Examples/gpu_resident_graph_capture/">native-CUDA example</a>,
   <a href="../gpu_graph_capture/">operator runbook</a>, and <a href="graph-capture-closeout/">P3 closeout record</a>
   are the discoverable references; the closeout alone owns P3 status/evidence.</li>
 </ul>
 <h3 id="pending">Pending<a class="headerlink" href="#pending" title="Permanent link">&para;</a></h3>
-<p>Listed in execution order; each becomes active when the previous epic ships.</p>
+<p>The 0.2.13 release and 0.3.0 migration take precedence over the next epic.</p>
 <ul>
 <li><a href="data-oriented-gpu/#epic-i-differentiability-and-global-optimization">Epic I: Differentiability and Global Optimization</a>
   — implementation companion:

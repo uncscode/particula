@@ -16239,13 +16239,12 @@ specified replay counts; those counts do not alter any excluded interval.</p>
 <li><code>captured_replay</code> / <code>synchronized_elapsed</code>: Time replay dispatch through
   one post-dispatch completion boundary.</li>
 </ul>
-<p>The first two commands, the documentation test, the repository runner, and
+<p>The first two commands, the repository runner, and
 MkDocs build are hardware-free:</p>
 <div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/tests/profiling_support_test.py<span class="w"> </span>-q<span class="w"> </span>--no-cov
 pytest<span class="w"> </span>particula/gpu/tests/benchmark_helpers_test.py<span class="w"> </span>-q<span class="w"> </span>--no-cov
 pytest<span class="w"> </span>particula/gpu/tests/benchmark_test.py<span class="w"> </span>--benchmark<span class="w"> </span>-k<span class="w"> </span>resident<span class="w"> </span>-v<span class="w"> </span>-s<span class="w"> </span>--no-cov
 pytest<span class="w"> </span>particula/gpu/tests/profiling_smoke_test.py<span class="w"> </span>--benchmark<span class="w"> </span>-q<span class="w"> </span>--no-cov
-pytest<span class="w"> </span>particula/tests/gpu_graph_capture_performance_docs_test.py<span class="w"> </span>-q<span class="w"> </span>--no-cov
 .opencode/tools/run_pytest.py
 mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
 </code></pre></div>

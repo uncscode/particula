@@ -16190,10 +16190,15 @@ metadata is preserved outside <code>WarpGasData</code>. GPU-only helper state su
 </ul>
 <h2 id="deprecation-timeline">Deprecation timeline<a class="headerlink" href="#deprecation-timeline" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>v0.3.0</strong>: <code>ParticleRepresentation</code> and <code>GasSpecies</code> are deprecated and
-  emit log warnings.</li>
-<li><strong>v1.0</strong>: planned removal of the legacy facades.</li>
+<li><strong>v0.2.13</strong> (planned after the E8 closeout merges): retain both the legacy
+  <code>ParticleRepresentation</code> and <code>GasSpecies</code> facades and the data containers.
+  Existing facade migration warnings remain applicable.</li>
+<li><strong>v0.3.0</strong> (planned breaking migration): remove the legacy facades, migrate
+  dependent workflows to the data containers, and update all affected
+  documentation, examples, imports, and tests.</li>
 </ul>
+<p>This 2026-09-27 maintainer decision supersedes the previous v1.0 removal
+target. The versions above are release plans, not announcements of publication.</p>
 <h2 id="related-references">Related references<a class="headerlink" href="#related-references" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>ParticleData</code> implementation: <code>particula/particles/particle_data.py</code></li>
