@@ -35,15 +35,20 @@
    Each equal substep reads gas left by preceding commits. An attempted commit
    is atomic; earlier successful substeps persist on later failure. Preserve
    no-admission/zero-time behavior and existing substep limits.
-9. `EnvironmentData` on the flat aggregate is authoritative. Resolve migration
-   of the existing `Nucleation(environment=...)` signature before P3; any
-   temporary accepted argument must not override held state or survive M6.
+9. `EnvironmentData` on the flat aggregate is authoritative. Remove the existing
+   `Nucleation(environment=...)` argument in the native API per E9 appendix D4;
+   any isolated legacy argument must not override native held state or survive M6.
 10. Existing CPU adapters retain original request/configuration/runnable/payload
     identities, profile admission and exactly-once calls. Errors propagate with
     no fallback, retry, implicit conversions or added recovery. CPU replacement
     never automatically rebinds prepared GPU/resident objects.
 
 ## Quality Bars
+
+E9 appendix D1–D2 additionally requires explicit count/radius-PDF interpretation
+through GPU/resident composition and checkpoint metadata. Physical expansion
+preserves represented particle counts; representative-volume scaling preserves
+density by scaling counts and volume together. Test both independently.
 
 - Every function-changing phase ships adjacent `*_test.py` tests in its PR.
   Preserve enduring assertions when replacing facade fixtures.

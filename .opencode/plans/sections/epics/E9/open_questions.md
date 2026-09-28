@@ -1,36 +1,44 @@
-# Open Questions
+# Open Questions and Review Decisions
 
-- [ ] **M1 gate: exact ordered species mapping.** Must all containers share a
-  full gas-width order, or is an explicit process-owned partitioning-lane map
-  required? `gas_data.py:65–80` provides names/mask, while environment species
-  lanes have no names (`environment_data.py:30–43`). Recommend documenting and
-  testing an explicit ordered mapping that preserves current schemas and all
-  nonpartitioning gas; do not infer identity from equal shapes alone. M1 owner
-  and scientific reviewer must select the precise representation before M2.
-- [ ] **M1/M2 gate: public spelling and mutation rules.** Select constructor,
-  individual getter/setter and coordinated replacement names, plus field-level
-  copy/view semantics. Recommend one consistent minimal API with preflight
-  before publication; the identity/no-partial-replacement contract is fixed.
-- [ ] **M2 gate: supported initialization inventory.** Which current builder
-  and preset capabilities need native equivalents, and where do they live?
-  Inventory actual consumers and supported examples before removing names;
-  preserve useful behavior without recreating facade-based factories.
-- [ ] **M2 gate: temporary compatibility shape.** Which minimal bridge keeps
-  not-yet-migrated consumers operational while serial tracks proceed?
-  Recommend concrete, explicitly inventoried temporary seams with consumer
-  lists and M6 deletion proof, not a new permanent public facade.
-- [ ] **M5 gate: supported example inventory and historical exceptions.**
-  Confirm every runnable/notebook in scope and explicitly label retained
-  historical before/after snippets. A new quick start alone is insufficient.
-- [ ] **Release governance: named reviewers and scheduling.** Maintainer to
-  assign track/release reviewers and dates; v0.3.0 has no fixed deadline.
-- [ ] **Plan tooling: accept epic milestones as program phases?** The actual
-  schema rejects epic `add-phase`; six milestones are stored instead. Recommend
-  retaining supported milestones and detailed phases on maintenance children,
-  rather than inventing unsupported phase fields or IDs. Orchestrator must
-  acknowledge this representation in its final report.
+Reviewed with Kyle Gorkowski on 2026-09-27. The canonical decision and research
+record is [appendix D1–D5](appendix.md#review-decisions-2026-09-27).
+Checked entries mean a planning decision was made, not implementation shipped.
 
-Already fixed by issue #1602: serial execution, migration before deletion,
-single-box CPU execution, three unchanged container names, process-owned
-physics, retained CPU↔Warp transfers and no automatic GPU/resident rebinding.
-These are not open scope choices.
+- [x] **Species mapping:** explicit process-owned gas-to-particle lane map;
+  environment follows full gas order. Preserve nonpartitioning gas and
+  particle-only material. Structural validation does not infer chemistry.
+- [x] **API and mutation:** keyword-only `Aerosol(particles=..., gas=...,
+  environment=...)`, identity-returning properties/validated setters and atomic
+  all-three `replace_data(...)`. Raw fields are writable; derived values are
+  fresh; copies detach data and preserve metadata.
+- [x] **Initialization:** retain direct mass/radius, speciated, PDF/PMF and
+  sampled-lognormal capabilities through native builders/utilities. Preserve
+  established defaults/RNG unless an explicit change is approved.
+- [x] **Transition:** retain narrowly isolated legacy paths while native paths
+  migrate; no facade emulation on the flat aggregate or duplicate state.
+  Concrete consumer/aliasing/deletion ledger is required at M2 entry.
+- [x] **Examples/history:** retain all supported scientific content and execute
+  full published workloads. No historical exceptions approved; M5 expands the
+  existing seed inventory to every source/pair/snippet and records resources.
+- [x] **Governance:** Kyle/Gorkowski is final plan/scientific/release approver.
+  No fixed deadline. Use `data-native-v030-closeout.md` as the evidence index;
+  actual execution operators and revisions are recorded by owning tracks.
+- [x] **Plan representation:** retain schema-supported epic milestones and
+  maintenance-child phases. Fixed M3 metadata to depend on E9-M2.
+- [x] **Normalization correction:** raw counts per simulation volume for
+  discrete/resolved; radius-based `dN/dr` per simulation volume for PDFs.
+  Divide by V exactly once for physical concentration. Shared distribution_type
+  vocabulary on data and processes replaces ambiguous storage interpretation.
+  Radius in metres is the sole distribution coordinate, confirmed by maintainer.
+- [x] **Scope amendment:** include required CPU/GPU normalization and metadata
+  propagation, including prepared/resident/checkpoint consequences. Preserve
+  array layouts, device ownership, explicit transfer APIs and no implicit rebind.
+
+## Remaining implementation gates
+
+M1 must deliver the full consumer/unit/metadata ledger and independent
+non-unit-volume/PDF characterization; M2 must validate its concrete transition;
+M3/M4 must prove scientific and cross-backend corrections; M5 must complete its
+path-level inventory and execution evidence; M6 must prove removal and readiness.
+These are assigned phase deliverables, not further undecided API alternatives.
+No implementation gate or scientific test is claimed complete by this review.

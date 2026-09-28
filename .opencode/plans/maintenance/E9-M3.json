@@ -10,7 +10,9 @@
   "target_date": null,
   "completion_date": null,
   "last_updated": "2026-09-27",
-  "dependencies": [],
+  "dependencies": [
+    "E9-M2"
+  ],
   "section_files": {
     "appendix": ".opencode/plans/sections/maintenance/E9-M3/appendix.md",
     "change_log": ".opencode/plans/sections/maintenance/E9-M3/change_log.md",

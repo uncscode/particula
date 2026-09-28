@@ -30,7 +30,9 @@ No production physics changes, new accessors, redesigned construction, legacy
 class/bridge/export deletion, permanent compatibility facade, version bump or
 release approval. M6 owns deletion and final release readiness. Missing native
 capabilities reopen upstream gates rather than prompting local workarounds.
-No general multi-box CPU execution, precision/schema changes, hidden transfers,
+Document upstream approved distribution metadata and normalization corrections;
+M5 does not implement them. No general multi-box CPU execution, further
+precision/schema changes, hidden transfers,
 GPU fallback/rebinding, graph-capture redesign, performance claims or Epic I.
 Do not retire a supported tutorial merely to avoid migrating its scientific
 content. An unchanged example still needs an explicit inventory disposition.

@@ -1,5 +1,10 @@
 # Phase Details
 
+The approved API and storage contract is E9 appendix D1–D4. Each initializer
+sets the shared distribution_type explicitly: density inputs multiply by V,
+raw counts do not, and continuous_pdf is radius-based dN/dr. M1's handoff must
+make this unambiguous before any native construction is published.
+
 All six phases are Not Started. Each is a bounded PR with tests in the owning
 phase; there is no standalone unit-testing phase. P1 requires M1 completed and
 validated, and each subsequent phase requires its predecessor completed and

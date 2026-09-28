@@ -15,12 +15,15 @@
 - Last-stage removal of obsolete facades, `Atmosphere`, obsolete builders,
   facade bridges, compatibility branches, exports, messages and facade-only
   tests, after recording replacement coverage for enduring behavior.
-- Regression checks of retained CPU↔Warp transfers and GPU execution contracts.
+- Shared distribution_type metadata and consistent per-simulation-volume
+  storage, including radius PDFs; CPU/direct/prepared/resident normalization
+  corrections and transfer/checkpoint metadata preservation. See appendix D1–D2.
 
 ## Out of scope
 
 New physics, general multi-box CPU execution, renaming containers, changing
-precision/storage schemas, permanent compatibility facades, new GPU public
+precision/array layouts beyond the approved distribution metadata,
+permanent compatibility facades, new GPU public
 APIs, graph-capture redesign, hidden transfers/fallbacks, performance studies
 and Epic I implementation. Do not remove unrelated warnings or container
 transfer helpers merely because they mention conversion.
@@ -36,5 +39,5 @@ adjacent CPU wall-loss tests are required. No arbitrary coverage gates or
 local `-Werror` flags are introduced. No additional compliance constraints
 were supplied.
 
-This drafting task edits E9 only; existing child shells are referenced but
-their sections, phases and dependency metadata are delegated to their owners.
+The 2026-09-27 maintainer review amends E9 and all six children together;
+the appendix records the bounded changes to issue #1602's original constraints.

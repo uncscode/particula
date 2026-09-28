@@ -13,6 +13,10 @@
   `particula/dynamics/tests/wall_loss_strategies_test.py` and
   `particula/dynamics/wall_loss/tests/wall_loss_strategies_test.py`.
 - Narrow developer contract guidance and scientific test traceability.
+- Direct/prepared GPU condensation, coagulation and wall-loss normalization and
+  metadata admission under `particula/gpu/kernels/` plus adjacent tests, limited
+  to E9 appendix D1–D2. Preserve supported modes and execution ownership;
+  reject unsupported PDFs explicitly rather than adding GPU PDF algorithms.
 
 ## Interfaces and APIs
 

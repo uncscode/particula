@@ -4,7 +4,9 @@ Issue #1602 is the scope authority. Maintainer approval is required for public
 API spelling, the final alignment contract, retained preset inventory and
 release readiness. Track implementers supply evidence; scientific and
 execution reviewers check physics and protected GPU boundaries respectively.
-Named owners and dates are not assigned by this draft.
+Kyle Gorkowski (`Gorkowski`) is the final plan, scientific and release approver
+by the 2026-09-27 review. Execution operators are assigned in each track's
+evidence packet. No calendar deadline is assigned.
 
 | Date | Decision / source | Owner | Impact |
 |---|---|---|---|
@@ -15,6 +17,11 @@ Named owners and dates are not assigned by this draft.
 | 2026-09-27 | Testing guide and issue policy govern validation | Track reviewers | Focused assertions, untargeted runner, explicit adjacent wall-loss suite; no arbitrary local gates |
 
 ## Review and completion protocol
+
+The maintainer-approved appendix D1–D5 records shared distribution metadata,
+counts/radius-PDF normalization, required CPU/GPU corrections, explicit species
+mapping, property-based aggregate access and held nucleation environment.
+These are narrow amendments to the original schema/GPU restrictions in #1602.
 
 - Review each track's contract and affected behavioral coverage before code
   changes. Freeze M1 decisions before M2 admission.

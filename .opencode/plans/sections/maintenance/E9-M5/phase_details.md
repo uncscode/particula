@@ -1,5 +1,11 @@
 # Phase Details
 
+Publish E9 appendix D1–D4 consistently: shared distribution_type, radius PDFs
+dN/dr, explicit count/volume conversion, mapped species, property-based access
+and held nucleation environment. Explain intentional normalization corrections
+and metadata/checkpoint migration; do not claim old numerical errors are parity
+targets. Phase P5 also exercises corrected CPU/GPU non-unit-volume boundaries.
+
 All seven phases are Not Started, serial and issue-sized. Every phase consumes
 its predecessor's validated gate; P1 additionally requires M4 completed and
 validated. Example functions and their unit/regression tests ship together.

@@ -23,7 +23,7 @@
 | Mass/radius representation construction | Native data inputs/conversion | P3/P4 | Legacy builder names: M6 |
 | PresetParticleRadiusBuilder PDF/PMF | Retain useful distribution generation | P4 | Facade-bearing preset: M6 |
 | Resolved mass / sampled preset | Native data initialization | P5 | Facade-bearing builder: M6 |
-| CPU↔Warp conversion helpers | Preserve unchanged contract | P6 checks | Retained, never M6 deletion targets |
+| CPU↔Warp conversion helpers | Preserve explicit transfer API/raw arrays; propagate D1 distribution metadata | P6 checks | Retained, never M6 deletion targets |
 
 For every temporary compatibility seam, record exact path/symbol, reason,
 consumer list, held-state authority/aliasing rules, entry phase, tests,

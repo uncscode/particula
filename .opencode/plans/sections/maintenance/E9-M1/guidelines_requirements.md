@@ -2,7 +2,8 @@
 
 ## Functional requirements
 
-1. Preserve existing container names and schemas. The minimum contract table
+1. Preserve existing container names and array layouts; add distribution_type
+   metadata per E9 appendix D1–D2. The minimum contract table
    must record these authorities; B, N, Sp and Sg denote boxes, particles,
    particle species and gas species. Their relationship is not inferred from
    equal widths.
@@ -10,17 +11,17 @@
    | Owner / field | Shape | Meaning |
    |---|---|---|
    | ParticleData.masses | (B, N, Sp) | kg per represented particle, per species |
-   | ParticleData.concentration | (B, N) | Raw weights/counts or number density according to the audited convention |
+   | ParticleData.concentration | (B, N) | Counts for discrete/resolved; dN/dr for continuous_pdf; always per simulation volume |
+   | ParticleData.distribution_type | Scalar metadata | Shared discrete / continuous_pdf / particle_resolved vocabulary |
    | ParticleData.charge | (B, N) | Elementary-charge counts per particle |
    | ParticleData.density | (Sp,) | Material density, kg/m^3 |
    | ParticleData.volume | (B,) | Represented box volume, m^3 |
    | GasData.name / molar_mass / partitioning | Sg / (Sg,) / (Sg,) | Ordered names, kg/mol and boolean participation mask |
    | GasData.concentration | (B, Sg) | Gas mass concentration, kg/m^3, all gas categories |
    | EnvironmentData.temperature / pressure | (B,) | K / Pa |
-   | EnvironmentData.saturation_ratio | (B, Se) | Dimensionless species lanes; Se mapping must be frozen in P1 |
+   | EnvironmentData.saturation_ratio | (B, Sg) | Dimensionless lanes in full gas order |
 
-2. P1 must approve one explicit mapping: a shared full-width order, or an
-   explicit process-owned index map that preserves current layouts. Record
+2. Use the approved explicit process-owned index map (E9 appendix D3). Record
    ordered names and how unnamed particle/environment lanes and every
    species-indexed process parameter are associated. No silent sorting,
    truncation, name-based guessing, or partitioning-mask compaction. Distinguish
@@ -28,22 +29,21 @@
    Specify duplicate/missing-name and reordered-configuration handling. If a
    permutation cannot be detected from unnamed arrays, require the caller's
    declared mapping rather than claiming shape validation detects it.
-3. Freeze a distribution-specific normalization ledger before helper design.
-   For count/weight storage w, physical number density is w/V; for density
-   storage c, it is c. Never divide twice. Per-species population mass density
-   is sum_i(m_i,s * c_i); extensive mass is that density times V. Gas extensive
-   mass is gas.concentration_s * V. Per-particle total_mass is sum_s(m_i,s),
-   not any of these population quantities. Resolve the current documentation
-   versus legacy-getter discrepancy with consumer evidence, not a storage
-   reinterpretation. Keep any required interpretation explicit and process-owned.
+3. Implement appendix D1's approved normalization ledger. Raw counts divide
+   by V exactly once; radius PDFs also divide by V and require integration over
+   radius for population totals. Density inputs multiply by V on construction;
+   density-rate increments multiply by V on storage update. Gas remains kg/m^3.
+   Audit every CPU/GPU consumer; old unit-volume agreement is not sufficient.
+   Per-particle total_mass is sum_s(m_i,s), not population mass. Distribution
+   metadata describes storage; processes own compatible algorithm selection.
 4. Reuse `radii`, `total_mass`, `effective_density`, `mass_fractions` and
    `copy()` when sufficient. Add a helper only with a named downstream use.
    Define units, dimensions, physical domain, copy/view identity, allowed
    mutation, empty/zero behavior and rejection semantics for each addition.
    Derived values are computed from current arrays, never stored as competing
    authoritative caches. No physics strategies belong on a container.
-5. Specify aggregate access for M2: whole-container getters return the held
-   objects; validated individual setters retain the supplied object and check
+5. Specify appendix D4's property-based aggregate access for M2: properties
+   return held objects; validated setters retain the supplied object and check
    it against the other two held containers. Coordinated replacement validates
    the complete proposed triple before publishing any reference. Rejection
    preserves old references, their arrays and candidate inputs. Validation must

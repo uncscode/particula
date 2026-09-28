@@ -1,31 +1,28 @@
-# Open Questions
+# Open Questions and Review Decisions
 
-- [ ] **Q1 — Entry blocker: Which approved M1 revision freezes the contracts?**
-  Consume M1's decisions on species mapping, normalization, API names,
-  copy/view behavior and validator placement. They are currently draft review
-  questions. Recommendation: accept one reviewed M1 packet, not a second M2
-  specification; reopen M1 if a construction requirement is missing.
-- [ ] **Q2 — P1 blocker: What minimal temporary transition keeps later-track
-  consumers operational?** Existing aggregate/builders and consumers use facade
-  shapes. Recommendation: concrete narrowly bounded seam(s), read/write/alias
-  rules and consumer inventory approved before P1; no permanent public facade
-  or duplicate state. Record M3/M4/M5 migration ownership and M6 deletion proof.
-  If no safe bounded transition exists, escalate rather than waive serial gates.
-- [ ] **Q3 — P3 gate: Which initialization capabilities and public placements
-  are retained?** Seed inventory covers direct mass/radius, PDF/PMF radius-bin,
-  resolved mass and sampled lognormal presets. Recommendation: reuse existing
-  native builders plus small construction utilities; review actual supported
-  consumers before finalizing native module names and obsolete-name disposition.
-- [ ] **Q4 — P5 gate: Which existing defaults and random-state behavior must
-  native sampled presets preserve?** Recommendation: characterize current
-  sampling/defaults, preserve physical distributions and document RNG ownership;
-  use controlled fixtures for conversion tests, not new cross-backend replay
-  promises. Maintainer/scientific reviewer approves any intentional difference.
-- [ ] **Q5 — Handoff governance: Who signs M1 admission and M2 completion?**
-  Assign construction/scientific reviewers and M3 receiver. Recommendation:
-  named final-revision evidence review; no deadline is supplied by issue #1602.
+Authority: [E9 review decisions](../../epics/E9/appendix.md#review-decisions-2026-09-27).
 
-Fixed, not open choices: three native containers, process-owned physics,
-identity-preserving access, rejection atomicity, coordinated replacement,
-no automatic GPU rebinding, CPU single-box execution, retained transfer helpers,
-migration before removal and strictly serial completed-and-validated tracks.
+- [x] **Q1 contract authority:** consume approved D1–D4 and M1's eventual
+  completed-and-validated implementation packet. Actual revision hashes are
+  handoff evidence, not a second API design choice.
+- [x] **Q2 transition policy:** preserve isolated legacy paths until migration;
+  if needed isolate the old aggregate in a temporary concrete module rather
+  than add atmosphere/facade emulation to native Aerosol. Exact consumers,
+  aliasing/mutation rules and M6 deletion proof must be reviewed before P1.
+- [x] **Q3 retained construction:** reuse native builders, migrate AerosolBuilder
+  and retain direct mass/radius, speciated, radius PDF/PMF and sampled-lognormal
+  capabilities in small native utilities. Every result declares distribution_type.
+- [x] **Q4 defaults/RNG:** preserve existing sampling/default behavior unless
+  separately approved. Native density inputs explicitly multiply by volume;
+  direct counts do not. Sampling modal weights does not automatically make a
+  sample count equal a prescribed physical number density. Document both.
+- [x] **Q5 governance:** Kyle/Gorkowski accepts M1 entry and M2 completion.
+
+## Evidence still required in M2
+
+P1 freezes the concrete transition ledger and demonstrates retained-consumer
+smoke/full-suite behavior. P3–P5 expand the capability ledger and trace every
+retained assertion/default/unit conversion to its native successor. Characterize
+sampling with controlled fixtures and the existing random-state implementation;
+no new cross-backend RNG equivalence. P6 records final revision, commands,
+results and approval. API approval alone does not authorize M3 admission.

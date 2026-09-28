@@ -4,14 +4,16 @@
 
 - `particula/particles/particle_data.py` and adjacent `tests/`: audit existing
   derived properties and implement only necessary missing access/mutation
-  helpers, with explicit concentration interpretation.
+  helpers and shared distribution_type metadata, with count/radius-PDF
+  interpretation fixed by E9 appendix D1. Include metadata copy/validation and
+  required Warp carrier/transfer admission propagation; no kernel correction here.
 - `particula/gas/gas_data.py`, `environment_data.py` and adjacent `tests/`:
   required data-native helpers, ordered metadata and validation behavior.
 - A small concrete shared validation helper may be introduced only if the
   approved alignment contract requires it; decide location in P1 without
   creating an aggregate or a second state authority.
 - `particula/particles/representation.py`, legacy gas species, native
-  condensation/coagulation and GPU conversions are read-only audit references
+  condensation/coagulation are read-only audit references
   except for adjacent characterization/regression tests. Their consumer
   migration and deletion belong to later tracks.
 - `docs/Features/data-containers-and-gpu-foundations.md`: bounded developer
@@ -40,7 +42,8 @@
 | E9-M6 | Legacy API/bridge/export deletion last and v0.3.0 readiness |
 
 No new physics, general multi-box CPU execution, container renaming,
-precision/storage-schema redesign, permanent facade, GPU public API,
+precision/array-layout redesign beyond approved metadata, permanent facade,
+GPU public API,
 automatic GPU rebinding, hidden transfer/fallback, graph-capture redesign,
 performance claim, diagnostics track or Epic I implementation is included.
 Do not delete facade-based scientific tests or retained CPU↔Warp helpers.

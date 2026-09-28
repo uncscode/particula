@@ -1,5 +1,10 @@
 # Phase Details
 
+Final validation includes E9 appendix D1–D2: distribution metadata copies,
+transfers and checkpoint interpretation; radius-PDF integrals; corrected
+CPU/direct/prepared/resident number and per-species mass conservation at
+V=0.25/1/4. Legacy ambiguous checkpoints must not silently acquire new semantics.
+
 Entry: E9-M5 and all its predecessors are completed and validated, not merely
 drafted. P1 -> P2 -> P3 -> P4 -> P5 -> P6, each gated by reviewed evidence.
 No standalone unit-testing phase: every removal/function change includes its

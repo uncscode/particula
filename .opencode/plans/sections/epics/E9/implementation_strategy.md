@@ -3,7 +3,8 @@
 ## Architecture and ownership
 
 Use one flat aggregate of existing `ParticleData`, `GasData` and
-`EnvironmentData`. Preserve container schemas and direct field authority.
+`EnvironmentData`. Preserve array layouts and direct field authority; add the
+approved shared distribution metadata and normalization contract (appendix D1–D2).
 Processes own activity, surface, vapor-pressure and other physics strategies;
 do not relocate them onto a replacement facade. Reuse native condensation
 configuration (`condensation_strategies.py:294–364`) and coagulation's
@@ -15,7 +16,8 @@ concentrations, copy/view/mutation rules and ordered mapping between gas
 species, particle mass lanes, environment saturation-ratio lanes and process
 configuration. `GasData.partitioning` distinguishes gas categories in unified
 storage; nonpartitioning gas must still dilute. Do not silently sort, drop or
-reinterpret species. Final mapping/API spelling remains an M1 decision.
+reinterpret species. Mapping and API spelling are approved in appendix D3–D4;
+M1 implements/specifies their acceptance cases rather than reopening alternatives.
 
 Whole-container getters return held objects. Individual replacement validates
 the candidate against the other held containers. Coordinated replacement
@@ -37,12 +39,15 @@ rebind retained GPU arrays, prepared execution state or resident sessions.
    adapter needed to keep unmigrated consumers running; give it a deletion
    owner/gate and no permanent public promise.
 3. **M3:** Migrate native condensation/coagulation and wall-loss scientific
-   paths with process-owned strategies. Preserve geometry, distribution,
-   nonnegative concentration, conservation and single-box validation.
+    paths with process-owned strategies. Preserve geometry, distribution,
+    nonnegative concentration, conservation and single-box validation.
+    Correct direct/prepared GPU normalization for these families under D1–D2.
 4. **M4:** Migrate orchestration and CPU adapters. Dilution must retain
    all-state preflight and documented restoration on setter failure, covering
    both gas categories. Nucleation retains identity, current-gas sequential
-   substeps and atomicity per attempted substep, not whole-call rollback.
+    substeps and atomicity per attempted substep, not whole-call rollback.
+    Complete D1–D2 corrections for GPU source/sink processes, volume and
+    communication, resident composition and checkpoint metadata interpretation.
 5. **M5:** Execute the full supported example inventory, not only a new quick
    start. Update paired Python sources first, synchronize and execute notebooks,
    retain both files, and publish ownership and migration guidance.
