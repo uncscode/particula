@@ -6,6 +6,7 @@ import numpy as np
 import particula.gas as gas_package
 import pytest
 from particula.gas.environment_data import EnvironmentData
+from particula.gas.gas_data import GasData
 
 
 def _make_environment_data(
@@ -35,6 +36,38 @@ def test_environment_data_valid_single_box_coerces_float64() -> None:
     assert environment.temperature.dtype == np.float64
     assert environment.pressure.dtype == np.float64
     assert environment.saturation_ratio.dtype == np.float64
+
+
+@pytest.mark.parametrize("mask", [[True, False, True], [False] * 3])
+def test_full_order_ratio_with_unequal_particle_width_fixture(
+    mask: list[bool],
+) -> None:
+    """Fixture-paired gas lanes survive; no aggregate admission API exists."""
+    gas = GasData(
+        name=["water", "inert", "organic"],
+        molar_mass=np.array([0.018, 0.028, 0.12]),
+        concentration=np.array([[1e-6, 2e-6, 3e-6]]),
+        partitioning=np.array(mask),
+    )
+    environment = _make_environment_data(
+        temperature=[298.15],
+        pressure=[101325.0],
+        saturation_ratio=[[0.7, 7.0, 1.3]],
+    )
+    particle_species_width = 2
+    assert particle_species_width != gas.n_species
+    assert environment.saturation_ratio.dtype == np.float64
+    assert environment.saturation_ratio.shape == gas.concentration.shape
+    np.testing.assert_array_equal(
+        environment.saturation_ratio[0], [0.7, 7.0, 1.3]
+    )
+    copied = environment.copy()
+    for field in ("temperature", "pressure", "saturation_ratio"):
+        assert not np.shares_memory(
+            getattr(copied, field), getattr(environment, field)
+        )
+    environment.saturation_ratio[0, 1] = 0.0
+    assert copied.saturation_ratio[0, 1] == 7.0
 
 
 def test_environment_data_n_boxes_property() -> None:

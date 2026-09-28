@@ -237,6 +237,63 @@ class TestParticleDataValidation:
 class TestParticleDataProperties:
     """Tests for computed properties of ParticleData."""
 
+    @pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+    def test_raw_weight_and_population_mass_are_distinct(
+        self, volume: float
+    ) -> None:
+        """Per-slot mass is not concentration-weighted population mass."""
+        masses = np.array(
+            [[[0.5e-18, 1.5e-18], [2e-18, 3e-18], [0.0, 0.0]]],
+            dtype=np.float64,
+        )
+        data = ParticleData(
+            masses=masses.copy(),
+            concentration=np.array([[8.0, 0.5, 0.0]], dtype=np.float64),
+            charge=np.array([[1.0, -1.0, 0.0]], dtype=np.float64),
+            density=np.array([1000.0, 1200.0], dtype=np.float64),
+            volume=np.array([volume], dtype=np.float64),
+        )
+        npt.assert_allclose(
+            data.total_mass[0, 0], 2e-18, rtol=1e-12, atol=1e-30
+        )
+        npt.assert_allclose(8.0 / volume, {0.25: 32, 1.0: 8, 4.0: 2}[volume])
+        first = np.array([4e-18, 12e-18], dtype=np.float64)
+        full = np.array([5e-18, 13.5e-18], dtype=np.float64)
+        npt.assert_allclose(
+            8 * data.masses[0, 0], first, rtol=1e-12, atol=1e-30
+        )
+        for lane in range(2):
+            npt.assert_allclose(
+                np.sum(data.concentration[0] * data.masses[0, :, lane]),
+                full[lane],
+                rtol=1e-12,
+                atol=1e-30,
+            )
+            npt.assert_allclose(
+                np.sum(data.concentration[0] * data.masses[0, :, lane])
+                / volume,
+                full[lane] / volume,
+                rtol=1e-12,
+                atol=1e-30,
+            )
+        npt.assert_array_equal(data.masses[0, 2], [0.0, 0.0])
+        assert data.concentration[0, 2] == data.charge[0, 2] == 0.0
+        old_total = data.total_mass
+        copied = data.copy()
+        for field in ("masses", "concentration", "charge", "density", "volume"):
+            assert not np.shares_memory(
+                getattr(data, field), getattr(copied, field)
+            )
+        data.masses[0, 0, 0] = 1e-18
+        npt.assert_allclose(
+            data.total_mass[0, 0], 2.5e-18, rtol=1e-12, atol=1e-30
+        )
+        npt.assert_allclose(old_total[0, 0], 2e-18, rtol=1e-12, atol=1e-30)
+        npt.assert_allclose(data.mass_fractions[0, 0], [0.4, 0.6], rtol=1e-12)
+        npt.assert_allclose(
+            copied.total_mass[0, 0], 2e-18, rtol=1e-12, atol=1e-30
+        )
+
     def test_radii_single_species(self) -> None:
         """Radii matches analytic 1 µm sphere for single species."""
         mass = (4.0 / 3.0) * np.pi * (1e-6) ** 3 * 1000.0
@@ -439,6 +496,59 @@ class TestConversionFromRepresentation:
             concentration=concentration,
             charge=charge,
             volume=volume,
+        )
+
+    @pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+    @pytest.mark.parametrize(
+        "strategy_type", [SpeciatedMassMovingBin, ParticleResolvedSpeciatedMass]
+    )
+    def test_volume_weight_round_trip_by_strategy(
+        self, volume: float, strategy_type: type
+    ) -> None:
+        """Both facade strategies pass through raw storage, not density."""
+        strategy = strategy_type()
+        raw = np.array([8.0, 0.5, 0.0], dtype=np.float64)
+        rep = self._make_representation(
+            strategy,
+            np.array([[0.5e-18, 1.5e-18], [2e-18, 3e-18], [0.0, 0.0]]),
+            np.array([1000.0, 1200.0]),
+            raw,
+            np.array([1.0, -1.0, 0.0]),
+            volume,
+        )
+        data = from_representation(rep)
+        npt.assert_array_equal(data.concentration[0], raw)
+        npt.assert_array_equal(data.volume, [volume])
+        npt.assert_allclose(rep.get_concentration(), raw / volume, rtol=1e-12)
+        rebuilt = to_representation(
+            data, strategy, ActivityIdealMass(), SurfaceStrategyMass()
+        )
+        npt.assert_array_equal(rebuilt.concentration, raw)
+        assert rebuilt.volume == volume
+
+    @pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+    def test_legacy_radius_backed_pdf_storage_not_integration(
+        self, volume: float
+    ) -> None:
+        """A radius-backed facade preserves raw PDF-like lanes, then sums them.
+
+        No distribution-kind metadata exists; this documents legacy behavior,
+        not an assertion that radius-backed strategy performs PDF integration.
+        """
+        raw = np.array([1e9, 2e9, 1e9], dtype=np.float64)
+        rep = self._make_representation(
+            RadiiBasedMovingBin(),
+            np.array([1e-9, 2e-9, 4e-9]),
+            np.array([1000.0]),
+            raw,
+            np.zeros(3),
+            volume,
+        )
+        data = from_representation(rep)
+        npt.assert_array_equal(data.concentration[0], raw)
+        npt.assert_allclose(rep.get_concentration(), raw / volume)
+        assert rep.get_total_concentration() == pytest.approx(
+            raw.sum() / volume
         )
 
     def test_mass_based(self) -> None:
@@ -732,3 +842,28 @@ class TestConversionToRepresentation:
         assert rebuilt_charge is not None
         npt.assert_allclose(rebuilt_charge, charge)
         assert rebuilt.volume == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize(
+    ("volume", "expected_density"),
+    [(0.25, 18.0), (1.0, 4.5), (4.0, 1.125)],
+)
+def test_proposed_nonuniform_radius_pdf_integral_is_not_slot_sum(
+    volume: float, expected_density: float
+) -> None:
+    """Independent proposed scientific oracle, NOT current facade behavior."""
+    radius = np.array([1e-9, 2e-9, 4e-9], dtype=np.float64)
+    raw_pdf = np.array([1e9, 2e9, 1e9], dtype=np.float64)
+    intervals = (radius[1:] - radius[:-1]) * (raw_pdf[1:] + raw_pdf[:-1]) / 2
+    raw_count = intervals[0] + intervals[1]
+    npt.assert_allclose(raw_count, 4.5, rtol=1e-12)
+    npt.assert_allclose(raw_count / volume, expected_density, rtol=1e-12)
+    npt.assert_allclose(raw_count * 2e-18, 9e-18, rtol=1e-12, atol=1e-30)
+    expected_mass_density = {0.25: 3.6e-17, 1.0: 9e-18, 4.0: 2.25e-18}
+    npt.assert_allclose(
+        raw_count * 2e-18 / volume,
+        expected_mass_density[volume],
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    assert raw_pdf.sum() != pytest.approx(raw_count)

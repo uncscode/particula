@@ -51,6 +51,102 @@ def _available_warp_devices() -> list[str]:
     return warp_devices(wp)
 
 
+@pytest.mark.parametrize("device", _available_warp_devices())
+@pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+@pytest.mark.parametrize("kind", ["discrete", "resolved", "pdf_transfer_only"])
+def test_p1_raw_particle_transfer_characterization(
+    device: str, volume: float, kind: str
+) -> None:
+    """Transfers have no distribution metadata and never normalize weights."""
+    from particula.particles.particle_data import ParticleData
+
+    # PDF is transfer-only; no GPU PDF physics is asserted.
+    weights = [1e9, 2e9, 1e9] if kind == "pdf_transfer_only" else [8, 0.5, 0]
+    source = ParticleData(
+        masses=np.array([[[0.5e-18, 1.5e-18], [2e-18, 3e-18], [0.0, 0.0]]]),
+        concentration=np.array([weights], dtype=np.float64),
+        charge=np.array([[1.0, -1.0, 0.0]]),
+        density=np.array([1000.0, 1200.0]),
+        volume=np.array([volume]),
+    )
+    mirror = to_warp_particle_data(source, device=device, copy=True)
+    restored = from_warp_particle_data(mirror)
+    for field in ("masses", "concentration", "charge", "density", "volume"):
+        np.testing.assert_array_equal(
+            getattr(mirror, field).numpy(), getattr(source, field)
+        )
+        np.testing.assert_array_equal(
+            getattr(restored, field), getattr(source, field)
+        )
+        assert not np.shares_memory(
+            getattr(restored, field), getattr(source, field)
+        )
+    source.concentration[0, 0] = 0
+    assert mirror.concentration.numpy()[0, 0] == weights[0]
+
+
+@pytest.mark.parametrize("device", _available_warp_devices())
+@pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+@pytest.mark.parametrize("mask", [[True, False, True], [False] * 3])
+def test_p1_full_gas_and_environment_transfer_characterization(
+    device: str, volume: float, mask: list[bool]
+) -> None:
+    """Full ordered lanes survive two boxes; only names need CPU custody."""
+    from particula.gas.environment_data import EnvironmentData
+    from particula.gas.gas_data import GasData
+
+    source = GasData(
+        name=["water", "inert", "organic"],
+        molar_mass=np.array([0.018, 0.028, 0.12]),
+        concentration=np.array([[1e-6, 2e-6, 3e-6], [4e-6, 5e-6, 6e-6]]),
+        partitioning=np.array(mask),
+    )
+    environment = EnvironmentData(
+        temperature=np.array([298.15, 300.0]),
+        pressure=np.array([101325.0, 100000.0]),
+        saturation_ratio=np.array([[0.7, 7.0, 1.3], [1.7, 17.0, 2.3]]),
+    )
+    vapor = np.array([[100.0, 200.0, 300.0], [400.0, 500.0, 600.0]])
+    mirror = to_warp_gas_data(
+        source, device=device, copy=True, vapor_pressure=vapor
+    )
+    env_mirror = to_warp_environment_data(environment, device=device, copy=True)
+    restored = from_warp_gas_data(mirror, name=list(source.name))
+    env_restored = from_warp_environment_data(env_mirror)
+    np.testing.assert_array_equal(
+        mirror.partitioning.numpy(),
+        np.broadcast_to(np.array(mask, dtype=np.int32), (2, 3)),
+    )
+    np.testing.assert_array_equal(mirror.vapor_pressure.numpy(), vapor)
+    assert not hasattr(restored, "vapor_pressure")
+    assert restored.name == source.name
+    for field in ("molar_mass", "concentration", "partitioning"):
+        np.testing.assert_array_equal(
+            getattr(restored, field), getattr(source, field)
+        )
+        assert not np.shares_memory(
+            getattr(restored, field), getattr(source, field)
+        )
+    for field in ("temperature", "pressure", "saturation_ratio"):
+        np.testing.assert_array_equal(
+            getattr(env_restored, field), getattr(environment, field)
+        )
+        assert not np.shares_memory(
+            getattr(env_restored, field), getattr(environment, field)
+        )
+    np.testing.assert_allclose(
+        source.concentration[0] * volume,
+        np.array([1e-6, 2e-6, 3e-6]) * volume,
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    assert from_warp_gas_data(mirror).name == [
+        "species_0",
+        "species_1",
+        "species_2",
+    ]
+
+
 def _assert_environment_gpu_mirror_matches(source, gpu_data) -> None:
     """Assert Warp mirror shapes, values, and dtypes match the CPU source."""
     assert gpu_data.temperature.shape == source.temperature.shape

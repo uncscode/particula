@@ -156,6 +156,39 @@ class TestGasDataProperties:
 class TestGasDataCopy:
     """Tests for GasData copy method."""
 
+    @pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+    @pytest.mark.parametrize("mask", [[True, False, True], [False] * 3])
+    def test_full_order_and_extensive_mass(
+        self, volume: float, mask: list[bool]
+    ) -> None:
+        """Copy retains every gas lane; gas inventory is C times V."""
+        gas = GasData(
+            name=["water", "inert", "organic"],
+            molar_mass=np.array([0.018, 0.028, 0.12]),
+            concentration=np.array([[1e-6, 2e-6, 3e-6]]),
+            partitioning=np.array(mask),
+        )
+        copied = gas.copy()
+        assert copied.name == ["water", "inert", "organic"]
+        assert copied.name is not gas.name
+        for field in ("molar_mass", "concentration", "partitioning"):
+            npt.assert_array_equal(getattr(copied, field), getattr(gas, field))
+            assert not np.shares_memory(
+                getattr(copied, field), getattr(gas, field)
+            )
+        expected = {
+            0.25: [0.25e-6, 0.5e-6, 0.75e-6],
+            1.0: [1e-6, 2e-6, 3e-6],
+            4.0: [4e-6, 8e-6, 12e-6],
+        }[volume]
+        npt.assert_allclose(
+            gas.concentration[0] * volume, expected, rtol=1e-12, atol=1e-30
+        )
+        gas.name[1] = "changed"
+        gas.concentration[0, 1] = 0.0
+        assert copied.name[1] == "inert"
+        assert copied.concentration[0, 1] == 2e-6
+
     def test_copy_creates_independent_arrays(self) -> None:
         """copy() returns new arrays that do not share memory."""
         gas = GasData(
