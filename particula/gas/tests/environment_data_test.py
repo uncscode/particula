@@ -7,6 +7,7 @@ import particula.gas as gas_package
 import pytest
 from particula.gas.environment_data import EnvironmentData
 from particula.gas.gas_data import GasData
+from particula.particles.particle_data import ParticleData
 
 
 def _make_environment_data(
@@ -42,7 +43,14 @@ def test_environment_data_valid_single_box_coerces_float64() -> None:
 def test_full_order_ratio_with_unequal_particle_width_fixture(
     mask: list[bool],
 ) -> None:
-    """Fixture-paired gas lanes survive; no aggregate admission API exists."""
+    """Real unequal-width containers retain lanes; no admission API exists."""
+    particles = ParticleData(
+        masses=np.array([[[1e-18, 2e-18], [3e-18, 4e-18]]]),
+        concentration=np.array([[2.0, 1.0]]),
+        charge=np.zeros((1, 2)),
+        density=np.array([1000.0, 1200.0]),
+        volume=np.array([0.25]),
+    )
     gas = GasData(
         name=["water", "inert", "organic"],
         molar_mass=np.array([0.018, 0.028, 0.12]),
@@ -54,8 +62,16 @@ def test_full_order_ratio_with_unequal_particle_width_fixture(
         pressure=[101325.0],
         saturation_ratio=[[0.7, 7.0, 1.3]],
     )
-    particle_species_width = 2
-    assert particle_species_width != gas.n_species
+    assert particles.n_boxes == gas.n_boxes == environment.n_boxes == 1
+    assert particles.masses.shape == (1, 2, 2)
+    assert particles.density.shape == (2,)
+    assert particles.concentration.shape == particles.charge.shape == (1, 2)
+    assert particles.volume.shape == (1,)
+    assert particles.n_species == 2
+    assert gas.n_species == 3
+    assert gas.name == ["water", "inert", "organic"]
+    np.testing.assert_array_equal(gas.partitioning, mask)
+    np.testing.assert_array_equal(gas.concentration[0], [1e-6, 2e-6, 3e-6])
     assert environment.saturation_ratio.dtype == np.float64
     assert environment.saturation_ratio.shape == gas.concentration.shape
     np.testing.assert_array_equal(

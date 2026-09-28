@@ -1,12 +1,14 @@
 # Phase Details
 
-All five phases are Not Started. Execute strictly in the order below; each
+At drafting time, all five phases were Not Started. P1 characterization for
+issue #1610 is now committed (`5d8f36964`), but its scientific gate remains
+pending; P2–P5 are Not Started. Execute strictly in the order below; each
 is one bounded reviewable PR. Keep helper production changes near the template's
 rough 100-line increment; escalate a larger discovered requirement for review
 instead of pulling sibling migration work into this plan.
 
 - [ ] **E9-M1-P1: Freeze ordered species, units and ownership contracts with characterization tests**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1610 | Size: S | Status: Characterization committed; scientific sign-off pending (gate not passed)
   - Entry: E9 scope approved; no prior maintenance track required.
   - Goal: Remove semantic ambiguity before any new helper or constructor.
   - Work: Inventory facade accessors and actual native consumers by supported

@@ -867,3 +867,51 @@ def test_proposed_nonuniform_radius_pdf_integral_is_not_slot_sum(
         atol=1e-30,
     )
     assert raw_pdf.sum() != pytest.approx(raw_count)
+
+
+@pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+def test_proposed_pdf_varying_species_mass_interval_products(
+    volume: float,
+) -> None:
+    """Characterize proposed PDF physics, not ParticleData PDF behavior."""
+    radius = np.array([1e-9, 2e-9, 4e-9], dtype=np.float64)  # m
+    raw_pdf = np.array([1e9, 2e9, 1e9], dtype=np.float64)  # dN/dr, m^-1
+    species_mass = np.array(
+        [[1e-18, 4e-18], [3e-18, 1e-18], [2e-18, 5e-18]],
+        dtype=np.float64,
+    )  # kg per representative particle at each radius
+
+    endpoint_products = species_mass * raw_pdf[:, None]
+    extensive_mass = np.sum(
+        np.diff(radius)[:, None]
+        * (endpoint_products[:-1] + endpoint_products[1:])
+        / 2.0,
+        axis=0,
+    )
+    # Independent interval arithmetic: species 0 = 3.5 + 8.0,
+    # species 1 = 3.0 + 7.0, each in 1e-18 kg.
+    expected_extensive = np.array([11.5e-18, 10e-18], dtype=np.float64)
+    for species_idx in range(2):
+        npt.assert_allclose(
+            extensive_mass[species_idx],
+            expected_extensive[species_idx],
+            rtol=1e-12,
+            atol=1e-30,
+        )
+        npt.assert_allclose(
+            extensive_mass[species_idx] / volume,
+            expected_extensive[species_idx] / volume,
+            rtol=1e-12,
+            atol=1e-30,
+        )
+    raw_count = 4.5
+    for wrong_mass in (species_mass[0], species_mass[-1], species_mass.mean(0)):
+        assert not np.allclose(
+            extensive_mass, raw_count * wrong_mass, rtol=1e-12, atol=1e-30
+        )
+    assert not np.allclose(
+        extensive_mass,
+        endpoint_products.sum(axis=0),
+        rtol=1e-12,
+        atol=1e-30,
+    )
