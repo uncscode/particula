@@ -54,7 +54,7 @@ Arguments: adw_id=<workflow-id>
 Manifest finalization uses:
 
 ```
-Arguments: adw_id=<workflow-id> manifest_finalization=true plan_id=<plan-id> phase_ids=<comma-separated-phase-ids> worktree_path=<absolute-worktree> expected_plan_sha256=<sha256>
+Arguments: adw_id=<workflow-id> manifest_finalization=true plan_id=<plan-id> phase_ids=<comma-separated-phase-ids> worktree_path=<absolute-worktree>
 ```
 
 **Invocation:**
@@ -91,7 +91,7 @@ For normal issue-linked runs, find the matching plan phase by `issue_number` as
 before.
 
 For `manifest_finalization=true`, require explicit non-empty `plan_id` and
-`phase_ids`, `worktree_path`, and `expected_plan_sha256` arguments from the
+`phase_ids` and `worktree_path` arguments from the
 primary finalizer. Require `worktree_path` to exactly match the state-loaded
 value and pass it as `cwd` to every plan read and mutation. Do not infer
 ownership from branches, issues, or plan scans. Read the exact plan, verify that
@@ -101,13 +101,17 @@ phases are valid in this mode because the primary agent has already verified
 manifest-level completion evidence. Missing, duplicate, unknown, or incomplete
 target arguments return `PLAN_UPDATE_SHORT_FAILED` before mutation.
 
-Immediately before mutation, recompute the canonical plan-content SHA-256 in
-the supplied worktree and require it to match `expected_plan_sha256`. Apply the
-complete phase and plan closeout through one repository-atomic compare-and-swap
-operation that checks the same expected digest while holding the plan write
-boundary. If that operation is unavailable or reports stale content, return
-`PLAN_UPDATE_SHORT_FAILED` without partial mutation; do not emulate CAS with an
-unlocked read followed by multiple writes.
+Use the supported `update-phase` and `update` operations below. No plan digest
+argument is required. This is a resumable sequence of metadata updates, not an
+atomic closeout or compare-and-swap guarantee. Read the plan immediately before
+each mutation and check the complete ordered phase IDs and issue bindings
+against the initial read. If these change or other unexpected edits appear,
+stop and request fresh primary preflight. These checks detect observed changes
+but do not prevent concurrent writes; do not run parallel mutations of this plan.
+On any tool failure, stop, re-read when possible, and report verified completed
+updates and remaining phases with `PLAN_UPDATE_SHORT_FAILED`. Do not roll back
+or claim that no mutation occurred unless verified. On retry, validate the full
+target again and skip phases already Shipped.
 
 The primary finalizer is responsible for issue coverage and epic child-plan
 checks. This subagent verifies only target integrity and the post-mutation state.
@@ -147,9 +151,11 @@ adw_plans_mutate({
 ```
 
 In regular issue-linked mode, invoke `update-phase` for the matching phase. In
-manifest-finalization mode, do not issue independent phase writes: use the
-atomic digest-guarded closeout operation described above, then re-read the exact
-plan with `cwd=worktree_path` and verify every phase is Shipped.
+manifest-finalization mode, process the supplied phases sequentially in plan
+order, skipping phases already Shipped. Use the same `update-phase` call for
+each remaining phase and re-read to verify each result. Preserve issue bindings
+and unrelated metadata. Then re-read the exact plan with `cwd=worktree_path`
+and verify every phase is Shipped before promotion.
 
 ## Step 5: Check Plan Promotion
 
@@ -171,7 +177,10 @@ adw_plans_mutate({
 })
 ```
 
-If some phases remain, no plan-level promotion.
+Skip the promotion write if the plan is already Shipped. After promotion, re-read
+the plan and verify its status and every phase are Shipped before reporting
+completion. If some phases remain, no plan-level promotion; manifest finalization
+returns `PLAN_UPDATE_SHORT_FAILED` with the verified partial progress.
 
 ## Step 6: Report Completion
 
@@ -235,4 +244,4 @@ Error: {specific_error}
 
 **Trigger:** Runs during the shipping step of workflows
 
-**Fast:** Typically 3-4 tool calls total
+**Retries:** Revalidate the full target and skip verified Shipped metadata.

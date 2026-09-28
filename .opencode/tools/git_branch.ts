@@ -189,8 +189,12 @@ const selectDiagnostic = (
   truncationMarker = "... [truncated]",
 ): { type: "stderr" | "stdout" | "fallback" | "none"; message: string } => {
   const stderrText = clipDiagnostic(stderr, limit, truncationMarker);
-  if (stderrText) return { type: "stderr", message: stderrText };
   const stdoutText = clipDiagnostic(stdout, limit, truncationMarker);
+  // Older ADW CLIs print the cause to stdout and only Click's banner to stderr.
+  if (stderrText === "Aborted!" && stdoutText) {
+    return { type: "stdout", message: stdoutText };
+  }
+  if (stderrText) return { type: "stderr", message: stderrText };
   if (stdoutText) return { type: "stdout", message: stdoutText };
   const fallbackText = clipDiagnostic(fallback, limit, truncationMarker);
   if (fallbackText) return { type: "fallback", message: fallbackText };

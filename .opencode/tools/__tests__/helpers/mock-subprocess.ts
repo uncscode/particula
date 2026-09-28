@@ -18,6 +18,8 @@ type BunDollarError = {
   stdout?: string;
   stderr?: string;
   message?: string;
+  exitCode?: number;
+  code?: number;
 };
 
 type Invocation = {
@@ -186,9 +188,13 @@ export const installSubprocessMocks = (): void => {
         const err = new Error(dollarError.message ?? "mock subprocess failure") as Error & {
           stdout?: Buffer;
           stderr?: Buffer;
+          exitCode?: number;
+          code?: number;
         };
         err.stdout = Buffer.from(dollarError.stdout ?? "");
         err.stderr = Buffer.from(dollarError.stderr ?? "");
+        err.exitCode = dollarError.exitCode;
+        err.code = dollarError.code;
         return Promise.reject(err);
       }
 
