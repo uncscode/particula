@@ -211,3 +211,16 @@ formatting and mypy belong to subsequent Validate/Polish steps and are not
 claimed here; `.opencode/tools/run_linters.py` was not run in the fix pass.
 These are characterization checks, not scientific sign-off: P1 remains pending
 and P2 remains blocked.
+
+Build entry-gate recheck for issue #1611 (workflow `94cf733d`, 2026-09-28):
+at worktree HEAD `6091a0d9e`, the P1 ledger still records Kyle Gorkowski's
+scientific approval as pending. No identified revision approving inverse-volume
+normalization, PDF grid/integration, or distribution and ratio-producer
+provenance was available in the reviewed P1 phase/dependency/appendix records.
+The P1 ledger also proposes positive finite volume as future structural
+admission (lines 150–158), whereas E9 D3 assigns physical-domain checks to
+process admission. This conflict needs an explicit maintainer decision; it is
+not resolved by the prior epic planning approval or passing characterization
+tests. P2 steps 2–5, their acceptance matrix, additional characterization
+tests, and any P3/M2 authorization were not undertaken. P1 and P2 remain
+unapproved; no P2 test or review result is claimed by this gate recheck.
