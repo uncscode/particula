@@ -1,8 +1,22 @@
 # Phase Details
 
-All six phases are Not Started. Each is a bounded reviewable PR with tests in
+All six phases are Not Started. Each is a bounded reviewed work unit with tests in
 the owning change. P1 requires M2 completed and validated; every later phase
 requires its predecessor's validated gate. No separate unit-testing phase.
+
+The approved E9 appendix D1–D2 amendment adds direct/prepared GPU correction
+to the owning scientific phases below. Split expanded work into serial bounded
+PRs with adjacent tests; old S/XS estimates are provisional and must be re-sized
+before issue generation. Do not defer executable corrections to P6 docs.
+
+| Phase | Additional required normalization/metadata work |
+|---|---|
+| P1 | Shared distribution admission, explicit species maps and physical rate units; native and direct/prepared condensation |
+| P2 | N/V or radius-PDF quadrature/V for condensation inventories and gas deltas; direct/prepared GPU non-unit-volume conservation |
+| P3 | Density inputs to discrete/radius-PDF rate laws; compatible shared distribution metadata; no inferred GPU mode expansion |
+| P4 | Density-rate to raw-storage updates; volume factors in resolved selectors; reject unsupported unequal weights; direct/prepared GPU conservation |
+| P5 | Count/PDF-preserving losses and sink accounting on CPU/direct/prepared GPU; retain distinct stochastic contracts |
+| P6 | Reconcile CPU/GPU correction ledger, literal validation and downstream M4 integration requirements |
 
 - [ ] **E9-M3-P1: Complete native condensation admission and configuration with scientific tests**
   - Issue: TBD | Size: S | Status: Not Started
@@ -16,7 +30,8 @@ requires its predecessor's validated gate. No separate unit-testing phase.
     vapor-pressure, skip-index and multi-box rejection assertions. Add mixed
     partitioning, wrong mapping, direct mutation and rejection snapshots.
   - Gate: Native rate/configuration and affected builder/factory tests pass
-    without facade construction or changes to scientific formulas.
+    without facade construction; dimensional corrections follow D1 while
+    physical laws and supported algorithms remain unchanged.
 
 - [ ] **E9-M3-P2: Complete native condensation stepping with conservation and stability fixtures**
   - Issue: TBD | Size: S | Status: Not Started

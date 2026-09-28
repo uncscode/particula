@@ -5,7 +5,7 @@
 | Source | Drafting evidence / use |
 |---|---|
 | Issue #1602 via workflow issue state | Agreed T1 scope and replacement invariants |
-| E9 `implementation_strategy`, `dependency_map`, `open_questions` sections | Strict serial gates and unresolved M1 decisions |
+| E9 `appendix` D1–D5, `implementation_strategy`, `dependency_map` | Approved review decisions, normalization correction and strict serial implementation gates |
 | `particula/particles/particle_data.py:58–80,166–232` | Distribution-dependent concentration documentation, existing derived properties and deep copy |
 | `particula/particles/representation.py:566–592` | Getter divides raw concentration by volume before summation |
 | `particula/gas/gas_data.py:54–80,82–147` | Ordered gas metadata, kg/m^3, constructor coercion and copy |

@@ -18,8 +18,9 @@
 
 Flat constructor, identity-preserving whole-container access, individual
 replacement, coordinated three-container replacement, native aggregate builder
-and retained useful initialization. Final public spelling and generic schema
-versus process validation are consumed from M1, not guessed here. Preserve all
+and retained useful initialization. Public spelling is approved in E9 appendix
+D4; M1 supplies acceptance cases and structural versus process validation.
+Native construction implements D1's metadata and count/radius-PDF units. Preserve all
 gas species with ordered names/partitioning metadata and environment alignment.
 
 Construction behavioral tests migrate in the same PR as their implementation.
@@ -35,7 +36,8 @@ owner and M6 removal gate. Approval is required before introducing a seam.
   Preserve their existing behavior during M2; do not migrate them early.
 - M5 supported tutorial/notebook migration; M6 deletion of facades,
   `Atmosphere`, obsolete builders/exports/bridges/messages and facade-only tests.
-- Storage/precision redesign, general multi-box CPU execution, new GPU public
+- Storage/precision redesign beyond approved D1 metadata/normalization,
+  general multi-box CPU execution, new GPU public
   APIs, hidden transfer/fallback, automatic GPU/resident rebinding, capture
   redesign, benchmarks, diagnostics or Epic I.
 

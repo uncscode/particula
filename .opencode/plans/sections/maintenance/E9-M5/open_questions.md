@@ -1,27 +1,27 @@
-# Open Questions
+# Open Questions and Review Decisions
 
-- [ ] Which final M1–M4 revisions freeze accessor spelling, species mapping,
-  normalization, preset inventory and nucleation environment ownership?
-  - Owner: upstream reviewers; resolve before P1. Recommend consuming their
-    approved contracts verbatim rather than documenting speculative APIs.
-- [ ] Who approves the exhaustive supported-example/snippet inventory and any
-  historical-only exceptions, including older tutorial filenames?
-  - Owner: E9 documentation maintainer; P1 gate. Recommend retaining all
-    currently published supported scientific content with native equivalents;
-    renames require navigation updates, not silent removal.
-- [ ] What environment/resources and execution budget are required for every
-  full simulation notebook and optional scientific dependency?
-  - Owner: example maintainers; inventory at P1, resolve before owning phase.
-    Recommend full published-workload execution plus bounded regression
-    fixtures; reduced fixtures alone do not authorize handoff.
-- [ ] Which stable numerical outputs and tolerances should be recorded for
-  examples currently checked only by plots or narrative?
-  - Owner: scientific reviewers; resolve per family before migration using
-    M3/M4 independent references. Do not loosen tolerances to absorb drift.
-- [ ] Who signs the final M5 evidence and M6 removal authorization?
-  - Owner: E9 maintainer; assign before P7. No fixed calendar date supplied.
-    Recommend explicit named acceptance of inventory, execution and docs gates.
+Authority: [E9 review decisions](../../epics/E9/appendix.md#review-decisions-2026-09-27).
 
-Resolved by issue #1602: maintenance-only scope, strict validated serial chain,
-legacy deletion last in M6, CPU single-box execution, retained explicit transfer
-helpers, no automatic resident rebind and no permanent replacement facade.
+- [x] **Q1 API authority:** D1–D4 settle spelling, mapping, radius-based storage,
+  normalization and held environment. Publish only after M1–M4 completion and
+  validation; no speculative implementation claims.
+- [x] **Q2 inventory/history policy:** Kyle/Gorkowski approves preserving every
+  currently supported example and useful preset. Existing family/path seeds
+  must be expanded to every source/pair/snippet. No historical exceptions are
+  approved; renamed tutorials require navigation/link updates.
+- [x] **Q3 execution policy:** full published-workload runs plus bounded
+  regressions are required. The owning phase records environment, dependency,
+  resource and runtime needs before execution; unavailable required resources
+  block handoff rather than silently reducing workloads or dropping support.
+- [x] **Q4 numerical policy:** use independent M3/M4 physical expectations,
+  species-resolved conservation and established scientific tolerances. Record
+  intentional normalization corrections; do not loosen tolerances for drift.
+- [x] **Q5 governance:** Kyle/Gorkowski accepts M5 evidence and M6 authorization.
+
+## Evidence still required in M5
+
+Complete the path-level ledger, full execution records, PDF coordinate/units
+and distribution metadata examples, old/new numerical baselines and explicit
+historical allowlist (initially empty). Assign actual execution operators and
+budget per family; no machine availability or runtime has been measured here.
+Final M1–M4 revisions and all required M5 results remain mandatory gate evidence.

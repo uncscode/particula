@@ -39,7 +39,9 @@ labeled non-executable historical/migration material, never as supported APIs.
 
 ## Out of scope
 
-No new physics, precision/schema changes, general multi-box CPU execution,
+Validate upstream approved distribution metadata and normalization corrections;
+M6 does not defer their implementation until removal. No new physics, further
+precision/schema changes, general multi-box CPU execution,
 permanent substitute facade, new public GPU API, hidden transfer/synchronization
 or fallback, automatic prepared-state rebind, resident/graph redesign, new
 performance claims, arbitrary coverage targets, Epic I or release publication.

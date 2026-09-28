@@ -1,36 +1,32 @@
-# Open Questions
+# Open Questions and Review Decisions
 
-- [ ] **Q1 — P1 blocking: Which explicit ordered species mapping is approved?**
-  Shared full gas-width lanes or explicit process-owned mapping to existing
-  particle/environment layouts? Recommend the latter only where needed to
-  preserve current schemas; prohibit implicit partitioning-mask compaction.
-  Record nonpartitioning and particle-only cases, name policy and configuration
-  alignment. Evidence: GasData owns names/mask; particle/environment lanes have
-  no names. Maintainer and scientific reviewer must select the representation.
-- [ ] **Q2 — P1 blocking: What exact raw concentration convention applies to
-  each supported distribution/native consumer?** ParticleData documents counts
-  versus density, while the facade getter unconditionally divides by volume.
-  Recommend a consumer-backed normalization ledger and explicit interpretation
-  where needed, without changing storage schemas. Resolve with independent
-  non-unit-volume characterization before adding a universal helper.
-- [ ] **Q3 — P2 blocking: Which minimal API spelling and field-level copy/view
-  rules are approved?** Whole-container identity and rejection invariants are
-  fixed, but helper names, writable views versus copies, and coordinated setter
-  spelling need approval. Recommend explicit unit-bearing names for ambiguous
-  concentration quantities and reuse existing derived properties. P2 publishes
-  the exact M2 acceptance contract; M2 implements it.
-- [ ] **Q4 — P1/P2 blocking: Which helper gaps are genuinely needed, and where
-  should shared read-only alignment validation live?** Inventory actual M2–M4
-  callers before choosing additions. Recommend concrete data-native functions
-  or existing properties, never a new state facade or coercing reconstruction.
-  Explicitly distinguish generic schema checks from process physical admission.
-- [ ] **Q5 — Handoff governance: Who approves scientific semantics and M2
-  admission?** Maintainer must assign reviewers and implementation owners; no
-  fixed date is supplied. Record named approval with final-revision evidence.
+Authority: [E9 review decisions](../../epics/E9/appendix.md#review-decisions-2026-09-27).
+Resolved planning choices below do not mark M1 phases complete.
 
-Already resolved by issue #1602: three containers, all gas categories,
-process-owned physics, identity-preserving whole-container access, all-or-none
-replacement, single-box CPU processes, retained transfers, no automatic GPU
-rebinding, strict serial execution and deletion last. These are not options.
-The above five questions are first-pass review items; no unsupported decision
-is represented as already approved.
+- [x] **Q1 species alignment:** D3 chooses explicit process-owned lane mapping,
+  full gas-order environment lanes and preservation of nonparticipating material.
+  Nonempty unique gas names and expected configuration order are validated;
+  unnamed particle chemistry remains caller-declared, not inferred from shape.
+- [x] **Q2 concentration convention:** D1 chooses counts per simulation volume
+  for discrete/resolved and radius PDF dN/dr for continuous_pdf. Physical
+  concentration divides by V once; PDF populations integrate over radius in m.
+  Shared distribution_type metadata uses the existing three-value vocabulary.
+  D2 explicitly authorizes necessary CPU/GPU correction and metadata work.
+- [x] **Q3 access API:** D4 chooses particles/gas/environment properties with
+  validated setters and all-three replace_data; copies detach, raw fields are
+  writable, derived properties remain fresh. No redundant get_*/set_* family.
+- [x] **Q4 helpers/validation placement:** reuse existing derived properties;
+  provide consumer-backed normalization/population helpers. Proposed concrete
+  aerosol_validation.py owns shared structural checks; process admission owns
+  physics, mapping and distribution compatibility. No reconstruction to validate.
+- [x] **Q5 governance:** Kyle/Gorkowski approves semantics and final M1 evidence.
+
+## Evidence still required in M1
+
+P1 freezes exact helper signatures, PDF grid/quadrature, metadata-construction
+policy and the complete CPU/GPU consumer ledger against D1–D3. Characterize
+V=0.25/1/4 and unequal supported weights independently; do not bless legacy
+agreement as correctness. P2 publishes the D4 replacement acceptance matrix.
+P3/P4 implement bounded helpers/metadata admission with adjacent tests and
+transfer implications; P5 supplies literal final-revision results and approval.
+No normalization implementation or passing characterization is claimed here.

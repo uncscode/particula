@@ -1,25 +1,28 @@
-# Open Questions
+# Open Questions and Review Decisions
 
-- [ ] Which final M1/M2 revisions and approval records establish entry?
-  Owner: E9/M1/M2 maintainers. Resolve before P1; consume their species mapping
-  and count-versus-density convention instead of inventing local contracts.
-- [ ] What complete supported strategy/distribution/configuration matrix is
-  approved, including latent heat and turbulent-DNS? Owner: scientific
-  reviewers. Seed from all P1–P5 existing suites; freeze each family before its
-  migration. Exclusions require rationale, not merely legacy fixture usage.
-- [ ] Which minimal temporary seams keep pre-M4 legacy consumers working?
-  Owner: M2/M3/M4 maintainers. Prefer existing seams; any addition requires
-  named consumers, no competing state and M6 deletion ownership.
-- [ ] Do audited native/legacy normalization, binning or mutation results
-  disagree with the approved M1 physical contract? Owner: scientific reviewer.
-  Audit non-unit volumes/unequal weights first. Isolate confirmed discrepancies
-  for review rather than blessing both branches or introducing new physics.
-  Unresolved differences block the affected phase.
-- [ ] Who signs M3 scientific completion/validation and accepts M4 handoff?
-  Owner: E9 maintainer. Name reviewers before implementation; v0.3.0 does not
-  imply a fixed calendar deadline.
+Authority: [E9 review decisions](../../epics/E9/appendix.md#review-decisions-2026-09-27).
 
-Settled by #1602: single-box CPU, process-owned physics, unchanged GPU
-boundaries, BOTH wall-loss suites, tests with implementation, serial track
-gates and M6-last removal are not open choices. Record evidence-backed answers
-here as review resolves questions.
+- [x] **Q1 entry contracts:** D1–D4 fix normalization, radius-based distribution
+  metadata, species mapping and aggregate API. M1/M2 implementation revisions
+  and Kyle's acceptance must be supplied at entry, not fabricated during planning.
+- [x] **Q2 supported matrix:** preserve currently supported strategy/configuration
+  combinations, including latent heat, staggered condensation, turbulent-DNS
+  coagulation and both neutral/charged wall-loss suites. No automatic Cartesian
+  product or newly supported weighted/PDF selector follows from shared metadata.
+- [x] **Q3 temporary seams:** consume M2's isolated legacy paths and deletion
+  ledger; no duplicate arrays or new permanent public compatibility facade.
+- [x] **Q4 normalization disagreement:** fix against D1's physical contract,
+  not whichever legacy/native path happens to pass at V=1. D2 authorizes direct
+  and prepared GPU corrections for these process families. Record reproductions,
+  independent conserved quantities, rate units and intentional result changes.
+- [x] **Q5 review:** Kyle/Gorkowski accepts scientific completion and M4 entry.
+
+## Evidence still required in M3
+
+Freeze per-family executable support rows before changing that family. Cover
+V=0.25/1/4, radius-PDF quadrature, mapped species, supported unequal weights,
+rate/step consistency and concentration-weighted conservation. Unsupported
+weight/representation combinations reject before mutation. GPU raw values retain
+count interpretation across transfer; unsupported PDFs reject explicitly.
+Run direct/prepared regressions and both CPU wall-loss suites. No scientific
+correction, compatibility bridge or phase is declared implemented by this review.

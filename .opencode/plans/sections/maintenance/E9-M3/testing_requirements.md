@@ -64,7 +64,9 @@ reproduction without introducing a new performance claim:
 pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m "slow and performance" --no-cov
 ```
 
-GPU contracts remain unchanged: Warp CPU is the installed-Warp baseline for
-applicable retained tests, CUDA optional pass-or-clean-skip only. Record absent
+E9 appendix D1–D2 requires CPU/direct/prepared GPU normalization regressions,
+metadata rejection and V=0.25/1/4 conservation for each changed process family.
+Warp CPU is the installed-Warp baseline for applicable tests; CUDA is optional
+pass-or-clean-skip only. Record absent
 runtime/device evidence. Required failures/unavailable checks block handoff;
 optional skips never substitute for CPU scientific evidence.

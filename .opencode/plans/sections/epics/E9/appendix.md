@@ -1,5 +1,208 @@
 # Appendix
 
+## Review decisions: 2026-09-27
+
+This record incorporates the maintainer's interactive review of PR #1603.
+It supersedes conflicting first-draft alternatives in E9 and E9-M1–M6.
+Decisions are planning requirements, not implementation or passing evidence.
+Kyle Gorkowski (`Gorkowski`) is the final plan, scientific and release approver.
+The six tracks remain serial; no release date or implementation completion is
+implied. Research used the checkout at `561736c6f` and issue #1602.
+
+### D1 — Shared distribution metadata and volume normalization
+
+Reuse a single shared vocabulary, proposed at
+`particula/particles/distribution_types.py`:
+`DISTRIBUTION_TYPES = ("discrete", "continuous_pdf", "particle_resolved")`.
+Use the same typed values on `ParticleData.distribution_type` and process
+configuration. Data declares storage; injected strategies select algorithms
+and reject incompatible storage before mutation. Metadata is not a physics
+strategy or a second authoritative array. No inference from shape, volume,
+integer-looking weights or the process's preferred algorithm is permitted.
+Builders must set the type explicitly; M1 must inventory legacy construction
+before selecting any backward-transition default. A default cannot silently
+reinterpret existing data.
+
+| Type | Raw `concentration` storage | Physical concentration |
+|---|---|---|
+| `discrete` | Number represented in each bin, N_i | N_i / V, m^-3 |
+| `particle_resolved` | Number represented by each slot, N_i; usually 1 for an ordinary resolved particle | N_i / V, m^-3 |
+| `continuous_pdf` | dN/dr in the simulation volume, m^-1 | (dN/dr) / V, m^-4 |
+
+The maintainer confirmed all distribution coordinates are radius-based.
+The continuous coordinate is radius in metres, matching the existing
+continuous coagulation calls. Mass/log-radius/log-diameter PDFs require an
+explicit Jacobian conversion before entering this representation; a PDF sum
+is not a particle count. Preserve existing quadrature and scientific intent;
+freeze grid validity and quadrature in M1 and verify them in M3. Do not
+silently change PDF algorithms into PMF algorithms. Counts may be fractional
+population weights, but metadata does not grant an algorithm support for
+unequal weights: selectors that assume unit weights must reject unsupported
+weights or receive a separately reviewed conservative implementation.
+
+For discrete/resolved populations, particle species mass is
+`sum_i(N_i * m_i,s)` kg and its density is that sum divided by V. For PDFs,
+replace the sum with `integral(m_s(r) * dN/dr, dr)`. Gas remains kg/m^3, so
+gas species mass is `C_g,s * V`. `total_mass` remains per-particle mass.
+All count-density conversions divide by V once; density-rate updates write
+back `delta_N = V * delta_n` (and the corresponding PDF equation). Public rate
+units must distinguish per-particle kg/s, population kg/m^3/s, number-density
+rates and PDF-density rates. Do not label coagulation number rates kg/s.
+
+Required fix matrix:
+
+- M1 specifies metadata, read-only admission, number-density/population-mass
+  helpers, PDF quadrature and independent expected values. It characterizes
+  old behavior without declaring legacy agreement to be physical correctness.
+- M2 native initializers receiving number density store `N = n * V`; PDF
+  initializers store `dN/dr = V * dn/dr`. Direct count inputs do not multiply
+  again. Retain explicit units and defaults; sampled resolved slots remain
+  count weights rather than secretly rescaling them to a requested density.
+- M3 condensation uses N/V (or PDF quadrature weights/V) for inventory limits
+  and gas coupling. Coagulation density kernels receive normalized quantities
+  and density increments are converted back to storage. Resolved collision
+  volume factors are audited rather than divided twice. Both wall-loss paths
+  preserve the storage basis and represented population moments.
+- M4 dilution scales counts/PDF values and gas density at fixed V. Nucleation
+  converts rate J [m^-3 s^-1] into admitted number `J * V * dt`; gas removal
+  uses source mass/V. Physical volume evolution at fixed inventory holds
+  particle counts fixed and rescales gas density. Representative-volume
+  resampling is a different operation: scaling V and represented counts by
+  the same factor preserves density; it must not be confused with expansion.
+
+Independent checks use V=0.25, 1 and 4 m^3. For N=8 and m=2e-18 kg, number
+density is 32, 8 and 2 m^-3, while particle mass is always 1.6e-17 kg.
+For a per-particle gain of 1e-19 kg, gas-density loss is respectively
+3.2e-18, 8e-19 and 2e-19 kg/m^3. Include multiple species, unequal supported
+weights, zero/inactive slots, PDF integrals, rate/step agreement and rejection
+without mutation. Equivalent physical populations at scaled N and V must
+have equal intensive results where the algorithm supports those populations.
+
+### D2 — Narrow CPU/GPU scope amendment
+
+The maintainer explicitly approved correcting normalization on CPU and GPU.
+The original blanket unchanged-schema/unchanged-GPU-semantics restriction is
+amended only for distribution metadata and its required normalization,
+conservation, transfer and checkpoint consequences. Array shapes, precision,
+container names, explicit transfer APIs, device ownership and no-fallback /
+no-automatic-rebind boundaries remain protected.
+
+Transfer helpers preserve raw values and distribution metadata; they do not
+hide a counts-to-density conversion. Warp carrier metadata, copies,
+checkpoint versioning/restore and prepared/capture compatibility must preserve
+or validate the interpretation. Legacy checkpoints lacking sufficient semantic
+provenance must reject or use an explicit reviewed migration, never guess.
+Changing distribution metadata invalidates incompatible prepared bindings.
+GPU algorithms that only support resolved populations reject discrete/PDF
+inputs explicitly; this work does not add GPU PDF execution.
+
+Ownership stays serial: M1 freezes the cross-backend contract and metadata
+admission; M3 owns direct/prepared condensation, coagulation and wall-loss
+normalization with their scientific tests; M4 owns dilution, nucleation,
+resampling/volume evolution, communication, resident composition and checkpoint
+integration consequences. M5 updates examples and M6 validates the complete
+post-removal contract. Split oversized phase work into reviewed serial changes;
+do not hide a kernel-wide correction in a documentation-only phase. Installed
+Warp CPU is required evidence; CUDA remains optional pass-or-clean-skip.
+
+### D3 — Species alignment
+
+Environment saturation-ratio lanes follow full GasData order. Particle species
+may differ. Coupled processes own an explicit ordered gas-to-particle lane map;
+nonpartitioning gas and particle-only material are retained. Use validated
+integer lane pairs, rejecting duplicate source/target lanes and out-of-range
+indices for ordinary one-to-one transfer; chemical stoichiometric mappings are
+outside this migration. An omitted map must not silently compact a mask or
+assume chemical identity from equal widths. Process configuration records its
+expected ordered gas names so reordering can reject before mutation. Particle
+lane chemistry remains caller-declared because those lanes have no names.
+Names used for alignment must be nonempty and unique; do not silently rename
+or sort legacy duplicates. Explicitly classify unmapped/nonparticipating lanes.
+All-false masks are valid aggregate state, not a reason to discard gas.
+
+Aggregate validation checks container structure, box compatibility, gas/name
+metadata and gas/environment width, not particle/gas width equality or physics
+configuration. Process admission additionally checks the mapping, distribution,
+physical domains and single-box CPU limit. Shared read-only structural checks
+belong in a concrete `particula/aerosol_validation.py`; process-specific checks
+remain with processes. This module is proposed, not a delivered public export.
+
+### D4 — Aggregate and environment API
+
+Approved target: keyword-only
+`Aerosol(particles=..., gas=..., environment=...)`, identity-returning
+`particles`, `gas`, `environment` properties with validated setters, and
+`replace_data(particles=..., gas=..., environment=...)` requiring all three
+arguments. Validate the complete candidate triple before publication; retain
+candidate identity, including same-object assignments. Never implement the
+coordinated operation by chaining mutating setters. Rejection preserves old
+and candidate data. Raw array fields remain writable; existing derived
+properties calculate fresh results; `copy()` detaches arrays/metadata and
+preserves distribution type. No redundant aggregate get_*/set_* method family.
+
+`Nucleation` reads the current `aerosol.environment` during execution. Remove
+the constructor's redundant environment argument at the final breaking API.
+Replace the MassBasedMovingBin class test with explicit native distribution,
+fixed-slot, species-map and physical admission. Do not infer newly supported
+PDF/weighted behavior from removing a class check; M4 must retain the proven
+topology and reject unsupported cases.
+
+### D5 — Construction, transition and evidence policies
+
+Retain useful direct mass/radius, speciated mass, PDF/PMF and sampled lognormal
+capabilities through native builders and small native construction utilities.
+Reuse ParticleDataBuilder/GasDataBuilder, explicit EnvironmentData and migrated
+AerosolBuilder. Keep scientific distribution generation separate from facades;
+retain native binning/conversion algorithms used by coagulation. Preserve
+sample defaults and current random-state behavior unless a specific reviewed
+change is approved; dependency injection is not permission to change RNG.
+
+Prefer retaining existing legacy call paths while native paths are introduced.
+If aggregate isolation is necessary, move the old aggregate to an explicitly
+temporary concrete legacy module for unmigrated consumers; do not attach an
+Atmosphere-emulating property to the new aggregate. No duplicated authoritative
+arrays or permanent public shim. M2 must record exact consumers/imports,
+aliasing and mutation behavior, M3/M4/M5 migration owners and M6 deletion proof.
+The bridge implementation is a phase design deliverable, not an excuse to skip
+full-suite gates or coerce native counts into an unannotated legacy convention.
+
+Retain every currently supported example and scientific strategy/configuration
+family, including latent-heat/staggered condensation, turbulent-DNS coagulation,
+charged/neutral wall loss and their documented distribution combinations.
+This is preservation of existing supported combinations, not a new Cartesian
+product. M3 freezes the executable capability matrix; exclusions need explicit
+maintainer approval. M5 expands its existing family inventory to every path,
+pair and published snippet, including unaffected rows. No historical exceptions
+are approved by this review; failing examples cannot be silently reclassified.
+Full published workloads and bounded regression checks are both required.
+Record dependencies, environment, runtime budget and numerical baselines per
+example before its migration; missing resources remain a handoff blocker.
+
+Use `docs/Features/Roadmap/data-native-v030-closeout.md` as the final evidence
+index, with revision-specific PR/artifact links and Kyle's acceptance. Actual
+revisions, test results, execution operators and environment inventories are
+future gate evidence, not unanswered API questions or facts to fabricate now.
+Retain schema-supported epic milestones and child phases. Plan approval does
+not authorize release publication or mark any implementation phase complete.
+
+### Source findings grounding the normalization decision
+
+| Current source | Observation; not a passing scientific result |
+|---|---|
+| `particles/particle_data.py:58–70` | Documentation mixes resolved counts and binned density; no distribution metadata |
+| `particles/representation.py:566–581` | Getter always divides raw storage by volume |
+| `dynamics/condensation/condensation_strategies.py:995–1008,1101–1109` | rate uses raw weights; step uses weights/volume |
+| `dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py:88–94,395–439,525–579,657–670` | Process has distribution_type; helpers read raw weights; continuous path integrates radius; native binned update adds returned rate directly |
+| `particles/representation_builders.py:346–358,427–440,562–573,594–608` | PDF/PMF presets use unit-volume defaults; sampled resolved construction stores ones |
+| `particles/particle_data_builder.py:10–19` | Native builder example labels concentration as 1/m^3, requiring migration |
+| `particles/exhaustion.py:11–25` | Weighted extensive inventories and representative-volume scaling already expose count semantics |
+| `dynamics/particle_process.py:209–234,247–305` | Nucleation retains separate environment, facade type check and equal-width assumptions |
+| `gpu/conversion.py`; `gpu/kernels/condensation.py` | Transfers preserve raw arrays; direct condensation uses concentration-weighted gas deltas, requiring non-unit-volume audit |
+
+Paths in the table are relative to `particula/`. These observations justify a
+contract correction, not a claim that every named path has a demonstrated bug.
+Implementation must retain reproductions and independent expected quantities.
+
 ## Authorities and technical references
 
 Paths below are repository-relative. Line references describe the drafting

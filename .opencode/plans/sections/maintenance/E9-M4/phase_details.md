@@ -1,8 +1,20 @@
 # Phase Details
 
-All five phases are Not Started. Each is a bounded reviewable PR. P1 requires
+All five phases are Not Started. Each is a bounded reviewed work unit. P1 requires
 M3 completed and validated; every later phase requires its predecessor's
 validated gate. Unit tests ship with the function changes, not in a later phase.
+
+E9 appendix D1–D2 adds these required corrections within the serial phases.
+Split expanded work into bounded serial PRs and re-size provisional phase
+estimates before issue generation; do not hide implementation in P5 docs.
+
+| Phase | Additional required normalization/metadata work |
+|---|---|
+| P1 | Forward native shared distribution metadata and current held environment; reject incompatible processing before mutation |
+| P2 | CPU/direct/prepared GPU dilution scales raw counts/PDF and gas density consistently; test fixed-volume inventory |
+| P3 | CPU/direct/prepared GPU source rate J becomes J*V*dt counts; gas debit is source mass/V; audit exhaustion/resampling/scaling quantities |
+| P4 | Resident volume/communication semantics, prepared metadata compatibility and checkpoint versioned interpretation; exact-device restore; independent cross-layer conservation |
+| P5 | Final correction/compatibility ledger, full-loop evidence and M5 guidance |
 
 - [ ] **E9-M4-P1: Migrate scientific runnable state access and composition with behavioral tests**
   - Issue: TBD | Size: S | Status: Not Started
@@ -38,8 +50,8 @@ validated gate. Unit tests ship with the function changes, not in a later phase.
   - Issue: TBD | Size: S | Status: Not Started
   - Work: Replace `_topology` facade admission with approved native single-box
     topology/mapping. Read held environment and gas; stop synchronizing facade
-    caches on the native path. Resolve the explicit-environment argument and
-    distribution admission questions before code changes. Reuse P2/P3 source
+    caches on the native path. Remove the redundant constructor environment
+    argument; apply explicit distribution/fixed-slot admission. Reuse P2/P3 source
     finalization/commit primitives and unchanged exhaustion policy.
   - Tests: Migrate `dynamics/tests/nucleation_runnable_test.py` with
     `dynamics/nucleation/tests/particle_source_test.py` regression checks.

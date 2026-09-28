@@ -1,5 +1,10 @@
 # Success Metrics
 
+- [ ] Approved D1–D2 shared distribution metadata and count/radius-PDF convention
+  are implemented across required CPU/direct/prepared/resident consumers, with
+  non-unit-volume scientific evidence and explicit checkpoint interpretation.
+  Radius in metres is the sole distribution coordinate; no hidden PDF/PMF switch.
+
 All items below are pending acceptance criteria, not checked implementation
 claims. Record evidence per track and aggregate it at M6.
 

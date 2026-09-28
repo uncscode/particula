@@ -18,8 +18,9 @@ requires validated gates before progression. Upstream unresolved contracts
 block implementation rather than justify a competing M3 convention.
 
 Use existing NumPy/SciPy, pytest, Ruff/mypy and docs tooling; no new external
-dependencies. GPU conversion/export/ownership/resident/capture contracts are
-protected, not redesign targets. Epic I follows E9, not a prerequisite.
+dependencies. GPU exports, ownership and lifecycle boundaries are protected;
+approved D1–D2 metadata/normalization consequences are required. Epic I follows
+E9, not a prerequisite.
 
-This draft changes only E9-M3 phases and canonical sections. Dependency
-semantics are recorded here; sibling metadata/contracts remain untouched.
+The review corrected E9-M3.json to depend explicitly on E9-M2, matching this
+serial chain. Scientific correction requirements are coordinated across E9.

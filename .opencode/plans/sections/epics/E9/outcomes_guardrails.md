@@ -19,7 +19,8 @@ depend on `ParticleRepresentation`, `GasSpecies`, or `Atmosphere`.
 - Complete and validate M1 before M2, then M3, M4, M5 and M6; no parallel
   implementation and no early deletion.
 - CPU process execution remains single-box. Data containers retain their
-  existing schemas and names; no precision or storage redesign is included.
+  names and array layouts. Shared distribution_type metadata and consistent
+  count/radius-PDF normalization are the approved bounded schema amendment.
 - Scientific configuration stays on processes. There is no permanent new
   compatibility facade or duplicate authoritative state.
 - Getters return held container objects; accepted setters retain supplied
@@ -28,7 +29,9 @@ depend on `ParticleRepresentation`, `GasSpecies`, or `Atmosphere`.
 - Direct mutation remains subject to process validation. CPU replacement never
   automatically rebinds prepared GPU/resident state.
 - Retain CPU↔Warp transfer helpers and current export, device, ownership, RNG,
-  checkpoint and graph-capture boundaries. No hidden transfer, synchronization,
+  checkpoint and graph-capture ownership boundaries. Metadata propagation,
+  versioning and CPU/GPU normalization corrections follow appendix D1–D2.
+  No hidden transfer, synchronization,
   fallback, new GPU public API or new performance claim.
 - Temporary compatibility must have an explicit owner, consumer list and
   removal gate, and must be gone before M6 closes.

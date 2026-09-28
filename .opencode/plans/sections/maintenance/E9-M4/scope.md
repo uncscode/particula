@@ -14,12 +14,16 @@
   nucleation runnable and wall-loss runnable behavioral fixtures.
 - `particula/dynamics/nucleation/particle_source.py` and adjacent tests are
   retained transaction authority; change only a necessary native orchestration
-  interface, never its scientific law or exhaustion policy.
+  interface and approved count/volume normalization, never its scientific law
+  or resampling-before-scaling exhaustion policy.
 - `particula/execution/adapters/condensation.py` and `coagulation.py`: existing
   CPU carriers/dispatch and corresponding adapter/integration tests under
   `particula/execution/tests/`; retain concrete-only exports.
 - `particula/integration_tests/`: native composed-process regression fixtures.
   Narrow developer contract documentation accompanies closeout.
+- Required D1–D2 corrections in CPU/GPU dilution, nucleation, exhaustion,
+  communication and volume evolution; resident/prepared composition, metadata
+  compatibility and versioned checkpoint restore. Preserve lifecycle ownership.
 
 ## Interfaces and acceptance boundary
 
@@ -37,6 +41,7 @@ rewrites, M5 broad tutorials/notebooks, and M6 final class/export/bridge deletio
 are separate. No general multi-box CPU execution, permanent compatibility
 facade, new exports, new adapter families, hidden transfer/synchronization,
 fallback, automatic GPU rebind, resident scheduler or graph-capture redesign,
-precision/schema changes, performance claims or Epic I implementation.
-`execution/process_adapters.py` is resident GPU infrastructure, not the CPU
-adapter migration target. CPU↔Warp conversion helpers remain supported.
+precision/array-layout changes beyond approved metadata, performance claims or
+Epic I implementation. `execution/process_adapters.py` remains resident GPU
+infrastructure; only required D1–D2 semantic integration is included, not a CPU
+adapter redesign. CPU↔Warp conversion helpers remain supported.

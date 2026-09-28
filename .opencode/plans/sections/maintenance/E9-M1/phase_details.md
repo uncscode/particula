@@ -10,10 +10,10 @@ instead of pulling sibling migration work into this plan.
   - Entry: E9 scope approved; no prior maintenance track required.
   - Goal: Remove semantic ambiguity before any new helper or constructor.
   - Work: Inventory facade accessors and actual native consumers by supported
-    distribution. Record storage versus number-density semantics; choose the
-    species mapping and enumerate each needed helper with its consumer.
-    Approve names/mask/particle/environment/configuration alignment without
-    changing schemas. Mark interpretation conflicts as blockers, not defaults.
+    distribution on CPU and GPU. Apply E9 appendix D1–D3: shared distribution_type,
+    counts/radius-PDF storage, gas-order environment and explicit process maps.
+    Enumerate each helper with its consumer; freeze PDF quadrature and metadata
+    construction/admission. Record old semantic conflicts as correction rows.
   - Tests: Adjacent characterization cases for existing properties/copies,
     mixed partitioning flags and non-unit-volume legacy normalization; expected
     quantities come from independent arithmetic, not the facade under test.
@@ -24,7 +24,7 @@ instead of pulling sibling migration work into this plan.
   - Issue: TBD | Size: XS | Status: Not Started
   - Entry: P1 completed and validated.
   - Goal: Deliver an unambiguous aggregate acceptance contract to M2.
-  - Work: Specify exact getter/setter/coordinated-replacement spelling and
+  - Work: Specify acceptance cases for approved properties and replace_data and
     cross-container validation order. Cover same-object assignment, compatible
     candidate identity, invalid individual replacement, valid all-three layout
     change, rejection with no partial publication, and no GPU/resident rebinding.
@@ -41,12 +41,15 @@ instead of pulling sibling migration work into this plan.
   - Goal: Fill only approved particle access/mutation gaps for later migration.
   - Work: Reuse existing derived properties; add minimal missing helpers with
     explicit concentration interpretation, units and read/write contracts.
-    Preserve arrays as sole authority; do not migrate scientific consumers.
+    Preserve arrays as sole authority; add shared distribution metadata and
+    normalization/population helpers without migrating scientific consumers.
+    Audit required metadata propagation through copies and explicit Warp transfer;
+    reject unsupported interpretation rather than silently relabel existing data.
   - Tests: Co-located per-particle versus population mass, radii/fractions,
     V=0.25/4 normalization, multi-species lanes, empty/inactive data, read-only
     rejection, copy/view and direct-mutation freshness assertions as applicable.
   - Gate: All changed helpers have independent oracles, no double normalization,
-    unchanged schema/physics ownership, and passing focused tests and lint.
+    approved metadata only, unchanged physics ownership, and passing tests/lint.
 
 - [ ] **E9-M1-P4: Implement necessary gas and environment helpers with alignment tests**
   - Issue: TBD | Size: S | Status: Not Started

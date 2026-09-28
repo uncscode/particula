@@ -1,28 +1,28 @@
-# Open Questions
+# Open Questions and Review Decisions
 
-1. [ ] Which accepted M1–M3 revision freezes accessor spelling, ordered mixed-gas
-   mapping, concentration/volume conventions and native strategy signatures?
-   Evidence: upstream plans remain drafts. Require their completed-and-validated
-   handoff rather than inventing answers here; blocks P1 implementation.
-2. [ ] How should `Nucleation(environment=...)` transition to the aggregate's
-   sole environmental authority? Recommended: use held environment and remove
-   the redundant parameter at the breaking boundary; if a temporary argument
-   remains, require explicit identity consistency and M6 removal ownership.
-   Maintainer chooses the signature before P3. No silent override is permitted.
-3. [ ] What explicit process-owned admission replaces the current
-   `MassBasedMovingBin` facade type check for supported native nucleation?
-   Evidence: `particle_process.py:247–252`. Prefer the narrow existing physical
-   contract using M1–M3 decisions, not broadened distributions or a container
-   strategy field. Resolve before P3 and record rejected topology tests.
-4. [ ] Which temporary compatibility seams are still necessary after M3, and
-   which supported custom-runnable fixtures rely on them? Audit at P1; each
-   retained seam needs a consumer list and M6 removal owner. Do not treat this
-   inventory question as authorization for permanent compatibility.
-5. [ ] Who approves M3→M4 entry and M4→M5 completion, and where will final
-   revision evidence be retained? Recommended: named E9 maintainer plus owning
-   implementation reviewer, with PR evidence linked from the appendix ledger.
+Authority: [E9 review decisions](../../epics/E9/appendix.md#review-decisions-2026-09-27).
 
-Already fixed by issue #1602/E9: serial track execution, CPU single-box scope,
-all-gas dilution, per-attempted-substep nucleation atomicity, retained identities,
-no hidden transfers/fallback/rebind/export expansion, behavioral tests with
-implementation and final deletion only in M6. These are not open choices.
+- [x] **Q1 upstream contract:** consume D1–D4 and completed M1–M3 evidence;
+  accessor/mapping/normalization choices are settled. Revisions remain entry
+  evidence to be produced by implementation.
+- [x] **Q2 environment:** remove Nucleation's separate environment argument from
+  the final API; read current aerosol.environment on execution. CPU replacement
+  must be observed without automatic prepared GPU/resident rebinding.
+- [x] **Q3 nucleation admission:** replace facade type tests with native
+  distribution compatibility, fixed-slot, mapping and physical checks. Preserve
+  existing demonstrated topology; reject PDFs/unsupported weighted behavior
+  rather than widening scientific support merely because a class disappears.
+- [x] **Q4 compatibility:** retain only inventoried M2/M3 transition consumers,
+  including custom-runnable fixtures, with M6 deletion ownership.
+- [x] **Q5 governance:** Kyle/Gorkowski accepts entry/completion, with literal
+  final-revision evidence linked from the appendix and E9 closeout index.
+
+## Evidence still required in M4
+
+Implement D1–D2 consequences for CPU/GPU dilution and nucleation, resampling,
+volume evolution, communication, resident composition, metadata compatibility
+and checkpoint restore. Distinguish physical expansion (fixed counts) from
+representative-volume scaling (counts and volume scaled together). Version or
+reject ambiguous old checkpoint semantics explicitly. Retain current-gas
+substeps and per-attempted-substep atomicity. These are tested implementation
+deliverables; the current review does not establish their correctness.
