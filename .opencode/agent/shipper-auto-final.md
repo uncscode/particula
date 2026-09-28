@@ -109,10 +109,13 @@ SHIPPER_AUTO_FINAL_FAILED step=<todo-step> reason=<bounded-reason>
 8. Read and derive slice completion/checkpoint context from manifest/state fields.
 9. Compose the deterministic title + markdown summary in memory for downstream
    final PR handoff.
-10. Delegate to `plan-update-short` with the exact preflighted plan and phase IDs,
-    `worktree_path`, and the preflighted canonical plan-content SHA-256. It must
-    reject stale content before mutation and preserve that compare-and-swap
-    condition through one atomic closeout operation.
+10. Delegate to `plan-update-short` with the exact preflighted plan and phase IDs
+    and `worktree_path`. It re-reads the target, marks remaining phases Shipped
+    through `adw_plans_mutate update-phase`, then promotes the plan through
+    `adw_plans_mutate update` and verifies the result. This is a resumable sequence,
+    not an atomic compare-and-swap operation. Do not run concurrent closeout
+    tasks for the same plan. On failure, report partial progress and stop before
+    commit or summary persistence; a retry must repeat preflight.
 11. Delegate to `adw-commit` to commit/push tracked plan metadata changes. A bare
     `ADW_COMMIT_SUCCESS` is only local commit evidence. Require the explicit
     `Push: Synced to origin/<source_branch>` result. For `ADW_COMMIT_SKIPPED`,
@@ -171,9 +174,10 @@ This agent prepares handoff context only; runtime owns final PR creation.
   })
   ```
 - Delegate to `plan-update-short` only after this primary agent has resolved and
-  preflighted the exact plan. Pass `manifest_finalization=true`, `plan_id`, and
-  the complete comma-separated `phase_ids` list, state-loaded `worktree_path`,
-  and preflighted plan SHA-256. The subagent must not repeat ownership or
+  preflighted the exact plan. Pass `adw_id`, `manifest_finalization=true`, `plan_id`,
+  the complete comma-separated `phase_ids` list, and state-loaded `worktree_path`.
+  Use only these supported arguments. Do not invent a digest argument or pass
+  placeholder values. The subagent must not repeat ownership or
   completion-coverage inference; it performs the bounded mutation and verifies
   every phase plus the plan is Shipped. Treat `PLAN_UPDATE_SHORT_FAILED` as
   `SHIPPER_AUTO_FINAL_FAILED` so partially updated plan metadata is not silently
@@ -181,7 +185,7 @@ This agent prepares handoff context only; runtime owns final PR creation.
   ```python
   task({
     "description": "Finalize accumulated plan",
-    "prompt": f"Finalize the preflighted auto-mode plan. Arguments: adw_id={adw_id} manifest_finalization=true plan_id={plan_id} phase_ids={phase_ids_csv} worktree_path={worktree_path} expected_plan_sha256={plan_sha256}",
+    "prompt": f"Finalize the preflighted auto-mode plan. Arguments: adw_id={adw_id} manifest_finalization=true plan_id={plan_id} phase_ids={phase_ids_csv} worktree_path={worktree_path}",
     "subagent_type": "plan-update-short"
   })
   ```
@@ -206,10 +210,10 @@ This agent prepares handoff context only; runtime owns final PR creation.
 
 Success:
 ```
-SHIPPER_AUTO_FINAL_SUCCESS
+SHIPPER_AUTO_FINAL_SUCCESS plan=<plan_id> source=<source_branch> target=<target_branch>
 ```
 
 Failure:
 ```
-SHIPPER_AUTO_FINAL_FAILED: <reason>
+SHIPPER_AUTO_FINAL_FAILED step=<todo-step> reason=<bounded-reason>
 ```

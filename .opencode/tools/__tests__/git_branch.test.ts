@@ -5,6 +5,7 @@ import {
   getInvocations,
   installSubprocessMocks,
   restoreSubprocessMocks,
+  setDollarError,
   setDollarText,
   setSpawnResponse,
 } from "./helpers/mock-subprocess";
@@ -109,6 +110,40 @@ describe("git_branch wrapper", () => {
     await execute({ command: "push", branch: "feat-1" });
 
     expect(getInvocations().at(-1)?.args.join(" ")).toContain("uv run --active adw git push --branch feat-1");
+  });
+
+  it.each(["push", "push-force-with-lease", "checkout"])(
+    "preserves the CLI reason hidden by an abort banner for %s",
+    async (command) => {
+      setDollarError({ stderr: "Aborted!\n", stdout: "✗ Error: remote rejected [policy]\n" });
+      const execute = await loadToolExecute("../../git_branch.ts");
+      const result = await execute({ command, branch: "accumulate/example" });
+
+      expect(result).toBe(`Git Command Failed: ${command}\n✗ Error: remote rejected [policy]`);
+      expect(getInvocations()).toHaveLength(1);
+    },
+  );
+
+  it.each([
+    [{ stderr: "Error: push rejected", stdout: "progress" }, "Error: push rejected"],
+    [{ stderr: "Aborted!", stdout: "  " }, "Aborted!"],
+    [{ stderr: "", stdout: "push rejected" }, "push rejected"],
+    [{ message: "could not launch" }, "could not launch"],
+  ])("retains diagnostic precedence and fallbacks: %j", async (error, expected) => {
+    setDollarError(error);
+    const execute = await loadToolExecute("../../git_branch.ts");
+    const result = await execute({ command: "push", branch: "feature" });
+
+    expect(result).toBe(`Git Command Failed: push\n${expected}`);
+    expect(getInvocations()).toHaveLength(1);
+  });
+
+  it("bounds the legacy stdout diagnostic", async () => {
+    setDollarError({ stderr: "Aborted!", stdout: "x".repeat(1000) });
+    const execute = await loadToolExecute("../../git_branch.ts");
+    const result = await execute({ command: "push", branch: "feature" });
+
+    expect(result).toBe(`Git Command Failed: push\n${"x".repeat(500)}... [truncated]`);
   });
 
   it("allows help mode without branch validation", async () => {

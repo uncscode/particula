@@ -1125,7 +1125,13 @@ def _detect_unusable_coverage_diagnostics(output: str) -> Optional[str]:
         unusable coverage diagnostics, otherwise ``None``.
     """
 
-    lowered_output = output.lower()
+    # Assertion renderings and short failure summaries can quote an entire
+    # nested runner report. Those are not diagnostics from this pytest run.
+    lowered_output = "\n".join(
+        line.lower()
+        for line in output.splitlines()
+        if not re.match(r"^(?:E\s|>\s|FAILED\s|ERROR\s)", line.lstrip())
+    )
     for fragment in UNUSABLE_COVERAGE_FRAGMENTS:
         if fragment in lowered_output:
             return (
@@ -1215,8 +1221,15 @@ def parse_pytest_output(output: str) -> Dict:
     # Example: "===== 1630 passed, 8 skipped in 35.20s ====="
     # Or: "===== 1 failed, 1880 passed, 9 skipped in 26.35s ====="
     # Extract all counts from the summary line (order can vary)
-    summary_line_pattern = r"=+\s*(.*?)\s+in\s+([\d.]+)s?(?:\s*\([^)]*\))?\s*=+"
-    summary_match = re.search(summary_line_pattern, output)
+    # Anchor to physical lines, excluding quoted/escaped nested reports, and
+    # select the final footer after captured output from any failing tests.
+    summary_line_pattern = (
+        r"^=+[ \t]*(.*?)[ \t]+in[ \t]+([\d.]+)s?"
+        r"(?:[ \t]*\([^\r\n)]*\))?[ \t]*=+[ \t]*$"
+    )
+    summary_match = None
+    for match in re.finditer(summary_line_pattern, output, re.MULTILINE):
+        summary_match = match
 
     if summary_match:
         summary_text = summary_match.group(1)
@@ -1245,43 +1258,57 @@ def parse_pytest_output(output: str) -> Dict:
 
         result["total"] = result["passed"] + result["failed"] + result["errors"]
 
-    # Check for FAILED marker
-    failed_pattern = r"^(.*?)\s+FAILED"
-    for line in output.split("\n"):
-        if " FAILED " in line:
-            result["has_failures"] = True
-            match = re.match(failed_pattern, line.strip())
-            if match:
-                result["failed_tests"].append(match.group(1))
-
-    # Check for ERROR marker
-    error_pattern = r"^(.*?)\s+ERROR"
-    for line in output.split("\n"):
-        if " ERROR " in line:
-            result["has_errors"] = True
-            match = re.match(error_pattern, line.strip())
-            if match:
-                result["error_tests"].append(match.group(1))
+    # Serial progress, xdist progress, and the short summary use distinct
+    # layouts. Preserve actual node IDs rather than worker/progress prefixes.
+    for line in output.splitlines():
+        failure_match = re.match(r"^(\S+)\s+(FAILED|ERROR)(?:\s|$)", line)
+        if failure_match:
+            node_id, status = failure_match.groups()
+        else:
+            failure_match = re.match(
+                r"^(?:\[gw\d+\]\s+(?:\[\s*\d+%\]\s+)?)?(FAILED|ERROR)\s+(\S+)",
+                line,
+            )
+            if not failure_match:
+                continue
+            status, node_id = failure_match.groups()
+        key = "failed_tests" if status == "FAILED" else "error_tests"
+        if node_id not in result[key]:
+            result[key].append(node_id)
+    result["has_failures"] = result["failed"] > 0 or bool(result["failed_tests"])
+    result["has_errors"] = result["errors"] > 0 or bool(result["error_tests"])
 
     # Parse coverage percentage
     # Example: "TOTAL        6956   6956     0%"
-    coverage_pattern = r"TOTAL\s+\d+\s+\d+\s+(\d+)%"
-    match = re.search(coverage_pattern, output)
-    if match:
-        result["coverage_pct"] = int(match.group(1))
+    coverage_pattern = (
+        r"^TOTAL[ \t]+\d+[ \t]+\d+(?:[ \t]+\d+[ \t]+\d+)?"
+        r"[ \t]+(\d+(?:\.\d+)?)%[ \t]*$"
+    )
+    coverage_match = None
+    coverage_start = 0
+    for candidate in re.finditer(coverage_pattern, output, re.MULTILINE):
+        if coverage_match is not None:
+            coverage_start = coverage_match.end()
+        coverage_match = candidate
+    if coverage_match:
+        percentage = float(coverage_match.group(1))
+        result["coverage_pct"] = int(percentage) if percentage.is_integer() else percentage
 
     coverage_files: List[Dict[str, object]] = []
 
-    def _coverage_sort_key(entry: Dict[str, object]) -> int:
+    def _coverage_sort_key(entry: Dict[str, object]) -> float:
         value = entry.get("coverage_pct")
-        if isinstance(value, int):
+        if isinstance(value, (int, float)):
             return value
         if isinstance(value, str) and value.isdigit():
             return int(value)
         return 0
 
-    coverage_file_pattern = re.compile(r"^(\S+)\s+(\d+)\s+(\d+)\s+(\d+)%\s*(?:\|\s*)?(.+)?$")
-    for line in output.splitlines():
+    coverage_file_pattern = re.compile(
+        r"^(\S+)\s+(\d+)\s+(\d+)(?:\s+\d+\s+\d+)?\s+(\d+(?:\.\d+)?)%\s*(?:\|\s*)?(.+)?$"
+    )
+    coverage_output = output[coverage_start : coverage_match.start()] if coverage_match else output
+    for line in coverage_output.splitlines():
         stripped = line.strip()
         if not stripped or stripped.startswith("-"):
             continue
@@ -1289,15 +1316,16 @@ def parse_pytest_output(output: str) -> Dict:
             continue
         if stripped.startswith("TOTAL") or COVERAGE_HEADER_PATTERN.match(stripped):
             continue
-        match = coverage_file_pattern.match(stripped)
-        if match:
+        coverage_file_match = coverage_file_pattern.match(stripped)
+        if coverage_file_match:
+            percentage = float(coverage_file_match.group(4))
             coverage_files.append(
                 {
-                    "file": match.group(1),
-                    "statements": int(match.group(2)),
-                    "missing": int(match.group(3)),
-                    "coverage_pct": int(match.group(4)),
-                    "missing_lines": (match.group(5) or "").strip(),
+                    "file": coverage_file_match.group(1),
+                    "statements": int(coverage_file_match.group(2)),
+                    "missing": int(coverage_file_match.group(3)),
+                    "coverage_pct": int(percentage) if percentage.is_integer() else percentage,
+                    "missing_lines": (coverage_file_match.group(5) or "").strip(),
                 }
             )
 
@@ -1320,13 +1348,13 @@ def parse_pytest_output(output: str) -> Dict:
                 stripped.startswith("(") and "hidden" in stripped and "durations" in stripped
             ):
                 continue
-            match = entry_pattern.match(stripped)
-            if match:
+            duration_match = entry_pattern.match(stripped)
+            if duration_match:
                 durations_entries.append(
                     {
-                        "duration": float(match.group(1)),
-                        "phase": match.group(2),
-                        "test": match.group(3),
+                        "duration": float(duration_match.group(1)),
+                        "phase": duration_match.group(2),
+                        "test": duration_match.group(3),
                     }
                 )
         result["durations"] = durations_entries
@@ -1400,9 +1428,9 @@ def format_summary(
     coverage_files = metrics.get("coverage_files", [])
     if coverage_files:
 
-        def coverage_entry_pct(entry: Dict[str, object]) -> int:
+        def coverage_entry_pct(entry: Dict[str, object]) -> float:
             value = entry.get("coverage_pct")
-            if isinstance(value, int):
+            if isinstance(value, (int, float)):
                 return value
             if isinstance(value, str) and value.isdigit():
                 return int(value)

@@ -1,4 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, spyOn } from "bun:test";
+import * as fs from "node:fs/promises";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 
 import { assertContains } from "./helpers/assert-error-envelope";
 import {
@@ -16,12 +18,26 @@ import {
 } from "./helpers/tool_harness";
 
 describe("git_commit wrapper", () => {
+  const logDirectories = new Set<string>();
+  const spies: Array<{ mockRestore: () => void }> = [];
+  const logPath = (result: string): string => {
+    const path = result.match(/^full_output_path: (.+)$/m)?.[1];
+    expect(path).toBeDefined();
+    logDirectories.add(dirname(path!));
+    expect(isAbsolute(path!)).toBe(true);
+    return path!;
+  };
   beforeEach(() => {
     installSubprocessMocks();
     resetCapturedToolDefinition();
     setSpawnResponse({ stdout: "ok", exitCode: 0 });
   });
-  afterEach(() => {
+  afterEach(async () => {
+    for (const spy of spies.splice(0)) spy.mockRestore();
+    for (const directory of logDirectories) {
+      await fs.rm(directory, { recursive: true, force: true });
+    }
+    logDirectories.clear();
     restoreSubprocessMocks();
     resetCapturedToolDefinition();
   });
@@ -134,5 +150,156 @@ describe("git_commit wrapper", () => {
     assertContains(String(result), "ERROR: Failed to execute 'adw git commit'");
     assertContains(String(result), "stderr: commit failed");
   });
+
+  it("keeps threshold-length responses unchanged without creating logs", async () => {
+    const mkdir = spyOn(fs, "mkdir");
+    spies.push(mkdir);
+    const execute = await loadToolExecute("../../git_commit.ts");
+    const output = "a".repeat(8000);
+    setDollarText(output);
+    expect(await execute({ summary: "msg" })).toBe(`Git Commit Command\n\n${output}`);
+    setDollarError({ stderr: "e".repeat(500), exitCode: 1 });
+    expect(await execute({ summary: "msg" })).toBe(
+      "ERROR: Failed to execute 'adw git commit'\ncommand: commit\nexit_code: 1\n" +
+      `stderr: ${"e".repeat(500)}\n` +
+      "hint: Inspect stderr/stdout details and rerun with corrected inputs or repository state.",
+    );
+    expect(mkdir).not.toHaveBeenCalled();
+  });
+
+  it("preserves late codespell findings and raw streams in private unique logs", async () => {
+    const stderr = "warning\n\tdeprecated\r\n".repeat(50) + "codespell: teh ==> the\n";
+    const stdout = "pre-commit\n\tchecking files\r\n";
+    const message = "hook failed\n\tdetails";
+    setDollarError({ stderr, stdout, message, exitCode: 7 });
+    const execute = await loadToolExecute("../../git_commit.ts");
+    const result = String(await execute({ summary: "msg", worktree_path: "./trees/abc" }));
+    const path = logPath(result);
+    expect(getInvocations()).toHaveLength(1);
+    expect(result).toContain("exit_code: 7\nworktree_path: ./trees/abc");
+    expect(result).toContain("Commit was rejected by git hooks");
+    expect(result).not.toContain("codespell: teh");
+    expect(await fs.readFile(path, "utf8")).toBe(
+      `exit_code: 7\n\nstderr:\n${stderr}\n\nstdout:\n${stdout}\n\nmessage:\n${message}`,
+    );
+    expect((await fs.stat(path)).mode & 0o777).toBe(0o600);
+    expect((await fs.stat(dirname(path))).mode & 0o777).toBe(0o700);
+    const secondPath = logPath(String(await execute({ summary: "msg" })));
+    expect(secondPath).not.toBe(path);
+  });
+
+  for (const stream of ["stderr", "stdout", "message"]) {
+    it(`detects long raw ${stream} before whitespace normalization`, async () => {
+      const raw = "\n\t".repeat(251);
+      setDollarError({ stderr: "short", [stream]: raw, code: 2 });
+      const execute = await loadToolExecute("../../git_commit.ts");
+      const result = String(await execute({ summary: "msg" }));
+      expect(await fs.readFile(logPath(result), "utf8")).toContain(`${stream}:\n${raw}`);
+      expect(result).toContain("exit_code: 2");
+      expect(getInvocations()).toHaveLength(1);
+    });
+  }
+
+  it("saves long success exactly with a bounded head and tail preview", async () => {
+    const output = "status=committed\n" + "details\n\t".repeat(1000) + "sha=abc123\n";
+    setDollarText(output);
+    const execute = await loadToolExecute("../../git_commit.ts");
+    const result = String(await execute({ summary: "msg" }));
+    expect(result.startsWith(`Git Commit Command\n\n${output.slice(0, 4000)}\n... [truncated]\n${output.slice(-2000)}\nfull_output_path:`)).toBe(true);
+    expect(result.length).toBeLessThan(7000);
+    expect(await fs.readFile(logPath(result), "utf8")).toBe(output);
+    expect(getInvocations()).toHaveLength(1);
+  });
+
+  it("cleans only old direct matching directories before creating the new log", async () => {
+    const root = resolve(import.meta.dir, "../../../adforge_local/opencode/tmp");
+    await fs.mkdir(root, { recursive: true });
+    const fixture = await fs.mkdtemp(join(root, "cleanup-test-"));
+    logDirectories.add(fixture);
+    const old = await fs.mkdtemp(join(root, "git-commit-old-test-"));
+    const recent = await fs.mkdtemp(join(root, "git-commit-recent-test-"));
+    logDirectories.add(old);
+    logDirectories.add(recent);
+    const nested = join(fixture, "git-commit-nested");
+    await fs.mkdir(nested);
+    const link = join(root, `git-commit-link-${fixture.split("/").at(-1)}`);
+    const file = join(root, `git-commit-file-${fixture.split("/").at(-1)}`);
+    logDirectories.add(link);
+    logDirectories.add(file);
+    await fs.symlink(fixture, link);
+    await fs.writeFile(file, "keep");
+    await fs.writeFile(join(old, "output.log"), "old output");
+    const past = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000);
+    for (const path of [old, nested, fixture, file]) await fs.utimes(path, past, past);
+    // Limit cleanup enumeration to this test's entries, protecting existing logs.
+    const entries = (await fs.readdir(root, { withFileTypes: true })).filter((entry) =>
+      [old, recent, fixture, link, file].includes(join(root, entry.name)),
+    );
+    const readdir = spyOn(fs, "readdir").mockResolvedValue(entries as any);
+    spies.push(readdir);
+    const originalMkdtemp = fs.mkdtemp;
+    const mkdtemp = spyOn(fs, "mkdtemp").mockImplementation(async (prefix: any, options: any) => {
+      expect(await fs.stat(old).catch(() => null)).toBeNull();
+      return originalMkdtemp(prefix, options);
+    });
+    spies.push(mkdtemp);
+    setDollarText("s".repeat(8001));
+    const execute = await loadToolExecute("../../git_commit.ts");
+    logPath(String(await execute({ summary: "msg" })));
+    expect(await fs.stat(old).catch(() => null)).toBeNull();
+    expect((await fs.stat(recent)).isDirectory()).toBe(true);
+    expect((await fs.stat(nested)).isDirectory()).toBe(true);
+    expect((await fs.lstat(link)).isSymbolicLink()).toBe(true);
+    expect(await fs.readFile(file, "utf8")).toBe("keep");
+    expect(getInvocations()).toHaveLength(1);
+  });
+
+  for (const operation of ["readdir", "lstat", "rm"] as const) {
+    it(`saves the new log despite cleanup ${operation} failure`, async () => {
+      const root = resolve(import.meta.dir, "../../../adforge_local/opencode/tmp");
+      await fs.mkdir(root, { recursive: true });
+      const old = await fs.mkdtemp(join(root, "git-commit-cleanup-failure-"));
+      logDirectories.add(old);
+      const past = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000);
+      await fs.utimes(old, past, past);
+      const entries = (await fs.readdir(root, { withFileTypes: true })).filter((entry) => join(root, entry.name) === old);
+      if (operation !== "readdir") spies.push(spyOn(fs, "readdir").mockResolvedValue(entries as any));
+      spies.push(spyOn(fs, operation).mockRejectedValue(new Error("cleanup unavailable")));
+      const output = "s".repeat(8001);
+      setDollarText(output);
+      const execute = await loadToolExecute("../../git_commit.ts");
+      const result = String(await execute({ summary: "msg" }));
+      expect(await fs.readFile(logPath(result), "utf8")).toBe(output);
+      expect(result).not.toContain("output_log_error");
+      expect(result.startsWith("Git Commit Command\n")).toBe(true);
+      expect(getInvocations()).toHaveLength(1);
+    });
+  }
+
+  for (const operation of ["mkdir", "mkdtemp", "writeFile"] as const) {
+    for (const success of [true, false]) {
+      it(`retains the result and full inline output when ${operation} fails (${success ? "success" : "failure"})`, async () => {
+        const spy = spyOn(fs, operation).mockImplementation(async (...args: any[]) => {
+          if (operation === "writeFile") logDirectories.add(dirname(String(args[0])));
+          throw new Error("log unavailable");
+        });
+        spies.push(spy);
+        const output = "raw\n\toutput\r\n".repeat(1000);
+        if (success) setDollarText(output);
+        else setDollarError({ stderr: output, stdout: "original\n\tstdout", message: "fallback", exitCode: 9 });
+        const execute = await loadToolExecute("../../git_commit.ts");
+        const result = String(await execute({ summary: "msg" }));
+        expect(result).toContain("output_log_error: log unavailable");
+        expect(result).not.toContain("full_output_path:");
+        expect(result).toContain(output);
+        expect(result.startsWith(success ? "Git Commit Command\n" : "ERROR: Failed to execute 'adw git commit'")).toBe(true);
+        if (!success) {
+          expect(result).toContain("exit_code: 9");
+          expect(result).toContain("stdout:\noriginal\n\tstdout\n\nmessage:\nfallback");
+        }
+        expect(getInvocations()).toHaveLength(1);
+      });
+    }
+  }
 
 });

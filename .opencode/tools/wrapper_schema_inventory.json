@@ -1064,7 +1064,7 @@
     },
     {
       "wrapper_path": ".opencode/tools/git_commit.ts",
-      "companion_doc_path": null,
+      "companion_doc_path": ".opencode/tools/git_commit.md",
       "wrapper_kind": "split",
       "status": "ok",
       "current_shape": "direct_args_object",

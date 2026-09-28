@@ -6,6 +6,8 @@
  */
 
 import { tool } from "@opencode-ai/plugin";
+import { lstat, mkdir, mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
+import { join, resolve } from "node:path";
 
 // --- Inlined from lib/wrapper_contract.ts ---
 
@@ -171,6 +173,44 @@ const selectDiagnostic = (
 
 const ERROR_SNIPPET_LIMIT = 500;
 const TRUNCATION_MARKER = DEFAULT_TRUNCATION_MARKER;
+const LOG_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+
+async function cleanupOutputLogs(root: string): Promise<void> {
+  try {
+    const cutoff = Date.now() - LOG_RETENTION_MS;
+    for (const entry of await readdir(root, { withFileTypes: true })) {
+      if (!entry.name.startsWith("git-commit-") || !entry.isDirectory() || entry.isSymbolicLink()) {
+        continue;
+      }
+      try {
+        const path = join(root, entry.name);
+        const info = await lstat(path);
+        if (info.isDirectory() && !info.isSymbolicLink() && info.mtimeMs < cutoff) {
+          await rm(path, { recursive: true, force: true });
+        }
+      } catch {
+        // One inaccessible or concurrently removed log must not stop cleanup.
+      }
+    }
+  } catch {
+    // Retention is best-effort and must never prevent saving the new output.
+  }
+}
+
+async function preserveLongOutput(summary: string, fullOutput: string): Promise<string> {
+  try {
+    const root = resolve(import.meta.dir, "../../adforge_local/opencode/tmp");
+    await mkdir(root, { recursive: true, mode: 0o700 });
+    await cleanupOutputLogs(root);
+    const directory = await mkdtemp(join(root, "git-commit-"));
+    const path = join(directory, "output.log");
+    await writeFile(path, fullOutput, { mode: 0o600 });
+    return `${summary}\nfull_output_path: ${path}\nRead this temporary log for complete output before retrying.`;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return `${summary}\noutput_log_error: ${clipDiagnostic(message)}\n\n${fullOutput}`;
+  }
+}
 
 const getCommitHint = (stderr: string, stdout: string): string => {
   const combined = `${stderr}\n${stdout}`.toLowerCase();
@@ -197,11 +237,13 @@ const getCommitHint = (stderr: string, stdout: string): string => {
   return "Inspect stderr/stdout details and rerun with corrected inputs or repository state.";
 };
 
-const buildCommitError = (error: any, worktreePath?: string): string => {
-  const stderr = error?.stderr ? normalizeSnippet(error.stderr.toString()) : "";
-  const stdout = error?.stdout ? normalizeSnippet(error.stdout.toString()) : "";
-  const fallbackMessage =
-    typeof error?.message === "string" ? normalizeSnippet(error.message) : "";
+const buildCommitError = async (error: any, worktreePath?: string): Promise<string> => {
+  const rawStderr = error?.stderr?.toString() ?? "";
+  const rawStdout = error?.stdout?.toString() ?? "";
+  const rawMessage = typeof error?.message === "string" ? error.message : "";
+  const stderr = normalizeSnippet(rawStderr);
+  const stdout = normalizeSnippet(rawStdout);
+  const fallbackMessage = normalizeSnippet(rawMessage);
   const exitCode =
     typeof error?.exitCode === "number"
       ? error.exitCode
@@ -240,6 +282,12 @@ const buildCommitError = (error: any, worktreePath?: string): string => {
   }
 
   lines.push(`hint: ${getCommitHint(stderr || fallbackMessage, stdout)}`);
+  if ([rawStderr, rawStdout, rawMessage].some((value) => value.length > ERROR_SNIPPET_LIMIT)) {
+    return preserveLongOutput(
+      lines.join("\n"),
+      `exit_code: ${exitCode}\n\nstderr:\n${rawStderr}\n\nstdout:\n${rawStdout}\n\nmessage:\n${rawMessage}`,
+    );
+  }
   return lines.join("\n");
 };
 
@@ -262,7 +310,8 @@ RULES:
   confirmation flow and covers only the narrow OpenCode commit path.
 - It does not imply arbitrary git verbs, shell execution, auto-push, or
   background git behavior.
-- Uses deterministic error envelope compatible with git commit wrapper parsing.`,
+- Uses deterministic error envelope compatible with git commit wrapper parsing.
+- When full_output_path is returned, read the temporary log for complete output before retrying.`,
 
   args: {
     summary: tool.schema.string().describe("Commit summary line (required)."),
@@ -350,6 +399,12 @@ RULES:
 
     try {
       const output = await Bun.$`${cmdParts}`.text();
+      if (output.length > 8000) {
+        return preserveLongOutput(
+          `Git Commit Command\n\n${output.slice(0, 4000)}\n${TRUNCATION_MARKER}\n${output.slice(-2000)}`,
+          output,
+        );
+      }
       return `Git Commit Command\n\n${output}`;
     } catch (error: any) {
       return buildCommitError(error, worktreePath);
