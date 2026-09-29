@@ -1,8 +1,9 @@
 # Phase Details
 
 At drafting time, all five phases were Not Started. P1 characterization for
-issue #1610 is now committed (`5d8f36964`), but its scientific gate remains
-pending; P2–P5 are Not Started. Execute strictly in the order below; each
+issue #1610 was committed (`5d8f36964`); P1 scientific and P2 specification
+approvals are recorded in `appendix.md`. P3 is merged, P4 validation is in
+progress, and P5 remains Not Started. Execute strictly in the order below; each
 is one bounded reviewable PR. Keep helper production changes near the template's
 rough 100-line increment; escalate a larger discovered requirement for review
 instead of pulling sibling migration work into this plan.
@@ -11,8 +12,8 @@ Maintainer representation/grid/volume/builder clarifications and explicit P1
 scientific/P2 specification approval from issue #1612 are recorded in this
 track's `appendix.md`; they supersede conflicting raw-count/raw-PDF proposals.
 Historical characterization does not become revised-contract test evidence by
-approval. P3 implementation and independent tests are present in the #1612
-worktree; final review/ship evidence remains pending.
+approval. P3 implementation and independent tests are present in #1612's
+merged workflow; the P3 completion reconciliation is recorded below.
 
 - [ ] **E9-M1-P1: Freeze ordered species, units and ownership contracts with characterization tests**
   - Issue: #1610 | Size: S | Status: Characterization committed; revised scientific contract approved 2026-09-28; historical tests remain characterization
@@ -65,7 +66,7 @@ worktree; final review/ship evidence remains pending.
     inferred from this plan update.
 
 - [ ] **E9-M1-P3: Implement necessary particle data helpers with non-unit-volume tests**
-  - Issue: #1612 | Size: S | Status: Implemented in workflow worktree; final review/ship pending
+  - Issue: #1612 | Size: S | Status: Implemented; completed and merged in workflow state 2026-09-29
   - Entry: P2 completed and validated.
   - Goal: Fill only approved particle access/mutation gaps for later migration.
   - Work: Reuse existing derived properties; add minimal missing helpers with
@@ -90,7 +91,7 @@ worktree; final review/ship evidence remains pending.
     approved metadata only, unchanged physics ownership, and passing tests/lint.
 
 - [ ] **E9-M1-P4: Implement necessary gas and environment helpers with alignment tests**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1613 | Size: S | Status: P4 fix implemented; final gate pending
   - Entry: P3 completed and validated.
   - Goal: Make ordered mixed-gas and environment access safe for later consumers.
   - Work: Implement only P1-approved missing helpers or reusable read-only
@@ -118,3 +119,61 @@ worktree; final review/ship evidence remains pending.
   - Gate: Approved P1/P2 decisions plus literal successful required evidence at
     the final revision authorize M2. Required failures/unavailable checks keep
     M1 incomplete. No parallel M2–M6 implementation is authorized beforehand.
+
+## P4 fix handoff (issue #1613, 2026-09-29)
+
+- P1 scientific and P2 specification approvals are recorded in `appendix.md`;
+  these approvals do not supply implementation evidence. P3 predecessor gate
+  reconciled from issue #1612 workflow `8ef4d823`: `fix_completed=true`,
+  the post-fix Validate, Polish, Run Tests, Format and Ship Auto Implementation
+  phases are completed, and `branch_merged=true` (`current_phase` reports
+  "Workflow completed with skipped steps"; earlier pre-fix Validate/Polish/
+  Test/Format phases remain pending, replaced by the completed post-fix phases).
+  Worktree HEAD `0fd3472be` includes the inherited #1612 P3 commits. This
+  is a workflow-state and commit reconciliation, not a fresh P3 science review.
+- The direct-only P4 checker and adjacent regression tests are in
+  `particula/aerosol_validation.py` and
+  `particula/tests/aerosol_validation_test.py`. It does not certify same-width
+  ratio chemistry, transform masks, or modify inherited P3 code.
+- The checker accepts `ParticleData` masses `(B,N,Sp)`, concentration and
+  charge `(B,N)`, density `(Sp,)`, volume `(B,)`; `GasData` molar mass and
+  partitioning `(Sg,)`, concentration `(B,Sg)`, nonblank unique ordered names;
+  `EnvironmentData` temperature and pressure `(B,)` and saturation ratio
+  `(B,Sg)`. Only `B>0` and `Sg>0` are required: `Sp` may differ from `Sg`,
+  empty particle capacity and all-false masks pass. Rejection is read-only;
+  callers may correct metadata and retry without rollback or partial state.
+  Later M3/M4 admission must compare full ordered expected configuration names
+  with current gas names and verify authoritative ratio-producer order when
+  available (otherwise alignment is unverified), require unique in-range
+  one-to-one integer `(gas_index, particle_index)` pairs, classify unmatched
+  lanes, check mapped mask eligibility, physical-domain and distribution
+  capability before mutation. This checker neither implements those gates nor
+  detects same-width ratio permutations; an all-false mask admits no transfer.
+- Focused CPU gate on the fix revision: `pytest` for gas_data_test.py,
+  environment_data_test.py and aerosol_validation_test.py with `-q`, coverage
+  disabled: **111 passed**. Focused GPU conversion/export gate with `-q`,
+  coverage disabled: **150 passed**; existing transfer tests already assert
+  mixed/all-false masks, every gas/ratio lane, names and detached restores,
+  so no conversion production change was needed. Lint, mypy, untargeted
+  coverage and strict MkDocs gates are not inferred from focused results;
+  their final results are recorded separately below.
+- Final style-only revision test delegation: **31 focused passed; 6,975 full
+  suite passed, 20 skipped; 93% full-package coverage (80% threshold)**.
+  Documentation delegation: **strict MkDocs passed** with link and formatting
+  checks. On the subsequent P4 lint gate, Ruff check and format check passed
+  on `particula/` (520 files); mypy `particula/ --ignore-missing-imports`
+  passed (520 source files). The lint agent corrected only the two new P4
+  Python files. After those corrections, focused CPU **111 passed** and GPU
+  transfer/export **150 passed**; delegated full-suite **6,975 passed, 20
+  skipped, 93% coverage**; strict MkDocs **passed** (links and formatting
+  checked). M1/P5 is not declared shipped by this P4 gate.
+- Validator follow-up at worktree HEAD `0fd3472be` plus the pending P4 diff:
+  focused gas/environment/checker assertions **139 passed** (coverage disabled),
+  GPU conversion/exports **150 passed** (coverage disabled), Ruff check and
+  format-check **passed**, mypy on `particula/` **passed** (520 files), and
+  untargeted repository-policy coverage **7,003 passed, 20 skipped, 93%**
+  (80% threshold). The additional constructor-input nonmutation tests and
+  one-pass ordered-name inspection are included in this evidence. The strict
+  MkDocs validation-only equivalent returned exit code 0; it was not the
+  literal raw `mkdocs build --strict` invocation. These are local worktree
+  results, not a claim that M1/P5 has shipped.

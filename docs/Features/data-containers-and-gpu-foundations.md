@@ -38,6 +38,22 @@ and planned expansions, see the
 
 ## Public imports
 
+### Concrete CPU structural alignment (P4)
+
+Import `validate_aerosol_structure` directly from
+`particula.aerosol_validation`, not from the top-level package. It checks
+current raw array shapes, a positive shared box count, nonempty unique
+nonblank ordered gas names, and a saturation-ratio lane for **every** gas
+species. It reads only metadata: no copies, value or representation checks,
+mutation, mask filtering, or process admission. Particle and gas species
+widths may differ; empty particle axes and all-false partitioning masks are
+allowed. Caller-managed full gas and ratio lane order remains unchanged.
+
+This structural check cannot certify a same-width permutation of ratio lanes.
+Expected ordered names and ratio-producer provenance, particle/gas mapping,
+mask eligibility, physical validity, and distribution/process admission belong
+to later M3/M4 process bindings, not to this P4 helper.
+
 ### CPU particle population interpretation
 
 For new builder-created `ParticleData`, explicitly call

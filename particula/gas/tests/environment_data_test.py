@@ -347,6 +347,26 @@ def test_environment_data_nonpositive_pressure_raises_value_error(
         )
 
 
+@pytest.mark.parametrize("field", ["temperature", "pressure"])
+@pytest.mark.parametrize("value", [np.nan, np.inf, 0.0, -1.0])
+def test_environment_data_rejection_preserves_caller_arrays(
+    field: str, value: float
+) -> None:
+    """Physical constructor rejection never writes to caller-owned buffers."""
+    temperature = np.array([298.15], dtype=np.float64)
+    pressure = np.array([101325.0], dtype=np.float64)
+    saturation_ratio = np.array([[1.0]], dtype=np.float64)
+    candidate = {"temperature": temperature, "pressure": pressure}
+    candidate[field][0] = value
+    originals = [(array, array.copy()) for array in candidate.values()]
+    originals.append((saturation_ratio, saturation_ratio.copy()))
+    message = "finite values" if not np.isfinite(value) else "strictly positive"
+    with pytest.raises(ValueError, match=f"{field} must .*{message}"):
+        EnvironmentData(temperature, pressure, saturation_ratio)
+    for array, snapshot in originals:
+        np.testing.assert_array_equal(array, snapshot)
+
+
 @pytest.mark.parametrize("saturation_ratio", [-1.0, -1e-6])
 def test_environment_data_negative_saturation_ratio_raises_value_error(
     saturation_ratio: float,
