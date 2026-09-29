@@ -15,6 +15,14 @@ with pending tests, or provisional decisions do not satisfy a gate. No parallel
 track implementation is allowed. Internally P1 → P2 → P3 → P4 → P5 follows
 the same evidence-first ordering.
 
+The revised P1 scientific gate is not satisfied by earlier raw-count/raw-PDF
+characterization or the later issue #1612 clarification alone: reconcile
+fixed-V=1 PMF/PDF versus variable-V resolved units, explicit PDF quadrature,
+builder validation and post-mutation interpretation, then record independent
+evidence and Kyle's P1 approval. Only then may P2 specify and validate its
+complete replacement/ownership matrix; P3 requires separate explicit P2
+approval at a recorded revision. Neither gate has been promoted here.
+
 | Consumer | M1 output consumed | Boundary retained |
 |---|---|---|
 | E9-M2 | Approved replacement specification, units/order/ownership contract and tested helpers | M2 implements flat construction and actual replacement |

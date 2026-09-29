@@ -16,6 +16,7 @@ from particula.gpu.tests.mass_precision_study_support import (
     _MassPrecisionCase,
     _project_candidate,
 )
+from particula.particles.particle_data import ParticleData
 from particula.particles.particle_data_builder import ParticleDataBuilder
 
 _SUPPORTED_CANDIDATES = (
@@ -822,9 +823,10 @@ def test_study_helpers_leave_cpu_defaults_at_float64() -> None:
     case = _MASS_PRECISION_CASES[2]
     data = (
         ParticleDataBuilder()
+        .set_distribution_type("particle_resolved")
         .set_masses(case.masses, units="kg")
         .set_density(case.density_kg_m3, units="kg/m^3")
-        .set_concentration(case.concentration, units="1/m^3")
+        .set_concentration(case.concentration, units="count")
         .set_charge(case.charge)
         .set_volume(case.volume, units="m^3")
         .build()
@@ -841,14 +843,14 @@ def test_study_helpers_leave_warp_defaults_at_float64() -> None:
     """The study stays isolated from production Warp dtype defaults."""
     wp = pytest.importorskip("warp")
     case = _MASS_PRECISION_CASES[2]
-    data = (
-        ParticleDataBuilder()
-        .set_masses(case.masses, units="kg")
-        .set_density(case.density_kg_m3, units="kg/m^3")
-        .set_concentration(case.concentration, units="1/m^3")
-        .set_charge(case.charge)
-        .set_volume(case.volume, units="m^3")
-        .build()
+    # Warp has no durable tagged metadata carrier yet: exercise the existing
+    # raw-array precision study on its untagged direct-data path.
+    data = ParticleData(
+        masses=case.masses,
+        density=case.density_kg_m3,
+        concentration=case.concentration,
+        charge=case.charge,
+        volume=case.volume,
     )
 
     gpu_data = to_warp_particle_data(data, device="cpu")

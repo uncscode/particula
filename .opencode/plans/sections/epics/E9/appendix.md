@@ -11,6 +11,34 @@ implied. Research used the checkout at `561736c6f` and issue #1602.
 
 ### D1 — Shared distribution metadata and volume normalization
 
+**Later maintainer clarification (2026-09-28, issue #1612):** The original D1
+table and M1/M2/M3/M4 normalization examples below are historical planning
+proposals where they conflict with the updated P1 handoff in the E9-M1
+`appendix.md` ("Maintainer clarification for P1 handoff"). Discrete/PMF counts
+per bin and continuous radius PDF `dn/dr` are already **per-volume** quantities;
+both use fixed `volume == 1 m³` and must not be divided by V for bulk density.
+Resolved slot weights are represented counts and require division by their
+positive finite physical V for density. Only resolved density-to-storage
+conversion multiplies by V. PDF bulk count and mass density use trapezoidal
+integration on an explicitly supplied, positive, finite, strictly increasing
+radius grid (at least two nodes), with mass times PDF integrated together and
+no extrapolation. A valid PDF grid may have zero PDF and zero particle mass.
+PMF/resolved bulk properties use weighted sums. Callers own
+representation-consistent additions/changes. No legacy untagged compatibility
+is required; builders must require explicit kind and validate the
+representation-specific volume rule on creation. No global constructor
+validation or broadened nucleation support is authorized here.
+Direct construction and subsequent caller mutation use an explicit read-only
+`ParticleData` representation-validation method: callers invoke it after
+updates, new bulk helpers invoke it before interpretation, and process
+admission using that interpretation must also call it. The validator rejects
+invalid kind, volume, grid or schema without changing caller data; it cannot
+intercept writable-array edits or silently repair their meaning. Builder
+creation and this post-mutation validation are distinct from process-specific
+physical checks. Revised P1 ledger/tests/scientific approval and P2
+acceptance/ownership validation remain pending; this is not an implementation
+or phase-completion claim.
+
 Reuse a single shared vocabulary, proposed at
 `particula/particles/distribution_types.py`:
 `DISTRIBUTION_TYPES = ("discrete", "continuous_pdf", "particle_resolved")`.

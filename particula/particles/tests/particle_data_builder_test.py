@@ -7,10 +7,30 @@ and validation.
 import numpy as np
 import pytest
 from particula.particles.particle_data import ParticleData
-from particula.particles.particle_data_builder import ParticleDataBuilder
+from particula.particles.particle_data_builder import (
+    ParticleDataBuilder as _ParticleDataBuilder,
+)
 
 # pint is optional; skip tests that require it if not installed
 pint = pytest.importorskip("pint")
+
+
+class ParticleDataBuilder(_ParticleDataBuilder):
+    """Give legacy fixture cases an explicit kind without changing their units."""
+
+    def __init__(self) -> None:
+        """Initialize an explicitly discrete test builder."""
+        super().__init__()
+        self.set_distribution_type("discrete")
+
+    def set_volume(
+        self, volume: np.ndarray, units: str = "m^3"
+    ) -> "ParticleDataBuilder":
+        """Use resolved counts for the existing non-unit-volume fixtures."""
+        super().set_volume(volume, units=units)
+        if np.any(self._volume != 1):
+            self.set_distribution_type("particle_resolved")
+        return self
 
 
 class TestParticleDataBuilderBasics:

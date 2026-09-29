@@ -21,17 +21,19 @@ local `-Werror`; retain the configured warning policy.
 
 | Area | Required assertions | Phase |
 |---|---|---|
-| Concentration interpretation | Audited count/weight versus density conventions, V=0.25 and 4 m^3; inverse setter behavior if added; no double normalization | P1/P3 |
+| Concentration interpretation | Resolved counts at V=.25/1/4 m³, PMF sums and radius-PDF trapezoids at fixed V=1; inverse storage behavior if added; no double normalization | P1 specifies/P3 implements |
 | Derived quantities | Per-particle mass distinct from population mass density and extensive inventory; radii, fractions and zero/empty cases as applicable | P1/P3 |
 | Species order | Distinct sentinel values per lane; interleaved true/false flags; all-false mask; no loss or silent sorting | P1/P4 |
 | Invalid alignment | Wrong box/species counts, mapping/configuration mismatch and approved duplicate/missing-name policy; no input mutation | P4 |
-| Mutation and ownership | Held versus copied arrays, supplied identities per helper contract, rejection snapshots, direct mutation changes derived output | P3/P4 |
+| Mutation and ownership | Held versus copied arrays, supplied identities per helper contract, builder kind/volume/grid rejection, explicit read-only validation after direct construction/mutation, rejection snapshots, direct mutation changes derived output | P1 specifies/P3 implements; P4 follows |
 | Replacement specification | Individual mismatch, same-object replacement, accepted coordinated shape change, all-or-none rejection, no GPU rebinding | P2 specifies; M2 implements |
 | Integrated helper contract | Data-only mixed-gas/non-unit-volume fixture with current-array reads, not a new runnable | P5 |
 | Protected GPU boundary | Existing transfer and export tests; Warp CPU baseline when installed, optional CUDA clean skip | P4/P5 |
 
-Use independent NumPy formulas. For count storage w, explicitly calculate
-c=w/V; for density storage use c directly. Assert each species' inventory
+Use independent NumPy formulas. For resolved count storage w, calculate
+c=w/V; for PMF use per-bin density directly; for PDF integrate dn/dr or
+mass × dn/dr over the validated radius grid before taking a bulk result.
+Assert each species' inventory
 `V * (sum_i(m_i,s * c_i) + gas_concentration_s)` using the approved mapping,
 not only the all-species total. Account for nonpartitioning gas separately
 where it has no particle lane. Include values that differ by species so equal
@@ -41,8 +43,8 @@ use exact identity/unchanged-array assertions where appropriate. Do not relax
 an existing tighter scientific tolerance.
 
 Container batch dimensions remain supported as before; tests do not authorize
-multi-box CPU processes. Keep invalid physical-state process validation
-distinct from construction-time structural validation. Never delete enduring
+multi-box CPU processes. Keep process physical checks separate from builder
+creation and explicit post-mutation interpretation validation. Never delete enduring
 facade-fixture assertions instead of preserving/migrating their behavior.
 
 ## Implementation command sequence

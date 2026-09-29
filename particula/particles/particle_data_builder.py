@@ -12,6 +12,7 @@ Examples:
 
         data = (
             ParticleDataBuilder()
+            .set_distribution_type("discrete")
             .set_masses(np.array([[1e-18, 2e-18]]), units="kg")
             .set_density(np.array([1000.0, 1200.0]), units="kg/m^3")
             .set_concentration(np.array([1.0]), units="1/m^3")
@@ -23,6 +24,7 @@ Examples:
 
         data = (
             ParticleDataBuilder()
+            .set_distribution_type("discrete")
             .set_n_boxes(2)
             .set_n_particles(3)
             .set_n_species(1)
@@ -61,6 +63,23 @@ class ParticleDataBuilder:
         self._n_boxes: Optional[int] = None
         self._n_particles: Optional[int] = None
         self._n_species: Optional[int] = None
+        self._distribution_type: str | None = None
+        self._radius_grid: NDArray[np.float64] | None = None
+        self._concentration_units: str | None = None
+
+    def set_distribution_type(self, kind: str) -> "ParticleDataBuilder":
+        """Declare the storage interpretation without shape inference."""
+        if kind not in ("discrete", "continuous_pdf", "particle_resolved"):
+            raise ValueError("invalid distribution_type")
+        self._distribution_type = kind
+        return self
+
+    def set_radius_grid(
+        self, radius_grid: NDArray[np.float64]
+    ) -> "ParticleDataBuilder":
+        """Set the explicit radius grid in metres for a continuous PDF."""
+        self._radius_grid = np.array(radius_grid, dtype=np.float64, copy=True)
+        return self
 
     def set_masses(
         self, masses: NDArray[np.float64], units: str = "kg"
@@ -98,8 +117,8 @@ class ParticleDataBuilder:
         Args:
             concentration: Concentration array shaped (n_boxes, n_particles)
                 or (n_particles,).
-            units: Units of the provided concentration. Supported: 1/m^3,
-                1/cm^3.
+            units: Storage units. PMF: 1/m^3 or 1/cm^3;
+                PDF: 1/m^4; resolved: count.
 
         Returns:
             Self for fluent chaining.
@@ -113,12 +132,13 @@ class ParticleDataBuilder:
         elif concentration_array.ndim != 2:
             raise ValueError("concentration must be 1D or 2D")
 
-        if units != "1/m^3":
+        if units not in ("1/m^3", "1/m^4", "count"):
             concentration_array = concentration_array * get_unit_conversion(
                 units, "1/m^3"
             )
 
         self._concentration = concentration_array
+        self._concentration_units = units
         return self
 
     def set_charge(self, charge: NDArray[np.float64]) -> "ParticleDataBuilder":
@@ -265,7 +285,7 @@ class ParticleDataBuilder:
             raise ValueError("Counts are required before building ParticleData")
         return self._n_boxes, self._n_particles, self._n_species
 
-    def build(self) -> ParticleData:
+    def build(self) -> ParticleData:  # noqa: C901
         """Construct a ``ParticleData`` instance with validation.
 
         Returns:
@@ -274,6 +294,8 @@ class ParticleDataBuilder:
         Raises:
             ValueError: When required fields are missing or shapes mismatch.
         """
+        if self._distribution_type is None:
+            raise ValueError("distribution_type is required")
         if self._masses is None:
             self._ensure_counts()
             n_boxes, n_particles, n_species = self._get_counts()
@@ -301,13 +323,29 @@ class ParticleDataBuilder:
 
         conc = self._concentration
         if conc is None:
-            conc = np.ones((n_boxes, n_particles))
+            conc = (
+                np.zeros((n_boxes, n_particles))
+                if self._distribution_type == "continuous_pdf"
+                else np.ones((n_boxes, n_particles))
+            )
         else:
             conc = self._broadcast_if_needed(
                 conc,
                 (n_boxes, n_particles),
                 label="concentration",
             )
+            accepted_units = {
+                "discrete": ("1/m^3", "1/cm^3"),
+                "continuous_pdf": ("1/m^4",),
+                "particle_resolved": ("count",),
+            }
+            if (
+                self._concentration_units
+                not in accepted_units[self._distribution_type]
+            ):
+                raise ValueError(
+                    "concentration units must match distribution_type"
+                )
 
         charge = self._charge
         if charge is None:
@@ -325,10 +363,16 @@ class ParticleDataBuilder:
                 volume, (n_boxes,), label="volume"
             )
 
-        return ParticleData(
+        result = ParticleData(
             masses=masses,
             concentration=conc,
             charge=charge,
             density=density,
             volume=volume,
+            distribution_type=self._distribution_type,
+            radius_grid=(
+                None if self._radius_grid is None else self._radius_grid.copy()
+            ),
         )
+        result.validate_representation()
+        return result

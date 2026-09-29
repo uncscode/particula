@@ -11,11 +11,11 @@
    | Owner / field | Shape | Meaning |
    |---|---|---|
    | ParticleData.masses | (B, N, Sp) | kg per represented particle, per species |
-   | ParticleData.concentration | (B, N) | Counts for discrete/resolved; dN/dr for continuous_pdf; always per simulation volume |
+    | ParticleData.concentration | (B, N) | Discrete/PMF bin number per m³; radius PDF dn/dr per m⁴; resolved represented counts in physical V |
    | ParticleData.distribution_type | Scalar metadata | Shared discrete / continuous_pdf / particle_resolved vocabulary |
    | ParticleData.charge | (B, N) | Elementary-charge counts per particle |
    | ParticleData.density | (Sp,) | Material density, kg/m^3 |
-   | ParticleData.volume | (B,) | Represented box volume, m^3 |
+    | ParticleData.volume | (B,) | Fixed 1 m³ for PMF/PDF; positive finite physical V for resolved counts |
    | GasData.name / molar_mass / partitioning | Sg / (Sg,) / (Sg,) | Ordered names, kg/mol and boolean participation mask |
    | GasData.concentration | (B, Sg) | Gas mass concentration, kg/m^3, all gas categories |
    | EnvironmentData.temperature / pressure | (B,) | K / Pa |
@@ -29,10 +29,16 @@
    Specify duplicate/missing-name and reordered-configuration handling. If a
    permutation cannot be detected from unnamed arrays, require the caller's
    declared mapping rather than claiming shape validation detects it.
-3. Implement appendix D1's approved normalization ledger. Raw counts divide
-   by V exactly once; radius PDFs also divide by V and require integration over
-   radius for population totals. Density inputs multiply by V on construction;
-   density-rate increments multiply by V on storage update. Gas remains kg/m^3.
+ 3. Implement the clarified P1 normalization ledger (which supersedes the
+    original D1 proposals). Resolved counts divide by V exactly once; PMF bin
+    values and radius PDF are already per-volume. PDF totals use trapezoidal
+    integration on an explicit radius grid; never sum slots or divide PDF/PMF
+    density again. Only resolved density inputs/increments multiply by V on
+    storage. Gas remains kg/m³. Builders require explicit kind and validate
+    the representation-specific volume on creation. Direct construction and
+    later raw-array mutation use an explicit read-only representation validator;
+    new bulk helpers call it before interpretation. Do not add blanket
+    constructor coercion or automatic mutation interception.
    Audit every CPU/GPU consumer; old unit-volume agreement is not sufficient.
    Per-particle total_mass is sum_s(m_i,s), not population mass. Distribution
    metadata describes storage; processes own compatible algorithm selection.

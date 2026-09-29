@@ -15,6 +15,7 @@ Example:
             charge=np.zeros((1, 1000)),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.array([1e-6]),  # 1 cm^3
+            distribution_type="particle_resolved",
         )
 
     Multi-box CFD simulation (100 boxes)::
@@ -25,6 +26,7 @@ Example:
             charge=np.zeros((100, 10000)),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.ones(100) * 1e-6,
+            distribution_type="particle_resolved",
         )
 """
 
@@ -66,8 +68,11 @@ class ParticleData:
             Shape: (n_boxes, n_particles)
         density: Material densities in kg/m^3.
             Shape: (n_species,) - shared across all boxes
-        volume: Simulation volume per box in m^3.
-            Shape: (n_boxes,)
+        volume: Simulation volume per box in m^3. Shape: (n_boxes,).
+            PMF/PDF use 1 m³; resolved uses positive physical volume.
+        distribution_type: Explicit storage interpretation, or ``None`` for
+            untagged legacy carriers. New bulk helpers reject untagged data.
+        radius_grid: PDF radius nodes in metres, shape (n_particles,).
 
     Raises:
         ValueError: If array shapes are inconsistent.
@@ -78,6 +83,8 @@ class ParticleData:
     charge: NDArray[np.float64]
     density: NDArray[np.float64]
     volume: NDArray[np.float64]
+    distribution_type: str | None = None
+    radius_grid: NDArray[np.float64] | None = None
 
     def __post_init__(self) -> None:
         """Validate array shapes are consistent."""
@@ -184,6 +191,110 @@ class ParticleData:
         """
         return np.sum(self.masses, axis=-1)
 
+    def validate_representation(self) -> None:  # noqa: C901
+        """Validate storage for its declared distribution interpretation.
+
+        Call after directly changing writable arrays. This read-only check
+        never repairs state; derived population helpers call it on every read.
+
+        Raises:
+            ValueError: If kind, grid, volume, shape, or values are invalid.
+        """
+        if self.distribution_type not in (
+            "discrete",
+            "continuous_pdf",
+            "particle_resolved",
+        ):
+            raise ValueError("explicit distribution_type is required")
+        if not isinstance(self.masses, np.ndarray) or self.masses.ndim != 3:
+            raise ValueError("masses must be a rank-3 array")
+        boxes, slots, species = self.masses.shape
+        fields = (
+            (self.concentration, (boxes, slots)),
+            (self.charge, (boxes, slots)),
+            (self.density, (species,)),
+            (self.volume, (boxes,)),
+        )
+        if any(
+            not isinstance(value, np.ndarray) or value.shape != shape
+            for value, shape in fields
+        ):
+            raise ValueError("particle data array shapes are inconsistent")
+        if (
+            not np.all(np.isfinite(self.masses))
+            or np.any(self.masses < 0)
+            or not np.all(np.isfinite(self.concentration))
+            or np.any(self.concentration < 0)
+            or not np.all(np.isfinite(self.charge))
+            or not np.all(np.isfinite(self.density))
+            or np.any(self.density <= 0)
+            or not np.all(np.isfinite(self.volume))
+        ):
+            raise ValueError("particle data must have finite physical values")
+        if self.distribution_type == "particle_resolved":
+            if np.any(self.volume <= 0):
+                raise ValueError("particle-resolved volume must be positive")
+        elif np.any(self.volume != 1.0):
+            raise ValueError("PMF/PDF volume must be exactly 1 m^3")
+        if self.distribution_type == "continuous_pdf":
+            grid = self.radius_grid
+            if (
+                not isinstance(grid, np.ndarray)
+                or grid.shape != (slots,)
+                or slots < 2
+                or not np.all(np.isfinite(grid))
+                or np.any(grid <= 0)
+                or not np.all(np.diff(grid) > 0)
+            ):
+                raise ValueError(
+                    "PDF radius grid must be positive and increasing"
+                )
+        elif self.radius_grid is not None:
+            raise ValueError("radius_grid is only valid for continuous_pdf")
+
+    @property
+    def slot_concentration_density(self) -> NDArray[np.float64]:
+        """Return fresh per-slot number density or radius-PDF density.
+
+        PMF/resolved slots have units m^-3; PDF nodes have units m^-4.
+        """
+        self.validate_representation()
+        if self.distribution_type == "particle_resolved":
+            return self.concentration / self.volume[:, None]
+        return self.concentration.copy()
+
+    @property
+    def number_density(self) -> NDArray[np.float64]:
+        """Return fresh per-box number density in m^-3."""
+        slots = self.slot_concentration_density
+        if self.distribution_type == "continuous_pdf":
+            return np.asarray(
+                np.trapezoid(slots, x=self.radius_grid, axis=1),
+                dtype=np.float64,
+            )
+        return np.sum(slots, axis=1)
+
+    @property
+    def species_mass_density(self) -> NDArray[np.float64]:
+        """Return fresh per-box, per-species particle mass density in kg/m³."""
+        slots = self.slot_concentration_density
+        if self.distribution_type == "continuous_pdf":
+            # Integrate each species' product, not separate moments.
+            return np.asarray(
+                np.trapezoid(
+                    self.masses * slots[..., None],
+                    x=self.radius_grid,
+                    axis=1,
+                ),
+                dtype=np.float64,
+            )
+        return np.einsum("bn,bns->bs", slots, self.masses)
+
+    @property
+    def species_mass_inventory(self) -> NDArray[np.float64]:
+        """Return fresh per-box, per-species extensive mass in kg."""
+        return self.species_mass_density * self.volume[:, None]
+
     @property
     def effective_density(self) -> NDArray[np.float64]:
         """Mass-weighted effective density per particle.
@@ -229,6 +340,10 @@ class ParticleData:
             charge=np.copy(self.charge),
             density=np.copy(self.density),
             volume=np.copy(self.volume),
+            distribution_type=self.distribution_type,
+            radius_grid=(
+                None if self.radius_grid is None else np.copy(self.radius_grid)
+            ),
         )
 
 
@@ -322,6 +437,11 @@ def to_representation(
     Raises:
         ValueError: If box_index is out of range.
     """
+    if data.distribution_type is not None:
+        data.validate_representation()
+        raise ValueError(
+            "tagged particle data cannot round-trip through an untagged facade"
+        )
     if box_index < 0 or box_index >= data.n_boxes:
         raise ValueError(
             f"box_index {box_index} out of range for {data.n_boxes} boxes"

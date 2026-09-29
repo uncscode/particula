@@ -148,6 +148,11 @@ def to_warp_particle_data(
         >>> len(gpu_data.masses.shape)
         3
     """
+    if data.distribution_type is not None:
+        data.validate_representation()
+        raise ValueError(
+            "tagged particle data has no durable Warp metadata carrier"
+        )
     wp = _ensure_warp_available()
     _validate_device(wp, device)
 

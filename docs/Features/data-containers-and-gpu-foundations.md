@@ -38,6 +38,33 @@ and planned expansions, see the
 
 ## Public imports
 
+### CPU particle population interpretation
+
+For new builder-created `ParticleData`, explicitly call
+`set_distribution_type("discrete" | "continuous_pdf" | "particle_resolved")`
+before `build()`. Discrete/PMF bin concentrations are already in m⁻³ and
+continuous radius PDF values are `dn/dr` in m⁻⁴; both require a fixed 1 m³
+volume. A PDF additionally needs `set_radius_grid(...)`: positive, finite,
+strictly increasing radius nodes in metres, at least two, matching its slot
+width. `number_density` and `species_mass_density` integrate PDFs with
+trapezoids (mass times PDF is integrated together) and sum PMF bins.
+Particle-resolved slots instead hold represented counts and are normalized
+once by their positive physical volume. `slot_concentration_density` returns
+fresh per-slot density; `species_mass_inventory` returns kg per box and
+`total_mass` remains kg per particle. An empty PDF retains a valid grid with
+zero PDF and zero population mass.
+
+Call `validate_representation()` after directly constructing or mutating
+writable particle arrays; new population helpers call it on each read and
+reject invalid interpretation without repairing input. The caller owns
+representation-consistent changes. Tagged particle data is rejected before
+`to_warp_particle_data()` uploads it: the current Warp carrier cannot preserve
+its kind/grid metadata. `to_representation()` likewise rejects tagged data
+because the legacy facade cannot retain that provenance. Existing untagged
+explicit Warp transfers continue
+to support the older raw-array boundary; they do not provide PDF execution
+or tagged round trips.
+
 Prefer the currently exported package-level imports. The low-level
 `particula.gpu` container, conversion-helper, explicit-transfer, and
 direct-kernel workflow is experimental, but these import paths and its
