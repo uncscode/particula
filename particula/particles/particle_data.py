@@ -60,19 +60,20 @@ class ParticleData:
     Attributes:
         masses: Per-species masses in kg.
             Shape: (n_boxes, n_particles, n_species)
-        concentration: Number concentration per particle.
-            Shape: (n_boxes, n_particles)
-            For particle-resolved: actual count (typically 1).
-            For binned: number per m^3.
+        concentration: Raw slot weights of shape (n_boxes, n_particles).
+            Discrete bins store number per m^3, PDF nodes store dN/dr
+            in m^-4, and resolved slots store counts.
         charge: Particle charges (dimensionless integer counts).
             Shape: (n_boxes, n_particles)
         density: Material densities in kg/m^3.
             Shape: (n_species,) - shared across all boxes
-        volume: Simulation volume per box in m^3. Shape: (n_boxes,).
-            PMF/PDF use 1 m³; resolved uses positive physical volume.
+        volume: Simulation volume per box in m^3, shape (n_boxes,).
+            Tagged discrete/PDF storage uses 1 m^3; tagged resolved
+            storage uses positive physical volume.
         distribution_type: Explicit storage interpretation, or ``None`` for
             untagged legacy carriers. New bulk helpers reject untagged data.
-        radius_grid: PDF radius nodes in metres, shape (n_particles,).
+        radius_grid: Explicit PDF radius nodes in metres, shape
+            (n_particles,); absent for other kinds.
 
     Raises:
         ValueError: If array shapes are inconsistent.
@@ -87,7 +88,11 @@ class ParticleData:
     radius_grid: NDArray[np.float64] | None = None
 
     def __post_init__(self) -> None:
-        """Validate array shapes are consistent."""
+        """Validate raw array shapes without interpreting distribution kind.
+
+        Raises:
+            ValueError: If raw field shapes or species dimensions disagree.
+        """
         # Validate masses is 3D
         if self.masses.ndim != 3:
             raise ValueError(
@@ -196,6 +201,9 @@ class ParticleData:
 
         Call after directly changing writable arrays. This read-only check
         never repairs state; derived population helpers call it on every read.
+        Discrete and PDF storage requires exactly 1 m^3 per box; resolved
+        storage requires positive volume. PDF nodes must form an increasing,
+        positive radius grid with at least two nodes.
 
         Raises:
             ValueError: If kind, grid, volume, shape, or values are invalid.
@@ -263,7 +271,15 @@ class ParticleData:
     def slot_concentration_density(self) -> NDArray[np.float64]:
         """Return fresh per-slot number density or radius-PDF density.
 
-        PMF/resolved slots have units m^-3; PDF nodes have units m^-4.
+        Discrete and resolved slots have units m^-3; PDF nodes have units
+        m^-4. The result has shape (n_boxes, n_particles) and is detached
+        from the raw concentration array.
+
+        Returns:
+            Per-slot density on the declared representation's grid.
+
+        Raises:
+            ValueError: If the kind, grid, volume, or raw data is invalid.
         """
         self.validate_representation()
         if self.distribution_type == "particle_resolved":
@@ -272,7 +288,17 @@ class ParticleData:
 
     @property
     def number_density(self) -> NDArray[np.float64]:
-        """Return fresh per-box number density in m^-3."""
+        """Return fresh per-box number density in m^-3.
+
+        Sum discrete/resolved slot densities; integrate PDF node density
+        over the explicit radius grid using trapezoidal quadrature.
+
+        Returns:
+            Number density with shape (n_boxes,).
+
+        Raises:
+            ValueError: If the representation fails read-only validation.
+        """
         slots = self.slot_concentration_density
         if self.distribution_type == "continuous_pdf":
             return np.asarray(
@@ -283,7 +309,18 @@ class ParticleData:
 
     @property
     def species_mass_density(self) -> NDArray[np.float64]:
-        """Return fresh per-box, per-species particle mass density in kg/m³."""
+        """Return fresh per-species particle mass density in kg/m^3.
+
+        Weight species masses by raw slot density. For PDFs, integrate
+        the product of mass and dN/dr on the explicit radius grid using
+        trapezoidal node weights, rather than summing PDF nodes.
+
+        Returns:
+            Particle mass density with shape (n_boxes, n_species).
+
+        Raises:
+            ValueError: If the representation fails read-only validation.
+        """
         slots = self.slot_concentration_density
         if self.distribution_type == "continuous_pdf":
             # Trapezoidal node weights integrate the product without a
@@ -301,7 +338,14 @@ class ParticleData:
 
     @property
     def species_mass_inventory(self) -> NDArray[np.float64]:
-        """Return fresh per-box, per-species extensive mass in kg."""
+        """Return fresh extensive particle mass per species in kg.
+
+        Returns:
+            Mass inventory with shape (n_boxes, n_species).
+
+        Raises:
+            ValueError: If the representation fails read-only validation.
+        """
         return self.species_mass_density * self.volume[:, None]
 
     @property
@@ -341,7 +385,8 @@ class ParticleData:
         """Create a deep copy of this ParticleData.
 
         Returns:
-            A new ParticleData instance with copied arrays.
+            A new ParticleData with detached raw arrays and radius grid,
+            preserving the explicit distribution type when present.
         """
         return ParticleData(
             masses=np.copy(self.masses),
@@ -364,7 +409,9 @@ def from_representation(
 
     Uses raw concentration and charge arrays (no volume scaling) to avoid
     double-division for ParticleResolved strategies. Per-species masses are
-    tiled across boxes to match the ParticleData batch dimension.
+    tiled across boxes to match the ParticleData batch dimension. The
+    returned carrier remains untagged: a facade cannot establish whether
+    binned concentrations represent a PMF or a radius PDF.
 
     Example:
         >>> data = from_representation(rep, n_boxes=2)
@@ -432,6 +479,9 @@ def to_representation(
 ) -> ParticleRepresentation:
     """Convert ParticleData back to a ParticleRepresentation for one box.
 
+    Only untagged legacy data can cross this boundary because the facade
+    cannot retain explicit distribution provenance.
+
     Args:
         data: Batched particle data.
         strategy: Distribution strategy to use for the reconstructed
@@ -444,7 +494,7 @@ def to_representation(
         ParticleRepresentation: Representation for the selected box.
 
     Raises:
-        ValueError: If box_index is out of range.
+        ValueError: If data is tagged or box_index is out of range.
     """
     if data.distribution_type is not None:
         data.validate_representation()

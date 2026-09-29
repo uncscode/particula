@@ -50,7 +50,9 @@ class ParticleDataBuilder:
     Each setter performs a single unit conversion and ensures ``float64``
     dtype. Batch dimensions are inserted automatically when 1D (for
     concentration/charge) or 2D (for masses). A zero-initialization path is
-    available when counts are supplied instead of masses.
+    available when dimensions are supplied instead of masses. Building
+    requires an explicit storage kind; PDF storage also requires a radius
+    grid and matching PDF concentration units.
     """
 
     def __init__(self) -> None:
@@ -68,7 +70,18 @@ class ParticleDataBuilder:
         self._concentration_units: str | None = None
 
     def set_distribution_type(self, kind: str) -> "ParticleDataBuilder":
-        """Declare the storage interpretation without shape inference."""
+        """Declare the discrete, continuous PDF, or resolved storage kind.
+
+        Args:
+            kind: Explicit ``discrete``, ``continuous_pdf``, or
+                ``particle_resolved`` interpretation.
+
+        Returns:
+            This builder for fluent chaining.
+
+        Raises:
+            ValueError: If the kind is not supported.
+        """
         if kind not in ("discrete", "continuous_pdf", "particle_resolved"):
             raise ValueError("invalid distribution_type")
         self._distribution_type = kind
@@ -77,7 +90,18 @@ class ParticleDataBuilder:
     def set_radius_grid(
         self, radius_grid: NDArray[np.float64]
     ) -> "ParticleDataBuilder":
-        """Set the explicit radius grid in metres for a continuous PDF."""
+        """Copy the explicit continuous-PDF radius grid in metres.
+
+        Args:
+            radius_grid: Radius nodes with shape (n_particles,).
+
+        Returns:
+            This builder for fluent chaining.
+
+        Raises:
+            ValueError: At build time if the grid is invalid or the
+                declared kind is not ``continuous_pdf``.
+        """
         self._radius_grid = np.array(radius_grid, dtype=np.float64, copy=True)
         return self
 
@@ -288,11 +312,16 @@ class ParticleDataBuilder:
     def build(self) -> ParticleData:  # noqa: C901
         """Construct a ``ParticleData`` instance with validation.
 
+        Require an explicit kind and matching concentration units: m^-3
+        for discrete bins, m^-4 for PDF nodes, or counts for resolved slots.
+        Validate the kind-specific volume and PDF radius grid before return.
+
         Returns:
-            A validated ``ParticleData`` object.
+            A validated, explicitly tagged ``ParticleData`` object.
 
         Raises:
-            ValueError: When required fields are missing or shapes mismatch.
+            ValueError: When required fields, units, shapes, or physical
+                values do not match the declared representation.
         """
         if self._distribution_type is None:
             raise ValueError("distribution_type is required")

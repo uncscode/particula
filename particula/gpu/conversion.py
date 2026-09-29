@@ -122,12 +122,16 @@ def to_warp_particle_data(
     device: str = "cuda",
     copy: bool = True,
 ) -> "WarpParticleData":
-    """Transfer ParticleData to GPU with explicit control.
+    """Transfer untagged ParticleData to Warp with explicit control.
 
     Use this for long GPU-resident simulations where you want to:
     1. Transfer data to GPU once at simulation start
     2. Run many timesteps without CPU round-trips
     3. Transfer back only when needed (checkpoints, final result)
+
+    Explicitly tagged distributions are rejected before Warp availability
+    checks or uploads: the Warp particle struct has no durable kind or
+    radius-grid carrier. This also excludes tagged PDFs from direct kernels.
 
     Args:
         data: CPU-side ParticleData container.
@@ -140,6 +144,8 @@ def to_warp_particle_data(
         WarpParticleData with Warp arrays on specified device.
 
     Raises:
+        ValueError: If ``data`` has an explicit distribution type; its
+            interpretation cannot survive this transfer boundary.
         RuntimeError: If Warp is not available or device not found.
 
     Example:
@@ -428,11 +434,13 @@ def from_warp_particle_data(
     gpu_data: "WarpParticleData",
     sync: bool = True,
 ) -> "ParticleData":
-    """Transfer WarpParticleData back to CPU.
+    """Restore WarpParticleData as an untagged CPU particle carrier.
 
     Use this to transfer GPU-resident particle data back to CPU after
     GPU simulation steps. The returned ParticleData can be used for
-    checkpointing, analysis, or continuing with CPU-based operations.
+    checkpointing, analysis, or continuing with CPU-based operations. Warp
+    stores no distribution kind or PDF radius grid; the restored carrier
+    does not qualify for kind-dependent population helpers.
 
     Args:
         gpu_data: GPU-resident WarpParticleData container.
@@ -442,7 +450,7 @@ def from_warp_particle_data(
             batched transfers).
 
     Returns:
-        CPU-side ParticleData with NumPy arrays.
+        CPU-side untagged ParticleData with NumPy arrays.
 
     Example:
         >>> # After GPU simulation
