@@ -206,8 +206,12 @@ class ParticleData:
             "particle_resolved",
         ):
             raise ValueError("explicit distribution_type is required")
-        if not isinstance(self.masses, np.ndarray) or self.masses.ndim != 3:
-            raise ValueError("masses must be a rank-3 array")
+        if (
+            not isinstance(self.masses, np.ndarray)
+            or self.masses.ndim != 3
+            or self.masses.dtype != np.float64
+        ):
+            raise ValueError("masses must be a rank-3 float64 array")
         boxes, slots, species = self.masses.shape
         fields = (
             (self.concentration, (boxes, slots)),
@@ -216,10 +220,12 @@ class ParticleData:
             (self.volume, (boxes,)),
         )
         if any(
-            not isinstance(value, np.ndarray) or value.shape != shape
+            not isinstance(value, np.ndarray)
+            or value.shape != shape
+            or value.dtype != np.float64
             for value, shape in fields
         ):
-            raise ValueError("particle data array shapes are inconsistent")
+            raise ValueError("particle data arrays must have float64 schema")
         if (
             not np.all(np.isfinite(self.masses))
             or np.any(self.masses < 0)
@@ -241,6 +247,7 @@ class ParticleData:
             if (
                 not isinstance(grid, np.ndarray)
                 or grid.shape != (slots,)
+                or grid.dtype != np.float64
                 or slots < 2
                 or not np.all(np.isfinite(grid))
                 or np.any(grid <= 0)
@@ -279,15 +286,17 @@ class ParticleData:
         """Return fresh per-box, per-species particle mass density in kg/m³."""
         slots = self.slot_concentration_density
         if self.distribution_type == "continuous_pdf":
-            # Integrate each species' product, not separate moments.
-            return np.asarray(
-                np.trapezoid(
-                    self.masses * slots[..., None],
-                    x=self.radius_grid,
-                    axis=1,
-                ),
-                dtype=np.float64,
-            )
+            # Trapezoidal node weights integrate the product without a
+            # (boxes, slots, species) weighted-product scratch array.
+            grid = self.radius_grid
+            if grid is None:  # Defensive narrowing after validation.
+                raise ValueError("PDF radius grid is required")
+            intervals = np.diff(grid)
+            weights = np.empty_like(grid)
+            weights[0] = intervals[0] / 2
+            weights[-1] = intervals[-1] / 2
+            weights[1:-1] = (intervals[:-1] + intervals[1:]) / 2
+            return np.einsum("n,bn,bns->bs", weights, slots, self.masses)
         return np.einsum("bn,bns->bs", slots, self.masses)
 
     @property

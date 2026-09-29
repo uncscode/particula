@@ -60,6 +60,47 @@ def test_pdf_nonuniform_radius_integrates_mass_times_pdf() -> None:
     npt.assert_array_equal(data.radius_grid, [1e-9, 2e-9, 4e-9])
 
 
+def test_pdf_inventory_does_not_form_species_weighted_product(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Integrate node products without a full three-dimensional scratch."""
+    data = _particles("continuous_pdf")
+    data.radius_grid = np.array([1e-9, 2e-9, 4e-9])
+    data.concentration[:] = [[1e9, 2e9, 1e9]]
+
+    def unexpected_trapezoid(*args: object, **kwargs: object) -> None:
+        raise AssertionError(
+            "PDF species integration must contract node weights"
+        )
+
+    monkeypatch.setattr(np, "trapezoid", unexpected_trapezoid)
+    npt.assert_allclose(data.species_mass_density, [[6.25e-18, 9.75e-18]])
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["masses", "concentration", "charge", "density", "volume"],
+)
+def test_post_mutation_wrong_dtype_rejects_read_only(field: str) -> None:
+    """Tagged helpers reject schema drift before arithmetic or mutation."""
+    data = _particles("particle_resolved")
+    original = getattr(data, field)
+    invalid = original.astype(object)
+    setattr(data, field, invalid)
+    with pytest.raises(ValueError, match="float64"):
+        _ = data.species_mass_density
+    npt.assert_array_equal(getattr(data, field), invalid)
+
+
+def test_pdf_grid_wrong_dtype_rejects_read_only() -> None:
+    """Grid validation reports a domain error rather than a NumPy type error."""
+    data = _particles("continuous_pdf")
+    data.radius_grid = np.array([1e-9, 2e-9, 4e-9], dtype=object)
+    with pytest.raises(ValueError, match="radius grid"):
+        _ = data.number_density
+    assert data.radius_grid.dtype == object
+
+
 def test_copy_and_post_mutation_validation() -> None:
     """Copies detach grid and arrays; rejected reads do not repair mutation."""
     data = _particles("continuous_pdf")

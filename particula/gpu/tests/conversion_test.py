@@ -803,13 +803,12 @@ class TestToWarpEnvironmentData:
 
         fake_wp.from_numpy = fake_from_numpy
 
+        conversion_module = importlib.import_module("particula.gpu.conversion")
         monkeypatch.setattr(
-            "particula.gpu.conversion._ensure_warp_available",
-            lambda: fake_wp,
+            conversion_module, "_ensure_warp_available", lambda: fake_wp
         )
         monkeypatch.setattr(
-            "particula.gpu.conversion._validate_device",
-            lambda _wp, _device: None,
+            conversion_module, "_validate_device", lambda _wp, _device: None
         )
         monkeypatch.setitem(
             sys.modules,
