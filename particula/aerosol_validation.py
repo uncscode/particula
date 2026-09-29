@@ -11,7 +11,16 @@ from particula.particles.particle_data import ParticleData
 
 
 def _require_shape(value: object, field: str, shape: tuple[int, ...]) -> None:
-    """Require a raw NumPy array with the indicated rank and exact shape."""
+    """Require a raw NumPy array with the indicated rank and exact shape.
+
+    Args:
+        value: Stored field to inspect without conversion.
+        field: Name to include in validation errors.
+        shape: Required array dimensions.
+
+    Raises:
+        ValueError: If the field is not an array of the required shape.
+    """
     if not isinstance(value, np.ndarray) or value.ndim != len(shape):
         raise ValueError(f"{field} must be an ndarray of shape {shape}")
     if value.shape != shape:
@@ -19,7 +28,17 @@ def _require_shape(value: object, field: str, shape: tuple[int, ...]) -> None:
 
 
 def _gas_species_count(names: object) -> int:
-    """Require nonempty, unique, ordered gas species names."""
+    """Count the nonempty, unique gas names without changing their order.
+
+    Args:
+        names: Stored gas-name metadata to inspect.
+
+    Returns:
+        Number of ordered gas species.
+
+    Raises:
+        ValueError: If names are missing, blank, or duplicated.
+    """
     if not isinstance(names, list) or not names:
         raise ValueError("gas.name must be a nonempty list")
     seen: set[str] = set()
@@ -35,7 +54,16 @@ def _gas_species_count(names: object) -> int:
 def _require_containers(
     particles: object, gas: object, environment: object
 ) -> None:
-    """Check all top-level types before inspecting any stored fields."""
+    """Check all top-level types before inspecting any stored fields.
+
+    Args:
+        particles: Candidate particle container.
+        gas: Candidate gas container.
+        environment: Candidate environment container.
+
+    Raises:
+        TypeError: If an input is not its required CPU container.
+    """
     if not isinstance(particles, ParticleData):
         raise TypeError("particles must be ParticleData")
     if not isinstance(gas, GasData):
@@ -59,6 +87,9 @@ def validate_aerosol_structure(
         particles: Particle storage with nonempty box axis.
         gas: Ordered gas storage, including nonpartitioning species.
         environment: Per-box state with ratio lanes for every gas species.
+
+    Returns:
+        None when the stored schemas and shared dimensions agree.
 
     Raises:
         TypeError: If any top-level input is not its required CPU container.
