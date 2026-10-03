@@ -16274,8 +16274,7 @@ CPU-only and optional Warp CPU-backend flow.</p>
 - <a href="../Features/Roadmap/condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>
   — deferred-capability ownership without expanding production support</p>
 <p>Run <code>python docs/Examples/gpu_condensation_parity_walkthrough.py</code>, then
-<code>pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror</code>
-and <code>pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror</code>.
+<code>pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror</code>.
  Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
  Its caller-owned, write-only <code>energy_transfer</code> output is a diagnostic, not
  a return value or temperature feedback (<code>kg * J/kg = J</code>). This direct-kernel

@@ -18964,7 +18964,6 @@ provides fixed-four-substep low-level direct-kernel physics, conservation, and
 energy evidence. Run:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/gpu_condensation_parity_walkthrough.py
 pytest<span class="w"> </span>particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
-pytest<span class="w"> </span>particula/tests/condensation_parity_walkthrough_docs_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 </code></pre></div>
 <p>Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
 The downstream condensation ownership record
@@ -19834,7 +19833,9 @@ fallbacks. It also makes no performance, memory, or profiling completion claim.
 Correctness-qualified handoffs are limited to E8-F6 scaling/memory, E8-F7
 profiling, and E8-F8 example/closeout work.</p>
 <p><strong>Evidence record date (2026-09-05):</strong> This record follows the P4 plan update
-dated 2026-09-05 and preserves its original literal command outcomes. Python
+dated 2026-09-05 and preserves the literal outcomes for the retained commands.
+The retired documentation-assertion command is omitted; documentation rendering
+continues through MkDocs. Python
 3.12.12; the required installed-Warp uncaptured matrix passed with 48 passes.
 No native CUDA device/capture prerequisite qualified, so the optional CUDA
 selector cleanly skipped; this is not CPU or Warp-CPU capture fallback. The
@@ -19875,12 +19876,6 @@ plan record rather than a published MkDocs page.</p>
 <td><code>.opencode/tools/run_pytest.py</code></td>
 <td>0</td>
 <td><code>6634 passed, 24 skipped, 1 xfailed, 92.92% coverage</code></td>
-</tr>
-<tr>
-<td>Documentation</td>
-<td><code>pytest particula/execution/tests/graph_capture_docs_test.py particula/tests/execution_selection_docs_test.py -q --no-cov</code></td>
-<td>0</td>
-<td><code>25 passed</code></td>
 </tr>
 <tr>
 <td>Documentation</td>
