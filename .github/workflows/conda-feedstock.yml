@@ -1,0 +1,70 @@
+name: conda-feedstock
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - particula/__init__.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: conda-feedstock-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  version-change:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.version.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Compare PR version values
+        id: version
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python scripts/conda_feedstock.py --check-version "$BASE_SHA" "$HEAD_SHA"
+
+  conda-build:
+    needs: version-change
+    if: github.event_name == 'workflow_dispatch' || needs.version-change.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up clean conda build environment
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          activate-environment: feedstock-build
+          python-version: "3.12"
+          channels: conda-forge
+          channel-priority: strict
+          auto-activate-base: false
+      - name: Install conda build tools
+        run: conda install --yes conda-build
+      - name: Build and test the PR package
+        run: python scripts/conda_feedstock.py
+      - name: Save build log and conda package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conda-feedstock-python312
+          path: .artifacts/conda-feedstock/
+          include-hidden-files: true
+          if-no-files-found: warn

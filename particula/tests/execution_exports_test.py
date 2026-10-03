@@ -174,6 +174,20 @@ def test_execution_exports_are_exact_and_identical_at_package_boundary() -> (
     assert hasattr(execution, "__path__")
 
 
+def test_prepared_enqueue_names_remain_outside_execution_public_surface() -> (
+    None
+):
+    """Concrete prepared operations remain outside the public exports."""
+    prepared_names = (
+        "PreparedResidentTimestep",
+        "PreparedResidentSimulation",
+        "prepare_resident_timestep",
+        "prepare_resident_simulation",
+        "enqueue_prepared_resident_simulation",
+    )
+    assert all(name not in execution.__all__ for name in prepared_names)
+
+
 def test_public_registration_resolves_by_identity_without_execution() -> None:
     """Test the public registration seam only stores and selects an adapter."""
     context = _context()
@@ -445,10 +459,8 @@ assert not any(name.endswith("_gpu") for name in particula.__dict__)
     )
 
 
-def test_runnable_and_direct_gpu_kernel_import_boundaries_remain_compatible() -> (
-    None
-):
-    """Test runnable and direct-kernel APIs retain their established paths."""
+def test_runnable_import_boundaries_remain_compatible() -> None:
+    """Test runnable APIs retain their established paths without Warp."""
     from particula import RunnableSequence
     from particula.runnable import RunnableABC
     from particula.runnable import RunnableSequence as DirectSequence
@@ -456,6 +468,10 @@ def test_runnable_and_direct_gpu_kernel_import_boundaries_remain_compatible() ->
     assert RunnableABC is not None
     assert RunnableSequence is DirectSequence
 
+
+@pytest.mark.warp
+def test_direct_gpu_kernel_import_boundaries_remain_compatible() -> None:
+    """Test the direct GPU entry point retains its established import path."""
     pytest.importorskip("warp")
     import particula.gpu.kernels as kernels
 

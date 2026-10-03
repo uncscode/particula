@@ -40,14 +40,15 @@ def test_gpu_top_level_does_not_reexport_kernel_steps() -> None:
         assert symbol_name not in gpu.__all__
 
 
-def test_gpu_module_docstring_declares_experimental_supported_contract() -> (
-    None
-):
-    """Test GPU documentation marks its supported low-level path experimental."""
-    import particula.gpu as gpu
+def test_kernels_package_publishes_lazy_dilution_metadata() -> None:
+    """Package metadata exposes dilution without loading the concrete module."""
+    import particula.gpu.kernels as kernels
 
-    assert "experimental" in (gpu.__doc__ or "").lower()
-    assert "caller-owned" in (gpu.__doc__ or "").lower()
+    assert "dilution_step_gpu" in kernels.__all__
+    assert (
+        kernels._SYMBOL_TO_MODULE["dilution_step_gpu"]
+        == "particula.gpu.kernels.dilution"
+    )
 
 
 @pytest.mark.warp

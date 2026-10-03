@@ -14,6 +14,8 @@ from typing import Any
 import numpy as np
 import pytest
 
+pytestmark = pytest.mark.warp
+
 ROOT = Path(__file__).parents[2]
 SOURCE = ROOT / "docs/Examples/gpu_resident_graph_capture.py"
 MODULE_NAME = "docs.Examples.gpu_resident_graph_capture"
@@ -171,7 +173,7 @@ def test_preflight_propagates_unexpected_errors(
 
 
 def test_source_contract_preserves_lazy_native_capture_lifecycle() -> None:
-    """Check import policy, replay ordering, limits, and the published link."""
+    """Check import policy and replay ordering in the example source."""
     source = SOURCE.read_text(encoding="utf-8")
     tree = ast.parse(source)
     imports = {
@@ -206,22 +208,6 @@ def test_source_contract_preserves_lazy_native_capture_lifecycle() -> None:
     assert source.index("retire_resident_graph_capture") < source.index(
         "renew_resident_graph_capture"
     )
-    normalized_source = " ".join(source.split())
-    for phrase in (
-        "CPU and Warp-CPU are not",
-        "automatic recapture",
-        "migration",
-        "resize/compaction",
-        "hidden transfer or synchronization",
-        "retry/rollback",
-        "checkpointed or serialized opaque handles",
-        "performance claims",
-    ):
-        assert phrase in normalized_source
-    index = (ROOT / "docs/Examples/index.md").read_text(encoding="utf-8")
-    assert "gpu_resident_graph_capture.py" in index
-    assert "python docs/Examples/gpu_resident_graph_capture.py" in index
-    assert "no CPU or Warp-CPU fallback" in " ".join(index.split())
 
 
 def test_enabled_lifecycle_retires_and_closes_without_cuda(

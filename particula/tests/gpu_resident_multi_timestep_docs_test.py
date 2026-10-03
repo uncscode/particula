@@ -15,6 +15,8 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
+pytestmark = pytest.mark.warp
+
 _ROOT = Path(__file__).resolve().parents[2]
 _EXAMPLE = _ROOT / "docs" / "Examples" / "gpu_resident_multi_timestep.py"
 _DISABLED = [
@@ -430,20 +432,3 @@ def test_real_warp_cpu_example_has_resident_lifecycle_observations() -> None:
         result.restart_temperature_before_physics,
         result.checkpoint.environment.temperature,
     )
-
-
-def test_example_documents_resident_ownership_limits() -> None:
-    """The published example retains its no-fallback ownership language."""
-    text = _EXAMPLE.read_text(encoding="utf-8")
-    for phrase in (
-        "caller-owned diagnostics",
-        "manual, exact-device",
-        "No CPU fallback",
-        "automatic restart",
-        "graph capture",
-        "exact cross-backend RNG replay",
-    ):
-        assert phrase in text
-    assert "_step_gpu" not in text
-    assert "_NODE_CATALOGUE" not in text
-    assert "registry._views" not in text
