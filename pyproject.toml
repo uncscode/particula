@@ -59,7 +59,7 @@ build-backend = "flit_core.buildapi"
 line-length = 80
 fix = true
 src = ["particula", "docs/Examples"]
-include = ["particula/**/*.py", "docs/Examples/**/*.py"]
+include = ["particula/**/*.py", "docs/Examples/**/*.py", "scripts/**/*.py"]
 extend-exclude = [
   "**/*.ipynb",    # ignore every .ipynb anywhere in the project
 ]

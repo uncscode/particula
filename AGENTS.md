@@ -35,6 +35,12 @@ pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m
 # Focused deterministic GPU mass-precision baseline tests
 pytest particula/gpu/tests/mass_precision_cases_test.py -q
 
+# Isolated CPU-focused 0.2.x release checks (fresh installed wheel)
+python scripts/run_release_tests.py
+
+# Real conda-feedstock build/test (requires conda-build)
+python scripts/conda_feedstock.py
+
 # Host-only resident profiling-evidence schema tests (no profiler or GPU)
 pytest particula/gpu/tests/profiling_support_test.py -q --no-cov
 
@@ -418,7 +424,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   pytest particula/execution/tests/rng_test.py \
     particula/execution/tests/rng_invariance_test.py \
     particula/execution/tests/checkpoint_test.py -q
-  pytest particula/execution/tests/gpu_resident_session_docs_test.py -q
+  pytest particula/execution/tests/gpu_resident_session_example_test.py -q
   mkdocs build --strict
   ```
 
@@ -434,7 +440,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   remain caller-owned. No hidden transfer, CPU fallback, scheduler, backend
   selector, high-level runnable, resident loop, or transport is provided.
 - Validate publication with
-  `pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q -Werror`.
+  `pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror`.
 
 ```python
 from particula.gpu import (
@@ -981,7 +987,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   integration remain deferred.
 - Check concentration-weighted particle-plus-gas conservation at
   `rtol=1e-12, atol=1e-30`. Run `python docs/Examples/Nucleation/cpu_nucleation.py`,
-  `pytest particula/tests/nucleation_docs_test.py -q -Werror`, and
+  `pytest particula/tests/nucleation_example_test.py -q -Werror`, and
   `mkdocs build --strict`. If changing the paired custom notebook source, sync
   and execute it with the prescribed Jupytext tools.
 
@@ -1056,7 +1062,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   pytest particula/execution/tests/captured_full_loop_test.py -q \
     -m "warp and cuda" --no-cov
   .opencode/tools/run_pytest.py
-  pytest particula/tests/execution_selection_docs_test.py -q --no-cov
+  pytest particula/tests/execution_exports_test.py -q --no-cov
   mkdocs build --strict
   ```
 
@@ -1155,7 +1161,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   pass-or-clean-skip evidence. Validate this contract with:
 
   ```bash
-  pytest particula/tests/execution_selection_docs_test.py -q --no-cov
+  pytest particula/tests/execution_exports_test.py -q --no-cov
   mkdocs build --strict
   ```
 
@@ -1345,6 +1351,17 @@ evidence only, never CPU fallback.
 The canonical runnable resident example is
 `docs/Examples/gpu_resident_multi_timestep.py`. Warp CPU is the baseline;
 CUDA is optional pass-or-clean-skip evidence, never CPU fallback.
+
+## Conda release gate
+
+The separate `.github/workflows/conda-feedstock.yml` workflow runs a clean
+Python 3.12 conda build/test for PRs that change the literal package version,
+and supports manual dispatch. See `conda/README.md` for local reproduction,
+explicit test inputs, feedstock handoff, and the v0.3 GPU-policy review point.
+Release selection excludes GPU/Warp/CUDA tests and benchmarks; ordinary source
+CI retains GPU validation. Documentation prose/link and planning-reference
+assertions are removed; runtime/example coverage remains. Tests must not depend
+on `.opencode` records or a complete documentation checkout.
 
 ## ADW Workflows
 

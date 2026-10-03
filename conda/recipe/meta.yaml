@@ -1,0 +1,52 @@
+{% set version = environ["PARTICULA_VERSION"] %}
+
+package:
+  name: particula
+  version: {{ version }}
+
+# scripts/conda_feedstock.py stages only explicit build/test inputs here.
+# The upstream feedstock uses a release archive instead of this local source.
+source:
+  path: ../source
+
+build:
+  number: 0
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+
+requirements:
+  host:
+    - python {{ python_min }}
+    - pip
+    - flit-core >=3.2,<4
+  run:
+    - python >={{ python_min }}
+    - numpy >=2.0.0
+    - scipy >=1.14.0
+    - typing_extensions >=4.0.0
+    - warp-lang
+
+test:
+  requires:
+    - python {{ python_min }}
+    - pytest
+    - pip
+  source_files:
+    - particula
+    - pyproject.toml
+    - conftest.py
+    - scripts/run_release_tests.py
+    - docs/Examples/cpu_dilution.py
+    - docs/Examples/Nucleation/cpu_nucleation.py
+    - docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py
+  commands:
+    - python scripts/run_release_tests.py --installed
+
+about:
+  home: https://uncscode.github.io/particula
+  license: MIT
+  license_family: MIT
+  license_file: license
+  summary: a simple, fast, and powerful particle simulator
+  dev_url: https://github.com/uncscode/particula
+  doc_url: https://uncscode.github.io/particula/

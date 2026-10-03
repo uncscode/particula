@@ -416,6 +416,7 @@ def test_registry_construction_does_not_require_warp() -> None:
     assert registry.words_by_lane("coagulation") == ()
 
 
+@pytest.mark.warp
 def test_initialize_replaces_valid_caller_owned_warp_arrays() -> None:
     """Test initialization writes retained arrays by identity when Warp exists."""
     wp = pytest.importorskip("warp")
@@ -441,6 +442,7 @@ def test_initialize_replaces_valid_caller_owned_warp_arrays() -> None:
     )
 
 
+@pytest.mark.warp
 def test_initialize_preflight_failure_preserves_both_state_arrays() -> None:
     """Test invalid state-array schemas reject before either array is overwritten."""
     wp = pytest.importorskip("warp")
@@ -464,6 +466,7 @@ def test_initialize_preflight_failure_preserves_both_state_arrays() -> None:
 
 
 @pytest.mark.parametrize("failure", ("shape", "dtype", "contiguous"))
+@pytest.mark.warp
 def test_initialize_rejects_invalid_schema_before_copy(
     monkeypatch: pytest.MonkeyPatch, failure: str
 ) -> None:
@@ -507,6 +510,7 @@ def test_initialize_rejects_invalid_schema_before_copy(
     assert coagulation.numpy().tolist() == [17]
 
 
+@pytest.mark.warp
 def test_initialize_rejects_spoofed_array_before_copy(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -541,6 +545,7 @@ def test_initialize_rejects_spoofed_array_before_copy(
     assert coagulation.numpy().tolist() == [17]
 
 
+@pytest.mark.warp
 def test_initialize_rejects_identical_and_overlapping_warp_arrays() -> None:
     """Test retained state arrays must be distinct nonoverlapping Warp arrays."""
     wp = pytest.importorskip("warp")
@@ -569,6 +574,8 @@ def test_initialize_rejects_identical_and_overlapping_warp_arrays() -> None:
             registry.initialize()
 
 
+@pytest.mark.warp
+@pytest.mark.cuda
 def test_initialize_rejects_different_warp_devices_when_available() -> None:
     """Test distinct real state arrays must be on the same Warp device."""
     wp = pytest.importorskip("warp")
@@ -589,6 +596,7 @@ def test_initialize_rejects_different_warp_devices_when_available() -> None:
         registry.initialize()
 
 
+@pytest.mark.warp
 def test_initialize_second_copy_failure_keeps_first_write(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

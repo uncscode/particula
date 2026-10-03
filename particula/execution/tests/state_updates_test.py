@@ -565,8 +565,8 @@ def test_empty_update_schemas_are_write_free_noops(
     assert calls == 0 if boxes == 0 else 2
 
 
-def test_request_carriers_are_frozen_and_execution_import_is_isolated() -> None:
-    """Concrete imports retain package import isolation and carrier immutability."""
+def test_execution_import_is_isolated() -> None:
+    """Public execution imports do not load concrete update modules or Warp."""
     root = Path(__file__).parents[3]
     environment = os.environ | {"PYTHONPATH": str(root)}
     script = """
@@ -599,6 +599,11 @@ assert 'warp' not in sys.modules
         text=True,
     )
     assert completed.returncode == 0, completed.stderr
+
+
+@pytest.mark.warp
+def test_request_carrier_rejects_invalid_session() -> None:
+    """Concrete request construction requires an exact resident session."""
     updates = _state_updates()
     with pytest.raises(TypeError, match="exact ResidentSession"):
         updates.ResidentGasUpdateRequest(
