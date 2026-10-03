@@ -69,9 +69,13 @@ The release test inputs are explicit:
 - `docs/Examples/Nucleation/cpu_nucleation.py`.
 - `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py`.
 
-Documentation wording/link and planning-reference assertions were removed.
-They are not a hidden release prerequisite. Documentation rendering remains
-in the existing MkDocs source-checkout workflow.
+Documentation wording/link, notebook publication-state, and planning-reference
+assertions were intentionally removed at the maintainer's request, superseding
+the original issue's proposal to retain them in source CI. Documentation
+rendering remains in the existing MkDocs source-checkout workflow. Executable
+CPU example checks retain numerical/runtime and public API-boundary coverage;
+they require only the explicitly listed Python examples, not publication prose,
+notebooks, or planning records.
 
 ## Feedstock handoff
 
@@ -123,3 +127,12 @@ The standalone wheel runner also retains `.artifacts/release-tests.log`.
 - A real conda build was attempted but unavailable because `conda` is not
   installed locally. The new GitHub Actions build and external feedstock rerun
   remain required; no conda CI success is claimed by the wheel result.
+
+### PR review follow-up — 0.2.14
+
+The package version is now `0.2.14`, enabling the PR's conda build gate.
+After restoring CPU example API-boundary checks and updating the published
+test commands, the isolated wheel run passed **2,791 tests**, with **18 skipped,
+811 deselected, and 3,617 collected**. Installed-version smoke and `pip check`
+passed. Ruff checking and strict MkDocs validation also passed. This remains
+wheel evidence; the triggered conda workflow supplies separate build evidence.

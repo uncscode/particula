@@ -1,5 +1,6 @@
 """Runtime regressions for the CPU nucleation example."""
 
+import ast
 import runpy
 import subprocess
 import sys
@@ -12,6 +13,46 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 EXAMPLE = ROOT / "docs/Examples/Nucleation/cpu_nucleation.py"
 EXAMPLE_TIMEOUT_SECONDS = 30
+
+
+def test_cpu_nucleation_example_uses_public_imports_without_source_helpers():
+    """The runnable example stays on public APIs rather than P2/P3 helpers."""
+    tree = ast.parse(EXAMPLE.read_text(encoding="utf-8"))
+    imports = {
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+    }
+    assert {
+        "particula.dynamics",
+        "particula.gas",
+        "particula.particles.exhaustion",
+    } <= imports
+    assert imports <= {
+        "__future__",
+        "particula",
+        "particula.dynamics",
+        "particula.gas",
+        "particula.particles",
+        "particula.particles.exhaustion",
+    }
+    referenced_names = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name):
+            referenced_names.add(node.id)
+        elif isinstance(node, ast.Attribute):
+            referenced_names.add(node.attr)
+        elif isinstance(node, (ast.Import, ast.ImportFrom)):
+            for alias in node.names:
+                referenced_names.update(alias.name.split("."))
+    assert not referenced_names.intersection(
+        {
+            "particle_source",
+            "finalize_particle_source",
+            "commit_particle_source",
+            "ParticleSourceCommitConfig",
+        }
+    )
 
 
 def test_cpu_nucleation_example_uses_public_api_and_conserves_mass() -> None:

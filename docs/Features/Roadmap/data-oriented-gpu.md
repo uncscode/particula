@@ -1065,7 +1065,6 @@ energy evidence. Run:
 ```bash
 python docs/Examples/gpu_condensation_parity_walkthrough.py
 pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror
-pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror
 ```
 
 Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
@@ -1843,7 +1842,9 @@ Correctness-qualified handoffs are limited to E8-F6 scaling/memory, E8-F7
 profiling, and E8-F8 example/closeout work.
 
 **Evidence record date (2026-09-05):** This record follows the P4 plan update
-dated 2026-09-05 and preserves its original literal command outcomes. Python
+dated 2026-09-05 and preserves the literal outcomes for the retained commands.
+The retired documentation-assertion command is omitted; documentation rendering
+continues through MkDocs. Python
 3.12.12; the required installed-Warp uncaptured matrix passed with 48 passes.
 No native CUDA device/capture prerequisite qualified, so the optional CUDA
 selector cleanly skipped; this is not CPU or Warp-CPU capture fallback. The
@@ -1858,7 +1859,6 @@ plan record rather than a published MkDocs page.
 | Focused | `pytest particula/execution/tests/graph_capture_test.py particula/execution/tests/rng_invariance_test.py particula/execution/tests/checkpoint_test.py -q --no-cov` | 0 | `274 passed, 1 skipped` |
 | Optional CUDA | `pytest particula/execution/tests/captured_full_loop_test.py -q -m "warp and cuda" --no-cov` | 0 | `11 skipped, 48 deselected` (clean skip) |
 | Untargeted coverage | `.opencode/tools/run_pytest.py` | 0 | `6634 passed, 24 skipped, 1 xfailed, 92.92% coverage` |
-| Documentation | `pytest particula/execution/tests/graph_capture_docs_test.py particula/tests/execution_selection_docs_test.py -q --no-cov` | 0 | `25 passed` |
 | Documentation | `mkdocs build --strict` | 0 | Passed through the approved `docs-validator` `build_mkdocs_validate` worktree wrapper; strict mode is intrinsic and the exact workflow worktree is supplied as `cwd`. |
 
 ### E8-F2 prepared enqueue contract

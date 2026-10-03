@@ -155,9 +155,8 @@ meets its exit bar, the next pending epic in the sequence becomes active.
        parity, adaptive stepping, graph capture/replay, broad autodiff, or
        performance claim.
      - Focused evidence commands:
-       `python docs/Examples/gpu_condensation_parity_walkthrough.py`,
-       `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`,
-      and `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
+       `python docs/Examples/gpu_condensation_parity_walkthrough.py` and
+       `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 - [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
   (ADW plan E5) and all nine feature plans E5-F1 through E5-F9 shipped on
   2026-07-20. The bounded direct-kernel release covers Brownian, charged

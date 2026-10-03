@@ -77,7 +77,7 @@ The deterministic, hardware-free example uses only this public API:
 Focused regression commands are:
 
 ```bash
-pytest particula/tests/dilution_docs_test.py -q -Werror
+pytest particula/tests/dilution_example_test.py -q -Werror
 pytest particula/dynamics/tests/dilution_test.py -q -Werror
 pytest particula/dynamics/tests/dilution_runnable_test.py -q -Werror
 pytest particula/dynamics/tests/dilution_exports_test.py -q -Werror

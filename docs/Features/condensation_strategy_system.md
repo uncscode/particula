@@ -716,9 +716,8 @@ CUDA is optional additive evidence. The caller-owned, write-only
 feedback.
 
 Focused fixed-four-substep direct-kernel evidence commands are:
-`python docs/Examples/gpu_condensation_parity_walkthrough.py`,
-`pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`,
-and `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
+`python docs/Examples/gpu_condensation_parity_walkthrough.py` and
+`pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 
 #### P1--P4 direct-condensation evidence
 
