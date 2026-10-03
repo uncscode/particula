@@ -179,7 +179,7 @@ Focused validation:
 ```bash
 python docs/Examples/Nucleation/cpu_nucleation.py
 python -Werror docs/Examples/Nucleation/gpu_direct_nucleation.py
-pytest particula/tests/nucleation_docs_test.py -q -Werror
+pytest particula/tests/nucleation_example_test.py -q -Werror
 pytest particula/gpu/tests/gpu_direct_nucleation_example_test.py -q -Werror
 pytest particula/dynamics/nucleation/tests/ \
   particula/dynamics/tests/nucleation_runnable_test.py \

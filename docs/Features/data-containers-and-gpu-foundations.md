@@ -1565,10 +1565,9 @@ the other evidence classes.
 | `pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror` | Direct coagulation coverage, including singleton sedimentation and ST1956 configurations, direct/environment inputs, caller-owned output/RNG behavior, conservation, and rejected-call state safety. |
 | `pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror` | Fixed-mask deterministic/ownership evidence. |
 | `pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror` | Stochastic evidence. |
-| `pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror` | Hardware-free documentation-contract coverage. |
 | `pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q` | CPU integration/inventory-conservation evidence (separate particle-plus-gas inventory conservation checks); not direct-GPU validation. |
 | `pytest particula/integration_tests/condensation_particle_resolved_test.py -q` | CPU integration evidence for particle-resolved condensation; not direct-GPU validation. |
-| `pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror` | Latent-heat energy/bookkeeping documentation checks. |
+| `pytest particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py -q -Werror` | CPU example runtime and latent-heat energy/bookkeeping checks; not direct-GPU validation. |
 
 The required baseline is Warp `device="cpu"` when Warp is installed. The
 parity matrix, inventory conservation checks, and latent-heat energy/bookkeeping
@@ -1596,10 +1595,8 @@ not a return value or temperature feedback mechanism (`kg * J/kg = J`).
 
 The fixed-four-substep low-level direct-kernel walkthrough can be run with
 `python docs/Examples/gpu_condensation_parity_walkthrough.py`. Its focused
-regressions are
-`pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`
-and
-`pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
+runtime regression command is
+`pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 
 - [Data Containers example](../Examples/Data_Containers/index.md)
 - [Particle & Gas Data Migration](particle-data-migration/index.md)

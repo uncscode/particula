@@ -189,8 +189,7 @@ Jump in by selecting any card below and follow along in your browser or local en
       — deferred-capability ownership without expanding production support
 
     Run `python docs/Examples/gpu_condensation_parity_walkthrough.py`, then
-    `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`
-    and `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
+    `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
      Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
      Its caller-owned, write-only `energy_transfer` output is a diagnostic, not
      a return value or temperature feedback (`kg * J/kg = J`). This direct-kernel

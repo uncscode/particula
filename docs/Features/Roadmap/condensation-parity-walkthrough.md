@@ -45,7 +45,6 @@ pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_graph_capture_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_autodiff_test.py -q -Werror
-pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror
 ```
 
 ## Downstream roadmap owners
