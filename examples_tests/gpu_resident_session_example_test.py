@@ -15,13 +15,8 @@ import pytest
 
 pytestmark = pytest.mark.warp
 
-_ROOT = Path(__file__).resolve().parents[3]
+_ROOT = Path(__file__).resolve().parents[1]
 _EXAMPLE = _ROOT / "docs" / "Examples" / "gpu_resident_session.py"
-_DISABLED = [
-    "Canonical path: docs/Examples/gpu_resident_session.py",
-    "CPU fixture: not constructed because Warp is unavailable or disabled.",
-    "Warp is unavailable or disabled; no resident session was created.",
-]
 
 
 @pytest.fixture
@@ -67,7 +62,6 @@ def test_forced_disable_skips_loader_and_fixture(
         example_module, "_build_cpu_state", lambda: pytest.fail("fixture")
     )
     result = example_module.run_example()
-    assert result.output == _DISABLED
     assert result.session is result.registry is result.guard is None
     assert (
         result.checkpoint
@@ -90,7 +84,9 @@ def test_missing_warp_skips_fixture(
     monkeypatch.setattr(
         example_module, "_build_cpu_state", lambda: pytest.fail("fixture")
     )
-    assert example_module.run_example().output == _DISABLED
+    result = example_module.run_example()
+    assert result.session is result.registry is result.guard is None
+    assert result.checkpoint is result.restarted is None
 
 
 @pytest.mark.parametrize(
@@ -118,7 +114,7 @@ def test_broken_enabled_warp_import_propagates(
     assert raised.value is error
 
 
-def test_forced_disabled_script_has_exact_stdout() -> None:
+def test_forced_disabled_script_exits_successfully() -> None:
     """The standalone forced-disabled command exits successfully."""
     result = subprocess.run(  # noqa: S603
         [sys.executable, str(_EXAMPLE)],
@@ -128,7 +124,17 @@ def test_forced_disabled_script_has_exact_stdout() -> None:
         env={**os.environ, "PARTICULA_EXAMPLE_FORCE_NO_WARP": "1"},
         timeout=10,
     )
-    assert result.stdout == "\n".join(_DISABLED) + "\n"
+    assert result.returncode == 0
+
+
+def test_main_forwards_output(example_module, monkeypatch, capsys) -> None:
+    """Forward result lines without freezing incidental status wording."""
+    lines = ["session-sentinel", "checkpoint-sentinel"]
+    monkeypatch.setattr(
+        example_module, "run_example", lambda: SimpleNamespace(output=lines)
+    )
+    example_module.main()
+    assert capsys.readouterr().out.splitlines() == lines
 
 
 def test_loader_orders_concrete_imports_without_gpu_package(

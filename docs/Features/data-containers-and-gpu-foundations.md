@@ -519,7 +519,7 @@ pytest particula/execution/tests/diagnostics_test.py \
   particula/execution/tests/errors_test.py \
   particula/execution/tests/fallback_test.py \
   particula/execution/tests/fallback_integration_test.py \
-  particula/tests/gpu_resident_multi_timestep_docs_test.py -q
+  examples_tests/gpu_resident_multi_timestep_docs_test.py -q
 pytest particula/execution/tests/exports_test.py \
   particula/tests/execution_exports_test.py -q
 pytest particula/execution/tests/ -q
@@ -572,7 +572,7 @@ Caller-owned sidecars have stable fixed shapes; persistent coagulation and
 wall-loss RNG is also caller-owned. There is no hidden transfer or CPU fallback,
 high-level `Runnable`, backend selector, scheduler, resident production loop, or
 transport API. See the [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py),
-[P3 regression](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py),
+[P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py),
 and [E6 inventory](Roadmap/data-oriented-gpu.md#e6-roadmap-inventory).
 
 `WarpParticleData`, `WarpEnvironmentData`, and `WarpGasData` are exported from
@@ -1557,7 +1557,7 @@ the other evidence classes.
 | Command | Evidence |
 | --- | --- |
 | `python docs/Examples/gpu_direct_kernels_quick_start.py` | Canonical explicit-transfer walkthrough. |
-| `pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q` | Quick-start regression. |
+| `pytest examples_tests/gpu_direct_kernels_example_test.py -q` | Quick-start regression. |
 | `pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror` | Primary direct CPU-oracle particle-mass/gas-concentration parity matrix. |
 | `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror` | Bounded direct-step stiffness coverage. |
 | `pytest particula/gpu/kernels/tests/slot_management_test.py -q -Werror` | Fixed-slot activation mapping, caller-owned sidecars, and preflight state-safety coverage. |
@@ -1567,7 +1567,7 @@ the other evidence classes.
 | `pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror` | Stochastic evidence. |
 | `pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q` | CPU integration/inventory-conservation evidence (separate particle-plus-gas inventory conservation checks); not direct-GPU validation. |
 | `pytest particula/integration_tests/condensation_particle_resolved_test.py -q` | CPU integration evidence for particle-resolved condensation; not direct-GPU validation. |
-| `pytest particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py -q -Werror` | CPU example runtime and latent-heat energy/bookkeeping checks; not direct-GPU validation. |
+| `pytest examples_tests/condensation_latent_heat_example_test.py -q -Werror` | CPU example runtime and latent-heat energy/bookkeeping checks; not direct-GPU validation. |
 
 The required baseline is Warp `device="cpu"` when Warp is installed. The
 parity matrix, inventory conservation checks, and latent-heat energy/bookkeeping
@@ -1596,7 +1596,7 @@ not a return value or temperature feedback mechanism (`kg * J/kg = J`).
 The fixed-four-substep low-level direct-kernel walkthrough can be run with
 `python docs/Examples/gpu_condensation_parity_walkthrough.py`. Its focused
 runtime regression command is
-`pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
+`pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 
 - [Data Containers example](../Examples/Data_Containers/index.md)
 - [Particle & Gas Data Migration](particle-data-migration/index.md)

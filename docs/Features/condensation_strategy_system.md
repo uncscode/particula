@@ -2,7 +2,7 @@
 
 ## Complete direct-process context
 
-The direct condensation call begins the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). The [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [P3 regression](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py) preserve caller-owned sidecars and do not claim a high-level coordinator, resident loop, hidden transfer, or CPU fallback.
+The direct condensation call begins the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). The [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py) preserve caller-owned sidecars and do not claim a high-level coordinator, resident loop, hidden transfer, or CPU fallback.
 
 > Strategy-based condensation and evaporation with unified dynamics APIs, staggered Gauss-Seidel updates for stability, and runnable integration.
 
@@ -717,7 +717,7 @@ feedback.
 
 Focused fixed-four-substep direct-kernel evidence commands are:
 `python docs/Examples/gpu_condensation_parity_walkthrough.py` and
-`pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
+`pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 
 #### P1--P4 direct-condensation evidence
 

@@ -35,7 +35,7 @@ repository = "https://github.com/uncscode/particula"
 
 [project.optional-dependencies]
 dev = [
-    "pytest", "pytest-cov", "jupyterlab", "nbclient", "nbconvert",
+    "pytest", "pytest-cov", "PyYAML", "jupyterlab", "nbclient", "nbconvert",
     "build", "jupyter-book", "ghp-import",
     "mkdocs", "mkdocs-material[imaging]", "mkdocs-jupyter", "mkdocstrings[python]",
     "mkdocs-gen-files", "mkdocs-literate-nav",
@@ -59,7 +59,7 @@ build-backend = "flit_core.buildapi"
 line-length = 80
 fix = true
 src = ["particula", "docs/Examples"]
-include = ["particula/**/*.py", "docs/Examples/**/*.py", "scripts/**/*.py"]
+include = ["particula/**/*.py", "docs/Examples/**/*.py", "scripts/**/*.py", "examples_tests/**/*.py"]
 extend-exclude = [
   "**/*.ipynb",    # ignore every .ipynb anywhere in the project
 ]

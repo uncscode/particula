@@ -1,0 +1,20 @@
+diff --git a/recipe/meta.yaml b/recipe/meta.yaml
+--- a/recipe/meta.yaml
++++ b/recipe/meta.yaml
+@@ -33,9 +33,13 @@ test:
+   source_files:
+     - particula
++    - pyproject.toml
++    - conftest.py
++    - scripts/run_release_tests.py
++    - docs/Examples/cpu_dilution.py
++    - docs/Examples/Nucleation/cpu_nucleation.py
++    - docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py
+   commands:
+-    - pip check
+-    - python -c "import particula; print(particula.__version__)"
+-    - pytest -W error -W "ignore::pytest.PytestUnknownMarkWarning" -m "not slow and not performance"
++    - python scripts/run_release_tests.py --installed
+ 
+ about:
+   home: https://uncscode.github.io/particula

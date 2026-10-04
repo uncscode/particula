@@ -2,16 +2,73 @@
 
 The separate **conda-feedstock** GitHub Actions workflow builds the current
 checkout with conda-build on Linux and tests it in a clean Python 3.12 conda
-environment using conda-forge packages. It runs automatically only for PRs to
-`main` that change the literal `__version__` value in `particula/__init__.py`.
-Other edits to that file run only the inexpensive version check. Subsequent
-updates to a version-changing PR rebuild its current merge checkout.
+environment using conda-forge packages. It runs automatically for PRs to
+`main` that change the literal `__version__` value in `particula/__init__.py`
+or release infrastructure: `conda/`, release runners and their tests, this
+workflow, pytest configuration/bootstrap, or the three declared CPU examples
+and their tests.
+Other initializer-only edits run just the inexpensive change gate. The gate
+uses the PR merge base, so subsequent updates to a qualifying PR rebuild its
+current merge checkout without requiring another version bump.
 
 For a manual run, select **Actions → conda-feedstock → Run workflow**, then
-choose the branch. GitHub exposes this control once the workflow exists on the
+choose the branch and `feedstock_ref` (`main` by default, or for example
+`refs/pull/54/head` to check a proposed feedstock handoff). GitHub exposes this
+control once the workflow exists on the
 default branch. Manual runs do not require a version change. Normal source CI
-continues to exercise GPU tests, and also tests the version gate and staging
-helpers; the conda build is a separate release check.
+continues to exercise package and all source example tests, including GPU
+coverage, and separately tests infrastructure under `scripts/tests`; the conda
+build is a separate release check. Default pytest `testpaths` is `particula`.
+Run the other source suites explicitly:
+
+```bash
+pytest examples_tests -q -Werror
+pytest scripts/tests -q -Werror
+```
+
+All 13 source example test modules live in `examples_tests/`, with their
+existing basenames. The marker-policy regression lives in
+`scripts/tests/pytest_marker_policy_test.py`, not in the package suite.
+
+## External feedstock drift gate
+
+The independent `feedstock-contract` job fetches
+`conda-forge/particula-feedstock` and compares its literal `test.requires`,
+`test.source_files`, and ordered `test.commands` against our locally tested
+recipe. Automatic PR runs compare against external `main`; manual dispatch
+can select a candidate PR ref. It reads recipe data only and executes no code,
+Jinja, build scripts, or test commands from that checkout. It saves both recipe
+files, their SHA-256 hashes, the external commit, and a JSON comparison report.
+Unsupported test templates/selectors/schema and missing data fail explicitly.
+Input/requirement list ordering is ignored; command ordering is significant.
+The shared `python {{ python_min }}` requirement is compared literally; this
+check does not certify external variant values or dependency solves.
+
+Both **conda-build** and **feedstock-contract** must pass for release readiness.
+They run independently so a drift failure still leaves local build evidence.
+Configure both as required checks where branch protection enforces release
+readiness. A passing local mirror build alone is insufficient. An intentional
+recipe change needs an external handoff; until it merges, the automatic check
+can remain red. Use manual dispatch against its proposed PR ref to verify the
+candidate, then rerun against `main` after merging.
+
+This catches the PR #54 regression: the external recipe copied only
+`particula/` and ran broad pytest, while our mirror supplied the required
+fixtures and used the isolated CPU release runner. The previous PR check
+validated only that mirror and could not observe the mismatch. The frozen
+failed-recipe fixture under `scripts/tests/fixtures/` now verifies that both
+the missing inputs and the wrong command fail the gate.
+
+For a local data-only comparison (requires PyYAML):
+
+```bash
+python scripts/check_feedstock_contract.py \
+  --external-recipe /path/to/particula-feedstock/recipe/meta.yaml
+pytest scripts/tests -q
+```
+
+The external conda-forge rerun remains required: this bounded contract check
+does not execute the external build or prove full recipe/environment parity.
 
 ## Local commands
 
@@ -21,21 +78,34 @@ With `conda-build` installed in the active conda environment:
 python scripts/conda_feedstock.py
 ```
 
-For a faster installed-wheel check without conda:
+For installed-wheel checks without conda, run both suites:
 
 ```bash
 python scripts/run_release_tests.py
+python scripts/run_release_tests.py --suite examples
 ```
 
-The wheel command creates a disposable virtual environment and installs the
-built wheel, its declared dependencies, and pytest. It validates test isolation,
-but does not substitute for the conda build and dependency solve.
+Each wheel command creates a disposable virtual environment and installs the
+built wheel, its declared dependencies, and pytest. These validate test isolation,
+but do not substitute for the conda build and dependency solve.
 
 Both routes run `pip check`, print the installed version and import location,
-and execute the release suite from a temporary tests-only workspace. Application
-source files are not copied into that workspace; an isolated interpreter plus
-pytest's importlib mode prevents accidentally testing the source checkout.
+and execute each release suite from its own temporary workspace. Package
+application sources are not copied into those workspaces; an isolated interpreter
+plus pytest's importlib mode prevents accidentally testing the source checkout.
 Missing declared fixtures fail rather than silently skipping tests.
+
+| Suite | Selection and isolated inputs |
+| --- | --- |
+| `--suite package` (default) | Tests, fixtures, conftests, and config; no documentation. |
+| `--suite examples` | Three CPU test/script pairs plus root conftest/config. |
+
+Conda tests the already-installed package with both commands in this order:
+
+```bash
+python scripts/run_release_tests.py --installed
+python scripts/run_release_tests.py --installed --suite examples
+```
 
 ## 0.2.x release selection
 
@@ -47,11 +117,11 @@ and not warp and not cuda and not gpu_parity
 ```
 
 The entire `particula/gpu` test subtree is temporarily excluded before
-collection, including unmarked benchmark helpers and GPU example tests. The
+collection, including unmarked benchmark helpers. The
 two GPU-only execution modules `diagnostics_test.py` and
 `gpu_resources_test.py` are also excluded before their eager Warp imports.
 Other execution tests and CPU integration tests remain eligible. GPU example
-modules outside that subtree are Warp-marked and load example files lazily.
+modules now live in `examples_tests/` and are not staged by either release suite.
 Resident GPU benchmark helper suites are also Warp-marked, including their
 hardware-free cases.
 CPU condensation, coagulation, nucleation, gas, particle, execution, and
@@ -61,13 +131,25 @@ Review these exclusions for **v0.3**; do not carry them forward as an implicit
 GPU validation policy. `warp-lang` remains a runtime dependency consistent with
 `pyproject.toml`. Deferring GPU release validation does not make it optional.
 
-The release test inputs are explicit:
+The package release workspace contains test modules and fixtures under
+`particula`, including integration tests, root and package `conftest.py` files,
+and `pyproject.toml`. It contains **zero documentation inputs** and no
+`examples_tests/` or `scripts/tests/` suite.
 
-- Test modules and their fixtures under `particula`, including integration tests.
-- Root and package `conftest.py` files and `pyproject.toml`.
-- `docs/Examples/cpu_dilution.py`.
-- `docs/Examples/Nucleation/cpu_nucleation.py`.
-- `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py`.
+`CPU_EXAMPLE_TESTS` in `scripts/run_release_tests.py` is the authoritative
+release example-test allowlist; `CPU_EXAMPLES` declares the matching scripts.
+The examples workspace contains only these three pairs plus root
+`conftest.py` and `pyproject.toml`:
+
+| Test under `examples_tests/` | Script under `docs/Examples/` |
+| --- | --- |
+| `dilution_example_test.py` | `cpu_dilution.py` |
+| `nucleation_example_test.py` | `Nucleation/cpu_nucleation.py` |
+| `condensation_latent_heat_example_test.py` | `Dynamics/Condensation/Condensation_Latent_Heat.py` |
+
+Each declared example test module must contribute selected tests. The conda
+recipe lists inputs for both suites, but the runner stages them separately;
+it never copies the full documentation tree into either workspace.
 
 Documentation wording/link, notebook publication-state, and planning-reference
 assertions were intentionally removed at the maintainer's request, superseding
@@ -79,27 +161,76 @@ notebooks, or planning records.
 
 ## Feedstock handoff
 
-`conda/recipe/meta.yaml` mirrors the relevant dependency/build/test contract
-of conda-forge/particula-feedstock PR #53. Its source is the explicitly staged
-current checkout instead of a tagged archive. Keep this mirror synchronized
-when the external feedstock changes; this workflow does not fetch or execute
-unreviewed remote recipe changes.
+`conda/recipe/meta.yaml` is the local release mirror, derived from the earlier
+conda-forge/particula-feedstock handoff and now using the two-suite contract.
+Its source is the explicitly staged current checkout instead of a tagged
+archive. Keep local and external contracts synchronized for the chosen release;
+the current mirror does not establish that the external recipe has changed.
+The drift job fetches the external recipe for data-only comparison; the build
+job executes the local reviewed mirror only.
 
-In the external feedstock, preserve its release URL/checksum and maintainer
-metadata, copy the mirrored `test.source_files` list, and replace the broad
-pytest invocation with:
+### Immediate external fix for the unpatched v0.2.14 archive
+
+The existing v0.2.14 archive uses the earlier layout and runner. Preserve its
+release URL/checksum and maintainer metadata, and use the **seven-input,
+one-command** contract from that tag rather than this checkout's new paths:
+
+```yaml
+test:
+  requires:
+    - python {{ python_min }}
+    - pytest
+    - pip
+  source_files:
+    - particula
+    - pyproject.toml
+    - conftest.py
+    - scripts/run_release_tests.py
+    - docs/Examples/cpu_dilution.py
+    - docs/Examples/Nucleation/cpu_nucleation.py
+    - docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py
+  commands:
+    - python scripts/run_release_tests.py --installed
+```
+
+Do not add `examples_tests/` paths or `--suite examples` to an unpatched
+v0.2.14 recipe: that archive does not provide the new layout and suite option.
+The immediate fix must be checked against the tagged contract, not treated as
+a match for this checkout's two-suite mirror.
+
+`conda/feedstock-pr54.patch` supplies this exact test-only change against PR
+#54 revision `0a37f3ac68e52671fc9a352f3d2828918a010785`. In the feedstock
+checkout on the PR branch, apply it with:
+
+```bash
+git apply --check /path/to/particula/conda/feedstock-pr54.patch
+git apply /path/to/particula/conda/feedstock-pr54.patch
+```
+
+The patch preserves the release URL, checksum, dependencies, and maintainer
+metadata. It is a prepared handoff; publishing it and rerunning the external
+build remain required.
+
+### New two-suite contract
+
+Adopting the current mirror requires a **new source archive or a reviewed
+recipe patch** that supplies the runner changes and relocated example tests.
+Only then copy the current `conda/recipe/meta.yaml` test inputs and use:
 
 ```yaml
 test:
   # Keep the source_files and requires from conda/recipe/meta.yaml.
   commands:
     - python scripts/run_release_tests.py --installed
+    - python scripts/run_release_tests.py --installed --suite examples
 ```
 
-The script includes `pip check` and the import/version smoke test. The package
-source must contain these fixes, either through a new release or a reviewed
-recipe patch to v0.2.13. Changing this branch alone does not update the existing
-tag's archive. Rebuild the external feedstock after applying the handoff.
+Each suite includes `pip check` and the import/version smoke test. Changing
+this branch alone does not update an existing tag's archive or the external
+feedstock. Retain maintainer metadata and use the correct source URL/checksum
+for the chosen archive. Rebuild the external feedstock after applying the
+handoff; neither an external recipe update nor a passing external build is
+claimed here.
 
 ## Evidence
 
@@ -109,7 +240,30 @@ the package version, installed import location, pytest results, and JSON counts
 for collected, deselected, passed, skipped, failed, and errored cases. Paths
 excluded before collection do not contribute to deselected counts; skipped
 counts include module-level collection skips as well as skipped test cases.
-The standalone wheel runner also retains `.artifacts/release-tests.log`.
+The standalone runner retains `.artifacts/release-tests.log` for the package
+suite and `.artifacts/release-examples.log` for the examples suite.
+
+### Two-suite cleanup — 2026-10-04
+
+On baseline `58da90e07f970d5ad28a3dc92f7bae1b92b52dde` plus the uncommitted
+cleanup, both isolated Python 3.12.12 wheel suites passed for version 0.2.14:
+
+- `python scripts/run_release_tests.py`: **3,544 collected, 768 deselected,
+  2,761 passed, 18 skipped**, no failures/errors. Three skips were during
+  collection. The test workspace contained no documentation tree.
+- `python scripts/run_release_tests.py --suite examples`: **20 passed**, no
+  skips/deselections/failures/errors, with only the declared CPU inputs staged.
+- Both reported installed `site-packages` provenance and passed `pip check`.
+  Dependencies were NumPy 2.5.3, SciPy 1.18.1, and Warp 1.17.0; pytest was 9.1.1.
+- Full source examples: **150 passed, 1 skipped**. Infrastructure tests:
+  **103 passed**. Both ran with `-Werror`.
+- The prepared PR #54 patch applied cleanly to the frozen recipe and matched
+  the tagged contract while preserving release metadata.
+- The real conda command remains unavailable locally (`conda` is not
+  installed). External publication/build/rerun and workflow dispatch remain
+  pending. These successful checks are wheel/source evidence only.
+
+The older results below predate the suite split.
 
 ### Local verification — 2026-10-03
 

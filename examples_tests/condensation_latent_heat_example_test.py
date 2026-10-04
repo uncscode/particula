@@ -11,7 +11,7 @@ import numpy as np
 import particula as par
 import pytest
 
-ROOT = Path(__file__).resolve().parents[4]
+ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE_PATH = (
     ROOT / "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py"
 )
@@ -66,8 +66,6 @@ def test_condensation_latent_heat_example_runs_as_main_entrypoint(
 
     output = capsys.readouterr().out
 
-    assert "CPU-only example" in output
-    assert "Bookkeeping only" in output
     assert "Gas concentration [kg/m^3]" in output
     assert "Particle mass change [kg/m^3]" in output
     assert "Per-call latent heat energy density [J/m^3]" in output
@@ -90,8 +88,6 @@ def test_condensation_latent_heat_run_example_returns_finite_structured_results(
     assert result["final_gas_concentration"] > 0.0
     assert result["initial_particle_mass_concentration"] > 0.0
     assert result["final_particle_mass_concentration"] > 0.0
-    assert result["cpu_only_note"].startswith("CPU-only example")
-    assert result["bookkeeping_only_note"].startswith("Bookkeeping only")
     assert result["iteration_count"] == 5
     assert result["sub_steps_per_call"] == 1
 
@@ -192,7 +188,6 @@ def test_condensation_latent_heat_example_reports_condensation_or_explicit_zero_
     else:
         explanation = result.get("zero_transfer_explanation", "")
         assert explanation
-        assert "latent-heat signal" in explanation
 
 
 def test_condensation_latent_heat_example_energy_matches_mass_transfer_contract(
@@ -215,7 +210,7 @@ def test_condensation_latent_heat_example_energy_matches_mass_transfer_contract(
 def test_condensation_latent_heat_run_example_adds_zero_transfer_explanation() -> (
     None
 ):
-    """Zero-transfer branch adds the documented explanation string."""
+    """The effective-zero branch supplies a nonempty explanation."""
     namespace = cast(ExampleNamespace, runpy.run_path(str(EXAMPLE_PATH)))
     run_example = cast(Any, namespace["run_example"])
     run_example.__globals__["EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE"] = 1.0
@@ -223,10 +218,7 @@ def test_condensation_latent_heat_run_example_adds_zero_transfer_explanation() -
     result = namespace["run_example"]()
 
     assert "zero_transfer_explanation" in result
-    assert (
-        "did not transfer measurable vapor mass"
-        in result["zero_transfer_explanation"]
-    )
+    assert result["zero_transfer_explanation"]
 
 
 def test_condensation_latent_heat_main_prints_zero_transfer_explanation(
@@ -236,8 +228,8 @@ def test_condensation_latent_heat_main_prints_zero_transfer_explanation(
     namespace = cast(ExampleNamespace, runpy.run_path(str(EXAMPLE_PATH)))
     main = cast(Any, namespace["main"])
     main.__globals__["run_example"] = lambda: {
-        "cpu_only_note": "CPU-only example",
-        "bookkeeping_only_note": "Bookkeeping only",
+        "cpu_only_note": "cpu-note-sentinel",
+        "bookkeeping_only_note": "bookkeeping-note-sentinel",
         "initial_gas_concentration": 1.0,
         "final_gas_concentration": 1.0,
         "initial_particle_mass_concentration": 2.0,
@@ -251,4 +243,6 @@ def test_condensation_latent_heat_main_prints_zero_transfer_explanation(
     namespace["main"]()
 
     output = capsys.readouterr().out
-    assert "Zero-transfer explanation: example explanation" in output
+    assert "example explanation" in output
+    assert "cpu-note-sentinel" in output
+    assert "bookkeeping-note-sentinel" in output

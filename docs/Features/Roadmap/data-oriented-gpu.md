@@ -1064,7 +1064,7 @@ energy evidence. Run:
 
 ```bash
 python docs/Examples/gpu_condensation_parity_walkthrough.py
-pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror
+pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror
 ```
 
 Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
@@ -1279,7 +1279,7 @@ and [P3 published source](../../Examples/gpu_complete_process_sequence.py) cover
 the fixed illustrative order: `condensation_step_gpu`,
 `coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, then
 `nucleation_step_gpu`. This is illustrative, not a production coordinator;
-the P3 [regression](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py)
+the P3 [regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py)
 keeps explicit transfers visible.
 
 Delivered dilution scope:

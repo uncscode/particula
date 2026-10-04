@@ -15,8 +15,12 @@
 ### Build & Test Commands
 
 ```bash
-# Run all tests
+# Run the default package suite (testpaths = particula)
 pytest
+
+# Run source example and infrastructure suites separately
+pytest examples_tests -q -Werror
+pytest scripts/tests -q -Werror
 
 # Run tests with coverage
 pytest --cov=particula --cov-report=term-missing
@@ -35,8 +39,9 @@ pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m
 # Focused deterministic GPU mass-precision baseline tests
 pytest particula/gpu/tests/mass_precision_cases_test.py -q
 
-# Isolated CPU-focused 0.2.x release checks (fresh installed wheel)
+# Isolated CPU-focused 0.2.x release checks (fresh wheel per suite)
 python scripts/run_release_tests.py
+python scripts/run_release_tests.py --suite examples
 
 # Real conda-feedstock build/test (requires conda-build)
 python scripts/conda_feedstock.py
@@ -149,6 +154,14 @@ def function(
 `gpu_parity`, `stochastic`  
 **Collection policy:** plain `pytest` preserves normal collection;
 `--benchmark` is the only collection-affecting option.
+
+Default `testpaths` is `particula`: it does not collect `examples_tests/` or
+`scripts/tests/`. All 13 source example modules live in `examples_tests/`
+with unchanged basenames; run `pytest examples_tests -q -Werror` explicitly.
+Run `pytest scripts/tests -q -Werror` for release infrastructure and the moved
+`pytest_marker_policy_test.py`. Source CI runs all three suites separately and
+retains GPU example coverage; the release-only CPU allowlist is not a source-CI
+filter. See [example test suites](examples_tests/README.md).
 
 **GPU policy:** Warp CPU is the default parity backend when Warp is installed.
 CUDA coverage is optional local/manual validation and must skip cleanly when
@@ -424,7 +437,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   pytest particula/execution/tests/rng_test.py \
     particula/execution/tests/rng_invariance_test.py \
     particula/execution/tests/checkpoint_test.py -q
-  pytest particula/execution/tests/gpu_resident_session_example_test.py -q
+  pytest examples_tests/gpu_resident_session_example_test.py -q
   mkdocs build --strict
   ```
 
@@ -440,7 +453,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   remain caller-owned. No hidden transfer, CPU fallback, scheduler, backend
   selector, high-level runnable, resident loop, or transport is provided.
 - Validate publication with
-  `pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror`.
+  `pytest examples_tests/gpu_complete_process_sequence_example_test.py -q -Werror`.
 
 ```python
 from particula.gpu import (
@@ -987,7 +1000,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   integration remain deferred.
 - Check concentration-weighted particle-plus-gas conservation at
   `rtol=1e-12, atol=1e-30`. Run `python docs/Examples/Nucleation/cpu_nucleation.py`,
-  `pytest particula/tests/nucleation_example_test.py -q -Werror`, and
+  `pytest examples_tests/nucleation_example_test.py -q -Werror`, and
   `mkdocs build --strict`. If changing the paired custom notebook source, sync
   and execute it with the prescribed Jupytext tools.
 
@@ -1012,7 +1025,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   nucleation are dependencies. Warp CPU is the baseline; CUDA is optional and
   must cleanly skip when unavailable. Run
   `python -Werror docs/Examples/Nucleation/gpu_direct_nucleation.py` and
-  `pytest particula/gpu/tests/gpu_direct_nucleation_example_test.py -q -Werror`.
+  `pytest examples_tests/gpu_direct_nucleation_example_test.py -q -Werror`.
 
 ### Resident graph-capture admission lifecycle
 
@@ -1321,7 +1334,7 @@ pytest particula/execution/tests/diagnostics_test.py \
   particula/execution/tests/errors_test.py \
   particula/execution/tests/fallback_test.py \
   particula/execution/tests/fallback_integration_test.py \
-  particula/tests/gpu_resident_multi_timestep_docs_test.py -q
+  examples_tests/gpu_resident_multi_timestep_docs_test.py -q
 pytest particula/execution/tests/exports_test.py \
   particula/tests/execution_exports_test.py -q
 pytest particula/execution/tests/ -q
@@ -1355,13 +1368,31 @@ CUDA is optional pass-or-clean-skip evidence, never CPU fallback.
 ## Conda release gate
 
 The separate `.github/workflows/conda-feedstock.yml` workflow runs a clean
-Python 3.12 conda build/test for PRs that change the literal package version,
-and supports manual dispatch. See `conda/README.md` for local reproduction,
-explicit test inputs, feedstock handoff, and the v0.3 GPU-policy review point.
-Release selection excludes GPU/Warp/CUDA tests and benchmarks; ordinary source
-CI retains GPU validation. Documentation prose/link and planning-reference
-assertions are removed; runtime/example coverage remains. Tests must not depend
-on `.opencode` records or a complete documentation checkout.
+Python 3.12 conda build/test for PRs that change the literal package version
+or release infrastructure, and supports manual dispatch. Its independent
+`feedstock-contract` job compares the external feedstock's test inputs and
+commands with the local mirror; both jobs are release gates. Manual dispatch
+accepts a `feedstock_ref` for candidate PR recipes; automatic runs use `main`.
+See [conda release validation](conda/README.md) for local reproduction,
+explicit test inputs, and feedstock handoff. The recipe runs
+`python scripts/run_release_tests.py --installed` followed by
+`python scripts/run_release_tests.py --installed --suite examples`.
+The default `--suite package` stages tests, fixtures, conftests, and config
+with zero documentation inputs. The examples suite stages only the three CPU
+tests in the authoritative `CPU_EXAMPLE_TESTS` allowlist in
+`scripts/run_release_tests.py` and their matching scripts, plus root
+conftest/config. Neither suite requires a complete documentation checkout or
+`.opencode` records. Documentation prose/link and planning-reference assertions
+are removed; runtime/example coverage remains.
+
+These are explicit **0.2.x** GPU/Warp/CUDA and benchmark release exclusions,
+subject to **v0.3 review**, not source-CI exclusions. Ordinary source CI retains
+full GPU example coverage, and `warp-lang` remains a runtime dependency.
+The immediate external fix for the unpatched **v0.2.14** archive uses its old
+seven-input, one-command recipe. The new two-suite contract requires a new
+source archive or reviewed recipe patch; do not copy new paths or suite flags
+into an unpatched v0.2.14 recipe. Local changes do not establish an external
+recipe update or successful conda build.
 
 ## ADW Workflows
 

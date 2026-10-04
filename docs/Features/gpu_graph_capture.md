@@ -126,7 +126,7 @@ row is optional pass-or-clean-skip evidence only; it is never CPU or Warp-CPU
 substitution.
 
 ```bash
-pytest particula/tests/gpu_resident_graph_capture_docs_test.py -q --no-cov
+pytest examples_tests/gpu_resident_graph_capture_docs_test.py -q --no-cov
 pytest particula/execution/tests/graph_capture_test.py -q --no-cov
 pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov
 pytest particula/execution/tests/captured_full_loop_test.py -q \
@@ -138,4 +138,4 @@ mkdocs build --strict
 Relevant repository sources are
 `particula/execution/tests/graph_capture_test.py`,
 `particula/execution/tests/captured_full_loop_test.py`, and
-`particula/tests/gpu_resident_graph_capture_docs_test.py`.
+`examples_tests/gpu_resident_graph_capture_docs_test.py`.

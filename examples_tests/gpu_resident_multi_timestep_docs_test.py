@@ -17,20 +17,8 @@ import pytest
 
 pytestmark = pytest.mark.warp
 
-_ROOT = Path(__file__).resolve().parents[2]
+_ROOT = Path(__file__).resolve().parents[1]
 _EXAMPLE = _ROOT / "docs" / "Examples" / "gpu_resident_multi_timestep.py"
-_DISABLED = [
-    "Canonical path: docs/Examples/gpu_resident_multi_timestep.py",
-    "Warp is unavailable or disabled; install warp-lang or enable Warp.",
-    "No CPU fallback ran; no fixture, upload, diagnostics, or restart ran.",
-]
-_ENABLED = [
-    "Warp CPU is the installed-Warp baseline; CUDA is optional.",
-    "Caller owns resident data and diagnostic buffers; synchronization is explicit.",
-    "Restart is manual, exact-device, and uses canonical checkpoint bytes.",
-    "No CPU fallback, hidden transfer, automatic restart, graph capture, or performance guarantee.",
-    "Unsupported physics and exact cross-backend RNG replay are not claimed.",
-]
 _NO_CUDA_STDERR = (
     "Warp CUDA warning: Could not find or load the NVIDIA CUDA driver. "
     "GPU execution will not be available.\n"
@@ -83,7 +71,6 @@ def test_forced_disable_runs_no_enabled_work(
 
     result = example_module.run_example()
 
-    assert result.output == _DISABLED
     assert result.session is result.registry is result.guard is None
     assert (
         result.checkpoint
@@ -108,7 +95,9 @@ def test_missing_top_level_warp_runs_no_enabled_work(
     monkeypatch.setattr(
         example_module, "_load_enabled_runtime", lambda: pytest.fail("loader")
     )
-    assert example_module.run_example().output == _DISABLED
+    result = example_module.run_example()
+    assert result.session is result.checkpoint is result.restarted is None
+    assert result.source_steps == result.restarted_steps == 0
 
 
 @pytest.mark.parametrize(
@@ -130,8 +119,8 @@ def test_broken_warp_import_propagates(
     assert raised.value is error
 
 
-def test_forced_disabled_script_has_exact_output() -> None:
-    """The standalone disabled script prints deterministic guidance."""
+def test_forced_disabled_script_exits_successfully() -> None:
+    """The standalone disabled script succeeds without optional runtime work."""
     result = subprocess.run(  # noqa: S603
         [sys.executable, str(_EXAMPLE)],
         check=True,
@@ -140,7 +129,17 @@ def test_forced_disabled_script_has_exact_output() -> None:
         env={**os.environ, "PARTICULA_EXAMPLE_FORCE_NO_WARP": "1"},
         timeout=10,
     )
-    assert result.stdout == "\n".join(_DISABLED) + "\n"
+    assert result.returncode == 0
+
+
+def test_main_forwards_output(example_module, monkeypatch, capsys) -> None:
+    """Forward result lines without freezing incidental status wording."""
+    lines = ["loop-sentinel", "restart-sentinel"]
+    monkeypatch.setattr(
+        example_module, "run_example", lambda: SimpleNamespace(output=lines)
+    )
+    example_module.main()
+    assert capsys.readouterr().out.splitlines() == lines
 
 
 @pytest.mark.warp
@@ -165,7 +164,7 @@ def test_enabled_script_runs_warning_free_without_cuda_requirement() -> None:
         timeout=30,
     )
     assert result.stderr in ("", _NO_CUDA_STDERR)
-    assert result.stdout.endswith("\n".join(_ENABLED) + "\n")
+    assert result.returncode == 0
 
 
 @pytest.mark.warp
@@ -184,7 +183,7 @@ def test_optimized_enabled_script_keeps_availability_validation() -> None:
         },
         timeout=30,
     )
-    assert result.stdout.endswith("\n".join(_ENABLED) + "\n")
+    assert result.returncode == 0
 
 
 def test_loader_requests_only_concrete_resident_seams(

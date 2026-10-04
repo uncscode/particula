@@ -156,7 +156,7 @@ meets its exit bar, the next pending epic in the sequence becomes active.
        performance claim.
      - Focused evidence commands:
        `python docs/Examples/gpu_condensation_parity_walkthrough.py` and
-       `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
+       `pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 - [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
   (ADW plan E5) and all nine feature plans E5-F1 through E5-F9 shipped on
   2026-07-20. The bounded direct-kernel release covers Brownian, charged
@@ -193,7 +193,7 @@ meets its exit bar, the next pending epic in the sequence becomes active.
 
 The private [P2 sequence evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py),
 [P3 source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py),
-and [P3 regression](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py)
+and [P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py)
 document an explicit five-call sequence. Its `condensation_step_gpu`,
 `coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, and
 `nucleation_step_gpu` order is illustrative, not a production coordinator.

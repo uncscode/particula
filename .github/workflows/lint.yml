@@ -39,8 +39,8 @@ jobs:
     - name: Lint with ruff
       if: ${{ matrix.linter == 'ruff' }}
       run: |
-        ruff check particula/
-        ruff format particula/ --check
+        ruff check particula/ examples_tests/ scripts/
+        ruff format particula/ examples_tests/ scripts/ --check
 
     - name: Type check with mypy
       if: ${{ matrix.linter == 'mypy' }}

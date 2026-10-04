@@ -39,8 +39,12 @@ test:
     - docs/Examples/cpu_dilution.py
     - docs/Examples/Nucleation/cpu_nucleation.py
     - docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py
+    - examples_tests/dilution_example_test.py
+    - examples_tests/nucleation_example_test.py
+    - examples_tests/condensation_latent_heat_example_test.py
   commands:
     - python scripts/run_release_tests.py --installed
+    - python scripts/run_release_tests.py --installed --suite examples
 
 about:
   home: https://uncscode.github.io/particula

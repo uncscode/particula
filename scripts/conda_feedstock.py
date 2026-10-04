@@ -4,6 +4,8 @@ Requires conda and conda-build. The default invocation builds a clean staging
 tree and saves the literal build/test log and package under .artifacts/.
 ``--check-version BASE HEAD`` emits a GitHub Actions output after comparing
 literal version assignments without importing either revision's package.
+``--check-changes BASE HEAD`` also enables builds for release-infrastructure
+changes, even when the package version is unchanged.
 """
 
 from __future__ import annotations
@@ -16,10 +18,29 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from run_release_tests import CPU_EXAMPLES
+from run_release_tests import CPU_EXAMPLE_TESTS, CPU_EXAMPLES
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION_PATH = "particula/__init__.py"
+RELEASE_PATHS = {
+    ".github/workflows/conda-feedstock.yml",
+    "scripts/conda_feedstock.py",
+    "scripts/check_feedstock_contract.py",
+    "scripts/run_release_tests.py",
+    "pyproject.toml",
+    "conftest.py",
+    "particula/conftest.py",
+    *CPU_EXAMPLES,
+    *CPU_EXAMPLE_TESTS,
+}
+
+
+def release_inputs_changed(paths: list[str]) -> bool:
+    """Recognize edits that require rebuilding the release test environment."""
+    return any(
+        path in RELEASE_PATHS or path.startswith(("conda/", "scripts/tests/"))
+        for path in paths
+    )
 
 
 def read_version(source: str) -> str:
@@ -46,7 +67,9 @@ def version_changed(base: str, head: str) -> bool:
     return read_version(base) != read_version(head)
 
 
-def check_version(base: str, head: str) -> bool:
+def check_version(
+    base: str, head: str, *, include_release_inputs: bool = False
+) -> bool:
     """Compare PR revisions from Git and emit the build-gate output."""
     git = shutil.which("git")
     if git is None:
@@ -71,6 +94,15 @@ def check_version(base: str, head: str) -> bool:
         for revision in (ancestor, head)
     ]
     changed = version_changed(*sources)
+    if include_release_inputs:
+        paths = subprocess.run(  # noqa: S603 - fixed Git subcommand
+            [git, "diff", "--name-only", "-z", ancestor, head],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.split("\0")
+        changed = changed or release_inputs_changed(paths)
     print(f"Version: {read_version(sources[0])} -> {read_version(sources[1])}")
     output = f"changed={str(changed).lower()}\n"
     print(output, end="")
@@ -95,6 +127,7 @@ def stage_source(source: Path, destination: Path) -> None:
         "conftest.py",
         "scripts/run_release_tests.py",
         *CPU_EXAMPLES,
+        *CPU_EXAMPLE_TESTS,
     ):
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -151,8 +184,13 @@ def build() -> int:
 def main() -> int:
     """Select the cheap PR version gate or the actual conda build."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check-version", nargs=2, metavar=("BASE", "HEAD"))
+    gate = parser.add_mutually_exclusive_group()
+    gate.add_argument("--check-version", nargs=2, metavar=("BASE", "HEAD"))
+    gate.add_argument("--check-changes", nargs=2, metavar=("BASE", "HEAD"))
     args = parser.parse_args()
+    if args.check_changes:
+        check_version(*args.check_changes, include_release_inputs=True)
+        return 0
     if args.check_version:
         check_version(*args.check_version)
         return 0

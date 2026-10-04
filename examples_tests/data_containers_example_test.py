@@ -11,35 +11,22 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 from particula.gpu import WARP_AVAILABLE
 
 EXAMPLE_PATH = (
-    Path(__file__).resolve().parents[3]
+    Path(__file__).resolve().parents[1]
     / "docs"
     / "Examples"
     / "data_containers_and_gpu_foundations.py"
 )
 GUIDE_PATH = (
-    Path(__file__).resolve().parents[3]
+    Path(__file__).resolve().parents[1]
     / "docs"
     / "Examples"
     / "Data_Containers"
     / "data_containers_and_gpu_foundations.py"
 )
 EXAMPLES_ROOT = EXAMPLE_PATH.parent
-CPU_ONLY_OUTPUT = [
-    "ParticleData constructed: masses=(1, 2, 2), concentration=(1, 2), charge=(1, 2), density=(2,), volume=(1,)",
-    "GasData constructed: concentration=(1, 2), molar_mass=(2,), partitioning=(2,)",
-    "Warp-backed transfers are optional; CPU container example completed without Warp.",
-]
-WARP_OUTPUT_PREFIX = [
-    "ParticleData constructed: masses=(1, 2, 2), concentration=(1, 2), charge=(1, 2), density=(2,), volume=(1,)",
-    "GasData constructed: concentration=(1, 2), molar_mass=(2,), partitioning=(2,)",
-    "Warp particle round trip: restored_masses=(1, 2, 2), restored_concentration=(1, 2)",
-    "Warp gas round trip: restored_concentration=(1, 2), restored_names=['Water', 'H2SO4']",
-    "Gas restore note: names are caller-supplied on restore and vapor_pressure remains GPU-only helper state.",
-]
 
 
 def _load_module(module_name: str, module_path: Path) -> types.ModuleType:
@@ -131,28 +118,49 @@ def test_warp_enabled_honors_force_no_warp_environment(
     assert example_module._warp_enabled() is False
 
 
-def test_run_example_reports_cpu_only_message_when_warp_disabled(
+def test_run_example_skips_transfers_when_warp_disabled(
     monkeypatch: pytest.MonkeyPatch,
     example_module: types.ModuleType,
 ) -> None:
-    """Test run_example returns the documented CPU-only success message."""
+    """Disabled execution constructs CPU containers without transfers."""
     monkeypatch.setattr(example_module, "WARP_AVAILABLE", False)
     monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
 
-    output = example_module.run_example()
+    events = []
+    for name in ("_build_particle_data", "_build_gas_data"):
+        original = getattr(example_module, name)
 
-    assert output == CPU_ONLY_OUTPUT
+        def build(name=name, original=original):
+            events.append(name)
+            return original()
+
+        monkeypatch.setattr(example_module, name, build)
+    monkeypatch.setattr(
+        example_module,
+        "to_warp_particle_data",
+        lambda *a, **k: pytest.fail("disabled transfer"),
+    )
+    monkeypatch.setattr(
+        example_module,
+        "to_warp_gas_data",
+        lambda *a, **k: pytest.fail("disabled transfer"),
+    )
+    example_module.run_example()
+    assert events == ["_build_particle_data", "_build_gas_data"]
 
 
-def test_run_example_falls_back_to_cpu_message_when_warp_transfer_fails(
+def test_run_example_stops_transfers_after_optional_warp_failure(
     monkeypatch: pytest.MonkeyPatch,
     example_module: types.ModuleType,
 ) -> None:
-    """Test runtime Warp failures still return the documented CPU output."""
+    """An optional transfer failure stops later transfers without escaping."""
     monkeypatch.setattr(example_module, "WARP_AVAILABLE", True)
     monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
 
+    events = []
+
     def _raise_runtime_error(*args: object, **kwargs: object) -> object:
+        events.append("transfer-failed")
         raise RuntimeError("warp backend unavailable")
 
     monkeypatch.setattr(
@@ -161,9 +169,14 @@ def test_run_example_falls_back_to_cpu_message_when_warp_transfer_fails(
         _raise_runtime_error,
     )
 
-    output = example_module.run_example()
-
-    assert output == CPU_ONLY_OUTPUT
+    for name in ("from_warp_particle_data", "to_warp_gas_data"):
+        monkeypatch.setattr(
+            example_module,
+            name,
+            lambda *a, **k: pytest.fail("continued after failed transfer"),
+        )
+    example_module.run_example()
+    assert events == ["transfer-failed"]
 
 
 def test_example_main_prints_example_output(
@@ -171,13 +184,14 @@ def test_example_main_prints_example_output(
     capsys: pytest.CaptureFixture[str],
     example_module: types.ModuleType,
 ) -> None:
-    """Test the published example prints the documented output."""
-    monkeypatch.setenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", "1")
+    """Test the entry point forwards arbitrary returned output lines."""
+    lines = ["container-sentinel", "transfer-sentinel"]
+    monkeypatch.setattr(example_module, "run_example", lambda: lines)
 
     example_module.main()
 
     captured = capsys.readouterr()
-    assert captured.out.splitlines() == CPU_ONLY_OUTPUT
+    assert captured.out.splitlines() == lines
 
 
 def test_guide_main_prints_example_output(
@@ -186,12 +200,15 @@ def test_guide_main_prints_example_output(
     guide_module: types.ModuleType,
 ) -> None:
     """Test the guide-local module delegates to the canonical example."""
-    monkeypatch.setenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", "1")
+    lines = ["guide-sentinel", "canonical-sentinel"]
+    monkeypatch.setattr(
+        guide_module._CANONICAL_MODULE, "run_example", lambda: lines
+    )
 
     guide_module.main()
 
     captured = capsys.readouterr()
-    assert captured.out.splitlines() == CPU_ONLY_OUTPUT
+    assert captured.out.splitlines() == lines
 
 
 def test_example_runs_as_main_entrypoint(
@@ -204,7 +221,7 @@ def test_example_runs_as_main_entrypoint(
     runpy.run_path(str(EXAMPLE_PATH), run_name="__main__")
 
     captured = capsys.readouterr()
-    assert captured.out.splitlines() == CPU_ONLY_OUTPUT
+    assert captured.err == ""
 
 
 def test_guide_runs_as_main_entrypoint(
@@ -217,14 +234,14 @@ def test_guide_runs_as_main_entrypoint(
     runpy.run_path(str(GUIDE_PATH), run_name="__main__")
 
     captured = capsys.readouterr()
-    assert captured.out.splitlines() == CPU_ONLY_OUTPUT
+    assert captured.err == ""
 
 
 def test_example_non_warp_path_reports_cpu_success() -> None:
     """Test the published example path completes without Warp transfers."""
     result = _run_example(force_no_warp=True)
 
-    assert result.stdout.splitlines() == CPU_ONLY_OUTPUT
+    assert result.returncode == 0
 
 
 def test_guide_module_re_exports_canonical_run_example(
@@ -232,11 +249,10 @@ def test_guide_module_re_exports_canonical_run_example(
     guide_module: types.ModuleType,
 ) -> None:
     """Test the guide module re-exports the canonical run_example helper."""
-    monkeypatch.setenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", "1")
-
-    output = guide_module.run_example()
-
-    assert output == CPU_ONLY_OUTPUT
+    assert (
+        guide_module.run_example is guide_module._CANONICAL_MODULE.run_example
+    )
+    assert guide_module.main is guide_module._CANONICAL_MODULE.main
 
 
 def test_guide_module_raises_import_error_when_canonical_example_cannot_load(
@@ -263,11 +279,7 @@ def test_example_warp_path_reports_round_trip_shapes_and_names() -> None:
     """Test the published example path exercises Warp CPU round trips."""
     result = _run_example(force_no_warp=False)
 
-    output_lines = result.stdout.splitlines()
-
-    for expected_line in WARP_OUTPUT_PREFIX:
-        assert expected_line in output_lines
-    assert CPU_ONLY_OUTPUT[-1] not in output_lines
+    assert result.returncode == 0
 
 
 @pytest.mark.skipif(not WARP_AVAILABLE, reason="Warp is not available")
@@ -275,10 +287,60 @@ def test_run_example_warp_path_reports_round_trip_shapes_and_names(
     monkeypatch: pytest.MonkeyPatch,
     example_module: types.ModuleType,
 ) -> None:
-    """Test run_example reports the documented Warp round-trip details."""
+    """Observe real CPU round trips, preserving arrays and ordered gas names."""
     monkeypatch.setattr(example_module, "WARP_AVAILABLE", True)
     monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
 
-    output = example_module.run_example()
+    events = []
+    sources = {}
+    devices = {}
+    completed = []
 
-    assert output == WARP_OUTPUT_PREFIX
+    def observe(name, function):
+        def call(value, **kwargs):
+            events.append(name)
+            family = "particle" if "particle" in name else "gas"
+            if name.startswith("to_"):
+                assert kwargs["device"] == "cpu"
+                sources[family] = value
+                if family == "gas":
+                    np.testing.assert_array_equal(
+                        kwargs["vapor_pressure"], [[2330.0, 120.0]]
+                    )
+                result = function(value, **kwargs)
+                devices[family] = result
+                completed.append(name)
+                return result
+            assert value is devices[family]
+            result = function(value, **kwargs)
+            fields = (
+                ("masses", "concentration", "charge", "density", "volume")
+                if family == "particle"
+                else ("concentration", "molar_mass", "partitioning")
+            )
+            for field in fields:
+                np.testing.assert_array_equal(
+                    getattr(result, field), getattr(sources[family], field)
+                )
+            if family == "gas":
+                assert kwargs["name"] is sources[family].name
+                assert result.name == ["Water", "H2SO4"]
+                assert not hasattr(result, "vapor_pressure")
+            completed.append(name)
+            return result
+
+        return call
+
+    names = [
+        "to_warp_particle_data",
+        "from_warp_particle_data",
+        "to_warp_gas_data",
+        "from_warp_gas_data",
+    ]
+    for name in names:
+        monkeypatch.setattr(
+            example_module, name, observe(name, getattr(example_module, name))
+        )
+    example_module.run_example()
+    assert events == names
+    assert completed == names

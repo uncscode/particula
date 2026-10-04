@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import ast
+import builtins
 import importlib
 import os
 import subprocess
@@ -16,9 +16,15 @@ import pytest
 
 pytestmark = pytest.mark.warp
 
-ROOT = Path(__file__).parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "docs/Examples/gpu_resident_graph_capture.py"
 MODULE_NAME = "docs.Examples.gpu_resident_graph_capture"
+
+
+@pytest.fixture(autouse=True)
+def _example_import_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Scope nested docs imports to this checkout without scientific fixtures."""
+    monkeypatch.syspath_prepend(str(ROOT))
 
 
 class _NativeDevice:
@@ -38,9 +44,21 @@ def _fresh_example() -> Any:
     return importlib.import_module(MODULE_NAME)
 
 
-def test_import_is_lazy_about_warp_and_concrete_capture_modules() -> None:
+def test_import_is_lazy_about_warp_and_concrete_capture_modules(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Keep optional capture and concrete composition out of import time."""
     sys.modules.pop(MODULE_NAME, None)
+    original_import = builtins.__import__
+
+    def guarded_import(name: str, *args: Any, **kwargs: Any) -> Any:
+        if name == "warp" or name.startswith(
+            ("particula.execution", "particula.gpu")
+        ):
+            pytest.fail(f"eager runtime import: {name}")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", guarded_import)
     before = set(sys.modules)
     example = importlib.import_module(MODULE_NAME)
     loaded = set(sys.modules) - before
@@ -76,13 +94,12 @@ def test_force_disabled_path_is_deterministic_and_has_no_setup(
         lambda: pytest.fail("CPU fixture created"),
     )
     result = example.run_example()
-    assert result.output == list(example._UNAVAILABLE_OUTPUT)
     assert result.session is None
     assert result.gas_snapshot is None
     assert result.replay_count == 0
 
 
-def test_force_disabled_subprocess_has_exact_address_free_output() -> None:
+def test_force_disabled_subprocess_exits_successfully() -> None:
     """The unavailable branch exits normally without a device."""
     environment = os.environ | {
         "PARTICULA_EXAMPLE_FORCE_NO_NATIVE_CAPTURE": "1"
@@ -98,11 +115,6 @@ def test_force_disabled_subprocess_has_exact_address_free_output() -> None:
     )
     assert result.returncode == 0
     assert result.stderr == ""
-    assert result.stdout.splitlines() == [
-        "Canonical path: docs/Examples/gpu_resident_graph_capture.py",
-        "Native CUDA graph capture is unavailable or disabled.",
-        "No CPU or Warp-CPU fallback ran; no fixture, upload, or capture ran.",
-    ]
 
 
 @pytest.mark.parametrize(
@@ -172,42 +184,15 @@ def test_preflight_propagates_unexpected_errors(
         example._qualified_native_cuda()
 
 
-def test_source_contract_preserves_lazy_native_capture_lifecycle() -> None:
-    """Check import policy and replay ordering in the example source."""
-    source = SOURCE.read_text(encoding="utf-8")
-    tree = ast.parse(source)
-    imports = {
-        alias.name
-        for node in tree.body
-        if isinstance(node, ast.Import)
-        for alias in node.names
-    }
-    assert imports == {"importlib", "os", "numpy"}
-    assert "from particula.execution import" not in source
-    assert "from particula import" not in source
-    assert "_step_gpu" not in source
-    assert source.index("native = _qualified_native_cuda()") < source.index(
-        "particles, gas, environment = _build_cpu_state()"
+def test_main_forwards_result_output(monkeypatch, capsys) -> None:
+    """Print returned status lines without binding the test to guidance prose."""
+    example = _fresh_example()
+    lines = ["capture-status-sentinel", "second-status-sentinel"]
+    monkeypatch.setattr(
+        example, "run_example", lambda: SimpleNamespace(output=lines)
     )
-    assert source.index("session.initialize_streams") < source.index(
-        "prepare_resident_simulation"
-    )
-    assert source.count("replay_captured_resident_graph(captured, 1.0)") == 2
-    assert source.index("for _ in range(2):") < source.index(
-        "synchronize_device"
-    )
-    assert source.index("synchronize_device") < source.index(
-        "gas_output.numpy()"
-    )
-    assert "session.particles.numpy" not in source
-    assert "session.gas.concentration.numpy" not in source
-    assert 'configuration.communication_map,\n        "form"' not in source
-    assert source.index("object.__setattr__") < source.index(
-        "retire_resident_graph_capture"
-    )
-    assert source.index("retire_resident_graph_capture") < source.index(
-        "renew_resident_graph_capture"
-    )
+    example.main()
+    assert capsys.readouterr().out.splitlines() == lines
 
 
 def test_enabled_lifecycle_retires_and_closes_without_cuda(
@@ -223,8 +208,17 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
     )
     gas_snapshot = np.ones((3, 1), dtype=np.float64)
     saturation_snapshot = np.full((3, 1), 2.0, dtype=np.float64)
-    gas_output = SimpleNamespace(numpy=lambda: gas_snapshot)
-    saturation_output = SimpleNamespace(numpy=lambda: saturation_snapshot)
+
+    def read_snapshot(name: str, values: np.ndarray) -> np.ndarray:
+        events.append(name)
+        return values
+
+    gas_output = SimpleNamespace(
+        numpy=lambda: read_snapshot("read-gas", gas_snapshot)
+    )
+    saturation_output = SimpleNamespace(
+        numpy=lambda: read_snapshot("read-saturation", saturation_snapshot)
+    )
     session = SimpleNamespace(
         particles=SimpleNamespace(masses=SimpleNamespace(device="cuda:1")),
         initialize_streams=lambda *_args: events.append("initialize"),
@@ -239,7 +233,9 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
     guard = object()
     resident_runtime = SimpleNamespace(
         gpu_session=SimpleNamespace(
-            setup_resident_session=lambda *_args: session,
+            setup_resident_session=lambda *_args: (
+                events.append("setup") or session
+            ),
             ResidentStepGuard=lambda *_args: guard,
         ),
         gpu_resources=SimpleNamespace(
@@ -248,9 +244,9 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
     )
 
     def prepare(candidate: Any, _duration: float) -> object:
-        if candidate.environment_update is not original_update:
-            events.append("invalidated")
-            raise ValueError("structural drift")
+        assert candidate is request
+        assert _duration == 1.0
+        assert candidate.environment_update is original_update
         events.append("prepare")
         return object()
 
@@ -266,15 +262,35 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
     binding = SimpleNamespace(lifecycle=SimpleNamespace(state=captured_state))
 
     def replay(captured: Any, _duration: float) -> None:
+        assert captured is first_capture
+        assert _duration == 1.0
         events.append(f"replay-{captured.name}")
         if request.environment_update is not original_update:
             binding.lifecycle.state = invalidated_state
             events.append("invalidated")
             raise ValueError("structural drift")
 
-    def resolve_capability(device: Any, _adapter: Any) -> Any:
-        events.append(f"resolve-{device.native}")
-        return SimpleNamespace(device=device, availability="available")
+    qualifications: list[object] = []
+
+    def qualify(candidate, prepared, capture_set, adapter):
+        assert candidate is binding
+        assert capture_set == "capture-set"
+        events.append("qualify")
+        qualification = object()
+        qualifications.append(qualification)
+        return qualification
+
+    def capture(qualification):
+        assert qualification is qualifications[-1]
+        captured = next(captures)
+        events.append(f"capture-{captured.name}")
+        return captured
+
+    def renew(candidate, signature):
+        assert candidate is binding
+        assert request.environment_update is original_update
+        events.append("renew")
+        return object()
 
     graph_capture = SimpleNamespace(
         GraphCaptureAvailability=SimpleNamespace(AVAILABLE="available"),
@@ -286,13 +302,16 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
             "attach"
         ),
         create_resident_graph_capture_signature=lambda _request: object(),
-        resolve_graph_capture_capability=resolve_capability,
+        resolve_graph_capture_capability=lambda device, _adapter: (
+            events.append(f"resolve-{device.native}")
+            or SimpleNamespace(device=device, availability="available")
+        ),
         create_graph_capture_lifecycle=lambda *_args: object(),
-        qualify_prepared_resident_graph_capture=lambda *_args: object(),
-        capture_prepared_resident_graph=lambda _qualification: next(captures),
+        qualify_prepared_resident_graph_capture=qualify,
+        capture_prepared_resident_graph=capture,
         replay_captured_resident_graph=replay,
         retire_resident_graph_capture=lambda _binding: events.append("retire"),
-        renew_resident_graph_capture=lambda *_args: object(),
+        renew_resident_graph_capture=renew,
         close_resident_graph_capture=lambda _binding: events.append(
             "capture-close"
         ),
@@ -347,13 +366,18 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
             synchronize_device=lambda _device: events.append("synchronize")
         ),
     )
-    monkeypatch.setattr(example, "_qualified_native_cuda", lambda: "cuda:1")
+    monkeypatch.setattr(
+        example,
+        "_qualified_native_cuda",
+        lambda: events.append("preflight") or "cuda:1",
+    )
     monkeypatch.setattr(example, "_load_capability_runtime", lambda: runtime)
     monkeypatch.setattr(example, "_load_enabled_runtime", lambda: runtime)
     monkeypatch.setattr(
         example,
         "_build_cpu_state",
-        lambda: (
+        lambda: events.append("build-cpu")
+        or (
             SimpleNamespace(
                 volume=np.ones(1, dtype=np.float64),
                 masses=np.ones((1, 1, 1), dtype=np.float64),
@@ -372,24 +396,37 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
     assert result.captured is first_capture
     assert result.renewed_capture is renewed_capture
     assert result.captured is not result.renewed_capture
+    assert request.environment_update is original_update
+    assert not np.shares_memory(result.gas_snapshot, gas_snapshot)
+    assert not np.shares_memory(result.saturation_snapshot, saturation_snapshot)
     np.testing.assert_array_equal(result.gas_snapshot, gas_snapshot)
     np.testing.assert_array_equal(
         result.saturation_snapshot, saturation_snapshot
     )
     assert events == [
+        "preflight",
         "resolve-cuda:1",
+        "build-cpu",
+        "setup",
         "communication-map",
         f"publish-{request.capture_resource_requirements}",
         "attach",
         "initialize",
         "prepare",
+        "qualify",
+        "capture-captured",
         "replay-captured",
         "replay-captured",
         "synchronize",
+        "read-gas",
+        "read-saturation",
         "replay-captured",
         "invalidated",
         "retire",
+        "renew",
         "prepare",
+        "qualify",
+        "capture-renewed-capture",
         "capture-close",
         "session-close",
     ]

@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import importlib.util
+from fnmatch import fnmatchcase
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 SCRIPTS = Path(__file__).resolve().parents[1]
 
@@ -81,6 +83,113 @@ def test_version_gate_writes_action_output(runner, monkeypatch, tmp_path):
     ]
 
 
+@pytest.mark.parametrize(
+    "path",
+    [
+        "conda/recipe/meta.yaml",
+        "conda/recipe/conda_build_config.yaml",
+        "scripts/conda_feedstock.py",
+        "scripts/run_release_tests.py",
+        "scripts/check_feedstock_contract.py",
+        "scripts/tests/new_test.py",
+        ".github/workflows/conda-feedstock.yml",
+        "pyproject.toml",
+        "conftest.py",
+        "particula/conftest.py",
+        "docs/Examples/cpu_dilution.py",
+        "examples_tests/dilution_example_test.py",
+        "examples_tests/nucleation_example_test.py",
+        "examples_tests/condensation_latent_heat_example_test.py",
+    ],
+)
+def test_release_infrastructure_changes_enable_build(runner, path):
+    """A recipe or runner fix receives validation without a version bump."""
+    assert runner.release_inputs_changed([path])
+
+
+def test_unrelated_prose_does_not_enable_build(runner):
+    """Keep release builds scoped to version and release input changes."""
+    assert not runner.release_inputs_changed(["readme.md", "todo_fix.md"])
+
+
+def test_recipe_only_pr_writes_true_gate(runner, monkeypatch, tmp_path):
+    """Exercise the three-dot gate with identical versions and recipe drift."""
+    output = tmp_path / "github-output"
+    monkeypatch.setenv("GITHUB_OUTPUT", str(output))
+    monkeypatch.setattr(runner.shutil, "which", lambda _: "/mock/git")
+    responses = iter(
+        [
+            "ancestor-sha\n",
+            '__version__ = "0.2.14"',
+            '__version__ = "0.2.14"',
+            "conda/recipe/meta.yaml\0",
+        ]
+    )
+    monkeypatch.setattr(
+        runner.subprocess,
+        "run",
+        lambda *args, **kwargs: SimpleNamespace(stdout=next(responses)),
+    )
+    assert runner.check_version("base", "head", include_release_inputs=True)
+    assert output.read_text() == "changed=true\n"
+
+
+def test_workflow_triggers_cover_release_gate_inputs(runner):
+    """Inputs recognized by the gate must first trigger the Actions workflow."""
+    workflow = yaml.safe_load(
+        (SCRIPTS.parent / ".github/workflows/conda-feedstock.yml").read_text(),
+    )
+    # PyYAML's YAML 1.1 resolver reads the unquoted Actions `on` key as True.
+    events = workflow.get("on", workflow.get(True))
+    patterns = events["pull_request"]["paths"]
+    for path in (
+        *runner.RELEASE_PATHS,
+        runner.VERSION_PATH,
+        "conda/recipe/meta.yaml",
+        "scripts/tests/new_test.py",
+    ):
+        assert any(fnmatchcase(path, pattern) for pattern in patterns), path
+
+
+def test_recipe_declared_inputs_exist_in_staged_source(runner, tmp_path):
+    """Exercise the build staging boundary with the actual mirror input list."""
+    import check_feedstock_contract as contract
+
+    source = tmp_path / "source"
+    required = (
+        "particula/__init__.py",
+        "particula/conftest.py",
+        "particula/tests/example_test.py",
+        "pyproject.toml",
+        "conftest.py",
+        "readme.md",
+        "license",
+        "scripts/run_release_tests.py",
+        *runner.CPU_EXAMPLES,
+        *runner.CPU_EXAMPLE_TESTS,
+    )
+    for relative in required:
+        path = source / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("fixture")
+    excluded = (
+        "docs/Features/planning.md",
+        "docs/Examples/unlisted.py",
+        "examples_tests/unlisted_test.py",
+        ".opencode/plan.md",
+    )
+    for relative in excluded:
+        path = source / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("not a release input")
+    staged = tmp_path / "staged"
+    runner.stage_source(source, staged)
+    recipe = (SCRIPTS.parent / "conda/recipe/meta.yaml").read_text()
+    for relative in contract.test_contract(recipe)["source_files"]:
+        assert (staged / relative).exists(), relative
+    assert not any((staged / relative).exists() for relative in excluded)
+
+
 def test_staging_retains_integration_and_fixtures_without_application_sources(
     runner,
     tmp_path,
@@ -97,13 +206,14 @@ def test_staging_retains_integration_and_fixtures_without_application_sources(
         "particula/gas/tests/fixtures/reference.csv",
         "conftest.py",
         "pyproject.toml",
-        *release.CPU_EXAMPLES,
     )
     excluded = (
         "particula/__init__.py",
         "particula/gas/__init__.py",
         "particula/gas/species.py",
         "particula/gas/tests/__pycache__/test.pyc",
+        *release.CPU_EXAMPLES,
+        *release.CPU_EXAMPLE_TESTS,
     )
     for relative in (*required, *excluded):
         path = source / relative
@@ -112,10 +222,12 @@ def test_staging_retains_integration_and_fixtures_without_application_sources(
     release.stage_test_inputs(source, destination)
     assert all((destination / relative).is_file() for relative in required)
     assert not any((destination / relative).exists() for relative in excluded)
+    assert not (destination / "docs").exists()
+    assert not (destination / "examples_tests").exists()
 
 
-def test_missing_example_is_an_error_instead_of_silent_skip(runner, tmp_path):
-    """Missing declared release inputs fail during staging."""
+def test_missing_package_is_an_error_instead_of_silent_skip(runner, tmp_path):
+    """A missing package test tree must not produce an empty release suite."""
     import run_release_tests as release
 
     source = tmp_path / "source"
