@@ -1,9 +1,11 @@
 # TODO: finish conda release-test cleanup
 
-**Current status (2026-10-04): local cleanup and validation complete.** External
-publication, conda builds/reruns, workflow dispatch, and required-check settings
-remain blocked/pending. See the closeout record below; the original failure log
-is preserved unchanged.
+**Current status (2026-10-04): local cleanup committed and pushed; upstream
+[PR #1617](https://github.com/uncscode/particula/pull/1617) opened.** The package
+is bumped to 0.2.15 in a follow-up commit to exercise release validation and
+prepare a new archive containing the two-suite layout. External feedstock
+publication, conda builds/reruns, and required-check settings remain pending.
+The original failure log is preserved unchanged.
 
 ## Failure record
 
@@ -218,8 +220,10 @@ remains pending; do not infer success from the contract or wheel tests.
 ### Cleanup closeout — 2026-10-04
 
 Source baseline: `58da90e07f970d5ad28a3dc92f7bae1b92b52dde`, plus the current
-uncommitted cleanup and preserved pre-existing infrastructure changes. No new
-commit or release tag was created. GitHub's PR API still reports external
+then-uncommitted cleanup and preserved pre-existing infrastructure changes.
+This validation snapshot preceded publication of cleanup commit
+`04bdd33e791d4c777b234a618b59985cd13a2a6e` and upstream PR #1617. No release
+tag was created. GitHub's PR API reported external
 PR #54 head `0a37f3ac68e52671fc9a352f3d2828918a010785`, branch
 `regro-cf-autotick-bot:0.2.14_ha55db9`, open and unmerged.
 
@@ -303,6 +307,34 @@ Outstanding external work:
    where release protection is enforced. The local new-contract drift gate
    intentionally rejects the legacy external recipe, even after the immediate
    v0.2.14 repair. Contract agreement and wheels are not conda-build evidence.
+
+### PR publication and 0.2.15 validation — 2026-10-04
+
+Cleanup commit `04bdd33e791d4c777b234a618b59985cd13a2a6e` was pushed to
+`Gorkowski:fix/conda-release-test-cleanup`, and
+[upstream PR #1617](https://github.com/uncscode/particula/pull/1617) targets
+`uncscode/particula:main`. The follow-up version commit changes the literal
+package version from 0.2.14 to **0.2.15**, preparing an archive with the new
+test layout and exercising the version gate. No release tag was published.
+
+Both real isolated wheel commands were repeated for 0.2.15:
+
+- `python scripts/run_release_tests.py`: **3,544 collected, 768 deselected,
+  2,761 passed, 18 skipped, zero failures/errors**, 31.57 s pytest time.
+- `python scripts/run_release_tests.py --suite examples`: **20 passed**, zero
+  skips/deselections/failures/errors, 0.66 s pytest time.
+- Both imports came from their separate venv `site-packages`, reported 0.2.15,
+  and passed `pip check`. Ruff checking passed for the version file.
+- Both built wheel SHA-256 values were
+  `b603dcae068d13f3215cc8bf106ecf6420ef2bcec0af4a8c39b40996e49f2088`.
+  The suite logs at `.artifacts/release-tests.log` and
+  `.artifacts/release-examples.log` now contain these latest 0.2.15 results;
+  earlier 0.2.14 output remains in the session transcript and summaries above.
+
+After merge, publish the 0.2.15 GitHub release to trigger the existing PyPI
+publish workflow and provide the archive for the updated feedstock recipe.
+External recipe/build evidence remains pending; the version bump alone does
+not establish a published release or passing feedstock build.
 
 ## Original runner output (preserved)
 
