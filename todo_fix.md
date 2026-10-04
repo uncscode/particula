@@ -336,6 +336,31 @@ publish workflow and provide the archive for the updated feedstock recipe.
 External recipe/build evidence remains pending; the version bump alone does
 not establish a published release or passing feedstock build.
 
+### PR drift-gate correction — 2026-10-04
+
+The first 0.2.15 PR comparison correctly found `test.source_files` and
+`test.commands` drift against the old external recipe, but incorrectly made
+that pre-release handoff a source-merge prerequisite. This created a circular
+dependency on an archive that could only be published after the source merge.
+
+Automatic `pull_request` comparisons now use explicit `--allow-drift` and
+warn about supported differences. The JSON report preserves `passed=false`,
+adds `mode=advisory`, and sets `check_passed=true` only when both test contracts
+are readable and supported. Missing, malformed, or unsupported contracts still
+fail in both modes. CLI defaults and manual `workflow_dispatch` comparisons
+remain strict; the independent real conda-build gate is unchanged.
+
+This supersedes earlier statements above that the automatic drift job must
+remain red until the external handoff. An advisory source-PR success is not
+external parity or build evidence. Strict candidate/main checks and the
+external conda rerun remain required after the release handoff.
+
+Validation: focused `scripts/tests/feedstock_contract_test.py` and
+`scripts/tests/conda_feedstock_test.py` run passed **71 tests** in 0.72 s.
+This includes a two-mode CLI matrix and execution of the actual PR/manual
+workflow comparison commands. Ruff check and format-check passed for the
+checker and its regression module; correctness review found no blockers.
+
 ## Original runner output (preserved)
 
 linux_64_	UNKNOWN STEP	﻿2026-10-04T06:48:52.9609034Z Current runner version: '2.337.0'

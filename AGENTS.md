@@ -1371,8 +1371,13 @@ The separate `.github/workflows/conda-feedstock.yml` workflow runs a clean
 Python 3.12 conda build/test for PRs that change the literal package version
 or release infrastructure, and supports manual dispatch. Its independent
 `feedstock-contract` job compares the external feedstock's test inputs and
-commands with the local mirror; both jobs are release gates. Manual dispatch
-accepts a `feedstock_ref` for candidate PR recipes; automatic runs use `main`.
+commands with the local mirror. Automatic source-PR comparisons use external
+`main` with `--allow-drift`: supported differences emit a warning and retain
+`passed=false` in the report without blocking the source release. Missing or
+unsupported test contracts still fail. Manual dispatch accepts a
+`feedstock_ref` and enforces strict parity. The real `conda-build` remains a
+source-PR gate; external release readiness additionally requires strict
+contract parity and an actual external feedstock build.
 See [conda release validation](conda/README.md) for local reproduction,
 explicit test inputs, and feedstock handoff. The recipe runs
 `python scripts/run_release_tests.py --installed` followed by
