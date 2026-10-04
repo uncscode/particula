@@ -215,6 +215,9 @@ build remain required.
 
 Adopting the current mirror requires a **new source archive or a reviewed
 recipe patch** that supplies the runner changes and relocated example tests.
+Version **0.2.15** is the prepared release for this layout. After merging,
+publish its GitHub release and use that archive's URL/checksum in the external
+feedstock; a version commit or merge alone does not publish the release.
 Only then copy the current `conda/recipe/meta.yaml` test inputs and use:
 
 ```yaml
@@ -262,6 +265,16 @@ cleanup, both isolated Python 3.12.12 wheel suites passed for version 0.2.14:
 - The real conda command remains unavailable locally (`conda` is not
   installed). External publication/build/rerun and workflow dispatch remain
   pending. These successful checks are wheel/source evidence only.
+
+### Prepared 0.2.15 release
+
+After opening [upstream PR #1617](https://github.com/uncscode/particula/pull/1617),
+both isolated wheel commands were rerun with the package bumped to **0.2.15**.
+The package suite again passed **2,761 tests**, with 18 skipped and 768
+deselected; all **20 CPU example tests** passed. Installed version/provenance
+and `pip check` passed in both disposable environments. The suite logs now
+hold these 0.2.15 results. Conda CI and external feedstock evidence remain
+separate pending gates; no release tag was created by this validation.
 
 The older results below predate the suite split.
 
