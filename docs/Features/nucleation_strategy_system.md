@@ -2,7 +2,7 @@
 
 ## Complete direct-process context
 
-The direct nucleation boundary is shown last in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). Its [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [P3 regression](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py) do not turn the example into a public coordinator, GPU `Runnable`, backend selector, resident loop, or CPU fallback.
+The direct nucleation boundary is shown last in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). Its [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py) do not turn the example into a public coordinator, GPU `Runnable`, backend selector, resident loop, or CPU fallback.
 
 > Convert partitioning precursor gas into fixed-capacity particle slots with a
 > public, conservation-accounted CPU runnable.
@@ -179,8 +179,8 @@ Focused validation:
 ```bash
 python docs/Examples/Nucleation/cpu_nucleation.py
 python -Werror docs/Examples/Nucleation/gpu_direct_nucleation.py
-pytest particula/tests/nucleation_example_test.py -q -Werror
-pytest particula/gpu/tests/gpu_direct_nucleation_example_test.py -q -Werror
+pytest examples_tests/nucleation_example_test.py -q -Werror
+pytest examples_tests/gpu_direct_nucleation_example_test.py -q -Werror
 pytest particula/dynamics/nucleation/tests/ \
   particula/dynamics/tests/nucleation_runnable_test.py \
   particula/integration_tests/nucleation_process_test.py -q -Werror

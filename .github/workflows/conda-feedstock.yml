@@ -5,7 +5,28 @@ on:
     branches: [main]
     paths:
       - particula/__init__.py
+      - particula/conftest.py
+      - conftest.py
+      - pyproject.toml
+      - conda/**
+      - scripts/conda_feedstock.py
+      - scripts/check_feedstock_contract.py
+      - scripts/run_release_tests.py
+      - scripts/tests/**
+      - docs/Examples/cpu_dilution.py
+      - docs/Examples/Nucleation/cpu_nucleation.py
+      - docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py
+      - examples_tests/dilution_example_test.py
+      - examples_tests/nucleation_example_test.py
+      - examples_tests/condensation_latent_heat_example_test.py
+      - .github/workflows/conda-feedstock.yml
   workflow_dispatch:
+    inputs:
+      feedstock_ref:
+        description: "External recipe ref (e.g. main or refs/pull/54/head)"
+        default: main
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -27,13 +48,54 @@ jobs:
       - uses: actions/setup-python@v7.0.0
         with:
           python-version: "3.12"
-      - name: Compare PR version values
+      - name: Check version and release infrastructure changes
         id: version
         if: github.event_name == 'pull_request'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: python scripts/conda_feedstock.py --check-version "$BASE_SHA" "$HEAD_SHA"
+        run: python scripts/conda_feedstock.py --check-changes "$BASE_SHA" "$HEAD_SHA"
+
+  feedstock-contract:
+    needs: version-change
+    if: github.event_name == 'workflow_dispatch' || needs.version-change.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install read-only recipe parser and test dependencies
+        run: python -m pip install PyYAML pytest
+      - name: Run release infrastructure regressions
+        run: >-
+          python -m pytest scripts/tests/conda_feedstock_test.py
+          scripts/tests/feedstock_contract_test.py -q
+      - name: Fetch external recipe for data-only comparison
+        uses: actions/checkout@v7
+        with:
+          repository: conda-forge/particula-feedstock
+          ref: ${{ inputs.feedstock_ref || 'main' }}
+          path: .artifacts/feedstock-reference
+          persist-credentials: false
+      - name: Record external recipe revision
+        run: |
+          mkdir -p .artifacts/feedstock-contract
+          git -C .artifacts/feedstock-reference rev-parse HEAD > .artifacts/feedstock-contract/revision.txt
+      - name: Compare external and locally tested contracts
+        run: >-
+          python scripts/check_feedstock_contract.py
+          --external-recipe .artifacts/feedstock-reference/recipe/meta.yaml
+      - name: Save recipe comparison evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: feedstock-contract
+          path: .artifacts/feedstock-contract/
+          include-hidden-files: true
+          if-no-files-found: warn
 
   conda-build:
     needs: version-change

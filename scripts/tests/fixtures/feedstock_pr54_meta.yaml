@@ -1,0 +1,59 @@
+# Snapshot of recipe/meta.yaml at conda-forge/particula-feedstock
+# 0a37f3ac68e52671fc9a352f3d2828918a010785 (PR #54, failed job 111381756361).
+{% set version = "0.2.14" %}
+
+package:
+  name: particula
+  version: {{ version }}
+
+source:
+  url: https://github.com/uncscode/particula/archive/refs/tags/v{{ version }}.tar.gz
+  sha256: 0abf2359a9fa0802423dba110524eb72870379ce70e99fd241d247c85a6a9ca3
+
+build:
+  number: 0
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv
+
+requirements:
+  host:
+    - python {{ python_min }}
+    - pip
+    - flit-core >=3.2,<4
+  run:
+    - warp-lang
+    - typing_extensions >=4.0.0
+    - python >={{ python_min }}
+    - numpy >=2.0.0
+    - scipy >=1.14.0
+
+test:
+  requires:
+    - python {{ python_min }}
+    - pytest
+    - pip
+  source_files:
+    - particula
+  commands:
+    - pip check
+    - python -c "import particula; print(particula.__version__)"
+    - pytest -W error -W "ignore::pytest.PytestUnknownMarkWarning" -m "not slow and not performance"
+
+about:
+  home: https://uncscode.github.io/particula
+  license: MIT
+  license_family: MIT
+  license_file: license
+  summary: a simple, fast, and powerful particle simulator
+  description: |
+    Particula is a Python-based aerosol particle simulator. Its goal is to
+    provide a robust aerosol simulation (including both gas and particle phases)
+    that can be used to answer scientific questions arising from experiments and research endeavors.
+  dev_url: https://github.com/uncscode/particula
+  doc_url: https://uncscode.github.io/particula/
+
+extra:
+  recipe-maintainers:
+    - gorkowski
+    - ngam
+    - mahf708

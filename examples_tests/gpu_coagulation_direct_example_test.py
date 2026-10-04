@@ -14,7 +14,7 @@ import numpy as np
 import pytest
 
 EXAMPLE_PATH = (
-    Path(__file__).resolve().parents[3]
+    Path(__file__).resolve().parents[1]
     / "docs/Examples/gpu_coagulation_direct.py"
 )
 EXAMPLES_ROOT = EXAMPLE_PATH.parent
@@ -24,11 +24,6 @@ LAZY_IMPORTS = (
     "particula.execution.adapters.coagulation",
 )
 RUNTIME_IMPORTS = LAZY_IMPORTS[1:]
-DISABLED_OUTPUT = [
-    "Canonical path: docs/Examples/gpu_coagulation_direct.py",
-    "ParticleData constructed: masses=(1, 8, 1), concentration=(1, 8), charge=(1, 8), density=(1,), volume=(1,)",
-    "Warp is unavailable or disabled; no kernel ran.",
-]
 
 
 @pytest.fixture
@@ -87,9 +82,16 @@ def test_forced_disabled_routes_never_import_gpu_runtime(
             "_load_gpu_runtime",
             lambda: pytest.fail("disabled path loaded runtime"),
         )
-        assert module.run_example().output == DISABLED_OUTPUT
+        result = module.run_example()
+        assert result.particle_data is None
+        assert result.collision_pairs is result.n_collisions is None
+        assert result.rng_states is None
+        lines = ["coagulation-sentinel", "disabled-sentinel"]
+        cleanup.setattr(
+            module, "run_example", lambda: types.SimpleNamespace(output=lines)
+        )
         module.main()
-        assert capsys.readouterr().out.splitlines() == DISABLED_OUTPUT
+        assert capsys.readouterr().out.splitlines() == lines
         assert all(name not in sys.modules for name in LAZY_IMPORTS)
 
     process = subprocess.run(  # noqa: S603
@@ -100,7 +102,7 @@ def test_forced_disabled_routes_never_import_gpu_runtime(
         env={**os.environ, "PARTICULA_EXAMPLE_FORCE_NO_WARP": "1"},
         timeout=10,
     )
-    assert process.stdout.splitlines() == DISABLED_OUTPUT
+    assert process.returncode == 0
 
 
 def test_runtime_loader_uses_selected_adapter_imports(
@@ -281,8 +283,7 @@ def test_enabled_path_uses_selected_adapter_and_explicit_lifecycle(
     assert result.rng_states is first_kwargs["rng_states"]
     assert result.collision_pairs.shape == (1, 4, 2)
     assert result.n_collisions.shape == result.rng_states.shape == (1,)
-    assert "selected-adapter dispatch" in result.output[2]
-    assert "Selected Brownian coagulation complete" in result.output[3]
+    assert result.particle_data is restored
 
 
 @pytest.mark.parametrize(

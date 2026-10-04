@@ -92,7 +92,7 @@ Validate documentation with:
 pytest particula/execution/tests/rng_test.py \
   particula/execution/tests/rng_invariance_test.py \
   particula/execution/tests/checkpoint_test.py -q
-pytest particula/execution/tests/gpu_resident_session_example_test.py -q
+pytest examples_tests/gpu_resident_session_example_test.py -q
 mkdocs build --strict
 ```
 
