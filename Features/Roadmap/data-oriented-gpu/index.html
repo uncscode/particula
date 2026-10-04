@@ -18963,7 +18963,7 @@ coupling, and all higher-level process integration outside this milestone.</p>
 provides fixed-four-substep low-level direct-kernel physics, conservation, and
 energy evidence. Run:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/gpu_condensation_parity_walkthrough.py
-pytest<span class="w"> </span>particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>examples_tests/gpu_condensation_parity_walkthrough_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 </code></pre></div>
 <p>Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
 The downstream condensation ownership record
@@ -19276,7 +19276,7 @@ and <a href="../../../Examples/gpu_complete_process_sequence/">P3 published sour
 the fixed illustrative order: <code>condensation_step_gpu</code>,
 <code>coagulation_step_gpu</code>, <code>dilution_step_gpu</code>, <code>wall_loss_step_gpu</code>, then
 <code>nucleation_step_gpu</code>. This is illustrative, not a production coordinator;
-the P3 <a href="https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py">regression</a>
+the P3 <a href="https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py">regression</a>
 keeps explicit transfers visible.</p>
 <p>Delivered dilution scope:</p>
 <ul>

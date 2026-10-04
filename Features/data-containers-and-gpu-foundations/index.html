@@ -17482,7 +17482,7 @@ devices, test counts, coverage results, and per-target term-missing rows:</p>
 <span class="w">  </span>particula/execution/tests/errors_test.py<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>particula/execution/tests/fallback_test.py<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>particula/execution/tests/fallback_integration_test.py<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>particula/tests/gpu_resident_multi_timestep_docs_test.py<span class="w"> </span>-q
+<span class="w">  </span>examples_tests/gpu_resident_multi_timestep_docs_test.py<span class="w"> </span>-q
 pytest<span class="w"> </span>particula/execution/tests/exports_test.py<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>particula/tests/execution_exports_test.py<span class="w"> </span>-q
 pytest<span class="w"> </span>particula/execution/tests/<span class="w"> </span>-q
@@ -17531,7 +17531,7 @@ Caller-owned sidecars have stable fixed shapes; persistent coagulation and
 wall-loss RNG is also caller-owned. There is no hidden transfer or CPU fallback,
 high-level <code>Runnable</code>, backend selector, scheduler, resident production loop, or
 transport API. See the <a href="https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py">private P2 evidence</a>,
-<a href="https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py">P3 regression</a>,
+<a href="https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py">P3 regression</a>,
 and <a href="../Roadmap/data-oriented-gpu/#e6-roadmap-inventory">E6 inventory</a>.</p>
 <p><code>WarpParticleData</code>, <code>WarpEnvironmentData</code>, and <code>WarpGasData</code> are exported from
 <code>particula.gpu</code> only when Warp is available, so import them only behind an
@@ -18763,7 +18763,7 @@ the other evidence classes.</p>
 <td>Canonical explicit-transfer walkthrough.</td>
 </tr>
 <tr>
-<td><code>pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q</code></td>
+<td><code>pytest examples_tests/gpu_direct_kernels_example_test.py -q</code></td>
 <td>Quick-start regression.</td>
 </tr>
 <tr>
@@ -18803,7 +18803,7 @@ the other evidence classes.</p>
 <td>CPU integration evidence for particle-resolved condensation; not direct-GPU validation.</td>
 </tr>
 <tr>
-<td><code>pytest particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py -q -Werror</code></td>
+<td><code>pytest examples_tests/condensation_latent_heat_example_test.py -q -Werror</code></td>
 <td>CPU example runtime and latent-heat energy/bookkeeping checks; not direct-GPU validation.</td>
 </tr>
 </tbody>
@@ -18828,7 +18828,7 @@ not a return value or temperature feedback mechanism (<code>kg * J/kg = J</code>
 <p>The fixed-four-substep low-level direct-kernel walkthrough can be run with
 <code>python docs/Examples/gpu_condensation_parity_walkthrough.py</code>. Its focused
 runtime regression command is
-<code>pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror</code>.</p>
+<code>pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror</code>.</p>
 <ul>
 <li><a href="../../Examples/Data_Containers/">Data Containers example</a></li>
 <li><a href="../particle-data-migration/">Particle &amp; Gas Data Migration</a></li>

@@ -16214,7 +16214,7 @@ from the bounded direct-condensation walkthrough.</p>
 <h2 id="supported-evidence-boundary">Supported evidence boundary<a class="headerlink" href="#supported-evidence-boundary" title="Permanent link">&para;</a></h2>
 <p>The <a href="../../../Examples/gpu_condensation_parity_walkthrough/">walkthrough source</a>
 compares an independent fp64, fixed-four-substep NumPy oracle with the low-level
-direct GPU kernel. Its <a href="https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py">walkthrough regression test</a>
+direct GPU kernel. Its <a href="https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_condensation_parity_walkthrough_test.py">walkthrough regression test</a>
 keeps that bounded comparison executable.</p>
 <p>Physics, conservation, and energy are separately evaluated evidence. Warp CPU
 is the supported baseline when installed; CUDA is optional, additive evidence.
@@ -16321,7 +16321,7 @@ states the related P1--P4 production-hook limit.</p>
 </table>
 <h2 id="focused-reproduction-commands">Focused reproduction commands<a class="headerlink" href="#focused-reproduction-commands" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/gpu_condensation_parity_walkthrough.py
-pytest<span class="w"> </span>particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>examples_tests/gpu_condensation_parity_walkthrough_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_stiffness_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_graph_capture_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
