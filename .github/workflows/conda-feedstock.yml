@@ -84,7 +84,14 @@ jobs:
         run: |
           mkdir -p .artifacts/feedstock-contract
           git -C .artifacts/feedstock-reference rev-parse HEAD > .artifacts/feedstock-contract/revision.txt
-      - name: Compare external and locally tested contracts
+      - name: Report external drift for source PRs
+        if: github.event_name == 'pull_request'
+        run: >-
+          python scripts/check_feedstock_contract.py
+          --external-recipe .artifacts/feedstock-reference/recipe/meta.yaml
+          --allow-drift
+      - name: Enforce external release contract
+        if: github.event_name == 'workflow_dispatch'
         run: >-
           python scripts/check_feedstock_contract.py
           --external-recipe .artifacts/feedstock-reference/recipe/meta.yaml

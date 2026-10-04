@@ -3,6 +3,8 @@
 Read recipe data only: never render Jinja or execute external commands. The
 current recipes have literal top-level test mappings. Unsupported templating,
 selectors, anchors, or schemas fail rather than silently certifying parity.
+Source PRs can report valid drift with ``--allow-drift`` while awaiting the
+release archive and external recipe handoff. Default release checks are strict.
 Requires PyYAML (installed by conda-build or the CI contract-check job).
 """
 
@@ -11,6 +13,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 from pathlib import Path
 
@@ -85,8 +88,19 @@ def test_contract(recipe: str) -> dict[str, list[str]]:
     }
 
 
-def check_contract(mirror: Path, external: Path, artifacts: Path) -> bool:
-    """Save recipe evidence and fail on missing inputs or command drift."""
+def check_contract(
+    mirror: Path,
+    external: Path,
+    artifacts: Path,
+    *,
+    allow_drift: bool = False,
+) -> bool:
+    """Save parity evidence and return whether the selected policy passes.
+
+    ``passed`` in the report always means contract parity. ``check_passed``
+    and the return value permit valid differences only in advisory mode;
+    unreadable or unsupported test contracts fail under either policy.
+    """
     artifacts.mkdir(parents=True, exist_ok=True)
     report = {}
     contracts = {}
@@ -111,22 +125,45 @@ def check_contract(mirror: Path, external: Path, artifacts: Path) -> bool:
         ]
     report.update(contracts=contracts, differences=differences, errors=errors)
     report["passed"] = not errors and not differences
+    report["mode"] = "advisory" if allow_drift else "strict"
+    report["check_passed"] = not errors and (report["passed"] or allow_drift)
     output = json.dumps(report, indent=2) + "\n"
     (artifacts / "contract.json").write_text(output, encoding="utf-8")
     print(output, end="")
-    if not report["passed"]:
+    if differences and allow_drift and not errors:
+        prefix = (
+            "::warning::"
+            if os.environ.get("GITHUB_ACTIONS") == "true"
+            else "WARNING: "
+        )
+        print(
+            prefix
+            + "External feedstock test contract differs: "
+            + ", ".join(differences)
+            + ". Source PR drift is advisory; external release readiness "
+            "still requires the handoff, a strict check, and a feedstock build."
+        )
+    elif not report["passed"]:
         print(
             "Feedstock test contract mismatch/unavailable. Apply the handoff "
             "in conda/README.md and rerun; the local mirror alone is not "
             "external feedstock validation."
         )
-    return report["passed"]
+    return report["check_passed"]
 
 
 def main() -> int:
-    """Compare local files and return nonzero for drift or unavailable data."""
+    """Compare contracts, enforcing parity unless valid drift is permitted."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--external-recipe", type=Path, required=True)
+    parser.add_argument(
+        "--allow-drift",
+        action="store_true",
+        help=(
+            "Report valid differences without blocking a source PR. "
+            "Missing or unsupported test contracts still fail."
+        ),
+    )
     parser.add_argument(
         "--mirror", type=Path, default=Path("conda/recipe/meta.yaml")
     )
@@ -137,7 +174,12 @@ def main() -> int:
     )
     args = parser.parse_args()
     return int(
-        not check_contract(args.mirror, args.external_recipe, args.artifacts)
+        not check_contract(
+            args.mirror,
+            args.external_recipe,
+            args.artifacts,
+            allow_drift=args.allow_drift,
+        )
     )
 
 

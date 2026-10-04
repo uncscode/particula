@@ -35,35 +35,50 @@ existing basenames. The marker-policy regression lives in
 The independent `feedstock-contract` job fetches
 `conda-forge/particula-feedstock` and compares its literal `test.requires`,
 `test.source_files`, and ordered `test.commands` against our locally tested
-recipe. Automatic PR runs compare against external `main`; manual dispatch
-can select a candidate PR ref. It reads recipe data only and executes no code,
+recipe. Automatic PR runs compare against external `main` in **advisory drift
+mode**; manual dispatch selects a candidate PR ref and enforces **strict
+parity**. It reads recipe data only and executes no code,
 Jinja, build scripts, or test commands from that checkout. It saves both recipe
 files, their SHA-256 hashes, the external commit, and a JSON comparison report.
-Unsupported test templates/selectors/schema and missing data fail explicitly.
+Unsupported test templates/selectors/schema and missing data fail explicitly
+in both modes. Validation is bounded to the test contract, not the entire
+recipe. Advisory mode accepts only differences between two readable,
+supported test contracts and emits a visible warning. The JSON report keeps
+`passed=false` for drift; `mode` identifies the policy and `check_passed`
+records whether that policy passed. A green advisory job is not parity evidence.
 Input/requirement list ordering is ignored; command ordering is significant.
 The shared `python {{ python_min }}` requirement is compared literally; this
 check does not certify external variant values or dependency solves.
 
-Both **conda-build** and **feedstock-contract** must pass for release readiness.
-They run independently so a drift failure still leaves local build evidence.
-Configure both as required checks where branch protection enforces release
-readiness. A passing local mirror build alone is insufficient. An intentional
-recipe change needs an external handoff; until it merges, the automatic check
-can remain red. Use manual dispatch against its proposed PR ref to verify the
-candidate, then rerun against `main` after merging.
+**Source PR readiness** requires the real **conda-build** and source tests.
+The automatic **feedstock-contract** check may pass with reported drift because
+the new archive and external recipe cannot land before the source release.
+This avoids making the source PR depend on its own unreleased archive. Do not
+use `continue-on-error` to mask comparison or checkout failures.
+
+**External release readiness** additionally requires a passing **strict**
+contract check and a successful external feedstock build. The two jobs remain
+independent. Use manual dispatch against the candidate `feedstock_ref`, then
+rerun against `main` after the external recipe merges. Configuring the
+automatic jobs as required source-PR checks does not replace this strict
+post-handoff release validation.
 
 This catches the PR #54 regression: the external recipe copied only
 `particula/` and ran broad pytest, while our mirror supplied the required
 fixtures and used the isolated CPU release runner. The previous PR check
 validated only that mirror and could not observe the mismatch. The frozen
 failed-recipe fixture under `scripts/tests/fixtures/` now verifies that both
-the missing inputs and the wrong command fail the gate.
+the missing inputs and the wrong command fail strict validation and remain
+visible in advisory PR reports.
 
 For a local data-only comparison (requires PyYAML):
 
 ```bash
 python scripts/check_feedstock_contract.py \
   --external-recipe /path/to/particula-feedstock/recipe/meta.yaml
+# Pre-release comparison only: warn on supported contract differences.
+python scripts/check_feedstock_contract.py \
+  --external-recipe /path/to/particula-feedstock/recipe/meta.yaml --allow-drift
 pytest scripts/tests -q
 ```
 
