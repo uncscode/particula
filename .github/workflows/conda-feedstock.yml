@@ -97,7 +97,7 @@ jobs:
           --external-recipe .artifacts/feedstock-reference/recipe/meta.yaml
       - name: Save recipe comparison evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: feedstock-contract
           path: .artifacts/feedstock-contract/
@@ -131,7 +131,7 @@ jobs:
         run: python scripts/conda_feedstock.py
       - name: Save build log and conda package
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: conda-feedstock-python312
           path: .artifacts/conda-feedstock/
