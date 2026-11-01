@@ -117,7 +117,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up clean conda build environment
-        uses: conda-incubator/setup-miniconda@v3
+        uses: conda-incubator/setup-miniconda@v4
         with:
           miniforge-version: latest
           activate-environment: feedstock-build
