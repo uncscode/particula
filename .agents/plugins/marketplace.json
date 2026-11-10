@@ -1,0 +1,20 @@
+{
+  "name": "particula",
+  "interface": {
+    "displayName": "Particula"
+  },
+  "plugins": [
+    {
+      "name": "particula-helper",
+      "source": {
+        "source": "local",
+        "path": "./plugins/particula-helper"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Scientific Research"
+    }
+  ]
+}
