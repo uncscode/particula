@@ -77,6 +77,30 @@ def write_csv(path, rows):
         writer.writerows(rows)
 
 
+def mass_balance_checks(rows, process):
+    """Check the conserved mass budget for the selected physical process."""
+    start = rows[0]
+    total_key = "total_mass_kg_m-3"
+    total_error = max(
+        abs(row[total_key] - start[total_key]) for row in rows
+    ) / start[total_key]
+    checks = {
+        "max_relative_total_mass_error": total_error,
+        "mass_tolerance": 1e-6,
+        "mass_balance_pass": total_error < 1e-6,
+    }
+    if process == "coagulation":
+        particle_key = "particle_mass_kg_m-3"
+        particle_error = max(
+            abs(row[particle_key] - start[particle_key]) for row in rows
+        ) / start[particle_key]
+        checks["max_relative_particle_mass_error"] = particle_error
+        checks["mass_balance_pass"] = (
+            checks["mass_balance_pass"] and particle_error < 1e-6
+        )
+    return checks
+
+
 def main():
     args = parse_args()
     import numpy as np
@@ -92,8 +116,7 @@ def main():
         aerosol = process.execute(aerosol, time_step=args.duration / args.steps, sub_steps=1)
         rows.append(snapshot(aerosol, (step + 1) * args.duration / args.steps, np))
     start, end = rows[0], rows[-1]
-    mass_error = max(abs(r["total_mass_kg_m-3"] - start["total_mass_kg_m-3"]) for r in rows) / start["total_mass_kg_m-3"]
-    checks = {"finite_nonnegative": True, "max_relative_total_mass_error": mass_error, "mass_tolerance": 1e-6, "mass_balance_pass": mass_error < 1e-6}
+    checks = {"finite_nonnegative": True, **mass_balance_checks(rows, args.process)}
     if args.process == "condensation":
         checks["number_conserved"] = all(np.isclose(r["number_m-3"], start["number_m-3"], rtol=1e-10, atol=0) for r in rows)
     else:
