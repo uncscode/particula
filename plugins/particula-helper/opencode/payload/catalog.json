@@ -1,0 +1,26 @@
+[
+  {
+    "description": "Analyze and visualize Particula simulation results or compare them with observations; use for plots, conservation checks, convergence, uncertainty, and reproducibility reports.",
+    "name": "particula-analyze"
+  },
+  {
+    "description": "Design and write Particula aerosol simulations; use for scripts, notebooks, process selection, parameter sweeps, or translating a research question into a model.",
+    "name": "particula-build"
+  },
+  {
+    "description": "Diagnose Particula exceptions, incorrect results, version migrations or CPU/GPU mismatches; use for traceback analysis, API drift, conservation failures, or numerical instability.",
+    "name": "particula-debug"
+  },
+  {
+    "description": "Explain aerosol science and Particula APIs with authoritative sources; use for tutorials, feature questions, equations, units, or choosing a modeling approach.",
+    "name": "particula-guide"
+  },
+  {
+    "description": "Execute local Particula simulations and parameter sweeps reproducibly; use when the user asks to run, simulate, compare scenarios, or save results.",
+    "name": "particula-run"
+  },
+  {
+    "description": "Set up and inspect a local Particula Python environment; use for installation, dependency problems, environment selection, or first-run verification.",
+    "name": "particula-setup"
+  }
+]
