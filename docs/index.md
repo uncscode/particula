@@ -131,6 +131,7 @@ This “Quick Start Example” demonstrates a concise workflow for building an a
 ```python
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
 
 # 1. Build the GasSpecies for an organic vapor:
 organic = (
@@ -167,7 +168,7 @@ particle = (
 
 # 4. Create the Aerosol combining the atmosphere and particle distribution:
 aerosol = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere)
     .set_particles(particle)
     .build()

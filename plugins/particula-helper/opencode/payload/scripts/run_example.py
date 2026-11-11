@@ -35,6 +35,14 @@ def parse_args():
 
 
 def build(args, np, par):
+    # E9-M5 migrates this example; M6 removes the legacy branch.
+    try:
+        from particula._legacy_aerosol import AerosolBuilder
+    except ModuleNotFoundError as error:
+        if error.name != "particula._legacy_aerosol":
+            raise
+        AerosolBuilder = par.AerosolBuilder  # Released 0.2.x packages.
+
     gas = (par.gas.GasSpeciesBuilder().set_name("illustrative-organic")
            .set_molar_mass(0.18, "kg/mol")
            .set_vapor_pressure_strategy(par.gas.ConstantVaporPressureStrategy(1e-5))
@@ -51,7 +59,7 @@ def build(args, np, par):
         distribution=(4 / 3 * np.pi * radii ** 3 * 1000)[:, np.newaxis],
         density=np.array([1000.0]), concentration=weights, charge=np.zeros(40),
     )
-    aerosol = par.AerosolBuilder().set_atmosphere(atmosphere).set_particles(particles).build()
+    aerosol = AerosolBuilder().set_atmosphere(atmosphere).set_particles(particles).build()
     if args.process == "condensation":
         process = par.dynamics.MassCondensation(par.dynamics.CondensationIsothermal(molar_mass=0.18, diffusion_coefficient=2e-5, accommodation_coefficient=1.0))
     else:

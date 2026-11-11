@@ -35,6 +35,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
 
 # Optional: uncomment if many steps and you want a progress bar
 # from tqdm import tqdm
@@ -197,7 +198,7 @@ particles = (
 
 # Build aerosol with new API
 aerosol = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere)
     .set_particles(particles)
     .build()

@@ -56,6 +56,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
 
 # Organic density estimation for species
 from particula.particles import get_organic_density_array
@@ -334,7 +335,7 @@ particle_representation = (
 # %%
 # Build aerosol
 aerosol = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere)
     .set_particles(particle_representation)
     .build()

@@ -35,6 +35,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
 
 # Optional: uncomment if many steps and you want a progress bar
 # from tqdm import tqdm
@@ -368,7 +369,7 @@ particles_as = (
 )
 
 aerosol_as = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere_as)
     .set_particles(particles_as)
     .build()
@@ -486,7 +487,7 @@ particles_sucrose = (
 )
 
 aerosol_sucrose = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere_sucrose)
     .set_particles(particles_sucrose)
     .build()
@@ -606,7 +607,7 @@ particles_mixed = (
 )
 
 aerosol_mixed = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere_mixed)
     .set_particles(particles_mixed)
     .build()

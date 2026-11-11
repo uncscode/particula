@@ -3,6 +3,7 @@
 import numpy as np
 import particula as par
 from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
 
 
 def test_quick_start_runs():
@@ -42,7 +43,7 @@ def test_quick_start_runs():
 
     # 4. Create the Aerosol combining the atmosphere and particle distribution:
     aerosol = (
-        par.AerosolBuilder()
+        LegacyAerosolBuilder()
         .set_atmosphere(atmosphere)
         .set_particles(particle)
         .build()
