@@ -471,10 +471,14 @@ def run_mypy(
 
     try:
         resolved_cwd = _resolve_cwd(cwd)
-        target_arg = _resolve_target_arg(target_dir, resolved_cwd)
+        # A positional "." overrides mypy's configured packages/files.
+        # Omit it by default so the repository owns the type-checking scope.
+        targets = (
+            [_resolve_target_arg(target_dir, resolved_cwd)] if target_dir else []
+        )
         cmd = [
             *_resolve_python_tool_command("mypy", "mypy", resolved_cwd),
-            target_arg,
+            *targets,
             "--ignore-missing-imports",
         ]
         proc = subprocess.run(

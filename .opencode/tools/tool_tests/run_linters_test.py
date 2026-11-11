@@ -681,3 +681,37 @@ def test_run_explicit_ruff_rejects_invalid_mode_or_target_paths(
     assert result.success is False
     assert result.error_message is not None
     assert message in result.error_message
+
+
+@pytest.mark.parametrize("package_has_error", [False, True])
+def test_default_mypy_honors_configured_package_with_duplicate_payloads(
+    tmp_path: Path, package_has_error: bool
+):
+    """Real mypy avoids unrelated duplicate modules but catches package errors."""
+    pytest.importorskip("mypy")
+    (tmp_path / "pyproject.toml").write_text(
+        '[tool.mypy]\npackages = ["sample_package"]\n'
+    )
+    package = tmp_path / "sample_package"
+    package.mkdir()
+    (package / "__init__.py").write_text(
+        'value: int = "wrong"\n' if package_has_error else 'value: int = 1\n'
+    )
+    for directory in ("source", "payload"):
+        folder = tmp_path / directory
+        folder.mkdir()
+        (folder / "doctor.py").write_text('value: int = "wrong"\n')
+
+    result = run_linters_tool.run_mypy(cwd=str(tmp_path))
+
+    assert result.success is not package_has_error
+    assert "Duplicate module" not in result.stdout
+    if package_has_error:
+        assert "Incompatible types in assignment" in result.stdout
+    else:
+        assert "Success: no issues found" in result.stdout
+
+    # Explicit caller scope is still respected, including its real errors.
+    explicit = run_linters_tool.run_mypy(target_dir="source", cwd=str(tmp_path))
+    assert explicit.success is False
+    assert "Incompatible types in assignment" in explicit.stdout
