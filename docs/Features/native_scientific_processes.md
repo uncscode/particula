@@ -60,7 +60,10 @@ Native coagulation supports the existing CPU mechanisms, including turbulent
 DNS and the charged strategy variants. Resolved merging requires **equal
 positive active counts within a box**; unequal weights reject before selection.
 Density steps preserve the existing number-density update while keeping per-bin
-species masses and charge fixed. When composition varies with size, individual
+species masses and charge fixed. Their intended use is uniform composition
+across radius or a single effective material with prescribed effective density,
+rather than tracking radius-dependent composition. Effective density alone
+does not provide per-species transport. When composition varies with size, individual
 species and weighted charge need not be conserved, even if total-mass error
 converges under grid refinement. This accepted limitation is characterized by
 independent tests; conservative species transport is deferred. See
