@@ -363,11 +363,11 @@ def _enqueue_prepared_vapor_pressure(
         return
     binding = prepared.binding
     dimensions = cast(Any, binding.dimensions)
-    if not dimensions.n_boxes or not dimensions.n_species:
+    if not dimensions.n_boxes or not dimensions.gas_species:
         return
     wp.launch(
         _refresh_vapor_pressure_kernel,
-        dim=(dimensions.n_boxes, dimensions.n_species),
+        dim=(dimensions.n_boxes, dimensions.gas_species),
         inputs=[
             binding.thermodynamics.modes,
             binding.thermodynamics.parameters,
@@ -394,11 +394,11 @@ def _enqueue_prepared_saturation_ratio(
         return
     binding = prepared.binding
     dimensions = cast(Any, binding.dimensions)
-    if not dimensions.n_boxes or not dimensions.n_species:
+    if not dimensions.n_boxes or not dimensions.gas_species:
         return
     wp.launch(
         _refresh_saturation_ratio_kernel,
-        dim=(dimensions.n_boxes, dimensions.n_species),
+        dim=(dimensions.n_boxes, dimensions.gas_species),
         inputs=[
             binding.gas_concentration,
             binding.gas_molar_mass,
@@ -699,13 +699,13 @@ class ResidentThermodynamicUpdateCoordinator:
         """Launch the private resident saturation-ratio writer when nonempty."""
         session = self._request.session
         dimensions = session.dimensions
-        if not dimensions.n_boxes or not dimensions.n_species:
+        if not dimensions.n_boxes or not dimensions.gas_species:
             return
         gas = cast(Any, session.gas)
         environment = cast(Any, session.environment)
         wp.launch(
             _refresh_saturation_ratio_kernel,
-            dim=(dimensions.n_boxes, dimensions.n_species),
+            dim=(dimensions.n_boxes, dimensions.gas_species),
             inputs=[
                 gas.concentration,
                 gas.molar_mass,

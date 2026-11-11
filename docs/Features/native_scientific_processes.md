@@ -185,3 +185,21 @@ which scales native counts and volume together while preserving gas density.
 Invalid volumes or unrepresentable count densities gate primary writes. Callers
 retain device placement, transfers and synchronization; prepared enqueue uses
 pinned storage without allocation or host readback.
+
+## Resident native metadata and diagnostics
+
+Resident setup accepts tagged PMF and resolved populations and preserves their
+raw storage. It pins the population type, complete gas names, and separate
+particle-material and gas widths. Registry validation and capture signatures
+reject changed semantics or bindings; dispatch does not infer or rebind maps.
+Condensation and nucleation requests require their explicit uploaded mappings.
+Gas updates, thermodynamics and gas-shaped scratch use the full gas width.
+
+Native number diagnostics report number density (resolved counts divided by
+physical volume). Total-species-mass diagnostics require an explicit
+`CondensationSpeciesMap` in `ResidentDiagnosticRegistration.species_map` with
+the session's gas order and every particle material mapped. Outputs are
+extensive kg in gas order: gas concentration times volume plus mapped particle
+inventory. Unmapped particle-only material is supported by process calls, but
+this bounded gas-order total-mass diagnostic rejects it rather than dropping
+its inventory. Two-snapshot diagnostics do not require a mass map.

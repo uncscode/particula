@@ -335,6 +335,8 @@ class WarpCondensationState:
         latent_heat: Optional opaque latent-heat reference.
         energy_transfer: Optional writable energy-transfer output sidecar.
         thermal_work: Optional opaque thermal-work reference.
+        species_binding: Required explicit pinned species map for native
+            particles; omitted for legacy carriers.
 
     Raises:
         TypeError: If the configuration or a primary container has an invalid
@@ -356,6 +358,7 @@ class WarpCondensationState:
     latent_heat: object | None = None
     energy_transfer: object | None = None
     thermal_work: object | None = None
+    species_binding: object | None = None
 
     def __post_init__(self) -> None:
         """Perform ordered metadata and writable-output ownership validation.
@@ -408,6 +411,21 @@ class WarpCondensationState:
         if self.thermodynamics is None:
             raise ValueError("thermodynamics must not be None.")
         self._validate_optional_outputs(wp, boxes, particles, species, device)
+        self._validate_population_binding()
+
+    def _validate_population_binding(self) -> None:
+        """Require a matching native mapping without reading payloads."""
+        from particula.gpu.population_metadata import particle_distribution_type
+        from particula.gpu.species_mapping import CondensationSpeciesBinding
+
+        if particle_distribution_type(self.particles) is not None:
+            if type(self.species_binding) is not CondensationSpeciesBinding:
+                raise ValueError("native condensation requires species_binding")
+            self.species_binding.validate(self.particles, self.gas)
+        elif self.species_binding is not None:
+            raise ValueError(
+                "legacy condensation does not accept species_binding"
+            )
 
     def _validate_primary_arrays(self, wp: Any) -> Any:
         """Validate all primary Warp arrays and return the mass storage.
@@ -467,31 +485,37 @@ class WarpCondensationState:
             device,
         )
         _validate_array(
+            "gas.concentration", gas.concentration, wp.float64, None
+        )
+        if len(gas.concentration.shape) != 2:
+            raise ValueError("gas.concentration must have shape (B, G).")
+        gas_species = gas.concentration.shape[1]
+        _validate_array(
             "gas.molar_mass",
             gas.molar_mass,
             wp.float64,
-            (species,),
+            (gas_species,),
             device,
         )
         _validate_array(
             "gas.concentration",
             gas.concentration,
             wp.float64,
-            (boxes, species),
+            (boxes, gas_species),
             device,
         )
         _validate_array(
             "gas.vapor_pressure",
             gas.vapor_pressure,
             wp.float64,
-            (boxes, species),
+            (boxes, gas_species),
             device,
         )
         _validate_array(
             "gas.partitioning",
             gas.partitioning,
             wp.int32,
-            (boxes, species),
+            (boxes, gas_species),
             device,
         )
         _validate_array(
@@ -512,7 +536,7 @@ class WarpCondensationState:
             "environment.saturation_ratio",
             environment.saturation_ratio,
             wp.float64,
-            (boxes, species),
+            (boxes, gas_species),
             device,
         )
         return masses
@@ -550,7 +574,7 @@ class WarpCondensationState:
                 "energy_transfer",
                 self.energy_transfer,
                 wp.float64,
-                (boxes, species),
+                (boxes, gas.concentration.shape[1]),
                 device,
             )
 
@@ -878,6 +902,8 @@ class WarpCondensationExecutionAdapter:
             energy_transfer=p2_state.energy_transfer,
             thermal_work=p2_state.thermal_work,
         )
+        if p2_state.species_binding is not None:
+            call_kwargs["species_binding"] = p2_state.species_binding
         if prepare is None or enqueue is None:
             return _PreparedWarpCondensationBinding(
                 state,

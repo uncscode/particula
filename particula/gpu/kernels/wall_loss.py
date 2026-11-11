@@ -54,7 +54,6 @@ from particula.gpu.population_metadata import (
     LEGACY_UNTAGGED,
     PARTICLE_RESOLVED,
     particle_distribution_code,
-    require_legacy_particle_metadata,
 )
 from particula.gpu.properties import (
     dynamic_viscosity_wp,
@@ -1519,7 +1518,9 @@ def _prepare_selected_wall_loss_call(
         ValueError: If selected lanes, particle, environment, configuration,
             or RNG inputs violate the direct-kernel contract.
     """
-    require_legacy_particle_metadata(particles)
+    population = particle_distribution_code(particles)
+    if population not in (LEGACY_UNTAGGED, PARTICLE_RESOLVED):
+        raise ValueError("native GPU wall loss supports only particle_resolved")
     validated_config = _validate_config(config)
     n_boxes, device = _validate_particle_schema(particles)
     if (
@@ -1534,6 +1535,23 @@ def _prepare_selected_wall_loss_call(
         )
     _validate_charged_rectangular_field(validated_config, device)
     _validate_particle_values(particles)
+    if population == PARTICLE_RESOLVED:
+        from . import _wall_loss_native
+
+        _wall_loss_native.validate_physics(particles)
+        _wall_loss_native.validate_ownership(
+            particles,
+            rng_states,
+            (
+                selected_boxes,
+                temperature,
+                pressure,
+                validated_config.wall_electric_field,
+                getattr(environment, "temperature", None),
+                getattr(environment, "pressure", None),
+                getattr(environment, "saturation_ratio", None),
+            ),
+        )
     validated_time_step = _validate_time_step(time_step)
     validate_environment_inputs(
         temperature,
@@ -1664,7 +1682,9 @@ def wall_loss_selected_boxes_step_gpu(
         ValueError: If selected lanes, particle, environment, configuration,
             or RNG inputs violate the direct-kernel contract.
     """
-    require_legacy_particle_metadata(particles)
+    population = particle_distribution_code(particles)
+    if population not in (LEGACY_UNTAGGED, PARTICLE_RESOLVED):
+        raise ValueError("native GPU wall loss supports only particle_resolved")
     validated_config = _validate_config(config)
     n_boxes, device = _validate_particle_schema(particles)
     if (
@@ -1682,6 +1702,23 @@ def wall_loss_selected_boxes_step_gpu(
     # dispatch retains the resident no-readback boundary.
     _validate_charged_rectangular_field(validated_config, device)
     _validate_particle_values(particles)
+    if population == PARTICLE_RESOLVED:
+        from . import _wall_loss_native
+
+        _wall_loss_native.validate_physics(particles)
+        _wall_loss_native.validate_ownership(
+            particles,
+            rng_states,
+            (
+                selected_boxes,
+                temperature,
+                pressure,
+                validated_config.wall_electric_field,
+                getattr(environment, "temperature", None),
+                getattr(environment, "pressure", None),
+                getattr(environment, "saturation_ratio", None),
+            ),
+        )
     validated_time_step = _validate_time_step(time_step)
     validate_environment_inputs(
         temperature,

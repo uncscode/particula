@@ -2395,6 +2395,14 @@ class GPUResourceRegistry:
             id(self._session.gas),
             id(self._session.environment),
             *(id(value) for value in _primary_arrays(self._session)),
+            self._session.metadata.distribution_type,
+            self._session.metadata.gas_names,
+            (
+                self._session.dimensions.n_boxes,
+                self._session.dimensions.n_particles,
+                self._session.dimensions.n_species,
+                self._session.dimensions.gas_species,
+            ),
         )
 
     def _validate_session_signature(self) -> None:
@@ -3224,7 +3232,7 @@ class GPUResourceRegistry:
         shapes: dict[str, tuple[int, ...]] = {
             "b": (dimensions.n_boxes,),
             "bn": (dimensions.n_boxes, dimensions.n_particles),
-            "bs": (dimensions.n_boxes, dimensions.n_species),
+            "bs": (dimensions.n_boxes, dimensions.gas_species),
             "bns": (
                 dimensions.n_boxes,
                 dimensions.n_particles,
@@ -3820,6 +3828,13 @@ class GPUResourceRegistry:
             raise ValueError("configuration validation must retain identity.")
         map_data = configuration.communication_map
         final_volumes = configuration.prescribed_volume.final_volumes
+        if self._session.metadata.distribution_type == "discrete" and (
+            final_volumes is not None
+            or map_data.transport_mode is CommunicationTransportMode.PARTICLES
+        ):
+            raise ValueError(
+                "physical particle communication requires resolved counts"
+            )
         if final_volumes is not None:
             volume_entry = ManifestEntry(
                 "final_volumes", "communication", wp.float64, "b"

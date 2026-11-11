@@ -24,8 +24,6 @@ class _TaggedOnly:
 @pytest.mark.parametrize(
     "module,name",
     [
-        ("wall_loss", "_prepare_selected_wall_loss_call"),
-        ("wall_loss", "wall_loss_selected_boxes_step_gpu"),
         ("nucleation", "_preflight_nucleation"),
         ("exhaustion", "_execute_resampling_step_gpu"),
         ("exhaustion", "_execute_representative_volume_scaling_step_gpu"),
