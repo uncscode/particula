@@ -191,4 +191,6 @@ from particula.particles.properties.organic_density_module import (
 from particula.particles.particle_data_initialization import (
     create_particle_data_from_radii,
     create_lognormal_binned_particle_data,
+    create_resolved_particle_data,
+    create_lognormal_resolved_particle_data,
 )

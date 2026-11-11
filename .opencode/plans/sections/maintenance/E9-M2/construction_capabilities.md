@@ -38,3 +38,14 @@ aggregate species widths need not match; process admission owns mapping.
 ## P4 native radius evidence
 
 `particle_data_initialization_test.py` covers explicit PDF/PMF kinds, owned arrays, radius-derived masses, scalar/singleton and SI/non-SI inputs, existing lognormal defaults, nonuniform radius product quadrature, zero PDF, empty discrete input, invalid distributions and V=.25/4 rejection. Mass comparisons use explicit relative and mass-scale absolute tolerances. A GSD <= 1 is rejected because the existing finite-width lognormal generator cannot represent it; generator formulas and valid-default behavior are unchanged.
+
+## P5 native resolved evidence
+
+`resolved_initialization_test.py` owns direct resolved counts/density and
+sampled initialization. All legacy singleton/redundant forms that retain values
+are supported; differing density rows or differing charge species lanes reject.
+Independent species inventories cover V=.25/1/4, fractional and zero weights,
+multiple boxes, empty slots, controlled sample radii, defaults and global RNG
+preservation. Direct counts never multiply by volume; explicit density inputs
+do so once. Sampled modal numbers only determine mixture weights, and each
+sample retains count one. No scientific algorithm support is broadened.
