@@ -2,14 +2,14 @@
   "id": "E9-M3",
   "type": "maintenance",
   "title": "Complete CPU scientific process migration",
-  "status": "Draft",
+  "status": "In Progress",
   "priority": "P2",
-  "size": "M",
+  "size": "L",
   "owners": [],
-  "start_date": null,
+  "start_date": "2026-11-11",
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-09-27",
+  "last_updated": "2026-11-11",
   "dependencies": [
     "E9-M2"
   ],

@@ -1,5 +1,10 @@
 # Appendix: Evidence and Migration Ledgers
 
+Current authority: [implementation contract and evidence](implementation_record.md).
+The 2026-11-11 single-PR plan supersedes historical volume rules, entry
+status and per-phase PR instructions below. PMF/PDF require V=1 and already
+store density; only resolved counts use variable-V normalization.
+
 ## Observations, not passing test evidence
 
 Scientific paths below are under `particula/dynamics/`.

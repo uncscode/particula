@@ -1,5 +1,10 @@
 # Dependencies
 
+Current authority: [implementation contract and evidence](implementation_record.md).
+The 2026-11-11 single-PR plan supersedes historical volume rules, entry
+status and per-phase PR instructions below. PMF/PDF require V=1 and already
+store density; only resolved counts use variable-V normalization.
+
 Parent: E9, v0.3.0 data-native Aerosol migration, issue #1602.
 T1..T6 map exactly to E9-M1..E9-M6; all are maintenance tracks.
 

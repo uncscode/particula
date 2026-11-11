@@ -1,5 +1,10 @@
 # Open Questions and Review Decisions
 
+Current authority: [implementation contract and evidence](implementation_record.md).
+The 2026-11-11 single-PR plan supersedes historical volume rules, entry
+status and per-phase PR instructions below. PMF/PDF require V=1 and already
+store density; only resolved counts use variable-V normalization.
+
 Authority: [E9 review decisions](../../epics/E9/appendix.md#review-decisions-2026-09-27).
 
 - [x] **Q1 entry contracts:** D1–D4 fix normalization, radius-based distribution

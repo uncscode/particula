@@ -2,14 +2,14 @@
   "id": "E9",
   "type": "epic",
   "title": "v0.3.0 data-native Aerosol migration and legacy facade removal",
-  "status": "Draft",
+  "status": "In Progress",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-11-10",
+  "last_updated": "2026-11-11",
   "dependencies": [],
   "section_files": {
     "appendix": ".opencode/plans/sections/epics/E9/appendix.md",
@@ -63,14 +63,14 @@
     {
       "name": "T2 / E9-M2: construction, flat Aerosol and co-located tests (L)",
       "planned_date": null,
-      "actual_date": null,
-      "status": "Not Started"
+      "actual_date": "2026-11-11",
+      "status": "Shipped"
     },
     {
       "name": "T3 / E9-M3: CPU scientific processes and regression tests (L)",
       "planned_date": null,
       "actual_date": null,
-      "status": "Not Started"
+      "status": "In Progress"
     },
     {
       "name": "T4 / E9-M4: runnables, CPU adapters and integration tests (L)",
