@@ -10,25 +10,20 @@ one additional host copy of resident payload bytes and the inspection copies.
 
 Restart is explicit and same-device: it creates a fresh compatible session from
 the canonical bytes, never migrates data, serializes to disk, chooses a device,
-or falls back to CPU execution. Schema-v1 checkpoints have no communication
-family; schema-v2 checkpoints can retain one complete closed-map GAS or
-PARTICLES family and its optional final-volume sidecar. ``checkpoint()`` is
-nonterminal; ``finalize()`` caches a snapshot and terminally ends normal
- session use. Finalization first tears down any attached issued graph handle;
- teardown failure faults the source session and never caches a final checkpoint.
- No rollback is promised once a device operation has launched.
+or falls back to CPU execution. Schema v5 records explicit population semantics
+and independent species widths. Older schemas reject before setup or upload;
+there is no inferred migration. A snapshot may retain one complete closed-map
+GAS or PARTICLES communication family and its optional final-volume sidecar.
+``checkpoint()`` is nonterminal; ``finalize()`` caches a snapshot and ends
+normal session use. Finalization tears down any issued graph handle; teardown
+failure faults the source session and does not cache a final checkpoint.
+No rollback is promised once a device operation has launched.
 
-Schema-v3 always carries published-stream continuation metadata and optionally
-carries its canonical coagulation and wall-loss current-word payloads after the
-single synchronization boundary. Continuation words and their acquired process
-families must agree. The words are the continuation authority on an exact-device
-restart; normal dispatch and reacquisition retain restored arrays by identity
-until reset is explicitly requested.
-
-Schema-v4 adds an explicit acquired RNG-process inventory. Schema-v3 records
-created before that inventory existed infer it from their continuation payloads;
-schema-v1/v2 records may retain their historical in-family ``rng_states``
-payloads.
+Schema v5 requires published-stream continuation metadata and an explicit
+acquired RNG-process inventory, with optional coagulation and wall-loss current
+words after the single synchronization boundary. Words and acquired families
+must agree. They are the exact-device continuation authority; normal dispatch
+and reacquisition retain restored arrays until reset is explicitly requested.
 """
 
 from __future__ import annotations
@@ -56,7 +51,7 @@ if TYPE_CHECKING:
     from particula.gas import EnvironmentData, GasData
     from particula.particles import ParticleData
 
-_SCHEMA_VERSION = 4
+_SCHEMA_VERSION = 5
 _PRIMARY_ROLES = (
     ("particles", "masses"),
     ("particles", "concentration"),
@@ -125,17 +120,19 @@ class ResidentCheckpoint:
             acquired registry sidecars, resident ledgers, diagnostics, and at
             most one complete closed-map communication family. Arbitrary
             caller-owned outputs are never checkpoint authority.
-        communication: Optional schema-v2-or-later metadata for one pinned,
+        communication: Optional schema-v5 metadata for one pinned,
             complete closed-map communication family.
-        rng_continuation: Required schema-v3-or-later metadata with optional
+        rng_continuation: Required schema-v5 metadata with optional
             current ``uint32`` words for published coagulation and wall-loss
             streams.
-            Pre-v3 records must omit it. The words are authoritative
+            The words are authoritative
             continuation state on exact-device restart.
-        rng_resource_processes: Schema-v4 canonical process-family inventory
+        rng_resource_processes: Schema-v5 canonical process-family inventory
             for acquired RNG resources. This preserves the wall-loss
             acquisition boundary, whose sole ``rng_states`` sidecar is
             intentionally excluded from ordinary payloads.
+        distribution_type: Explicit "discrete", "particle_resolved", or
+            "legacy_untagged" semantics for canonical population bytes.
     """
 
     schema_version: int
@@ -153,13 +150,14 @@ class ResidentCheckpoint:
     communication: "CommunicationCheckpointMetadata | None" = None
     rng_continuation: "RNGContinuationCheckpoint | None" = None
     rng_resource_processes: tuple[str, ...] = ()
+    distribution_type: str = "legacy_untagged"
 
 
 @dataclass(frozen=True)
 class CommunicationCheckpointMetadata:
     """Describe an optional pinned communication family without live arrays.
 
-    This schema-v2 metadata identifies the sole restored communication mode and
+    This schema-v5 metadata identifies the sole restored communication mode and
     its fixed edge capacity. It is validated against canonical sidecar payloads
     before restart setup; it neither owns nor retains source-device arrays.
 
@@ -195,7 +193,7 @@ class RNGContinuationPayload:
 
 @dataclass(frozen=True)
 class RNGContinuationCheckpoint:
-    """Store required schema-v3 stream metadata and optional continuation words.
+    """Store required schema-v5 stream metadata and optional continuation words.
 
     The payloads, rather than root-seed-derived initialization, are the
     authority for restored published stream state. Explicit stream reset is the
@@ -441,6 +439,18 @@ class ResidentCheckpointController:
             environment = from_warp_environment_data(
                 cast(Any, self._session.environment), sync=False
             )
+            # Warp CPU .numpy() may return a live view. Inspection must be
+            # detached on every backend, independently of canonical bytes.
+            for carrier, roles in (
+                (
+                    particles,
+                    ("masses", "concentration", "charge", "density", "volume"),
+                ),
+                (gas, ("molar_mass", "concentration", "partitioning")),
+                (environment, ("temperature", "pressure", "saturation_ratio")),
+            ):
+                for role in roles:
+                    setattr(carrier, role, getattr(carrier, role).copy())
             resident_gas = cast(Any, self._session.gas)
             # Reuse conversion readbacks for inspection and canonical payloads.
             # The CPU GasData carrier intentionally has no vapor pressure and
@@ -510,6 +520,7 @@ class ResidentCheckpointController:
                 communication,
                 _capture_rng_continuation(rng_streams, rng_manifest),
                 tuple(process_id for process_id, _, _ in rng_streams),
+                self._session.metadata.distribution_type or "legacy_untagged",
             )
         except BaseException:
             raise
@@ -628,6 +639,11 @@ def restart_resident_session(  # noqa: C901
         unpack("particles", "charge"),
         unpack("particles", "density"),
         unpack("particles", "volume"),
+        distribution_type=(
+            None
+            if checkpoint.distribution_type == "legacy_untagged"
+            else checkpoint.distribution_type
+        ),
     )
     gas = GasData(
         list(checkpoint.gas_names),
@@ -782,6 +798,33 @@ def restart_resident_session(  # noqa: C901
     return session, registry, guard
 
 
+def _validate_population_metadata(checkpoint: ResidentCheckpoint) -> None:
+    """Require declared population meaning and gas width before any upload."""
+    kind = checkpoint.distribution_type
+    if type(kind) is not str or kind not in (
+        "legacy_untagged",
+        "discrete",
+        "particle_resolved",
+    ):
+        raise ValueError("checkpoint population semantics are invalid.")
+    width = checkpoint.dimensions.n_gas_species
+    if width is not None and (type(width) is not int or width < 0):
+        raise ValueError("checkpoint gas dimensions are invalid.")
+    if kind != "legacy_untagged" and width is None:
+        raise ValueError("native checkpoint requires explicit gas dimensions.")
+    if kind == "legacy_untagged" and (
+        checkpoint.dimensions.gas_species != checkpoint.dimensions.n_species
+    ):
+        raise ValueError("legacy checkpoint requires equal species widths.")
+    metadata = checkpoint.communication
+    if (
+        kind == "discrete"
+        and metadata is not None
+        and (metadata.mode == "particles" or metadata.has_final_volumes)
+    ):
+        raise ValueError("PMF checkpoint cannot evolve volume or move slots.")
+
+
 def _preflight_restart(  # noqa: C901
     checkpoint: object, device: object
 ) -> _RestartPlan:
@@ -790,30 +833,25 @@ def _preflight_restart(  # noqa: C901
         raise TypeError("checkpoint must be an exact ResidentCheckpoint.")
     if (
         type(checkpoint.schema_version) is not int
-        or checkpoint.schema_version not in (1, 2, 3, _SCHEMA_VERSION)
+        or checkpoint.schema_version != _SCHEMA_VERSION
         or type(checkpoint.carrier_type) is not str
         or checkpoint.carrier_type != "ResidentSession"
     ):
         raise ValueError("Unsupported resident checkpoint schema.")
     if checkpoint.lifecycle is not ResidentLifecycle.ACTIVE:
         raise ValueError("checkpoint must describe an active session.")
-    if checkpoint.schema_version == 1 and checkpoint.communication is not None:
-        raise ValueError(
-            "v1 checkpoints cannot contain communication metadata."
-        )
-    if checkpoint.schema_version >= 2:
-        metadata = checkpoint.communication
-        if metadata is not None:
-            if type(metadata) is not CommunicationCheckpointMetadata:
-                raise TypeError("communication metadata is invalid.")
-            if (
-                metadata.mode not in ("gas", "particles")
-                or metadata.form not in ("one_dimensional", "arbitrary_pairs")
-                or type(metadata.edge_capacity) is not int
-                or metadata.edge_capacity < 0
-                or type(metadata.has_final_volumes) is not bool
-            ):
-                raise ValueError("communication metadata is invalid.")
+    metadata = checkpoint.communication
+    if metadata is not None:
+        if type(metadata) is not CommunicationCheckpointMetadata:
+            raise TypeError("communication metadata is invalid.")
+        if (
+            metadata.mode not in ("gas", "particles")
+            or metadata.form not in ("one_dimensional", "arbitrary_pairs")
+            or type(metadata.edge_capacity) is not int
+            or metadata.edge_capacity < 0
+            or type(metadata.has_final_volumes) is not bool
+        ):
+            raise ValueError("communication metadata is invalid.")
     if type(checkpoint.dimensions) is not ResidentDimensions:
         raise TypeError(
             "checkpoint dimensions must be exact ResidentDimensions."
@@ -821,6 +859,7 @@ def _preflight_restart(  # noqa: C901
     if type(checkpoint.device) is not Device:
         raise TypeError("checkpoint device metadata is invalid.")
     dimensions = checkpoint.dimensions
+    _validate_population_metadata(checkpoint)
     if (
         type(dimensions.n_boxes) is not int
         or type(dimensions.n_particles) is not int
@@ -843,7 +882,7 @@ def _preflight_restart(  # noqa: C901
         type(name) is not str for name in checkpoint.gas_names
     ):
         raise TypeError("checkpoint gas_names must be a tuple of str.")
-    if len(checkpoint.gas_names) != checkpoint.dimensions.n_species:
+    if len(checkpoint.gas_names) != checkpoint.dimensions.gas_species:
         raise ValueError("checkpoint gas_names do not match dimensions.")
     if (
         type(checkpoint.completed_steps) is not int
@@ -873,7 +912,11 @@ def _preflight_restart(  # noqa: C901
     expected = {
         ("particles", "masses"): (
             "<f8",
-            (dimensions.n_boxes, dimensions.n_particles, dimensions.n_species),
+            (
+                dimensions.n_boxes,
+                dimensions.n_particles,
+                dimensions.n_species,
+            ),
         ),
         ("particles", "concentration"): (
             "<f8",
@@ -885,24 +928,24 @@ def _preflight_restart(  # noqa: C901
         ),
         ("particles", "density"): ("<f8", (dimensions.n_species,)),
         ("particles", "volume"): ("<f8", (dimensions.n_boxes,)),
-        ("gas", "molar_mass"): ("<f8", (dimensions.n_species,)),
+        ("gas", "molar_mass"): ("<f8", (dimensions.gas_species,)),
         ("gas", "concentration"): (
             "<f8",
-            (dimensions.n_boxes, dimensions.n_species),
+            (dimensions.n_boxes, dimensions.gas_species),
         ),
         ("gas", "vapor_pressure"): (
             "<f8",
-            (dimensions.n_boxes, dimensions.n_species),
+            (dimensions.n_boxes, dimensions.gas_species),
         ),
         ("gas", "partitioning"): (
             "<i4",
-            (dimensions.n_boxes, dimensions.n_species),
+            (dimensions.n_boxes, dimensions.gas_species),
         ),
         ("environment", "temperature"): ("<f8", (dimensions.n_boxes,)),
         ("environment", "pressure"): ("<f8", (dimensions.n_boxes,)),
         ("environment", "saturation_ratio"): (
             "<f8",
-            (dimensions.n_boxes, dimensions.n_species),
+            (dimensions.n_boxes, dimensions.gas_species),
         ),
     }
     for key, (dtype, shape) in expected.items():
@@ -915,44 +958,34 @@ def _preflight_restart(  # noqa: C901
             raise ValueError("checkpoint primary payload metadata is invalid.")
     resource_payloads = payloads[len(_PRIMARY_ROLES) :]
     continuation = _validate_rng_continuation(checkpoint, dimensions)
-    if checkpoint.schema_version < 3:
-        resource_payloads, continuation = _normalize_legacy_rng_payloads(
-            resource_payloads, dimensions
-        )
     communication_family, has_final_volumes = _validate_resource_payloads(
         resource_payloads, dimensions
     )
-    if checkpoint.schema_version == 1 and communication_family is not None:
+    metadata = checkpoint.communication
+    if (metadata is None) != (communication_family is None):
         raise ValueError(
-            "v1 checkpoints cannot contain communication payloads."
+            "communication metadata must match communication payloads."
         )
-    if checkpoint.schema_version >= 2:
-        metadata = checkpoint.communication
-        if (metadata is None) != (communication_family is None):
-            raise ValueError(
-                "communication metadata must match communication payloads."
-            )
-        if metadata is not None and (
-            metadata.mode
-            != (
-                "gas"
-                if communication_family == "communication_gas"
-                else "particles"
-            )
-            or metadata.edge_capacity
-            != next(
-                item.capacity
-                for item in payloads
-                if item.family == communication_family
-            )
-            or metadata.has_final_volumes != has_final_volumes
-        ):
-            raise ValueError("communication metadata does not match payloads.")
+    if metadata is not None and (
+        metadata.mode
+        != (
+            "gas"
+            if communication_family == "communication_gas"
+            else "particles"
+        )
+        or metadata.edge_capacity
+        != next(
+            item.capacity
+            for item in payloads
+            if item.family == communication_family
+        )
+        or metadata.has_final_volumes != has_final_volumes
+    ):
+        raise ValueError("communication metadata does not match payloads.")
     _validate_rng_resource_pairing(
         resource_payloads,
         continuation,
         checkpoint.rng_resource_processes,
-        checkpoint.schema_version,
     )
     return _RestartPlan(primary, resource_payloads, continuation)
 
@@ -960,17 +993,11 @@ def _preflight_restart(  # noqa: C901
 def _validate_rng_continuation(  # noqa: C901
     checkpoint: ResidentCheckpoint, dimensions: ResidentDimensions
 ) -> RNGContinuationCheckpoint | None:
-    """Fail closed on malformed v3 continuation metadata before setup."""
+    """Fail closed on malformed v5 continuation metadata before setup."""
     continuation = checkpoint.rng_continuation
-    if checkpoint.schema_version < 3:
-        if continuation is not None:
-            raise ValueError(
-                "pre-v3 checkpoints cannot contain RNG continuation."
-            )
-        return None
     if continuation is None:
         raise ValueError(
-            "schema-v3-or-later checkpoints require RNG continuation metadata."
+            "schema-v5 checkpoints require RNG continuation metadata."
         )
     if type(continuation) is not RNGContinuationCheckpoint:
         raise TypeError("RNG continuation metadata is invalid.")
@@ -1068,7 +1095,6 @@ def _validate_rng_resource_pairing(  # noqa: C901
     payloads: tuple[CheckpointPayload, ...],
     continuation: RNGContinuationCheckpoint | None,
     resource_processes: object,
-    schema_version: int,
 ) -> None:
     """Require acquired RNG families and continuation words to pair exactly.
 
@@ -1076,32 +1102,6 @@ def _validate_rng_resource_pairing(  # noqa: C901
     ``rng_states`` sidecar is continuation-only. Coagulation ordinary sidecars
     independently corroborate that inventory for legacy records.
     """
-    if schema_version < 3 and resource_processes == ():
-        continued = (
-            set()
-            if continuation is None
-            else {payload.process_id for payload in continuation.payloads}
-        )
-        has_coagulation_payloads = any(
-            payload.family == "coagulation" for payload in payloads
-        )
-        if has_coagulation_payloads != ("coagulation" in continued):
-            raise ValueError(
-                "legacy RNG payloads and coagulation sidecars disagree."
-            )
-        return
-    if schema_version == 3 and resource_processes == ():
-        if continuation is None:
-            raise ValueError("schema-v3 checkpoints require RNG continuation.")
-        inferred = tuple(item.process_id for item in continuation.payloads)
-        has_coagulation_payloads = any(
-            payload.family == "coagulation" for payload in payloads
-        )
-        if has_coagulation_payloads != ("coagulation" in inferred):
-            raise ValueError(
-                "RNG continuation and coagulation sidecars disagree."
-            )
-        return
     if type(resource_processes) is not tuple or any(
         type(process) is not str for process in resource_processes
     ):
@@ -1120,18 +1120,6 @@ def _validate_rng_resource_pairing(  # noqa: C901
         raise ValueError(
             "RNG resource inventory and coagulation sidecars disagree."
         )
-    if schema_version < 3:
-        continued = (
-            set()
-            if continuation is None
-            else {payload.process_id for payload in continuation.payloads}
-        )
-        if acquired or continued:
-            raise ValueError(
-                "legacy checkpoints cannot restore RNG resources without "
-                "historical payloads."
-            )
-        return
     if continuation is None:
         raise ValueError(
             "current checkpoints require RNG continuation metadata."
@@ -1139,60 +1127,6 @@ def _validate_rng_resource_pairing(  # noqa: C901
     continued = {payload.process_id for payload in continuation.payloads}
     if continued != acquired:
         raise ValueError("RNG continuation and resource families disagree.")
-
-
-def _normalize_legacy_rng_payloads(
-    payloads: tuple[CheckpointPayload, ...], dimensions: ResidentDimensions
-) -> tuple[tuple[CheckpointPayload, ...], RNGContinuationCheckpoint | None]:
-    """Extract authentic schema-v1/v2 RNG sidecars into restart authority."""
-    rng_payloads = tuple(item for item in payloads if item.role == "rng_states")
-    if not rng_payloads:
-        return payloads, None
-    canonical = ("coagulation", "wall_loss")
-    processes = tuple(item.family for item in rng_payloads)
-    if processes != tuple(
-        process for process in canonical if process in processes
-    ):
-        raise ValueError("legacy checkpoint RNG payload order is invalid.")
-    for item in rng_payloads:
-        if (
-            item.family not in canonical
-            or item.dtype != "<u4"
-            or item.shape != (dimensions.n_boxes,)
-            or (item.family == "wall_loss" and item.capacity is not None)
-        ):
-            raise ValueError(
-                "legacy checkpoint RNG payload metadata is invalid."
-            )
-    from particula.execution.rng import (
-        STREAM_SCHEMA_VERSION,
-        StreamDescriptor,
-        StreamKey,
-    )
-
-    logical_box_ids = tuple(str(index) for index in range(dimensions.n_boxes))
-    lanes = tuple(range(dimensions.n_boxes))
-    continuation_payloads = tuple(
-        RNGContinuationPayload(item.family, item.dtype, item.shape, item.data)
-        for item in rng_payloads
-    )
-    descriptors = tuple(
-        StreamDescriptor(StreamKey(STREAM_SCHEMA_VERSION, process, name), lane)
-        for process in processes
-        for name, lane in zip(logical_box_ids, lanes, strict=True)
-    )
-    continuation = RNGContinuationCheckpoint(
-        STREAM_SCHEMA_VERSION,
-        0,
-        logical_box_ids,
-        lanes,
-        descriptors,
-        continuation_payloads,
-    )
-    return (
-        tuple(item for item in payloads if item.role != "rng_states"),
-        continuation,
-    )
 
 
 def _validate_resource_payloads(  # noqa: C901
@@ -1227,7 +1161,7 @@ def _validate_resource_payloads(  # noqa: C901
     shape_map = {
         "b": (dimensions.n_boxes,),
         "bn": (dimensions.n_boxes, dimensions.n_particles),
-        "bs": (dimensions.n_boxes, dimensions.n_species),
+        "bs": (dimensions.n_boxes, dimensions.gas_species),
         "bns": (
             dimensions.n_boxes,
             dimensions.n_particles,

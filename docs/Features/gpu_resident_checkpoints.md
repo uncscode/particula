@@ -1,14 +1,16 @@
 # GPU resident checkpoints
 
-Current controllers create schema-v4 checkpoints; v1 noncommunication and v2
-communication checkpoints remain restart-compatible. Resident communication is a concrete-only
-closed-map barrier: communication runs before optional prescribed volume
-evolution, and both invalidate saturation ratio only.
+Current controllers create schema-v5 checkpoints with explicit population type
+and independent particle-material and gas widths. Schemas v1–v4 reject before
+setup or upload; there is no inferred migration. Supported population semantics
+are native PMF, native resolved counts, and explicitly marked transitional
+untagged carriers. PDF remains unsupported on Warp. Native inspection carriers
+retain their population tag; canonical bytes remain restart authority.
 
-The barrier resources and executor are direct imports under
-`particula.execution`; they are not package or top-level exports. Schema-v2
-restart creates fresh communication arrays and bindings rather than reusing
-source identities.
+Resident communication is a concrete-only closed-map barrier. Communication
+runs before optional physical volume evolution; both invalidate saturation
+ratio. Restart creates fresh communication arrays and bindings. Native PMF
+checkpoints cannot contain particle transport or prescribed volume evolution.
 
 The direct-import-only checkpoint boundary is available from
 `particula.execution.checkpoint`; it is deliberately not exported by
@@ -40,10 +42,9 @@ resident-array identities.
 Restart compatibility is intentionally exact and fail-closed. It accepts
 `ResidentCheckpoint` records with carrier type `"ResidentSession"`, lifecycle
 `ACTIVE`, complete valid canonical payload descriptors, and an exactly equal
-target `Device`. Schema-v1 checkpoints must be noncommunication checkpoints.
-Schema-v2 checkpoints may contain no communication family or exactly one
-complete closed-map GAS or PARTICLES communication family with matching
-metadata and payloads. Schema-v3-and-later records always require continuation
+target `Device`. Schema-v5 checkpoints may contain no communication family or
+exactly one complete closed-map GAS or PARTICLES family with matching metadata
+and payloads. They always require RNG continuation
 metadata, though their published-stream payload collection may be empty when
 neither canonical coagulation nor wall-loss resource family is acquired. Their
 immutable current `uint32` words are restart authority; normal dispatch and
@@ -58,8 +59,8 @@ schemas, malformed, incomplete, partial, mixed, or mismatched communication
 payloads, non-`ACTIVE` checkpoint records, and device mismatches; it does not
 promise forward or backward compatibility.
 
-Schema-v3-and-later continuation covers the canonical published `coagulation`
-and `wall_loss` streams; schema-v4 is the current format. Each retained record
+Schema-v5 continuation covers the canonical published `coagulation`
+and `wall_loss` streams; schema-v5 is the current format. Each retained record
 includes schema-versioned stable logical-ID, root-seed, and namespace metadata
 plus immutable current `uint32` words. Those words are the sole continuation
 authority, rather than lossy CPU inspection carriers or ordinary resource

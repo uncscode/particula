@@ -457,14 +457,12 @@ its snapshot; a later exact matching finalization returns that same object.
 The implemented compatibility boundary is exact and fail-closed: restart accepts
 a `ResidentCheckpoint` with carrier type `"ResidentSession"`, lifecycle
 `ACTIVE`, complete valid payload descriptors and payloads, and an exactly equal
-target `Device`. Schema version `1` checkpoints must be noncommunication.
-Schema version `2` checkpoints may have no communication family or exactly one
-complete closed-map GAS or PARTICLES family with matching metadata and payloads.
-Schema-v1 and schema-v2 checkpoints remain restart-compatible. Schema-v3
-additionally captures published RNG-stream current words as continuation
-authority. Other versions or carrier schemas, malformed, incomplete, mixed, or
-mismatched records, non-`ACTIVE` checkpoint records, and device mismatches are
-rejected.
+target `Device`. Only schema-v5 is accepted. It retains explicit population
+semantics and independent gas and particle widths, optional complete closed-map
+communication, and required RNG continuation metadata/current published words.
+Schemas v1–v4 reject before setup or upload; no migration or inferred population
+meaning is provided. Malformed, incomplete, mixed, or mismatched records,
+non-`ACTIVE` checkpoint records, and device mismatches reject.
 Restart is explicit, never automatic, and creates fresh session, registry,
 guard, containers, primary arrays, and sidecars. It does not select or migrate
 a device, provide fallback, or guarantee rollback after an asynchronous writer
@@ -727,7 +725,7 @@ smoke—not exact per-seed or cross-backend replay.
 
 The supported boundary remains concrete-only and caller-owned: setup uploads
 each CPU container once; registry resources are identity-pinned; diagnostics
-copy only to caller-owned outputs; schema-v3/v4 current words, not lossy inspection
+copy only to caller-owned outputs; schema-v5 current words, not lossy inspection
 carriers, are continuation authority; manual in-memory restart requires the
 exact device and creates fresh identities; and source finalization caches its
 first snapshot. Export expansion, automatic restart, device selection or

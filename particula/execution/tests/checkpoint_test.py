@@ -410,7 +410,7 @@ def test_checkpoint_captures_wall_loss_stream_continuation(
     registry.acquire_wall_loss()
     checkpoint = session.checkpoint(registry, guard)
 
-    assert checkpoint.schema_version == 4
+    assert checkpoint.schema_version == 5
     assert checkpoint.rng_continuation is not None
     assert [
         item.process_id for item in checkpoint.rng_continuation.payloads
@@ -518,7 +518,7 @@ def test_restart_continues_all_published_rng_streams_without_reinitializing(
 
 @pytest.mark.warp
 @pytest.mark.stochastic
-def test_schema_v4_restart_continues_real_process_streams(
+def test_schema_v5_restart_continues_real_process_streams(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Checkpoint real dispatch words into fresh restart-owned sidecars."""
@@ -532,7 +532,7 @@ def test_schema_v4_restart_continues_real_process_streams(
         source_wall_loss = wall_loss.rng_states.numpy().copy()
         checkpoint = session.checkpoint(registry, guard)
 
-        assert checkpoint.schema_version == 4
+        assert checkpoint.schema_version == 5
         assert checkpoint.rng_continuation is not None
         assert [
             item.process_id for item in checkpoint.rng_continuation.payloads
@@ -673,8 +673,8 @@ def test_v3_restart_requires_continuation_metadata_before_setup(
 
 
 @pytest.mark.warp
-def test_pre_inventory_v3_checkpoint_infers_rng_resources() -> None:
-    """Authentic pre-change v3 records infer the absent process inventory."""
+def test_pre_inventory_v3_checkpoint_rejects() -> None:
+    """Pre-v5 records reject even with otherwise valid current words."""
     session, registry, guard = _resident_binding()
     registry.acquire_coagulation(1).rng_states.assign(
         np.array([17], dtype=np.uint32)
@@ -682,13 +682,10 @@ def test_pre_inventory_v3_checkpoint_infers_rng_resources() -> None:
     checkpoint = session.checkpoint(registry, guard)
     legacy_v3 = replace(checkpoint, schema_version=3, rng_resource_processes=())
 
-    _, restored_registry, _ = restart_resident_session(
-        legacy_v3, Device(Backend.WARP, "cpu")
-    )
-
-    np.testing.assert_array_equal(
-        restored_registry.acquire_coagulation(1).rng_states.numpy(), [17]
-    )
+    with pytest.raises(
+        ValueError, match="Unsupported resident checkpoint schema"
+    ):
+        restart_resident_session(legacy_v3, Device(Backend.WARP, "cpu"))
 
 
 @pytest.mark.warp
@@ -759,17 +756,19 @@ def test_legacy_restart_rejects_acquired_rng_resources_before_setup(
         lambda *_args, **_kwargs: pytest.fail("restart setup must not run"),
     )
 
-    with pytest.raises(ValueError, match="legacy checkpoints cannot restore"):
+    with pytest.raises(
+        ValueError, match="Unsupported resident checkpoint schema"
+    ):
         restart_resident_session(legacy, Device(Backend.WARP, "cpu"))
 
 
 @pytest.mark.warp
 @pytest.mark.parametrize("schema_version", (1, 2))
 @pytest.mark.parametrize("process", ("coagulation", "wall_loss"))
-def test_authentic_legacy_rng_payloads_restart(
+def test_authentic_legacy_rng_payloads_reject(
     schema_version: int, process: str
 ) -> None:
-    """Historical in-family RNG sidecars remain exact restart authority."""
+    """Historical in-family RNG sidecars cannot establish population semantics."""
     session, registry, guard = _resident_binding()
     resources = (
         registry.acquire_coagulation(1)
@@ -801,15 +800,10 @@ def test_authentic_legacy_rng_payloads_restart(
         rng_resource_processes=(),
     )
 
-    _, restored_registry, _ = restart_resident_session(
-        legacy, Device(Backend.WARP, "cpu")
-    )
-    restored = (
-        restored_registry.acquire_coagulation(1)
-        if process == "coagulation"
-        else restored_registry.acquire_wall_loss()
-    )
-    np.testing.assert_array_equal(restored.rng_states.numpy(), [29])
+    with pytest.raises(
+        ValueError, match="Unsupported resident checkpoint schema"
+    ):
+        restart_resident_session(legacy, Device(Backend.WARP, "cpu"))
 
 
 @pytest.mark.warp
@@ -980,57 +974,25 @@ def test_restart_restores_zero_edge_communication_resources(
 
 
 @pytest.mark.warp
-def test_restart_accepts_v1_noncommunication_checkpoint() -> None:
-    """Schema-v1 noncommunication records retain fresh primary identities."""
+@pytest.mark.parametrize("schema_version", (1, 2, 3, 4))
+def test_restart_rejects_old_schema_before_setup(schema_version, monkeypatch):
+    """Old formats cannot be silently interpreted as native or legacy state."""
+    import particula.execution.checkpoint as checkpoint_module
+
     session, registry, guard = _resident_binding()
     checkpoint = session.checkpoint(registry, guard)
-    legacy = replace(
-        checkpoint,
-        schema_version=1,
-        communication=None,
-        rng_continuation=None,
+    monkeypatch.setattr(
+        checkpoint_module,
+        "setup_resident_session",
+        lambda *a, **k: pytest.fail("old checkpoint reached setup"),
     )
-
-    restored, restored_registry, restored_guard = restart_resident_session(
-        legacy, Device(Backend.WARP, "cpu")
-    )
-
-    assert restored is not session
-    assert restored_registry is not registry
-    assert restored_guard is not guard
-    assert (
-        cast(Any, restored.particles).masses
-        is not cast(Any, session.particles).masses
-    )
-    np.testing.assert_array_equal(
-        cast(Any, restored.gas).concentration.numpy(),
-        cast(Any, session.gas).concentration.numpy(),
-    )
-
-
-@pytest.mark.warp
-def test_restart_accepts_v2_noncommunication_checkpoint() -> None:
-    """Schema-v2 permits a record without communication or RNG continuation."""
-    session, registry, guard = _resident_binding()
-    checkpoint = session.checkpoint(registry, guard)
-    legacy = replace(
-        checkpoint,
-        schema_version=2,
-        communication=None,
-        rng_continuation=None,
-    )
-
-    restored, restored_registry, restored_guard = restart_resident_session(
-        legacy, Device(Backend.WARP, "cpu")
-    )
-
-    assert restored is not session
-    assert restored_registry is not registry
-    assert restored_guard is not guard
-    np.testing.assert_array_equal(
-        cast(Any, restored.gas).vapor_pressure.numpy(),
-        cast(Any, session.gas).vapor_pressure.numpy(),
-    )
+    with pytest.raises(
+        ValueError, match="Unsupported resident checkpoint schema"
+    ):
+        restart_resident_session(
+            replace(checkpoint, schema_version=schema_version),
+            Device(Backend.WARP, "cpu"),
+        )
 
 
 @pytest.mark.warp
@@ -1112,7 +1074,7 @@ def test_restart_rejects_mismatched_communication_checkpoint_metadata() -> None:
         ),
     )
     for candidate in malformed:
-        with pytest.raises(ValueError, match="communication"):
+        with pytest.raises(ValueError, match="communication|schema"):
             restart_resident_session(candidate, Device(Backend.WARP, "cpu"))
 
 
@@ -1124,7 +1086,7 @@ def test_restart_rejects_non_checkpoint_and_terminal_checkpoint() -> None:
         )
 
     terminal = ResidentCheckpoint(
-        1,
+        5,
         "ResidentSession",
         cast(ResidentDimensions, object()),
         Device(Backend.WARP, "cpu"),
