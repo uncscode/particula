@@ -1,45 +1,25 @@
 # Scope
 
-## Modules and directories
+M2 implements native Aerosol construction/access/replacement, native
+AerosolBuilder, and useful native mass/radius/bin/resolved initialization.
+Production changes are bounded to these construction surfaces, minimal exports,
+and explicit legacy import routing. Tests ship with their owning phases.
 
-- `particula/aerosol.py`, `particula/aerosol_builder.py` and adjacent
-  `particula/tests/aerosol_test.py` / `aerosol_builder_test.py`.
-- Existing `particula/particles/particle_data_builder.py` and
-  `particula/gas/gas_data_builder.py`, with adjacent tests: reuse first;
-  modify only construction gaps approved by the M1/M2 inventory.
-- Useful capabilities in `particula/particles/representation_builders.py`
-  and its tests: mass/radius input, lognormal radius-bin PDF/PMF initialization,
-  resolved mass initialization and sampled resolved presets. Provide native
-  equivalents in reviewed concrete construction modules, not new state facades.
-- Minimal construction exports and docstrings, a bounded developer reference
-  in `docs/Features/particle-data-migration/`, and data-only integration tests.
+`particula._legacy_aerosol` retains the old aggregate and builder, with their
+historical aliasing and mutation behavior. The approved temporary seam is
+inventoried in `legacy_consumers.md`; M6 removes it after named consumers
+migrate. There is no native atmosphere emulation or duplicate authoritative
+state. Example changes route imports and synchronize paired sources, with
+full tutorial migration/execution remaining M5-owned.
 
-## Interfaces and acceptance boundary
+The new aggregate runs the existing structural validator followed by particle
+representation validation. Unequal particle/gas species counts and all-false
+gas masks are valid. Mapping and physical process admission remain downstream.
+The delivered M1 fixed-volume PMF/PDF and variable-volume resolved-count rules
+supersede original D1 density-times-volume proposals.
 
-Flat constructor, identity-preserving whole-container access, individual
-replacement, coordinated three-container replacement, native aggregate builder
-and retained useful initialization. Public spelling is approved in E9 appendix
-D4; M1 supplies acceptance cases and structural versus process validation.
-Native construction implements D1's metadata and count/radius-PDF units. Preserve all
-gas species with ordered names/partitioning metadata and environment alignment.
-
-Construction behavioral tests migrate in the same PR as their implementation.
-Inventory any strictly necessary temporary seam for unmigrated consumers:
-path, concrete consumers, authority/aliasing rules, introducing phase, migration
-owner and M6 removal gate. Approval is required before introducing a seam.
-
-## Out of scope
-
-- M1 contract/helper redesign; escalate missing or contradictory prerequisites.
-- M3 scientific condensation/coagulation/wall-loss migration or new physics.
-- M4 `Runnable` composition, dilution/nucleation orchestration, CPU adapters.
-  Preserve their existing behavior during M2; do not migrate them early.
-- M5 supported tutorial/notebook migration; M6 deletion of facades,
-  `Atmosphere`, obsolete builders/exports/bridges/messages and facade-only tests.
-- Storage/precision redesign beyond approved D1 metadata/normalization,
-  general multi-box CPU execution, new GPU public
-  APIs, hidden transfer/fallback, automatic GPU/resident rebinding, capture
-  redesign, benchmarks, diagnostics or Epic I.
-
-This drafting operation edits only E9-M2 metadata and its twelve section files;
-all production paths above are future implementation scope.
+Out of scope: scientific process migration (M3), runnable/adapters and resident
+composition (M4), broad tutorials (M5), legacy removal/release (M6), new GPU
+schema/interpretation, tagged Warp upload, checkpoint metadata, automatic GPU
+rebind, hidden transfer/fallback, general multi-box CPU execution and new
+sampling physics. Existing untagged transfer and device ownership are preserved.

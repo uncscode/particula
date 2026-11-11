@@ -1,94 +1,38 @@
 # Phase Details
 
-The approved API and storage contract is E9 appendix D1–D4. Each initializer
-sets the shared distribution_type explicitly: density inputs multiply by V,
-raw counts do not, and continuous_pdf is radius-based dN/dr. M1's handoff must
-make this unambiguous before any native construction is published.
+## Current implementation and serial evidence
 
-All six phases are Not Started. Each is a bounded PR with tests in the owning
-phase; there is no standalone unit-testing phase. P1 requires M1 completed and
-validated, and each subsequent phase requires its predecessor completed and
-validated. Required failures or unavailable evidence block the next gate.
+The approved M1 handoff and merged PR #1624 preceded M2. All six phases are
+implemented on stacked branches in P1 → P2 → P3 → P4 → P5 → P6 order. Each
+implementation phase began after its predecessor's local validation passed.
+PR merge/review and final maintainer M3 admission are separate gates; no merge
+or M3 implementation is claimed. Final-revision evidence is in
+`validation_evidence.md`.
 
-- [ ] **E9-M2-P1: Introduce flat three-container Aerosol with migrated construction tests**
-  - Issue: TBD | Size: S | Status: Not Started
-  - Entry: Accept M1 final-revision contracts, helpers and approval; resolve
-    the transitional compatibility decision before changing aggregate shape.
-  - Work: Implement native constructor/whole-container access in `aerosol.py`
-    using M1 read-only validation and approved names. Migrate aggregate
-    construction/string-representation behavioral tests. Inventory affected
-    legacy consumers and any minimal approved temporary seam, owned for M6
-    removal; preserve later-track execution without migrating it here.
-  - Tests: Exact held identities, direct current-data visibility, mixed gas,
-    wrong types/box/species layouts, unchanged candidate inputs on rejection,
-    and no facade construction on the native path.
-  - Gate: Native aggregate tests and affected retained consumer smoke tests
-    pass; no duplicated state/physics authority or unowned temporary seam.
+| Phase | Delivered behavior | PR / evidence |
+|---|---|---|
+| P1 | Keyword-only three-container aggregate; identity reads; structural then representation admission; legacy isolation | #1625, `p1_working_evidence.md` |
+| P2 | All setters and atomic whole-triple replacement; same-object revalidation and rejection snapshots | #1626, `p2_validation.md` |
+| P3 | Native fluent builder, constructor-consistent admission and repeated-build identity; temporary legacy builder | #1627, `p3_validation.md` |
+| P4 | Owned single-material radius and lognormal PDF/PMF native initialization | #1628, `p4_validation.md` |
+| P5 | Owned direct resolved mass/count/density and sampled-lognormal initialization | #1629, `p5_validation.md` |
+| P6 | Bounded developer guide, data-only integration, reconciled ledgers and final validation | Final phase PR, `validation_evidence.md` |
 
-- [ ] **E9-M2-P2: Implement individual and coordinated replacement with atomic rejection tests**
-  - Issue: TBD | Size: S | Status: Not Started
-  - Work: Implement all three individual replacements and one coordinated
-    operation with complete preflight before reference publication. Reuse M1
-    validators, not coercing constructors or chained mutating public setters.
-  - Tests: Each accepted candidate retained by identity; unaffected references
-    stay identical; same-object assignments; individual mismatch rejects;
-    valid coordinated species-layout change succeeds where individual changes
-    cannot. Inject failures at each preflight stage and compare all old and
-    candidate references, arrays and metadata. Cover no GPU/resident rebinding.
-  - Gate: Full replacement matrix passes, including late-candidate rejection,
-    with no partial state change or accidental validation side effects.
+## Contract applied to every phase
 
-- [ ] **E9-M2-P3: Migrate aggregate construction builders with alignment and identity tests**
-  - Issue: TBD | Size: S | Status: Not Started
-  - Work: Migrate `AerosolBuilder` to the three native containers. Reuse
-    `ParticleDataBuilder`, `GasDataBuilder` and explicit `EnvironmentData`
-    construction; add only demonstrated construction gaps. Remove native-path
-    reliance on facade strategy-name checks, not the M6-owned legacy classes.
-    Freeze the capability ledger for direct mass/radius inputs and presets.
-  - Tests: Migrate `aerosol_builder_test.py` behavior: fluent assembly, missing
-    components, shared validation, identity, repeated builds per approved
-    ownership rules, mixed/all-false gas masks and rejection nonmutation.
-  - Gate: Builder and direct-constructor admission agree; no species omitted,
-    no physics configuration stored, every retained capability has P4/P5 owner.
+Native builders/initializers declare kind explicitly. Discrete/PMF densities
+and radius PDF dn/dr are already per-volume and use fixed volume 1 m³. Only
+resolved density-to-count conversion multiplies by physical volume; direct
+counts do not. Non-unit-volume success cases belong to resolved storage;
+non-unit binned volumes reject. PDF mass density integrates mass times PDF.
 
-- [ ] **E9-M2-P4: Provide data-native radius-bin initialization with behavioral tests**
-  - Issue: TBD | Size: S | Status: Not Started
-  - Work: Extract/reuse useful radius-to-mass and lognormal PDF/PMF generation
-    from `PresetParticleRadiusBuilder` and direct radius construction into the
-    approved native construction module. Preserve documented defaults and
-    units; return native data without activity/surface/distribution strategies.
-  - Tests: Migrate distribution shape, radius/mass/density/charge, invalid
-    distribution input, PDF versus PMF and unit-conversion assertions. Add
-    independent population totals at V=0.25/4 using the M1 convention; do not
-    require identical raw arrays if the approved explicit conversion differs.
-  - Gate: Approved binned capabilities work natively, all enduring assertions
-    are traceable, and no facade construction is needed by the native path.
+Aerosol validates structure then calls ParticleData.validate_representation;
+it never copies/coerces candidates, stores process mappings, or rebinds GPU
+state. Chemical mapping and unnamed gas/environment order are not certified by
+structural width checks. Native tagged Warp upload remains unsupported and
+rejects rather than silently dropping metadata.
 
-- [ ] **E9-M2-P5: Provide data-native resolved initialization with non-unit-volume tests**
-  - Issue: TBD | Size: S | Status: Not Started
-  - Work: Provide direct resolved mass and sampled lognormal initialization
-    using existing utilities/native builders. Preserve density/charge shape
-    behavior, count/volume meaning and reviewed random-state contract; do not
-    expand to new sampling physics or promise cross-backend RNG replay.
-  - Tests: Migrate resolved-builder behavioral coverage; use controlled sample
-    fixtures for mass conversion and independent inventory oracles at non-unit
-    volumes. Test species/density/charge mismatch, invalid inputs and approved
-    empty/inactive behavior. Verify partitioning and nonpartitioning gas stay
-    ordered when the initialized particles enter the aggregate.
-  - Gate: All inventoried retained construction capabilities have native tests;
-    no double normalization, altered scientific tolerances or lost coverage.
-
-- [ ] **E9-M2-P6: Update development documentation**
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Work: Publish bounded construction/access/replacement developer guidance
-    with M1 authority links, units/defaults and explicit no-GPU-rebind warning.
-    Finalize capability, behavioral-test and temporary-compatibility ledgers.
-    Broad supported tutorial/notebook migration remains M5.
-  - Tests: Data-only integration from native initialization through builder,
-    read access, individual/coordinated replacement and rejection snapshots;
-    retain non-unit-volume/mixed-gas quantities and transfer/export smoke
-    assertions. Rerun required focused groups, then untargeted coverage,
-    lint/type checks and strict docs. Unit tests already ship in P1–P5.
-  - Gate: Record final revision/date, literal results, skips and reviewer
-    approval. M3 starts only after M2 is completed and validated; no open
-    blocking construction/compatibility decision or required unavailable check.
+Each phase includes its co-located behavioral tests. The capability and exact
+legacy-consumer ledgers give successor assertions and M3/M4/M5/M6 ownership.
+M2 completion requires final validation and explicit maintainer handoff
+acceptance before M3 starts.

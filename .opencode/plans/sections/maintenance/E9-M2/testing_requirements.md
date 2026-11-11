@@ -26,15 +26,16 @@ controls. No local `-Werror`; retain the configured warning policy.
 | Coordinated replacement | New compatible layout accepted by identity; each preflight failure leaves entire old/candidate triple untouched | P2 |
 | Alignment | Distinct species values, interleaved `[True, False, True]`, all-false flags, wrong declared mapping/order and dimensions | P1–P3/P5 |
 | Builders | Required inputs, documented allocation/copy defaults, fluent use, constructor-consistent validation | P3 |
-| Radius-bin presets | PDF/PMF distinctions, mass/radius conversion, units, invalid distribution, non-unit volume | P4 |
+| Radius-bin presets | PDF/PMF distinctions, mass/radius conversion, units, invalid distribution, fixed V=1 and non-unit rejection | P4 |
 | Resolved presets | Controlled sampling, mass/density/charge shapes, count and volume, rejection, no implicit normalization | P5 |
 | Data-only integration | Initialization → construction → access/replacement; unchanged quantities except explicitly supplied replacement state | P6 |
 | Protected boundaries | Existing runnable behavior pending M4, scientific behavior pending M3, retained transfer/export contracts and no automatic GPU rebind | All affected phases/P6 |
 
-Use M1's approved distribution convention with V=0.25 and 4 m^3. Independently
-calculate physical number density (w/V for counts, c for density storage),
-particle species inventory `V * sum_i(m_i,s * c_i)` and gas inventory
-`V * gas_concentration_s` using the approved map. Keep per-particle total mass
+Use resolved V=0.25, 1 and 4 m^3 with independent count/V and species
+sum(mass * count) inventory oracles. PMF at fixed V=1 sums density weights;
+PDF at fixed V=1 integrates mass times dn/dr over the explicit radius grid.
+Binned non-unit volume cases must reject. Gas inventory is V times gas density.
+No process map is validated or stored by aggregate construction. Keep per-particle total mass
 distinct. Construction/wrapping must not silently change these quantities;
 replacement selects caller-provided state, not a conservation operation that
 rescales it. Assert component outputs, not only an all-species sum. Preserve
@@ -48,7 +49,7 @@ does not authorize multi-box execution. Migrate enduring facade-fixture
 assertions with their owning construction phase, leaving later-track tests
 operational through the approved temporary transition rather than deleting them.
 
-## Future implementation validation sequence
+## Implementation validation sequence
 
 Refine focused paths against the actual diff and include any new adjacent
 initialization modules and P6 data-only integration test. Representative commands:
@@ -73,4 +74,6 @@ CUDA is optional pass-or-clean-skip, never fallback. Add an affected prepared
 state identity regression if needed to demonstrate no rebind, without adding
 production hooks or changing resident lifecycle. No performance claims required.
 Log literal outputs and final revision; required unavailable/failing checks
-block M3 handoff. None of these commands ran during this drafting task.
+block M3 handoff. Results are recorded in the phase evidence and final validation record.
+
+P6 also runs `pytest examples_tests -q -Werror` and `pytest scripts/tests -q -Werror` separately, the new native initialization and integration suites, and helper package checks. GPU-bearing validation uses host device/cache access when available. No focused coverage override replaces the untargeted runner.

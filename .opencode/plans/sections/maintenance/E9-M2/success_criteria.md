@@ -1,18 +1,20 @@
 # Success Criteria
 
-All implementation gates below are pending; drafting does not satisfy them.
+P1–P5 implementation gates are locally validated. P6 final-revision checks and
+maintainer acceptance are recorded in `validation_evidence.md`; no acceptance
+is inferred from plan approval.
 
-- [ ] Reviewed M1 contracts and final-revision validation accepted before P1.
-- [ ] Flat native construction and builder work without invoking facades.
-- [ ] Getters and accepted replacements preserve exact supplied identities.
-- [ ] Each individual mismatch and invalid coordinated triple leaves old and
+- [x] Reviewed M1 contracts and final-revision validation accepted before P1.
+- [x] Flat native construction and builder work without invoking facades.
+- [x] Getters and accepted replacements preserve exact supplied identities.
+- [x] Each individual mismatch and invalid coordinated triple leaves old and
   candidate state unchanged; valid coordinated layout changes succeed.
-- [ ] All retained initialization capabilities have native equivalents with
+- [x] All retained initialization capabilities have native equivalents with
   migrated unit, shape, distribution, non-unit-volume and rejection assertions.
-- [ ] Mixed/all-nonpartitioning gas survives in declared order; alignment
+- [x] Mixed/all-nonpartitioning gas survives in declared order; structural
   mismatches reject without normalization, silent sorting or truncation.
-- [ ] No process-owned physics moves onto state; no implicit GPU rebind occurs.
-- [ ] Existing runnable/scientific behavior remains protected pending M3/M4;
+- [x] No process-owned physics moves onto state; no implicit GPU rebind occurs.
+- [x] Existing runnable/scientific behavior remains protected pending M3/M4;
   every temporary compatibility seam has an explicit M6 removal owner/gate.
 - [ ] Focused assertions, untargeted full-package coverage, required lint/type
   and bounded docs checks pass at the final M2 revision.
@@ -30,3 +32,5 @@ All implementation gates below are pending; drafting does not satisfy them.
 
 Optional CUDA skips are recorded, not interpreted as measured success. M2
 completion is not full v0.3.0 readiness or proof that M3–M6 have been migrated.
+
+The original metric table describes the draft baseline. Current capability and transition inventory is complete in the dedicated ledgers; resolved non-unit and fixed-volume binned evidence replace historical generic volume examples.

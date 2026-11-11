@@ -1,36 +1,23 @@
 # Dependencies
 
-**Parent:** E9. **Issue:** #1602. **Track:** T2. Metadata prerequisite: E9-M1.
+M1 → M2 → M3 → M4 → M5 → M6 remains strictly serial, with each implementation
+track completed and validated before the next starts. M2's six phases follow
+the same local implementation/validation order; the separate PRs are stacked.
 
-`E9-M1 -> E9-M2 -> E9-M3 -> E9-M4 -> E9-M5 -> E9-M6`
+M1 handoff was approved on 2026-11-10 and PR #1624 merged at `229bdb4a1`.
+M2 began from that merged baseline. Its phase evidence links the exact
+predecessor commit and PR. M2 does not implement any later track.
 
-Each arrow means **completed and validated**, not drafted, started, or merged
-with tests pending. T1–T6 map one-to-one to M1–M6. No parallel implementation.
-Internally P1 → P2 → P3 → P4 → P5 → P6 follows the same serial evidence gates.
+- M3 owns scientific process admission, mapping and numerical migration.
+- M4 owns runnable/adapters, dilution/nucleation orchestration and resident work.
+- M5 owns supported examples/notebooks and broad migration documentation.
+- M6 removes temporary legacy APIs only after named consumers and enduring
+  behavioral tests migrate, then owns release-readiness validation.
 
-| Related plan | Dependency / ownership |
-|---|---|
-| E9-M1 | Approves units, normalization, ordered mapping, API/copy-view/replacement specification and shared validators; supplies tested helpers |
-| E9-M3 | Starts after M2 completion; consumes flat construction/replacement for scientific migration, owns scientific strategies |
-| E9-M4 | Starts after M3; owns runnable composition, dilution/nucleation orchestration and CPU adapters |
-| E9-M5 | Starts after M4; owns supported examples/notebooks and broad migration docs |
-| E9-M6 | Starts after M5; owns temporary compatibility and legacy API removal, final release-readiness validation |
+Existing native builders, structural/representation validators and distribution
+generators are reused. No new package or hardware prerequisite is introduced.
+Explicit untagged CPU/Warp transfer remains protected; new tagged data still
+rejects unsupported upload. No checkpoint or GPU normalization claim is made.
 
-M1 is complete and its prerequisite is satisfied as of 2026-11-10. Kyle
-Gorkowski approved the M1 handoff at PR #1624 revision `a7c1eb63c`, with all
-required implementation checks passing at `0db7e42b2`. M2 is Ready and may
-begin from the approved accumulation branch; it has not started. The approval
-and literal evidence are recorded in `../E9-M1/validation_evidence.md`. This
-handoff does not claim PR #1624 has merged.
-Unresolved or changed M1 contracts reopen the relevant entry gates; do not
-invent alternate mapping/normalization authority inside Aerosol or its builder.
-
-Existing native builders, distribution utilities and scientific tests supply
-the baseline. CPU↔Warp transfer/export/ownership and prepared/resident identity
-contracts are protected dependencies, not new implementation work. No new
-external package, performance study or hardware prerequisite is introduced.
-Epic I follows the migration and is not an upstream dependency.
-
-M2 handoff includes final revision, approved native capability/API inventory,
-replacement matrix evidence, migrated-test mapping, compatibility removal
-ledger, required validation and reviewer acceptance. Only then may M3 start.
+Final local checks and maintainer acceptance in `validation_evidence.md` admit
+M3. Open PRs do not by themselves supply that acceptance.
