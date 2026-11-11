@@ -1,24 +1,27 @@
 # Success Criteria
 
-These are pending implementation gates, not completed drafting outcomes.
+Implementation and required validation are complete; evidence is in
+[implementation.md](implementation.md). Maintainer acceptance and M5
+authorization remain pending.
 
-- [ ] M3 completed-and-validated revision and upstream contracts are accepted.
-- [ ] All supported CPU runnable rate/execute paths use native containers;
+- [x] M3 completed-and-validated revision and upstream contracts are accepted.
+- [x] All supported CPU runnable rate/execute paths use native containers;
   composed calls preserve ordering, returned aggregate identity and state.
-- [ ] Multi-box and invalid directly mutated state reject without unauthorized
+- [x] Multi-box and invalid directly mutated state reject without unauthorized
   writes; ordered alignment and non-unit-volume results match M1/M3 contracts.
-- [ ] Dilution decays all gas lanes and particle concentrations once per
+- [x] Dilution decays all gas lanes and particle concentrations once per
   substep, preserves protected fields, and retains rejection/commit-failure
   behavior, including custom-strategy delegation boundaries.
-- [ ] Nucleation reads current gas/environment, preserves independent weighted
+- [x] Nucleation reads current gas/environment, preserves independent weighted
   conservation and commits atomically per attempted substep only.
-- [ ] CPU adapter paths retain supported profile gates, exactly-once dispatch,
+- [x] CPU adapter paths retain supported profile gates, exactly-once dispatch,
   payload/result identity, error propagation and concrete-only export surface.
-- [ ] Enduring behavioral assertions are migrated, not discarded; each
+- [x] Enduring behavioral assertions are migrated, not discarded; each
   temporary compatibility seam has an M6 removal owner and remaining consumers.
-- [ ] Focused assertions, explicit CPU wall-loss checks, retained GPU boundary
+- [x] Focused assertions, explicit CPU wall-loss checks, retained GPU boundary
   checks, untargeted coverage, and required lint/type/docs checks pass.
-- [ ] Dated final-revision evidence and reviewer approval authorize M5 to start.
+- [ ] Maintainer review accepts the dated final-revision evidence and
+  authorizes M5 to start.
 
 | Metric | Baseline at drafting | Target | Source |
 |---|---|---|---|

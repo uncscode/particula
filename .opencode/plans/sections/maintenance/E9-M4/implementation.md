@@ -36,7 +36,7 @@ issue: #1606. This supersedes the old multiple-PR and issue-generation wording.
 | 8. Native resident/prepared metadata and diagnostics | Implemented; focused checks pass |
 | 9. Schema-v5 checkpoints and exact-device continuation | Implemented; focused checks pass |
 | 10. Complete native composed-process regressions | Implemented; focused checks pass |
-| 11. Final validation and developer handoff | Pending |
+| 11. Final validation and developer handoff | Checks pass; maintainer acceptance pending |
 
 Each functional checkpoint includes adjacent tests and literal evidence before
 dependent work. The final PR includes all checkpoints; no partial checkpoint
@@ -60,7 +60,7 @@ optional pass-or-clean-skip. Thresholds and scientific tolerances stay intact.
 
 ## Validation evidence
 
-Focused checkpoint evidence follows. Final acceptance remains pending.
+Focused and final-revision evidence follows. Maintainer acceptance remains pending.
 
 ### Checkpoint 2
 
@@ -197,3 +197,63 @@ Focused checkpoint evidence follows. Final acceptance remains pending.
 - Native full-loop fixtures use no selected wall-loss boxes; real selected-wall
   removal and native stochastic restart are independently covered in checkpoints
   8–9. Existing communication fixtures cover nonzero transport and volume change.
+
+## M5/M6 developer handoff and residual consumers
+
+| Temporary seam | Remaining callers / evidence | Removal owner |
+|---|---|---|
+| Native-or-legacy scientific/dilution runnable branches and `RunnableABC` annotations | `runnable_test.py`, `wall_loss_runnable_test.py`, legacy dilution suites; `docs/Examples/cpu_dilution.py` and simulation notebooks | M5 migrates examples; M6 removes facade branches after successor coverage |
+| Concrete-only `LegacyNucleation` | `dynamics/tests/nucleation_runnable_test.py` only; public `Nucleation` is native | M6, retain enduring transaction assertions in native tests |
+| CPU adapter and Equilibria native-or-legacy admission | Legacy adapter/equilibrium regression fixtures alongside new native integration tests | M6 after native fixture migration |
+| Untagged direct/prepared Warp execution | Legacy low-level examples/tests; native metadata is explicit on new paths | M5 migrates examples; M6 removes untagged admission |
+| Concrete pre-prepared exhaustion helpers and nucleation preflight | Private legacy phase regression tests; tagged direct/prepared public calls use native-aware preparation | M6 after phase-test replacement |
+| Explicit `legacy_untagged` schema-v5 checkpoint meaning | Existing resident lifecycle and example fixtures | M6; old checkpoint schemas already reject in M4 |
+
+Native CPU calls read current aggregate environment and unified full-order gas.
+`Nucleation(source_config, commit_config)` has no environment constructor input;
+source configuration carries explicit gas-order/lane provenance. The migrated
+`docs/Examples/Nucleation/cpu_nucleation.py` demonstrates that invocation.
+Native dilution preserves masses and exponentially decays raw population and
+every gas lane. CPU source injection commits weighted represented counts; the
+bounded GPU source retains integral one-count-per-slot admission.
+
+Prepared GPU mappings pin exact particle/gas arrays and complete ordered names.
+Explicit restart creates fresh arrays, so callers prepare fresh process mappings
+and requests deliberately, as in `native_full_loop_test.py`. Dispatch never
+rebinds or performs CPU fallback. Total-mass diagnostics require every material
+lane mapped; particle-only process layouts must use appropriate independent
+accounting or the supported two-snapshot diagnostics.
+
+Broad notebook/example migration and final facade deletion are not M4 claims.
+M3 fixed-composition density coagulation and equal-active-weight resolved
+coagulation limits remain. No runtime benchmark or performance claim is made.
+
+## Final revision validation — 2026-11-11
+
+Code/test revision: `d29a79924`; the final handoff commit changes plan records
+only. All commands use the repository `.venv`. Warp checks used
+`WARP_CACHE_PATH=/tmp/particula-m4-warp` with device access enabled: NVIDIA
+GeForce RTX 5060 (8 GiB, sm_120), driver 615.78.08/CUDA 13.4, Warp 1.11.1.
+Earlier restricted-process CUDA skips were replaced by actual hardware runs.
+
+| Gate / exact command | Result |
+|---|---|
+| `PATH="$PWD/.venv/bin:$PATH" .venv/bin/python .opencode/tools/run_pytest.py --timeout 1200` (untargeted, CUDA available) | **9,349 passed, 19 skipped; 92% coverage, unchanged 80% threshold; validation passed** |
+| `.venv/bin/pytest examples_tests scripts/tests -q -Werror --no-cov` | **280 passed, 1 skipped** |
+| `.venv/bin/pytest particula/dynamics/tests/wall_loss_strategies_test.py particula/dynamics/wall_loss/tests/wall_loss_strategies_test.py particula/gpu/tests/conversion_test.py particula/gpu/tests/kernel_exports_test.py particula/execution/tests/exports_test.py particula/tests/execution_exports_test.py -q --no-cov` | **227 passed**, including both explicitly selected CPU wall-loss suites |
+| `PATH="$PWD/.venv/bin:$PATH" .venv/bin/python .opencode/tools/run_linters.py` | All linters passed |
+| `.venv/bin/ruff check particula/` and `.venv/bin/ruff format --check particula/` | Passed |
+| `.venv/bin/mypy particula/ --ignore-missing-imports` | Passed, 551 source files |
+| `.venv/bin/mkdocs build --strict` | Passed |
+| `git diff --check` | Passed |
+
+The untargeted gate includes resident/full-loop, transfer, RNG, restart, native
+scientific and integration regressions. Earlier focused runs establish native
+CPU/CUDA path coverage and separate deterministic conservation from stochastic
+continuation. No threshold or tolerance was relaxed; optional skips are not
+claimed as GPU passes. Runtime performance remains unmeasured by this work.
+
+Delivery is one PR to `uncscode/particula:main` with eleven serial commits,
+closing #1606 and preserving the accepted M3 base. Implementation and required
+validation are complete. Maintainer review, merge and authorization to begin M5
+remain separate; this record does not mark E9 or its release shipped.
