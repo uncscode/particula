@@ -140,7 +140,7 @@ Warp CPU is required when installed; CUDA results/skips are explicit.
 | Existing coverage/seam | Required successor / retention | Owner / state |
 |---|---|---|
 | Condensation `_make_data_inputs` via from_representation/from_species | species_mapping_test plus native_step/native_staggered/native_step_admission and GPU condensation_native_test establish facade-free configuration, rate, stepping, rejection and conservation assertions; legacy fixtures retained separately | M3 P1/P2 checkpoint complete; final ledger review P6 |
-| Coagulation native helper/ABC and mechanism fixtures | native_rates_test supplies explicit metadata, per-particle kernel inputs, density/radius-PDF rate measures and all CPU mechanism rows; weighted step/charge inventory remains P4-owned | P3 checkpoint complete; P4 pending |
+| Coagulation native helper/ABC and mechanism fixtures | native_rates_test supplies explicit metadata, physical kernel inputs and density/PDF measures; native_coagulation_step_test adds weighted resolved merges, binning and admission; arbitrary fixed-grid species transport remains a pending scientific decision | P3 committed b41c908d1; CPU P4 checkpoint in progress; see p4_validation.md |
 | Both wall-loss strategy suites | Native fixtures preserving geometry, helpers, RNG and sink assertions | M3 P5, pending |
 | `_legacy_aerosol`, legacy builder, facade scientific dispatch | Retain for unmigrated runnables/adapters/examples; no duplicate authoritative arrays | consumers M4/M5, removal M6 |
 | Untagged CPU/Warp conversions and legacy prepared consumers | Retain explicit old path; distinguish from native tagged evidence | native admission M3; resident M4; final removal review M6 |

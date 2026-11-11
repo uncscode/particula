@@ -75,14 +75,14 @@
     {
       "id": "E9-M3-P4",
       "title": "Complete native coagulation stepping with weighted conservation tests",
-      "status": "Not Started",
+      "status": "In Progress",
       "size": "S",
       "issue_number": null,
-      "start_date": null,
+      "start_date": "2026-11-11",
       "completion_date": null,
       "estimates": null,
       "actuals": null,
-      "notes_ref": null,
+      "notes_ref": ".opencode/plans/sections/maintenance/E9-M3/p4_validation.md",
       "depends_on": null,
       "reconciliation_evidence_fingerprint": null
     },
