@@ -1,4 +1,10 @@
-# P4 CPU density-moment correction
+# Historical, superseded P4 moment-transport experiment
+
+**Superseded by the maintainer's 2026-11-11 decision:** “Preserve method;
+document limitation.” The implementation and tests described below were
+removed from the final M3 diff. These results are historical evidence for an
+unselected extension, not the current supported contract. See
+[p4_preserved_method.md](p4_preserved_method.md) for current scope and evidence.
 
 Entry revision: `daf119778` plus the previously uncommitted `_native_step.py`
 species-moment implementation. This follow-up remains part of the single M3

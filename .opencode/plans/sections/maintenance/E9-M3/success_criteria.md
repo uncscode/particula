@@ -28,3 +28,7 @@
 
 Final implementation and evidence: [P6 validation](p6_validation.md).
 Scientific acceptance and M4 entry remain pending maintainer review.
+
+The maintainer explicitly accepts the fixed-composition PMF/PDF species-closure
+limitation for M3; see [preserved-method decision](p4_preserved_method.md).
+This exception does not weaken resolved coagulation conservation requirements.

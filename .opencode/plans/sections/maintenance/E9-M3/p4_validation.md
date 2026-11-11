@@ -1,11 +1,8 @@
-# P4 coagulation stepping — implementation evidence
+# P4 initial CPU checkpoint and historical investigation
 
-Entry: P3 committed as `b41c908d1`. The initial CPU checkpoint below is
-superseded for PMF/PDF stepping by the species-moment correction recorded in
-[p4_moments_validation.md](p4_moments_validation.md). Direct/prepared GPU admission
-and normalization now have a separate checkpoint in
-[p4_gpu_validation.md](p4_gpu_validation.md). M3 is not complete and M4 is not
-opened; final-revision P6 validation and scientific review remain required.
+Current authority: [maintainer decision and preserved method](p4_preserved_method.md).
+The initial fixed-composition PMF/PDF method is retained. The subsequently
+explored moment extension below is historical and has been removed from M3.
 
 ## Initial native CPU checkpoint
 
@@ -18,7 +15,7 @@ opened; final-revision P6 validation and scientific review remain required.
 - PMF/PDF retain the existing gain/loss laws and explicit Euler update in
   density storage at V=1. Nonfinite or negative proposals reject without
   clipping or caller writes. This initial checkpoint did not establish
-  conservative species transport; the subsequent moment correction does.
+  conservative species transport; the moment extension described later was subsequently declined.
 - Resolved steps accept equal positive active weights, including fractional
   weights, and reject unequal weights before RNG use. The existing selector
   receives `time_step * common_weight` and the original physical volume, so
@@ -86,12 +83,11 @@ case, while individual species errors persist.
 
 On 2026-11-11 the maintainer was initially asked to choose between retaining the method
 with an explicit scientific limitation and expanding M3 to conservative species
-transport. No answer is recorded yet. Neither narrowing support to uniform
-composition nor silently replacing the solver is authorized by this evidence.
-The existing objective's per-species conservation requirement remains unmet
-for this row until its correction and validation are complete.
+transport. The later explicit answer was “Preserve method; document limitation.”
+This accepts the composition-dependent PMF/PDF conservation limitation for M3;
+resolved conservation requirements remain in force.
 
-### Subsequent prototype resolves the algorithm/scope conflict
+### Historical prototype (not retained after maintainer decision)
 
 A later read-only numerical probe shows that replacing the number-density
 solver is unnecessary. Its existing gain quadrature is linear in its supplied
@@ -124,7 +120,8 @@ weighted charge bookkeeping where supported and final regression gates remain
 required. No global mass rescaling, support narrowing or new collision law is
 proposed. The earlier scope-choice question was withdrawn as unnecessary:
 the original M3 objective already authorizes this conservation correction while
-retaining the number-density algorithm. No limitation waiver was accepted.
+retaining the number-density algorithm. That earlier status was superseded by the maintainer's later explicit decision
+to preserve the method and document the limitation.
 
 ## GPU audit and successor implementation
 
@@ -171,4 +168,4 @@ as host-derived scalar state in a prepared call.
 - Strict documentation build: passed in 1.43 s.
 
 This initial checkpoint alone does not satisfy P4/P6 or final-revision
-validation. The moment and GPU records supply the subsequent P4 evidence.
+validation. The preserved-method and GPU records supply the current P4 evidence.

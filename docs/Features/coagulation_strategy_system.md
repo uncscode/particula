@@ -68,25 +68,29 @@ proposals leave caller arrays unchanged. Density, volume and the explicit PDF
 radius grid are protected. This is single-box CPU execution; runnable and
 resident integration remain separate migration work.
 
-Discrete/PDF stepping retains the existing explicit number gain/loss update.
-Species mass and signed charge are additive collision quantities: the gain
-integrand carries the sum of both donors' quantities, while loss removes the
-departing particles' quantities. The step advances each quantity's density
-inventory, then recovers its mean per particle using the updated number
-density. Thus per-bin species mass and charge can change. Assigning gained
-particles the destination bin's old composition would generally violate
-species conservation even when total mass appears accurate.
+Discrete/PDF stepping preserves the existing explicit number gain/loss
+update on a fixed composition grid. It writes concentration only; per-bin
+species masses and charge remain unchanged. Negative or nonfinite proposed
+concentrations reject before publication, without clipping.
 
-The existing cubic interpolation, trapezoid integration and PMF-to-PDF
-conversion are retained. Conservation is subject to finite-domain and grid
-error, rather than enforced by global rescaling. Independent finite-step
-fixtures cover varying composition, different material densities, signed
-charge and grid refinement; they distinguish per-species inventory defects
-from number-rate agreement. Negative/nonfinite number or material inventories,
-or nonzero inventories with zero number density, reject before any writes.
-Choose a stable timestep and adequately resolved grid. No clipping or new
-accuracy order is implied. Zero-time, zero-population and zero-kernel work
-preserves state exactly.
+**Known limitation:** gained particles inherit the destination bin's fixed
+composition rather than the combined donor composition. With composition
+varying across particle size, this method does not generally conserve each
+species or weighted charge. Refining the radius grid or reducing the timestep
+does not resolve that composition error, even when total-mass error converges.
+M3 deliberately preserves this method; conservative species/charge transport
+is deferred and is not part of the supported density-step contract.
+
+For an illustrative two-species, equal-density (1000 kg/m^3), constant-kernel
+(1e-15 m^3/s) lognormal case, the PDF species defects at 1024 radius nodes are
+approximately +7.79% and -12.20% **of gross transferred species mass**, while
+total-mass error converges. The corresponding PMF defects are +7.43% and
+-12.49%. These are fixture-specific characterization results, not universal
+error bounds or percentages of the starting inventory. The fixture spans
+1e-9 to 1e-6 m, has geometric mean 1e-7 m, log standard deviation .35 and
+number density 1e10 m^-3; its first species fraction is
+`clip(.5 + .3*log(r/1e-7), .05, .95)`. The independent refinement regression
+retains both the nonzero species defects and the decreasing total-mass error.
 
 Resolved stepping uses the existing binned/direct selector with equal positive
 active counts within the box. Unequal active weights reject before drawing;
@@ -102,7 +106,7 @@ equality.
 Focused native stepping checks:
 
 ```bash
-pytest particula/dynamics/coagulation/coagulation_strategy/tests/native_coagulation_step_test.py particula/dynamics/coagulation/coagulation_strategy/tests/native_coagulation_moments_test.py -q --no-cov
+pytest particula/dynamics/coagulation/coagulation_strategy/tests/native_coagulation_step_test.py particula/dynamics/coagulation/coagulation_strategy/tests/native_coagulation_limitations_test.py -q --no-cov
 ```
 
 ## Key Benefits

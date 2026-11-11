@@ -9,7 +9,9 @@ Branch: `codex/e9-m3-scientific-processes`; issue #1605.
 This record supersedes contradictory September M3 planning wording. All
 implementation and validation below remain pending unless explicitly recorded.
 P6's final integration, assertion/compatibility inventory and review handoff
-are recorded in [p6_validation.md](p6_validation.md).
+are recorded in [p6_validation.md](p6_validation.md). The later explicit
+maintainer decision in [p4_preserved_method.md](p4_preserved_method.md) supersedes
+the moment-transport extension and its PMF/PDF species-closure requirement.
 
 ## Scientific contract
 
@@ -35,7 +37,7 @@ are recorded in [p6_validation.md](p6_validation.md).
 |---|---|---|---|
 | CPU condensation | Isothermal, staggered half/random/batch, latent heat; uptake, evaporation, reservoir | PMF/PDF at V=1, resolved positive V; weighted inventories and mapped species | condensation strategies, mass-transfer, staggered conservation/stability and new native tests |
 | CPU coagulation rates | Brownian, charged, sedimentation, turbulent shear, turbulent DNS, combined | Discrete/PDF density rates; explicit matching representation; physical kernel inputs | all seven strategy test modules and independent rate fixtures |
-| CPU coagulation steps | Existing number law with species/charge moment quadrature; resolved binned/direct selector | Equal positive active resolved counts; reject unsupported unequal weights; finite-grid density conservation evidence | native_coagulation_step_test and native_coagulation_moments_test |
+| CPU coagulation steps | Existing fixed-composition number update; resolved binned/direct selector | Equal positive active resolved counts; reject unsupported unequal weights; documented PMF/PDF species-closure limitation | native_coagulation_step_test and native_coagulation_limitations_test |
 | CPU wall loss | Spherical/rectangular neutral/charged; image charge and field; deterministic binned and stochastic resolved | PMF/PDF at V=1, resolved positive V; preserve survivor and removed inventories | BOTH dynamics/tests and dynamics/wall_loss/tests suites, separately |
 | Direct/prepared GPU condensation | Existing fixed-four-substep scheme and latent correction | Explicit count basis, species mapping, non-unit V; no GPU PDF algorithm | condensation, graph capture, direct/prepared integration tests |
 | Direct/prepared GPU coagulation | Existing mechanism-specific kernels/selectors | Explicit supported count/weight matrix, volume correction; no inferred mode expansion | coagulation, validation, stochastic and prepared tests |
@@ -93,7 +95,7 @@ that boundary belong with M3 metadata changes; no M4 functionality is claimed.
 | Tagged PDF / unknown code | particle_population_test and population_metadata_test: rejection before Warp probe/readback | no PDF execution |
 | Species maps / independent widths | population_metadata_test: full gas order, skipped/unmapped lanes, stale binding and no-device-work checks | condensation P2 |
 | Condensation direct/prepared | condensation_native_test: explicit binding, mapped four-substep science, N/V gas coupling and extensive energy | P2 verified discrete/resolved checkpoint |
-| Coagulation direct/prepared | coagulation_native_test: all eleven masks, equal counts, independent species/charge inventory and stochastic expectations; population_boundary_test rejects PMF/PDF | P4 GPU checkpoint complete; CPU moments have separate p4_moments_validation.md evidence |
+| Coagulation direct/prepared | coagulation_native_test: all eleven masks, equal counts, independent species/charge inventory and stochastic expectations; population_boundary_test rejects PMF/PDF | P4 GPU checkpoint complete; CPU fixed-composition limitation is recorded in p4_preserved_method.md |
 | Wall loss direct/prepared | wall_loss_native_test: four configurations, unequal counts, independent sinks/statistics, persistent/reset RNG and frozen references | P5 GPU checkpoint; see p5_gpu_validation.md |
 | Wall loss selected-box resident seams | population_boundary_test: reject tagged state before payload access | M4 integration; no native resident support claimed |
 | Dilution/nucleation/exhaustion and resident setup/revalidation | population_boundary_test and gpu_session_test: reject newly tagged consumers before mutation or metadata loss | M4 |
@@ -143,7 +145,7 @@ Warp CPU is required when installed; CUDA results/skips are explicit.
 | Existing coverage/seam | Required successor / retention | Owner / state |
 |---|---|---|
 | Condensation `_make_data_inputs` via from_representation/from_species | species_mapping_test plus native_step/native_staggered/native_step_admission and GPU condensation_native_test establish facade-free configuration, rate, stepping, rejection and conservation assertions; legacy fixtures retained separately | M3 P1/P2 checkpoint complete; final ledger review P6 |
-| Coagulation native helper/ABC and mechanism fixtures | native_rates_test supplies explicit metadata, physical kernel inputs and density/PDF measures; native_coagulation_step_test adds weighted resolved merges, binning and admission; native_coagulation_moments_test adds independent finite-step species/charge transport and refinement through the retained gain quadrature | P3 committed b41c908d1; P4 CPU/GPU checkpoints and moment correction; see p4_validation.md, p4_gpu_validation.md and p4_moments_validation.md |
+| Coagulation native helper/ABC and mechanism fixtures | native_rates_test supplies explicit metadata, physical kernel inputs and density/PDF measures; native_coagulation_step_test adds weighted resolved merges, binning and admission; native_coagulation_limitations_test retains fixed masses/charge and independently characterizes persistent species defects under refinement | P3 committed b41c908d1; P4 CPU/GPU checkpoints with accepted density limitation; see p4_preserved_method.md, p4_validation.md and p4_gpu_validation.md |
 | Both wall-loss strategy suites | Both original suites now use explicit native fixtures, retaining every original test function; native_wall_loss_test adds independent density/resolved sinks, weighted stochastic evidence and admission | M3 P5 checkpoints; see p5_cpu_validation.md and p5_gpu_validation.md |
 | `_legacy_aerosol`, legacy builder, facade scientific dispatch | Retain for unmigrated runnables/adapters/examples; no duplicate authoritative arrays | consumers M4/M5, removal M6 |
 | Untagged CPU/Warp conversions and legacy prepared consumers | Retain explicit old path; distinguish from native tagged evidence | native admission M3; resident M4; final removal review M6 |

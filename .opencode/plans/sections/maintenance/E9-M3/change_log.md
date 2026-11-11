@@ -8,3 +8,8 @@
 Initial status: Draft; all phases Not Started. Plan-only work does not imply
 scientific validation or release readiness. Later entries must distinguish
 contract decisions, implementation evidence and completed-and-validated gates.
+
+2026-11-11 follow-up: maintainer answered “Preserve method; document limitation.”
+Restored number-only PMF/PDF stepping and fixed masses/charge, removed the
+moment extension, and added explicit nonclosure characterization. Resolved
+CPU/GPU conservation and unrelated process work remain unchanged.

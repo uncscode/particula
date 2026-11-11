@@ -15,7 +15,8 @@ The approved E9 appendix D1–D2 amendment adds direct/prepared GPU correction
 to the owning scientific phases below. Deliver serial commits with adjacent
 tests in the single authorized PR. The old S/XS estimates are historical;
 the expanded single-PR implementation is size L. Scientific corrections stay
-with their owning phase, including the P4 species/charge-moment follow-up.
+with their owning phase, including the explicit decision to retain fixed-composition PMF/PDF stepping
+with its documented species-conservation limitation; see p4_preserved_method.md.
 
 | Phase | Additional required normalization/metadata work |
 |---|---|
