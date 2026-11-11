@@ -255,3 +255,49 @@ def test_sample_missing_conversion_dependency_precedes_rng(monkeypatch):
         create_lognormal_resolved_particle_data(
             particle_resolved_count=3, volume=1000.0, volume_units="L"
         )
+
+
+@pytest.mark.parametrize("guard_sampler", [False, True])
+def test_overflowing_modal_total_rejects_before_sampling(
+    monkeypatch, guard_sampler
+):
+    """Finite individual weights cannot overflow their total after RNG use."""
+    if guard_sampler:
+
+        def fail(**kwargs):
+            raise AssertionError("sampler must not run")
+
+        monkeypatch.setattr(
+            initialization, "get_lognormal_sample_distribution", fail
+        )
+    numbers = np.array([1e308, 1e308])
+    before = np.random.get_state()
+    try:
+        with pytest.raises(
+            ValueError, match="total modal number concentration"
+        ):
+            create_lognormal_resolved_particle_data(
+                particle_resolved_count=4, number_concentration=numbers
+            )
+        after = np.random.get_state()
+        assert before[0] == after[0]
+        np.testing.assert_array_equal(before[1], after[1])
+        assert before[2:] == after[2:]
+        np.testing.assert_array_equal(numbers, [1e308, 1e308])
+    finally:
+        np.random.set_state(before)
+
+
+def test_large_finite_modal_total_remains_supported():
+    """Large valid mixture weights still produce the requested unit counts."""
+    before = np.random.get_state()
+    try:
+        np.random.seed(123)
+        data = create_lognormal_resolved_particle_data(
+            particle_resolved_count=4, number_concentration=[4e307, 4e307]
+        )
+        assert data.masses.shape == (1, 4, 1)
+        np.testing.assert_array_equal(data.concentration, [[1.0] * 4])
+        assert np.all(np.isfinite(data.masses))
+    finally:
+        np.random.set_state(before)

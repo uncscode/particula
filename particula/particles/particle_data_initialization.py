@@ -421,6 +421,7 @@ def create_lognormal_resolved_particle_data(
         geometric_standard_deviation: GSD values > 1; default [1.2, 1.4].
         number_concentration: Modal densities; default [1e10, 1e9] m^-3.
             These set relative modal sampling weights, not final number density.
+            Their sum must be finite before sampling.
         density: Single material density, default 1000 kg/m^3.
         charge: Scalar or per-particle charge; default zero.
         volume: Positive finite physical volume, default 1 m^3.
@@ -452,6 +453,10 @@ def create_lognormal_resolved_particle_data(
         radius_units,
         number_concentration_units,
     )
+    with np.errstate(over="ignore"):
+        modal_total = np.sum(numbers)
+    if not np.isfinite(modal_total):
+        raise ValueError("total modal number concentration must be finite")
     material = _single_density(density, density_units)
     result = create_resolved_particle_data(
         masses=np.zeros(particle_resolved_count),
