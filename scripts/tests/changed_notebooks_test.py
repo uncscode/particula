@@ -1,6 +1,7 @@
 """Regression coverage for notebook matrix selection against real Git history."""
 
 import importlib.util
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -13,12 +14,15 @@ SPEC = importlib.util.spec_from_file_location("changed_notebooks", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
+GIT = shutil.which("git")
+assert GIT is not None
 
 
 def git(*args):
     """Run a Git command in the isolated fixture repository."""
     return subprocess.check_output(  # noqa: S603 -- fixture-owned Git argv
-        ["git", *args], text=True  # noqa: S607 -- Git is a test prerequisite
+        [GIT, *args],
+        text=True,
     ).strip()
 
 
