@@ -74,10 +74,11 @@ has been established here.
 
 ## Final revision gate
 
-Tested implementation revision: `6375d9e4e` (2026-11-11). All changed production
-and test Python files are frozen at that revision; a final documentation-only
-evidence commit records the results without changing the tested code. The local
-source hash inventory is `.artifacts/e9-m3/final/source-manifest.json`.
+Initial tested implementation revision: `6375d9e4e` (2026-11-11). Evidence-only
+revision `0d847cc68` preserves that exact code. The subsequent CI reference-
+arithmetic follow-up below changes one test helper and no production code;
+its new validation supplements this initial gate. The initial local source
+hash inventory is `.artifacts/e9-m3/final/source-manifest.json`.
 Upstream main was independently verified as the merged M2 baseline above.
 
 All commands use the repository `.venv`; prefix executables below with
@@ -124,3 +125,41 @@ The P2 manual slow/performance reproduction remains recorded in
 touched staggered stepping. No native performance claim is inferred.
 M4 scientific acceptance remains pending; this record is implementation and
 validation evidence for review, not a maintainer approval or release gate.
+
+## CI follow-up: DNS reference arithmetic
+
+PR #1632's first test run passed Python 3.12 and 3.14 but failed five
+representation/volume variants of the native DNS reference comparison on
+Python 3.13. The same diagonal element differed by 1.247e-30 (relative
+1.2703e-11); its configured tolerance remained rtol=2e-12, atol=1e-30.
+See [the original CI run](https://github.com/uncscode/particula/actions/runs/43074595892).
+
+The independent raw-array reference used `x**(1/3)` while the carrier uses
+`np.cbrt(x)`. A rounded 1/3 exponent introduces a several-ulp radius bias,
+amplified by cancellation in the existing DNS formula. The old reference
+also differed locally, although within tolerance. Replacing that expression
+with `np.cbrt` makes the local DNS result exactly equal without changing any
+production operation, reference input authority, tolerance or conservation
+assertion. This is a P3 test-reference correction, not a new DNS solver.
+
+An isolated Python 3.13.12 environment used CI's NumPy 2.5.4, SciPy 1.18.1,
+and pytest 9.2.0. The original failure did not reproduce on this local CPU
+even with reduced SIMD features, so a platform-independent reproduction is
+not claimed. After correction, all 253 native-rate tests pass there in 0.19 s;
+the repository environment passes all 809 coagulation plus native integration
+tests in 5.25 s. Changed-file Ruff and format checks pass.
+
+```bash
+/tmp/particula-e9-m3-py313/bin/python -m pytest \
+  particula/dynamics/coagulation/coagulation_strategy/tests/native_rates_test.py \
+  -q --tb=short
+.venv/bin/pytest particula/dynamics/coagulation/ \
+  particula/integration_tests/native_scientific_processes_test.py \
+  -q --no-cov --tb=short
+.venv/bin/python .opencode/tools/run_pytest.py
+```
+
+The follow-up untargeted gate passed: 9,069 passed, 19 skipped in 152.22 s;
+92% coverage against the unchanged 80% threshold. Strict documentation built
+successfully in 1.52 s. Logs: `.artifacts/e9-m3/ci-dns/`. GitHub's final head
+checks remain the authority for the remote Python matrix.
