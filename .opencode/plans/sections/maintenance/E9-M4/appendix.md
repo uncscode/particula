@@ -34,3 +34,12 @@ E9-M2 ownership requirements; E9-M3 scientific phases and closeout ledger.
 M5 receives tested native invocation patterns and environment-signature choices.
 M6 receives residual legacy consumers and temporary seams, not an instruction
 to delete retained CPU↔Warp transfer helpers or scientific regression coverage.
+
+## Implementation authority (2026-11-11)
+
+The historical line anchors above describe the draft. Current implementation,
+consumer/compatibility decisions, native successor assertions and command
+evidence are in [implementation.md](implementation.md), on branch
+`codex/e9-m4-native-integration` from accepted M3 base `da2ad5e50`.
+One PR closes #1606; no per-phase issues are generated. M4 acceptance and M5
+authorization remain the maintainer's review decision.

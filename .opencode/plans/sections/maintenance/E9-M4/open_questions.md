@@ -17,12 +17,18 @@ Authority: [E9 review decisions](../../epics/E9/appendix.md#review-decisions-202
 - [x] **Q5 governance:** Kyle/Gorkowski accepts entry/completion, with literal
   final-revision evidence linked from the appendix and E9 closeout index.
 
-## Evidence still required in M4
+## Accepted implementation decisions and evidence
 
-Implement D1–D2 consequences for CPU/GPU dilution and nucleation, resampling,
+The implementation record covers D1–D2 consequences for CPU/GPU dilution and
+nucleation, resampling,
 volume evolution, communication, resident composition, metadata compatibility
 and checkpoint restore. Distinguish physical expansion (fixed counts) from
 representative-volume scaling (counts and volume scaled together). Version or
 reject ambiguous old checkpoint semantics explicitly. Retain current-gas
-substeps and per-attempted-substep atomicity. These are tested implementation
-deliverables; the current review does not establish their correctness.
+substeps and per-attempted-substep atomicity. See
+[implementation evidence](implementation.md) for exact commands and results.
+Final maintainer acceptance and M5 authorization remain pending.
+
+The maintainer accepted single-PR delivery, canonical free-slot wall-loss
+retirement, explicit native source mapping/current environment, and rejection
+of old checkpoint formats. No schema migration utility is included.

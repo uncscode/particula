@@ -45,3 +45,15 @@ precision/array-layout changes beyond approved metadata, performance claims or
 Epic I implementation. `execution/process_adapters.py` remains resident GPU
 infrastructure; only required D1–D2 semantic integration is included, not a CPU
 adapter redesign. CPU↔Warp conversion helpers remain supported.
+
+## Accepted single-PR implementation decisions (2026-11-11)
+
+The [implementation record](implementation.md) is the delivery and evidence
+authority for this PR. It includes native direct/prepared source and dilution,
+count-preserving physical volume evolution and communication, frozen resident
+semantics and separate species widths, and schema-v5 checkpoint restoration.
+PMF/PDF volume is exactly one; resolved counts use positive physical volume.
+Native resolved wall-loss retirement clears charge with masses/counts so the
+slot is reusable. Schema v1–v4 checkpoints reject without migration. Total-mass
+resident diagnostics require explicit complete material-to-gas mapping.
+Broad user example migration remains M5; final legacy removal remains M6.

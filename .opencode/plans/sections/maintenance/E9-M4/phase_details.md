@@ -1,12 +1,11 @@
 # Phase Details
 
-All five phases are Not Started. Each is a bounded reviewed work unit. P1 requires
-M3 completed and validated; every later phase requires its predecessor's
-validated gate. Unit tests ship with the function changes, not in a later phase.
-
-E9 appendix D1–D2 adds these required corrections within the serial phases.
-Split expanded work into bounded serial PRs and re-size provisional phase
-estimates before issue generation; do not hide implementation in P5 docs.
+The maintainer accepted M3 at `da2ad5e50` and requested a single M4 PR with
+serial commits on 2026-11-11. Implementation and focused evidence are recorded in
+[the implementation ledger](implementation.md). Final validation and maintainer
+acceptance remain separate gates; plan status stays In Progress until acceptance.
+Unit tests ship with their functional commits. This delivery decision supersedes
+the original per-phase issue generation and multiple-PR wording.
 
 | Phase | Additional required normalization/metadata work |
 |---|---|
@@ -16,8 +15,8 @@ estimates before issue generation; do not hide implementation in P5 docs.
 | P4 | Resident volume/communication semantics, prepared metadata compatibility and checkpoint versioned interpretation; exact-device restore; independent cross-layer conservation |
 | P5 | Final correction/compatibility ledger, full-loop evidence and M5 guidance |
 
-- [ ] **E9-M4-P1: Migrate scientific runnable state access and composition with behavioral tests**
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E9-M4-P1: Migrate scientific runnable state access and composition with behavioral tests**
+  - Issue: #1606 | Size: S | Status: Implemented; acceptance pending
   - Work: Accept M1–M3 contracts and establish the consumer/assertion ledger.
     Migrate `MassCondensation`, `Coagulation` and `WallLoss` rate/execute paths
     in `particle_process.py` to held data and environment. Preserve native
@@ -31,8 +30,8 @@ estimates before issue generation; do not hide implementation in P5 docs.
   - Gate: Native runnable assertions and applicable M3 scientific regressions
     pass without facade construction; no new scientific algorithm or exports.
 
-- [ ] **E9-M4-P2: Migrate dilution state access and atomic updates with all-gas tests**
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E9-M4-P2: Migrate dilution state access and atomic updates with all-gas tests**
+  - Issue: #1606 | Size: S | Status: Implemented; acceptance pending
   - Work: Migrate `dilution.py` physical-rate, preflight, candidate, commit and
     restore paths to unified gas and native particle storage. Update `Dilution`
     only where required; preserve concrete preflight and custom delegation.
@@ -46,8 +45,8 @@ estimates before issue generation; do not hide implementation in P5 docs.
   - Gate: All gas lanes follow independent `exp(-alpha * dt)` expectations;
     rejection and failure contracts remain intact without legacy setters.
 
-- [ ] **E9-M4-P3: Migrate nucleation orchestration with current-gas and substep failure tests**
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E9-M4-P3: Migrate nucleation orchestration with current-gas and substep failure tests**
+  - Issue: #1606 | Size: M | Status: Implemented; acceptance pending
   - Work: Replace `_topology` facade admission with approved native single-box
     topology/mapping. Read held environment and gas; stop synchronizing facade
     caches on the native path. Remove the redundant constructor environment
@@ -63,8 +62,8 @@ estimates before issue generation; do not hide implementation in P5 docs.
   - Gate: Native nucleation uses current gas each equal substep and retains
     per-attempted-substep atomicity; no whole-call rollback or physics expansion.
 
-- [ ] **E9-M4-P4: Migrate CPU adapter integration with dispatch and ownership tests**
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E9-M4-P4: Migrate CPU adapter integration with dispatch and ownership tests**
+  - Issue: #1606 | Size: L | Status: Implemented; acceptance pending
   - Work: Migrate CPU consumers/fixtures in `execution/adapters/condensation.py`
     and `coagulation.py` to native aggregates and M3 strategies. Avoid gratuitous
     adapter edits when identity-preserving delegation already works. Preserve
@@ -78,8 +77,8 @@ estimates before issue generation; do not hide implementation in P5 docs.
   - Gate: Direct CPU and selected-adapter native workflows agree under existing
     tolerances; no transfers, fallback, GPU rebind or capability expansion.
 
-- [ ] **E9-M4-P5: Update development documentation**
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E9-M4-P5: Update development documentation**
+  - Issue: #1606 | Size: S | Status: Documentation and final validation
   - Work: Publish narrow developer call/ownership/failure guidance and finalized
     consumer/assertion/compatibility ledgers for M5/M6. Broad supported-example
     and notebook migration remains M5-owned; final legacy deletion stays M6.
