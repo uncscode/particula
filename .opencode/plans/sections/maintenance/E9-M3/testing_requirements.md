@@ -19,7 +19,7 @@ store density; only resolved counts use variable-V normalization.
    overrides. The generic template's numerical gate does not supersede the
    active testing guide/runner policy.
 5. Do not add local `-Werror`; rely on configured warning policy and retain
-   intentional warning assertions. This draft claims no test execution.
+   intentional warning assertions. Literal implementation results are recorded in `p6_validation.md`.
 
 ## Scientific matrix
 

@@ -74,6 +74,53 @@ has been established here.
 
 ## Final revision gate
 
-Final commands and outcomes will be recorded after the integration checkpoint
-is committed and all required checks complete. Phase-local results above are
-not substituted for final-revision validation. M4 acceptance remains pending.
+Tested implementation revision: `6375d9e4e` (2026-11-11). All changed production
+and test Python files are frozen at that revision; a final documentation-only
+evidence commit records the results without changing the tested code. The local
+source hash inventory is `.artifacts/e9-m3/final/source-manifest.json`.
+Upstream main was independently verified as the merged M2 baseline above.
+
+All commands use the repository `.venv`; prefix executables below with
+`.venv/bin/`. Logs are under `.artifacts/e9-m3/final/`.
+
+| Final gate | Result |
+|---|---|
+| CPU scientific directories plus native wall-loss module | 1,797 passed in 9.11 s |
+| Normal CPU wall-loss suite, separate invocation | 16 passed in 0.03 s |
+| Recursively excluded adjacent CPU wall-loss suite, separate invocation | 43 passed in 0.05 s |
+| Native GPU science, metadata, transfers/exports and all integration tests | 1,081 passed in 11.93 s; no skips; Warp CPU and CUDA |
+| Examples, separate invocation with required warning policy | 150 passed, 1 skipped in 34.30 s; opt-in native graph-capture example smoke |
+| Infrastructure, separate invocation with required warning policy | 130 passed in 26.48 s |
+| Repository Ruff and mypy | Passed |
+| Repository Ruff formatting | 536 files already formatted |
+| Strict documentation build | Passed in 1.48 s; final evidence-only update also rebuilt strictly |
+| Untargeted package coverage runner | 9,069 passed, 19 skipped in 150.38 s; 92% coverage, unchanged 80% threshold |
+
+Literal commands (line continuation is shell syntax):
+
+```bash
+pytest particula/dynamics/condensation/ particula/dynamics/coagulation/ \
+  particula/dynamics/tests/native_wall_loss_test.py -q --no-cov --tb=short
+pytest particula/dynamics/tests/wall_loss_strategies_test.py -q --no-cov
+pytest particula/dynamics/wall_loss/tests/wall_loss_strategies_test.py -q --no-cov
+pytest particula/gpu/kernels/tests/condensation_native_test.py \
+  particula/gpu/kernels/tests/coagulation_native_test.py \
+  particula/gpu/kernels/tests/wall_loss_native_test.py \
+  particula/gpu/tests/population_metadata_test.py \
+  particula/gpu/tests/population_boundary_test.py \
+  particula/gpu/tests/conversion_test.py \
+  particula/gpu/tests/kernel_exports_test.py \
+  particula/integration_tests/ -q --no-cov --tb=short -ra
+pytest examples_tests -q -Werror -ra
+pytest scripts/tests -q -Werror -ra
+python .opencode/tools/run_linters.py --no-auto-fix
+ruff format --check particula/
+mkdocs build --strict
+python .opencode/tools/run_pytest.py
+```
+
+The P2 manual slow/performance reproduction remains recorded in
+`p2_validation.md` (8 passed, 1 deselected); no subsequent production change
+touched staggered stepping. No native performance claim is inferred.
+M4 scientific acceptance remains pending; this record is implementation and
+validation evidence for review, not a maintainer approval or release gate.
