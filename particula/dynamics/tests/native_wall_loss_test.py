@@ -197,8 +197,12 @@ def test_resolved_sink_uses_raw_unequal_counts_and_preserves_survivors(
     )
     for name, (identity, values) in before.items():
         assert getattr(particle, name) is identity
-        if name not in ("masses", "concentration"):
+        if name not in ("masses", "concentration", "charge"):
             npt.assert_array_equal(identity, values)
+    npt.assert_array_equal(particle.charge[0, lost], 0)
+    npt.assert_array_equal(
+        particle.charge[0, survivors], before["charge"][1][0, survivors]
+    )
 
 
 @pytest.mark.parametrize("family", FAMILIES)
@@ -464,10 +468,11 @@ def test_occupied_zero_mass_is_not_silently_removed(family):
 
 
 @pytest.mark.parametrize("family", FAMILIES)
-def test_resolved_mass_must_be_writable(family):
+@pytest.mark.parametrize("field", ["masses", "charge"])
+def test_resolved_mass_must_be_writable(family, field):
     """Read-only material cannot cause partial publication of new counts."""
     particle = _particle()
-    particle.masses.flags.writeable = False
+    getattr(particle, field).flags.writeable = False
     before = _snapshot(particle)
     with pytest.raises(ValueError, match="writable"):
         _strategy(family, "particle_resolved").step(particle, 298.15, 101325, 1)

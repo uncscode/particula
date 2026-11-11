@@ -27,7 +27,7 @@ issue: #1606. This supersedes the old multiple-PR and issue-generation wording.
 | Work | State |
 |---|---|
 | 1. Accepted contracts and delivery record | Recorded |
-| 2. Native scientific runnables and CPU slot retirement | Pending |
+| 2. Native scientific runnables and CPU slot retirement | Implemented; focused checks pass |
 | 3. CPU/direct/prepared GPU dilution | Pending |
 | 4. CPU nucleation, mapping and exhaustion transactions | Pending |
 | 5. Direct/prepared GPU nucleation and exhaustion | Pending |
@@ -62,3 +62,16 @@ optional pass-or-clean-skip. Thresholds and scientific tolerances stay intact.
 
 Implementation checks have not yet run. Append exact command outcomes and
 revision references here as work completes. Final acceptance remains pending.
+
+### Checkpoint 2
+
+- `.venv/bin/pytest particula/dynamics/tests/native_runnable_test.py particula/tests/runnable_test.py particula/dynamics/tests/wall_loss_runnable_test.py particula/dynamics/tests/native_wall_loss_test.py particula/integration_tests/native_scientific_processes_test.py -q --no-cov`: 474 passed.
+- Both CPU wall-loss suites explicitly: 16 passed and 43 passed.
+- Changed-file Ruff check and format: passed.
+- Initial full mypy inspection exposes downstream annotation migration work
+  in legacy custom fixtures, dilution, nucleation, Equilibria and adapters.
+  This is pending M4 work, not a passing comprehensive gate.
+- Native successor assertions live in `native_runnable_test.py`; legacy
+  runnable fixtures remain for transition coverage. M3 removed-slot charge
+  assertions now check zero for removed slots, unchanged survivors, and the
+  independently computed charge sink. Read-only charge rejects before draws.

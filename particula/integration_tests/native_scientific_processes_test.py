@@ -198,7 +198,19 @@ def test_resolved_native_aggregate_through_three_processes(
     npt.assert_allclose(
         _inventory(particle) + sink, mass_before, rtol=2e-15, atol=0
     )
-    npt.assert_array_equal(particle.charge, before_wall_charge)
+    npt.assert_array_equal(particle.charge[0, removed], 0)
+    npt.assert_array_equal(
+        particle.charge[0, ~removed], before_wall_charge[0, ~removed]
+    )
+    charge_sink = np.dot(
+        before_wall_charge[0, removed], before_wall_count[0, removed]
+    )
+    npt.assert_allclose(
+        np.dot(particle.charge[0], particle.concentration[0]) + charge_sink,
+        charge_before,
+        rtol=2e-15,
+        atol=0,
+    )
     npt.assert_array_equal(aerosol.gas.concentration, gas_before)
     assert aerosol.particles is particle
     for actual, original in zip(

@@ -168,7 +168,7 @@ def _storage(strategy: Any, particle: ParticleData, resolved: bool) -> None:
         control = getattr(strategy, name, None)
         if isinstance(control, np.ndarray):
             fields.append(control)
-    for index in (0, 1) if resolved else (0,):
+    for index in (0, 1, 2) if resolved else (0,):
         target = fields[index]
         if not target.flags.writeable:
             raise ValueError("native wall-loss destinations must be writable")
@@ -191,9 +191,9 @@ def step(
 ) -> ParticleData:
     """Stage the existing CPU deterministic or Bernoulli removal law.
 
-    Resolved removal clears selected masses/counts and retains charge storage,
-    including inactive lanes, as on the existing CPU path. GPU slot clearing
-    and its random lifecycle are separate contracts.
+    Resolved removal clears selected masses/counts/charge so removed slots can
+    be reused. Untouched inactive lanes are not repaired. The CPU Bernoulli
+    removal law and its random lifecycle are unchanged.
     """
     radius, density = validate(strategy, particle, temperature, pressure)
     _scalar(time_step, "time_step")
@@ -261,6 +261,9 @@ def step(
     masses = particle.masses.copy()
     lost = (particle.concentration[0] > 0) & (survived == 0)
     masses[0, lost] = 0
+    charge = particle.charge.copy()
+    charge[0, lost] = 0
     np.copyto(particle.masses, masses)
     np.copyto(particle.concentration, updated)
+    np.copyto(particle.charge, charge)
     return particle
