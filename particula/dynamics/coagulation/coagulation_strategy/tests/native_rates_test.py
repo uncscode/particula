@@ -98,7 +98,10 @@ def _physical(particle, temperature=298.15, pressure=101325.0):
     """Independently derive per-particle geometry and gas transport quantities."""
     masses = np.sum(particle.masses[0], axis=1)
     volumes = np.sum(particle.masses[0] / particle.density, axis=1)
-    radius = (3 * volumes / (4 * np.pi)) ** (1 / 3)
+    # Use a cube root, not a power with a rounded 1/3 exponent. DNS variance
+    # cancellation can amplify its several-ulp radius bias across CPU builds.
+    # Inputs remain independently derived from raw species masses/densities.
+    radius = np.cbrt(3 * volumes / (4 * np.pi))
     # The retained CPU effective-density contract is mass-weighted arithmetic
     # density, distinct from the volume used to calculate physical radius.
     density = np.sum(particle.masses[0] * particle.density, axis=1) / masses
