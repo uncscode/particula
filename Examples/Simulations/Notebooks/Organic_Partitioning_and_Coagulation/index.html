@@ -17005,6 +17005,7 @@ else:
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula._legacy_aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">AerosolBuilder</span> <span class="k">as</span> <span class="n">LegacyAerosolBuilder</span>
 
 <span class="c1"># Organic density estimation for species</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_organic_density_array</span>
@@ -17033,6 +17034,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
 
 # Organic density estimation for species
 from particula.particles import get_organic_density_array
@@ -17643,7 +17645,7 @@ and modifies it in place.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Build aerosol</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">AerosolBuilder</span><span class="p">()</span>
+    <span class="n">LegacyAerosolBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_particles</span><span class="p">(</span><span class="n">particle_representation</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -17653,7 +17655,7 @@ and modifies it in place.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7"># Build aerosol
 aerosol = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere)
     .set_particles(particle_representation)
     .build()
@@ -17967,7 +17969,7 @@ speed.
 
 <span class="n">time_step</span> <span class="o">=</span> <span class="n">total_time</span> <span class="o">/</span> <span class="n">total_steps</span>
 
-<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">total_steps</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">"Running Sim"</span><span class="p">,</span> <span class="n">mininterval</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">total_steps</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">"Running Sim"</span><span class="p">,</span> <span class="n">mininterval</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
     <span class="c1"># execute condensation process, this is the slowest computationally</span>
     <span class="c1"># feel free to comment this out to see the effect of coagulation only</span>
     <span class="c1"># aerosol_process = condensation_process.execute(</span>
@@ -17994,7 +17996,7 @@ condensation_sub_step = 50_000
 
 time_step = total_time / total_steps
 
-for step in tqdm(range(total_steps), desc="Running Sim", mininterval=0.5):
+for _ in tqdm(range(total_steps), desc="Running Sim", mininterval=0.5):
     # execute condensation process, this is the slowest computationally
     # feel free to comment this out to see the effect of coagulation only
     # aerosol_process = condensation_process.execute(

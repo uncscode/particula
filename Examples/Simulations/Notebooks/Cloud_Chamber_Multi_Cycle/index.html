@@ -17183,6 +17183,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula._legacy_aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">AerosolBuilder</span> <span class="k">as</span> <span class="n">LegacyAerosolBuilder</span>
 
 <span class="c1"># Optional: uncomment if many steps and you want a progress bar</span>
 <span class="c1"># from tqdm import tqdm</span>
@@ -17212,6 +17213,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
 
 # Optional: uncomment if many steps and you want a progress bar
 # from tqdm import tqdm
@@ -17829,7 +17831,7 @@ print("Multi-cycle framework functions defined.")</div>
 <span class="p">)</span>
 
 <span class="n">aerosol_as</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">AerosolBuilder</span><span class="p">()</span>
+    <span class="n">LegacyAerosolBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">atmosphere_as</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_particles</span><span class="p">(</span><span class="n">particles_as</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -17938,7 +17940,7 @@ particles_as = (
 )
 
 aerosol_as = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere_as)
     .set_particles(particles_as)
     .build()
@@ -18084,7 +18086,7 @@ print(aerosol_as)</div>
 <span class="p">)</span>
 
 <span class="n">aerosol_sucrose</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">AerosolBuilder</span><span class="p">()</span>
+    <span class="n">LegacyAerosolBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">atmosphere_sucrose</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_particles</span><span class="p">(</span><span class="n">particles_sucrose</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -18195,7 +18197,7 @@ particles_sucrose = (
 )
 
 aerosol_sucrose = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere_sucrose)
     .set_particles(particles_sucrose)
     .build()
@@ -18343,7 +18345,7 @@ print(aerosol_sucrose)</div>
 <span class="p">)</span>
 
 <span class="n">aerosol_mixed</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">AerosolBuilder</span><span class="p">()</span>
+    <span class="n">LegacyAerosolBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">atmosphere_mixed</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_particles</span><span class="p">(</span><span class="n">particles_mixed</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -18456,7 +18458,7 @@ particles_mixed = (
 )
 
 aerosol_mixed = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere_mixed)
     .set_particles(particles_mixed)
     .build()

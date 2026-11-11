@@ -16853,6 +16853,7 @@ The guide includes installation commands, examples, and compatibility limits.</p
 <p>This “Quick Start Example” demonstrates a concise workflow for building an aerosol system in Particula and performing a single condensation step.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula._legacy_aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">AerosolBuilder</span> <span class="k">as</span> <span class="n">LegacyAerosolBuilder</span>
 
 <span class="c1"># 1. Build the GasSpecies for an organic vapor:</span>
 <span class="n">organic</span> <span class="o">=</span> <span class="p">(</span>
@@ -16889,7 +16890,7 @@ The guide includes installation commands, examples, and compatibility limits.</p
 
 <span class="c1"># 4. Create the Aerosol combining the atmosphere and particle distribution:</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">AerosolBuilder</span><span class="p">()</span>
+    <span class="n">LegacyAerosolBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_particles</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>

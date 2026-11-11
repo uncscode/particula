@@ -16907,6 +16907,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula._legacy_aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">AerosolBuilder</span> <span class="k">as</span> <span class="n">LegacyAerosolBuilder</span>
 
 <span class="c1"># Optional: uncomment if many steps and you want a progress bar</span>
 <span class="c1"># from tqdm import tqdm</span>
@@ -16936,6 +16937,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
 
 # Optional: uncomment if many steps and you want a progress bar
 # from tqdm import tqdm
@@ -17226,7 +17228,7 @@ activity_params = (
 
 <span class="c1"># Build aerosol with new API</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">AerosolBuilder</span><span class="p">()</span>
+    <span class="n">LegacyAerosolBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_particles</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -17327,7 +17329,7 @@ particles = (
 
 # Build aerosol with new API
 aerosol = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere)
     .set_particles(particles)
     .build()

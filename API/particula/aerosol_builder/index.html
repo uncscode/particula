@@ -1100,10 +1100,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#particula.aerosol_builder.AerosolBuilder.set_atmosphere" class="md-nav__link">
+  <a href="#particula.aerosol_builder.AerosolBuilder.set_environment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_atmosphere
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.aerosol_builder.AerosolBuilder.set_gas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_gas
       
     </span>
   </a>
@@ -16443,10 +16454,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#particula.aerosol_builder.AerosolBuilder.set_atmosphere" class="md-nav__link">
+  <a href="#particula.aerosol_builder.AerosolBuilder.set_environment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_atmosphere
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.aerosol_builder.AerosolBuilder.set_gas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_gas
       
     </span>
   </a>
@@ -16512,20 +16534,7 @@
 
     <div class="doc doc-contents first">
 
-        <p>AerosolBuilder Module.</p>
-<p>Provides a fluent interface to create an <code>Aerosol</code> instance from an
-<code>Atmosphere</code> and a <code>ParticleRepresentation</code>.  The builder validates
-consistency between the gas and particle phases (e.g., the number of
-partitioning species) before constructing the final object.</p>
-<p>Examples:
-<div class="highlight"><span class="filename">Typical Usage</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.aerosol_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">AerosolBuilder</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">AerosolBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">my_atmosphere</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_particles</span><span class="p">(</span><span class="n">my_particles</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="p">)</span>
-</code></pre></div></p>
+        <p>Fluent assembly of an identity-preserving native Aerosol.</p>
 
 
 
@@ -16564,46 +16573,11 @@ partitioning species) before constructing the final object.</p>
 
 
 
-        <p>Fluent builder for <code>Aerosol</code> objects.</p>
-<p>The builder collects the required components—<code>Atmosphere</code> and
-<code>ParticleRepresentation</code>—and validates that they are mutually
-consistent before instantiating an <code>Aerosol</code>.</p>
+        <p>Retain three supplied CPU containers and validate them at build time.</p>
+<p>No default containers, copies, species filtering, or physics configuration
+are created. Repeated builds share the supplied data by identity.</p>
 
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-          <b><code><span title="particula.aerosol_builder.AerosolBuilder.-">-</span></code></b>
-              (<code><span title="particula.aerosol_builder.AerosolBuilder.atmosphere">atmosphere</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>Working copy of the atmosphere to embed in the aerosol.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-          <b><code><span title="particula.aerosol_builder.AerosolBuilder.-">-</span></code></b>
-              (<code><span title="particula.aerosol_builder.AerosolBuilder.particles">particles</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>Working copy of the particle representation.</p>
-          </div>
-        </li>
-    </ul>
-        <p>Methods:
-- set_atmosphere : Assign the atmosphere component.
-- set_particles  : Assign the particle component.
-- build          : Validate and return a fully-formed <code>Aerosol</code>.</p>
-
-
-<p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><span class="filename">Builder Pattern</span><pre><span></span><code><span class="n">builder</span> <span class="o">=</span> <span class="n">AerosolBuilder</span><span class="p">()</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">atm</span><span class="p">)</span><span class="o">.</span><span class="n">set_particles</span><span class="p">(</span><span class="n">prt</span><span class="p">)</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-</code></pre></div>
-
-        <p>Initialize an empty builder.</p>
-<p>Returns:
-- None</p>
+        <p>Require particles, gas, and environment for every build.</p>
 
 
 
@@ -16614,25 +16588,17 @@ consistent before instantiating an <code>Aerosol</code>.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/aerosol_builder.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Initialize an empty builder.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">    - None</span>
-<span class="sd">    """</span>
-    <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"atmosphere"</span><span class="p">,</span> <span class="s2">"particles"</span><span class="p">]</span>
-    <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Atmosphere</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ParticleRepresentation</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Require particles, gas, and environment for every build."""</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"gas"</span><span class="p">,</span> <span class="s2">"environment"</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">:</span> <span class="n">ParticleData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">gas</span><span class="p">:</span> <span class="n">GasData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="p">:</span> <span class="n">EnvironmentData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -16662,86 +16628,73 @@ consistent before instantiating an <code>Aerosol</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Finalize and construct an <code>Aerosol</code> object.</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code>-<span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If either component is missing or validation fails.</p>
-          </div>
-        </li>
-    </ul>
+        <p>Construct a fresh aggregate holding the exact supplied containers.</p>
 
 
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-internal" title="            Aerosol (particula._legacy_aerosol.Aerosol)" href="../_legacy_aerosol/#particula._legacy_aerosol.Aerosol">Aerosol</a></code>
+              <code><a class="autorefs autorefs-internal" title="            Aerosol (particula.aerosol.Aerosol)" href="../aerosol/#particula.aerosol.Aerosol">Aerosol</a></code>
           –
           <div class="doc-md-description">
-            <p>Aerosol object, The validated aerosol instance.</p>
+            <p>Native Aerosol after structural and representation admission.</p>
           </div>
         </li>
     </ul>
-        <p>Examples:
-<div class="highlight"><pre><span></span><code><span class="n">aerosol</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">AerosolBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">atm</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_particles</span><span class="p">(</span><span class="n">prt</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="p">)</span>
-</code></pre></div></p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If any component is missing or invalid.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="TypeError">TypeError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If a supplied component has the wrong container type.</p>
+          </div>
+        </li>
+    </ul>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/aerosol_builder.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Finalize and construct an `Aerosol` object.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        - ValueError : If either component is missing or validation fails.</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Construct a fresh aggregate holding the exact supplied containers.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Aerosol object, The validated aerosol instance.</span>
+<span class="sd">        Native Aerosol after structural and representation admission.</span>
 
-<span class="sd">    Examples:</span>
-<span class="sd">    ```py</span>
-<span class="sd">    aerosol = (</span>
-<span class="sd">        AerosolBuilder()</span>
-<span class="sd">        .set_atmosphere(atm)</span>
-<span class="sd">        .set_particles(prt)</span>
-<span class="sd">        .build()</span>
-<span class="sd">    )</span>
-<span class="sd">    ```</span>
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If any component is missing or invalid.</span>
+<span class="sd">        TypeError: If a supplied component has the wrong container type.</span>
 <span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_species_length</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+    <span class="k">return</span> <span class="n">Aerosol</span><span class="p">(</span>
+        <span class="n">particles</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">ParticleData</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">),</span>
+        <span class="n">gas</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">GasData</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas</span><span class="p">),</span>
+        <span class="n">environment</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">EnvironmentData</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="p">),</span>
+    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16751,106 +16704,78 @@ consistent before instantiating an <code>Aerosol</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="particula.aerosol_builder.AerosolBuilder.set_atmosphere" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_atmosphere</span>
+<h4 id="particula.aerosol_builder.AerosolBuilder.set_environment" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_environment</span>
 
 
-<a href="#particula.aerosol_builder.AerosolBuilder.set_atmosphere" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_atmosphere</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">:</span> <span class="n">Atmosphere</span><span class="p">,</span> <span class="n">atmosphere_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AerosolBuilder</span>
+<a href="#particula.aerosol_builder.AerosolBuilder.set_environment" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_environment</span><span class="p">(</span><span class="n">environment</span><span class="p">:</span> <span class="n">EnvironmentData</span><span class="p">,</span> <span class="n">environment_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AerosolBuilder</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Attach an <code>Atmosphere</code> to the builder.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>atmosphere</code></b>
-              (<code><a class="autorefs autorefs-internal" title="            Atmosphere
-
-
-  
-      dataclass
-   (particula.gas.atmosphere.Atmosphere)" href="../gas/atmosphere/#particula.gas.atmosphere.Atmosphere">Atmosphere</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>Atmosphere to embed in the aerosol.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>atmosphere_units</code></b>
-              (<code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Ignored; included for signature uniformity.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-<b><code>AerosolBuilder</code></b> (              <code><a class="autorefs autorefs-internal" title="            AerosolBuilder (particula.aerosol_builder.AerosolBuilder)" href="#particula.aerosol_builder.AerosolBuilder">AerosolBuilder</a></code>
-)          –
-          <div class="doc-md-description">
-            <p>The builder instance (for chaining).</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="n">builder</span> <span class="o">=</span> <span class="n">AerosolBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">atm</span><span class="p">)</span>
-</code></pre></div>
+        <p>Retain environment; optional builder-protocol units are ignored.</p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/aerosol_builder.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_atmosphere</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">atmosphere</span><span class="p">:</span> <span class="n">Atmosphere</span><span class="p">,</span> <span class="n">atmosphere_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_environment</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">environment</span><span class="p">:</span> <span class="n">EnvironmentData</span><span class="p">,</span>
+    <span class="n">environment_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AerosolBuilder"</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Attach an `Atmosphere` to the builder.</span>
+<span class="w">    </span><span class="sd">"""Retain environment; optional builder-protocol units are ignored."""</span>
+    <span class="k">if</span> <span class="n">environment_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for environment parameter."</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="o">=</span> <span class="n">environment</span>
+    <span class="k">return</span> <span class="bp">self</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
 
-<span class="sd">    Args:</span>
-<span class="sd">        atmosphere: Atmosphere to embed in the aerosol.</span>
-<span class="sd">        atmosphere_units: Ignored; included for signature uniformity.</span>
+</div>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        AerosolBuilder: The builder instance (for chaining).</span>
+<div class="doc doc-object doc-function">
 
-<span class="sd">    Examples:</span>
-<span class="sd">        ```py</span>
-<span class="sd">        builder = AerosolBuilder().set_atmosphere(atm)</span>
-<span class="sd">        ```</span>
-<span class="sd">    """</span>
-    <span class="k">if</span> <span class="n">atmosphere_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for atmosphere parameter."</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">atmosphere</span> <span class="o">=</span> <span class="n">atmosphere</span>
+
+<h4 id="particula.aerosol_builder.AerosolBuilder.set_gas" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_gas</span>
+
+
+<a href="#particula.aerosol_builder.AerosolBuilder.set_gas" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_gas</span><span class="p">(</span><span class="n">gas</span><span class="p">:</span> <span class="n">GasData</span><span class="p">,</span> <span class="n">gas_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AerosolBuilder</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Retain full gas data; optional builder-protocol units are ignored.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/aerosol_builder.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_gas</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">gas</span><span class="p">:</span> <span class="n">GasData</span><span class="p">,</span> <span class="n">gas_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AerosolBuilder"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Retain full gas data; optional builder-protocol units are ignored."""</span>
+    <span class="k">if</span> <span class="n">gas_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for gas parameter."</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">gas</span> <span class="o">=</span> <span class="n">gas</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16866,82 +16791,27 @@ consistent before instantiating an <code>Aerosol</code>.</p>
 
 
 <a href="#particula.aerosol_builder.AerosolBuilder.set_particles" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_particles</span><span class="p">(</span><span class="n">particles</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span> <span class="n">particles_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AerosolBuilder</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_particles</span><span class="p">(</span><span class="n">particles</span><span class="p">:</span> <span class="n">ParticleData</span><span class="p">,</span> <span class="n">particles_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AerosolBuilder</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Attach a <code>ParticleRepresentation</code> to the builder.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>particles</code></b>
-              (<code><a class="autorefs autorefs-internal" title="            ParticleRepresentation (particula.particles.representation.ParticleRepresentation)" href="../particles/representation/#particula.particles.representation.ParticleRepresentation">ParticleRepresentation</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>Particle representation to embed in the aerosol.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>particles_units</code></b>
-              (<code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Ignored; included for signature uniformity.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-internal" title="            AerosolBuilder (particula.aerosol_builder.AerosolBuilder)" href="#particula.aerosol_builder.AerosolBuilder">AerosolBuilder</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The builder instance (for chaining).</p>
-          </div>
-        </li>
-    </ul>
+        <p>Retain particles; optional builder-protocol units are ignored.</p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/aerosol_builder.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_particles</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">particles</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
-    <span class="n">particles_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_particles</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">particles</span><span class="p">:</span> <span class="n">ParticleData</span><span class="p">,</span> <span class="n">particles_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AerosolBuilder"</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Attach a `ParticleRepresentation` to the builder.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        particles: Particle representation to embed in the aerosol.</span>
-<span class="sd">        particles_units: Ignored; included for signature uniformity.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        The builder instance (for chaining).</span>
-<span class="sd">    """</span>
+<span class="w">    </span><span class="sd">"""Retain particles; optional builder-protocol units are ignored."""</span>
     <span class="k">if</span> <span class="n">particles_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Ignoring units for particles parameter."</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particles</span>
