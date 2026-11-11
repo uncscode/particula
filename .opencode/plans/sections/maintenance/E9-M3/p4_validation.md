@@ -1,12 +1,13 @@
-# P4 coagulation stepping — in progress
+# P4 coagulation stepping — implementation evidence
 
-Entry: P3 committed as `b41c908d1`. CPU work below is a validated
-implementation checkpoint, not P4 completion. Direct/prepared GPU admission
+Entry: P3 committed as `b41c908d1`. The initial CPU checkpoint below is
+superseded for PMF/PDF stepping by the species-moment correction recorded in
+[p4_moments_validation.md](p4_moments_validation.md). Direct/prepared GPU admission
 and normalization now have a separate checkpoint in
 [p4_gpu_validation.md](p4_gpu_validation.md). M3 is not complete and M4 is not
-opened; the CPU fixed-grid correction below remains unfinished.
+opened; final-revision P6 validation and scientific review remain required.
 
-## Native CPU changes
+## Initial native CPU checkpoint
 
 - Tagged `ParticleData` dispatches to a private staged step. Legacy untagged
   containers and facade execution retain their existing paths.
@@ -16,8 +17,8 @@ opened; the CPU fixed-grid correction below remains unfinished.
   ownership are validated before draws, including zero-work calls.
 - PMF/PDF retain the existing gain/loss laws and explicit Euler update in
   density storage at V=1. Nonfinite or negative proposals reject without
-  clipping or caller writes. This does not establish a conservative species
-  transport algorithm; the scientific decision below is still required.
+  clipping or caller writes. This initial checkpoint did not establish
+  conservative species transport; the subsequent moment correction does.
 - Resolved steps accept equal positive active weights, including fractional
   weights, and reject unequal weights before RNG use. The existing selector
   receives `time_step * common_weight` and the original physical volume, so
@@ -169,4 +170,5 @@ as host-derived scalar state in a prepared call.
   CPU and available CUDA package regressions, not native GPU P4 evidence.
 - Strict documentation build: passed in 1.43 s.
 
-This checkpoint does not satisfy P4/P6 or final-revision validation.
+This initial checkpoint alone does not satisfy P4/P6 or final-revision
+validation. The moment and GPU records supply the subsequent P4 evidence.

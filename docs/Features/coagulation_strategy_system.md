@@ -53,12 +53,57 @@ rates remain zero. Supplied pair kernels must be real, finite, nonnegative
 square matrices matching the population width.
 
 Gain/loss/net-rate APIs remain discrete/PDF operations. Native resolved kernel
-support does not introduce deterministic resolved rate APIs or establish which
-weights its stochastic selector can conserve. P4 owns resolved selection,
-temporary kernel binning and stepping. Existing untagged/facade examples below
+support does not introduce deterministic resolved rate APIs. Existing
+untagged/facade examples below
 retain their temporary compatibility behavior; M4 owns runnable and adapter
 migration. Independent native fixtures are in
 `particula/dynamics/coagulation/coagulation_strategy/tests/native_rates_test.py`.
+
+### Native CPU stepping and conservation
+
+Native `step` preserves the input container and its arrays. It validates
+representation, writable/nonoverlapping destinations, environment and current
+process controls before publishing a staged update. Rejected numerical
+proposals leave caller arrays unchanged. Density, volume and the explicit PDF
+radius grid are protected. This is single-box CPU execution; runnable and
+resident integration remain separate migration work.
+
+Discrete/PDF stepping retains the existing explicit number gain/loss update.
+Species mass and signed charge are additive collision quantities: the gain
+integrand carries the sum of both donors' quantities, while loss removes the
+departing particles' quantities. The step advances each quantity's density
+inventory, then recovers its mean per particle using the updated number
+density. Thus per-bin species mass and charge can change. Assigning gained
+particles the destination bin's old composition would generally violate
+species conservation even when total mass appears accurate.
+
+The existing cubic interpolation, trapezoid integration and PMF-to-PDF
+conversion are retained. Conservation is subject to finite-domain and grid
+error, rather than enforced by global rescaling. Independent finite-step
+fixtures cover varying composition, different material densities, signed
+charge and grid refinement; they distinguish per-species inventory defects
+from number-rate agreement. Negative/nonfinite number or material inventories,
+or nonzero inventories with zero number density, reject before any writes.
+Choose a stable timestep and adequately resolved grid. No clipping or new
+accuracy order is implied. Zero-time, zero-population and zero-kernel work
+preserves state exactly.
+
+Resolved stepping uses the existing binned/direct selector with equal positive
+active counts within the box. Unequal active weights reject before drawing;
+this selector's merge cannot conserve them. Collision scheduling includes
+`common_count * time_step / volume`. Temporary kernel bins carry summed counts
+and count-weighted material means at the original physical volume; authoritative
+merges use original slot material and charge. Inactive slots do not participate.
+The step stages per-species mass, count and charge, preserving weighted species
+and charge inventories. Selection consumes the strategy's existing RNG;
+rejection after draws does not promise RNG rollback or cross-backend seeded
+equality.
+
+Focused native stepping checks:
+
+```bash
+pytest particula/dynamics/coagulation/coagulation_strategy/tests/native_coagulation_step_test.py particula/dynamics/coagulation/coagulation_strategy/tests/native_coagulation_moments_test.py -q --no-cov
+```
 
 ## Key Benefits
 

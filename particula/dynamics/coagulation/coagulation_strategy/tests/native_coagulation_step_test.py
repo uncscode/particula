@@ -293,7 +293,11 @@ def test_density_step_equals_existing_rate_times_duration(kind):
     expected = particle.concentration + rate[None, :] * duration
     assert strategy.step(particle, 298.15, 101325.0, duration) is particle
     npt.assert_array_equal(particle.concentration, expected)
-    for name in ("masses", "charge", "density", "volume"):
+    for name in before:
+        assert getattr(particle, name) is before[name][0]
+    # Species/charge means now follow donor moments; the independent moment
+    # oracle and conservation checks live in native_coagulation_moments_test.
+    for name in ("density", "volume"):
         npt.assert_array_equal(getattr(particle, name), before[name][1])
 
 
