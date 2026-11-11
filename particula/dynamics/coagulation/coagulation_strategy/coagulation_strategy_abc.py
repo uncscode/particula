@@ -24,6 +24,7 @@ from particula.particles import change_particle_representation
 from particula.particles.particle_data import ParticleData
 from particula.particles.representation import ParticleRepresentation
 
+from ._native_step import binned_kernel_data, kernel_edges, step_native
 from ._native_validation import (
     is_native,
     positive_scalar,
@@ -167,6 +168,10 @@ def _get_particle_resolved_kernel_radius_data(
         ValueError: If finite radii cannot be determined for binning.
     """
     data = _require_single_box_particle_data(data)
+    if is_native(data):
+        return kernel_edges(
+            data, bin_radius, total_bins, bins_per_radius_decade
+        )
     if bin_radius is not None:
         return bin_radius
     particle_radius = data.radii[0]
@@ -224,6 +229,8 @@ def _get_binned_kernel_data_from_particle_data(
         ParticleData with binned masses, concentration, and charge.
     """
     data = _require_single_box_particle_data(data)
+    if is_native(data):
+        return binned_kernel_data(data, kernel_radius)
     radii = data.radii[0]
     masses = data.masses[0]
     concentration = data.concentration[0]
@@ -706,6 +713,14 @@ class CoagulationStrategyABC(ABC):
             ```
         """
         particle = _unwrap_particle(particle)
+        if is_native(particle):
+            return step_native(
+                self,
+                cast(ParticleData, particle),
+                temperature,
+                pressure,
+                time_step,
+            )
         if isinstance(particle, ParticleData):
             particle = _require_single_box_particle_data(particle)
         if self.distribution_type in ["discrete", "continuous_pdf"]:
