@@ -1,0 +1,14 @@
+{
+  "name": "particula",
+  "owner": {
+    "name": "Particula developers"
+  },
+  "plugins": [
+    {
+      "name": "particula-helper",
+      "source": "./plugins/particula-helper",
+      "description": "Learn Particula, build and debug aerosol simulations, and run reproducible local Python studies with plots and scientific checks."
+    }
+  ],
+  "description": "Particula workflows for reproducible aerosol simulations"
+}

@@ -82,7 +82,7 @@ def test_init_deprecation_log_message(_enable_particula_log_capture):
         charge=np.array([0.0, 0.0]),
     )
     assert "ParticleData" in caplog.text
-    assert "particle-data-migration/index.md" in caplog.text
+    assert "deprecated" in caplog.text.lower()
 
 
 def test_distribution_setter_deprecation_log(

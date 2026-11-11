@@ -54,6 +54,8 @@ from particula.execution.tests.resident_benchmark_support import (
     write_resident_capture_comparison_artifact,
 )
 
+pytestmark = pytest.mark.warp
+
 
 def _case() -> ResidentBenchmarkCase:
     """Return a valid canonical host-only benchmark case."""

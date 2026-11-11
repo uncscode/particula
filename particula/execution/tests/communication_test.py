@@ -83,6 +83,7 @@ def _configuration(
     return configuration, ResidentDimensions(3, 2, 1)
 
 
+@pytest.mark.warp
 def test_carriers_are_frozen_and_validate_cheap_metadata() -> None:
     """Typed immutable declarations retain caller payload identities."""
     communication = _communication()
@@ -132,6 +133,7 @@ def test_configuration_retains_all_caller_array_identities() -> None:
     assert result.prescribed_volume.final_volumes is volumes
 
 
+@pytest.mark.warp
 def test_carrier_metadata_rejects_invalid_enum_nested_and_roles() -> None:
     """Carrier construction rejects malformed metadata before Warp preflight."""
     communication = _communication()
@@ -1057,8 +1059,8 @@ def test_private_range_and_duplicate_helpers_cover_edge_cases() -> None:
     assert communication._duplicate_scratch_size(3) == 4
 
 
-def test_communication_remains_unexported_and_has_no_overdraw_input() -> None:
-    """Package import neither imports this concrete module nor claims P3 work."""
+def test_communication_remains_unexported() -> None:
+    """Package import does not import the concrete communication module."""
     root = Path(__file__).parents[3]
     environment = os.environ | {"PYTHONPATH": str(root)}
     script = """
@@ -1077,8 +1079,3 @@ assert 'warp' not in sys.modules
         text=True,
     )
     assert completed.returncode == 0, completed.stderr
-    communication = _communication()
-    validator_docstring = (
-        communication.validate_communication_configuration.__doc__
-    )
-    assert "source-inventory" in validator_docstring

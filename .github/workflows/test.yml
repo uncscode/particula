@@ -21,16 +21,18 @@ jobs:
     - uses: actions/checkout@v7
     
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v7.0.0
+      uses: actions/setup-python@v7.1.0
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip' # caching pip dependencies
         
     - name: Install dependencies
       run: |
-        python -m pip install pytest
+        python -m pip install pytest PyYAML
         python -m pip install .
 
     - name: Test with pytest
       run: |
         pytest -Werror -m "not slow and not performance"
+        pytest examples_tests -Werror -m "not slow and not performance"
+        pytest scripts/tests -Werror

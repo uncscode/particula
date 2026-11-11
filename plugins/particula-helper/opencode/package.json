@@ -1,0 +1,28 @@
+{
+  "name": "particula-helper-opencode",
+  "version": "0.2.0",
+  "description": "Particula scientific workflows for OpenCode 2",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uncscode/particula.git",
+    "directory": "plugins/particula-helper/opencode"
+  },
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "payload",
+    "README.md",
+    "LICENSE",
+    "npm-shrinkwrap.json"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@opencode/plugin": "2.1.3"
+  }
+}

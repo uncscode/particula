@@ -8,24 +8,7 @@ package import edge cases when running the full test suite
 (``pytest particula``).
 """
 
-# ruff: noqa: E402
-
-import importlib.util
-import pathlib
-import sys
 import unittest
-
-_WORKTREE_ROOT = pathlib.Path(__file__).resolve().parents[3]
-if str(_WORKTREE_ROOT) not in sys.path:
-    sys.path.insert(0, str(_WORKTREE_ROOT))
-
-for _module in [
-    "particula",
-    "particula.dynamics",
-    "particula.dynamics.wall_loss",
-]:
-    sys.modules.pop(_module, None)
-
 
 import numpy as np
 from particula.dynamics import (
@@ -34,32 +17,15 @@ from particula.dynamics import (
 from particula.dynamics import (
     get_rectangle_wall_loss_rate,
 )
+from particula.dynamics.wall_loss.wall_loss_strategies import (
+    RectangularWallLossStrategy,
+    SphericalWallLossStrategy,
+    WallLossStrategy,
+)
 from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,
 )
-
-# Import the wall loss strategies directly from the source file to avoid
-# environment-specific package resolution issues for
-# ``particula.dynamics.wall_loss`` when tests are run via ADW tooling.
-_MODULE_PATH = (
-    pathlib.Path(__file__).resolve().parents[1]
-    / "wall_loss"
-    / "wall_loss_strategies.py"
-)
-
-_spec = importlib.util.spec_from_file_location(
-    "_wall_loss_strategies_test_module",
-    _MODULE_PATH,
-)
-assert _spec and _spec.loader is not None
-_wall_loss_strategies = importlib.util.module_from_spec(_spec)
-sys.modules[_spec.name] = _wall_loss_strategies
-_spec.loader.exec_module(_wall_loss_strategies)
-
-RectangularWallLossStrategy = _wall_loss_strategies.RectangularWallLossStrategy
-SphericalWallLossStrategy = _wall_loss_strategies.SphericalWallLossStrategy
-WallLossStrategy = _wall_loss_strategies.WallLossStrategy
 
 
 class TestWallLossStrategies(unittest.TestCase):

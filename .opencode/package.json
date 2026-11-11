@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "@opencode-ai/plugin": "1.18.32"
+  },
+  "overrides": {
+    "effect": "4.0.0-beta.103"
   }
 }

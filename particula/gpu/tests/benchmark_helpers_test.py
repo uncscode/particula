@@ -1459,6 +1459,7 @@ def test_source_revision_records_git_revision_and_dirty_state(
     expected: str,
 ) -> None:
     """Retain reproducible Git metadata in bounded source provenance."""
+    monkeypatch.setattr(benchmark_module.shutil, "which", lambda _: "/mock/git")
     responses = iter((revision, status))
     monkeypatch.setattr(
         benchmark_module.subprocess,
@@ -1474,10 +1475,56 @@ def test_source_revision_uses_labeled_fallback_when_git_is_unavailable(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Do not invent a revision when VCS metadata cannot be queried."""
+    monkeypatch.setattr(benchmark_module.shutil, "which", lambda _: None)
     monkeypatch.setattr(
         benchmark_module.subprocess,
         "run",
-        lambda *args, **kwargs: (_ for _ in ()).throw(OSError("no git")),
+        lambda *args, **kwargs: pytest.fail("Git must not run when absent"),
+    )
+
+    assert benchmark_module._source_revision() == "vcs-unavailable"
+
+
+@pytest.mark.parametrize("command_index", [0, 1])
+@pytest.mark.parametrize("failure", ["os", "exit", "timeout"])
+def test_source_revision_uses_fallback_when_git_command_fails(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+    command_index: int,
+    failure: str,
+) -> None:
+    """Either Git command may fail even when executable discovery succeeds."""
+    monkeypatch.setattr(benchmark_module.shutil, "which", lambda _: "/mock/git")
+    errors = {
+        "os": OSError("no git"),
+        "exit": benchmark_module.subprocess.CalledProcessError(1, "git"),
+        "timeout": benchmark_module.subprocess.TimeoutExpired("git", 5),
+    }
+    calls = 0
+
+    def run(*args, **kwargs):
+        nonlocal calls
+        current = calls
+        calls += 1
+        if current == command_index:
+            raise errors[failure]
+        return types.SimpleNamespace(stdout="abc123\n")
+
+    monkeypatch.setattr(benchmark_module.subprocess, "run", run)
+    assert benchmark_module._source_revision() == "vcs-unavailable"
+    assert calls == command_index + 1
+
+
+def test_source_revision_uses_fallback_for_empty_revision(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Successful commands with an empty revision cannot establish provenance."""
+    monkeypatch.setattr(benchmark_module.shutil, "which", lambda _: "/mock/git")
+    monkeypatch.setattr(
+        benchmark_module.subprocess,
+        "run",
+        lambda *args, **kwargs: types.SimpleNamespace(stdout=" \n"),
     )
 
     assert benchmark_module._source_revision() == "vcs-unavailable"

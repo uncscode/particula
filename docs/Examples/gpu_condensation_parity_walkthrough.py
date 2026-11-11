@@ -7,7 +7,7 @@ Warp is unavailable, or ``PARTICULA_EXAMPLE_FORCE_NO_WARP=1``, it reports the
 completed oracle and does not import a kernel or allocate device state.
 
 Run ``python docs/Examples/gpu_condensation_parity_walkthrough.py`` or
-``pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q
+``pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q
 -Werror``. Warp outputs are mutable caller-owned state. ``energy_transfer``
 is caller-owned ``(n_boxes, n_species)`` storage, mutated in place with signed
 joules, and is not a third returned value. A failed kernel call

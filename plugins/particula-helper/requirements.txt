@@ -1,0 +1,4 @@
+# Tested CPU starter environment; use an isolated venv.
+particula==0.2.15
+numpy==2.5.4
+matplotlib==3.11.2

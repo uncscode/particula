@@ -1,7 +1,7 @@
 # Testing Guide
 
 **Project:** particula  
-**Last Updated:** 2026-09-06
+**Last Updated:** 2026-10-04
 
 particula uses pytest as its primary testing framework. Tests should be close to
 the code they validate and should exercise scientific correctness, edge cases,
@@ -49,6 +49,19 @@ particula/
 ```
 
 Integration tests live in `particula/integration_tests/`.
+
+Tests that execute `docs/Examples/` scripts live in `examples_tests/`, outside
+the default `testpaths = ["particula"]` collection. Release infrastructure and
+marker-configuration tests live in `scripts/tests/`. Invoke both explicitly;
+the package coverage runner alone does not collect these source-only suites:
+
+```bash
+pytest examples_tests -q
+pytest scripts/tests -q
+```
+
+Source CI runs all three suites, retaining full GPU example coverage. See
+`examples_tests/README.md` for source and installed-release input boundaries.
 
 ## Commands
 
@@ -260,7 +273,8 @@ Keep tests close to the layer they validate:
 
 - `particula/gpu/kernels/tests/`: direct kernel behavior and parity.
 - `particula/gpu/properties/tests/`: GPU property helpers.
-- `particula/gpu/tests/`: conversions, exports, examples, and process sequences.
+- `particula/gpu/tests/`: conversions, exports, and process sequences.
+- `examples_tests/`: runnable CPU, direct-GPU, and resident-GPU examples.
 - `particula/execution/tests/`: resident sessions, scheduling, communication,
   checkpoints, restart, diagnostics, and integration.
 - Adjacent CPU `tests/` directories: independent reference behavior.
@@ -270,19 +284,19 @@ for concrete workflows and expected output. Update an example and its test
 together instead of copying its detailed contract into this guide:
 
 - Data containers: `docs/Examples/data_containers_and_gpu_foundations.py` and
-  `particula/gpu/tests/data_containers_example_test.py`.
+  `examples_tests/data_containers_example_test.py`.
 - Direct kernels: `docs/Examples/gpu_direct_kernels_quick_start.py` and
-  `particula/gpu/tests/gpu_direct_kernels_example_test.py`.
+  `examples_tests/gpu_direct_kernels_example_test.py`.
 - Direct coagulation: `docs/Examples/gpu_coagulation_direct.py` and
-  `particula/gpu/tests/gpu_coagulation_direct_example_test.py`.
+  `examples_tests/gpu_coagulation_direct_example_test.py`.
 - Direct nucleation: `docs/Examples/Nucleation/gpu_direct_nucleation.py` and
-  `particula/gpu/tests/gpu_direct_nucleation_example_test.py`.
+  `examples_tests/gpu_direct_nucleation_example_test.py`.
 - Complete direct sequence: `docs/Examples/gpu_complete_process_sequence.py`
-  and `particula/gpu/tests/gpu_complete_process_sequence_example_test.py`.
+  and `examples_tests/gpu_complete_process_sequence_example_test.py`.
 - Resident session: `docs/Examples/gpu_resident_session.py` and
-  `particula/execution/tests/gpu_resident_session_docs_test.py`.
+  `examples_tests/gpu_resident_session_example_test.py`.
 - Resident loop: `docs/Examples/gpu_resident_multi_timestep.py` and
-  `particula/tests/gpu_resident_multi_timestep_docs_test.py`.
+  `examples_tests/gpu_resident_multi_timestep_docs_test.py`.
 
 `particula/gpu/tests/process_sequence_test.py` is the maintained reference for
 composing direct GPU boundaries without restoring CPU state between calls.
@@ -351,14 +365,21 @@ pytest particula/execution/tests/ -q \
 
 ### Release-validation command sets
 
-Run the hardware-free GPU documentation contract test during release
-validation, alongside the applicable focused tests and the repository's
-untargeted coverage runner:
+The CPU-focused 0.2.x release path validates an installed wheel in separate
+package and explicitly allowlisted CPU-example workspaces:
 
 ```bash
-pytest particula/tests/gpu_coagulation_docs_test.py \
-  particula/execution/tests/graph_capture_docs_test.py -q --no-cov
+python scripts/run_release_tests.py
+python scripts/run_release_tests.py --suite examples
 ```
+
+The package workspace contains no documentation. Examples stage only the three
+test/script pairs in `CPU_EXAMPLE_TESTS` and `CPU_EXAMPLES`. GPU exclusions are
+release-only, require v0.3 review, and do not make `warp-lang` optional. Source
+CI still runs the full example suite. Documentation prose and layout assertions
+are not release tests; runtime/conservation/lifecycle example checks remain.
+Use `conda/README.md` for the separate conda build, external recipe handoff,
+and the old v0.2.14 versus new two-suite archive compatibility boundary.
 
 ### Device-aware tolerance policy
 

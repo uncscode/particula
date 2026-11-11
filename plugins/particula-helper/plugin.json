@@ -1,0 +1,40 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "author": {
+    "email": "kkgorkow@gmail.com",
+    "name": "Kyle Gorkowski"
+  },
+  "description": "Learn Particula, build and debug aerosol simulations, and run reproducible local Python studies with plots and scientific checks.",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "category": "Scientific Research",
+        "composerIcon": "./assets/icon.png",
+        "composerIconDark": "./assets/icon-dark.png",
+        "defaultPrompt": [
+          "Help me install Particula and check my local Python environment.",
+          "Build and run a small condensation simulation, then plot and explain the results.",
+          "Debug my Particula script and check its units, conservation, and time-step sensitivity."
+        ],
+        "developerName": "Kyle Gorkowski",
+        "displayName": "Particula Helper",
+        "logo": "./assets/icon.png",
+        "logoDark": "./assets/icon-dark.png",
+        "longDescription": "Six local Particula workflows for setup, guidance, simulation design, execution, analysis, and debugging. Includes CPU examples and scientific checks. Running simulations requires Python and file access in the selected environment. No hosted service, automatic Python installation, or MCP server is included.",
+        "shortDescription": "Learn, run, analyze aerosols"
+      }
+    }
+  },
+  "keywords": [
+    "particula",
+    "aerosol",
+    "simulation",
+    "python",
+    "scientific-computing"
+  ],
+  "name": "particula-helper",
+  "version": "0.2.0",
+  "license": "MIT",
+  "homepage": "https://uncscode.github.io/particula/AI_Assistants/",
+  "repository": "https://github.com/uncscode/particula"
+}

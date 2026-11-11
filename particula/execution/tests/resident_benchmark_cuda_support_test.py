@@ -18,6 +18,8 @@ from particula.execution.tests.resident_benchmark_cuda_support import (
     resident_benchmark_provenance,
 )
 
+pytestmark = pytest.mark.warp
+
 
 def test_cuda_support_import_does_not_import_warp() -> None:
     """Keep the host import boundary free of Warp and CUDA probing."""

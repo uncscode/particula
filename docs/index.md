@@ -94,6 +94,12 @@ Particula [Computer software]. [DOI: 10.5281/zenodo.6634653](https://doi.org/10.
 
 ---
 
+## AI Assistants
+
+Use [Particula Helper](AI_Assistants/index.md) with Codex/ChatGPT, Claude
+Code/Cowork, or OpenCode for environment setup and reproducible local studies.
+The guide includes installation commands, examples, and compatibility limits.
+
 ## Get Started with Particula
 
 [Setup Particula](Examples/Setup_Particula/index.md){ .md-button .md-button--primary }
