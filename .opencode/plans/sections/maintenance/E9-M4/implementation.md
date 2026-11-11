@@ -30,7 +30,7 @@ issue: #1606. This supersedes the old multiple-PR and issue-generation wording.
 | 2. Native scientific runnables and CPU slot retirement | Implemented; focused checks pass |
 | 3. CPU/direct/prepared GPU dilution | Implemented; focused checks pass |
 | 4. CPU nucleation, mapping and exhaustion transactions | Implemented; focused checks pass |
-| 5. Direct/prepared GPU nucleation and exhaustion | Pending |
+| 5. Direct/prepared GPU nucleation and exhaustion | Implemented; focused checks pass |
 | 6. CPU adapters and remaining orchestration consumers | Pending |
 | 7. Communication and physical volume evolution | Pending |
 | 8. Native resident/prepared metadata and diagnostics | Pending |
@@ -107,3 +107,21 @@ Focused checkpoint evidence follows. Final acceptance remains pending.
 - `LegacyNucleation` is concrete-only in `particle_process.py`; only the
   transitional runnable regression module imports it. Public `Nucleation` has
   two constructor arguments and always uses the current aggregate environment.
+
+### Checkpoint 5
+
+- Native/legacy direct and prepared nucleation/exhaustion plus boundary guards:
+  221 passed, 20 skipped (optional CUDA).
+- Direct nucleation and complete-process source examples: 26 passed with
+  `-Werror`. All Warp runs use `/tmp/particula-m4-warp` for cache storage.
+- Changed-file Ruff/format, focused source mypy and whitespace checks: passed.
+- Native GPU injection uses explicit uploaded mapping configuration and separate
+  gas/particle widths. Existing integer event admission is retained: one
+  unit-count slot per event. CPU weighted packing is not silently substituted.
+- Native exhaustion scales count demand with physical volume once; it does not
+  scale gas concentration. Tests cover resampling/source composition, independent
+  density closure, repeated prepared execution, stale bindings, protected gas
+  metadata aliasing, and write-free invalid live-state rejection.
+- Old concrete `_execute_*` exhaustion and `_preflight_nucleation` legacy
+  phase helpers remain fail-closed for tagged direct calls; migrated public and
+  prepared boundaries have positive native successor tests.

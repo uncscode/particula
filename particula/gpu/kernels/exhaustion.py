@@ -44,8 +44,12 @@ except ImportError as exc:  # pragma: no cover - guarded by Warp tests
         "Install with: pip install warp-lang"
     ) from exc
 
+from particula.gpu.kernels._population_validation import _scan_population
 from particula.gpu.kernels.environment import _is_warp_array_like
-from particula.gpu.population_metadata import require_legacy_particle_metadata
+from particula.gpu.population_metadata import (
+    particle_distribution_code,
+    require_legacy_particle_metadata,
+)
 
 PLANNING_SUCCESS = 0
 PLANNING_EXACT_INVENTORY_FAILURE = 1
@@ -1456,6 +1460,7 @@ class _PreparedResamplingCall:
     invalid: Any
     planning_failed: Any
     upstream_invalid: Any
+    native: bool = False
 
 
 @dataclass(frozen=True)
@@ -1487,6 +1492,7 @@ class _PreparedRepresentativeVolumeScalingCall:
     status: Any
     selected: Any
     upstream_invalid: Any
+    native: bool = False
 
 
 def _validate_prepared_upstream(
@@ -1518,6 +1524,21 @@ def _enqueue_resampling_validation(
         inputs=[prepared.invalid, prepared.planning_failed],
         device=prepared.device,
     )
+    if b and prepared.native:
+        wp.launch(
+            _scan_population,
+            dim=b,
+            inputs=[
+                prepared.masses,
+                prepared.concentration,
+                prepared.charge,
+                prepared.density,
+                prepared.volume,
+                3,
+                prepared.invalid,
+            ],
+            device=prepared.device,
+        )
     if b:
         wp.launch(
             _scan_particle_values,
@@ -1578,7 +1599,9 @@ def _prepare_resampling_step_gpu(
     inspect mutable payload values. Enqueue owns device validation and all
     writes; observation is the sole status readback.
     """
-    require_legacy_particle_metadata(particles)
+    kind = particle_distribution_code(particles)
+    if kind not in (0, 3):
+        raise ValueError("native exhaustion supports only particle_resolved")
     bounds = (
         _require_exact_bound(
             "radius_cubed_relative_error", radius_cubed_relative_error
@@ -1658,6 +1681,7 @@ def _prepare_resampling_step_gpu(
         )
     )
     prepared = _PreparedResamplingCall(
+        native=kind == 3,
         result=particles,
         masses=masses,
         concentration=concentration,
@@ -1793,7 +1817,9 @@ def _prepare_representative_volume_scaling_step_gpu(  # noqa: C901
     This private setup phase validates fixed schemas but leaves mutable payload
     validation to enqueue and bounded status observation to the observer.
     """
-    require_legacy_particle_metadata(particles)
+    kind = particle_distribution_code(particles)
+    if kind not in (0, 3):
+        raise ValueError("native exhaustion supports only particle_resolved")
     masses = _field(particles, "masses")
     if not _is_warp_array_like(masses):
         raise TypeError("masses must be a Warp array")
@@ -1848,6 +1874,7 @@ def _prepare_representative_volume_scaling_step_gpu(  # noqa: C901
                     "representative scaling arrays must not overlap"
                 )
     prepared = _PreparedRepresentativeVolumeScalingCall(
+        native=kind == 3,
         result=(particles, provisional_source_demand, resolved_scale),
         masses=masses,
         concentration=concentration,
@@ -1886,6 +1913,21 @@ def _enqueue_scaling_validation(
         inputs=[prepared.density, prepared.status],
         device=prepared.device,
     )
+    if b and prepared.native:
+        wp.launch(
+            _scan_population,
+            dim=b,
+            inputs=[
+                prepared.masses,
+                prepared.concentration,
+                prepared.charge,
+                prepared.density,
+                prepared.volume,
+                3,
+                prepared.status,
+            ],
+            device=prepared.device,
+        )
     if b:
         wp.launch(
             _scan_representative_volume_scaling,

@@ -47,6 +47,7 @@ except ImportError as exc:  # pragma: no cover - import guard
         "Install with: pip install warp-lang"
     ) from exc
 
+from particula.gpu.kernels._population_validation import _scan_population
 from particula.gpu.kernels.environment import _is_warp_array_like
 from particula.gpu.kernels.exhaustion import (
     ResamplingBuffers,
@@ -64,7 +65,11 @@ from particula.gpu.kernels.slot_management import (
     _write_diagnostics,
     _write_empty_diagnostics,
 )
-from particula.gpu.population_metadata import require_legacy_particle_metadata
+from particula.gpu.nucleation_species_mapping import NucleationSpeciesBinding
+from particula.gpu.population_metadata import (
+    particle_distribution_code,
+    require_legacy_particle_metadata,
+)
 from particula.util.constants import AVOGADRO_NUMBER
 
 _AVOGADRO_NUMBER = wp.constant(wp.float64(AVOGADRO_NUMBER))
@@ -1048,6 +1053,7 @@ def _preflight_nucleation(  # noqa: C901
     finalized_demand: NucleationFinalizedDemandBuffers | None = None,
     diagnostics: NucleationDiagnosticBuffers | None = None,
     validate_payload: bool = True,
+    _native_binding: NucleationSpeciesBinding | None = None,
 ) -> _NucleationPreflight:
     """Validate the deferred P1 boundary without writing caller-owned arrays.
 
@@ -1080,7 +1086,8 @@ def _preflight_nucleation(  # noqa: C901
         ValueError: If schemas, ownership, physical values, or species settings
             violate the P1 contract.
     """
-    require_legacy_particle_metadata(particles)
+    if _native_binding is None:
+        require_legacy_particle_metadata(particles)
     if not isinstance(config, NucleationConfig):
         raise ValueError("config must be NucleationConfig.")
     try:
@@ -1112,10 +1119,17 @@ def _preflight_nucleation(  # noqa: C901
         _array(particles, "density", wp.float64, (n_species,), device),
         _array(particles, "volume", wp.float64, (n_boxes,), device),
     )
+    gas_species = (
+        len(_native_binding.gas_names)
+        if _native_binding is not None
+        else n_species
+    )
     gas_arrays = (
-        _array(gas, "molar_mass", wp.float64, (n_species,), device),
-        _array(gas, "concentration", wp.float64, (n_boxes, n_species), device),
-        _array(gas, "partitioning", wp.int32, (n_boxes, n_species), device),
+        _array(gas, "molar_mass", wp.float64, (gas_species,), device),
+        _array(
+            gas, "concentration", wp.float64, (n_boxes, gas_species), device
+        ),
+        _array(gas, "partitioning", wp.int32, (n_boxes, gas_species), device),
     )
     temperature_value: Any
     saturation_value: Any | None = None
@@ -1134,7 +1148,7 @@ def _preflight_nucleation(  # noqa: C901
                 environment,
                 "saturation_ratio",
                 wp.float64,
-                (n_boxes, n_species),
+                (n_boxes, gas_species),
                 device,
             )
             external.append(saturation_value)
@@ -1159,7 +1173,7 @@ def _preflight_nucleation(  # noqa: C901
                 type("Direct", (), {"saturation": saturation})(),
                 "saturation",
                 wp.float64,
-                (n_boxes, n_species),
+                (n_boxes, gas_species),
                 device,
             )
             external.append(saturation_value)
@@ -1171,7 +1185,7 @@ def _preflight_nucleation(  # noqa: C901
         diagnostics,
         n_boxes,
         n_particles,
-        n_species,
+        gas_species,
         device,
     )
     # P3 receives only finalized-demand and diagnostic records. Scratch remains
@@ -1188,11 +1202,27 @@ def _preflight_nucleation(  # noqa: C901
             diagnostics.active_slot_counts,
             diagnostics.free_slot_counts,
         )
+    if _native_binding is not None:
+        external.extend(
+            (
+                _native_binding.particle_to_gas,
+                _native_binding.gas_to_particle,
+                gas.vapor_pressure,
+            )
+        )
+        mapped = {
+            source for source, _ in _native_binding.species_map.gas_to_particle
+        }
+        if any(
+            count > 0 and index not in mapped
+            for index, count in enumerate(config.molecule_counts)
+        ):
+            raise ValueError("positive injection requires mapped gas species")
     _no_overlap(particle_arrays + gas_arrays + tuple(external) + sidecars)
     normalized_time_step = _real(time_step, "time_step")
     if (
-        config.precursor_index >= n_species
-        or len(config.molecule_counts) != n_species
+        config.precursor_index >= gas_species
+        or len(config.molecule_counts) != gas_species
     ):
         raise ValueError(
             "precursor index and molecule_counts must match species."
@@ -1218,6 +1248,9 @@ def _preflight_nucleation(  # noqa: C901
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
             protected_sidecars=sidecars,
+            protected_inputs=(
+                particle_arrays + gas_arrays + tuple(external) + sidecars
+            ),
         )
     for value, name, positive in zip(
         (particle_arrays[0], particle_arrays[1], *particle_arrays[3:]),
@@ -2229,6 +2262,7 @@ def _select_p4_policy(
     volume: wp.array(dtype=wp.float64),
     resampling_enabled: wp.int32,
     scaling_enabled: wp.int32,
+    native: wp.int32,
     release: wp.array(dtype=wp.int32),
     scaling: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
@@ -2248,9 +2282,11 @@ def _select_p4_policy(
             release[box] = deficit
         elif scaling_enabled != 0:
             scaling[box] = 1
-            scaled_events = (demand[box] * requested[box]) * (
-                volume[box] * requested[box]
-            )
+            scaled_events = wp.float64(counts[box]) * requested[box]
+            if native == 0:
+                scaled_events = (demand[box] * requested[box]) * (
+                    volume[box] * requested[box]
+                )
             if (
                 not wp.isfinite(scaled_events)
                 or scaled_events < 0.0
@@ -2606,6 +2642,7 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             preflight.particles.volume,
             int(controls.resampling),
             int(controls.representative_volume_scaling),
+            0,
             release,
             scaling,
             invalid,
@@ -3170,6 +3207,7 @@ def _validate_prepared_nucleation_p1(  # noqa: C901, PLR0913
             if not wp.isfinite(density[species]) or density[species] <= 0.0:
                 wp.atomic_add(status, 2, 1)
                 wp.atomic_add(invalid, 0, 1)
+        for species in range(molar_mass.shape[0]):
             if (
                 not wp.isfinite(molar_mass[species])
                 or molar_mass[species] <= 0.0
@@ -3369,9 +3407,12 @@ class _PreparedNucleationCall:
     scaling: _PreparedRepresentativeVolumeScalingCall | None
     dimensions: tuple[int, int, int]
     device: Any
+    native: bool = False
+    particle_to_gas: Any = None
+    gas_species: int = 0
 
 
-def _prepare_nucleation_step_gpu(
+def _prepare_nucleation_step_gpu(  # noqa: C901
     particles: Any,
     gas: Any,
     config: NucleationConfig,
@@ -3385,6 +3426,7 @@ def _prepare_nucleation_step_gpu(
     temperature: Any | None = None,
     saturation: Any | None = None,
     environment: Any | None = None,
+    species_binding: NucleationSpeciesBinding | None = None,
 ) -> _PreparedNucleationCall:
     """Validate metadata, allocate, and pin one private nucleation invocation.
 
@@ -3416,7 +3458,15 @@ def _prepare_nucleation_step_gpu(
         ValueError: If fixed schemas, identities, controls, or sidecars are
             invalid.
     """
-    require_legacy_particle_metadata(particles)
+    kind = particle_distribution_code(particles)
+    if kind not in (0, 3):
+        raise ValueError("native nucleation supports only particle_resolved")
+    if kind == 3:
+        if not isinstance(species_binding, NucleationSpeciesBinding):
+            raise ValueError("native nucleation requires species_binding")
+        species_binding.validate(particles, gas)
+    elif species_binding is not None:
+        raise ValueError("species_binding requires native resolved metadata")
     if not isinstance(scratch, NucleationScratchBuffers):
         raise ValueError("scratch must be NucleationScratchBuffers.")
     if not isinstance(finalized_demand, NucleationFinalizedDemandBuffers):
@@ -3437,6 +3487,7 @@ def _prepare_nucleation_step_gpu(
         finalized_demand=finalized_demand,
         diagnostics=diagnostics,
         validate_payload=False,
+        _native_binding=species_binding,
     )
     _validate_public_p4_inputs(
         preflight, exhaustion_controls, exhaustion_buffers
@@ -3447,6 +3498,7 @@ def _prepare_nucleation_step_gpu(
         preflight.n_species,
         preflight.device,
     )
+    gas_species = gas.concentration.shape[1]
     particle_arrays = preflight.particle_arrays
     gas_arrays = preflight.gas_arrays
     temperature_work = preflight.temperature
@@ -3456,7 +3508,9 @@ def _prepare_nucleation_step_gpu(
         )
     saturation_work = preflight.saturation
     if saturation_work is None:
-        saturation_work = wp.zeros((b, s), dtype=wp.float64, device=device)
+        saturation_work = wp.zeros(
+            (b, gas_species), dtype=wp.float64, device=device
+        )
     molecule_counts: Any = wp.array(
         np.asarray(config.molecule_counts, dtype=np.int32),
         dtype=wp.int32,
@@ -3486,7 +3540,7 @@ def _prepare_nucleation_step_gpu(
         wp.zeros(b, dtype=wp.float64, device=device),
         wp.zeros(b, dtype=wp.float64, device=device),
         wp.zeros(b, dtype=wp.float64, device=device),
-        wp.zeros((b, s), dtype=wp.float64, device=device),
+        wp.zeros((b, gas_species), dtype=wp.float64, device=device),
         wp.zeros(b, dtype=wp.int32, device=device),
     )
     p3_work = (
@@ -3522,6 +3576,13 @@ def _prepare_nucleation_step_gpu(
             _upstream_invalid=pipeline_invalid,
         )
     return _PreparedNucleationCall(
+        native=kind == 3,
+        particle_to_gas=(
+            species_binding.particle_to_gas
+            if species_binding is not None
+            else None
+        ),
+        gas_species=gas_species,
         result=(particles, gas),
         particle_arrays=particle_arrays,
         gas_arrays=gas_arrays,
@@ -3576,7 +3637,74 @@ def _prepare_nucleation_step_gpu(
     )
 
 
-def _enqueue_prepared_nucleation_call(
+@wp.kernel
+def _native_source_counts(
+    density: wp.array(dtype=wp.float64),
+    volume: wp.array(dtype=wp.float64),
+    counts: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Stage density events as represented counts before exhaustion scaling."""
+    box = wp.tid()
+    if invalid[0] == 0:
+        counts[box] = density[box] * volume[box]
+
+
+@wp.kernel
+def _native_source_density(
+    counts: wp.array(dtype=wp.float64),
+    volume: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Restore finalized event density after count/volume scaling."""
+    box = wp.tid()
+    if invalid[0] == 0:
+        counts[box] /= volume[box]
+
+
+@wp.kernel
+def _commit_native_nucleation(
+    masses: wp.array3d(dtype=wp.float64),
+    counts: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    gas: wp.array2d(dtype=wp.float64),
+    molar_mass: wp.array(dtype=wp.float64),
+    molecules: wp.array(dtype=wp.int32),
+    particle_to_gas: wp.array(dtype=wp.int32),
+    final_demand: wp.array(dtype=wp.float64),
+    final_counts: wp.array(dtype=wp.int32),
+    selected: wp.array2d(dtype=wp.int32),
+    status: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Activate unit-count resolved slots and consume full-order gas density."""
+    box = wp.tid()
+    if invalid[0] != 0 or status[0] != 2:
+        return
+    for rank in range(final_counts[box]):
+        slot = selected[box, rank]
+        for species in range(masses.shape[2]):
+            source = particle_to_gas[species]
+            mass = wp.float64(0.0)
+            if source >= 0:
+                mass = (
+                    wp.float64(molecules[source])
+                    * molar_mass[source]
+                    / _AVOGADRO_NUMBER
+                )
+            masses[box, slot, species] = mass
+        counts[box, slot] = wp.float64(1.0)
+        charge[box, slot] = wp.float64(0.0)
+    for species in range(molecules.shape[0]):
+        if molecules[species] > 0:
+            gas[box, species] -= final_demand[box] * (
+                wp.float64(molecules[species])
+                * molar_mass[species]
+                / _AVOGADRO_NUMBER
+            )
+
+
+def _enqueue_prepared_nucleation_call(  # noqa: C901
     prepared: _PreparedNucleationCall,
 ) -> tuple[Any, Any]:
     """Enqueue one fixed P1--P5 sequence using only pinned arrays.
@@ -3643,6 +3771,19 @@ def _enqueue_prepared_nucleation_call(
         ],
         device=prepared.device,
     )
+    if b and prepared.native:
+        wp.launch(
+            _scan_population,
+            dim=b,
+            inputs=[*particles, 3, prepared.p3_status],
+            device=prepared.device,
+        )
+        wp.launch(
+            _aggregate_prepared_status,
+            dim=1,
+            inputs=[prepared.p3_status, prepared.pipeline_invalid],
+            device=prepared.device,
+        )
     if not b:
         return prepared.result
     wp.launch(
@@ -3653,7 +3794,7 @@ def _enqueue_prepared_nucleation_call(
             gas[0],
             prepared.saturation,
             prepared.molecule_counts,
-            s,
+            prepared.gas_species,
             controls[0],
             controls[3],
             controls[4],
@@ -3678,7 +3819,7 @@ def _enqueue_prepared_nucleation_call(
         dim=b,
         inputs=[
             *p2_work,
-            s,
+            prepared.gas_species,
             *scratch,
             finalized[1],
             finalized[2],
@@ -3812,6 +3953,7 @@ def _enqueue_prepared_nucleation_call(
             p4[4],
             particles[4],
             *prepared.policy_controls,
+            int(prepared.native),
             p4_work[1],
             p4_work[2],
             prepared.p4_status,
@@ -3838,12 +3980,25 @@ def _enqueue_prepared_nucleation_call(
         ],
         device=prepared.device,
     )
-    wp.launch(
-        _copy_p4_workspace,
-        dim=b,
-        inputs=[finalized[1], p4[0], prepared.pipeline_invalid],
-        device=prepared.device,
-    )
+    if prepared.native:
+        wp.launch(
+            _native_source_counts,
+            dim=b,
+            inputs=[
+                finalized[1],
+                particles[4],
+                p4[0],
+                prepared.pipeline_invalid,
+            ],
+            device=prepared.device,
+        )
+    else:
+        wp.launch(
+            _copy_p4_workspace,
+            dim=b,
+            inputs=[finalized[1], p4[0], prepared.pipeline_invalid],
+            device=prepared.device,
+        )
     wp.launch(
         _write_unscaled_p4_resolution,
         dim=b,
@@ -3876,6 +4031,13 @@ def _enqueue_prepared_nucleation_call(
             _promote_prepared_invalid_lane,
             dim=1,
             inputs=[prepared.scaling.status, 0, prepared.pipeline_invalid],
+            device=prepared.device,
+        )
+    if prepared.native:
+        wp.launch(
+            _native_source_density,
+            dim=b,
+            inputs=[p4[0], particles[4], prepared.pipeline_invalid],
             device=prepared.device,
         )
     if n:
@@ -3950,26 +4112,47 @@ def _enqueue_prepared_nucleation_call(
         ],
         device=prepared.device,
     )
-    wp.launch(
-        _commit_nucleation_p5_kernel,
-        dim=b,
-        inputs=[
-            particles[0],
-            particles[1],
-            particles[2],
-            particles[4],
-            gas[1],
-            gas[0],
-            prepared.molecule_counts,
-            p4[1],
-            p4[9],
-            p4[10],
-            p4[5],
-            prepared.p5_status,
-            prepared.pipeline_invalid,
-        ],
-        device=prepared.device,
-    )
+    if prepared.native:
+        wp.launch(
+            _commit_native_nucleation,
+            dim=b,
+            inputs=[
+                particles[0],
+                particles[1],
+                particles[2],
+                gas[1],
+                gas[0],
+                prepared.molecule_counts,
+                prepared.particle_to_gas,
+                p4[1],
+                p4[9],
+                p4[10],
+                prepared.p5_status,
+                prepared.pipeline_invalid,
+            ],
+            device=prepared.device,
+        )
+    else:
+        wp.launch(
+            _commit_nucleation_p5_kernel,
+            dim=b,
+            inputs=[
+                particles[0],
+                particles[1],
+                particles[2],
+                particles[4],
+                gas[1],
+                gas[0],
+                prepared.molecule_counts,
+                p4[1],
+                p4[9],
+                p4[10],
+                p4[5],
+                prepared.p5_status,
+                prepared.pipeline_invalid,
+            ],
+            device=prepared.device,
+        )
     return prepared.result
 
 
@@ -4065,6 +4248,7 @@ def nucleation_step_gpu(
     temperature: Any | None = None,
     saturation: Any | None = None,
     environment: Any | None = None,
+    species_binding: NucleationSpeciesBinding | None = None,
 ) -> tuple[Any, Any]:
     """Execute one fixed-capacity direct-Warp nucleation step.
 
@@ -4109,6 +4293,7 @@ def nucleation_step_gpu(
         temperature=temperature,
         saturation=saturation,
         environment=environment,
+        species_binding=species_binding,
     )
     _enqueue_prepared_nucleation_call(prepared)
     return _observe_prepared_nucleation_call(prepared)
