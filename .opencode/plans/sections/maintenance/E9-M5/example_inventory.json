@@ -316,77 +316,97 @@
       "source": "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.py",
       "notebook": "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration implemented and executed",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder",
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/condensation_latent_heat_example_test.py; examples_tests/native_condensation_examples_test.py; embedded full-workload assertions",
+      "scientific_expectation": "Closed resolved cases conserve particle-plus-gas inventory (rtol=1e-12, atol=1e-30); fixed-reservoir mass bins retain prescribed gas; initial binned case evaporates; latent energy is converted from J to J/m^3 using volume.",
+      "execution": "full source workload and saved notebook executed",
+      "evidence": [
+        "11 focused tests passed",
+        "Saved notebook code cells executed without errors",
+        "Rendered plots visually inspected; bounded stability claims and units reconciled"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.py",
       "notebook": "docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration implemented and executed",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/condensation_latent_heat_example_test.py; examples_tests/native_condensation_examples_test.py; embedded full-workload assertions",
+      "scientific_expectation": "Closed resolved cases conserve particle-plus-gas inventory (rtol=1e-12, atol=1e-30); fixed-reservoir mass bins retain prescribed gas; initial binned case evaporates; latent energy is converted from J to J/m^3 using volume.",
+      "execution": "full source workload and saved notebook executed",
+      "evidence": [
+        "11 focused tests passed",
+        "Saved notebook code cells executed without errors",
+        "Rendered plots visually inspected; bounded stability claims and units reconciled"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.py",
       "notebook": "docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration implemented and executed",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/condensation_latent_heat_example_test.py; examples_tests/native_condensation_examples_test.py; embedded full-workload assertions",
+      "scientific_expectation": "Closed resolved cases conserve particle-plus-gas inventory (rtol=1e-12, atol=1e-30); fixed-reservoir mass bins retain prescribed gas; initial binned case evaporates; latent energy is converted from J to J/m^3 using volume.",
+      "execution": "full source workload and saved notebook executed",
+      "evidence": [
+        "11 focused tests passed",
+        "Saved notebook code cells executed without errors",
+        "Rendered plots visually inspected; bounded stability claims and units reconciled"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py",
       "notebook": "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration implemented and executed",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/condensation_latent_heat_example_test.py; examples_tests/native_condensation_examples_test.py; embedded full-workload assertions",
+      "scientific_expectation": "Closed resolved cases conserve particle-plus-gas inventory (rtol=1e-12, atol=1e-30); fixed-reservoir mass bins retain prescribed gas; initial binned case evaporates; latent energy is converted from J to J/m^3 using volume.",
+      "execution": "full source workload and saved notebook executed",
+      "evidence": [
+        "11 focused tests passed",
+        "Saved notebook code cells executed without errors",
+        "Rendered plots visually inspected; bounded stability claims and units reconciled"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.py",
       "notebook": "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration implemented and executed",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/condensation_latent_heat_example_test.py; examples_tests/native_condensation_examples_test.py; embedded full-workload assertions",
+      "scientific_expectation": "Closed resolved cases conserve particle-plus-gas inventory (rtol=1e-12, atol=1e-30); fixed-reservoir mass bins retain prescribed gas; initial binned case evaporates; latent energy is converted from J to J/m^3 using volume.",
+      "execution": "full source workload and saved notebook executed",
+      "evidence": [
+        "11 focused tests passed",
+        "Saved notebook code cells executed without errors",
+        "Rendered plots visually inspected; bounded stability claims and units reconciled"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.py",

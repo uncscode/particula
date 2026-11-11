@@ -15,7 +15,8 @@
 # %% [markdown]
 # # Condensation Tutorial: Mass Binned
 #
-# **NEEDS REVISION: integration unstable**
+# The published 10,000-substep integration is retained. Gas is a prescribed
+# reservoir (`update_gases=False`); this is an open-system uptake example.
 #
 # A mass binned model is relaxes the assumption of a single composition for all particles in a given bin. Instead, it allows for a distribution of compositions within each bin. This is useful when the composition of particles is separated by masses. This does not account for the same sized particles having different compositions, but rather different sized particles having different compositions.
 #
@@ -26,7 +27,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 
 # %% [markdown]
 # ## Aerosol Setup
@@ -53,25 +56,20 @@ water_sat = vapor_pressure_water.saturation_concentration(
 water_concentration = 0.8 * water_sat
 
 combo_gas = (
-    par.gas.GasSpeciesBuilder()
+    par.gas.GasDataBuilder()
     .set_molar_mass(
         np.array([molar_mass_water, molar_mass_ammonium_sulfate]), "kg/mol"
     )
-    .set_vapor_pressure_strategy(
-        [vapor_pressure_water, vapor_pressure_ammonium]
-    )
     .set_concentration(np.array([water_concentration, 0.0]), "kg/m^3")
-    .set_name(["H2O", "NH4HSO4"])
-    .set_partitioning(True)
+    .set_names(["H2O", "NH4HSO4"])
+    .set_partitioning([True, True])
     .build()
 )
 
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_more_partitioning_species(combo_gas)
-    .set_temperature(25, temperature_units="degC")
-    .set_pressure(1, pressure_units="atm")
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=[298.15],
+    pressure=[101325.0],
+    saturation_ratio=[[water_concentration / water_sat, 0.0]],
 )
 
 # %% [markdown]
@@ -81,6 +79,7 @@ atmosphere = (
 
 # %%
 # sample
+np.random.seed(42)
 particles_sample = par.particles.get_lognormal_sample_distribution(
     mode=np.array([100, 1000]) * 1e-9,
     geometric_standard_deviation=np.array([1.3, 1.5]),
@@ -95,8 +94,8 @@ bins, edges = np.histogram(particles_sample, bins=bins_lognormal, density=True)
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.bar(edges[:-1], bins, width=np.diff(edges), align="edge")
 ax.set_xscale("log")
-ax.set_xlabel("Diameter (m)")
-ax.set_ylabel("Count")
+ax.set_xlabel("Radius (m)")
+ax.set_ylabel("Probability density per metre of radius")
 plt.show()
 
 # %%
@@ -129,21 +128,21 @@ surface_strat = (
     .build()
 )
 
-paritcle_rep = (
-    par.particles.ParticleMassRepresentationBuilder()
-    .set_distribution_strategy(
-        par.particles.SpeciatedMassMovingBinBuilder().build()
-    )
-    .set_surface_strategy(surface_strat)
-    .set_activity_strategy(activity_strat)
-    .set_density(densities, "kg/m^3")
-    .set_charge(0.0)
-    .set_mass(mass_speciation, "kg")
+particles = (
+    par.particles.ParticleDataBuilder()
+    .set_distribution_type("discrete")
+    .set_masses(mass_speciation)
+    .set_density(densities)
+    .set_charge(np.zeros(len(concentration)))
     .set_concentration(concentration, "1/cm^3")
+    .set_volume(np.array([1.0]))
     .build()
 )
-
-aerosol = LegacyAerosol(atmosphere=atmosphere, particles=paritcle_rep)
+aerosol = par.Aerosol(
+    particles=particles,
+    gas=combo_gas,
+    environment=environment,
+)
 
 print(aerosol)
 
@@ -155,6 +154,10 @@ print(aerosol)
 # %%
 # define the condensation process
 condensation_isothermal = par.dynamics.CondensationIsothermal(
+    activity_strategy=activity_strat,
+    surface_strategy=surface_strat,
+    vapor_pressure_strategy=[vapor_pressure_water, vapor_pressure_ammonium],
+    species_map=CondensationSpeciesMap(("H2O", "NH4HSO4"), ((0, 0), (1, 1))),
     molar_mass=np.array(
         [molar_mass_water, molar_mass_ammonium_sulfate]
     ),  # kg/mol
@@ -176,13 +179,15 @@ aerosol_sim = []
 
 
 fig, ax = plt.subplots(figsize=(8, 6))
-bins, edges = np.histogram(aerosol.particles.get_radius(), bins=bins_lognormal)
+bins, edges = np.histogram(aerosol.particles.radii[0], bins=bins_lognormal)
 ax.bar(edges[:-1], bins, width=np.diff(edges), align="edge", label="Initial")
 
 print(aerosol)
 # one step
+initial_gas = combo_gas.concentration.copy()
+initial_water_mass = particles.species_mass_density[0, 0]
 aerosol = condensation_process.execute(aerosol, time_step, sub_steps)
-bins, edges = np.histogram(aerosol.particles.get_radius(), bins=bins_lognormal)
+bins, edges = np.histogram(aerosol.particles.radii[0], bins=bins_lognormal)
 ax.bar(
     edges[:-1],
     bins,
@@ -195,7 +200,7 @@ ax.bar(
 print(aerosol)
 # 10 seconds
 aerosol = condensation_process.execute(aerosol, time_step, sub_steps)
-bins, edges = np.histogram(aerosol.particles.get_radius(), bins=bins_lognormal)
+bins, edges = np.histogram(aerosol.particles.radii[0], bins=bins_lognormal)
 ax.bar(
     edges[:-1],
     bins,
@@ -210,10 +215,19 @@ ax.set_xscale("log")
 # ax.set_yscale("log")
 plt.legend()
 ax.set_xlabel("Radius (m)")
-ax.set_ylabel("Concentration (1/m^3)")
+ax.set_ylabel("Computational bins")
 plt.show()
 
 # %% [markdown]
 # ## Summary
 #
 # We built out the condensation process, and the equations that define the process. We also defined the inputs and outputs of the process. Next we will build out coagulation and nucleation processes, to complete the aerosol dynamics framework.
+
+
+# %%
+# Open-system checks: the fixed reservoir supplies net condensed water.
+np.testing.assert_array_equal(combo_gas.concentration, initial_gas)
+if not np.all(np.isfinite(particles.masses)) or np.any(particles.masses < 0):
+    raise AssertionError("Nonphysical particle masses")
+if particles.species_mass_density[0, 0] <= initial_water_mass:
+    raise AssertionError("Expected water uptake from the prescribed reservoir")

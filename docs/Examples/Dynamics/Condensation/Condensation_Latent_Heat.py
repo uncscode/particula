@@ -32,8 +32,8 @@
 # recent latent-heat bookkeeping value. This example therefore uses
 # `sub_steps=1` so each stored value matches the full runnable call, then
 # accumulates the cumulative signal explicitly in the outer loop. The
-# bookkeeping quantity reported by the strategy follows the gas/particle mass
-# concentration contract in this example, so it is labeled as an energy density.
+# strategy reports extensive energy in joules. We divide each value by the
+# represented volume before reporting energy density in J/m³.
 
 # %%
 """CPU-only latent-heat condensation example.
@@ -44,11 +44,11 @@ reported energy is diagnostic only and does not feed back into the
 temperature state.
 """
 
-import copy
-
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 
 CPU_ONLY_NOTE = (
     "CPU-only example: this workflow uses public CPU condensation APIs only."
@@ -78,7 +78,7 @@ def _as_float(value: float | np.ndarray) -> float:
     return float(np.asarray(value, dtype=np.float64).reshape(-1)[0])
 
 
-def _build_aerosol() -> LegacyAerosol:
+def _build_aerosol() -> par.Aerosol:
     """Build a small supersaturated single-species aerosol state.
 
     Returns:
@@ -95,39 +95,30 @@ def _build_aerosol() -> LegacyAerosol:
         temperature=temperature,
     )
     gas_species = (
-        par.gas.GasSpeciesBuilder()
-        .set_molar_mass(molar_mass_water, "kg/mol")
-        .set_vapor_pressure_strategy(vapor_pressure_water)
-        .set_concentration(saturation_concentration * 1.03, "kg/m^3")
-        .set_name("H2O")
-        .set_partitioning(True)
+        par.gas.GasDataBuilder()
+        .set_molar_mass([molar_mass_water], "kg/mol")
+        .set_concentration([saturation_concentration * 1.03], "kg/m^3")
+        .set_names(["H2O"])
+        .set_partitioning([True])
         .build()
     )
-    atmosphere = (
-        par.gas.AtmosphereBuilder()
-        .set_more_partitioning_species(gas_species)
-        .set_temperature(temperature)
-        .set_pressure(101325.0, pressure_units="Pa")
-        .build()
+    environment = par.gas.EnvironmentData(
+        temperature=[temperature],
+        pressure=[101325.0],
+        saturation_ratio=[[1.03]],
     )
 
     particle_radii = np.array([30e-9, 45e-9, 60e-9, 90e-9], dtype=np.float64)
     density = 1000.0  # kg/m^3
     particle_mass = (4.0 / 3.0) * np.pi * particle_radii**3 * density
-    particles = (
-        par.particles.ResolvedParticleMassRepresentationBuilder()
-        .set_distribution_strategy(
-            par.particles.ParticleResolvedSpeciatedMass()
-        )
-        .set_activity_strategy(par.particles.ActivityIdealMass())
-        .set_surface_strategy(par.particles.SurfaceStrategyVolume())
-        .set_mass(particle_mass.reshape(-1, 1), "kg")
-        .set_density(np.array([density], dtype=np.float64), "kg/m^3")
-        .set_charge(np.zeros_like(particle_radii, dtype=np.float64))
-        .set_volume(1.0e-6, "m^3")
-        .build()
+    particles = par.particles.create_resolved_particle_data(
+        masses=particle_mass.reshape(-1, 1),
+        density=[density],
+        volume=BOX_VOLUME,
     )
-    return LegacyAerosol(atmosphere=atmosphere, particles=particles)
+    return par.Aerosol(
+        particles=particles, gas=gas_species, environment=environment
+    )
 
 
 def run_example() -> dict[str, float | list[float] | str | int]:
@@ -166,23 +157,27 @@ def run_example() -> dict[str, float | list[float] | str | int]:
             "diffusion_coefficient_units": "m^2/s",
             "accommodation_coefficient": 1.0,
             "latent_heat_strategy": latent_heat_strategy,
+            "activity_strategy": par.particles.ActivityIdealMass(),
+            "surface_strategy": par.particles.SurfaceStrategyVolume(),
+            "vapor_pressure_strategy": par.gas.WaterBuckStrategy(),
+            "species_map": CondensationSpeciesMap(("H2O",), ((0, 0),)),
         },
     )
     condensation = par.dynamics.MassCondensation(
         condensation_strategy=condensation_strategy
     )
 
-    current = LegacyAerosol(
-        atmosphere=copy.deepcopy(aerosol.atmosphere),
-        particles=copy.deepcopy(aerosol.particles),
+    current = par.Aerosol(
+        gas=aerosol.gas.copy(),
+        environment=aerosol.environment.copy(),
+        particles=aerosol.particles.copy(),
     )
-    initial_gas_concentration = _as_float(
-        current.atmosphere.partitioning_species.get_concentration()
-    )
+    initial_gas_concentration = _as_float(current.gas.concentration)
     initial_particle_mass_concentration = _as_float(
-        current.particles.get_mass_concentration()
+        current.particles.species_mass_density
     )
 
+    # Native bookkeeping reports extensive J; divide by physical volume once.
     per_call_latent_heat_energy_densities: list[float] = []
     for _ in range(RUN_ITERATION_COUNT):
         current = condensation.execute(
@@ -192,13 +187,12 @@ def run_example() -> dict[str, float | list[float] | str | int]:
         )
         per_call_latent_heat_energy_densities.append(
             float(condensation_strategy.last_latent_heat_energy)
+            / float(current.particles.volume[0])
         )
 
-    final_gas_concentration = _as_float(
-        current.atmosphere.partitioning_species.get_concentration()
-    )
+    final_gas_concentration = _as_float(current.gas.concentration)
     final_particle_mass_concentration = _as_float(
-        current.particles.get_mass_concentration()
+        current.particles.species_mass_density
     )
     cumulative_latent_heat_energy_density = float(
         sum(per_call_latent_heat_energy_densities)

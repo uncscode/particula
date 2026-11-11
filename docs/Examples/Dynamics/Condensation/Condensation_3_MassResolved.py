@@ -26,7 +26,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 
 # %% [markdown]
 # ## Setup Aerosol
@@ -55,25 +57,20 @@ water_sat = vapor_pressure_water.saturation_concentration(
 water_concentration = water_sat * initial_water_vapor_activity
 
 gas_phase = (
-    par.gas.GasSpeciesBuilder()
+    par.gas.GasDataBuilder()
     .set_molar_mass(
         np.array([molar_mass_water, molar_mass_ammonium_sulfate]), "kg/mol"
     )
-    .set_vapor_pressure_strategy(
-        [vapor_pressure_water, vapor_pressure_ammonium]
-    )
     .set_concentration(np.array([water_concentration, 1e-30]), "kg/m^3")
-    .set_name(["H2O", "NH4HSO4"])
-    .set_partitioning(True)
+    .set_names(["H2O", "NH4HSO4"])
+    .set_partitioning([True, True])
     .build()
 )
 
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_more_partitioning_species(gas_phase)
-    .set_temperature(25, temperature_units="degC")
-    .set_pressure(1, pressure_units="atm")
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=[298.15],
+    pressure=[101325.0],
+    saturation_ratio=[[water_concentration / water_sat, 0.0]],
 )
 
 # %% [markdown]
@@ -85,6 +82,8 @@ atmosphere = (
 density = 1.77e3  # kg/m^3
 volume_sim = 1 * par.util.get_unit_conversion("cm^3", "m^3")  # m^3
 number_of_samples = 10_000
+
+np.random.seed(42)
 
 # Generate a particle distribution using a lognormal sample distribution
 # This distribution has a mean particle diameter (mode) and geometric standard deviation (GSD)
@@ -127,30 +126,17 @@ surface_strat = (
 
 # Build a resolved mass representation for each particle
 # This defines how particle mass, activity, and surface are represented
-resolved_masses = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(
-        par.particles.ParticleResolvedSpeciatedMass()
-    )  # Use speciated mass distribution
-    .set_activity_strategy(
-        activity_strat
-    )  # Define activity based on ideal mass
-    .set_surface_strategy(
-        surface_strat
-    )  # Define surface area based on particle volume
-    .set_mass(mass_speciation, "kg")  # Assign mass of particles (in kg)
-    .set_density(densities, "kg/m^3")  # Set particle density to 1500 kg/m^3
-    .set_charge(0)  # Assume neutral particles with no charge
-    .set_volume(volume_sim, "m^3")  # Set volume of particle distribution
-    .build()  # Finalize the resolved mass representation
+resolved_masses = par.particles.create_resolved_particle_data(
+    masses=mass_speciation,
+    density=densities,
+    volume=volume_sim,
+)
+aerosol_resolved = par.Aerosol(
+    particles=resolved_masses,
+    gas=gas_phase,
+    environment=environment,
 )
 
-# Create an aerosol object with the defined atmosphere and resolved particles
-aerosol_resolved = LegacyAerosol(
-    atmosphere=atmosphere, particles=resolved_masses
-)
-
-# Print the properties of the atmosphere
 print(aerosol_resolved)
 
 # %% [markdown]
@@ -161,6 +147,10 @@ print(aerosol_resolved)
 # %%
 # define the condensation process
 condensation_isothermal = par.dynamics.CondensationIsothermal(
+    activity_strategy=activity_strat,
+    surface_strategy=surface_strat,
+    vapor_pressure_strategy=[vapor_pressure_water, vapor_pressure_ammonium],
+    species_map=CondensationSpeciesMap(("H2O", "NH4HSO4"), ((0, 0), (1, 1))),
     molar_mass=np.array(
         [molar_mass_water, molar_mass_ammonium_sulfate]
     ),  # kg/mol
@@ -192,6 +182,14 @@ water_saturation_in_time = np.ones_like(time, dtype=np.float64)
 print(f"Total iterations to do: {len(time) * sub_steps}")
 
 # %%
+# Independent per-species extensive inventory before the full published run.
+initial_inventory = (
+    np.sum(
+        resolved_masses.masses * resolved_masses.concentration[..., None],
+        axis=1,
+    )
+    + gas_phase.concentration * resolved_masses.volume[:, None]
+)
 # Simulation loop
 for i, _t in enumerate(time):
     if i > 0:
@@ -200,18 +198,32 @@ for i, _t in enumerate(time):
             aerosol_resolved, time_step, sub_steps
         )
 
-    total_mass_resolved[i] = aerosol_resolved.particles.get_mass_concentration()
-    number_distribution_resolved[i, :] = aerosol_resolved.particles.get_radius(
-        clone=True
+    current_inventory = (
+        np.sum(
+            resolved_masses.masses * resolved_masses.concentration[..., None],
+            axis=1,
+        )
+        + gas_phase.concentration * resolved_masses.volume[:, None]
     )
+    np.testing.assert_allclose(
+        current_inventory, initial_inventory, rtol=1e-12, atol=1e-30
+    )
+    if not np.all(np.isfinite(resolved_masses.masses)) or np.any(
+        resolved_masses.masses < 0
+    ):
+        raise AssertionError("Nonphysical particle masses")
+    total_mass_resolved[i] = (
+        aerosol_resolved.particles.species_mass_density.sum()
+    )
+    number_distribution_resolved[i, :] = aerosol_resolved.particles.radii[0]
     number_distribution_binned[i, :], edges = np.histogram(
         number_distribution_resolved[i, :], bins=bins_lognormal
     )
     total_number_resolved[i] = np.sum(number_distribution_resolved[i, :] > 0)
-    water_saturation_in_time[i] = (
-        aerosol_resolved.atmosphere.partitioning_species.get_saturation_ratio(
-            temperature=298.15
-        )[0]
+    water_saturation_in_time[i] = vapor_pressure_water.saturation_ratio(
+        aerosol_resolved.gas.concentration[0, 0],
+        molar_mass_water,
+        aerosol_resolved.environment.temperature[0],
     )
 
 

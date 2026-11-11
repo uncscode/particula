@@ -15,7 +15,7 @@
 # %% [markdown]
 # # Staggered Condensation Stepping
 #
-# This notebook demonstrates the **staggered ODE stepping framework** for particle-resolved condensation simulations. The staggered approach improves numerical stability and mass conservation compared to simultaneous particle updates.
+# This notebook demonstrates the **staggered ODE stepping framework** for particle-resolved condensation simulations. The examples compare gas-feedback ordering and check mass conservation for the specified workloads.
 #
 # ## What You'll Learn
 #
@@ -35,19 +35,20 @@
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import copy
 
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 
 # Set random seed for reproducibility
 RANDOM_SEED = 42
 np.random.seed(RANDOM_SEED)
 
 # %% [markdown]
-# ## Setup Gas and Atmosphere
+# ## Setup Native Gas and Environment
 #
 # First, we set up the gas phase with water vapor at supersaturated conditions to drive condensation.
 
@@ -70,22 +71,19 @@ water_concentration = saturation_concentration * initial_rh
 
 # Build gas species
 gas_species = (
-    par.gas.GasSpeciesBuilder()
-    .set_molar_mass(molar_mass_water, "kg/mol")
-    .set_vapor_pressure_strategy(vapor_pressure_water)
-    .set_concentration(water_concentration, "kg/m^3")
-    .set_name("H2O")
-    .set_partitioning(True)
+    par.gas.GasDataBuilder()
+    .set_molar_mass([molar_mass_water], "kg/mol")
+    .set_concentration([water_concentration], "kg/m^3")
+    .set_names(["H2O"])
+    .set_partitioning([True])
     .build()
 )
 
 # Build atmosphere
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_more_partitioning_species(gas_species)
-    .set_temperature(25, temperature_units="degC")
-    .set_pressure(1, pressure_units="atm")
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=[temperature],
+    pressure=[101325.0],
+    saturation_ratio=[[initial_rh]],
 )
 
 print(f"Initial water concentration: {water_concentration:.6e} kg/m^3")
@@ -118,16 +116,17 @@ surface_strategy = par.particles.SurfaceStrategyVolume(
 )
 
 # Build particle representation
-particles = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
-    .set_activity_strategy(activity_strategy)
-    .set_surface_strategy(surface_strategy)
-    .set_mass(mass_speciation, "kg")
-    .set_density(densities, "kg/m^3")
-    .set_charge(0)
-    .set_volume(volume_sim, "m^3")
-    .build()
+particles = par.particles.create_resolved_particle_data(
+    masses=mass_speciation,
+    density=densities,
+    volume=volume_sim,
+)
+# Every strategy receives its own explicit process configuration.
+configuration = dict(
+    activity_strategy=activity_strategy,
+    surface_strategy=surface_strategy,
+    vapor_pressure_strategy=vapor_pressure_water,
+    species_map=CondensationSpeciesMap(("H2O",), ((0, 0),)),
 )
 
 print(f"Created {n_particles} particles")
@@ -154,15 +153,19 @@ def run_simulation(strategy, aerosol, time_step, n_steps, sub_steps=1):
     """Run condensation simulation and track mass over time."""
     condensation = par.dynamics.MassCondensation(condensation_strategy=strategy)
 
-    # Deep copy for this simulation
-    current_aerosol = LegacyAerosol(
-        atmosphere=copy.deepcopy(aerosol.atmosphere),
-        particles=copy.deepcopy(aerosol.particles),
+    # Copy all native containers for an independent simulation
+    current_aerosol = par.Aerosol(
+        gas=aerosol.gas.copy(),
+        environment=aerosol.environment.copy(),
+        particles=aerosol.particles.copy(),
     )
 
-    particle_mass = float(np.sum(current_aerosol.particles.get_mass()))
+    particle_mass = float(
+        np.sum(current_aerosol.particles.species_mass_inventory)
+    )
     gas_mass = np.asarray(
-        current_aerosol.atmosphere.partitioning_species.get_concentration()
+        current_aerosol.gas.concentration
+        * current_aerosol.particles.volume[:, None]
     ).item()
     mass_history = [particle_mass]
     gas_mass_history = [gas_mass]
@@ -174,18 +177,25 @@ def run_simulation(strategy, aerosol, time_step, n_steps, sub_steps=1):
         )
 
         # Record masses after step
-        particle_mass = float(np.sum(current_aerosol.particles.get_mass()))
+        particle_mass = float(
+            np.sum(current_aerosol.particles.species_mass_inventory)
+        )
         gas_mass = np.asarray(
-            current_aerosol.atmosphere.partitioning_species.get_concentration()
+            current_aerosol.gas.concentration
+            * current_aerosol.particles.volume[:, None]
         ).item()
         mass_history.append(particle_mass)
         gas_mass_history.append(gas_mass)
 
+    combined = np.array(mass_history) + np.array(gas_mass_history)
+    np.testing.assert_allclose(combined, combined[0], rtol=1e-12, atol=1e-30)
     return np.array(mass_history), np.array(gas_mass_history)
 
 
 # Create base aerosol
-aerosol_base = LegacyAerosol(atmosphere=atmosphere, particles=particles)
+aerosol_base = par.Aerosol(
+    gas=gas_species, environment=environment, particles=particles
+)
 
 # Simulation parameters
 time_step = 0.01  # seconds
@@ -199,6 +209,7 @@ results = {}
 for mode in modes:
     strategy = par.dynamics.CondensationIsothermalStaggered(
         molar_mass=molar_mass_water,
+        **configuration,
         theta_mode=mode,
         num_batches=10,
         shuffle_each_step=True,
@@ -271,16 +282,18 @@ for mode, data in results.items():
 # - **Simultaneous**: `CondensationIsothermal` - all particles see same gas concentration
 # - **Staggered**: `CondensationIsothermalStaggered` - particles update in sequence with gas feedback
 #
-# We'll use a larger time step to highlight the stability difference.
+# We use a larger time step to compare these two trajectories; this is not
+# a general stability or convergence study.
 
 # %%
-# Large time step to highlight stability difference
+# Larger time step for the bounded comparison
 large_time_step = 0.1  # 10x larger
 n_steps_stability = 50
 
 # Staggered strategy
 staggered_strategy = par.dynamics.CondensationIsothermalStaggered(
     molar_mass=molar_mass_water,
+    **configuration,
     theta_mode="random",
     num_batches=10,
     random_state=RANDOM_SEED,
@@ -289,6 +302,7 @@ staggered_strategy = par.dynamics.CondensationIsothermalStaggered(
 # Simultaneous strategy
 simultaneous_strategy = par.dynamics.CondensationIsothermal(
     molar_mass=molar_mass_water,
+    **configuration,
     diffusion_coefficient=2e-5,
     accommodation_coefficient=1.0,
     update_gases=True,
@@ -365,7 +379,8 @@ plt.show()
 #
 # ### Choosing `num_batches`
 #
-# More batches = more frequent gas updates = better stability but more overhead.
+# More batches change how frequently gas feedback is applied. Accuracy and
+# cost depend on the workload and require separate convergence/timing studies.
 #
 # - **Small systems (<100 particles)**: `num_batches=1-5`
 # - **Medium systems (100-1000 particles)**: `num_batches=10-20`
@@ -381,6 +396,7 @@ batch_results = {}
 for num_batches in batch_counts:
     strategy = par.dynamics.CondensationIsothermalStaggered(
         molar_mass=molar_mass_water,
+        **configuration,
         theta_mode="half",
         num_batches=num_batches,
         random_state=RANDOM_SEED,
@@ -413,20 +429,20 @@ plt.show()
 #
 # ### Key Takeaways
 #
-# 1. **Staggered stepping** splits each timestep into two passes, improving stability and mass conservation
-# 2. **Three theta modes** offer different trade-offs:
-#    - `"half"`: Deterministic, good default
-#    - `"random"`: Best mass conservation
-#    - `"batch"`: Maximum staggering via batch updates
-# 3. **Mass conservation** is verified with relative errors < 10^-10
-# 4. **At large time steps**, staggered stepping maintains stability where simultaneous stepping may diverge
+# 1. **Staggered stepping** uses sequential particle updates with gas feedback.
+# 2. The `half`, `random`, and `batch` modes give distinct update orderings.
+# 3. These workloads check extensive particle-plus-gas mass with `rtol=1e-12`
+#    and `atol=1e-30`; observed roundoff does not rank the modes' accuracy.
+# 4. Both methods remain finite in this comparison. Choosing a time step still
+#    requires a convergence study for the intended physical case.
 #
 # ### Quick Reference
 #
 # ```python
-# # Recommended setup for most use cases
+# # Reuse the explicit species mapping and physical configuration above
 # strategy = par.dynamics.CondensationIsothermalStaggered(
 #     molar_mass=0.018,  # kg/mol
+#     **configuration,
 #     theta_mode="random",
 #     num_batches=10,
 #     shuffle_each_step=True,

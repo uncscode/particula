@@ -136,16 +136,16 @@ def test_condensation_latent_heat_build_aerosol_creates_single_box_state(
     assert callable(build_aerosol)
 
     aerosol = build_aerosol()
-    gas_species = aerosol.atmosphere.partitioning_species
+    gas_species = aerosol.gas
 
-    assert gas_species.get_name() == "H2O"
-    assert aerosol.atmosphere.temperature == pytest.approx(298.15)
-    assert aerosol.atmosphere.total_pressure == pytest.approx(101325.0)
-    particle_mass = aerosol.particles.get_mass()
+    assert gas_species.name == ["H2O"]
+    assert aerosol.environment.temperature[0] == pytest.approx(298.15)
+    assert aerosol.environment.pressure[0] == pytest.approx(101325.0)
+    particle_mass = aerosol.particles.total_mass[0]
 
     assert particle_mass.shape == (4,)
     assert np.all(particle_mass > 0.0)
-    assert np.all(gas_species.get_concentration() > 0.0)
+    assert np.all(gas_species.concentration > 0.0)
 
 
 def test_condensation_latent_heat_main_path_matches_run_example_contract(
