@@ -512,6 +512,39 @@ only with `initialize_rng=True`, and omitted outputs/state are call-local. The
 exact return tuple is `(particles, collision_pairs, n_collisions)`; RNG state is
 not returned.
 
+For explicitly tagged native `ParticleData` transferred to Warp, every
+supported mechanism requires **equal positive active counts within each box**.
+Counts may be fractional and may differ between boxes; zero-count slots are
+inactive. Every native schedule includes the common count: its trial budget
+scales as `K_majorant * pair_count * count * dt / volume`. The original
+per-particle species masses and raw counts remain in their original storage.
+Accepted merges conserve count-weighted species mass and charge; donor fields
+are cleared and recipient counts remain unchanged. Untagged legacy inputs keep
+their separately tested, mechanism-specific behavior.
+
+Native admission rejects PMF/PDF populations, unequal active counts, malformed
+fp64 primary storage, invalid physical state, and overlapping writable and
+protected arrays. A supplied volume must match the physical volume on the
+particle container. CPU-to-Warp and reverse transfers retain raw counts and
+representation metadata. Existing charged/sedimentation active-count limits
+remain mechanism-specific; the native tag does not add new mechanism support.
+
+The private prepared call freezes the native scheduling mode and device
+references. Enqueue uses current counts from the pinned device arrays and
+performs no allocation, readback, synchronization, reset or host configuration
+resolution. Callers keep arrays alive and state compatible between enqueues;
+new bindings or semantics require preparation again. This is direct/prepared
+science evidence; native resident/checkpoint integration remains M4-owned.
+
+Native regression coverage uses resolved volumes 0.25/1/4 m³, common counts
+0.25/1/4, independent species/charge inventories and independent one-pair
+stochastic expectations for all eleven supported masks on Warp CPU and optional
+CUDA. Run it with:
+
+```bash
+pytest particula/gpu/kernels/tests/coagulation_native_test.py -q --no-cov
+```
+
 Malformed configuration and unsupported distributions fail before particle
 access. Same-device preflight validates caller state, but a later runtime
 failure has no rollback guarantee. Transfers are explicit: there is no automatic

@@ -5528,12 +5528,12 @@ def test_turbulent_public_dispatch_keeps_linear_majorant_path() -> None:
 
     Warp inlines ``@wp.func`` helpers into the public selector, so wall-clock
     timing cannot reliably distinguish an O(A) scan from an O(A²) scan across
-    CPU and CUDA.  This structural diagnostic inspects the public kernel's
+    CPU and CUDA.  This structural diagnostic inspects the shared selector's
     parsed source: the singleton branch must call the two-largest-radii helper,
     while only its alternate branch may contain the exhaustive pair scan.
     """
     source = inspect.getsource(
-        coagulation_module.brownian_coagulation_kernel.func
+        coagulation_module._coagulation_selector_impl.func
     )
     tree = ast.parse(source)
     singleton_branch = next(
