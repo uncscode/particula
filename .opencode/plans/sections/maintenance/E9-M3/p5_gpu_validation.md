@@ -71,5 +71,5 @@ python .opencode/tools/run_pytest.py
 
 Focused result: 624 passed, 1 skipped in 7.77 s. Repository Ruff/mypy passed;
 strict docs built in 1.44 s. Logs: `.artifacts/e9-m3/p5-gpu/`.
-Untargeted package validation passed in 148.38 s at 92% coverage against the
-unchanged 80% threshold; see `package-tests.log` for the assertion totals.
+Untargeted package validation: 9,036 passed, 19 skipped in 148.38 s at 92%
+coverage against the unchanged 80% threshold; see `package-tests.log`.

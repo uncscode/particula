@@ -1,5 +1,8 @@
 # P5 native CPU wall-loss checkpoint
 
+This is the historical CPU checkpoint. Subsequent GPU evidence is in
+`p5_gpu_validation.md`; final integration and gates are in `p6_validation.md`.
+
 Entry revision: `450e8dd68`. This checkpoint implements the CPU portion of
 P5 in the single M3 PR. Direct/prepared GPU wall-loss admission and sink tests
 remain pending; P5/M3 completion and M4 admission are not claimed.

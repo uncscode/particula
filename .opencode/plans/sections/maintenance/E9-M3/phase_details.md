@@ -102,7 +102,7 @@ with their owning phase, including the P4 species/charge-moment follow-up.
     Do not substitute GPU laws or slot behavior for existing CPU science.
 
 - [ ] **E9-M3-P6: Update development documentation**
-  - Issue: #1605 (single PR) | Status: Final validation in progress
+  - Issue: #1605 (single PR) | Status: Implemented and validated; review pending
   - Work: Document native scientific calls, units, mapping, process-owned
     configuration and mutation boundaries in narrow developer guidance, e.g.
     `docs/Features/condensation_strategy_system.md` where applicable. Finalize
