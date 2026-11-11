@@ -16989,7 +16989,8 @@ intervals to extrapolate its last bin width.</p>
           –
           <div class="doc-md-description">
             <p>Modal densities; default [1e10, 1e9] m^-3.
-These set relative modal sampling weights, not final number density.</p>
+These set relative modal sampling weights, not final number density.
+Their sum must be finite before sampling.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -17203,7 +17204,12 @@ Deterministic input admission precedes random sampling.</p>
 <span class="normal">469</span>
 <span class="normal">470</span>
 <span class="normal">471</span>
-<span class="normal">472</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_lognormal_resolved_particle_data</span><span class="p">(</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span>
+<span class="normal">476</span>
+<span class="normal">477</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_lognormal_resolved_particle_data</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">particle_resolved_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20_000</span><span class="p">,</span>
     <span class="n">mode</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -17225,6 +17231,7 @@ Deterministic input admission precedes random sampling.</p>
 <span class="sd">        geometric_standard_deviation: GSD values &gt; 1; default [1.2, 1.4].</span>
 <span class="sd">        number_concentration: Modal densities; default [1e10, 1e9] m^-3.</span>
 <span class="sd">            These set relative modal sampling weights, not final number density.</span>
+<span class="sd">            Their sum must be finite before sampling.</span>
 <span class="sd">        density: Single material density, default 1000 kg/m^3.</span>
 <span class="sd">        charge: Scalar or per-particle charge; default zero.</span>
 <span class="sd">        volume: Positive finite physical volume, default 1 m^3.</span>
@@ -17256,6 +17263,10 @@ Deterministic input admission precedes random sampling.</p>
         <span class="n">radius_units</span><span class="p">,</span>
         <span class="n">number_concentration_units</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">over</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
+        <span class="n">modal_total</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">modal_total</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"total modal number concentration must be finite"</span><span class="p">)</span>
     <span class="n">material</span> <span class="o">=</span> <span class="n">_single_density</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">density_units</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">create_resolved_particle_data</span><span class="p">(</span>
         <span class="n">masses</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">particle_resolved_count</span><span class="p">),</span>
