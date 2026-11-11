@@ -17,8 +17,8 @@ SPEC.loader.exec_module(MODULE)
 
 def git(*args):
     """Run a Git command in the isolated fixture repository."""
-    return subprocess.check_output(  # noqa: S603,S607 -- fixture-owned Git argv
-        ["git", *args], text=True
+    return subprocess.check_output(  # noqa: S603 -- fixture-owned Git argv
+        ["git", *args], text=True  # noqa: S607 -- Git is a test prerequisite
     ).strip()
 
 
