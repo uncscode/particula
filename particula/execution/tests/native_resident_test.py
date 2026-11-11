@@ -167,7 +167,10 @@ def test_native_mass_diagnostic_rejects_ambiguous_mapping(device, failure):
         np.testing.assert_array_equal(output.numpy(), 0)
 
 
-def test_native_condensation_adapter_preserves_material_and_gas_widths(device):
+@pytest.mark.parametrize("latent", [False, True])
+def test_native_condensation_adapter_preserves_material_and_gas_widths(
+    device, latent
+):
     """Selected Warp execution forwards the pinned nonidentity mapping."""
     from particula.execution.adapters.condensation import (
         CondensationExecutionConfig,
@@ -182,7 +185,7 @@ def test_native_condensation_adapter_preserves_material_and_gas_widths(device):
     from particula.gpu import to_warp_environment_data
     from particula.gpu.kernels.tests.condensation_native_test import _state
 
-    source = _state(device, scenario="uptake", latent=False)
+    source = _state(device, scenario="uptake", latent=latent)
     environment = to_warp_environment_data(
         EnvironmentData(
             temperature=np.full(2, 298.15),
@@ -193,13 +196,14 @@ def test_native_condensation_adapter_preserves_material_and_gas_widths(device):
     )
     request = WarpCondensationExecutionState(
         WarpCondensationState(
-            CondensationExecutionConfig(_configuration()),
+            CondensationExecutionConfig(_configuration(latent_heat=latent)),
             source.p,
             source.g,
             environment,
             source.kwargs["thermodynamics"],
             scratch_buffers=source.kwargs["scratch_buffers"],
             species_binding=source.kwargs["species_binding"],
+            latent_heat=source.kwargs.get("latent_heat"),
         ),
         1.0,
     )

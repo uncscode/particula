@@ -968,7 +968,11 @@ def _validate_selected_warp_sidecars(
         if state.latent_heat is None:
             raise ValueError("latent_heat is required by the selected profile.")
         _validate_array(
-            "latent_heat", state.latent_heat, wp.float64, (species,), device
+            "latent_heat",
+            state.latent_heat,
+            wp.float64,
+            (cast(Any, state.gas).concentration.shape[1],),
+            device,
         )
 
     requires_activity_surface = (

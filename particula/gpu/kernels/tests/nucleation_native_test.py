@@ -330,3 +330,21 @@ def test_native_source_rejects_p4_alias_with_protected_vapor_pressure(device):
     )
     with pytest.raises(ValueError, match="overlap"):
         _prepare_nucleation_step_gpu(p, g, config, 1.0, **kwargs)
+
+
+def test_nonbinary_volume_preserves_admitted_count(device):
+    """P4/P5 retain one admitted event without a density round trip."""
+    from dataclasses import replace
+
+    from particula.gpu.kernels import nucleation_step_gpu
+
+    p, g, config, kwargs = setup(device, volume=0.09)
+    g.concentration.assign(np.array([[7.0, 100.0, 11.111111111111112, 9.0]]))
+    before = density_inventory(p, g)
+    nucleation_step_gpu(p, g, replace(config, coefficient=1.0), 1.0, **kwargs)
+    np.testing.assert_array_equal(
+        kwargs["exhaustion_buffers"].final_counts.numpy(), [1]
+    )
+    np.testing.assert_allclose(
+        density_inventory(p, g), before, rtol=1e-12, atol=1e-30
+    )
