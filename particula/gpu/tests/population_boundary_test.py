@@ -24,8 +24,8 @@ class _TaggedOnly:
 @pytest.mark.parametrize(
     "module,name",
     [
-        ("wall_loss", "_prepare_wall_loss_step_gpu"),
         ("wall_loss", "_prepare_selected_wall_loss_call"),
+        ("wall_loss", "wall_loss_selected_boxes_step_gpu"),
         ("dilution", "_prepare_dilution_step_gpu"),
         ("nucleation", "_preflight_nucleation"),
         ("nucleation", "_prepare_nucleation_step_gpu"),
@@ -72,3 +72,15 @@ def test_native_coagulation_rejects_unsupported_population_before_payload(code):
     particles.distribution_kind = code
     with pytest.raises(ValueError, match="only particle_resolved"):
         _prepare_coagulation_step_gpu(particles, None, None, 0.1)
+
+
+@pytest.mark.parametrize("code", [1, 2])
+def test_native_wall_loss_rejects_unsupported_population_before_payload(code):
+    """A resolved-removal kernel is not a PMF/PDF loss algorithm."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels.wall_loss import _prepare_wall_loss_step_gpu
+
+    particles = _TaggedOnly()
+    particles.distribution_kind = code
+    with pytest.raises(ValueError, match="only particle_resolved"):
+        _prepare_wall_loss_step_gpu(particles, None, None, 0.1, config=None)

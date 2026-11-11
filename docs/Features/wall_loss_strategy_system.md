@@ -227,13 +227,33 @@ unselected storage retains its capacity and other fields. Rejected preflight
 calls do not mutate caller-owned particle or RNG state. Rollback is not
 promised after a mutation kernel launches.
 
+Native tagged inputs use resolved raw counts, including unequal positive
+weights, with positive physical box volumes. The removal probability is
+`1 - exp(-k * time_step)` for each eligible representative; surviving counts
+are unchanged. Removed species inventory is `sum(mass * count)` and its
+concentration is that inventory divided by box volume. No volume factor is
+introduced into the per-particle wall-loss coefficient. Native preflight
+rejects occupied zero-mass slots, unrepresentable derived geometry/count
+density, noncontiguous storage, and overlapping writers or protected inputs.
+Tagged PMF/PDF inputs reject before payload access. The temporary untagged
+legacy path remains separately supported.
+
+The private prepared boundary freezes array references and scalar arguments.
+Its enqueue performs no host setup or transfer, but the frozen kernel's
+`initialize_rng=True` flag still requests a reset on each eligible launch.
+For persistent replay, supply initialized caller-owned RNG state and prepare
+with `initialize_rng=False`. Zero-time and wholly inactive calls do not advance
+or reset supplied words. Native selected-box/resident dispatch remains an M4
+integration task and rejects tagged inputs at its separate boundary.
+
 Warp CPU is the baseline when Warp is installed. CUDA is optional and the
 focused suites skip cleanly when it is unavailable:
 
 ```bash
 pytest particula/gpu/dynamics/tests/wall_loss_funcs_test.py -q -Werror
 pytest particula/gpu/kernels/tests/wall_loss_test.py \
-  particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror
+  particula/gpu/kernels/tests/wall_loss_parity_test.py \
+  particula/gpu/kernels/tests/wall_loss_native_test.py -q -Werror
 ```
 
 Hidden transfer or CPU fallback, dynamic-slot management, scheduler/runnable or
