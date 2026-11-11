@@ -100,3 +100,28 @@ Native latent energy (J) is divided by represented volume for J/m³ reporting.
 Eleven focused tests pass. Plot inspection supports finite trajectories and
 roundoff-level conservation, not a universal stability ranking. P2 coagulation
 and helper starter migration remain pending; this is not the P2 completion gate.
+
+### P2 coagulation and helper checkpoint
+
+All eleven coagulation pairs execute at their original published workload sizes,
+including four smaller examples under Functional and both charged-kernel routes.
+All 16 plots inspected. Resolved runs conserve independently weighted inventory
+at rtol=1e-12, atol=1e-30; native binned diagnostics match independent sums or
+radius quadrature. The old preset builder regenerated default bimodal inputs,
+overwriting the declared concentration array. Native initialization now honors
+the declared modes/numbers; the correction is explicit in each affected example.
+For the two-hour 80 nm pattern cases, material mass drifts are -0.00225778 (PMF)
+and -0.0000324505 (PDF); no conservation tolerance was relaxed or exact
+conservation claimed. The 50,000-particle time comparison retains 12 calls of
+600 s with 50 substeps. Charged kernels have 1,281 exact-zero entries from the
+broad input range; final arrays are finite, nonnegative and symmetric. Plots mask
+zeros and retain/document intermediate underflow warnings.
+
+The helper starter and doctor now require the native checkout, with no facade
+fallback. Native default condensation and coagulation pass their existing 1e-6
+mass tolerance (errors 7.9e-16 total and 2.5e-9 particle, respectively). Historical
+failed high-loading evidence is retained. Installation instructions distinguish
+the native checkout from old released packages. OpenCode payload regenerated.
+
+P2 gate: 64 focused native/example scientific tests and eight plugin distribution
+tests passed; generated payload check and diff whitespace check passed.

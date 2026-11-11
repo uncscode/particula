@@ -46,7 +46,6 @@ Example:
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from scipy.integrate import trapezoid
 
 # %% [markdown]
@@ -66,12 +65,19 @@ mode = np.array([80e-9])  # 80 nm
 gsd = np.array([1.5])
 number_conc = np.array([1e10])  # m^-3 total
 
-# Atmosphere (25C, 1 atm)
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(25, "degC")
-    .set_pressure(1, "atm")
-    .build()
+# Native ambient environment. GasData requires a species axis, so a
+# zero-concentration, non-partitioning carrier fills that axis. Coagulation
+# does not consume it; ambient pressure is specified independently.
+environment = par.gas.EnvironmentData(
+    temperature=np.array([298.15]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.zeros((1, 1)),
+)
+gas = par.gas.GasData(
+    name=["carrier"],
+    molar_mass=np.array([0.02897]),
+    partitioning=np.array([False]),
+    concentration=np.zeros((1, 1)),
 )
 
 # %% [markdown]
@@ -87,17 +93,16 @@ concentration_pmf = par.particles.get_lognormal_pmf_distribution(
 )
 
 # Build PMF particle representation
-particles_pmf = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_distribution_type("pmf")
-    .set_radius_bins(radius_bins, radius_bins_units="m")
-    .set_concentration(concentration_pmf, concentration_units="m^-3")
-    .set_density(np.array([1_000.0]), density_units="kg/m^3")
-    .set_charge(np.zeros_like(radius_bins))
-    .build()
+particles_pmf = par.particles.create_particle_data_from_radii(
+    radii=radius_bins,
+    concentration=concentration_pmf,
+    distribution_type="discrete",
+    density=1000.0,
 )
 
-aerosol_pmf = LegacyAerosol(atmosphere=atmosphere, particles=particles_pmf)
+aerosol_pmf = par.Aerosol(
+    particles=particles_pmf, gas=gas.copy(), environment=environment.copy()
+)
 print(f"PMF initial total: {concentration_pmf.sum():.2e} m^-3")
 
 # %% [markdown]
@@ -113,17 +118,16 @@ concentration_pdf = par.particles.get_lognormal_pdf_distribution(
 )
 
 # Build PDF particle representation
-particles_pdf = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_distribution_type("pdf")
-    .set_radius_bins(radius_bins, radius_bins_units="m")
-    .set_concentration(concentration_pdf, concentration_units="m^-3")
-    .set_density(np.array([1_000.0]), density_units="kg/m^3")
-    .set_charge(np.zeros_like(radius_bins))
-    .build()
+particles_pdf = par.particles.create_particle_data_from_radii(
+    radii=radius_bins,
+    concentration=concentration_pdf,
+    distribution_type="continuous_pdf",
+    density=1000.0,
 )
 
-aerosol_pdf = LegacyAerosol(atmosphere=atmosphere, particles=particles_pdf)
+aerosol_pdf = par.Aerosol(
+    particles=particles_pdf, gas=gas.copy(), environment=environment.copy()
+)
 pdf_total = trapezoid(concentration_pdf, x=radius_bins)
 print(f"PDF initial total: {pdf_total:.2e} m^-3")
 
@@ -133,9 +137,10 @@ print(f"PDF initial total: {pdf_total:.2e} m^-3")
 # %%
 # Sample radii from the same lognormal distribution
 # Match the actual PMF aerosol concentration (after builder processing)
-pmf_initial_concentration = aerosol_pmf.particles.get_total_concentration()
+pmf_initial_concentration = aerosol_pmf.particles.number_density[0]
 n_samples = 50_000
 
+np.random.seed(42)
 radii_sample = par.particles.get_lognormal_sample_distribution(
     mode=mode,
     geometric_standard_deviation=gsd,
@@ -151,25 +156,24 @@ sample_volume = len(radii_sample) / pmf_initial_concentration
 density = np.array([1_000.0])
 mass_sample = 4 / 3 * np.pi * radii_sample**3 * density
 
-# Build particle-resolved representation
-particles_resolved = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
-    .set_activity_strategy(par.particles.ActivityIdealMass())
-    .set_surface_strategy(par.particles.SurfaceStrategyVolume())
-    .set_mass(mass_sample, mass_units="kg")
-    .set_density(density, density_units="kg/m^3")
-    .set_charge(0)
-    .set_volume(sample_volume, volume_units="m^3")
-    .build()
+# Unit count weights and the physical volume establish number density.
+particles_resolved = par.particles.create_resolved_particle_data(
+    masses=mass_sample,
+    density=density,
+    volume=sample_volume,
 )
-
-aerosol_resolved = LegacyAerosol(
-    atmosphere=atmosphere, particles=particles_resolved
+aerosol_resolved = par.Aerosol(
+    particles=particles_resolved,
+    gas=gas.copy(),
+    environment=environment.copy(),
+)
+initial_resolved_inventory = np.sum(
+    particles_resolved.masses * particles_resolved.concentration[..., None],
+    axis=1,
 )
 print(f"Particle-resolved initial count: {len(radii_sample)} particles")
 print(
-    f"  -> concentration: {aerosol_resolved.particles.get_total_concentration():.2e} m^-3"
+    f"  -> concentration: {aerosol_resolved.particles.number_density[0]:.2e} m^-3"
 )
 
 # %% [markdown]
@@ -223,11 +227,11 @@ n_steps = 12  # 12 steps = 2 hours total
 times = np.arange(0, (n_steps + 1) * time_step, time_step)  # 0 to 7200 s
 
 # Storage for number concentrations
-# PMF and Resolved: use get_total_concentration()
+# PMF and Resolved: native number_density respects density/count semantics
 # PDF: must integrate since concentration is per unit size (m^-4)
-number_pmf = [aerosol_pmf.particles.get_total_concentration()]
-number_pdf = [trapezoid(aerosol_pdf.particles.concentration, x=radius_bins)]
-number_resolved = [aerosol_resolved.particles.get_total_concentration()]
+number_pmf = [aerosol_pmf.particles.number_density[0]]
+number_pdf = [trapezoid(aerosol_pdf.particles.concentration[0], x=radius_bins)]
+number_resolved = [aerosol_resolved.particles.number_density[0]]
 
 print(
     f"Initial: PMF={number_pmf[0]:.2e}, PDF={number_pdf[0]:.2e}, "
@@ -244,21 +248,31 @@ for step in range(n_steps):
     aerosol_pmf = coagulation_pmf.execute(
         aerosol_pmf, time_step=time_step, sub_steps=sub_steps
     )
-    number_pmf.append(aerosol_pmf.particles.get_total_concentration())
+    number_pmf.append(aerosol_pmf.particles.number_density[0])
 
     # PDF coagulation
     aerosol_pdf = coagulation_pdf.execute(
         aerosol_pdf, time_step=time_step, sub_steps=sub_steps
     )
     number_pdf.append(
-        trapezoid(aerosol_pdf.particles.concentration, x=radius_bins)
+        trapezoid(aerosol_pdf.particles.concentration[0], x=radius_bins)
     )
 
     # Particle-resolved coagulation
     aerosol_resolved = coagulation_resolved.execute(
         aerosol_resolved, time_step=time_step, sub_steps=sub_steps
     )
-    number_resolved.append(aerosol_resolved.particles.get_total_concentration())
+    number_resolved.append(aerosol_resolved.particles.number_density[0])
+    np.testing.assert_allclose(
+        np.sum(
+            aerosol_resolved.particles.masses
+            * aerosol_resolved.particles.concentration[..., None],
+            axis=1,
+        ),
+        initial_resolved_inventory,
+        rtol=1e-12,
+        atol=1e-30,
+    )
 
     print(
         f"Step {step + 1}/{n_steps}: "
@@ -375,6 +389,17 @@ res_pct = 100 * number_resolved[-1] / number_resolved[0]
 print(f"  PMF: {number_pmf[-1]:.2e} m^-3 ({pmf_pct:.1f}% remaining)")
 print(f"  PDF: {number_pdf[-1]:.2e} m^-3 ({pdf_pct:.1f}% remaining)")
 print(f"  Resolved: {number_resolved[-1]:.2e} m^-3 ({res_pct:.1f}% remaining)")
+
+# %% [markdown]
+# ## Native initialization and numerical limits
+#
+# Native construction retains the explicitly generated concentration array.
+# Earlier versions used a preset builder that regenerated its default bimodal
+# distribution, replacing the declared inputs. The plots here therefore use
+# the stated mode and total number concentration, not that old preset result.
+# Finite-grid coagulation is not exactly mass conservative. Number loss and
+# distribution changes illustrate this workload; they are not a convergence
+# study or evidence of exact agreement between representations.
 
 # %% [markdown]
 # ## Summary

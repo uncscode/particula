@@ -25,7 +25,7 @@ See the [installation and compatibility guide](https://uncscode.github.io/partic
 
 ## Environment and science
 
-Reuse the user's selected environment. `requirements.txt` is an opt-in pinned
+Reuse the user's selected environment. The native starters require the selected E9 checkout; `requirements.txt` is an opt-in pinned
 starter for a fresh environment, not an instruction to replace an existing one.
 Condensation is the introductory CPU example. Scientific checks are numerical
 checks, not experimental validation. See `references/compatibility.md` for

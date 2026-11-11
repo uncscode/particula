@@ -34,7 +34,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 # %% [markdown]
 # ## Build a PMF aerosol
@@ -54,27 +53,33 @@ concentration_pmf = par.particles.get_lognormal_pmf_distribution(
     number_of_particles=np.array([5e8]),  # m^-3 total
 )
 
-# Atmosphere (ambient, non-condensing)
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(25, "degC")
-    .set_pressure(1, "atm")
-    .build()
+# Native ambient environment. GasData requires a species axis, so a
+# zero-concentration, non-partitioning carrier fills that axis. Coagulation
+# does not consume it; ambient pressure is specified independently.
+environment = par.gas.EnvironmentData(
+    temperature=np.array([298.15]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.zeros((1, 1)),
+)
+gas = par.gas.GasData(
+    name=["carrier"],
+    molar_mass=np.array([0.02897]),
+    partitioning=np.array([False]),
+    concentration=np.zeros((1, 1)),
 )
 
 # PMF particle representation
-particles_pmf = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_distribution_type("pmf")
-    .set_radius_bins(radius_bins, radius_bins_units="m")
-    .set_concentration(concentration_pmf, concentration_units="m^-3")
-    .set_density(np.array([1_000.0]), density_units="kg/m^3")
-    .set_charge(np.zeros_like(radius_bins))
-    .build()
+particles_pmf = par.particles.create_particle_data_from_radii(
+    radii=radius_bins,
+    concentration=concentration_pmf,
+    distribution_type="discrete",
+    density=1000.0,
 )
 
 # Aerosol object
-pmf_aerosol = LegacyAerosol(atmosphere=atmosphere, particles=particles_pmf)
+pmf_aerosol = par.Aerosol(
+    particles=particles_pmf, gas=gas.copy(), environment=environment.copy()
+)
 
 # %% [markdown]
 # ## Configure coagulation (discrete)
@@ -104,13 +109,13 @@ print(coagulation_process)
 time_step = 200  # seconds
 time_substeps = 10
 
-pmf_before = pmf_aerosol.particles.get_concentration()
-radii = pmf_aerosol.particles.get_radius()
+pmf_before = pmf_aerosol.particles.concentration[0].copy()
+radii = pmf_aerosol.particles.radii[0].copy()
 
 pmf_after_aerosol = coagulation_process.execute(
     pmf_aerosol, time_step=time_step, sub_steps=time_substeps
 )
-pmf_after = pmf_after_aerosol.particles.get_concentration()
+pmf_after = pmf_after_aerosol.particles.concentration[0].copy()
 
 # %% [markdown]
 # ## Plot: concentration before/after
@@ -136,3 +141,9 @@ plt.show()
 # - Runnable: `par.dynamics.Coagulation`
 # - Representation: PMF (bin-based number concentration)
 # - Runtime guardrails: small grid, short horizon for fast execution
+
+# %% [markdown]
+# Native construction uses the explicitly generated distribution above. The old
+# preset construction regenerated default modal inputs instead. Finite-grid
+# coagulation has numerical mass drift; these curves illustrate number loss,
+# not exact conservation or a time-step/grid-convergence claim.

@@ -24,8 +24,8 @@ Notebook sync/execution occurs in the owning phase, not deferred to P7.
   - Gate: Inventory approved; foundation scripts and affected pairs execute,
     assertions pass and changed landing pages render strictly.
 
-- [ ] **E9-M5-P2: Migrate condensation and coagulation examples with scientific checks**
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E9-M5-P2: Migrate condensation and coagulation examples with scientific checks**
+  - Issue: TBD | Size: S | Status: Implemented and validated
   - Work: Migrate all Dynamics/Condensation and Dynamics/Coagulation supported
     object-pattern notebooks, including latent heat, staggered, charged,
     distribution comparison and time evolution. Audit functional subdirectories

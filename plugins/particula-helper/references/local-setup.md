@@ -1,11 +1,14 @@
 # Local execution
 The plugin contains skills and supporting Python scripts, not an MCP server. A compatible host must expose local Python execution and file tools. Uploading a ZIP does not connect web/mobile chat to your computer. No API key or hosted server is needed for these scripts.
 
-Use an existing suitable environment where possible. For the tested starter on a new project, use Python 3.12 or newer (tested here with Python 3.14), then:
+Use an existing suitable environment where possible. These native starters require a Particula checkout containing the E9 native
+data APIs. They do not run against the older 0.2.x facade-only API. For a new
+project, use Python 3.12 or newer and install the selected native checkout:
 
 ```sh
 python -m venv .venv
 .venv/bin/python -m pip install -r /absolute/path/to/particula-helper/requirements.txt
+.venv/bin/python -m pip install -e /absolute/path/to/native-particula-checkout
 .venv/bin/python /absolute/path/to/particula-helper/scripts/doctor.py
 .venv/bin/python /absolute/path/to/particula-helper/scripts/run_example.py --process condensation --output ./runs/condensation-001
 ```
