@@ -5,56 +5,71 @@
       "source": "docs/Examples/Activity/activity_tutorial.py",
       "notebook": "docs/Examples/Activity/activity_tutorial.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "functional API retained; units, bounded diagnostics and plotting audited",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_activity_equilibria_examples_test.py",
+      "scientific_expectation": "Analytical ideal/kappa activity; finite nonideal activity; bounded organic partitioning and water-aware equilibrium inventory; no new phase-transfer validation claim.",
+      "execution": "full standalone and notebook passed; output cells retained",
+      "evidence": [
+        "Seven functional example regression cases pass",
+        "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
+      ]
     },
     {
       "source": "docs/Examples/Activity/bat_activity_example.py",
       "notebook": "docs/Examples/Activity/bat_activity_example.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "functional API retained; units, bounded diagnostics and plotting audited",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_activity_equilibria_examples_test.py",
+      "scientific_expectation": "Analytical ideal/kappa activity; finite nonideal activity; bounded organic partitioning and water-aware equilibrium inventory; no new phase-transfer validation claim.",
+      "execution": "full standalone and notebook passed; output cells retained",
+      "evidence": [
+        "Seven functional example regression cases pass",
+        "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
+      ]
     },
     {
       "source": "docs/Examples/Activity/equilibria_example.py",
       "notebook": "docs/Examples/Activity/equilibria_example.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "functional API retained; units, bounded diagnostics and plotting audited",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_activity_equilibria_examples_test.py",
+      "scientific_expectation": "Analytical ideal/kappa activity; finite nonideal activity; bounded organic partitioning and water-aware equilibrium inventory; no new phase-transfer validation claim.",
+      "execution": "full standalone and notebook passed; output cells retained",
+      "evidence": [
+        "Seven functional example regression cases pass",
+        "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
+      ]
     },
     {
       "source": "docs/Examples/Activity/ideal_activity_example.py",
       "notebook": "docs/Examples/Activity/ideal_activity_example.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "functional API retained; units, bounded diagnostics and plotting audited",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_activity_equilibria_examples_test.py",
+      "scientific_expectation": "Analytical ideal/kappa activity; finite nonideal activity; bounded organic partitioning and water-aware equilibrium inventory; no new phase-transfer validation claim.",
+      "execution": "full standalone and notebook passed; output cells retained",
+      "evidence": [
+        "Seven functional example regression cases pass",
+        "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
+      ]
     },
     {
       "source": "docs/Examples/Activity/kappa_activity_example.py",
       "notebook": "docs/Examples/Activity/kappa_activity_example.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "functional API retained; units, bounded diagnostics and plotting audited",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_activity_equilibria_examples_test.py",
+      "scientific_expectation": "Analytical ideal/kappa activity; finite nonideal activity; bounded organic partitioning and water-aware equilibrium inventory; no new phase-transfer validation claim.",
+      "execution": "full standalone and notebook passed; output cells retained",
+      "evidence": [
+        "Seven functional example regression cases pass",
+        "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
+      ]
     },
     {
       "source": "docs/Examples/Aerosol/Aerosol_Tutorial.py",
@@ -506,23 +521,29 @@
       "source": "docs/Examples/Equilibria/Notebooks/activity_part1.py",
       "notebook": "docs/Examples/Equilibria/Notebooks/activity_part1.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "functional API retained; units, bounded diagnostics and plotting audited",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_activity_equilibria_examples_test.py",
+      "scientific_expectation": "Analytical ideal/kappa activity; finite nonideal activity; bounded organic partitioning and water-aware equilibrium inventory; no new phase-transfer validation claim.",
+      "execution": "full standalone and notebook passed; output cells retained",
+      "evidence": [
+        "Seven functional example regression cases pass",
+        "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
+      ]
     },
     {
       "source": "docs/Examples/Equilibria/Notebooks/equilibria_part1.py",
       "notebook": "docs/Examples/Equilibria/Notebooks/equilibria_part1.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "functional API retained; units, bounded diagnostics and plotting audited",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_activity_equilibria_examples_test.py",
+      "scientific_expectation": "Analytical ideal/kappa activity; finite nonideal activity; bounded organic partitioning and water-aware equilibrium inventory; no new phase-transfer validation claim.",
+      "execution": "full standalone and notebook passed; output cells retained",
+      "evidence": [
+        "Seven functional example regression cases pass",
+        "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
+      ]
     },
     {
       "source": "docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.py",

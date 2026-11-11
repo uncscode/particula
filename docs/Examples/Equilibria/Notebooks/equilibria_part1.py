@@ -66,7 +66,7 @@ density = get_organic_density_array(
 # %% [markdown]
 # ## Calculate the Activity Coefficients
 #
-# The next step involves calculating the activity coefficients, which are pivotal in determining how the organic compounds distribute between the liquid and vapor phases. We use the `partitioning.get_properties_for_liquid_vapor_equilibrium` function, a specialized tool that simplifies the process by returning only the essential properties: activity coefficients, mass fractions, and the two-phase *q* values for the alpha-beta equilibrium.
+# The next step involves calculating the activity coefficients, which are pivotal in determining how the organic compounds distribute between the liquid and vapor phases. We use the `partitioning.get_properties_for_liquid_vapor_partitioning` function, a specialized tool that simplifies the process by returning only the essential properties: activity coefficients, mass fractions, and the two-phase *q* values for the alpha-beta equilibrium.
 #
 
 # %%
@@ -94,7 +94,7 @@ alpha_opt, beta_opt, system_opt, fit_result = (
 )
 
 print(f"mass in organic aerosol [ug/m3]: {system_opt[0]}")
-print(f"mass in water [ug/3]: {system_opt[1]}")
+print(f"mass in water [ug/m3]: {system_opt[1]}")
 
 # %% [markdown]
 # ## Activity Coefficients as a Function of Relative Humidity (f(RH))
@@ -141,7 +141,9 @@ print("Calculation complete")
 # %% [markdown]
 # ## Plotting the Equilibrium Composition vs. Relative Humidity
 #
-# (To be updated, current bug in q-alpha transfer)
+# This functional example is independent of the native aerosol containers.
+# Its equilibrium solver and phase-transfer model are unchanged by M5; the
+# plot is illustrative, not a new validation of two-phase thermodynamics.
 #
 # Now that we have calculated the equilibrium composition for a range of RH values, we will visualize these results. The plot will show how the total organic aerosol concentration and the water concentration in the aerosol vary with changing RH. This visualization is crucial for understanding the dynamic behavior of aerosols in different atmospheric humidity conditions.
 
@@ -178,3 +180,10 @@ plt.show()
 #
 # In this notebook, we have journeyed through the process of defining a liquid-vapor equilibrium system and employing the binary activity model to calculate activity coefficients as a function of relative humidity (RH). We then used these coefficients to determine the equilibrium composition of the liquid and vapor phases. Finally, the results were visualized to demonstrate the impact of RH on aerosol behavior, which is essential for understanding atmospheric aerosol dynamics and their environmental implications.
 #
+
+# Check finite, physically bounded condensed organic mass across the RH sweep.
+assert np.all(np.isfinite(total_oa_concentration))
+assert np.all(total_oa_concentration >= 0)
+assert np.all(total_oa_concentration <= concentration_organic_matter.sum())
+assert np.all(np.isfinite(water_concentration))
+assert np.all(water_concentration >= 0)
