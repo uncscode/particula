@@ -24,6 +24,13 @@ Grid refinement and smaller timesteps do not eliminate that composition
 defect. Conservative species/charge transport is deferred; this is not an M4
 implementation commitment or a general scientific-acceptance decision.
 
+The maintainer further clarified intended use: uniform composition across
+radius, or a single effective-material/effective-density representation. The
+method is generally not appropriate for tracking composition varying with
+radius. Effective density is a bulk approximation and does not supply missing
+species transport. This guidance does not introduce a new runtime rejection
+or claim that uniform composition eliminates discretization error.
+
 The reproducible equal-density, constant-kernel lognormal fixture in
 `native_coagulation_limitations_test.py` independently integrates raw mass
 times population on 128/256/512/1024 nodes. Its PDF species defects approach

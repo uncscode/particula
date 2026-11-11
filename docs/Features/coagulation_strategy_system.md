@@ -73,6 +73,14 @@ update on a fixed composition grid. It writes concentration only; per-bin
 species masses and charge remain unchanged. Negative or nonfinite proposed
 concentrations reject before publication, without clipping.
 
+**Intended use:** this fixed-composition PMF/PDF method is suited to particles
+with uniform composition across radius, or to a population represented as a
+single effective material with a prescribed effective density. It is generally
+not appropriate for tracking composition that varies with radius. An effective
+density is a bulk material approximation, not a replacement for transporting
+individual species between bins. Uniform composition does not remove the
+method's finite-domain and discretization errors.
+
 **Known limitation:** gained particles inherit the destination bin's fixed
 composition rather than the combined donor composition. With composition
 varying across particle size, this method does not generally conserve each
