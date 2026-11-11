@@ -1,7 +1,8 @@
 # Open Questions and Review Decisions
 
 Authority: [E9 review decisions](../../epics/E9/appendix.md#review-decisions-2026-09-27).
-Resolved planning choices below do not mark M1 phases complete.
+The decisions below and final validation have been accepted; Kyle approved
+the M1 handoff on 2026-11-10. See `validation_evidence.md`.
 
 - [x] **Q1 species alignment:** D3 chooses explicit process-owned lane mapping,
   full gas-order environment lanes and preservation of nonparticipating material.
@@ -25,12 +26,13 @@ Resolved planning choices below do not mark M1 phases complete.
   distribution compatibility. No reconstruction to validate.
 - [x] **Q5 governance:** Kyle/Gorkowski approves semantics and final M1 evidence.
 
-## Evidence still required in M1
+## Completed M1 evidence
 
 P1/P2 decisions are approved in the dated appendix update. P3's explicit
 representation metadata, builder admission, population helpers and transfer
 rejection, and P4's concrete structural checker are delivered on the accumulated
 branch. P5 adds the data-only mixed/all-false, non-unit-volume integration
-regression and the bounded developer reference. Remaining gates are literal
-final-revision checks and Kyle's approval of the resulting M1 handoff. No M2
-aggregate implementation or downstream physics migration is delivered.
+regression and the bounded developer reference. The required checks pass at
+`0db7e42b2`; Kyle approved the resulting M1 handoff at PR revision `a7c1eb63c`
+on 2026-11-10. No M2 aggregate implementation or downstream physics migration
+is delivered.

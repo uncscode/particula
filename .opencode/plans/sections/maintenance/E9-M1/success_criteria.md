@@ -1,7 +1,7 @@
 # Success Criteria
 
-Implementation checks pass at `0db7e42b2`; final maintainer handoff approval
-remains pending. See `validation_evidence.md` for commands and provenance.
+Implementation checks pass at `0db7e42b2`; Kyle approved the final handoff
+at PR revision `a7c1eb63c` on 2026-11-10. M1 is complete and M2 is Ready. See `validation_evidence.md` for commands and provenance.
 
 - [x] Approved ordered mapping covers particle/density, all gas categories,
   environment and process parameters, with mismatches rejected explicitly.
@@ -17,7 +17,7 @@ remains pending. See `validation_evidence.md` for commands and provenance.
   is visible to subsequent derived reads and validation, not hidden by caches.
 - [x] Adjacent tests, retained transfer/export assertions, required lint/type
   checks, untargeted full-suite coverage and bounded strict docs checks pass.
-- [ ] M2 start authorization records revision, evidence and reviewer approval;
+- [x] M2 start authorization records revision, evidence and reviewer approval;
   unresolved contract questions or required unavailable checks block handoff.
 
 | Metric | Baseline at drafting | Target | Source |
@@ -37,6 +37,6 @@ downstream gates, not M1 completion claims.
 ## Current completion boundary (2026-11-10)
 
 The delivered-helper and integration inventory is reconciled in `appendix.md`.
-Checklist completion is contingent on `validation_evidence.md` and final
-maintainer approval. Historical drafting baselines in the table above remain
+Checklist completion is supported by `validation_evidence.md` and the recorded
+2026-11-10 final maintainer approval. Historical drafting baselines in the table above remain
 historical; they do not override the recorded P1/P2 decisions.

@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-09-27",
+  "last_updated": "2026-11-10",
   "dependencies": [],
   "section_files": {
     "appendix": ".opencode/plans/sections/epics/E9/appendix.md",
@@ -57,8 +57,8 @@
     {
       "name": "T1 / E9-M1: data contracts, accessors and co-located tests (M)",
       "planned_date": null,
-      "actual_date": null,
-      "status": "Not Started"
+      "actual_date": "2026-11-10",
+      "status": "Shipped"
     },
     {
       "name": "T2 / E9-M2: construction, flat Aerosol and co-located tests (L)",
