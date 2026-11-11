@@ -99,6 +99,143 @@ from particula.gpu import (
 from particula.particles import ParticleData
 ```
 
+## E9-M1 developer contract and M2 handoff
+
+M1 delivers CPU interpretation helpers and read-only structural validation.
+It does not migrate scientific consumers or implement the data-native
+`Aerosol` aggregate. Legacy untagged carriers remain available, but their raw
+arrays do not establish a distribution interpretation.
+
+### Stored units and physical inventories
+
+Let `c[b,n]` be stored concentration, `m[b,n,s]` per-particle species mass
+in kg, and `V[b]` physical volume in m³. The declared kind is authoritative;
+array shape, a legacy strategy, or fractional weights do not infer it.
+
+| Declared `distribution_type` | Raw `c` units | Volume rule | Number density (m⁻³) | Species mass density (kg/m³) |
+| --- | --- | --- | --- | --- |
+| `discrete` (PMF) | Number per bin per m³ | Exactly 1 m³ | Sum `c` over bins | Sum `c*m` over bins |
+| `continuous_pdf` | Radius PDF `dn/dr`, m⁻⁴ | Exactly 1 m³ | Trapezoidal integral of `c` over radius | Trapezoidal integral of `c*m` over radius |
+| `particle_resolved` | Represented particle counts | Finite, strictly positive V | Sum `c` / V | Sum `c*m` / V |
+
+PDF quadrature uses the explicitly supplied positive, finite, strictly
+increasing float64 radius grid in metres, with at least two nodes and one
+node per slot. Integrate the product of varying species mass and PDF on that
+interval, without extrapolation; summing PDF nodes or multiplying separate
+integrals is incorrect. Zero PDF and mass on a valid grid are allowed.
+Density-to-storage conversion would multiply by V only for resolved counts;
+M1 supplies no inverse-conversion helper or automatic rescaling.
+
+`species_mass_inventory` is species mass density times V, in kg per box.
+`total_mass` is instead mass per particle, summed over species. Gas
+`concentration` is always kg/m³, so extensive gas inventory is concentration
+multiplied by the same physical box volume. Gas molar mass is kg/mol,
+particle material density is kg/m³, and saturation ratio is dimensionless.
+
+### Delivered helper inventory
+
+These are existing signatures/properties, not additional aggregate APIs:
+
+| Owner and access | Result and contract |
+| --- | --- |
+| `ParticleData.validate_representation()` | Returns `None`; read-only kind, float64 schema, physical-value, volume and grid admission; rejects without repair. |
+| `ParticleData.slot_concentration_density` | Fresh `(B,N)` array; m⁻³ for PMF/resolved, m⁻⁴ for PDF. |
+| `ParticleData.number_density` | Fresh `(B,)` array, m⁻³. |
+| `ParticleData.species_mass_density` | Fresh `(B,Sp)` array, kg/m³. |
+| `ParticleData.species_mass_inventory` | Fresh `(B,Sp)` array, kg. |
+| `ParticleData.copy()` | Detached arrays and PDF grid, preserved kind. |
+| `GasData.copy()` | Detached names list, molar masses, concentrations and partitioning flags. |
+| `EnvironmentData.copy()` | Detached temperature, pressure and saturation-ratio arrays. |
+| `validate_aerosol_structure(particles, gas, environment)` | Concrete import from `particula.aerosol_validation`; returns `None`, checks raw dimensions and ordered-name metadata without mutation. |
+
+The four population properties call representation validation on every read.
+Builder creation enforces explicit kind and its volume/grid/units rules;
+direct `ParticleData(...)` construction checks raw shapes but does not invoke
+representation validation. After raw edits, callers must explicitly validate
+before interpreting data. The structural checker does not call representation
+validation, inspect physical values, certify chemistry, or admit a process.
+
+Raw fields are writable. `ParticleData` retains supplied arrays except for
+constructor density broadcasting/empty-density normalization;
+`GasData` retains its supplied name list and may share already-compatible
+NumPy arrays after dtype normalization. `EnvironmentData` copies constructor
+arrays. None of these mutable objects is a frozen snapshot: use `copy()` for
+isolation. Derived population results are detached values, not writable views
+into the source, and a subsequent read reflects current source arrays.
+
+### Ordered lanes and process-owned mapping
+
+For `Sp` particle species and `Sg` gas species, `Sp` need not equal `Sg`.
+Gas names, molar masses, partitioning flags and concentration columns retain
+one full order. Environment saturation ratios use all `Sg` lanes in that same
+order, including nonpartitioning species; a mask never compresses storage.
+The structural checker requires nonblank unique names and matching dimensions,
+but matching widths cannot prove the ratio producer used the right chemistry.
+
+A future process binding must compare expected full ordered gas names and
+ratio-producer provenance and supply explicit unique, in-range, one-to-one
+`(gas_index, particle_index)` pairs. It must check mapped mask eligibility,
+classify unmatched species, and admit physical values and distribution
+capabilities before mutation. These process gates remain M3/M4 work.
+An all-false mask preserves all gas/ratio lanes and admits no partitioning
+transfer; it is not an empty gas container.
+
+The data-only integration regression uses particle order `[solute_a, solute_b]`
+and gas order `[solute_b, inert, solute_a]`, with explicit pairs `(0,1)` and
+`(2,0)` for the mixed mask. At V=0.25 m³, particle inventories are
+`[5, 13.5] * 1e-18` kg and gas inventories are
+`[0.5, 1.75, 0.75] * 1e-18` kg: mapped totals are therefore
+`[14, 5.75] * 1e-18` kg in map order, with inert gas accounted for separately.
+It also checks V=4 m³, all-false masks, current reads and detached copies.
+This is inventory accounting evidence, not a physics execution example.
+
+### Explicit transfer and ownership boundary
+
+The supported raw transfer calls remain
+`to_warp_particle_data(data, device="cuda", copy=True)`,
+`to_warp_gas_data(data, device="cuda", copy=True, vapor_pressure=None)`, and
+`to_warp_environment_data(data, device="cuda", copy=True)`.
+They do not convert count storage to density. `copy=False` requests the
+compatible zero-copy path and must not be treated as an isolation guarantee.
+Callers own device placement and synchronization.
+
+Downloads are `from_warp_particle_data(gpu_data, sync=True)`,
+`from_warp_gas_data(gpu_data, name=None, sync=True)`, and
+`from_warp_environment_data(gpu_data, sync=True)`; `sync=False` requires
+caller synchronization before host access. Particle restore is untagged and
+must not be assumed detached from Warp CPU storage; explicitly copy when
+independent CPU ownership is needed. Preserve gas names externally and pass
+`name=` to restore their meaning; otherwise names are placeholders. GPU vapor
+pressure is omitted on CPU restore. Restored gas numeric storage can also
+share Warp CPU arrays; use `copy()` when isolation is required. Environment
+construction detaches its
+restored arrays. The detailed raw transfer tables below remain authoritative.
+
+Tagged particles are rejected by both Warp upload and legacy facade restore
+because neither carrier preserves kind/grid provenance. Do not clear the tag
+to bypass this check. M1 does not deliver tagged Warp round trips, GPU PDF
+execution, resident metadata migration, or performance evidence.
+
+### M2-only aggregate replacement specification
+
+The approved future interface is keyword-only
+`Aerosol(particles=..., gas=..., environment=...)`, identity-returning properties
+with validated setters, and keyword-only
+`replace_data(particles=..., gas=..., environment=...)` requiring all three.
+These are **specified for M2, not shipped M1 APIs**.
+
+Validate the complete proposed triple before publishing any reference.
+Same-object assignment preserves identity; a compatible distinct candidate is
+retained by identity. An incompatible single setter rejects without changing
+held or candidate state. A compatible all-three layout change publishes the
+three supplied identities together; one invalid candidate rejects the entire
+operation. Do not implement this by chaining setters or by reconstructing
+containers for validation. Representation validation and structural alignment
+are separate checks; process mapping and physics admission remain later gates.
+Acceptance implies no hidden copy, transfer, GPU/resident rebinding or automatic
+interception of subsequent raw edits. M1's final validation and maintainer
+handoff approval are required before M2 starts.
+
 ## Execution selection
 
 The package-level selection and policy values are stable and dependency-neutral.
@@ -795,7 +932,9 @@ leading `n_boxes` axis.
 | `concentration` | `(n_boxes, n_particles)` | Per-box particle concentration or count, depending on workflow. |
 | `charge` | `(n_boxes, n_particles)` | Per-box particle charge state as dimensionless elementary-charge counts. |
 | `density` | `(n_species,)` | Shared-across-box species density. |
-| `volume` | `(n_boxes,)` | Authoritative per-box simulation volume. |
+| `volume` | `(n_boxes,)` | Authoritative per-box simulation volume in m³. |
+| `distribution_type` | Scalar string or `None` | Explicit CPU interpretation; `None` is legacy untagged storage. |
+| `radius_grid` | `(n_particles,)` or `None` | CPU-only PDF radius nodes in metres; required only for `continuous_pdf`. |
 
 Derived properties such as `radii`, `total_mass`, and `effective_density` are
 computed from stored fields rather than stored separately.

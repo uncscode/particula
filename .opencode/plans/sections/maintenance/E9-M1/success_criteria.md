@@ -32,3 +32,10 @@ All checks are pending implementation acceptance, not drafting achievements.
 Optional CUDA clean skips are not measured GPU success. Full E9 release
 readiness, migrated physics and implemented aggregate replacement remain
 downstream gates, not M1 completion claims.
+
+## Current completion boundary (2026-11-10)
+
+The delivered-helper and integration inventory is reconciled in `appendix.md`.
+Checklist completion is contingent on `validation_evidence.md` and final
+maintainer approval. Historical drafting baselines in the table above remain
+historical; they do not override the recorded P1/P2 decisions.

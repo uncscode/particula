@@ -11,3 +11,11 @@ At the 2026-09-27 drafting record, status was Draft; no production
 implementation, test execution, sibling plan modification, schema generation
 or release completion was claimed. Subsequent P1 characterization test evidence
 is in the appendix, not scientific approval or authorization to start P2.
+
+## 2026-11-10 — P5 implementation
+
+Merged upstream main into the published accumulation branch, carried over the
+requested artifact-ignore commit, reconciled current P1/P2 approvals and P3/P4
+helper inventories, expanded the developer reference, and added the required
+data-only integration regression. Final checks and M1 approval are tracked in
+`validation_evidence.md`; no downstream track is declared complete.

@@ -27,11 +27,10 @@ Resolved planning choices below do not mark M1 phases complete.
 
 ## Evidence still required in M1
 
-P1 reconciles exact helper contracts, clarified PDF grid/quadrature,
-metadata-construction policy and the complete CPU/GPU consumer ledger against
-the later D1 clarification and D2–D3. Characterize V=0.25/1/4 for resolved
-counts only, and PMF/PDF at fixed V=1 independently; do not bless legacy
-agreement as correctness. P2 publishes the D4 replacement acceptance matrix.
-P3/P4 implement bounded helpers/metadata admission with adjacent tests and
-transfer implications; P5 supplies literal final-revision results and approval.
-No normalization implementation or passing characterization is claimed here.
+P1/P2 decisions are approved in the dated appendix update. P3's explicit
+representation metadata, builder admission, population helpers and transfer
+rejection, and P4's concrete structural checker are delivered on the accumulated
+branch. P5 adds the data-only mixed/all-false, non-unit-volume integration
+regression and the bounded developer reference. Remaining gates are literal
+final-revision checks and Kyle's approval of the resulting M1 handoff. No M2
+aggregate implementation or downstream physics migration is delivered.

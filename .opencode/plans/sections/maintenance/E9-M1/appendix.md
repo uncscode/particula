@@ -1,5 +1,9 @@
 # Appendix
 
+Current contract inventory: see **P5 delivered-contract reconciliation** below
+and `validation_evidence.md`. Earlier dated proposals and checks are preserved
+as history; the 2026-09-28 maintainer approval supersedes pending P1/P2 notes.
+
 ## Evidence and references
 
 | Source | Drafting evidence / use |
@@ -313,7 +317,7 @@ remains blocked until predecessor gates pass. No code, tests, transfer,
 resident, checkpoint, or documentation-render validation is claimed by this
 decision record.
 
-## P2 replacement and ownership gate (specification pending approval)
+## P2 replacement and ownership gate (historical proposal; approved below)
 
 P2 may **start** only after the revised P1 ledger, independent scientific
 fixtures and validation ownership are reconciled, checked at a recorded
@@ -392,3 +396,26 @@ of the revised semantics, and P2's future aggregate setter/replace_data
 implementation has not been delivered or validated. The P3 code and its
 validation evidence remain subject to normal final review and shipping gates;
 approval of a contract does not manufacture passing implementation evidence.
+
+## P5 delivered-contract reconciliation (2026-11-10, issue #1614)
+
+This current inventory supersedes historical proposed/pending statuses above,
+without reclassifying historical test runs as final-revision evidence.
+
+| Decision/helper | Delivered authority and status |
+|---|---|
+| P1 units/grid and P2 ownership | Explicit maintainer approval on 2026-09-28 recorded above; fixed-V=1 PMF/PDF, variable-V resolved counts and product quadrature govern. |
+| Particle interpretation | `ParticleData.validate_representation()` plus fresh `slot_concentration_density`, `number_density`, `species_mass_density`, `species_mass_inventory` properties; exact units/shapes in the developer reference. |
+| Builder admission | Explicit distribution kind; representation-compatible units, volume and radius grid; direct constructor remains raw-shape validation. |
+| Copy ownership | Particle copies detach arrays/grid and preserve kind; gas copies detach names/arrays; environment copies detach arrays. Raw particle/gas constructor arrays may alias inputs; environment constructor copies. |
+| P4 alignment | `validate_aerosol_structure(particles, gas, environment)` from the concrete module; no package export, physical admission, representation validation or chemistry certification. |
+| Full lane preservation | Gas/environment retain all ordered gas lanes and masks; unequal particle/gas widths and all-false masks are structurally valid. Explicit process maps and ratio provenance remain process-owned. |
+| Transfer boundary | Raw untagged CPU/Warp transfer remains explicit; no density conversion. Tagged particle upload and legacy restore reject missing metadata support. No tagged GPU/PDF execution claim. |
+| M2 replacement | Approved keyword-only aggregate/properties/whole-triple replacement specification only; no setters, publication or replacement implementation in M1. |
+| P5 regression | `particula/integration_tests/data_container_contract_test.py`: float64 two-box V=.25/4, two particle/three gas lanes, mixed/all-false masks, independent per-species inventories, unmapped gas, current reads and detached copies. |
+
+P3/P4 unit assertions remain in their owning modules. P5 introduces no production
+helper or scientific process change. See `validation_evidence.md` for literal
+checks and revision provenance. Required failed/unavailable checks or missing
+final maintainer approval keep M1 incomplete and M2 blocked. The existing
+P1/P2 decision approval is not final M1 handoff approval.

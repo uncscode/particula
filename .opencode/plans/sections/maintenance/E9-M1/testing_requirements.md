@@ -50,9 +50,11 @@ facade-fixture assertions instead of preserving/migrating their behavior.
 ## Implementation command sequence
 
 Refine the focused list to the actual helper diff and add new adjacent files;
-the following are future validation commands, not drafting results:
+the commands below are required; results belong in the dated evidence record:
 
 ```bash
+pytest particula/integration_tests/data_container_contract_test.py -q --no-cov
+pytest particula/tests/aerosol_validation_test.py -q --no-cov
 pytest particula/particles/tests/ particula/gas/tests/ -q --no-cov
 pytest particula/gpu/tests/conversion_test.py particula/gpu/tests/kernel_exports_test.py -q --no-cov
 pytest particula/dynamics/tests/wall_loss_strategies_test.py -q --no-cov
@@ -64,7 +66,11 @@ python3 .opencode/tools/build_mkdocs.py --validate-only --strict
 mkdocs build --strict
 ```
 
-At P5 include the data-only integration test once its file is assigned.
+P5 owns `particula/integration_tests/data_container_contract_test.py`.
+Run source examples and infrastructure separately under repository policy:
+`pytest examples_tests -q -Werror` and `pytest scripts/tests -q -Werror`.
+These source-suite commands retain their repository policy; P5 focused checks
+do not add `-Werror`.
 Both wall-loss suites protect downstream regressions; the concrete adjacent
 suite is excluded from normal recursive collection and must run explicitly.
 CUDA is optional evidence, never CPU fallback; no benchmark is required.
