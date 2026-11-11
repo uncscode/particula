@@ -533,14 +533,14 @@ def setup_prepared_gas_update(
     typed = cast(ResidentGasUpdateRequest, request)
     dimensions = typed.session.dimensions
     target = cast(Any, typed.session.gas)
-    shape = (dimensions.n_boxes, dimensions.n_species)
+    shape = (dimensions.n_boxes, dimensions.gas_species)
     value_range = _validate_array(
         typed.concentration, shape, target.concentration.device, "concentration"
     )
     _reject_primary_aliases(
         typed.session, (typed.concentration,), (value_range,)
     )
-    size = dimensions.n_boxes * dimensions.n_species
+    size = dimensions.n_boxes * dimensions.gas_species
     _scan(
         cast(Any, typed.concentration),
         size,
@@ -596,7 +596,7 @@ def _enqueue_prepared_gas_update(prepared: PreparedResidentGasUpdate) -> object:
         The identical resident gas container.
     """
     dimensions = cast(Any, prepared.dimensions)
-    if dimensions.n_boxes * dimensions.n_species:
+    if dimensions.n_boxes * dimensions.gas_species:
         wp.copy(
             cast(Any, prepared.target_concentration),
             cast(Any, prepared.concentration),
@@ -687,7 +687,7 @@ class ResidentStateUpdateExecutor:
         _validate_node(request, environment=False)
         dimensions = request.session.dimensions
         target = cast(Any, request.session.gas)
-        shape = (dimensions.n_boxes, dimensions.n_species)
+        shape = (dimensions.n_boxes, dimensions.gas_species)
         concentration_range = _validate_array(
             request.concentration,
             shape,
@@ -697,7 +697,7 @@ class ResidentStateUpdateExecutor:
         _reject_primary_aliases(
             request.session, (request.concentration,), (concentration_range,)
         )
-        size = dimensions.n_boxes * dimensions.n_species
+        size = dimensions.n_boxes * dimensions.gas_species
         _scan(
             cast(Any, request.concentration),
             size,

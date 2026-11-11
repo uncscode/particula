@@ -33,7 +33,7 @@ issue: #1606. This supersedes the old multiple-PR and issue-generation wording.
 | 5. Direct/prepared GPU nucleation and exhaustion | Implemented; focused checks pass |
 | 6. CPU adapters and remaining orchestration consumers | Implemented; focused checks pass |
 | 7. Communication and physical volume evolution | Implemented; focused checks pass |
-| 8. Native resident/prepared metadata and diagnostics | Pending |
+| 8. Native resident/prepared metadata and diagnostics | Implemented; focused checks pass |
 | 9. Schema-v5 checkpoints and exact-device continuation | Pending |
 | 10. Complete native composed-process regressions | Pending |
 | 11. Final validation and developer handoff | Pending |
@@ -153,3 +153,18 @@ Focused checkpoint evidence follows. Final acceptance remains pending.
 - Native prepared kernels retain pinned allocation-free dispatch. Their owning
   resident metadata/binding integration follows in checkpoint 8. Unsupported
   PMF/PDF admission remains fail-closed before payload access.
+
+### Checkpoint 8
+
+- Native resident setup, explicit mappings, adapters, graph signatures, prepared
+  enqueue, gas/environment updates and thermodynamics: **513 passed, 1 skipped**
+  with native CUDA available. Native diagnostics and selected wall-loss plus
+  legacy diagnostics: **273 passed** with CPU/CUDA coverage.
+- Full package mypy: passed (548 source files). Full Ruff/format: passed.
+- Session metadata pins population type and independent species widths.
+  Capture signatures retain condensation/source maps and diagnostic mass maps.
+  Selected wall loss now supports resolved counts and preserves unselected RNG.
+- Native total-mass diagnostics require every particle lane mapped into explicit
+  gas order; they reject unsupported particle-only inventory. Number output is
+  density, including count/volume for resolved populations. Complete native
+  composed-loop evidence is still checkpoint 10 work.

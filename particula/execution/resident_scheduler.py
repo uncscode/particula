@@ -1174,6 +1174,12 @@ def _validate_resident_request_nodes(  # noqa: C901
         or condensation.thermodynamics is not request.thermodynamics
     ):
         raise ValueError("condensation state does not match resident binding.")
+    if (
+        condensation.species_binding is not None
+        and getattr(condensation.species_binding, "gas_names", None)
+        != request.session.metadata.gas_names
+    ):
+        raise ValueError("condensation binding gas order differs from session")
     coagulation_request = request.coagulation
     coagulation = coagulation_request.request.state
     if (

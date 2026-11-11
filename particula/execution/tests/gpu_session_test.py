@@ -39,19 +39,18 @@ def _metadata(species: int = 1) -> ResidentMetadata:
     )
 
 
-@pytest.mark.parametrize("kind", ["discrete", "particle_resolved"])
-def test_tagged_cpu_setup_rejects_before_transfer(monkeypatch, kind):
-    """M3 transfer support must not silently discard tags in resident setup."""
+def test_pdf_cpu_setup_rejects_before_transfer(monkeypatch):
+    """GPU PDF remains unsupported even after native resident migration."""
     from particula.gpu import conversion
 
     particles, gas, environment = _cpu_resources()
-    particles.distribution_type = kind
+    particles.distribution_type = "continuous_pdf"
 
     def forbidden(*args, **kwargs):
-        raise AssertionError("tagged resident setup must not transfer")
+        raise AssertionError("unsupported PDF setup must not transfer")
 
     monkeypatch.setattr(conversion, "to_warp_particle_data", forbidden)
-    with pytest.raises(ValueError, match="resident metadata migration"):
+    with pytest.raises(ValueError, match="continuous_pdf"):
         setup_resident_session(
             particles, gas, environment, Device(Backend.WARP, "cpu")
         )
@@ -69,7 +68,9 @@ def test_resident_revalidation_rejects_new_population_tag():
         lifecycle=ResidentLifecycle.ACTIVE,
     )
     particles.distribution_kind = 3
-    with pytest.raises(ValueError, match="require a migrated consumer"):
+    with pytest.raises(
+        ValueError, match="population metadata does not match session"
+    ):
         session.__post_init__()
 
 

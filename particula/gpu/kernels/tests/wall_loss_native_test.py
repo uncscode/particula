@@ -633,3 +633,44 @@ def test_explicit_reset_flag_remains_frozen_in_prepared_call(device, family):
     second = _snapshot(state)
     for name in first:
         npt.assert_array_equal(second[name], first[name])
+
+
+@pytest.mark.parametrize("family", FAMILIES)
+@pytest.mark.parametrize("prepared", [False, True])
+def test_native_selected_wall_loss_preserves_unselected_state_and_rng(
+    device, family, prepared, monkeypatch
+):
+    """Selected resident dispatch removes counts only in selected logical boxes."""
+    import warp as wp
+
+    from particula.gpu.kernels import wall_loss
+
+    state = _state(device, family)
+    selected = wp.array([0, 2], dtype=wp.int32, device=device)
+    before = _snapshot(state)
+    kwargs = dict(state.kwargs)
+    kwargs.pop("initialize_rng")
+    kwargs.update(time_step=1e30, selected_boxes=selected)
+    if prepared:
+        call = wall_loss._prepare_selected_wall_loss_call(state.p, **kwargs)
+
+        def forbidden(*args, **kwargs):
+            pytest.fail("selected enqueue performed setup or synchronization")
+
+        with monkeypatch.context() as patch:
+            for name in ("zeros", "empty", "synchronize"):
+                patch.setattr(wp, name, forbidden)
+            for _ in range(2):
+                wall_loss._enqueue_prepared_wall_loss_call(call)
+    else:
+        assert (
+            wall_loss.wall_loss_selected_boxes_step_gpu(state.p, **kwargs)
+            is state.p
+        )
+    after = _snapshot(state)
+    lost = _assert_sink(before, after)
+    np.testing.assert_array_equal(lost[1], False)
+    np.testing.assert_array_equal(
+        lost[[0, 2]], before["concentration"][[0, 2]] > 0
+    )
+    assert after["rng"][1] == before["rng"][1]

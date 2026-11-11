@@ -354,6 +354,7 @@ def setup_prepared_resident_communication(  # noqa: C901
             state.initial_masses,
             state.initial_concentration,
             state.initial_charge,
+            typed.session.metadata.distribution_type == "particle_resolved",
         )
     if resources.final_volumes is None:
         volume_enqueue: Callable[..., object] = _enqueue_prepared_noop
@@ -369,6 +370,7 @@ def setup_prepared_resident_communication(  # noqa: C901
             state.volume_invalid,
             state.volume_changed,
             particles.masses.device,
+            typed.session.metadata.distribution_type == "particle_resolved",
         )
     return PreparedResidentCommunicationBinding(
         prepared,

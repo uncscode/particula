@@ -30,6 +30,8 @@ from numbers import Integral, Real
 from threading import RLock, get_ident
 from typing import TYPE_CHECKING, Any, cast
 
+import numpy as np
+
 from particula.execution import Backend, Device, _isfinite_real
 
 if TYPE_CHECKING:
@@ -93,12 +95,24 @@ def _validate_cpu_shape(
         raise ValueError(f"{name} must have shape {expected_shape}.")
 
 
-def _reject_tagged_cpu_population(particles: "ParticleData") -> None:
-    """Prevent population provenance loss until the resident M4 migration."""
+def _validate_native_cpu_population(particles: "ParticleData") -> None:
+    """Check explicit population admission before upload."""
+    if particles.distribution_type == "continuous_pdf":
+        raise ValueError("GPU continuous_pdf populations are unsupported")
     if particles.distribution_type is not None:
-        raise ValueError(
-            "tagged particle populations require resident metadata migration"
-        )
+        particles.validate_representation()
+        with np.errstate(over="ignore", invalid="ignore"):
+            density = particles.concentration / particles.volume[:, None]
+        if not np.all(np.isfinite(density)):
+            raise ValueError("resident population density must be finite")
+
+
+def _gas_shape(gas: "GasData") -> tuple[int, int]:
+    """Validate gas rank before using its independent width."""
+    gas_shape = getattr(gas.concentration, "shape", None)
+    if not isinstance(gas_shape, tuple) or len(gas_shape) != 2:
+        raise ValueError("gas.concentration must have shape (B, G).")
+    return gas_shape
 
 
 def _preflight_cpu_session(
@@ -129,7 +143,7 @@ def _preflight_cpu_session(
 
     if not isinstance(particles, ParticleData):
         raise TypeError("particles must be a ParticleData.")
-    _reject_tagged_cpu_population(particles)
+    _validate_native_cpu_population(particles)
     if not isinstance(gas, GasData):
         raise TypeError("gas must be a GasData.")
     if not isinstance(environment, EnvironmentData):
@@ -138,7 +152,11 @@ def _preflight_cpu_session(
     masses_shape = getattr(particles.masses, "shape", None)
     if not isinstance(masses_shape, tuple) or len(masses_shape) != 3:
         raise ValueError("particles.masses must have rank 3.")
-    dimensions = ResidentDimensions(*masses_shape)
+    gas_shape = _gas_shape(gas)
+    dimensions = ResidentDimensions(
+        *masses_shape,
+        gas_shape[1] if particles.distribution_type is not None else None,
+    )
     boxes = dimensions.n_boxes
     if boxes == 0:
         raise ValueError(
@@ -159,16 +177,20 @@ def _preflight_cpu_session(
     )
     _validate_cpu_shape(particles.density, "particles.density", (species,))
     _validate_cpu_shape(particles.volume, "particles.volume", (boxes,))
-    _validate_cpu_shape(gas.molar_mass, "gas.molar_mass", (species,))
-    _validate_cpu_shape(gas.partitioning, "gas.partitioning", (species,))
+    _validate_cpu_shape(
+        gas.molar_mass, "gas.molar_mass", (dimensions.gas_species,)
+    )
+    _validate_cpu_shape(
+        gas.partitioning, "gas.partitioning", (dimensions.gas_species,)
+    )
     _validate_cpu_shape(
         gas.concentration,
         "gas.concentration",
-        (boxes, species),
+        (boxes, dimensions.gas_species),
     )
     if isinstance(gas.name, str):
         raise TypeError("gas.name must be an ordered collection of strings.")
-    if len(gas.name) != species:
+    if len(gas.name) != dimensions.gas_species:
         raise ValueError("gas.name length must match n_species.")
     _validate_cpu_shape(
         environment.temperature,
@@ -183,7 +205,7 @@ def _preflight_cpu_session(
     _validate_cpu_shape(
         environment.saturation_ratio,
         "environment.saturation_ratio",
-        (boxes, species),
+        (boxes, dimensions.gas_species),
     )
     gas_names = tuple(gas.name)
     _validate_gas_names(gas_names)
@@ -197,12 +219,21 @@ class ResidentDimensions:
     Attributes:
         n_boxes: Nonnegative number of resident boxes.
         n_particles: Nonnegative fixed particle capacity per box.
-        n_species: Nonnegative number of gas species.
+        n_species: Nonnegative number of particle material species.
+        n_gas_species: Explicit gas width; None retains legacy equal widths.
     """
 
     n_boxes: int
     n_particles: int
     n_species: int
+    n_gas_species: int | None = None
+
+    @property
+    def gas_species(self) -> int:
+        """Return explicit gas width or the legacy shared width."""
+        return (
+            self.n_species if self.n_gas_species is None else self.n_gas_species
+        )
 
     def __post_init__(self) -> None:
         """Validate the immutable resident dimensions.
@@ -214,6 +245,10 @@ class ResidentDimensions:
         _validate_dimension(self.n_boxes, "n_boxes", positive=False)
         _validate_dimension(self.n_particles, "n_particles", positive=False)
         _validate_dimension(self.n_species, "n_species", positive=False)
+        if self.n_gas_species is not None:
+            _validate_dimension(
+                self.n_gas_species, "n_gas_species", positive=False
+            )
 
 
 @dataclass(frozen=True)
@@ -330,6 +365,7 @@ class ResidentMetadata:
     device: Device
     gas_names: tuple[str, ...]
     stream: ResidentStreamMetadata = ResidentStreamMetadata(0, 0, (), ())
+    distribution_type: str | None = None
 
     def __post_init__(self) -> None:
         """Validate fixed-cost metadata declarations without normalizing names.
@@ -343,6 +379,12 @@ class ResidentMetadata:
         if self.device.backend is not Backend.WARP:
             raise ValueError("device.backend must be Backend.WARP.")
         _validate_gas_names(self.gas_names)
+        if self.distribution_type not in (
+            None,
+            "discrete",
+            "particle_resolved",
+        ):
+            raise ValueError("resident distribution_type is unsupported.")
         if type(self.stream) is not ResidentStreamMetadata:
             raise TypeError("stream must be an exact ResidentStreamMetadata.")
         self.stream.__post_init__()
@@ -471,11 +513,6 @@ def _validate_generated_containers(
         raise TypeError("gas must be a WarpGasData.")
     if not isinstance(environment, environment_type):
         raise TypeError("environment must be a WarpEnvironmentData.")
-    from particula.gpu.population_metadata import (
-        require_legacy_particle_metadata,
-    )
-
-    require_legacy_particle_metadata(particles)
 
 
 def _validate_schema(
@@ -510,7 +547,9 @@ def _validate_schema(
         raise ValueError("particles.masses must provide a tuple shape.")
     if len(masses.shape) != 3:
         raise ValueError("particles.masses must have rank 3.")
-    dimensions_from_masses = ResidentDimensions(*masses.shape)
+    dimensions_from_masses = ResidentDimensions(
+        *masses.shape, dimensions.n_gas_species
+    )
     if dimensions_from_masses != dimensions:
         raise ValueError(
             "particles.masses shape must match ResidentDimensions."
@@ -558,28 +597,28 @@ def _validate_schema(
         "gas.molar_mass",
         cast(Any, gas).molar_mass,
         wp.float64,
-        (species,),
+        (dimensions.gas_species,),
         device,
     )
     _validate_array(
         "gas.concentration",
         cast(Any, gas).concentration,
         wp.float64,
-        (boxes, species),
+        (boxes, dimensions.gas_species),
         device,
     )
     _validate_array(
         "gas.vapor_pressure",
         cast(Any, gas).vapor_pressure,
         wp.float64,
-        (boxes, species),
+        (boxes, dimensions.gas_species),
         device,
     )
     _validate_array(
         "gas.partitioning",
         cast(Any, gas).partitioning,
         wp.int32,
-        (boxes, species),
+        (boxes, dimensions.gas_species),
         device,
     )
     _validate_array(
@@ -600,13 +639,17 @@ def _validate_schema(
         "environment.saturation_ratio",
         cast(Any, environment).saturation_ratio,
         wp.float64,
-        (boxes, species),
+        (boxes, dimensions.gas_species),
         device,
     )
     if str(device) != metadata.device.native:
         raise ValueError(
             "particles.masses device must match metadata.device.native."
         )
+    from particula.gpu.population_metadata import particle_distribution_type
+
+    if particle_distribution_type(particles) != metadata.distribution_type:
+        raise ValueError("particle population metadata does not match session.")
     _reject_primary_aliases(particles, gas, environment)
 
 
@@ -671,7 +714,8 @@ def _validate_resident_carriers(
     if metadata.device.backend is not Backend.WARP:
         raise ValueError("device.backend must be Backend.WARP.")
     _validate_gas_names(metadata.gas_names)
-    if len(metadata.gas_names) != dimensions.n_species:
+    metadata.__post_init__()
+    if len(metadata.gas_names) != dimensions.gas_species:
         raise ValueError("metadata.gas_names length must match n_species.")
     if metadata.stream.n_boxes not in (0, dimensions.n_boxes):
         raise ValueError(
@@ -1551,7 +1595,9 @@ def setup_resident_session(
         validated_environment,
         device=device.native,
     )
-    metadata = ResidentMetadata(device, gas_names, stream)
+    metadata = ResidentMetadata(
+        device, gas_names, stream, validated_particles.distribution_type
+    )
     return ResidentSession(
         warp_particles,
         warp_gas,

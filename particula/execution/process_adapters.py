@@ -206,6 +206,8 @@ class ResidentNucleationRequest:
         config: Opaque direct-kernel configuration.
         time_step: Opaque duration for the direct kernel.
         exhaustion_controls: Opaque direct-kernel exhaustion controls.
+        species_binding: Explicit native source mapping pinned to the session
+            carriers and complete gas-name order.
     """
 
     session: ResidentSession
@@ -214,6 +216,7 @@ class ResidentNucleationRequest:
     config: object
     time_step: object
     exhaustion_controls: object
+    species_binding: object | None = None
 
     def __post_init__(self) -> None:
         """Validate exact dependencies without inspecting kernel arguments.
@@ -682,6 +685,15 @@ class ResidentNucleationAdapter:
             saturation=None,
             environment=request.session.environment,
         )
+        if request.species_binding is not None:
+            if (
+                getattr(request.species_binding, "gas_names", None)
+                != request.session.metadata.gas_names
+            ):
+                raise ValueError(
+                    "nucleation binding gas order differs from session"
+                )
+            call_kwargs["species_binding"] = request.species_binding
         call_args = (
             request.session.particles,
             request.session.gas,
@@ -712,6 +724,7 @@ class ResidentNucleationAdapter:
             temperature=cast(Any, call_kwargs["temperature"]),
             saturation=cast(Any, call_kwargs["saturation"]),
             environment=cast(Any, call_kwargs["environment"]),
+            species_binding=cast(Any, request.species_binding),
         )
         return _PreparedResidentProcessBinding(
             prepared,
