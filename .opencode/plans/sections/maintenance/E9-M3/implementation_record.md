@@ -91,7 +91,7 @@ that boundary belong with M3 metadata changes; no M4 functionality is claimed.
 | Tagged PDF / unknown code | particle_population_test and population_metadata_test: rejection before Warp probe/readback | no PDF execution |
 | Species maps / independent widths | population_metadata_test: full gas order, skipped/unmapped lanes, stale binding and no-device-work checks | condensation P2 |
 | Condensation direct/prepared | condensation_native_test: explicit binding, mapped four-substep science, N/V gas coupling and extensive energy | P2 verified discrete/resolved checkpoint |
-| Coagulation direct/prepared | population_boundary_test: interim rejection before payload access | P4 admits only verified resolved mechanism/weight combinations |
+| Coagulation direct/prepared | coagulation_native_test: all eleven masks, equal counts, independent species/charge inventory and stochastic expectations; population_boundary_test rejects PMF/PDF | P4 GPU checkpoint complete; CPU fixed-grid species correction remains unfinished |
 | Wall loss direct/selected/prepared | population_boundary_test: interim rejection before payload access | P5 admits resolved removal with sink accounting |
 | Dilution/nucleation/exhaustion and resident setup/revalidation | population_boundary_test and gpu_session_test: reject newly tagged consumers before mutation or metadata loss | M4 |
 
@@ -106,11 +106,11 @@ ST1956 turbulent shear, their approved pairs, and all four). Triple masks
 `apply_coagulation_kernel` retains recipient concentration while adding donor
 mass and charge, then clears the donor. Therefore native active weights must
 be equal within each box for that merge to conserve weighted species mass and
-charge. P4 must verify positive equal fractional/multiple weights, reject
-unequal weights, and account for common weight in collision scheduling. The
-current selector applies a scheduling weight only to sedimentation-containing
-masks; this is a concrete normalization audit item, not evidence that the
-other tagged paths already support arbitrary multiplicities.
+charge. P4 tests verify positive equal fractional/multiple weights, reject
+unequal weights, and include common weight in collision scheduling. The legacy
+selector retains its sedimentation-only weight factor; the native selector
+applies current common count to all eleven supported masks. See
+`p4_gpu_validation.md` for the independent scientific evidence.
 
 ## Serial commits and gates
 
@@ -140,7 +140,7 @@ Warp CPU is required when installed; CUDA results/skips are explicit.
 | Existing coverage/seam | Required successor / retention | Owner / state |
 |---|---|---|
 | Condensation `_make_data_inputs` via from_representation/from_species | species_mapping_test plus native_step/native_staggered/native_step_admission and GPU condensation_native_test establish facade-free configuration, rate, stepping, rejection and conservation assertions; legacy fixtures retained separately | M3 P1/P2 checkpoint complete; final ledger review P6 |
-| Coagulation native helper/ABC and mechanism fixtures | native_rates_test supplies explicit metadata, physical kernel inputs and density/PDF measures; native_coagulation_step_test adds weighted resolved merges, binning and admission; arbitrary fixed-grid species transport remains a pending scientific decision | P3 committed b41c908d1; CPU P4 checkpoint in progress; see p4_validation.md |
+| Coagulation native helper/ABC and mechanism fixtures | native_rates_test supplies explicit metadata, physical kernel inputs and density/PDF measures; native_coagulation_step_test adds weighted resolved merges, binning and admission; fixed-grid species moments still require implementation using the retained gain quadrature | P3 committed b41c908d1; CPU P4 in progress; see p4_validation.md |
 | Both wall-loss strategy suites | Native fixtures preserving geometry, helpers, RNG and sink assertions | M3 P5, pending |
 | `_legacy_aerosol`, legacy builder, facade scientific dispatch | Retain for unmigrated runnables/adapters/examples; no duplicate authoritative arrays | consumers M4/M5, removal M6 |
 | Untagged CPU/Warp conversions and legacy prepared consumers | Retain explicit old path; distinguish from native tagged evidence | native admission M3; resident M4; final removal review M6 |

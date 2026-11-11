@@ -24,7 +24,6 @@ class _TaggedOnly:
 @pytest.mark.parametrize(
     "module,name",
     [
-        ("coagulation", "_prepare_coagulation_step_gpu"),
         ("wall_loss", "_prepare_wall_loss_step_gpu"),
         ("wall_loss", "_prepare_selected_wall_loss_call"),
         ("dilution", "_prepare_dilution_step_gpu"),
@@ -61,3 +60,15 @@ def test_native_condensation_requires_binding_before_payload_access():
 
     with pytest.raises(ValueError, match="requires species_binding"):
         _prepare_condensation_step_gpu(_TaggedOnly(), None, None, None, 0.1)
+
+
+@pytest.mark.parametrize("code", [1, 2])
+def test_native_coagulation_rejects_unsupported_population_before_payload(code):
+    """The resolved migration does not admit PMF or PDF selector algorithms."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels.coagulation import _prepare_coagulation_step_gpu
+
+    particles = _TaggedOnly()
+    particles.distribution_kind = code
+    with pytest.raises(ValueError, match="only particle_resolved"):
+        _prepare_coagulation_step_gpu(particles, None, None, 0.1)

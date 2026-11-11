@@ -112,7 +112,11 @@ from particula.gpu.kernels.environment import (
     _is_warp_array_like,
     _validate_positive_finite_array,
 )
-from particula.gpu.population_metadata import require_legacy_particle_metadata
+from particula.gpu.population_metadata import (
+    LEGACY_UNTAGGED,
+    PARTICLE_RESOLVED,
+    particle_distribution_code,
+)
 from particula.gpu.properties.gas_properties import (
     dynamic_viscosity_wp,
     molecule_mean_free_path_wp,
@@ -934,9 +938,9 @@ def _validate_sedimentation_particle_physics_kernel(  # noqa: C901
 
 
 @no_type_check
-@wp.kernel
+@wp.func
 # type: ignore[misc]
-def brownian_coagulation_kernel(  # noqa: C901
+def _coagulation_selector_impl(  # noqa: C901
     masses: Any,
     concentration: Any,
     density: Any,
@@ -967,6 +971,8 @@ def brownian_coagulation_kernel(  # noqa: C901
     rng_states: Any,
     mechanism_mask: Any,
     collision_capacity: Any,
+    native_counts: wp.int32,
+    box_idx: int,
 ) -> None:
     """Select stochastic coagulation pairs for each box.
 
@@ -1027,8 +1033,10 @@ def brownian_coagulation_kernel(  # noqa: C901
         mechanism_mask: Fixed internal sampler mask. Public singleton,
             two-way, and four-way approved masks are executable.
         collision_capacity: Maximum accepted collisions per box for this call.
+        native_counts: One for admitted native resolved counts, zero for the
+            separately retained legacy scheduling contract.
+        box_idx: Box index supplied by the kernel launch entry point.
     """  # type: ignore
-    box_idx = wp.tid()  # type: ignore[misc]
     n_particles = masses.shape[1]
 
     executable_mask = (
@@ -1217,7 +1225,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         / (wp.float64(2.0))
     )
     scheduling_concentration = wp.float64(1.0)
-    if sedimentation_enabled:
+    if sedimentation_enabled or native_counts == wp.int32(1):
         scheduling_concentration = concentration[
             box_idx, active_indices[box_idx, 0]
         ]
@@ -1346,6 +1354,148 @@ def brownian_coagulation_kernel(  # noqa: C901
 
     n_collisions[box_idx] = collision_count
     rng_states[box_idx] = state
+
+
+@no_type_check
+@wp.kernel
+def brownian_coagulation_kernel(
+    masses: Any,
+    concentration: Any,
+    density: Any,
+    volume: Any,
+    temperature: Any,
+    pressure: Any,
+    gas_constant: Any,
+    boltzmann_constant: Any,
+    molecular_weight_air: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
+    elementary_charge_value: Any,
+    electric_permittivity: Any,
+    time_step: Any,
+    radii: Any,
+    diffusivities: Any,
+    g_terms: Any,
+    speeds: Any,
+    settling_velocities: Any,
+    turbulent_dissipation: Any,
+    fluid_density: Any,
+    total_masses: Any,
+    charge: Any,
+    active_indices: Any,
+    collision_pairs: Any,
+    n_collisions: Any,
+    rng_states: Any,
+    mechanism_mask: Any,
+    collision_capacity: Any,
+) -> None:
+    """Retain legacy scheduling through the shared selector implementation."""
+    _coagulation_selector_impl(
+        masses,
+        concentration,
+        density,
+        volume,
+        temperature,
+        pressure,
+        gas_constant,
+        boltzmann_constant,
+        molecular_weight_air,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+        elementary_charge_value,
+        electric_permittivity,
+        time_step,
+        radii,
+        diffusivities,
+        g_terms,
+        speeds,
+        settling_velocities,
+        turbulent_dissipation,
+        fluid_density,
+        total_masses,
+        charge,
+        active_indices,
+        collision_pairs,
+        n_collisions,
+        rng_states,
+        mechanism_mask,
+        collision_capacity,
+        wp.int32(0),
+        wp.tid(),
+    )
+
+
+@no_type_check
+@wp.kernel
+def _native_coagulation_kernel(
+    masses: Any,
+    concentration: Any,
+    density: Any,
+    volume: Any,
+    temperature: Any,
+    pressure: Any,
+    gas_constant: Any,
+    boltzmann_constant: Any,
+    molecular_weight_air: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
+    elementary_charge_value: Any,
+    electric_permittivity: Any,
+    time_step: Any,
+    radii: Any,
+    diffusivities: Any,
+    g_terms: Any,
+    speeds: Any,
+    settling_velocities: Any,
+    turbulent_dissipation: Any,
+    fluid_density: Any,
+    total_masses: Any,
+    charge: Any,
+    active_indices: Any,
+    collision_pairs: Any,
+    n_collisions: Any,
+    rng_states: Any,
+    mechanism_mask: Any,
+    collision_capacity: Any,
+) -> None:
+    """Schedule every native mechanism with its common raw particle count."""
+    _coagulation_selector_impl(
+        masses,
+        concentration,
+        density,
+        volume,
+        temperature,
+        pressure,
+        gas_constant,
+        boltzmann_constant,
+        molecular_weight_air,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+        elementary_charge_value,
+        electric_permittivity,
+        time_step,
+        radii,
+        diffusivities,
+        g_terms,
+        speeds,
+        settling_velocities,
+        turbulent_dissipation,
+        fluid_density,
+        total_masses,
+        charge,
+        active_indices,
+        collision_pairs,
+        n_collisions,
+        rng_states,
+        mechanism_mask,
+        collision_capacity,
+        wp.int32(1),
+        wp.tid(),
+    )
 
 
 @no_type_check
@@ -2128,6 +2278,8 @@ class _PreparedCoagulationCall:
         max_collisions: Effective collision capacity per box.
         device: Active Warp device for all launches.
         selector_inputs: Frozen arguments for the selector kernel.
+        native_counts: Select the native count-normalized wrapper without
+            rereading mutable carrier metadata during enqueue.
     """
 
     particles: Any
@@ -2140,6 +2292,7 @@ class _PreparedCoagulationCall:
     max_collisions: int
     device: Any
     selector_inputs: tuple[Any, ...]
+    native_counts: bool = False
 
 
 def _prepare_coagulation_step_gpu(  # noqa: C901
@@ -2199,6 +2352,16 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     no RNG state: supplied collision buffers are returned by identity, while
     ``rng_states`` remains caller-owned. Caller-owned RNG buffers are reset only
     when ``initialize_rng=True`` explicitly opts in.
+
+    Explicitly tagged native inputs support resolved counts only. Every native
+    mechanism requires equal positive active counts within each box, native
+    fp64 primary arrays, and finite physical state. The selector multiplies its
+    schedule by the current common count for every supported mechanism. An
+    explicit volume must equal the particle container's positive physical
+    volume. All native writers must be disjoint from each other and protected
+    inputs. These read-only checks may allocate private flags and synchronize
+    during preparation; frozen enqueue adds no validation or host work. Legacy
+    untagged callers retain their previous mechanism-specific behavior.
 
     Args:
         particles: Caller-owned, Warp-resident particle data. All required Warp
@@ -2270,8 +2433,8 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
             This mode is supported when both direct inputs are ``None``.
         validate_charge_finite: When True, explicitly scan charge on device and
             synchronize for host-visible rejection of NaN or infinity. The
-            default False avoids per-step allocation, synchronization, and host
-            readback for Brownian execution. Every charged-containing mode
+            default False avoids the charge scan for legacy Brownian execution.
+            Native tagged inputs always validate charge. Every charged mode
             performs this scan before caller output or RNG mutation.
         turbulent_dissipation: Explicit turbulent kinetic-energy dissipation
             rate [m^2/s^3] for the turbulent-shear P2 boundary. For a
@@ -2357,7 +2520,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
         masses and concentrations, finite/positive density, its bounded active
         count, and finite charge before time-step or environment normalization.
         The active bound caps its exact compact-active O(A²) majorant at 32,640
-        pairs per box. Brownian validates charge only with
+        pairs per box. Legacy untagged Brownian validates charge only with
         ``validate_charge_finite=True`` and otherwise avoids this scan,
         allocation, synchronization, and host readback.
 
@@ -2419,7 +2582,18 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     if not turbulent_requested:
         validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
 
-    require_legacy_particle_metadata(particles)
+    population_code = particle_distribution_code(particles)
+    if population_code not in (LEGACY_UNTAGGED, PARTICLE_RESOLVED):
+        raise ValueError(
+            "GPU coagulation supports only particle_resolved populations"
+        )
+    native_counts = population_code == PARTICLE_RESOLVED
+    if native_counts:
+        from . import _coagulation_native
+
+        _coagulation_native.validate_schema(particles)
+        if not isinstance(initialize_rng, (bool, np.bool_)):
+            raise ValueError("initialize_rng must be Boolean")
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
 
@@ -2477,9 +2651,13 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     if volume is None:
         volume = particles.volume
     volume_array = _ensure_volume_array(volume, n_boxes, device)
+    if native_counts:
+        _coagulation_native.validate_physics(particles, volume_array)
 
     expected_pairs_shape = (n_boxes, max_collisions_value, 2)
     if collision_pairs is not None:
+        if native_counts and len(collision_pairs.shape) != 3:
+            raise ValueError("collision_pairs must have rank 3")
         if collision_pairs.shape[0] != n_boxes or collision_pairs.shape[2] != 2:
             raise ValueError("collision_pairs shape must match (n_boxes, *, 2)")
         if collision_pairs.shape[1] < max_collisions_value:
@@ -2495,6 +2673,35 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
 
     if n_collisions is not None:
         _validate_collision_counts(n_collisions, expected_counts_shape, device)
+
+    if native_counts:
+        protected = [
+            temperature_array,
+            pressure_array,
+            volume_array,
+            normalized_turbulent_dissipation,
+            normalized_fluid_density,
+            temperature,
+            pressure,
+            volume,
+        ]
+        if turbulent_enabled:
+            protected.extend((turbulent_dissipation, fluid_density))
+        if environment is not None:
+            protected.extend(
+                (
+                    environment.temperature,
+                    environment.pressure,
+                    environment.saturation_ratio,
+                )
+            )
+        _coagulation_native.validate_ownership(
+            particles,
+            collision_pairs,
+            n_collisions,
+            rng_states,
+            tuple(protected),
+        )
 
     if collision_pairs is None:
         collision_pairs = wp.zeros(
@@ -2605,6 +2812,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
             wp.int32(resolved_mechanism_config.mask),
             wp.int32(max_collisions_value),
         ),
+        native_counts=native_counts,
     )
 
 
@@ -2626,7 +2834,9 @@ def _enqueue_prepared_coagulation_call(
         API.
     """
     wp.launch(
-        brownian_coagulation_kernel,
+        _native_coagulation_kernel
+        if prepared.native_counts
+        else brownian_coagulation_kernel,
         dim=(prepared.n_boxes,),
         inputs=list(prepared.selector_inputs),
         device=prepared.device,

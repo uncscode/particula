@@ -2,7 +2,9 @@
 
 Entry: P3 committed as `b41c908d1`. CPU work below is a validated
 implementation checkpoint, not P4 completion. Direct/prepared GPU admission
-and normalization remain pending. M3 is not complete and M4 is not opened.
+and normalization now have a separate checkpoint in
+[p4_gpu_validation.md](p4_gpu_validation.md). M3 is not complete and M4 is not
+opened; the CPU fixed-grid correction below remains unfinished.
 
 ## Native CPU changes
 
@@ -44,7 +46,7 @@ mutable input/control rejection, protected aliases, zero-material binning,
 same-backend normalized-hazard replay, actual selector execution and uniform-
 composition quadrature refinement. This is not cross-backend seeded parity.
 
-## Scientific decision pending: fixed-grid species conservation
+## Fixed-grid species conservation: diagnosis and correction target
 
 The existing PMF/PDF number-only update cannot conserve arbitrary
 size-dependent species composition. The masses/composition assigned to each
@@ -81,14 +83,52 @@ refinement against gross transfer. It expressly does not claim arbitrary
 species conservation. Total-mass error also converges for the varying-fraction
 case, while individual species errors persist.
 
-On 2026-11-11 the maintainer was asked to choose between retaining the method
+On 2026-11-11 the maintainer was initially asked to choose between retaining the method
 with an explicit scientific limitation and expanding M3 to conservative species
 transport. No answer is recorded yet. Neither narrowing support to uniform
 composition nor silently replacing the solver is authorized by this evidence.
 The existing objective's per-species conservation requirement remains unmet
-for this row until the decision and its implementation are complete.
+for this row until its correction and validation are complete.
 
-## GPU audit for the next implementation unit
+### Subsequent prototype resolves the algorithm/scope conflict
+
+A later read-only numerical probe shows that replacing the number-density
+solver is unnecessary. Its existing gain quadrature is linear in its supplied
+kernel/integrand. Carrying donor species mass through that same operator gives
+`G_s = G(K * (m_s[:, None] + m_s[None, :]), concentration)`, with loss
+`m_s * L(K, concentration)`. Number gain/loss remains unchanged. This provides
+the required species inventory tendency rather than assigning the destination
+node's original composition to all gained particles. The native step must
+stage new species density inventories and recover mean per-particle masses
+from its staged updated number density, preserving caller array identities.
+
+For the same varying-fraction probe above, signed species defects divided by
+gross species loss become:
+
+| Representation | Nodes | Species 1 | Species 2 |
+|---|---:|---:|---:|
+| PDF | 128 | -0.00046994 | -0.00046437 |
+| PDF | 256 | -0.00011661 | -0.00011517 |
+| PDF | 512 | -0.0000290374 | -0.0000286756 |
+| PDF | 1024 | -0.00000724507 | -0.00000715455 |
+| PMF | 128 | -0.0269270 | -0.0269216 |
+| PMF | 256 | -0.0134779 | -0.0134764 |
+| PMF | 512 | -0.00674242 | -0.00674206 |
+| PMF | 1024 | -0.00337207 | -0.00337198 |
+
+Both species now converge with the retained quadrature, rather than showing
+persistent composition errors. This is prototype evidence only. Production
+implementation, finite-step admission, independent scientific fixtures,
+weighted charge bookkeeping where supported and final regression gates remain
+required. No global mass rescaling, support narrowing or new collision law is
+proposed. The earlier scope-choice question was withdrawn as unnecessary:
+the original M3 objective already authorizes this conservation correction while
+retaining the number-density algorithm. No limitation waiver was accepted.
+
+## GPU audit and successor implementation
+
+The following entry audit is addressed by
+[p4_gpu_validation.md](p4_gpu_validation.md); it is retained as provenance.
 
 The GPU selector currently multiplies its schedule by common concentration
 only for sedimentation-containing masks. Native resolved admission must require
