@@ -31,7 +31,9 @@
 import numpy as np
 import particula as par
 from matplotlib import pyplot as plt
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 
 np.set_printoptions(precision=3, suppress=True)
 TIME_STEP = 30.0  # seconds
@@ -43,41 +45,51 @@ PRESSURE = 101325.0  # Pa
 
 
 # %%
-def build_aerosol() -> LegacyAerosol:
-    """Create a small discrete aerosol with an empty atmosphere."""
-    particles = par.particles.PresetParticleRadiusBuilder().build()
-    partitioning_species = par.gas.GasSpecies(
-        name="PlaceholderPartitioning",
-        molar_mass=0.018,
-        partitioning=True,
-        vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(1e3),
+def build_aerosol() -> par.Aerosol:
+    """Create native bins spanning the two modes with zero initial gas.
+
+    This composition example uses 10 nm–10 µm rather than the preset's
+    1 nm–100 µm grid: negligible tails on the wider grid can make the
+    interpolated coagulation rate negative at depleted bins. Native
+    admission rejects that state; this example does not clamp it away.
+    """
+    particles = par.particles.create_lognormal_binned_particle_data(
+        distribution_type="discrete", radius_bins=np.logspace(-8, -5, 150)
     )
-    gas_only_species = par.gas.GasSpecies(
-        name="PlaceholderGasOnly",
-        molar_mass=0.028,
-        partitioning=False,
-        vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(1e3),
+    gas = par.gas.GasData(
+        name=["PlaceholderPartitioning", "PlaceholderGasOnly"],
+        molar_mass=np.array([0.018, 0.028]),
+        partitioning=np.array([True, False]),
+        concentration=np.zeros((1, 2)),
     )
-    atmosphere = par.gas.Atmosphere(
-        temperature=TEMPERATURE,
-        total_pressure=PRESSURE,
-        partitioning_species=partitioning_species,
-        gas_only_species=gas_only_species,
+    environment = par.gas.EnvironmentData(
+        temperature=np.array([TEMPERATURE]),
+        pressure=np.array([PRESSURE]),
+        saturation_ratio=np.zeros((1, 2)),
     )
-    return LegacyAerosol(atmosphere=atmosphere, particles=particles)
+    return par.Aerosol(particles=particles, gas=gas, environment=environment)
+
+
+def safe_substeps(strategy, aerosol, duration):
+    """Bound explicit Euler loss for the current particle sizes."""
+    coefficient = strategy.loss_coefficient(
+        aerosol.particles, temperature=TEMPERATURE, pressure=PRESSURE
+    )
+    return max(1, int(np.ceil(np.max(coefficient) * duration / 0.9)))
 
 
 def run_wall_loss(strategy: par.dynamics.WallLossStrategy, sub_steps: int = 1):
     """Execute wall loss over the shared time grid."""
     aerosol = build_aerosol()
+    sub_steps = max(sub_steps, safe_substeps(strategy, aerosol, TIME_STEP))
     wall_loss = par.dynamics.WallLoss(wall_loss_strategy=strategy)
     series = np.zeros_like(TIME_GRID)
-    series[0] = aerosol.particles.get_total_concentration()
+    series[0] = aerosol.particles.number_density[0]
     for idx in range(1, TIME_GRID.size):
         aerosol = wall_loss.execute(
             aerosol, time_step=TIME_STEP, sub_steps=sub_steps
         )
-        series[idx] = aerosol.particles.get_total_concentration()
+        series[idx] = aerosol.particles.number_density[0]
     return series, aerosol
 
 
@@ -96,16 +108,16 @@ def plot_decay(times_min, *series_with_labels):
 
 times_minutes = TIME_GRID / 60.0
 baseline_aerosol = build_aerosol()
-print("Initial bins:", baseline_aerosol.particles.get_radius().size)
+print("Initial bins:", baseline_aerosol.particles.radii[0].size)
 print(
     "Initial total conc (1/m^3):",
-    f"{baseline_aerosol.particles.get_total_concentration():.3e}",
+    f"{baseline_aerosol.particles.number_density[0]:.3e}",
 )
 
 # %% [markdown]
 # ## Basic spherical wall loss
 # Spherical chamber with modest eddy diffusivity and radius. Uses two
-# sub-steps to demonstrate clamping behavior in the runnable.
+# substeps to satisfy the native nonnegative Euler update requirement.
 
 # %%
 spherical_strategy = par.dynamics.SphericalWallLossStrategy(
@@ -161,22 +173,28 @@ aerosol_wall_only = build_aerosol()
 aerosol_coag_wall = build_aerosol()
 wall_only_series = np.zeros_like(TIME_GRID)
 coag_wall_series = np.zeros_like(TIME_GRID)
-wall_only_series[0] = aerosol_wall_only.particles.get_total_concentration()
-coag_wall_series[0] = aerosol_coag_wall.particles.get_total_concentration()
+wall_only_series[0] = aerosol_wall_only.particles.number_density[0]
+coag_wall_series[0] = aerosol_coag_wall.particles.number_density[0]
 
 for idx in range(1, TIME_GRID.size):
     aerosol_wall_only = par.dynamics.WallLoss(
         wall_loss_strategy=spherical_strategy
-    ).execute(aerosol_wall_only, time_step=TIME_STEP)
+    ).execute(
+        aerosol_wall_only,
+        time_step=TIME_STEP,
+        sub_steps=safe_substeps(
+            spherical_strategy, aerosol_wall_only, TIME_STEP
+        ),
+    )
     aerosol_coag_wall = coag_wall.execute(
-        aerosol_coag_wall, time_step=TIME_STEP
+        aerosol_coag_wall,
+        time_step=TIME_STEP,
+        sub_steps=safe_substeps(
+            spherical_strategy, aerosol_coag_wall, TIME_STEP
+        ),
     )
-    wall_only_series[idx] = (
-        aerosol_wall_only.particles.get_total_concentration()
-    )
-    coag_wall_series[idx] = (
-        aerosol_coag_wall.particles.get_total_concentration()
-    )
+    wall_only_series[idx] = aerosol_wall_only.particles.number_density[0]
+    coag_wall_series[idx] = aerosol_coag_wall.particles.number_density[0]
 
 _ = plot_decay(
     times_minutes,
@@ -188,40 +206,51 @@ _ = plot_decay(
 # ### Concise condensation + wall loss snippet
 # Shows a lightweight condensation strategy chained with wall loss over a
 # short window (10 min). Parameters are intentionally small to keep runtime
-# ≤1 s.
+# modest; this is a fixed gas reservoir, not a closed mass budget.
 
 # %%
 short_time = np.linspace(0.0, 600.0, 21)  # 10 min, 30 s spacing
 cond_series = np.zeros_like(short_time)
-try:
-    condensation_strategy = par.dynamics.CondensationIsothermalBuilder()
-    condensation_strategy.set_molar_mass(0.12, "kg/mol")
-    condensation_strategy.set_diffusion_coefficient(1e-5, "m^2/s")
-    condensation_strategy.set_accommodation_coefficient(0.9)
-    condensation_strategy.set_update_gases(False)
-    condensation = par.dynamics.MassCondensation(
-        condensation_strategy=condensation_strategy.build()
+# The former zero-gas/high-volatility placeholder could fully evaporate bins
+# and was silently skipped on failure. Use an explicitly illustrative low-
+# volatility organic reservoir for this runnable composition demonstration.
+aerosol_cond = build_aerosol()
+aerosol_cond.gas.name[0] = "illustrative-organic"
+aerosol_cond.gas.molar_mass[0] = 0.12
+aerosol_cond.gas.concentration[0, 0] = 1e-8
+condensation_strategy = par.dynamics.CondensationIsothermal(
+    molar_mass=aerosol_cond.gas.molar_mass.copy(),
+    diffusion_coefficient=1e-5,
+    accommodation_coefficient=0.9,
+    update_gases=False,
+    activity_strategy=par.particles.ActivityIdealMass(),
+    surface_strategy=par.particles.SurfaceStrategyVolume(
+        surface_tension=0.072,
+        density=1000.0,
+    ),
+    vapor_pressure_strategy=[
+        par.gas.ConstantVaporPressureStrategy(1e-5),
+        par.gas.ConstantVaporPressureStrategy(1e3),
+    ],
+    species_map=CondensationSpeciesMap(tuple(aerosol_cond.gas.name), ((0, 0),)),
+)
+condensation = par.dynamics.MassCondensation(condensation_strategy)
+wall_loss_runnable = par.dynamics.WallLoss(spherical_strategy)
+cond_wall = condensation | wall_loss_runnable
+cond_series[0] = aerosol_cond.particles.number_density[0]
+for idx in range(1, short_time.size):
+    aerosol_cond = cond_wall.execute(
+        aerosol_cond,
+        time_step=short_time[1] - short_time[0],
+        sub_steps=safe_substeps(spherical_strategy, aerosol_cond, TIME_STEP),
     )
-    wall_loss_runnable = par.dynamics.WallLoss(
-        wall_loss_strategy=spherical_strategy
-    )
-    cond_wall = condensation | wall_loss_runnable
-
-    aerosol_cond = build_aerosol()
-    cond_series[0] = aerosol_cond.particles.get_total_concentration()
-
-    for idx in range(1, short_time.size):
-        aerosol_cond = cond_wall.execute(
-            aerosol_cond, time_step=short_time[1] - short_time[0]
-        )
-        cond_series[idx] = aerosol_cond.particles.get_total_concentration()
-
-    _ = plot_decay(
-        short_time / 60.0,
-        (cond_series, "Condensation | Wall loss (10 min)", "m-"),
-    )
-except ValueError as exc:
-    print(f"Skipping condensation wall loss snippet: {exc}")
+    cond_series[idx] = aerosol_cond.particles.number_density[0]
+assert np.all(np.isfinite(cond_series))
+assert np.all(np.diff(cond_series) <= 0)
+_ = plot_decay(
+    short_time / 60.0,
+    (cond_series, "Condensation | Wall loss (10 min)", "m-"),
+)
 
 # %% [markdown]
 # ## Assertions and sanity checks

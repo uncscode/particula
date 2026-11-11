@@ -17,7 +17,7 @@
 
 The notebook builds an ammonium-sulfate aerosol, applies a hand-built
 saturation-based mass source, and couples condensation and coagulation
-runnables. Its direct facade mutation is illustrative only; use
+runnables. Its native fixed-slot custom source is illustrative only; use
 ``../cpu_nucleation.py`` for the supported bounded CPU-only nucleation API.
 """
 
@@ -25,12 +25,15 @@ runnables. Its direct facade mutation is illustrative only; use
 # # Custom Nucleation: Single Species
 #
 # In this *How-to Guide*, we demonstrate an illustrative custom single-species
-# workflow with fixed nucleation rates. Its direct facade mutation and
+# workflow with a saturation-dependent rate. Its custom slot activation and
 # saturation-based mass source are not the supported E6-F7 public API. Use the
 # supported `cpu_nucleation.py` script and CPU Nucleation Strategy System guide
 # for public `Nucleation` runnable usage.
 #
-# This guide is based on the **Dynamics Customization** tutorial.
+# The 100 seeded initial particles share 100,000 fixed-capacity slots.
+# Unit count weights preserve the resolved coagulation contract. Gas debit
+# includes the physical volume; no arrays are squeezed or methods patched.
+# The plotted range includes both the 400 nm initial mode and 2 nm nuclei.
 #
 # **Imports**
 
@@ -42,12 +45,10 @@ import numpy as np
 
 # particula
 import particula as par
-from IPython import get_ipython
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
-
-ipython = get_ipython()
-if ipython is not None:
-    ipython.run_line_magic("matplotlib", "inline")
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
+from particula.particles.slot_management import activate_slots
 
 # %% [markdown]
 # ## Aerosol Setup
@@ -63,7 +64,7 @@ density_ammonium_sulfate = 1.77e3  # kg/m^3
 volume_sim = 0.1 * par.util.get_unit_conversion("cm^3", "m^3")  # m^3
 
 parameters_vapor = {
-    "vapor_pressure": 4e-12,  # pascal
+    "vapor_pressure": 4e-12,  # atmosphere
     "vapor_pressure_units": "atm",
 }
 
@@ -78,8 +79,9 @@ sulfate_saturation = vapor_pressure_sulfate.saturation_concentration(
 initial_sulfate_concentration = 0.5 * sulfate_saturation  # kg/m^3
 
 # Generate a lognormal particle size distribution
+np.random.seed(42)
 particle_sample = par.particles.get_lognormal_sample_distribution(
-    mode=np.array([400e-9]),  # Mean particle diameter of 400 nm
+    mode=np.array([400e-9]),  # Modal particle radius of 400 nm
     geometric_standard_deviation=np.array([1.4]),  # GSD of 1.4
     number_of_particles=np.array([1e4]),
     number_of_samples=100,
@@ -89,162 +91,79 @@ particle_mass_sample = (
 )
 
 
-def squeeze_single_species_arrays(
-    particles: par.particles.ParticleRepresentation,
-) -> None:
-    """Clamp single-species arrays to 1-D while preserving charge shape.
+def build_aerosol() -> par.Aerosol:
+    """Build one native resolved box with explicit free-slot capacity."""
+    masses = np.zeros((100_000, 1))
+    counts = np.zeros(100_000)
+    masses[: particle_mass_sample.size, 0] = particle_mass_sample
+    counts[: particle_mass_sample.size] = 1.0
+    particles = par.particles.create_resolved_particle_data(
+        masses=masses,
+        concentration=counts,
+        density=density_ammonium_sulfate,
+        volume=volume_sim,
+    )
+    gas = par.gas.GasData(
+        name=["sulfate"],
+        molar_mass=np.array([molar_mass_ammonium_sulfate]),
+        partitioning=np.array([True]),
+        concentration=np.array([[float(initial_sulfate_concentration)]]),
+    )
+    environment = par.gas.EnvironmentData(
+        temperature=np.array([298.15]),
+        pressure=np.array([101325.0]),
+        saturation_ratio=np.zeros((1, 1)),
+    )
+    return par.Aerosol(particles=particles, gas=gas, environment=environment)
 
-    Args:
-        particles: Particle container with distribution, concentration, and
-            optional charge arrays that should remain 1-D for
-            single-species workflows.
 
-    Returns:
-        None: This helper mutates the particle representation in place.
-    """
-    if hasattr(particles, "distribution"):
-        particles.distribution = np.atleast_1d(
-            np.squeeze(particles.distribution)
+def current_saturation(aerosol):
+    """Evaluate the current gas state with the explicit vapor strategy."""
+    return float(aerosol.gas.concentration[0, 0] / sulfate_saturation)
+
+
+def total_inventory(aerosol):
+    """Independent extensive particle-plus-gas inventory in kg."""
+    return float(
+        np.sum(
+            aerosol.particles.masses
+            * aerosol.particles.concentration[..., None]
         )
-    if hasattr(particles, "concentration"):
-        particles.concentration = np.atleast_1d(
-            np.squeeze(particles.concentration)
-        )
-    if hasattr(particles, "charge") and particles.charge is not None:
-        particles.charge = np.atleast_1d(np.squeeze(particles.charge))
-
-
-def ensure_single_species_shapes(
-    particles: par.particles.ParticleRepresentation,
-) -> None:
-    """Enforce 1-D shapes and patch mutators for single-species aerosols.
-
-    Args:
-        particles: Particle representation whose distribution, concentration,
-            and charge arrays should be constrained to one dimension; also used
-            to override mass and concentration mutation hooks for 1-D inputs.
-
-    Returns:
-        None: This helper mutates the particle representation in place.
-    """
-    squeeze_single_species_arrays(particles)
-
-    original_add_mass = particles.strategy.add_mass
-    original_add_concentration = particles.strategy.add_concentration
-
-    def _add_mass_single_species(
-        distribution, concentration, density, added_mass
-    ):
-        """Wrap add_mass to keep single-species arrays one-dimensional.
-
-        Args:
-            distribution: Particle distribution array representing masses.
-            concentration: Concentration array corresponding to the particles.
-            density: Density value used for the mass calculation.
-            added_mass: Mass to add; will be squeezed to 1-D before calling
-                the original method.
-
-        Returns:
-            Updated distribution returned by the wrapped strategy.
-        """
-        added_mass = np.atleast_1d(np.squeeze(added_mass))
-        result = original_add_mass(
-            distribution, concentration, density, added_mass
-        )
-        squeeze_single_species_arrays(particles)
-        return result
-
-    def _add_concentration_single_species(
-        distribution,
-        concentration,
-        added_distribution,
-        added_concentration,
-        charge=None,
-        added_charge=None,
-    ):
-        """Wrap add_concentration to maintain single-species shapes.
-
-        Args:
-            distribution: Current particle distribution array.
-            concentration: Current concentration array.
-            added_distribution: Distribution array for the incoming mass.
-            added_concentration: Concentration array for the incoming mass.
-            charge: Optional charge array for the existing particles.
-            added_charge: Optional charge array for the incoming particles.
-
-        Returns:
-            Updated particle state returned by the wrapped strategy.
-        """
-        added_distribution = np.atleast_1d(np.squeeze(added_distribution))
-        added_concentration = np.atleast_1d(np.squeeze(added_concentration))
-        added_charge = (
-            np.zeros_like(added_concentration)
-            if added_charge is None
-            else np.atleast_1d(np.squeeze(added_charge))
-        )
-        charge = (
-            np.zeros_like(concentration)
-            if charge is None
-            else np.atleast_1d(np.squeeze(charge))
-        )
-        result = original_add_concentration(
-            distribution,
-            concentration,
-            added_distribution,
-            added_concentration,
-            charge=charge,
-            added_charge=added_charge,
-        )
-        squeeze_single_species_arrays(particles)
-        return result
-
-    particles.strategy.add_mass = _add_mass_single_species
-    particles.strategy.add_concentration = _add_concentration_single_species
-
-
-def build_aerosol() -> LegacyAerosol:
-    """Construct a single-species aerosol with gas and particle setup.
-
-    Returns:
-        Aerosol: Initialized aerosol containing sulfate gas and resolved
-            particle masses configured for single-species simulations.
-    """
-    gas_sulfate = (
-        par.gas.GasSpeciesBuilder()
-        .set_name("sulfate")
-        .set_molar_mass(molar_mass_ammonium_sulfate, "kg/mol")
-        .set_partitioning(True)
-        .set_vapor_pressure_strategy(vapor_pressure_sulfate)
-        .set_concentration(initial_sulfate_concentration, "kg/m^3")
-        .build()
+        + aerosol.gas.concentration[0, 0] * volume_sim
     )
 
-    atmosphere_local = (
-        par.gas.AtmosphereBuilder()
-        .set_more_partitioning_species(gas_sulfate)
-        .set_temperature(25, temperature_units="degC")
-        .set_pressure(1, pressure_units="atm")
-        .build()
-    )
 
-    resolved_masses = (
-        par.particles.ResolvedParticleMassRepresentationBuilder()
-        .set_distribution_strategy(
-            par.particles.ParticleResolvedSpeciatedMass()
+def inject_custom_nuclei(aerosol, rate, duration, nucleus_mass):
+    """Apply the illustrative mass-rate law using unit-count free slots.
+
+    The rate is kg/m³/s. Multiply by physical volume exactly once to obtain
+    represented mass, then floor to whole nuclei. Available gas limits the
+    request. Capacity failure occurs before the gas debit; there is no resize
+    or claim of rollback for a whole multi-process time step.
+    """
+    count = int(
+        np.floor(
+            min(float(rate) * duration, aerosol.gas.concentration[0, 0])
+            * volume_sim
+            / nucleus_mass
         )
-        .set_activity_strategy(par.particles.ActivityIdealMass())
-        .set_surface_strategy(par.particles.SurfaceStrategyVolume())
-        .set_mass(particle_mass_sample, "kg")
-        .set_density(density_ammonium_sulfate, "kg/m^3")
-        .set_volume(volume_sim, "m^3")
-        .set_charge(0.0)
-        .build()
     )
-
-    ensure_single_species_shapes(resolved_masses)
-    resolved_masses.charge = np.zeros_like(resolved_masses.concentration)
-
-    return LegacyAerosol(atmosphere=atmosphere_local, particles=resolved_masses)
+    if count == 0:
+        return 0
+    print(f"Activating {count} unit-count nuclei")
+    before = total_inventory(aerosol)
+    activate_slots(
+        aerosol.particles,
+        np.full((1, count, 1), nucleus_mass),
+        np.ones((1, count)),
+        np.zeros((1, count)),
+        np.array([count], dtype=np.int32),
+    )
+    aerosol.gas.concentration[0, 0] -= count * nucleus_mass / volume_sim
+    np.testing.assert_allclose(
+        total_inventory(aerosol), before, rtol=1e-12, atol=1e-30
+    )
+    return count
 
 
 aerosol = build_aerosol()
@@ -268,17 +187,16 @@ print(aerosol)
 
 # %%
 # setup dynamics for condensation
-condensation_strategy = (
-    par.dynamics.CondensationIsothermalBuilder()
-    .set_molar_mass(molar_mass_ammonium_sulfate, molar_mass_units="kg/mol")
-    .set_accommodation_coefficient(1)
-    .set_diffusion_coefficient(2e-5, diffusion_coefficient_units="m^2/s")
-    .build()
+condensation_strategy = par.dynamics.CondensationIsothermal(
+    molar_mass=molar_mass_ammonium_sulfate,
+    accommodation_coefficient=1,
+    diffusion_coefficient=2e-5,
+    activity_strategy=par.particles.ActivityIdealMass(),
+    surface_strategy=par.particles.SurfaceStrategyVolume(),
+    vapor_pressure_strategy=vapor_pressure_sulfate,
+    species_map=CondensationSpeciesMap(("sulfate",), ((0, 0),)),
 )
-# Ensure the condensation strategy works with 1-D masses and concentrations
-condensation_runnable = par.dynamics.MassCondensation(
-    condensation_strategy=condensation_strategy,
-)
+condensation_runnable = par.dynamics.MassCondensation(condensation_strategy)
 # setup dynamics for coagulation
 coagulation_strategy = (
     par.dynamics.BrownianCoagulationBuilder()
@@ -308,27 +226,23 @@ base_nucleation_rate = (
 )  # Base nucleation rate in kg/m^3/s
 mass_nucleated_particle = (
     4 / 3 * np.pi * (2e-9) ** 3 * density_ammonium_sulfate
-)  # Mass of a 10 nm particle in kg
+)  # Mass of a 4 nm diameter particle in kg
 exponent_nucleation = 2  # Nucleation rate exponent (empirical)
 time_step = 1  # Time step in seconds
 
 # 1. Add more vapor to the gas phase (e.g., by external sources)
 print(
     "Current sulfate concentration: ",
-    aerosol.atmosphere.partitioning_species.get_concentration(),
+    aerosol.gas.concentration[0, 0],
 )
-aerosol.atmosphere.partitioning_species.add_concentration(
-    vapor_production * time_step
-)
+aerosol.gas.concentration[0, 0] += vapor_production * time_step
 print(
     "New sulfate concentration: ",
-    aerosol.atmosphere.partitioning_species.get_concentration(),
+    aerosol.gas.concentration[0, 0],
 )
 
 # 2. Calculate the new saturation ratio for sulfate in the atmosphere
-saturation_ratio = aerosol.atmosphere.partitioning_species.get_saturation_ratio(
-    temperature=298.15
-)
+saturation_ratio = current_saturation(aerosol)
 print(f"Saturation ratio: {saturation_ratio}")
 
 # 3. Calculate the nucleation rate based on the saturation ratio
@@ -352,7 +266,7 @@ number_of_new_particles = time_step * nucleation_rate // mass_nucleated_particle
 print(f"Number of new particles nucleated: {number_of_new_particles}")
 
 # 5. Determine the number of resolved particles to create (based on simulation volume)
-single_resolved_particle = aerosol.particles.get_concentration().max()
+single_resolved_particle = 1.0 / volume_sim
 number_of_new_resolved_particles = int(
     np.asarray(number_of_new_particles // single_resolved_particle).flat[0]
 )
@@ -365,46 +279,8 @@ number_of_new_resolved_particles = int(
 # We'll first reset the aerosol system to its initial state, create a output matrix, then run the previous simulation in a for loop.
 
 # %%
-# Build the sulfate gas species using the GasSpeciesBuilder
-gas_sulfate = (
-    par.gas.GasSpeciesBuilder()
-    .set_name("sulfate")
-    .set_molar_mass(molar_mass_ammonium_sulfate, "kg/mol")
-    .set_partitioning(True)
-    .set_vapor_pressure_strategy(vapor_pressure_sulfate)
-    .set_concentration(initial_sulfate_concentration, "kg/m^3")
-    .build()
-)
-
-# AtmosphereBuilder constructs the atmosphere with predefined species
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_more_partitioning_species(
-        gas_sulfate
-    )  # Add the sulfate gas species to the atmosphere
-    .set_temperature(25, temperature_units="degC")  # Set temperature to 25°C
-    .set_pressure(1, pressure_units="atm")  # Set pressure to 1 atmosphere
-    .build()  # Finalize the atmosphere object
-)
-# Build the resolved particle mass representation for the aerosol particles
-resolved_masses = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
-    .set_activity_strategy(par.particles.ActivityIdealMass())
-    .set_surface_strategy(par.particles.SurfaceStrategyVolume())
-    .set_mass(particle_mass_sample, "kg")
-    .set_density(density_ammonium_sulfate, "kg/m^3")
-    .set_volume(0.1, "cm^3")
-    .set_charge(0.0)
-    .build()
-)
-
-
-ensure_single_species_shapes(resolved_masses)
-resolved_masses.charge = np.zeros_like(resolved_masses.concentration)
-
-# Create the aerosol object with the atmosphere and particles
-aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
+# Reset to the same seeded initial sample and fixed capacity.
+aerosol = build_aerosol()
 
 # Print the properties of the created aerosol system
 print(aerosol)
@@ -416,7 +292,7 @@ time_step = 1
 sub_steps = 2
 
 # bins
-bins_lognormal = np.logspace(-9, -7, 200)
+bins_lognormal = np.logspace(-9, -5, 200)
 
 # output arrays
 time = np.arange(0, total_time, time_step)
@@ -437,25 +313,20 @@ base_nucleation_rate = (
 )  # Base nucleation rate in kg/m^3/s
 mass_nucleated_particle = (
     4 / 3 * np.pi * (2e-9) ** 3 * density_ammonium_sulfate
-)  # Mass of a 10 nm particle in kg
+)  # Mass of a 4 nm diameter particle in kg
 exponent_nucleation = 2  # Nucleation rate exponent (empirical)
 
 
 bin_edges = bins_lognormal
 
+initial_inventory = total_inventory(aerosol)
 for i, _ in enumerate(time):
     if i > 0:
         # 1. Add more vapor to the gas phase (e.g., by external sources)
-        aerosol.atmosphere.partitioning_species.add_concentration(
-            vapor_production * time_step
-        )
+        aerosol.gas.concentration[0, 0] += vapor_production * time_step
 
         # 2. Calculate the new saturation ratio for sulfate in the atmosphere
-        saturation_ratio = (
-            aerosol.atmosphere.partitioning_species.get_saturation_ratio(
-                temperature=298.15
-            )
-        )
+        saturation_ratio = current_saturation(aerosol)
 
         # 3. Calculate the nucleation rate based on the saturation ratio
         # Ensure the saturation ratio is above 1, nucleation only occurs above saturation
@@ -470,66 +341,36 @@ for i, _ in enumerate(time):
             * (saturation_difference / 500) ** exponent_nucleation
         )
 
-        # 4. Calculate the number of new particles nucleated
-        # Floor division ensures we only get whole particles
-        number_of_new_particles = (
-            time_step * nucleation_rate // mass_nucleated_particle
+        # The custom law uses explicit native fixed-slot activation.
+        number_of_new_resolved_particles = inject_custom_nuclei(
+            aerosol, nucleation_rate, time_step, mass_nucleated_particle
         )
-
-        # 5. Determine the number of resolved particles to create (based on simulation volume)
-        single_resolved_particle = aerosol.particles.get_concentration().max()
-        number_of_new_resolved_particles = int(
-            np.asarray(
-                number_of_new_particles // single_resolved_particle
-            ).flat[0]
-        )
-
-        # 6. If new particles are nucleated, proceed to add them to the aerosol
-        if number_of_new_resolved_particles > 0:
-            # Remove nucleated mass from the gas phase to conserve mass
-            aerosol.atmosphere.partitioning_species.add_concentration(
-                -number_of_new_resolved_particles * mass_nucleated_particle
-            )
-
-            # Create arrays to store the properties of the newly resolved particles
-            new_resolved_particle_masses = np.full(
-                number_of_new_resolved_particles, mass_nucleated_particle
-            )
-            new_resolved_particle_concentrations = np.ones_like(
-                new_resolved_particle_masses
-            )  # Concentration of 1 per particle
-
-            # Add the new resolved particles to the aerosol
-            aerosol.particles.add_concentration(
-                added_concentration=new_resolved_particle_concentrations,
-                added_distribution=new_resolved_particle_masses,
-            )
-
-            ensure_single_species_shapes(aerosol.particles)
 
         # 7. Perform the condensation step
         condensation_runnable.execute(aerosol, time_step, sub_steps)
         # 8. Perform the coagulation step
         coagulation_runnable.execute(aerosol, time_step, sub_steps)
 
-    total_mass_resolved[i] = aerosol.particles.get_mass_concentration()
-    number_distribution = aerosol.particles.get_radius(clone=True)
+    np.testing.assert_allclose(
+        total_inventory(aerosol),
+        initial_inventory + i * vapor_production * time_step * volume_sim,
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    total_mass_resolved[i] = aerosol.particles.species_mass_density[0, 0]
+    number_distribution = aerosol.particles.radii[0].copy()
     number_distribution_binned[i, :], edges = np.histogram(
         number_distribution, bins=bins_lognormal
     )
     if i == 0:
         bin_edges = edges
     total_number_resolved[i] = np.sum(number_distribution > 0)
-    saturation_ratio_output[i] = np.asarray(
-        aerosol.atmosphere.partitioning_species.get_saturation_ratio(
-            temperature=298.15
-        )
-    ).flat[0]
+    saturation_ratio_output[i] = np.asarray(current_saturation(aerosol)).flat[0]
 
     if i % 20 == 0:
         # Retrieve and print the total number of resolved particles simulated
         total_resolved_particles_in_simulation = (
-            aerosol.particles.get_concentration().sum()
+            aerosol.particles.concentration.sum()
         )
         print(
             f"Index {i}: Total resolved particles in simulation: {total_resolved_particles_in_simulation}"
@@ -572,7 +413,7 @@ contour = ax.contourf(
 cbar = fig.colorbar(contour)
 cbar.set_label("Log10 of Number concentration (m^-3)")
 
-ax.set_ylim(1e-9, 1e-7)  # Set limits for y-axis
+ax.set_ylim(1e-9, 1e-5)  # Set limits for y-axis
 
 # Set axis labels
 ax.set_yscale("log")  # Log scale for particle radius on y-axis
@@ -591,7 +432,7 @@ ax1.set_ylabel("Total Particle mass (kg/m^3)", color="blue")
 ax1.tick_params(axis="y", labelcolor="blue")
 
 ax2 = ax1.twinx()
-ax2.plot(time, saturation_ratio_output, label="Satruation Ratio", color="red")
+ax2.plot(time, saturation_ratio_output, label="Saturation Ratio", color="red")
 ax2.set_ylabel("Saturation Ratio", color="red")
 ax2.tick_params(axis="y", labelcolor="red")
 

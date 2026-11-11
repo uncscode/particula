@@ -36,13 +36,13 @@ Notebook sync/execution occurs in the owning phase, not deferred to P7.
   - Gate: Each inventoried pair synced/executed; deterministic and stochastic
     checks separated; process-owned configuration and single-box scope clear.
 
-- [ ] **E9-M5-P3: Migrate wall-loss dilution and nucleation examples with behavioral checks**
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E9-M5-P3: Migrate wall-loss dilution and nucleation examples with behavioral checks**
+  - Issue: TBD | Size: S | Status: Implemented and validated
   - Work: Migrate Chamber_Wall_Loss notebooks, `cpu_dilution.py`,
     `Nucleation/cpu_nucleation.py` and Custom_Nucleation_Single_Species pair.
     Use M4 native held state, preserving geometry, charge and source controls.
   - Tests: Update owning docs/example fixtures including
-    `particula/tests/nucleation_docs_test.py`; check all-gas dilution, current-gas
+    `examples_tests/nucleation_example_test.py` (current owning fixture); check all-gas dilution, current-gas
     substeps, concentration-weighted conservation, identity and failure claims.
     Run both CPU wall-loss strategy suites as assertions.
   - Gate: CPU entrypoints and pairs execute with retained scientific outcomes;

@@ -80,68 +80,93 @@
       "source": "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.py",
       "notebook": "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.ipynb",
       "phase": "P3",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional/native audit completed",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/dilution_example_test.py; examples_tests/nucleation_example_test.py; examples_tests/native_custom_nucleation_example_test.py; both CPU wall-loss strategy suites; embedded scientific assertions",
+      "scientific_expectation": "Exact dilution decay and held identities; native fixed-shape Euler positivity with independent decay; source-aware extensive nucleation accounting and volume-aware gas debit; no whole-call rollback claim.",
+      "execution": "full published workload executed; paired notebook outputs retained where applicable",
+      "evidence": [
+        "507 focused tests passed with warnings as errors",
+        "Six notebooks executed without errors",
+        "12 plot outputs visually inspected",
+        "Input/grid and source-accounting corrections documented in implementation record"
+      ]
     },
     {
       "source": "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.py",
       "notebook": "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.ipynb",
       "phase": "P3",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional/native audit completed",
       "legacy_patterns": [
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/dilution_example_test.py; examples_tests/nucleation_example_test.py; examples_tests/native_custom_nucleation_example_test.py; both CPU wall-loss strategy suites; embedded scientific assertions",
+      "scientific_expectation": "Exact dilution decay and held identities; native fixed-shape Euler positivity with independent decay; source-aware extensive nucleation accounting and volume-aware gas debit; no whole-call rollback claim.",
+      "execution": "full published workload executed; paired notebook outputs retained where applicable",
+      "evidence": [
+        "507 focused tests passed with warnings as errors",
+        "Six notebooks executed without errors",
+        "12 plot outputs visually inspected",
+        "Input/grid and source-accounting corrections documented in implementation record"
+      ]
     },
     {
       "source": "docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.py",
       "notebook": "docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb",
       "phase": "P3",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional/native audit completed",
       "legacy_patterns": [
         "GasSpecies",
         "ParticleRepresentation",
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/dilution_example_test.py; examples_tests/nucleation_example_test.py; examples_tests/native_custom_nucleation_example_test.py; both CPU wall-loss strategy suites; embedded scientific assertions",
+      "scientific_expectation": "Exact dilution decay and held identities; native fixed-shape Euler positivity with independent decay; source-aware extensive nucleation accounting and volume-aware gas debit; no whole-call rollback claim.",
+      "execution": "full published workload executed; paired notebook outputs retained where applicable",
+      "evidence": [
+        "507 focused tests passed with warnings as errors",
+        "Six notebooks executed without errors",
+        "12 plot outputs visually inspected",
+        "Input/grid and source-accounting corrections documented in implementation record"
+      ]
     },
     {
       "source": "docs/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.py",
       "notebook": "docs/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb",
       "phase": "P3",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional/native audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/dilution_example_test.py; examples_tests/nucleation_example_test.py; examples_tests/native_custom_nucleation_example_test.py; both CPU wall-loss strategy suites; embedded scientific assertions",
+      "scientific_expectation": "Exact dilution decay and held identities; native fixed-shape Euler positivity with independent decay; source-aware extensive nucleation accounting and volume-aware gas debit; no whole-call rollback claim.",
+      "execution": "full published workload executed; paired notebook outputs retained where applicable",
+      "evidence": [
+        "507 focused tests passed with warnings as errors",
+        "Six notebooks executed without errors",
+        "12 plot outputs visually inspected",
+        "Input/grid and source-accounting corrections documented in implementation record"
+      ]
     },
     {
       "source": "docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.py",
       "notebook": "docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.ipynb",
       "phase": "P3",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional/native audit completed",
       "legacy_patterns": [
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/dilution_example_test.py; examples_tests/nucleation_example_test.py; examples_tests/native_custom_nucleation_example_test.py; both CPU wall-loss strategy suites; embedded scientific assertions",
+      "scientific_expectation": "Exact dilution decay and held identities; native fixed-shape Euler positivity with independent decay; source-aware extensive nucleation accounting and volume-aware gas debit; no whole-call rollback claim.",
+      "execution": "full published workload executed; paired notebook outputs retained where applicable",
+      "evidence": [
+        "507 focused tests passed with warnings as errors",
+        "Six notebooks executed without errors",
+        "12 plot outputs visually inspected",
+        "Input/grid and source-accounting corrections documented in implementation record"
+      ]
     },
     {
       "source": "docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py",
@@ -550,28 +575,38 @@
       "source": "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.py",
       "notebook": "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb",
       "phase": "P3",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional/native audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder",
         "ParticleRepresentation"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/dilution_example_test.py; examples_tests/nucleation_example_test.py; examples_tests/native_custom_nucleation_example_test.py; both CPU wall-loss strategy suites; embedded scientific assertions",
+      "scientific_expectation": "Exact dilution decay and held identities; native fixed-shape Euler positivity with independent decay; source-aware extensive nucleation accounting and volume-aware gas debit; no whole-call rollback claim.",
+      "execution": "full published workload executed; paired notebook outputs retained where applicable",
+      "evidence": [
+        "507 focused tests passed with warnings as errors",
+        "Six notebooks executed without errors",
+        "12 plot outputs visually inspected",
+        "Input/grid and source-accounting corrections documented in implementation record"
+      ]
     },
     {
       "source": "docs/Examples/Nucleation/cpu_nucleation.py",
       "notebook": null,
       "phase": "P3",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional/native audit completed",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/dilution_example_test.py; examples_tests/nucleation_example_test.py; examples_tests/native_custom_nucleation_example_test.py; both CPU wall-loss strategy suites; embedded scientific assertions",
+      "scientific_expectation": "Exact dilution decay and held identities; native fixed-shape Euler positivity with independent decay; source-aware extensive nucleation accounting and volume-aware gas debit; no whole-call rollback claim.",
+      "execution": "full published workload executed; paired notebook outputs retained where applicable",
+      "evidence": [
+        "507 focused tests passed with warnings as errors",
+        "Six notebooks executed without errors",
+        "12 plot outputs visually inspected",
+        "Input/grid and source-accounting corrections documented in implementation record"
+      ]
     },
     {
       "source": "docs/Examples/Nucleation/gpu_direct_nucleation.py",
@@ -766,16 +801,21 @@
       "source": "docs/Examples/cpu_dilution.py",
       "notebook": null,
       "phase": "P3",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional/native audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "ParticleRepresentation"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/dilution_example_test.py; examples_tests/nucleation_example_test.py; examples_tests/native_custom_nucleation_example_test.py; both CPU wall-loss strategy suites; embedded scientific assertions",
+      "scientific_expectation": "Exact dilution decay and held identities; native fixed-shape Euler positivity with independent decay; source-aware extensive nucleation accounting and volume-aware gas debit; no whole-call rollback claim.",
+      "execution": "full published workload executed; paired notebook outputs retained where applicable",
+      "evidence": [
+        "507 focused tests passed with warnings as errors",
+        "Six notebooks executed without errors",
+        "12 plot outputs visually inspected",
+        "Input/grid and source-accounting corrections documented in implementation record"
+      ]
     },
     {
       "source": "docs/Examples/data_containers_and_gpu_foundations.py",

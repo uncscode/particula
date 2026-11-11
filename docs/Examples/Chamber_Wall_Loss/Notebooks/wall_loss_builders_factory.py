@@ -29,7 +29,9 @@
 import particula as par
 
 # Light-weight particle distribution for rate calculations
-particle = par.particles.PresetParticleRadiusBuilder().build()
+particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete"
+)
 T = 298.0  # K
 P = 101325.0  # Pa
 
@@ -52,7 +54,7 @@ rate = spherical.rate(particle=particle, temperature=T, pressure=P)
 print("eddy diffusivity [1/s]", f"{spherical.wall_eddy_diffusivity:.3e}")
 print("chamber radius [m]", f"{spherical.chamber_radius:.2f}")
 print("distribution type", spherical.distribution_type)
-print("rate[0]", f"{rate[0]:.3e} 1/s")
+print("rate[0]", f"{rate[0]:.3e} m^-3 s^-1")
 
 # %% [markdown]
 # ## Factory creation for rectangular chambers
