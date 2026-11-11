@@ -367,7 +367,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   registry-owned continuation sidecars, ledgers, diagnostics, and at most one
   complete closed-map communication family, plus detached CPU inspection
   carriers. It excludes arbitrary caller outputs and ordinary `rng_states`.
-  Current schema-v4 checkpoints always carry RNG continuation metadata. Their
+  Current schema-v5 checkpoints always carry RNG continuation metadata. Their
   canonical process-family inventory preserves the acquired-stream boundary.
   Published coagulation/wall-loss current-word payloads may be empty, but when
   present they are the sole continuation authority. Inspection `GasData` has
@@ -385,10 +385,10 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   [GPU resident checkpoints](docs/Features/gpu_resident_checkpoints.md).
 - Restart compatibility is fail-closed: an ACTIVE `ResidentCheckpoint` with
   carrier type `"ResidentSession"`, complete valid descriptors and bytes, and
-  an exactly equal target `Device` is required. Schema-v1 permits only
-  noncommunication checkpoints; schema-v2 permits no communication family or
-  one complete closed-map family. Controllers create schema-v4 checkpoints,
-  which require continuation metadata even with zero published-stream payloads.
+  an exactly equal target `Device` is required. Only schema-v5 is accepted;
+  earlier schemas reject before setup or upload without inferred migration.
+  Controllers retain explicit population semantics and independent species
+  widths plus required RNG continuation, even with zero published payloads.
   A published stream payload must pair with its matching acquired resource
   family, and either unmatched or incompatible form rejects before setup.
   Fresh exact-device restore uses present published words without reseeding;
@@ -421,7 +421,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   or synchronization. Selected or all-stream initialization/reset is
   deliberate; normal scheduling does not inspect, transfer, synchronize,
   reseed, checkpoint, restart, fall back, or promise rollback.
-- Schema-v3-and-later checkpoints always contain continuation metadata; schema-v4
+- Schema-v5 checkpoints always contain continuation metadata; schema-v5
   is the current format. Immutable current words for any published streams are
   the continuation authority, separate from lossy CPU inspection carriers; zero
   stream payloads are valid. Continuation is manual through a fresh session on
@@ -1273,17 +1273,17 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   checkpoint/finalize, resource acquisition or replacement, fallback, retry,
   resize, or compaction. A failure after a writer-capable call closes the token,
   faults the session, and has no rollback or retry guarantee.
-- Compatibility is fail-closed: schema-v1 noncommunication, schema-v2
-  optional-communication, and schema-v3-or-later continuation checkpoints
-  require carrier type `"ResidentSession"`, ACTIVE state, complete valid
-  payloads, and an exactly equal `Device` restart. Schema-v3-or-later
+- Compatibility is fail-closed: only schema-v5 checkpoints with explicit
+  population semantics and species widths, complete canonical
+  payloads, and an exactly equal `Device` restart. Schema-v5
   continuation metadata is required even when it has zero published-stream
   payloads. Stream/resource mismatches reject before setup.
   `ParticleData.volume` is fixed resident state except for the optional
   prescribed volume-evolution barrier. The standalone E7-F7-P2 direct import is
   `particula.gpu.kernels.communication.volume_evolution_step_gpu`: callers pass
-  active-device final `(B,)` `wp.float64` volumes in m^3, and it scales particle
-  and gas concentrations in place to preserve extensive inventories. It has no
+  active-device final `(B,)` `wp.float64` volumes in m^3. Native resolved counts
+  stay unchanged while gas density scales by old/new volume; legacy density
+  scales in both carriers. PMF/PDF reject physical volume evolution. It has no
   scheduler integration, transport/mixing/advection, hidden transfer,
   synchronization, CPU fallback, resizing, or package/top-level export.
   E7-F7-P3 provides the separate concrete-only direct import

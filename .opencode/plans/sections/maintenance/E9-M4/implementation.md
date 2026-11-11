@@ -34,7 +34,7 @@ issue: #1606. This supersedes the old multiple-PR and issue-generation wording.
 | 6. CPU adapters and remaining orchestration consumers | Implemented; focused checks pass |
 | 7. Communication and physical volume evolution | Implemented; focused checks pass |
 | 8. Native resident/prepared metadata and diagnostics | Implemented; focused checks pass |
-| 9. Schema-v5 checkpoints and exact-device continuation | Pending |
+| 9. Schema-v5 checkpoints and exact-device continuation | Implemented; focused checks pass |
 | 10. Complete native composed-process regressions | Pending |
 | 11. Final validation and developer handoff | Pending |
 
@@ -168,3 +168,17 @@ Focused checkpoint evidence follows. Final acceptance remains pending.
   gas order; they reject unsupported particle-only inventory. Number output is
   density, including count/volume for resolved populations. Complete native
   composed-loop evidence is still checkpoint 10 work.
+
+### Checkpoint 9
+
+- Native/legacy checkpoints, stream lifecycle and invariance: **151 passed**
+  with CUDA available. New tests cover PMF/resolved explicit semantics, unequal
+  widths, detached inspection, canonical sidecar bytes, restored counters,
+  semantic rejection before setup and real native stochastic adapter continuation.
+- Full package mypy: passed (549 source files). Changed-file Ruff/format: passed.
+- Only v5 restarts. V1–v4 rejection replaces historical acceptance assertions;
+  malformed canonical payload and exact-device guards remain covered. No legacy
+  migration or inferred RNG inventory remains. Explicit legacy-untagged v5
+  records support the inventoried transition without relabeling native data.
+- Native tests found Warp CPU inspection could alias resident arrays. Checkpoint
+  now detaches every inspection field on all backends before publishing bytes.
