@@ -406,6 +406,7 @@ def test_native_single_material_nonidentity_map(device, scenario):
         "pmf_volume",
         "mass",
         "count",
+        "number_density_overflow",
         "density",
         "charge",
         "gas",
@@ -456,6 +457,9 @@ def test_native_preflight_rejections_preserve_all_caller_storage(  # noqa: C901
             value = 2
         values.flat[0] = value
         fields[fault].assign(values)
+    elif fault == "number_density_overflow":
+        state.p.volume.fill_(0.25)
+        state.p.concentration.fill_(1e308)
     elif fault == "mapping":
         state.kwargs["species_binding"] = None
     elif fault == "storage":
@@ -747,4 +751,280 @@ def test_native_empty_particle_axis_preserves_gas(device):
     result = module.condensation_step_gpu(state.p, state.g, **state.kwargs)
     assert result[0] is state.p and result[1].shape == (2, 0, 3)
     npt.assert_array_equal(state.g.concentration.numpy(), before)
+    npt.assert_array_equal(state.energy.numpy(), 0)
+
+
+@pytest.mark.parametrize("prepared_call", [False, True])
+def test_empty_gas_clears_outputs_without_gas_indexed_launches(
+    device, prepared_call, monkeypatch
+):
+    """An empty explicit map and gas axis are a safe native no-op."""
+    import warp as wp
+
+    from particula.gpu.kernels import condensation as module
+    from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
+    from particula.gpu.species_mapping import prepare_condensation_species_map
+
+    state = _state(device, latent=False)
+    state.g = SimpleNamespace(
+        concentration=wp.zeros((2, 0), dtype=wp.float64, device=device),
+        vapor_pressure=wp.zeros((2, 0), dtype=wp.float64, device=device),
+        molar_mass=wp.zeros(0, dtype=wp.float64, device=device),
+        partitioning=wp.zeros((2, 0), dtype=wp.int32, device=device),
+    )
+    binding = prepare_condensation_species_map(
+        state.p,
+        state.g,
+        gas_names=(),
+        species_map=CondensationSpeciesMap((), ()),
+    )
+    kwargs = dict(
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+        species_binding=binding,
+        thermodynamics=ThermodynamicsConfig(
+            modes=wp.zeros(0, dtype=wp.int32, device=device),
+            parameters=wp.zeros((0, 4), dtype=wp.float64, device=device),
+            molar_mass_reference=state.g.molar_mass,
+        ),
+        scratch_buffers=module.CondensationScratchBuffers(
+            total_mass_transfer=state.total,
+            work_mass_transfer=state.work,
+        ),
+    )
+    before = [
+        a.numpy().copy()
+        for a in (
+            state.p.masses,
+            state.p.concentration,
+            state.p.charge,
+        )
+    ]
+    prepared = module._prepare_condensation_step_gpu(state.p, state.g, **kwargs)
+    assert prepared.gas_species_count == 0
+    launches = []
+    original = wp.launch
+
+    def record(kernel, *args, **kw):
+        launches.append(kernel)
+        return original(kernel, *args, **kw)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(wp, "launch", record)
+        if prepared_call:
+            module._enqueue_prepared_condensation_call(prepared)
+        else:
+            module.condensation_step_gpu(state.p, state.g, **kwargs)
+    assert module._refresh_vapor_pressure_kernel not in launches
+    assert module.native_kernels.reduce_candidates not in launches
+    for array, saved in zip(
+        (state.p.masses, state.p.concentration, state.p.charge),
+        before,
+        strict=True,
+    ):
+        npt.assert_array_equal(array.numpy(), saved)
+    npt.assert_array_equal(state.total.numpy(), 0)
+    npt.assert_array_equal(state.work.numpy(), 0)
+
+
+@pytest.mark.parametrize("kind,volume", [(1, 1.0), (3, 0.25), (3, 4.0)])
+@pytest.mark.parametrize(
+    "case", ["rounded_uptake", "unrepresentable_release", "rounded_release"]
+)
+def test_representable_transfer_never_overdraws_gas(device, kind, volume, case):
+    """Tiny available gas is checked against actual changes, not total inventory."""
+    import warp as wp
+
+    from particula.gpu.kernels import _condensation_native as native
+    from particula.gpu.kernels import condensation as module
+
+    def array(values, dtype=wp.float64):
+        return wp.array(np.asarray(values), dtype=dtype, device=device)
+
+    old = np.array([[[1e-18], [0.0]]])
+    if case == "rounded_uptake":
+        proposed = [[[1e-20], [0.0]]]
+        available = 1e-22
+    else:
+        proposed = [
+            [[-1e-35 if case == "unrepresentable_release" else -1e-34], [1e-20]]
+        ]
+        available = 0.0
+    masses, candidate = array(old), array(proposed)
+    counts = array([[1e12 * (volume if kind == 3 else 1.0)] * 2])
+    volumes, gas = array([volume]), array([[available]])
+    mapping = array([0], wp.int32)
+    demand, release, scale, delta = [array([[0.0]]) for _ in range(4)]
+    finalized = wp.zeros_like(masses)
+    wp.launch(
+        native.reduce_candidates,
+        dim=(1, 1),
+        inputs=[
+            candidate,
+            counts,
+            demand,
+            release,
+            mapping,
+            volumes,
+            wp.int32(kind),
+            masses,
+        ],
+        device=device,
+    )
+    wp.launch(
+        module._scale_inventory_uptake_kernel,
+        dim=(1, 1),
+        inputs=[
+            gas,
+            demand,
+            release,
+            scale,
+        ],
+        device=device,
+    )
+    wp.launch(
+        native.finalize_transfer,
+        dim=(1, 2),
+        inputs=[
+            masses,
+            candidate,
+            scale,
+            finalized,
+            mapping,
+        ],
+        device=device,
+    )
+    wp.launch(
+        native.reduce_finalized,
+        dim=(1, 1),
+        inputs=[
+            finalized,
+            counts,
+            delta,
+            mapping,
+            volumes,
+            wp.int32(kind),
+            masses,
+            gas,
+        ],
+        device=device,
+    )
+    wp.launch(
+        module.apply_mass_transfer_kernel,
+        dim=(1, 2),
+        inputs=[
+            masses,
+            finalized,
+        ],
+        device=device,
+    )
+    wp.launch(
+        module._couple_finalized_transfer_to_gas_kernel,
+        dim=(1, 1),
+        inputs=[
+            delta,
+            gas,
+        ],
+        device=device,
+    )
+    applied = masses.numpy() - old
+    weighted = np.sum(applied[0, :, 0] * 1e12)
+    assert weighted <= available
+    assert gas.numpy()[0, 0] == available - weighted
+    npt.assert_array_equal(finalized.numpy(), applied)
+    if case in ("rounded_uptake", "unrepresentable_release"):
+        npt.assert_array_equal(masses.numpy(), old)
+        assert release.numpy()[0, 0] == 0
+    else:
+        assert applied[0, 0, 0] < 0 and applied[0, 1, 0] > 0
+        assert release.numpy()[0, 0] == -applied[0, 0, 0] * 1e12
+
+
+@pytest.mark.parametrize("prepared_call", [False, True])
+def test_evaporated_resolved_slots_allow_next_gpu_process(
+    device, prepared_call
+):
+    """Retirement follows gas and latent-energy accounting using original counts."""
+    from particula.gpu.kernels import condensation as module
+    from particula.gpu.kernels.coagulation import coagulation_step_gpu
+    from particula.gpu.kernels.wall_loss import (
+        NeutralWallLossConfig,
+        wall_loss_step_gpu,
+    )
+
+    state = _state(device, scenario="evaporation", latent=True)
+    old_masses = state.p.masses.numpy().copy()
+    old_masses[:, 0, 2] = 0  # Fully volatile first representative.
+    old_masses[:, 2] = 0  # Free spare slot.
+    state.p.masses.assign(old_masses)
+    counts = state.p.concentration.numpy().copy()
+    counts[:, :2] = 2e9
+    state.p.concentration.assign(counts)
+    before_gas = state.g.concentration.numpy().copy()
+    before_charge = state.p.charge.numpy().copy()
+    state.kwargs["time_step"] = 1e6
+    if prepared_call:
+        prepared = module._prepare_condensation_step_gpu(
+            state.p, state.g, **state.kwargs
+        )
+        module._enqueue_prepared_condensation_call(prepared)
+    else:
+        module.condensation_step_gpu(state.p, state.g, **state.kwargs)
+    new_masses = state.p.masses.numpy().copy()
+    npt.assert_array_equal(new_masses[:, 0], 0)
+    npt.assert_array_equal(new_masses[:, 1, 2], old_masses[:, 1, 2])
+    npt.assert_array_equal(state.p.concentration.numpy()[:, 0], 0)
+    npt.assert_array_equal(state.p.charge.numpy()[:, 0], 0)
+    npt.assert_array_equal(state.p.concentration.numpy()[:, 1], counts[:, 1])
+    npt.assert_array_equal(state.p.charge.numpy()[:, 1], before_charge[:, 1])
+    for source, target in state.pairs:
+        transferred = np.sum(
+            (new_masses - old_masses)[:, :, target] * counts, axis=1
+        )
+        npt.assert_allclose(
+            state.g.concentration.numpy()[:, source] - before_gas[:, source],
+            -transferred / 0.25,
+            rtol=1e-12,
+            atol=1e-30,
+        )
+        npt.assert_allclose(
+            state.energy.numpy()[:, source],
+            transferred * state.heat[source],
+            rtol=1e-12,
+            atol=1e-30,
+        )
+    coagulation_step_gpu(state.p, 298.15, 101325.0, 0.01)
+    wall_loss_step_gpu(
+        state.p,
+        298.15,
+        101325.0,
+        0.01,
+        config=NeutralWallLossConfig("spherical", 1e-3, chamber_radius=1.0),
+    )
+
+
+@pytest.mark.parametrize("prepared_call", [False, True])
+def test_four_substeps_cannot_spend_sub_ulp_gas_budget(device, prepared_call):
+    """The public path cannot hide rounded uptake behind gas clamping."""
+    from particula.gpu.kernels import condensation as module
+
+    state = _state(device, volume=1.0, scenario="uptake", single=True)
+    state.p.masses.fill_(1e-18)
+    state.p.concentration.fill_(1e12)
+    state.g.concentration.fill_(1e-22)
+    state.kwargs["time_step"] = 1e6
+    old_mass = state.p.masses.numpy().copy()
+    old_gas = state.g.concentration.numpy().copy()
+    if prepared_call:
+        prepared = module._prepare_condensation_step_gpu(
+            state.p, state.g, **state.kwargs
+        )
+        module._enqueue_prepared_condensation_call(prepared)
+    else:
+        module.condensation_step_gpu(state.p, state.g, **state.kwargs)
+    # One ulp of a single particle already costs more than the entire gas budget.
+    npt.assert_array_equal(state.p.masses.numpy(), old_mass)
+    npt.assert_array_equal(state.g.concentration.numpy(), old_gas)
+    npt.assert_array_equal(state.total.numpy(), 0)
     npt.assert_array_equal(state.energy.numpy(), 0)

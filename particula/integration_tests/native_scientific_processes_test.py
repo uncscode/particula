@@ -279,3 +279,77 @@ def test_density_native_aggregate_through_three_processes(kind, strategy_type):
     npt.assert_array_equal(aerosol.gas.concentration, gas_before)
     if kind == "continuous_pdf":
         npt.assert_array_equal(particle.radius_grid, radius)
+
+
+@pytest.mark.parametrize("strategy_type", CONDENSATION)
+@pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+@pytest.mark.parametrize("solid_core", [False, True])
+def test_complete_evaporation_remains_consumable_by_later_processes(
+    strategy_type, volume, solid_core
+):
+    """Retire absent particles while preserving a surviving unmapped core."""
+    from particula.dynamics.condensation.tests.species_mapping_test import (
+        native_strategy,
+    )
+    from particula.particles import get_slot_diagnostics
+
+    masses = np.array([[2e-18, 3e-18, 0], [5e-18, 7e-18, 0]])
+    if solid_core:
+        masses[1, 2] = 11e-18
+    particle = create_resolved_particle_data(
+        masses=masses,
+        density=[1000.0, 1200.0, 1500.0],
+        concentration=2.0,
+        charge=[1.0, -2.0],
+        volume=volume,
+    )
+    aerosol = _aggregate(particle)
+    gas = aerosol.gas
+    gas.concentration[0, 1:] = 0
+    mapping = CondensationSpeciesMap(("inert", "B", "A"), ((2, 0), (1, 1)))
+    extra = {}
+    if strategy_type is CondensationIsothermalStaggered:
+        extra = dict(theta_mode="half", num_batches=2, shuffle_each_step=False)
+    elif strategy_type is CondensationLatentHeat:
+        extra = dict(latent_heat_strategy=ConstantLatentHeat(2e6))
+    strategy = native_strategy(strategy_type, gas, mapping, **extra)
+    arrays = (particle.masses, particle.concentration, particle.charge)
+    strategy.step(particle, gas, 298, 101325, 1e6, 1.8e-5)
+    assert all(
+        a is b
+        for a, b in zip(
+            arrays,
+            (particle.masses, particle.concentration, particle.charge),
+            strict=True,
+        )
+    )
+    npt.assert_array_equal(particle.masses[0, :, :2], 0)
+    npt.assert_array_equal(
+        particle.concentration, [[0, 2 if solid_core else 0]]
+    )
+    npt.assert_array_equal(particle.charge, [[0, -2 if solid_core else 0]])
+    npt.assert_allclose(
+        gas.concentration[0, [2, 1]] * volume,
+        2 * masses[:, :2].sum(axis=0),
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    get_slot_diagnostics(particle)
+    if strategy_type is CondensationLatentHeat:
+        npt.assert_allclose(
+            strategy.last_latent_heat_energy,
+            -2 * masses[:, :2].sum() * 2e6,
+            rtol=1e-12,
+            atol=1e-30,
+        )
+    BrownianCoagulationStrategy("particle_resolved").step(
+        particle,
+        298,
+        101325,
+        0.01,
+    )
+    SphericalWallLossStrategy(
+        wall_eddy_diffusivity=1e-3,
+        chamber_radius=1.0,
+        distribution_type="particle_resolved",
+    ).step(particle, 298, 101325, 0.01)

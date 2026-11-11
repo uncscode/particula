@@ -382,3 +382,23 @@ def test_latent_energy_uses_mapped_full_gas_order_and_extensive_mass(volume):
         rtol=1e-12,
         atol=1e-27,
     )
+
+
+@pytest.mark.parametrize("field", ["concentration", "charge"])
+@pytest.mark.parametrize("alias", [False, True])
+def test_resolved_retirement_storage_rejected_before_any_update(field, alias):
+    """The added retirement writers have read-only and overlap preflight."""
+    from particula.dynamics.condensation.tests.species_mapping_test import (
+        snapshot,
+    )
+
+    particles, gas, mapping = make_state()
+    if alias:
+        setattr(particles, field, particles.masses[:, :, 0])
+    else:
+        getattr(particles, field).flags.writeable = False
+    before = snapshot(particles, gas)
+    strategy = native_strategy(CondensationIsothermal, gas, mapping)
+    with pytest.raises(ValueError, match="writable|alias"):
+        strategy.step(particles, gas, 298, 101325, 1.0)
+    assert snapshot(particles, gas) == before

@@ -73,6 +73,14 @@ released inventory. Unmapped/skipped/nonpartitioning lanes remain unchanged.
 finite-stage availability limiter. Native latent energy is extensive J, using
 counts (density integrated over volume for PMF/PDF), rather than energy density.
 
+When a resolved particle fully evaporates (every material mass is zero), its
+count and charge are cleared after gas and energy accounting. This releases a
+fixed slot that subsequent coagulation and wall-loss calls can consume. A
+remaining unmapped or nonvolatile material keeps the particle active. Clearing
+charge records removal of the particle; no gas-phase charge transport is
+modeled. Resolved count and charge storage must therefore also be writable
+and nonoverlapping. PMF/PDF retain their prescribed bin populations.
+
 The native staggered step preserves two theta sweeps, seeded or caller-owned
 random generators, shuffle and batching. Each node uses its own local theta
 duration. Material/radius evaluation is frozen from the original particle
@@ -80,6 +88,7 @@ state during the two sweeps; current private gas and remaining mass determine
 coupling and limiting. Full-grid PDF weights are computed before selecting
 batches. Physical arrays publish only after successful staging; late model
 failure does not promise rollback of already consumed random draws.
+Fully evaporated resolved particles leave subsequent staggered batches/sweeps.
 
 CPU native calls require one box and revalidate mutable state at each entry.
 They preserve carrier and destination-array identities and reject protected
@@ -705,6 +714,15 @@ mapped proposals, bounds evaporation and gas-limits uptake, then couples the
 representable particle change to gas. Whole-call transfer and energy outputs
 are cleared at entry and accumulated from the applied substeps. PMF requires
 V=1; resolved volumes need not be one. PDF execution rejects explicitly.
+
+Resolved N/V must be finite at admission. Evaporation contributes only its
+representable release to the uptake budget. Before either inventory update,
+rounded positive additions are reconciled against available gas; a bounded
+downward correction suppresses uptake if it cannot fit, and a nonfinite
+reduction suppresses that species' transfer. Fully evaporated resolved slots
+have their counts and charge cleared after whole-call gas and latent-energy
+accounting. Empty gas storage with an empty map is a no-op that clears transfer
+outputs and launches no gas-indexed work.
 
 Setup validates configuration, physical state and nonoverlapping writers;
 validation may launch read-only device scans and read private status flags.

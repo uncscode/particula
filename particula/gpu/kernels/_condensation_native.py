@@ -34,6 +34,11 @@ def _validate_primary(  # noqa: C901
         count = concentration[box, lane]
         if not wp.isfinite(count) or count < wp.float64(0.0):
             wp.atomic_add(invalid, 0, 1)
+        if kind == wp.int32(3):
+            v = volume[box]
+            if v > wp.float64(0.0) and wp.isfinite(v):
+                if not wp.isfinite(count / v):
+                    wp.atomic_add(invalid, 0, 1)
         if not wp.isfinite(charge[box, lane]):
             wp.atomic_add(invalid, 0, 1)
         for species in range(masses.shape[2]):
@@ -118,6 +123,7 @@ def reduce_candidates(
     gas_to_particle: Any,
     volume: Any,
     kind: wp.int32,
+    masses: Any,
 ) -> None:
     """Reduce bounded particle proposals into full-gas density inventory."""
     box, g = wp.tid()  # type: ignore[misc]
@@ -127,6 +133,9 @@ def reduce_candidates(
     if p >= 0:
         for slot in range(candidate.shape[1]):
             transfer = candidate[box, slot, p]
+            if transfer < wp.float64(0.0):
+                mass = masses[box, slot, p]
+                transfer = (mass + transfer) - mass
             weighted = transfer * _density_weight(
                 concentration, volume, kind, box, slot
             )
@@ -168,12 +177,46 @@ def reduce_finalized(
     gas_to_particle: Any,
     volume: Any,
     kind: wp.int32,
+    masses: Any,
+    gas_concentration: Any,
 ) -> None:
-    """Reduce actual particle changes with N/V only for resolved counts."""
+    """Reconcile rounded uptake before either primary inventory is updated.
+
+    One lane owns each mapped species, so corrections and the weighted sum
+    use the same deterministic order. A downward relative-epsilon step moves
+    gaining masses by at least one representable value (Warp has no nextafter).
+    If four corrections cannot fit the budget, suppress uptake for that species.
+    Nonfinite reductions suppress all transfers for that species.
+    """
     box, g = wp.tid()  # type: ignore[misc]
     p = gas_to_particle[g]
     delta = wp.float64(0.0)
     if p >= 0:
+        for attempt in range(5):
+            delta = wp.float64(0.0)
+            for slot in range(finalized.shape[1]):
+                delta += finalized[box, slot, p] * _density_weight(
+                    concentration, volume, kind, box, slot
+                )
+            if wp.isfinite(delta) and delta <= gas_concentration[box, g]:
+                break
+            for slot in range(finalized.shape[1]):
+                transfer = finalized[box, slot, p]
+                if not wp.isfinite(delta):
+                    finalized[box, slot, p] = wp.float64(0.0)
+                elif transfer > wp.float64(0.0):
+                    mass = masses[box, slot, p]
+                    updated = mass + transfer
+                    decrement = wp.max(
+                        updated * wp.float64(2.220446049250313e-16),
+                        wp.float64(4.9406564584124654e-324),
+                    )
+                    updated = wp.max(mass, updated - decrement)
+                    if attempt == 4:
+                        updated = mass
+                    finalized[box, slot, p] = updated - mass
+        # Recompute after the last correction, including the bounded fallback.
+        delta = wp.float64(0.0)
         for slot in range(finalized.shape[1]):
             delta += finalized[box, slot, p] * _density_weight(
                 concentration, volume, kind, box, slot
@@ -202,3 +245,18 @@ def energy_transfer(
                 count *= volume[box]
             delta += total[box, slot, p] * count
     energy[box, g] = delta * latent_heat[g]
+
+
+@wp.kernel
+def retire_evaporated_slots(
+    masses: Any, concentration: Any, charge: Any
+) -> None:
+    """Clear fully evaporated resolved slots after gas/energy accounting."""
+    box, slot = wp.tid()  # type: ignore[misc]
+    empty = bool(True)
+    for species in range(masses.shape[2]):
+        if masses[box, slot, species] != wp.float64(0.0):
+            empty = False
+    if empty and concentration[box, slot] > wp.float64(0.0):
+        concentration[box, slot] = wp.float64(0.0)
+        charge[box, slot] = wp.float64(0.0)
