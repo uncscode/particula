@@ -34,6 +34,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 # %% [markdown]
 # ## Build a PMF aerosol
@@ -73,7 +74,7 @@ particles_pmf = (
 )
 
 # Aerosol object
-pmf_aerosol = par.Aerosol(atmosphere=atmosphere, particles=particles_pmf)
+pmf_aerosol = LegacyAerosol(atmosphere=atmosphere, particles=particles_pmf)
 
 # %% [markdown]
 # ## Configure coagulation (discrete)

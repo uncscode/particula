@@ -11,7 +11,7 @@ from typing import Any, Protocol, cast
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.dynamics.dilution import (
     DilutionStrategy,
     _validate_nonnegative_scalar,

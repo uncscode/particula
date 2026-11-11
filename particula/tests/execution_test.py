@@ -12,7 +12,7 @@ from typing import assert_type, cast
 import numpy as np
 import numpy.testing as npt
 import pytest
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.dynamics.dilution import DilutionStrategy
 from particula.dynamics.particle_process import Dilution
 from particula.execution import (

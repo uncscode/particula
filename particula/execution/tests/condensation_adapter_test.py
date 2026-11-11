@@ -11,7 +11,7 @@ from typing import Any, cast
 import numpy as np
 import pytest
 
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.execution import (
     CONDENSATION_PROCESS,
     Backend,
@@ -151,7 +151,7 @@ def guarded_import(name, *args, **kwargs):
     return original_import(name, *args, **kwargs)
 
 builtins.__import__ = guarded_import
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.execution import (
     CondensationActivityMode, CondensationConfiguration,
     CondensationExecutionMode, CondensationSurfaceMode,
@@ -959,7 +959,7 @@ def guarded_import(name, *args, **kwargs):
     return original_import(name, *args, **kwargs)
 
 builtins.__import__ = guarded_import
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.dynamics import MassCondensation
 from particula.execution import (
     CondensationActivityMode, CondensationConfiguration,

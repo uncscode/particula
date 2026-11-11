@@ -7,7 +7,7 @@ import numpy.testing as npt
 import particula.dynamics
 import particula.dynamics.particle_process as particle_process
 import pytest
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.dynamics.nucleation import (
     ActivationNucleationStrategy,
     ClosedInterval,

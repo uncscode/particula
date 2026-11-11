@@ -29,6 +29,7 @@ import numpy as np
 
 # particula imports
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 # %% [markdown]
 # ## Aerosol Setup
@@ -82,7 +83,7 @@ resolved_masses = (
 )
 
 # Create an aerosol object with the defined atmosphere and resolved particles
-aerosol = par.Aerosol(atmosphere=atmosphere, particles=resolved_masses)
+aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
 
 # Print the properties of the atmosphere
 print(aerosol)

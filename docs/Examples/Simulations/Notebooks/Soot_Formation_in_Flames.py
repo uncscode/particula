@@ -56,6 +56,7 @@ import numpy as np  # numerical tools
 import particula as par  # the main Particula package
 from matplotlib.colors import LogNorm
 from numpy.typing import NDArray
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from tqdm import tqdm  # optional: for progress bars during simulation
 
 # 🎨 Set default plot styling using Tailwind-inspired colors from Particula
@@ -538,7 +539,7 @@ resolved_masses = (
 )
 
 # Wrap into full aerosol system with gas phase
-aerosol = par.Aerosol(atmosphere=atmosphere, particles=resolved_masses)
+aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
 print(aerosol)
 
 # 📊 Plot the initial size distribution

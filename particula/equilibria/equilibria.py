@@ -34,7 +34,7 @@ from __future__ import annotations
 import inspect
 from typing import TYPE_CHECKING, Any, Mapping
 
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.equilibria.equilibria_strategies import EquilibriaStrategy
 from particula.runnable import RunnableABC
 

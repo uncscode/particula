@@ -33,6 +33,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from scipy.integrate import trapezoid
 
 # %% [markdown]
@@ -82,7 +83,7 @@ particles_pmf = (
     .build()
 )
 
-aerosol_pmf = par.Aerosol(atmosphere=atmosphere, particles=particles_pmf)
+aerosol_pmf = LegacyAerosol(atmosphere=atmosphere, particles=particles_pmf)
 
 # PDF particles
 particles_pdf = (
@@ -95,7 +96,7 @@ particles_pdf = (
     .build()
 )
 
-aerosol_pdf = par.Aerosol(atmosphere=atmosphere, particles=particles_pdf)
+aerosol_pdf = LegacyAerosol(atmosphere=atmosphere, particles=particles_pdf)
 
 # %% [markdown]
 # ## Configure coagulation runnables

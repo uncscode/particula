@@ -7,6 +7,7 @@ deterministic, supersaturated, single-species water aerosol.
 import numpy as np
 import particula as par
 import pytest
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 LATENT_HEAT_WATER = 2.26e6  # J/kg
 CONSERVATION_RTOL = 1e-12
@@ -35,7 +36,7 @@ def _as_float(value: float | np.ndarray) -> float:
     return float(array_value.reshape(()))
 
 
-def _particle_water_inventory(aerosol: par.Aerosol) -> float:
+def _particle_water_inventory(aerosol: LegacyAerosol) -> float:
     """Return the total particle-phase water inventory for the fixture.
 
     Args:
@@ -66,7 +67,7 @@ def _particle_water_inventory(aerosol: par.Aerosol) -> float:
     return float(np.sum(water_mass * concentration, dtype=np.float64))
 
 
-def _build_test_aerosol() -> tuple[par.Aerosol, float]:
+def _build_test_aerosol() -> tuple[LegacyAerosol, float]:
     """Build a supersaturated single-species water aerosol state.
 
     Returns:
@@ -115,7 +116,7 @@ def _build_test_aerosol() -> tuple[par.Aerosol, float]:
         .set_volume(1.0e-6, "m^3")
         .build()
     )
-    aerosol = par.Aerosol(atmosphere=atmosphere, particles=particles)
+    aerosol = LegacyAerosol(atmosphere=atmosphere, particles=particles)
     return aerosol, float(saturation_concentration)
 
 

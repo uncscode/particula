@@ -43,6 +43,7 @@ Example:
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 # %% [markdown]
 # ## Build a PDF aerosol
@@ -84,7 +85,7 @@ particles_pdf = (
 )
 
 # Aerosol object
-pdf_aerosol = par.Aerosol(atmosphere=atmosphere, particles=particles_pdf)
+pdf_aerosol = LegacyAerosol(atmosphere=atmosphere, particles=particles_pdf)
 
 # %% [markdown]
 # ## Configure coagulation (continuous PDF)

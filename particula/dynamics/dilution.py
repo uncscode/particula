@@ -28,7 +28,7 @@ from numpy.typing import NDArray
 from particula.util.validate_inputs import validate_inputs
 
 if TYPE_CHECKING:
-    from particula.aerosol import Aerosol
+    from particula._legacy_aerosol import Aerosol
 
 
 def _return_scalar_if_appropriate(

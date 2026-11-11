@@ -40,6 +40,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 # Set random seed for reproducibility
 RANDOM_SEED = 42
@@ -154,7 +155,7 @@ def run_simulation(strategy, aerosol, time_step, n_steps, sub_steps=1):
     condensation = par.dynamics.MassCondensation(condensation_strategy=strategy)
 
     # Deep copy for this simulation
-    current_aerosol = par.Aerosol(
+    current_aerosol = LegacyAerosol(
         atmosphere=copy.deepcopy(aerosol.atmosphere),
         particles=copy.deepcopy(aerosol.particles),
     )
@@ -184,7 +185,7 @@ def run_simulation(strategy, aerosol, time_step, n_steps, sub_steps=1):
 
 
 # Create base aerosol
-aerosol_base = par.Aerosol(atmosphere=atmosphere, particles=particles)
+aerosol_base = LegacyAerosol(atmosphere=atmosphere, particles=particles)
 
 # Simulation parameters
 time_step = 0.01  # seconds

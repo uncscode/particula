@@ -15,7 +15,7 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.dynamics import CondensationIsothermal, MassCondensation
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,

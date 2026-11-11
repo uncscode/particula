@@ -31,6 +31,7 @@
 import numpy as np
 import particula as par
 from matplotlib import pyplot as plt
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 np.set_printoptions(precision=3, suppress=True)
 TIME_STEP = 30.0  # seconds
@@ -42,7 +43,7 @@ PRESSURE = 101325.0  # Pa
 
 
 # %%
-def build_aerosol() -> par.Aerosol:
+def build_aerosol() -> LegacyAerosol:
     """Create a small discrete aerosol with an empty atmosphere."""
     particles = par.particles.PresetParticleRadiusBuilder().build()
     partitioning_species = par.gas.GasSpecies(
@@ -63,7 +64,7 @@ def build_aerosol() -> par.Aerosol:
         partitioning_species=partitioning_species,
         gas_only_species=gas_only_species,
     )
-    return par.Aerosol(atmosphere=atmosphere, particles=particles)
+    return LegacyAerosol(atmosphere=atmosphere, particles=particles)
 
 
 def run_wall_loss(strategy: par.dynamics.WallLossStrategy, sub_steps: int = 1):

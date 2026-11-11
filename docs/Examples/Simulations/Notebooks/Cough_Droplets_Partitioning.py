@@ -53,6 +53,7 @@ import copy  # to safely duplicate Python objects
 import matplotlib.pyplot as plt  # for plotting
 import numpy as np  # numerical tools
 import particula as par  # the main Particula package
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from tqdm import tqdm  # optional: for progress bars during simulation
 
 # 🎨 Set default plot styling using Tailwind-inspired colors from Particula
@@ -414,7 +415,7 @@ resolved_masses = (
 )
 
 # Combine gas and particle phases into full aerosol system
-aerosol = par.Aerosol(atmosphere=atmosphere, particles=resolved_masses)
+aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
 
 # Optional: print summary of aerosol system
 print(aerosol)

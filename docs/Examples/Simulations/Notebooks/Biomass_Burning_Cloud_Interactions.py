@@ -45,6 +45,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from tqdm import tqdm
 
 # plot settings
@@ -102,7 +103,7 @@ plt.rcParams.update(
 #    – Use `ResolvedParticleMassRepresentationBuilder` to combine mass, density, charge (0), and volume
 #
 # 9. **Aerosol Object & Initial Visualization**
-#    – Instantiate `par.Aerosol(atmosphere, particles)`
+#    – Instantiate `LegacyAerosol(atmosphere, particles)`
 #    – Plot a histogram of log₁₀ particle radii to verify the initial distribution
 #
 # > **Pro tip:** For fast prototyping, begin with `5 000 – 10 000` particles. Once your setup is validated, increase `number_of_samples`, simulation length, or time resolution.
@@ -218,7 +219,7 @@ resolved_masses = (
 )
 
 # Create Aerosol object
-aerosol = par.Aerosol(atmosphere=atmosphere, particles=resolved_masses)
+aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
 print(aerosol)
 
 

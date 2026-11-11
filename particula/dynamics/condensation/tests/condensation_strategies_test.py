@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 import numpy as np
 import particula as par  # new – we will build real objects
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,
@@ -3456,7 +3457,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
             partitioning_species=gas_species,
             gas_only_species=[],
         )
-        aerosol = par.Aerosol(atmosphere=atmosphere, particles=particle)
+        aerosol = LegacyAerosol(atmosphere=atmosphere, particles=particle)
 
         cond_latent = CondensationLatentHeat(
             molar_mass=self.molar_mass,
@@ -3474,7 +3475,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
             aerosol_out.atmosphere.partitioning_species, GasSpecies
         )
 
-        aerosol_iso = par.Aerosol(
+        aerosol_iso = LegacyAerosol(
             atmosphere=copy.deepcopy(atmosphere),
             particles=copy.deepcopy(self.particle),
         )

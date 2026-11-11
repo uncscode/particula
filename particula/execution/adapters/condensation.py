@@ -23,7 +23,7 @@ from math import prod
 from numbers import Integral, Real
 from typing import Any, cast
 
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.dynamics import MassCondensation
 from particula.execution import (
     Backend,

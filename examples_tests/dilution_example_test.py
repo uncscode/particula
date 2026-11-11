@@ -80,7 +80,8 @@ def test_cpu_dilution_example_imports_only_public_dependencies() -> None:
         if isinstance(node, ast.ImportFrom)
     }
     assert imports == {"numpy", "particula"}
-    assert from_imports <= {"__future__"}
+    # Temporary E9-M2 import; remove with legacy examples in M5/M6.
+    assert from_imports <= {"__future__", "particula._legacy_aerosol"}
 
 
 def test_cpu_dilution_example_results_are_isolated_snapshots() -> None:

@@ -25,6 +25,7 @@
 
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 # %% [markdown]
 # ## Gas->Atmosphere and Particles
@@ -93,7 +94,7 @@ lognormal_rep = (
 # With both the `Atmosphere` and `ParticleRepresentation` objects created, we can now create an `Aerosol` object. This object will contain both the gas and particle phase objects, and will be used to track the state of the aerosol system during dynamics.
 
 # %%
-aerosol = par.Aerosol(atmosphere=atmosphere, particles=lognormal_rep)
+aerosol = LegacyAerosol(atmosphere=atmosphere, particles=lognormal_rep)
 
 print(aerosol)
 

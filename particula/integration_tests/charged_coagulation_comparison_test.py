@@ -12,6 +12,7 @@ Each case asserts mass/charge conservation and physical merger behavior.
 import numpy as np
 import numpy.testing as npt
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 
 def _run_coagulation(
@@ -93,7 +94,7 @@ def _run_coagulation(
         .build()
     )
 
-    aerosol = par.Aerosol(atmosphere=atmosphere, particles=resolved_masses)
+    aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
 
     # -- coagulation --
     hs_strategy = par.dynamics.HardSphereKernelStrategy()

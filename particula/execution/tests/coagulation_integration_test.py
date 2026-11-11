@@ -16,6 +16,7 @@ import numpy.testing as npt
 import pytest
 
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from particula.execution import ExecutionResult
 from particula.execution.adapters.coagulation import (
     BrownianCoagulationConfig,
@@ -109,7 +110,7 @@ def _make_cpu_aerosol() -> tuple[Any, Any]:
         .set_pressure(101325.0, pressure_units="Pa")
         .build()
     )
-    aerosol = par.Aerosol(atmosphere=atmosphere, particles=particles)
+    aerosol = LegacyAerosol(atmosphere=atmosphere, particles=particles)
     runnable = par.dynamics.Coagulation(
         par.dynamics.BrownianCoagulationStrategy("particle_resolved")
     )

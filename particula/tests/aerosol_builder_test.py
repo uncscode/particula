@@ -9,7 +9,7 @@ import copy
 import unittest
 
 import numpy as np
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.aerosol_builder import AerosolBuilder
 from particula.gas import (
     AtmosphereBuilder,

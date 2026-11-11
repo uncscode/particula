@@ -7,7 +7,7 @@ import numpy.testing as npt
 import particula.dynamics as dynamics
 import particula.dynamics.dilution as dilution_module
 import pytest
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.dynamics.dilution import (
     dilute_aerosol,
     get_dilution_rate,

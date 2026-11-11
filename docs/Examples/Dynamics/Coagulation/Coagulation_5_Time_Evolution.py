@@ -46,6 +46,7 @@ Example:
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from scipy.integrate import trapezoid
 
 # %% [markdown]
@@ -96,7 +97,7 @@ particles_pmf = (
     .build()
 )
 
-aerosol_pmf = par.Aerosol(atmosphere=atmosphere, particles=particles_pmf)
+aerosol_pmf = LegacyAerosol(atmosphere=atmosphere, particles=particles_pmf)
 print(f"PMF initial total: {concentration_pmf.sum():.2e} m^-3")
 
 # %% [markdown]
@@ -122,7 +123,7 @@ particles_pdf = (
     .build()
 )
 
-aerosol_pdf = par.Aerosol(atmosphere=atmosphere, particles=particles_pdf)
+aerosol_pdf = LegacyAerosol(atmosphere=atmosphere, particles=particles_pdf)
 pdf_total = trapezoid(concentration_pdf, x=radius_bins)
 print(f"PDF initial total: {pdf_total:.2e} m^-3")
 
@@ -163,7 +164,7 @@ particles_resolved = (
     .build()
 )
 
-aerosol_resolved = par.Aerosol(
+aerosol_resolved = LegacyAerosol(
     atmosphere=atmosphere, particles=particles_resolved
 )
 print(f"Particle-resolved initial count: {len(radii_sample)} particles")
