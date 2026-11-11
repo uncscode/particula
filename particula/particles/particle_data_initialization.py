@@ -2,6 +2,7 @@
 
 Initialization allocates owned float64 arrays. Aggregate wrapping is a separate,
 identity-preserving operation. Binned densities use fixed volume 1 m^3.
+Canonical SI inputs do not require Pint; other unit spellings/conversions do.
 """
 
 import numpy as np
@@ -14,6 +15,11 @@ from particula.particles.properties.lognormal_size_distribution import (
     get_lognormal_pmf_distribution,
 )
 from particula.util.convert_units import get_unit_conversion
+
+
+def _unit_factor(units: str, target: str) -> float:
+    """Avoid the optional converter when inputs already use canonical units."""
+    return 1.0 if units == target else float(get_unit_conversion(units, target))
 
 
 def _vector(value: ArrayLike, name: str) -> NDArray[np.float64]:
@@ -31,7 +37,7 @@ def _single_density(value: ArrayLike, units: str) -> float:
     array = np.asarray(value, dtype=np.float64)
     if array.size == 0 or not np.all(array == array.flat[0]):
         raise ValueError("radius initialization requires one material density")
-    result = float(array.flat[0]) * get_unit_conversion(units, "kg/m^3")
+    result = float(array.flat[0]) * _unit_factor(units, "kg/m^3")
     if not np.isfinite(result) or result <= 0:
         raise ValueError("density must be positive and finite")
     return float(result)
@@ -58,7 +64,7 @@ def _modal_parameters(
     modes = (
         np.array([100e-9, 1e-6])
         if mode is None
-        else _vector(mode, "mode") * get_unit_conversion(radius_units, "m")
+        else _vector(mode, "mode") * _unit_factor(radius_units, "m")
     )
     deviations = _vector(
         [1.2, 1.4]
@@ -70,7 +76,7 @@ def _modal_parameters(
         np.array([1e10, 1e9])
         if number_concentration is None
         else _vector(number_concentration, "number_concentration")
-        * get_unit_conversion(number_concentration_units, "1/m^3")
+        * _unit_factor(number_concentration_units, "1/m^3")
     )
     if not (modes.shape == deviations.shape == numbers.shape) or not modes.size:
         raise ValueError("mode, deviation, and concentration shapes must match")
@@ -88,7 +94,7 @@ def _modal_parameters(
 
 def _reference_volume(value: float, units: str) -> float:
     """Canonicalize conversion roundoff only for non-SI reference volumes."""
-    volume = float(value) * get_unit_conversion(units, "m^3")
+    volume = float(value) * _unit_factor(units, "m^3")
     if units != "m^3" and abs(volume - 1.0) <= 4 * np.spacing(1.0):
         volume = 1.0
     return float(volume)
@@ -134,7 +140,7 @@ def create_particle_data_from_radii(
     """
     if distribution_type not in ("discrete", "continuous_pdf"):
         raise ValueError("radius bins require discrete or continuous_pdf")
-    radius = _vector(radii, "radii") * get_unit_conversion(radius_units, "m")
+    radius = _vector(radii, "radii") * _unit_factor(radius_units, "m")
     if not np.all(np.isfinite(radius)) or np.any(radius <= 0):
         raise ValueError("radii must be positive and finite")
     material = _single_density(density, density_units)
@@ -205,7 +211,7 @@ def create_lognormal_binned_particle_data(
         np.logspace(-9, -4, 250)
         if radius_bins is None
         else _vector(radius_bins, "radius_bins")
-        * get_unit_conversion(radius_units, "m")
+        * _unit_factor(radius_units, "m")
     )
     if radius.size < 2 or np.any(np.diff(radius) <= 0):
         raise ValueError("lognormal radius grid must have increasing nodes")
