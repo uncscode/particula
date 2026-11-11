@@ -679,6 +679,7 @@ def test_cpu_adapter_executes_native_cases_and_conserves_inventory(
         time_step=1.0e-12 if case == "evaporation" else 0.1,
     )
     aerosol = state.state.aerosol
+    assert isinstance(aerosol, Aerosol)
     initial_mass = aerosol.particles.get_species_mass(clone=True)
     concentration = aerosol.particles.get_concentration(clone=True)
     initial_gas = np.array(

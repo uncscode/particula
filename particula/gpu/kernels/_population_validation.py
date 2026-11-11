@@ -15,7 +15,7 @@ def array_field(
     container: Any, name: str, shape: tuple[int, ...], dtype: Any, device: Any
 ) -> Any:
     """Require a contiguous same-device field without reading its payload."""
-    value = getattr(container, name, None)
+    value: Any = getattr(container, name, None)
     if (
         not _is_warp_array_like(value)
         or value.dtype != dtype
@@ -36,7 +36,7 @@ def memory_range(array: Any) -> tuple[int, int]:
     )
     if size is None:
         raise ValueError("unsupported native storage dtype")
-    strides = []
+    strides: list[int] = []
     length = size
     for dimension in reversed(array.shape):
         strides.insert(0, length)
@@ -114,7 +114,7 @@ def validate_population(particles: Any) -> tuple[Any, ...]:
         raise ValueError(
             "native validation requires explicit population metadata"
         )
-    masses = getattr(particles, "masses", None)
+    masses: Any = getattr(particles, "masses", None)
     if not _is_warp_array_like(masses) or masses.ndim != 3:
         raise ValueError("native masses must be rank-three Warp storage")
     boxes, slots, species = masses.shape

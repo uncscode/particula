@@ -63,6 +63,7 @@ from particula.particles.activity_strategies import ActivityIdealMass
 from particula.particles.distribution_strategies import MassBasedMovingBin
 from particula.particles.representation import ParticleRepresentation
 from particula.particles.surface_strategies import SurfaceStrategyVolume
+from particula.runnable import Aerosol as AerosolLike
 from particula.runnable import RunnableABC
 
 
@@ -1732,17 +1733,17 @@ class _RecordingRunnable(RunnableABC):
         """Create an empty recording runnable."""
         self.calls: list[tuple[object, object, object]] = []
 
-    def rate(self, aerosol: Aerosol) -> object:
+    def rate(self, aerosol: AerosolLike) -> object:
         """Provide the required unused runnable rate seam."""
         del aerosol
         return None
 
     def execute(
         self,
-        aerosol: Aerosol,
+        aerosol: AerosolLike,
         time_step: float,
         sub_steps: int = 1,
-    ) -> Aerosol:
+    ) -> AerosolLike:
         """Record controls and return the original aerosol."""
         self.calls.append((aerosol, time_step, sub_steps))
         return aerosol
@@ -1950,8 +1951,8 @@ def test_cpu_adapter_propagates_exception_after_one_dispatch() -> None:
         """Raise the preconstructed sentinel error during dispatch."""
 
         def execute(
-            self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
-        ) -> Aerosol:
+            self, aerosol: AerosolLike, time_step: float, sub_steps: int = 1
+        ) -> AerosolLike:
             """Record one call and raise the sentinel error."""
             self.calls.append((aerosol, time_step, sub_steps))
             raise error
@@ -1973,8 +1974,8 @@ def test_cpu_adapter_rejects_replacement_aerosol_after_one_dispatch() -> None:
         """Return a distinct aerosol sentinel after recording the call."""
 
         def execute(
-            self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
-        ) -> Aerosol:
+            self, aerosol: AerosolLike, time_step: float, sub_steps: int = 1
+        ) -> AerosolLike:
             """Record the call and deliberately return another object."""
             self.calls.append((aerosol, time_step, sub_steps))
             return cast(Aerosol, object())

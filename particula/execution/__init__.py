@@ -69,8 +69,7 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from particula._legacy_aerosol import Aerosol
-    from particula.runnable import RunnableABC
+    from particula.runnable import Aerosol, RunnableABC
 
 _NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 

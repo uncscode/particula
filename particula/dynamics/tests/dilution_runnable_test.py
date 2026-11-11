@@ -14,6 +14,7 @@ from particula.particles.activity_strategies import ActivityIdealMass
 from particula.particles.distribution_strategies import MassBasedMovingBin
 from particula.particles.representation import ParticleRepresentation
 from particula.particles.surface_strategies import SurfaceStrategyVolume
+from particula.runnable import Aerosol as AerosolLike
 from particula.runnable import RunnableABC, RunnableSequence
 
 
@@ -367,15 +368,15 @@ class Marker(RunnableABC):
     def __init__(self, calls: list[str]):
         self.calls = calls
 
-    def rate(self, aerosol: Aerosol) -> float:
+    def rate(self, aerosol: AerosolLike) -> float:
         return 0.0
 
     def execute(
         self,
-        aerosol: Aerosol,
+        aerosol: AerosolLike,
         time_step: float,
         sub_steps: int = 1,
-    ) -> Aerosol:
+    ) -> AerosolLike:
         self.calls.append("marker")
         return aerosol
 
