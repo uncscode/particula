@@ -89,14 +89,14 @@
     {
       "id": "E9-M3-P5",
       "title": "Migrate neutral and charged wall-loss strategies with both CPU suites",
-      "status": "Not Started",
+      "status": "In Progress",
       "size": "S",
       "issue_number": null,
-      "start_date": null,
+      "start_date": "2026-11-11",
       "completion_date": null,
       "estimates": null,
       "actuals": null,
-      "notes_ref": null,
+      "notes_ref": ".opencode/plans/sections/maintenance/E9-M3/p5_cpu_validation.md",
       "depends_on": null,
       "reconciliation_evidence_fingerprint": null
     },

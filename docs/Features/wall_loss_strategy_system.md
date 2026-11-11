@@ -24,6 +24,62 @@ This feature is built around user-facing APIs exposed via `particula.dynamics`:
 - `WallLoss` runnable – delegates to a wall loss strategy on `Aerosol`, splits
   `time_step` across `sub_steps`, and clamps concentrations non-negative.
 
+## Native CPU strategy contract (E9-M3)
+
+The neutral spherical/rectangular and charged spherical/rectangular strategies
+accept explicitly tagged, single-box `ParticleData` directly. Configuration
+remains on the strategy. Each coefficient, rate and step call revalidates the
+current representation, physical state, environment, geometry and field values.
+Native strategy and particle distribution types must agree. Legacy facade
+execution remains available for unmigrated consumers; runnable/adapter migration
+belongs to M4.
+
+| Representation | Stored population | Rate measure | Native step |
+|---|---|---|---|
+| Discrete PMF | Bin number density, m⁻³, at V=1 | m⁻³ s⁻¹ | Existing forward Euler loss |
+| Radius PDF | dn/dr, m⁻⁴, at V=1 | m⁻⁴ s⁻¹ | Existing forward Euler loss; integrate inventories on `radius_grid` |
+| Particle resolved | Counts at positive physical V | Count/V per second, m⁻³ s⁻¹ | Bernoulli survival of each weighted representative |
+
+Density steps preserve per-particle mass and charge and publish only the
+concentration update. A negative or nonfinite Euler proposal rejects before
+mutation; use a smaller timestep. No exponential deterministic solver or
+concentration clipping is introduced. The coefficient laws retain their
+existing neutral transport, image-charge enhancement at zero potential, signed
+field drift and coefficient limiting behavior.
+
+Resolved survival uses `p = exp(-k * time_step)`. Unequal positive counts are
+supported: a representative either retains its entire raw count or is removed.
+Changing V changes density accounting, not its per-particle survival hazard.
+The existing neutral CPU helper draws for positive-radius slots, including
+unoccupied material carriers; charged CPU removal draws for occupied
+positive-radius slots. Native zero-time and wholly unoccupied calls perform
+validation but draw nothing. Rejections after a draw do not roll back RNG state.
+
+Removed occupied slots have their counts and species masses cleared. CPU charge
+storage is retained, including in removed slots, as in the existing CPU
+strategy. Surviving and previously unoccupied material remains unchanged.
+This is a CPU process contract, not a claim that removed charged slots satisfy
+the separate fixed-slot activation contract; M4 composition must respect that
+boundary. GPU removal has its own slot-clearing and RNG contract.
+
+Steps preserve the container and primary array identities. Preflight rejects
+unwritable destinations and aliases with protected state or array-backed
+geometry/field configuration. Density, volume, charge and the PDF radius grid
+remain protected; resolved masses are the additional writer. Independent tests
+account for removed species and weighted charge, rather than requiring a sink
+process to conserve its remaining inventory.
+
+Both CPU strategy suites must be run explicitly, in separate invocations:
+
+```bash
+pytest particula/dynamics/tests/wall_loss_strategies_test.py -q --no-cov
+pytest particula/dynamics/wall_loss/tests/wall_loss_strategies_test.py -q --no-cov
+pytest particula/dynamics/tests/native_wall_loss_test.py -q --no-cov
+```
+
+The adjacent `wall_loss/tests` directory is excluded from recursive discovery;
+the full package runner cannot substitute for its explicit check.
+
 ## Key Benefits
 
 - **Consistent dynamics workflow**: Use the same strategy-based API (`rate`, `step`, `distribution_type`) as for condensation and coagulation.
