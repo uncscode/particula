@@ -12,3 +12,6 @@ The entries above describe the historical planning-only state.
 | 2026-11-10 | Reconciled Draft/normalization/transfer wording; linked phase validation and final handoff evidence | Codex |
 
 Final maintainer acceptance and PR merge remain distinct from local implementation evidence. No later-track migration or release is claimed.
+
+2026-11-11: Reconciled the final handoff with merged P1–P5, optional Pint
+behavior, lognormal grid boundaries and pre-sampling modal-total rejection.

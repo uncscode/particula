@@ -8,15 +8,16 @@ capability/temporary-consumer ledgers, and eight data-only integration cases.
 P1–P5 each passed local focused, full-package and lint/type gates before the
 next phase began. See their phase records for exact predecessor commits.
 
-Final implementation revision: `f6304ff70d6ba60a2c7af2e9c01cdc409472b89c`.
+Original validation revision: `f6304ff70d6ba60a2c7af2e9c01cdc409472b89c`.
 All 15 final command groups completed with exit code 0. The revision remained
-unchanged throughout the run. The initial evidence-only follow-up changed documentation only. Later notebook
-CI repairs are recorded separately below; the package implementation remains
-identical to this full-suite tested revision.
+unchanged throughout that run. The later notebook repairs and initializer
+review fixes are recorded separately below. These historical results do not
+stand in for final validation of the updated branch.
 
 **Final M2 acceptance is pending Kyle Gorkowski.** Metadata remains In Progress
 for review and final sign-off; this does not mean construction implementation is
-missing. No PR merge, release, M3 admission or later-track migration is claimed.
+missing. P1–P5 have merged; P6 remains under review. No release, M3 admission
+or later-track migration is claimed.
 
 ## Phase PRs
 
@@ -147,3 +148,22 @@ The skip is `Biomass_Burning_Cloud_Interactions.ipynb`; it is not evidence of a
 completed simulation. The run selected only the 21 notebooks changed in P1.
 The delayed dependency-install job eventually completed and its notebook passed.
 Strict documentation build passed after updating this record.
+
+## Final PR update after P1–P5 merges (2026-11-11)
+
+Current base: `6414546bd7bf178a48c69761325fd059f53e01ba`. The final PR already
+contains this main revision; no additional merge commit is necessary. Verified
+phase merge commits are P1 `b7f3f1465`, P2 `df752ad38`, P3 `0803b91dd`,
+P4 `b1e6198aa`, and P5 `6414546bd`. The phase table above retains historical
+implementation commits; P1–P5 metadata now records Shipped on 2026-11-11.
+
+The final guide now incorporates all merged review/CI corrections:
+
+- Canonical SI initialization does not depend on optional Pint. Non-SI
+  conversions retain explicit dependency errors and targeted optional tests.
+- Lognormal PMFs need three nodes, PDFs need two, and direct radius
+  initialization still accepts two discrete bins.
+- Sampled modal totals must be finite; overflowing totals reject before RNG
+  use, while large finite totals remain supported.
+
+Final M2 acceptance remains separate from the five merged phase PRs.

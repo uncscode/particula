@@ -114,7 +114,8 @@ retain their grid. Empty discrete/resolved populations are supported; sampled
 presets require a positive integer sample count. Non-unit binned volumes reject.
 At initialization only, non-SI reference-volume conversion roundoff within four
 float64 ulps of one is canonicalized to exactly one; direct SI admission stays
-exact. Unit conversions use the existing conversion utility.
+exact. Canonical SI units work without Pint. Other unit spellings and
+conversions use the existing optional Pint conversion utility.
 
 For resolved inputs, `concentration_units="count"` is the default and does not
 rescale supplied weights. Explicit `"1/m^3"` or `"1/cm^3"` inputs multiply the
@@ -131,14 +132,20 @@ material density 1000 kg/m³, and zero charge. Supplied nodes/modes use
 `radius_units`; omitted defaults remain SI. GSD must exceed one, because the
 existing finite-width lognormal generator does not represent a delta function.
 The existing PDF and PMF algorithms retain their normalization on the supplied
-grid. Binned kind is always explicit; legacy `pdf`/`pmf` aliases are not used.
+grid. Lognormal discrete PMFs require at least three positive, strictly
+increasing nodes because the retained converter extrapolates its last bin
+width from two intervals. Lognormal PDFs require two nodes. Direct radius
+initialization still accepts two discrete bins with caller-supplied weights.
+Binned kind is always explicit; legacy `pdf`/`pmf` aliases are not used.
 
 Sampled defaults preserve 20,000 samples, volume 1 m³, and the same modal and
 material defaults. Modal densities control relative sampling weights only.
 Samples retain unit counts, so physical number density is sample count / volume,
 not the sum of the modal input densities. The existing NumPy/SciPy global random
 state is used; no new seed API or cross-backend replay guarantee is provided.
-Deterministic input validation happens before sampling.
+Deterministic input validation happens before sampling. Modal densities must
+have a finite total: individually finite inputs such as `[1e308, 1e308]` reject
+with `ValueError` before the sampler runs or global random state changes.
 
 Resolved density is per species; charge is per particle. Scalar and singleton
 forms broadcast. Redundant density population rows or charge species lanes may
