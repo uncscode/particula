@@ -82,10 +82,11 @@ described here; resolved coagulation requires equal positive active counts.
 
 Native CPU wall loss retains forward Euler for PMF/PDF and Bernoulli whole-
 representative removal for resolved counts, including unequal weights.
-Account for removed inventory as an explicit sink. CPU resolved removal
-retains charge storage when mass/count are cleared. Those slots therefore need
-not satisfy the separate activation free-slot contract. GPU removal instead
-clears charge as well. See [wall-loss contracts](wall_loss_strategy_system.md).
+Account for removed inventory as an explicit sink. M4 native CPU resolved removal
+clears charge together with mass/count, so removed slots satisfy the activation
+free-slot contract. Surviving and untouched inactive storage is preserved. This
+amends M3 charge retention without changing the CPU removal law. GPU removal
+also clears charge. See [wall-loss contracts](wall_loss_strategy_system.md).
 
 ## Direct/prepared Warp boundary
 

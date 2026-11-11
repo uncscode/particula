@@ -5,13 +5,15 @@ the CPU-only single-box nucleation process.
 """
 
 from dataclasses import dataclass
-from numbers import Real
+from numbers import Integral, Real
 from typing import Any, Protocol, cast
 
 import numpy as np
 from numpy.typing import NDArray
 
-from particula._legacy_aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.aerosol import Aerosol
+from particula.aerosol_validation import validate_aerosol_structure
 from particula.dynamics.dilution import (
     DilutionStrategy,
     _validate_nonnegative_scalar,
@@ -60,13 +62,56 @@ from .wall_loss.wall_loss_strategies import WallLossStrategy
 _MAX_NUCLEATION_SUB_STEPS = 10_000
 
 
+def _native_process_state(
+    aerosol: Aerosol,
+) -> tuple[ParticleData, GasData, float, float]:
+    """Read and validate the currently held single-box native process state.
+
+    This boundary never creates a facade or caches aggregate references.
+    Scientific strategies additionally validate their own physical inputs.
+    """
+    particles, gas, environment = (
+        aerosol.particles,
+        aerosol.gas,
+        aerosol.environment,
+    )
+    validate_aerosol_structure(particles, gas, environment)
+    particles.validate_representation()
+    if particles.n_boxes != 1:
+        raise ValueError("CPU runnables require exactly one box.")
+    temperature = float(environment.temperature[0])
+    pressure = float(environment.pressure[0])
+    if not all(
+        np.isfinite(value) and value > 0 for value in (temperature, pressure)
+    ):
+        raise ValueError(
+            "temperature and pressure must be finite and positive."
+        )
+    return particles, gas, temperature, pressure
+
+
+def _native_duration(time_step: float, sub_steps: int) -> float:
+    """Validate equal-substep controls before any native process mutation."""
+    if (
+        isinstance(sub_steps, (bool, np.bool_))
+        or not isinstance(sub_steps, Integral)
+        or sub_steps <= 0
+    ):
+        raise ValueError("sub_steps must be a positive integer.")
+    return _validate_nonnegative_scalar(time_step, "time_step") / sub_steps
+
+
 class DilutionStrategyProtocol(Protocol):
     """Structural contract for strategies compatible with ``Dilution``."""
 
-    def rate(self, aerosol: Aerosol) -> float | NDArray[np.float64]:
+    def rate(
+        self, aerosol: Aerosol | LegacyAerosol
+    ) -> float | NDArray[np.float64]:
         """Return the particle-number concentration rate."""
 
-    def step(self, aerosol: Aerosol, time_step: float) -> Aerosol:
+    def step(
+        self, aerosol: Aerosol | LegacyAerosol, time_step: float
+    ) -> Aerosol | LegacyAerosol:
         """Apply one dilution step to an aerosol."""
 
 
@@ -234,7 +279,7 @@ class Nucleation(RunnableABC):
         self.environment = environment
 
     def _topology(  # noqa: C901
-        self, aerosol: Aerosol
+        self, aerosol: Aerosol | LegacyAerosol
     ) -> tuple[ParticleRepresentation, ParticleData, GasData]:
         """Validate and return the supported facade backing containers."""
         try:
@@ -353,7 +398,7 @@ class Nucleation(RunnableABC):
             saturation=saturation,
         )
 
-    def rate(self, aerosol: Aerosol) -> float:
+    def rate(self, aerosol: Aerosol | LegacyAerosol) -> float:
         """Calculate the current single-box potential event rate [#/m³/s].
 
         Args:
@@ -374,10 +419,10 @@ class Nucleation(RunnableABC):
 
     def execute(
         self,
-        aerosol: Aerosol,
+        aerosol: Aerosol | LegacyAerosol,
         time_step: float | np.number,
         sub_steps: int | np.integer = 1,
-    ) -> Aerosol:
+    ) -> Aerosol | LegacyAerosol:
         """Apply nucleation in equal sequential substeps.
 
         Each substep reads the gas concentration left by preceding successful
@@ -500,8 +545,11 @@ class MassCondensation(RunnableABC):
         self.condensation_strategy = condensation_strategy
 
     def execute(
-        self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
-    ) -> Aerosol:
+        self,
+        aerosol: Aerosol | LegacyAerosol,
+        time_step: float,
+        sub_steps: int = 1,
+    ) -> Aerosol | LegacyAerosol:
         """Perform the mass condensation process over a given time step.
 
         Arguments:
@@ -520,6 +568,24 @@ class MassCondensation(RunnableABC):
             # The aerosol now has reduced/increased particle/gas mass
             ```
         """
+        if isinstance(aerosol, Aerosol):
+            duration = _native_duration(time_step, sub_steps)
+            for _ in range(sub_steps):
+                particles, gas, temperature, pressure = _native_process_state(
+                    aerosol
+                )
+                result = self.condensation_strategy.step(
+                    particle=particles,
+                    gas_species=gas,
+                    temperature=temperature,
+                    pressure=pressure,
+                    time_step=duration,
+                )
+                if result[0] is not particles or result[1] is not gas:
+                    raise ValueError(
+                        "Native condensation must retain its containers."
+                    )
+            return aerosol
         for _ in range(sub_steps):
             # calculate the condensation step for strategy
             particles_out, gas_out = self.condensation_strategy.step(
@@ -533,7 +599,7 @@ class MassCondensation(RunnableABC):
             aerosol.atmosphere.partitioning_species = cast(GasSpecies, gas_out)
         return aerosol
 
-    def rate(self, aerosol: Aerosol) -> Any:
+    def rate(self, aerosol: Aerosol | LegacyAerosol) -> Any:
         """Compute mass condensation rates for each particle.
 
         Arguments:
@@ -549,6 +615,16 @@ class MassCondensation(RunnableABC):
             # rates may look like array([1.2e-12, 4.5e-12, ...])
             ```
         """
+        if isinstance(aerosol, Aerosol):
+            particles, gas, temperature, pressure = _native_process_state(
+                aerosol
+            )
+            return self.condensation_strategy.rate(
+                particle=particles,
+                gas_species=gas,
+                temperature=temperature,
+                pressure=pressure,
+            )
         return self.condensation_strategy.rate(
             particle=aerosol.particles,
             gas_species=aerosol.atmosphere.partitioning_species,
@@ -598,8 +674,11 @@ class Coagulation(RunnableABC):
         self.coagulation_strategy = coagulation_strategy
 
     def execute(
-        self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
-    ) -> Aerosol:
+        self,
+        aerosol: Aerosol | LegacyAerosol,
+        time_step: float,
+        sub_steps: int = 1,
+    ) -> Aerosol | LegacyAerosol:
         """Perform the coagulation process over a given time step.
 
         Arguments:
@@ -619,6 +698,23 @@ class Coagulation(RunnableABC):
             # The aerosol now reflects changes from particle collisions
             ```
         """
+        if isinstance(aerosol, Aerosol):
+            duration = _native_duration(time_step, sub_steps)
+            for _ in range(sub_steps):
+                particles, _, temperature, pressure = _native_process_state(
+                    aerosol
+                )
+                result = self.coagulation_strategy.step(
+                    particle=particles,
+                    temperature=temperature,
+                    pressure=pressure,
+                    time_step=duration,
+                )
+                if result is not particles:
+                    raise ValueError(
+                        "Native coagulation must retain its container."
+                    )
+            return aerosol
         # Loop over particles
         for _ in range(sub_steps):
             # Calculate the coagulation step for the particle
@@ -630,7 +726,7 @@ class Coagulation(RunnableABC):
             )  # type: ignore[assignment]
         return aerosol
 
-    def rate(self, aerosol: Aerosol) -> Any:
+    def rate(self, aerosol: Aerosol | LegacyAerosol) -> Any:
         """Compute the coagulation rate for each particle in the aerosol.
 
         Arguments:
@@ -646,6 +742,13 @@ class Coagulation(RunnableABC):
             # rates might look like array([0.1, 0.05, ...])
             ```
         """
+        if isinstance(aerosol, Aerosol):
+            particles, _, temperature, pressure = _native_process_state(aerosol)
+            return self.coagulation_strategy.net_rate(
+                particle=particles,
+                temperature=temperature,
+                pressure=pressure,
+            )
         rates = np.array([], dtype=np.float64)
         # Calculate the net coagulation rate for the particle
         net_rate = self.coagulation_strategy.net_rate(
@@ -694,6 +797,9 @@ class WallLoss(RunnableABC):
         Args:
             particle: Particle object whose concentration is clipped in place.
         """
+        if isinstance(particle, ParticleData):
+            np.maximum(particle.concentration, 0.0, out=particle.concentration)
+            return
         concentration = particle.get_concentration()
         clipped_concentration = np.clip(concentration, 0.0, None)
         if not np.array_equal(clipped_concentration, concentration):
@@ -702,8 +808,11 @@ class WallLoss(RunnableABC):
             )
 
     def execute(
-        self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
-    ) -> Aerosol:
+        self,
+        aerosol: Aerosol | LegacyAerosol,
+        time_step: float,
+        sub_steps: int = 1,
+    ) -> Aerosol | LegacyAerosol:
         """Apply wall loss over the provided time step.
 
         Concentrations are clamped to remain non-negative after each
@@ -717,6 +826,24 @@ class WallLoss(RunnableABC):
         Returns:
             Aerosol with updated particle concentrations.
         """
+        if isinstance(aerosol, Aerosol):
+            duration = _native_duration(time_step, sub_steps)
+            for _ in range(sub_steps):
+                particles, _, temperature, pressure = _native_process_state(
+                    aerosol
+                )
+                result = self.wall_loss_strategy.step(
+                    particle=particles,
+                    temperature=temperature,
+                    pressure=pressure,
+                    time_step=duration,
+                )
+                if result is not particles:
+                    raise ValueError(
+                        "Native wall loss must retain its container."
+                    )
+                self._clamp_non_negative(particles)
+            return aerosol
         for _ in range(sub_steps):
             aerosol.particles = self.wall_loss_strategy.step(
                 particle=aerosol.particles,
@@ -727,7 +854,7 @@ class WallLoss(RunnableABC):
             self._clamp_non_negative(aerosol.particles)
         return aerosol
 
-    def rate(self, aerosol: Aerosol) -> Any:
+    def rate(self, aerosol: Aerosol | LegacyAerosol) -> Any:
         """Return the wall loss rate for the aerosol particles.
 
         Args:
@@ -736,6 +863,13 @@ class WallLoss(RunnableABC):
         Returns:
             Array of wall loss rates matching the particle representation.
         """
+        if isinstance(aerosol, Aerosol):
+            particles, _, temperature, pressure = _native_process_state(aerosol)
+            return self.wall_loss_strategy.rate(
+                particle=particles,
+                temperature=temperature,
+                pressure=pressure,
+            )
         return self.wall_loss_strategy.rate(
             particle=aerosol.particles,
             temperature=aerosol.atmosphere.temperature,
@@ -769,7 +903,9 @@ class Dilution(RunnableABC):
         """
         self.dilution_strategy = dilution_strategy
 
-    def rate(self, aerosol: Aerosol) -> float | NDArray[np.float64]:
+    def rate(
+        self, aerosol: Aerosol | LegacyAerosol
+    ) -> float | NDArray[np.float64]:
         """Delegate particle-number dilution-rate evaluation to the strategy.
 
         Args:
@@ -783,10 +919,10 @@ class Dilution(RunnableABC):
 
     def execute(
         self,
-        aerosol: Aerosol,
+        aerosol: Aerosol | LegacyAerosol,
         time_step: float | np.number,
         sub_steps: int | np.integer = 1,
-    ) -> Aerosol:
+    ) -> Aerosol | LegacyAerosol:
         """Apply dilution as equal, sequential substeps over a total duration.
 
         The runnable validates the total duration and substep count before
@@ -796,7 +932,7 @@ class Dilution(RunnableABC):
         with responsibility for aerosol validation, mutation, and atomicity.
 
         Args:
-            aerosol: Aerosol to mutate in place.
+            aerosol: Aerosol | LegacyAerosol to mutate in place.
             time_step: Total elapsed time [s], finite and nonnegative.
             sub_steps: Positive count of equal internal dilution steps.
 
