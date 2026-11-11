@@ -177,3 +177,4 @@ trees/
 logs/
 .opencode.backup.*/
 adforge_local/
+.codegraph/

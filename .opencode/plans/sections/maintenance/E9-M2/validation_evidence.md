@@ -196,3 +196,11 @@ and adjacent logs. Commands follow the earlier exact ledger with the current
 worktree and repository `.venv`, plus CI-scope Ruff check/format and the Pint-free
 initializer/integration run. Native CUDA and Warp CPU were available. Previous
 notebook execution results remain separately attributed to their tested revision.
+
+## Final maintainer acceptance and merge (2026-11-11)
+
+Kyle confirmed “M2 is completed” and authorized the M3 implementation plan.
+PR #1630 is merged at `fd114270a3e847a6b7b51a2c2ef2f7e5c27ecb4b`,
+the M3 entry baseline. This resolves the historical pending acceptance above;
+the reported validation remains attributed to its actual tested revision.
+M2 and P6 are Shipped. M3 is admitted; M4 remains gated on M3 completion.
