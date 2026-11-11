@@ -26,6 +26,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 # %% [markdown]
 # ## Aerosol Setup
@@ -142,7 +143,7 @@ paritcle_rep = (
     .build()
 )
 
-aerosol = par.Aerosol(atmosphere=atmosphere, particles=paritcle_rep)
+aerosol = LegacyAerosol(atmosphere=atmosphere, particles=paritcle_rep)
 
 print(aerosol)
 

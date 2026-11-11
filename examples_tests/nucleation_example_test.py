@@ -30,6 +30,7 @@ def test_cpu_nucleation_example_uses_public_imports_without_source_helpers():
     } <= imports
     assert imports <= {
         "__future__",
+        "particula._legacy_aerosol",  # E9-M5 migrates; M6 removes.
         "particula",
         "particula.dynamics",
         "particula.gas",

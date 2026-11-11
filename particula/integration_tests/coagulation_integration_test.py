@@ -10,6 +10,7 @@ import unittest
 
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 
 class TestCoagulationIntegration(unittest.TestCase):
@@ -59,7 +60,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_density(self.density, "kg/m^3")
             .build()
         )
-        aerosol_pmf = par.Aerosol(
+        aerosol_pmf = LegacyAerosol(
             atmosphere=self.atmosphere, particles=particle_pmf
         )
         self.assertIsNotNone(aerosol_pmf)
@@ -90,7 +91,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_charge(np.zeros_like(self.radius_bins))
             .build()
         )
-        aerosol_pdf = par.Aerosol(
+        aerosol_pdf = LegacyAerosol(
             atmosphere=self.atmosphere, particles=particle_pdf
         )
         self.assertIsNotNone(aerosol_pdf)
@@ -126,7 +127,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_volume(self.volume, "m^3")
             .build()
         )
-        aerosol_resolved = par.Aerosol(
+        aerosol_resolved = LegacyAerosol(
             atmosphere=self.atmosphere, particles=resolved_masses
         )
         self.assertIsNotNone(aerosol_resolved)
@@ -156,7 +157,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_density(self.density, "kg/m^3")
             .build()
         )
-        aerosol_pmf = par.Aerosol(
+        aerosol_pmf = LegacyAerosol(
             atmosphere=self.atmosphere, particles=particle_pmf
         )
         initial_mass_pmf = aerosol_pmf.particles.get_mass_concentration(
@@ -191,7 +192,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_charge(np.zeros_like(self.radius_bins))
             .build()
         )
-        aerosol_pdf = par.Aerosol(
+        aerosol_pdf = LegacyAerosol(
             atmosphere=self.atmosphere, particles=particle_pdf
         )
         initial_mass_pdf = aerosol_pdf.particles.get_mass_concentration(
@@ -232,7 +233,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_volume(self.volume, "m^3")
             .build()
         )
-        aerosol_resolved = par.Aerosol(
+        aerosol_resolved = LegacyAerosol(
             atmosphere=self.atmosphere, particles=resolved_masses
         )
         initial_mass_resolved = (
@@ -279,7 +280,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_density(self.density, "kg/m^3")
             .build()
         )
-        aerosol_pmf = par.Aerosol(
+        aerosol_pmf = LegacyAerosol(
             atmosphere=self.atmosphere, particles=particle_pmf
         )
         initial_mass_pmf = aerosol_pmf.particles.get_mass_concentration()
@@ -305,7 +306,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_charge(np.zeros_like(self.radius_bins))
             .build()
         )
-        aerosol_pdf = par.Aerosol(
+        aerosol_pdf = LegacyAerosol(
             atmosphere=self.atmosphere, particles=particle_pdf
         )
         initial_mass_pdf = aerosol_pdf.particles.get_mass_concentration()
@@ -340,7 +341,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_volume(self.volume, "m^3")
             .build()
         )
-        aerosol_resolved = par.Aerosol(
+        aerosol_resolved = LegacyAerosol(
             atmosphere=self.atmosphere, particles=resolved_masses
         )
         initial_mass_resolved = (

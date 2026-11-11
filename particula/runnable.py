@@ -30,7 +30,7 @@ else:
     AVAILABLE_TQDM = True
 
 
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 
 
 class RunnableABC(ABC):

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 
 class ExampleResult:
@@ -66,7 +67,7 @@ class ExampleResult:
         raise AttributeError("ExampleResult is immutable")
 
 
-def _build_aerosol() -> par.Aerosol:
+def _build_aerosol() -> LegacyAerosol:
     """Build a deterministic CPU aerosol with three concentration domains."""
     particles = par.particles.ParticleRepresentation(
         strategy=par.particles.MassBasedMovingBin(),
@@ -96,7 +97,7 @@ def _build_aerosol() -> par.Aerosol:
         partitioning_species=partitioning,
         gas_only_species=gas_only,
     )
-    return par.Aerosol(atmosphere=atmosphere, particles=particles)
+    return LegacyAerosol(atmosphere=atmosphere, particles=particles)
 
 
 def run_example() -> ExampleResult:

@@ -45,6 +45,7 @@ import numpy as np
 
 # particula imports
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 # %% [markdown]
 # ## Setup Aerosol
@@ -103,7 +104,7 @@ lognormal_rep = (
     .build()
 )
 
-aerosol = par.Aerosol(atmosphere=atmosphere, particles=lognormal_rep)
+aerosol = LegacyAerosol(atmosphere=atmosphere, particles=lognormal_rep)
 
 print(aerosol)
 

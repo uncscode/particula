@@ -6,7 +6,7 @@ zero duration or zero rate paths are no-ops.
 """
 
 import numpy as np
-from particula import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.dynamics import (
     ActivationNucleationBuilder,
     Nucleation,

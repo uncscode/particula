@@ -20,8 +20,8 @@ aerosol = (
 import logging
 from typing import Optional
 
+from particula._legacy_aerosol import Aerosol
 from particula.abc_builder import BuilderABC
-from particula.aerosol import Aerosol
 from particula.gas.atmosphere import Atmosphere
 from particula.particles.representation import ParticleRepresentation
 

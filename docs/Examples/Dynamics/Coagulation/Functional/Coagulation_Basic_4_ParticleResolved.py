@@ -27,6 +27,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 # %% [markdown]
 # ## Build a particle-resolved aerosol
@@ -68,7 +69,7 @@ particles_resolved = (
     .build()
 )
 
-aerosol_resolved = par.Aerosol(
+aerosol_resolved = LegacyAerosol(
     atmosphere=atmosphere, particles=particles_resolved
 )
 

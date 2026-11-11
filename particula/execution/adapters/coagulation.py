@@ -26,7 +26,7 @@ from math import prod
 from numbers import Integral, Real
 from typing import TYPE_CHECKING, Any, cast
 
-from particula.aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol
 from particula.dynamics import Coagulation
 from particula.dynamics.coagulation.coagulation_strategy import (
     brownian_coagulation_strategy,

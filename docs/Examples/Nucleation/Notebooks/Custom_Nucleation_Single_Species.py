@@ -43,6 +43,7 @@ import numpy as np
 # particula
 import particula as par
 from IPython import get_ipython
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 ipython = get_ipython()
 if ipython is not None:
@@ -201,7 +202,7 @@ def ensure_single_species_shapes(
     particles.strategy.add_concentration = _add_concentration_single_species
 
 
-def build_aerosol() -> par.Aerosol:
+def build_aerosol() -> LegacyAerosol:
     """Construct a single-species aerosol with gas and particle setup.
 
     Returns:
@@ -243,7 +244,7 @@ def build_aerosol() -> par.Aerosol:
     ensure_single_species_shapes(resolved_masses)
     resolved_masses.charge = np.zeros_like(resolved_masses.concentration)
 
-    return par.Aerosol(atmosphere=atmosphere_local, particles=resolved_masses)
+    return LegacyAerosol(atmosphere=atmosphere_local, particles=resolved_masses)
 
 
 aerosol = build_aerosol()
@@ -403,7 +404,7 @@ ensure_single_species_shapes(resolved_masses)
 resolved_masses.charge = np.zeros_like(resolved_masses.concentration)
 
 # Create the aerosol object with the atmosphere and particles
-aerosol = par.Aerosol(atmosphere=atmosphere, particles=resolved_masses)
+aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
 
 # Print the properties of the created aerosol system
 print(aerosol)

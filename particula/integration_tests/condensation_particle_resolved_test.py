@@ -5,6 +5,7 @@ import unittest
 import numpy as np
 import numpy.testing as npt
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 
 class TestCondensationParticleResolved(unittest.TestCase):
@@ -88,7 +89,7 @@ class TestCondensationParticleResolved(unittest.TestCase):
             .set_surface_tension(np.array([0.072, 0.092]), "N/m")
             .build()
         )
-        self.aerosol = par.Aerosol(
+        self.aerosol = LegacyAerosol(
             atmosphere=self.atmosphere,
             particles=(
                 par.particles.ResolvedParticleMassRepresentationBuilder()

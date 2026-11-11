@@ -2,6 +2,7 @@
 
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 
 def test_quick_start_runs():
@@ -63,4 +64,4 @@ def test_quick_start_runs():
     #   The result is an Aerosol instance with updated particle properties.
     # print(result)
     # 8. Confirm the result is an Aerosol instance:
-    assert isinstance(result, par.Aerosol)
+    assert isinstance(result, LegacyAerosol)

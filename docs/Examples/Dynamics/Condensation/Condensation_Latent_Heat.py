@@ -48,6 +48,7 @@ import copy
 
 import numpy as np
 import particula as par
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 CPU_ONLY_NOTE = (
     "CPU-only example: this workflow uses public CPU condensation APIs only."
@@ -77,7 +78,7 @@ def _as_float(value: float | np.ndarray) -> float:
     return float(np.asarray(value, dtype=np.float64).reshape(-1)[0])
 
 
-def _build_aerosol() -> par.Aerosol:
+def _build_aerosol() -> LegacyAerosol:
     """Build a small supersaturated single-species aerosol state.
 
     Returns:
@@ -126,7 +127,7 @@ def _build_aerosol() -> par.Aerosol:
         .set_volume(1.0e-6, "m^3")
         .build()
     )
-    return par.Aerosol(atmosphere=atmosphere, particles=particles)
+    return LegacyAerosol(atmosphere=atmosphere, particles=particles)
 
 
 def run_example() -> dict[str, float | list[float] | str | int]:
@@ -171,7 +172,7 @@ def run_example() -> dict[str, float | list[float] | str | int]:
         condensation_strategy=condensation_strategy
     )
 
-    current = par.Aerosol(
+    current = LegacyAerosol(
         atmosphere=copy.deepcopy(aerosol.atmosphere),
         particles=copy.deepcopy(aerosol.particles),
     )
