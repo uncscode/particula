@@ -35,7 +35,7 @@ issue: #1606. This supersedes the old multiple-PR and issue-generation wording.
 | 7. Communication and physical volume evolution | Implemented; focused checks pass |
 | 8. Native resident/prepared metadata and diagnostics | Implemented; focused checks pass |
 | 9. Schema-v5 checkpoints and exact-device continuation | Implemented; focused checks pass |
-| 10. Complete native composed-process regressions | Pending |
+| 10. Complete native composed-process regressions | Implemented; focused checks pass |
 | 11. Final validation and developer handoff | Pending |
 
 Each functional checkpoint includes adjacent tests and literal evidence before
@@ -182,3 +182,18 @@ Focused checkpoint evidence follows. Final acceptance remains pending.
   records support the inventoried transition without relabeling native data.
 - Native tests found Warp CPU inspection could alias resident arrays. Checkpoint
   now detaches every inspection field on all backends before publishing bytes.
+
+### Checkpoint 10
+
+- Real native CPU five-runnable sequence and native CPU/CUDA complete prepared
+  loops plus mapping-drift rejection: **9 passed**. No process adapter is mocked.
+- Prepared cases cover uptake/dilution and source injection separately, preserving
+  the existing integral-event GPU source contract and equal-weight coagulation
+  restriction. Explicit gas replacement is accounted for as a prescribed input;
+  per-species inventories, diagnostics and restart continuation retain existing
+  tolerances. Enqueue forbids allocation, readback and synchronization.
+- Native composition forbids legacy facade construction. Restart explicitly
+  creates new process mappings for fresh carriers; normal dispatch never rebinds.
+- Native full-loop fixtures use no selected wall-loss boxes; real selected-wall
+  removal and native stochastic restart are independently covered in checkpoints
+  8–9. Existing communication fixtures cover nonzero transport and volume change.
