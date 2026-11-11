@@ -16,7 +16,7 @@ or M3 implementation is claimed. Final-revision evidence is in
 | P3 | Native fluent builder, constructor-consistent admission and repeated-build identity; temporary legacy builder | #1627, `p3_validation.md` |
 | P4 | Owned single-material radius and lognormal PDF/PMF native initialization | #1628, `p4_validation.md` |
 | P5 | Owned direct resolved mass/count/density and sampled-lognormal initialization | #1629, `p5_validation.md` |
-| P6 | Bounded developer guide, data-only integration, reconciled ledgers and final validation | Final phase PR, `validation_evidence.md` |
+| P6 | Bounded developer guide, data-only integration, reconciled ledgers and final validation | #1630, `validation_evidence.md` |
 
 ## Contract applied to every phase
 

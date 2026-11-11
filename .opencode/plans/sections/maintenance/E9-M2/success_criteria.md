@@ -1,6 +1,6 @@
 # Success Criteria
 
-P1–P5 implementation gates are locally validated. P6 final-revision checks and
+P1–P6 implementation gates are locally validated. P6 final-revision checks and
 maintainer acceptance are recorded in `validation_evidence.md`; no acceptance
 is inferred from plan approval.
 
@@ -16,7 +16,7 @@ is inferred from plan approval.
 - [x] No process-owned physics moves onto state; no implicit GPU rebind occurs.
 - [x] Existing runnable/scientific behavior remains protected pending M3/M4;
   every temporary compatibility seam has an explicit M6 removal owner/gate.
-- [ ] Focused assertions, untargeted full-package coverage, required lint/type
+- [x] Focused assertions, untargeted full-package coverage, required lint/type
   and bounded docs checks pass at the final M2 revision.
 - [ ] Maintainer accepts the M3 handoff packet; no earlier M3 implementation.
 
