@@ -75,3 +75,16 @@ The six native-foundation assertions and fourteen transfer assertions pass
 coordinate conversion now includes the explicit 2e6 Jacobian and an independent
 population/material-integral regression. Final P1 ledger and snippet audit
 remain pending; this checkpoint does not complete M5.
+
+### P1 execution and inventory audit
+
+All twelve P1 Python entrypoints executed directly with repository `.venv`,
+`MPLBACKEND=Agg`, `MPLCONFIGDIR=/tmp/particula-m5-mpl`, and
+`WARP_CACHE_PATH=/tmp/particula-m5-warp`; every exit code was zero. All ten
+paired notebooks also executed and retain outputs. Functional activity,
+surface and vapor-pressure examples retain their independent strategies;
+no executable facade imports or conversion bridges remain in P1 sources.
+Topic-index paths remain stable; discovery-based MkDocs navigation includes
+these pages. The inventory assigns later published snippet migration to P6/P7.
+P1 implementation gate is passed at the foundation checkpoint plus this
+record. Final M5-wide validation and acceptance remain pending.

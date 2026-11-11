@@ -70,8 +70,11 @@
       ],
       "regression": "examples_tests/native_foundations_example_test.py",
       "scientific_expectation": null,
-      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/Aerosol/Aerosol_Tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.py",
@@ -148,8 +151,11 @@
       "legacy_patterns": [],
       "regression": "examples_tests/data_containers_example_test.py",
       "scientific_expectation": "counts [1,0.25] / volume 1e-6; density [1e6,2.5e5]; independent material inventory and preserved transfer metadata",
-      "execution": "both standalone entrypoints and 14 tests passed 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/Data_Containers/data_containers_and_gpu_foundations.py"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.py",
@@ -429,8 +435,11 @@
       ],
       "regression": "examples_tests/native_foundations_example_test.py",
       "scientific_expectation": null,
-      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/Gas_Phase/Notebooks/AtmosphereTutorial.ipynb"
     },
     {
       "source": "docs/Examples/Gas_Phase/Notebooks/Gas_Species.py",
@@ -442,8 +451,11 @@
       ],
       "regression": "examples_tests/native_foundations_example_test.py",
       "scientific_expectation": "SI gas conversion, ordered species and independent Antoine/ideal-gas ratios; coefficients retained, not physically requalified",
-      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/Gas_Phase/Notebooks/Gas_Species.ipynb"
     },
     {
       "source": "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.py",
@@ -453,8 +465,11 @@
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/Gas_Phase/Notebooks/Vapor_Pressure.ipynb"
     },
     {
       "source": "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.py",
@@ -502,8 +517,11 @@
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.py",
@@ -513,8 +531,11 @@
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/Particle_Phase/Notebooks/Aerosol_Distributions.ipynb"
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.py",
@@ -524,8 +545,11 @@
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/Particle_Phase/Notebooks/Distribution_Tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.py",
@@ -535,8 +559,11 @@
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.ipynb"
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.py",
@@ -549,8 +576,11 @@
       ],
       "regression": "examples_tests/native_foundations_example_test.py",
       "scientific_expectation": "spherical particle masses; three independent material inventories; total modal number 2e10 m^-3",
-      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.py",
@@ -560,8 +590,11 @@
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.py",
@@ -677,8 +710,11 @@
       "legacy_patterns": [],
       "regression": "examples_tests/data_containers_example_test.py",
       "scientific_expectation": "counts [1,0.25] / volume 1e-6; density [1e6,2.5e5]; independent material inventory and preserved transfer metadata",
-      "execution": "both standalone entrypoints and 14 tests passed 2026-11-11",
-      "evidence": []
+      "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
+      "evidence": [
+        "implementation.md#foundation-checkpoint-validation"
+      ],
+      "published_link": "Examples/data_containers_and_gpu_foundations.py"
     },
     {
       "source": "docs/Examples/gpu_coagulation_direct.py",
@@ -764,469 +800,547 @@
       "path": "readme.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "AGENTS.md",
       "python_fences": 9,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P7"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Aerosol/Aerosol_Tutorial.md",
       "python_fences": 3,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.md",
       "python_fences": 6,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.md",
       "python_fences": 10,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.md",
       "python_fences": 14,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.md",
       "python_fences": 4,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.md",
       "python_fences": 4,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.md",
       "python_fences": 12,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.md",
       "python_fences": 15,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.md",
       "python_fences": 8,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.md",
       "python_fences": 15,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.md",
       "python_fences": 10,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Condensation/Condensation_1_Bin.md",
       "python_fences": 3,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.md",
       "python_fences": 5,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.md",
       "python_fences": 8,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.md",
       "python_fences": 5,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Equilibria/Notebooks/activity_part1.md",
       "python_fences": 6,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Equilibria/Notebooks/equilibria_part1.md",
       "python_fences": 5,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.md",
       "python_fences": 4,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Gas_Phase/Notebooks/Gas_Species.md",
       "python_fences": 6,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.md",
       "python_fences": 8,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.md",
       "python_fences": 9,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.md",
       "python_fences": 5,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.md",
       "python_fences": 9,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.md",
       "python_fences": 4,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.md",
       "python_fences": 6,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.md",
       "python_fences": 4,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.md",
       "python_fences": 5,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.md",
       "python_fences": 7,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.md",
       "python_fences": 14,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.md",
       "python_fences": 12,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.md",
       "python_fences": 12,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Accelerating_Python/Details/One-Line_Vision.md",
       "python_fences": 8,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Accelerating_Python/Details/Taichi_Exploration.md",
       "python_fences": 9,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Accelerating_Python/index.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Code_Concepts/Details/Design_Patterns.md",
       "python_fences": 2,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Code_Concepts/Details/Object_Oriented_Patterns.md",
       "python_fences": 6,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Fluid_and_Particle_Properties_Comparison.md",
       "python_fences": 10,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Horizontal_Velocity_Comparison.md",
       "python_fences": 5,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Kernel_Comparison.md",
       "python_fences": 7,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Distribution_Comparison.md",
       "python_fences": 5,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Relative_Velocity_Comparison.md",
       "python_fences": 8,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/ionparticle_coagulation.md",
       "python_fences": 4,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Properties/dynamic_viscosity.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Properties/mean_free_path.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Examples/Activity/index.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/Roadmap/data-oriented-gpu.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/Roadmap/warp-autodiff-limitations.md",
       "python_fences": 7,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/activity_system.md",
       "python_fences": 11,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/backend_selection.md",
       "python_fences": 2,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/coagulation_strategy_system.md",
       "python_fences": 21,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/condensation_strategy_system.md",
       "python_fences": 19,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/data-containers-and-gpu-foundations.md",
       "python_fences": 16,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/dilution_strategy_system.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/native_scientific_processes.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/nucleation_strategy_system.md",
       "python_fences": 4,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/particle-data-migration/construction.md",
       "python_fences": 2,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/particle-data-migration/containers.md",
       "python_fences": 6,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/particle-data-migration/dynamics.md",
       "python_fences": 2,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/particle-data-migration/troubleshooting.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/slot_exhaustion_policies.md",
       "python_fences": 2,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Features/wall_loss_strategy_system.md",
       "python_fences": 11,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Theory/Accelerating_Python/Details/One-Line_Vision.md",
       "python_fences": 8,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Theory/Accelerating_Python/index.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Theory/Activity_Calculations/activity_theory.md",
       "python_fences": 2,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Theory/Activity_Calculations/equilibria_theory.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Theory/Code_Concepts/Details/Design_Patterns.md",
       "python_fences": 2,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Theory/Code_Concepts/Details/Object_Oriented_Patterns.md",
       "python_fences": 6,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Theory/nvidia-warp/datastructures.md",
       "python_fences": 16,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Theory/nvidia-warp/examples/fluids.md",
       "python_fences": 9,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Theory/nvidia-warp/examples/geometry.md",
       "python_fences": 11,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Theory/nvidia-warp/index.md",
       "python_fences": 3,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/Theory/nvidia-warp/kernels.md",
       "python_fences": 12,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     },
     {
       "path": "docs/contribute/Code_Specifications/Details/Function_docstring_format.md",
       "python_fences": 2,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P7"
     },
     {
       "path": "docs/contribute/Feature_Workflow/Details/Add_Unit_Test.md",
       "python_fences": 2,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P7"
     },
     {
       "path": "docs/contribute/Feature_Workflow/Details/Add_to_init.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P7"
     },
     {
       "path": "docs/index.md",
       "python_fences": 1,
       "disposition": "pending audit",
-      "execution": "pending"
+      "execution": "pending",
+      "phase": "P6"
     }
   ],
   "additional_entrypoints": [
@@ -1245,6 +1359,6 @@
   ],
   "navigation_audit": {
     "path": "mkdocs.yml",
-    "status": "pending"
+    "status": "P1 topic indexes checked; MkDocs uses discovered docs navigation; final tree audit pending P7"
   }
 }

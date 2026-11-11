@@ -6,13 +6,13 @@ and held nucleation environment. Explain intentional normalization corrections
 and metadata/checkpoint migration; do not claim old numerical errors are parity
 targets. Phase P5 also exercises corrected CPU/GPU non-unit-volume boundaries.
 
-All seven phases are Not Started, serial and issue-sized. Every phase consumes
+Phases execute serially within one PR; current evidence is in implementation.md. Every phase consumes
 its predecessor's validated gate; P1 additionally requires M4 completed and
 validated. Example functions and their unit/regression tests ship together.
 Notebook sync/execution occurs in the owning phase, not deferred to P7.
 
-- [ ] **E9-M5-P1: Inventory supported workflows and migrate foundational tutorials with regression fixtures**
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E9-M5-P1: Inventory supported workflows and migrate foundational tutorials with regression fixtures**
+  - Issue: #1609 | Size: S | Status: Implemented and validated
   - Work: Reconcile appendix inventory with full examples tree, indexes, API
     snippets and navigation. Record old/new API and numerical-baseline mapping.
     Migrate Aerosol, Gas_Species, AtmosphereTutorial, Particle_Representation,
