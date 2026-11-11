@@ -8,6 +8,8 @@ single-PR plan in the attached goal objective. Entry baseline is merged M2
 Branch: `codex/e9-m3-scientific-processes`; issue #1605.
 This record supersedes contradictory September M3 planning wording. All
 implementation and validation below remain pending unless explicitly recorded.
+P6's final integration, assertion/compatibility inventory and review handoff
+are recorded in [p6_validation.md](p6_validation.md).
 
 ## Scientific contract
 
@@ -33,7 +35,7 @@ implementation and validation below remain pending unless explicitly recorded.
 |---|---|---|---|
 | CPU condensation | Isothermal, staggered half/random/batch, latent heat; uptake, evaporation, reservoir | PMF/PDF at V=1, resolved positive V; weighted inventories and mapped species | condensation strategies, mass-transfer, staggered conservation/stability and new native tests |
 | CPU coagulation rates | Brownian, charged, sedimentation, turbulent shear, turbulent DNS, combined | Discrete/PDF density rates; explicit matching representation; physical kernel inputs | all seven strategy test modules and independent rate fixtures |
-| CPU coagulation steps | Existing discrete/PDF update and resolved binned/direct selector | Audit resolved selector weights before admission; reject unsupported unequal weights; preserve per-species mass | ABC and particle_resolved_step tests |
+| CPU coagulation steps | Existing number law with species/charge moment quadrature; resolved binned/direct selector | Equal positive active resolved counts; reject unsupported unequal weights; finite-grid density conservation evidence | native_coagulation_step_test and native_coagulation_moments_test |
 | CPU wall loss | Spherical/rectangular neutral/charged; image charge and field; deterministic binned and stochastic resolved | PMF/PDF at V=1, resolved positive V; preserve survivor and removed inventories | BOTH dynamics/tests and dynamics/wall_loss/tests suites, separately |
 | Direct/prepared GPU condensation | Existing fixed-four-substep scheme and latent correction | Explicit count basis, species mapping, non-unit V; no GPU PDF algorithm | condensation, graph capture, direct/prepared integration tests |
 | Direct/prepared GPU coagulation | Existing mechanism-specific kernels/selectors | Explicit supported count/weight matrix, volume correction; no inferred mode expansion | coagulation, validation, stochastic and prepared tests |

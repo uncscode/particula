@@ -103,14 +103,14 @@
     {
       "id": "E9-M3-P6",
       "title": "Update development documentation",
-      "status": "Not Started",
+      "status": "In Progress",
       "size": "XS",
       "issue_number": null,
-      "start_date": null,
+      "start_date": "2026-11-11",
       "completion_date": null,
       "estimates": null,
       "actuals": null,
-      "notes_ref": null,
+      "notes_ref": ".opencode/plans/sections/maintenance/E9-M3/p6_validation.md",
       "depends_on": null,
       "reconciliation_evidence_fingerprint": null
     }
