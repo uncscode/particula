@@ -927,7 +927,9 @@ class Dilution(RunnableABC):
 
         The runnable validates the total duration and substep count before
         calling the strategy. A ``DilutionStrategy`` validates and executes one
-        total-duration exact step, making the concrete path whole-call atomic.
+        preflight before the first equal native substep. Each substep is atomic;
+        prior successful steps persist if a later step fails. The isolated
+        legacy path retains its historical total-duration exact step.
         Custom strategies are not inspected and retain equal-substep delegation
         with responsibility for aerosol validation, mutation, and atomicity.
 
@@ -959,8 +961,10 @@ class Dilution(RunnableABC):
         )
         if isinstance(self.dilution_strategy, DilutionStrategy):
             self.dilution_strategy._preflight(aerosol, validated_time_step)
-            self.dilution_strategy.step(aerosol, validated_time_step)
-            return aerosol
+            if not isinstance(aerosol, Aerosol):
+                # Retained legacy whole-call behavior until M6 deletion.
+                self.dilution_strategy.step(aerosol, validated_time_step)
+                return aerosol
         sub_step_time_step = validated_time_step / sub_steps
         for _ in range(sub_steps):
             self.dilution_strategy.step(aerosol, sub_step_time_step)

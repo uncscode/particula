@@ -28,7 +28,7 @@ issue: #1606. This supersedes the old multiple-PR and issue-generation wording.
 |---|---|
 | 1. Accepted contracts and delivery record | Recorded |
 | 2. Native scientific runnables and CPU slot retirement | Implemented; focused checks pass |
-| 3. CPU/direct/prepared GPU dilution | Pending |
+| 3. CPU/direct/prepared GPU dilution | Implemented; focused checks pass |
 | 4. CPU nucleation, mapping and exhaustion transactions | Pending |
 | 5. Direct/prepared GPU nucleation and exhaustion | Pending |
 | 6. CPU adapters and remaining orchestration consumers | Pending |
@@ -60,8 +60,7 @@ optional pass-or-clean-skip. Thresholds and scientific tolerances stay intact.
 
 ## Validation evidence
 
-Implementation checks have not yet run. Append exact command outcomes and
-revision references here as work completes. Final acceptance remains pending.
+Focused checkpoint evidence follows. Final acceptance remains pending.
 
 ### Checkpoint 2
 
@@ -75,3 +74,19 @@ revision references here as work completes. Final acceptance remains pending.
   runnable fixtures remain for transition coverage. M3 removed-slot charge
   assertions now check zero for removed slots, unchanged survivors, and the
   independently computed charge sink. Read-only charge rejects before draws.
+
+### Checkpoint 3
+
+- CPU native/legacy dilution, runnable, exports and existing direct-GPU suite:
+  335 passed, 9 skipped.
+- Native direct/prepared GPU dilution and population-boundary suite with
+  `WARP_CACHE_PATH=/tmp/particula-m4-warp`: 58 passed, 22 skipped
+  (optional CUDA). The first native run failed on the read-only default Warp
+  cache; using the explicit writable cache resolved those failures.
+- Changed-file Ruff check, format and whitespace checks: passed.
+- Native CPU dilution uses equal substeps and restores an attempted substep
+  after a write failure. Legacy exact total-duration execution is preserved.
+- Native GPU preflight validates population metadata, physical state and
+  writer aliases. Prepared repeated enqueue retains its allocation/transfer/
+  synchronization-free boundary. Native positive tests replace dilution's
+  temporary rejection row in the population-boundary inventory.
