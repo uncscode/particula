@@ -1,6 +1,7 @@
 """Independent count, density and sampling contracts for native initialization."""
 
 import numpy as np
+import particula.util.convert_units as convert_units
 import pytest
 from particula.particles import (
     create_lognormal_resolved_particle_data,
@@ -11,8 +12,12 @@ from particula.particles import particle_data_initialization as initialization
 
 @pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
 @pytest.mark.parametrize("units", ["count", "1/m^3", "1/cm^3"])
-def test_counts_and_density_inventory(volume, units):
+def test_counts_and_density_inventory(monkeypatch, volume, units):
     """Fractional weights preserve each species and normalize exactly once."""
+    if units == "1/cm^3":
+        pytest.importorskip("pint")
+    else:
+        monkeypatch.setattr(convert_units, "unit_registry", None)
     masses = np.array([[0.5e-18, 1.5e-18], [2e-18, 3e-18], [0.0, 0.0]])
     weights = np.array([8.0, 0.5, 0.0])
     data = create_resolved_particle_data(
@@ -51,6 +56,7 @@ def test_counts_and_density_inventory(volume, units):
 
 def test_multibox_units_and_owned_broadcasts():
     """Each box uses its own volume while density stays per species."""
+    pytest.importorskip("pint")
     masses = np.ones((2, 3, 2)) * 1e-9
     data = create_resolved_particle_data(
         masses=masses,
@@ -137,6 +143,7 @@ def test_invalid_inputs_are_read_only(kwargs):
 @pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
 def test_controlled_samples_have_unit_counts(monkeypatch, volume):
     """Modal densities determine mixture selection, never slot weight scaling."""
+    monkeypatch.setattr(convert_units, "unit_registry", None)
     radii = np.array([1e-7, 2e-7, 3e-7])
 
     def sample(**kwargs):
@@ -210,3 +217,41 @@ def test_sample_rejection_precedes_rng(monkeypatch, kwargs):
     )
     with pytest.raises(ValueError):
         create_lognormal_resolved_particle_data(**kwargs)
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"mass_units": "ng"},
+        {"density_units": "g/cm^3"},
+        {"volume_units": "L"},
+        {"concentration_units": "1/cm^3"},
+    ],
+)
+def test_non_si_resolved_requires_pint(monkeypatch, kwargs):
+    """Optional unit conversions fail clearly without mutating caller data."""
+    monkeypatch.setattr(convert_units, "unit_registry", None)
+    masses = np.array([1e-18, 2e-18])
+    weights = np.array([1.0, 0.5])
+    with pytest.raises(ImportError, match="Install pint"):
+        create_resolved_particle_data(
+            masses=masses, density=1000.0, concentration=weights, **kwargs
+        )
+    np.testing.assert_array_equal(masses, [1e-18, 2e-18])
+    np.testing.assert_array_equal(weights, [1.0, 0.5])
+
+
+def test_sample_missing_conversion_dependency_precedes_rng(monkeypatch):
+    """Non-SI sample inputs require Pint before any random state is consumed."""
+    monkeypatch.setattr(convert_units, "unit_registry", None)
+
+    def fail(**kwargs):
+        raise AssertionError("sampler must not run")
+
+    monkeypatch.setattr(
+        initialization, "get_lognormal_sample_distribution", fail
+    )
+    with pytest.raises(ImportError, match="Install pint"):
+        create_lognormal_resolved_particle_data(
+            particle_resolved_count=3, volume=1000.0, volume_units="L"
+        )

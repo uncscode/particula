@@ -1,6 +1,7 @@
 """Independent numerical and ownership checks for native initializers."""
 
 import numpy as np
+import particula.util.convert_units as convert_units
 import pytest
 from particula.particles import (
     create_lognormal_binned_particle_data,
@@ -11,16 +12,14 @@ from particula.particles import (
 @pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
 def test_radius_mass_density_and_owned_arrays(kind):
     """Radius conversion and product quadrature agree with scalar arithmetic."""
-    radii = np.array([1.0, 2.0, 4.0])
+    radii = np.array([1.0, 2.0, 4.0]) * 1e-9
     weights = np.array([1.0, 2.0, 1.0])
     charge = np.array([0.0, -1.0, 2.0])
     data = create_particle_data_from_radii(
         radii=radii,
         concentration=weights,
         distribution_type=kind,
-        density=1.0,
-        density_units="g/cm^3",
-        radius_units="nm",
+        density=1000.0,
         charge=charge,
     )
     masses = 4 / 3 * np.pi * 1000 * np.array([1e-27, 8e-27, 64e-27])
@@ -123,6 +122,7 @@ def test_invalid_radius_inputs_do_not_mutate(kwargs):
 
 def test_scalar_singleton_units_and_empty_discrete():
     """Singleton forms preserve values and explicit unit conversions."""
+    pytest.importorskip("pint")
     data = create_particle_data_from_radii(
         radii=[[100.0, 200.0]],
         radius_units="nm",
@@ -136,6 +136,10 @@ def test_scalar_singleton_units_and_empty_discrete():
     np.testing.assert_allclose(
         data.concentration, [[1e6, 2e6]], rtol=1e-12, atol=0
     )
+
+
+def test_empty_discrete():
+    """Empty SI populations work without an optional conversion dependency."""
     empty = create_particle_data_from_radii(
         radii=[], concentration=[], distribution_type="discrete"
     )
@@ -165,6 +169,7 @@ def test_invalid_lognormal_inputs(kwargs):
 @pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
 def test_lognormal_explicit_unit_equivalence(kind):
     """Node, mode and modal number conversions retain the same population."""
+    pytest.importorskip("pint")
     nodes = np.geomspace(1.0, 1000.0, 40)
     converted = create_lognormal_binned_particle_data(
         distribution_type=kind,
@@ -214,3 +219,83 @@ def test_si_volume_rule_stays_exact():
             distribution_type="discrete",
             volume=np.nextafter(1.0, 2.0),
         )
+
+
+@pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
+def test_si_initializers_without_pint(monkeypatch, kind):
+    """Canonical units need no registry for defaults or explicit modal input."""
+    monkeypatch.setattr(convert_units, "unit_registry", None)
+    radii = np.geomspace(1e-9, 1e-5, 40)
+    direct = create_particle_data_from_radii(
+        radii=radii, concentration=1.0, distribution_type=kind
+    )
+    np.testing.assert_allclose(
+        direct.masses[0, :, 0],
+        4 / 3 * np.pi * radii**3 * 1000,
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    for kwargs in (
+        {},
+        {
+            "radius_bins": radii,
+            "mode": [1e-7, 1e-6],
+            "number_concentration": [1e10, 1e9],
+        },
+    ):
+        data = create_lognormal_binned_particle_data(
+            distribution_type=kind, **kwargs
+        )
+        np.testing.assert_allclose(data.number_density, [1.1e10], rtol=1e-12)
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"radius_units": "nm"},
+        {"density_units": "g/cm^3"},
+        {"volume_units": "L"},
+        {"concentration_units": "1/cm^3"},
+    ],
+)
+def test_conversion_without_pint_is_explicit(monkeypatch, kwargs):
+    """Noncanonical units still report the optional dependency requirement."""
+    monkeypatch.setattr(convert_units, "unit_registry", None)
+    with pytest.raises(ImportError, match="Install pint"):
+        create_particle_data_from_radii(
+            radii=[1e-9, 2e-9],
+            concentration=1.0,
+            distribution_type="discrete",
+            **kwargs,
+        )
+
+
+@pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
+@pytest.mark.parametrize("count", [1, 2, 3])
+def test_lognormal_minimum_grid_size(kind, count):
+    """Minimum grids succeed or reject clearly before the PMF converter."""
+    radii = np.geomspace(1e-7, 1e-6, count)
+    saved = radii.copy()
+    if count < (3 if kind == "discrete" else 2):
+        with pytest.raises(ValueError, match="requires at least"):
+            create_lognormal_binned_particle_data(
+                distribution_type=kind, radius_bins=radii
+            )
+        np.testing.assert_array_equal(radii, saved)
+        return
+    data = create_lognormal_binned_particle_data(
+        distribution_type=kind, radius_bins=radii
+    )
+    assert data.masses.shape == (1, count, 1)
+    np.testing.assert_allclose(data.number_density, [1.1e10], rtol=1e-12)
+    np.testing.assert_array_equal(radii, saved)
+
+
+def test_direct_two_bin_discrete_remains_supported():
+    """Direct weights do not need the lognormal converter's third node."""
+    data = create_particle_data_from_radii(
+        radii=[1e-7, 2e-7],
+        concentration=[2.0, 3.0],
+        distribution_type="discrete",
+    )
+    np.testing.assert_array_equal(data.number_density, [5.0])
