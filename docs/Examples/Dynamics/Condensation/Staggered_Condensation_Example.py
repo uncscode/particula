@@ -161,9 +161,9 @@ def run_simulation(strategy, aerosol, time_step, n_steps, sub_steps=1):
     )
 
     particle_mass = float(np.sum(current_aerosol.particles.get_mass()))
-    gas_mass = float(
+    gas_mass = np.asarray(
         current_aerosol.atmosphere.partitioning_species.get_concentration()
-    )
+    ).item()
     mass_history = [particle_mass]
     gas_mass_history = [gas_mass]
 
@@ -175,9 +175,9 @@ def run_simulation(strategy, aerosol, time_step, n_steps, sub_steps=1):
 
         # Record masses after step
         particle_mass = float(np.sum(current_aerosol.particles.get_mass()))
-        gas_mass = float(
+        gas_mass = np.asarray(
             current_aerosol.atmosphere.partitioning_species.get_concentration()
-        )
+        ).item()
         mass_history.append(particle_mass)
         gas_mass_history.append(gas_mass)
 
