@@ -25,3 +25,11 @@ Host-access verification of `28acda48b`: 6,771 package tests passed, 19 skipped,
 infrastructure tests passed. Package mypy and strict docs passed. Default root
 lint remains blocked by upstream duplicate plugin modules; final maintainer
 approval remains pending. Draft upstream PR: #1624.
+
+## 2026-11-10 — Default lint gate resolved
+
+Commit `0db7e42b2` honors the existing configured mypy package scope instead of
+overriding it with the repository root. No exclusions or error suppressions
+were added. All required checks pass, including the literal default runner,
+6,771 package tests (92% coverage), and 46 lint-runner tests. Final M1 handoff
+approval was requested explicitly and remains the only pending gate.

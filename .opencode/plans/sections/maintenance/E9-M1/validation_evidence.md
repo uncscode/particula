@@ -24,22 +24,31 @@ The initially restricted probe hid CUDA and is not hardware-absence evidence.
 Final GPU-capable runs must use host device access and report actual results;
 optional skips are never CUDA success or fallback evidence.
 
-## Required gates
+## Current gate status
 
-Host-access results at the committed implementation revision are below. Initial focused CPU checks
-passed (integration 4, particle/gas 682, structure 51, conversion/exports 134,
-standard wall-loss 16, adjacent wall-loss 43); these working-tree checks are
-not final-revision or CUDA evidence. The literal default lint runner reports a
-duplicate `doctor` module under assistant-plugin copies. A passing scoped
-package mypy check cannot replace that failed required default command.
+The default lint failure was fixed in `0db7e42b2`: omit the implicit positional
+`.` from mypy so it honors the existing `[tool.mypy] packages = ["particula"]`
+configuration. This matches CI without exclusions, diagnostic suppression, or
+changes to package type-checking policy. Explicit targets retain their existing
+behavior and validation; Ruff's default scope is unchanged.
+
+The literal `.opencode/tools/run_linters.py` now reports
+`RESULT: ALL LINTERS PASSED`. All 46 lint-runner tests pass, including real-mypy
+regressions that preserve detection of errors in the configured package and
+explicit targets despite duplicate unrelated source/payload files.
+All required checks now pass at the lint-fix revision, as recorded below.
+Historical failures remain below for provenance; final maintainer sign-off is
+the only pending M1 handoff gate.
 
 ## Handoff decision
 
-**M1 incomplete; M2 blocked.** P1 scientific and P2 specification approval
-was recorded on 2026-09-28. Final M1 approval has not been requested or granted
-against the completed P5 diff and final evidence. Required failed/unavailable
-checks must be resolved and Kyle must approve the revision-specific handoff
-before M1 is marked complete. No M2–M6 work or release completion is claimed.
+All required implementation checks pass at `0db7e42b2`. Final maintainer
+handoff approval remains pending; a direct approval question was presented to
+Kyle after the fix and regression tests passed. No approval is inferred from
+the request to fix the blockers. M2 remains pending that sign-off, not a lint
+failure.
+P1 scientific and P2 specification approval was recorded on 2026-09-28.
+No M2–M6 implementation or release completion is claimed.
 
 ## Preliminary restricted-environment checks
 
@@ -90,7 +99,7 @@ not represent measured GPU success; the available CUDA conversion cases were
 collected and passed (150 conversion/export tests versus 134 with restricted
 CPU-only visibility). No benchmark or GPU PDF execution is claimed.
 
-### Remaining required failure
+### Historical required failure — resolved by 0db7e42b2
 
 The literal default lint runner calls mypy on the repository root and reports:
 
@@ -100,8 +109,33 @@ plugins/particula-helper/scripts/doctor.py: error: Duplicate module named "docto
 
 Both files match upstream main byte-for-byte (SHA-256
 `86b09da1afc3d1cf9ca2241d2b61df6f1e5069e0c83faa0d8b281ca4d7eeaf50`),
-and the lint runner and `pyproject.toml` have no E9-M1 changes. This is an
-upstream source/payload discovery conflict, not resolved by the separate passing
-502-file package mypy check. P5 does not change plugin packaging or weaken the
-required lint gate. M1 remains incomplete and M2 remains blocked pending this
-required check and Kyle's final revision-specific approval.
+at the originally tested revision. The original root-target command overrode
+the configured package scope. The later runner fix resolves this discovery
+conflict by honoring that existing configuration; neither plugin packaging nor
+`pyproject.toml` changes. This historical failure does not override the updated
+literal default-runner result recorded above.
+
+## Lint-fix revision — all required checks passed
+
+Revision: `0db7e42b27b0d031c2680af037ea11e7776641b0`, 2026-11-10.
+Repository `.venv` with host CUDA/cache access; device details are unchanged.
+The following evidence supersedes the earlier failed lint gate. The subsequent
+ledger-only commit changes no implementation or tests; its documentation
+checks and exact revision are recorded in PR #1624.
+
+| Literal command | Exit | Result |
+|---|---|---|
+| `pytest particula/integration_tests/data_container_contract_test.py -q --no-cov` | 0 | 4 passed in 0.01s |
+| `pytest particula/particles/tests/ particula/gas/tests/ -q --no-cov` | 0 | 682 passed in 0.25s |
+| `pytest particula/tests/aerosol_validation_test.py -q --no-cov` | 0 | 51 passed in 0.04s |
+| `pytest particula/gpu/tests/conversion_test.py particula/gpu/tests/kernel_exports_test.py -q --no-cov` | 0 | 150 passed in 4.73s |
+| `pytest particula/dynamics/tests/wall_loss_strategies_test.py -q --no-cov` | 0 | 16 passed in 0.18s |
+| `pytest particula/dynamics/wall_loss/tests/wall_loss_strategies_test.py -q --no-cov` | 0 | 43 passed in 9.01s |
+| `.opencode/tools/run_pytest.py` | 0 | 6,771 passed; 19 skipped; 92% coverage (80% threshold); VALIDATION: PASSED |
+| `.opencode/tools/run_linters.py` | 0 | Ruff Check: No issues found; Mypy: No issues found; RESULT: ALL LINTERS PASSED |
+| `mypy particula/ --ignore-missing-imports` | 0 | Success: no issues found in 502 source files |
+| `python3 .opencode/tools/build_mkdocs.py --validate-only --strict` | 0 | Outcome: success; Stage: complete; Exit Code: 0 |
+| `mkdocs build --strict` | 0 | INFO    -  Documentation built in 1.37 seconds |
+| `pytest examples_tests -q -Werror` | 0 | 150 passed, 1 skipped in 29.94s |
+| `pytest scripts/tests -q -Werror` | 0 | 127 passed in 24.82s |
+| `pytest .opencode/tools/tool_tests/run_linters_test.py -q --no-cov` | 0 | 46 passed in 1.60s |
