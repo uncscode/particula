@@ -80,3 +80,18 @@ Scientific strategy normalization remains M3-owned; aggregate-based orchestratio
 
 - `examples_tests/dilution_example_test.py` — M5 removes the temporary import exception.
 - `examples_tests/nucleation_example_test.py` — M5 removes the temporary import exception.
+
+## P3 builder consumers
+
+The old builder now lives beside the old aggregate in `particula._legacy_aerosol`. It retains references and its historical strategy/count checks. No native container is converted. These consumers migrate in M5 and the legacy builder is removed in M6.
+
+- `particula/integration_tests/quick_start_test.py` — M5
+- `docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.py` — M5
+- `docs/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.py` — M5
+- `docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.py` — M5
+- `readme.md` — M5
+- `docs/index.md` — M5
+- `plugins/particula-helper/scripts/run_example.py` — M5
+- `particula/tests/legacy_aerosol_builder_test.py` — M6 legacy-only removal
+
+The helper example selects the legacy module for this development checkout and retains the released 0.2.x public builder when that module is absent. Its generated OpenCode copy follows the canonical source. Native builder tests replace the public legacy assertions in P3.

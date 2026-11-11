@@ -28,10 +28,11 @@ OpenCode. See the guide for native install commands and environment requirements
 
 ```python
 import particula as par
+from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
 
 # Build an aerosol system
 aerosol = (
-    par.AerosolBuilder()
+    LegacyAerosolBuilder()
     .set_atmosphere(atmosphere)
     .set_particles(particles)
     .build()
