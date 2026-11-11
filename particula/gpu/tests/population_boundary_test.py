@@ -29,8 +29,6 @@ class _TaggedOnly:
         ("nucleation", "_preflight_nucleation"),
         ("exhaustion", "_execute_resampling_step_gpu"),
         ("exhaustion", "_execute_representative_volume_scaling_step_gpu"),
-        ("communication", "volume_evolution_step_gpu"),
-        ("communication", "particle_communication_step_gpu"),
     ],
 )
 @pytest.mark.parametrize("code", [1, 2, 3])

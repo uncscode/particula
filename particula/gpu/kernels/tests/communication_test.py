@@ -1868,6 +1868,7 @@ def test_private_particle_planner_and_commit_follow_immutable_fields(
         requests,
         invalid,
         demand,
+        0,
     )
     assert invalid[0] == 0 and demand[0] == 1
     npt.assert_array_equal(assignments, [[0, -1]])

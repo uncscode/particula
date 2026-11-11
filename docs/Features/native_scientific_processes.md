@@ -168,3 +168,20 @@ readback or synchronization; device validation gates invalid live state before
 primary writers, with explicit observation afterward. Standalone GPU
 resampling and representative scaling likewise admit only resolved native
 storage, retaining count-weighted moments or count/volume density respectively.
+
+### Native direct communication and physical volume
+
+The concrete GPU communication primitives accept tagged resolved counts.
+Particle transport moves the same represented count out of the source and into
+its destination, including unequal-volume boxes. Fixed-capacity planning retains
+its exact population matching, ascending free-slot allocation and gated commit.
+Count-weighted species mass and signed charge are conserved. PMF/PDF particle
+transport is unsupported.
+
+`volume_evolution_step_gpu` prescribes physical volume: native particle counts,
+per-particle masses and charge remain unchanged, while every gas density scales
+by the old/new volume ratio. This differs from representative-volume exhaustion,
+which scales native counts and volume together while preserving gas density.
+Invalid volumes or unrepresentable count densities gate primary writes. Callers
+retain device placement, transfers and synchronization; prepared enqueue uses
+pinned storage without allocation or host readback.
