@@ -34,3 +34,12 @@ assert discarded matrix values are historical behavior, not native expectations:
 P5 explicitly tests rejection of differing values and acceptance of redundant
 rows/columns. Facade strategy-count admission has no native successor because
 aggregate species widths need not match; process admission owns mapping.
+
+## P4 native radius evidence
+
+`particle_data_initialization_test.py` covers explicit PDF/PMF kinds, owned arrays, radius-derived masses, scalar/singleton and SI/non-SI inputs, existing lognormal defaults, nonuniform radius product quadrature, zero PDF, empty discrete input, invalid distributions and V=.25/4 rejection. Mass comparisons use explicit relative and mass-scale absolute tolerances. A GSD <= 1 is rejected because the existing finite-width lognormal generator cannot represent it; generator formulas and valid-default behavior are unchanged.
+
+Lognormal grid minimum: discrete PMFs require three strictly increasing positive
+nodes because the retained converter extrapolates its final bin width from two
+intervals; continuous PDFs require two. Direct radius initialization still
+supports two discrete bins because it takes caller-supplied weights.
