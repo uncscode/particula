@@ -1,4 +1,8 @@
-"""Independent representation-aware bulk particle property checks."""
+"""Independent representation-aware bulk particle property checks.
+
+Mass checks use rtol=1e-12 and atol=1e-30: NumPy's default absolute
+tolerance would hide errors in the roughly 1e-18 kg fixture inventories.
+"""
 
 import numpy as np
 import numpy.testing as npt
@@ -30,18 +34,33 @@ def test_resolved_number_and_species_mass_density(volume: float) -> None:
     npt.assert_allclose(
         data.slot_concentration_density, [[8 / volume, 0.5 / volume, 0]]
     )
-    npt.assert_allclose(data.species_mass_inventory, [[5e-18, 13.5e-18]])
     npt.assert_allclose(
-        data.species_mass_density, [[5e-18 / volume, 13.5e-18 / volume]]
+        data.species_mass_inventory,
+        [[5e-18, 13.5e-18]],
+        rtol=1e-12,
+        atol=1e-30,
     )
-    npt.assert_allclose(data.total_mass[0], [2e-18, 5e-18, 0])
+    npt.assert_allclose(
+        data.species_mass_density,
+        [[5e-18 / volume, 13.5e-18 / volume]],
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    npt.assert_allclose(
+        data.total_mass[0], [2e-18, 5e-18, 0], rtol=1e-12, atol=1e-30
+    )
 
 
 def test_pmf_density_is_already_per_volume() -> None:
     """Fractional PMF bins add directly, without a second volume division."""
     data = _particles("discrete")
     npt.assert_allclose(data.number_density, [8.5])
-    npt.assert_allclose(data.species_mass_density, [[5e-18, 13.5e-18]])
+    npt.assert_allclose(
+        data.species_mass_density,
+        [[5e-18, 13.5e-18]],
+        rtol=1e-12,
+        atol=1e-30,
+    )
 
 
 def test_pdf_nonuniform_radius_integrates_mass_times_pdf() -> None:
@@ -52,7 +71,12 @@ def test_pdf_nonuniform_radius_integrates_mass_times_pdf() -> None:
     # First interval: (1 * 0.5 + 2 * 2) / 2 = 2.25 (in e-18 kg/m³).
     # Second interval: (2 * 2 + 1 * 0) = 4, giving 6.25 total.
     npt.assert_allclose(data.number_density, [4.5])
-    npt.assert_allclose(data.species_mass_density, [[6.25e-18, 9.75e-18]])
+    npt.assert_allclose(
+        data.species_mass_density,
+        [[6.25e-18, 9.75e-18]],
+        rtol=1e-12,
+        atol=1e-30,
+    )
     data.concentration[:] = 0
     data.masses[:] = 0
     npt.assert_array_equal(data.number_density, [0])
@@ -74,7 +98,12 @@ def test_pdf_inventory_does_not_form_species_weighted_product(
         )
 
     monkeypatch.setattr(np, "trapezoid", unexpected_trapezoid)
-    npt.assert_allclose(data.species_mass_density, [[6.25e-18, 9.75e-18]])
+    npt.assert_allclose(
+        data.species_mass_density,
+        [[6.25e-18, 9.75e-18]],
+        rtol=1e-12,
+        atol=1e-30,
+    )
 
 
 @pytest.mark.parametrize(
