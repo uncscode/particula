@@ -19,3 +19,9 @@ requested artifact-ignore commit, reconciled current P1/P2 approvals and P3/P4
 helper inventories, expanded the developer reference, and added the required
 data-only integration regression. Final checks and M1 approval are tracked in
 `validation_evidence.md`; no downstream track is declared complete.
+
+Host-access verification of `28acda48b`: 6,771 package tests passed, 19 skipped,
+92% coverage; 150 conversion/export, 150 source example (1 skip), and 127
+infrastructure tests passed. Package mypy and strict docs passed. Default root
+lint remains blocked by upstream duplicate plugin modules; final maintainer
+approval remains pending. Draft upstream PR: #1624.
