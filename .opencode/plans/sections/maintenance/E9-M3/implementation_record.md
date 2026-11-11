@@ -85,12 +85,12 @@ that boundary belong with M3 metadata changes; no M4 functionality is claimed.
   P2 integrates the binding into the existing fixed-four-substep implementation;
   it must not add per-enqueue host resolution or transfers.
 
-| GPU boundary | P1 executable evidence | Numerical acceptance owner |
+| GPU boundary | Executable boundary evidence | Numerical acceptance owner |
 |---|---|---|
 | Tagged discrete/resolved transfer | population_metadata_test: raw round trips, nonunit resolved inventory, explicit legacy retention | transfer complete |
 | Tagged PDF / unknown code | particle_population_test and population_metadata_test: rejection before Warp probe/readback | no PDF execution |
 | Species maps / independent widths | population_metadata_test: full gas order, skipped/unmapped lanes, stale binding and no-device-work checks | condensation P2 |
-| Condensation direct/prepared | population_boundary_test: interim rejection before payload access | P2 admits discrete/resolved with independent science tests |
+| Condensation direct/prepared | condensation_native_test: explicit binding, mapped four-substep science, N/V gas coupling and extensive energy | P2 verified discrete/resolved checkpoint |
 | Coagulation direct/prepared | population_boundary_test: interim rejection before payload access | P4 admits only verified resolved mechanism/weight combinations |
 | Wall loss direct/selected/prepared | population_boundary_test: interim rejection before payload access | P5 admits resolved removal with sink accounting |
 | Dilution/nucleation/exhaustion and resident setup/revalidation | population_boundary_test and gpu_session_test: reject newly tagged consumers before mutation or metadata loss | M4 |
@@ -139,7 +139,7 @@ Warp CPU is required when installed; CUDA results/skips are explicit.
 
 | Existing coverage/seam | Required successor / retention | Owner / state |
 |---|---|---|
-| Condensation `_make_data_inputs` via from_representation/from_species | Facade-free native fixtures with independent physics assertions; retain legacy-only branches separately | M3 P1/P2, pending |
+| Condensation `_make_data_inputs` via from_representation/from_species | species_mapping_test plus native_step/native_staggered/native_step_admission and GPU condensation_native_test establish facade-free configuration, rate, stepping, rejection and conservation assertions; legacy fixtures retained separately | M3 P1/P2 checkpoint complete; final ledger review P6 |
 | Coagulation native helper/ABC and mechanism fixtures | Explicit metadata, physical rate units, weighted species/charge inventory | M3 P3/P4, pending |
 | Both wall-loss strategy suites | Native fixtures preserving geometry, helpers, RNG and sink assertions | M3 P5, pending |
 | `_legacy_aerosol`, legacy builder, facade scientific dispatch | Retain for unmigrated runnables/adapters/examples; no duplicate authoritative arrays | consumers M4/M5, removal M6 |

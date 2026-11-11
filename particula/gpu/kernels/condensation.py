@@ -7,11 +7,19 @@ proposal, bounds and finalizes it, and mutates particle masses and P2 scratch
 sidecars without coupling gas. The public step performs that coupling after
 each finalized P2 transfer.
 
+Tagged native calls require an explicit ``CondensationSpeciesBinding``.
+Particle-material arrays retain full composition; gas properties, partitioning,
+limiting reductions and energy outputs retain full gas order. Resolved counts
+use N/V for gas density coupling and raw N for extensive energy. Discrete PMF
+uses stored density and requires V=1. GPU PDF is unsupported. Legacy untagged
+calls retain their existing same-width behavior until their later migration.
+
 Entry-point validation accepts scalar direct inputs, explicit ``(n_boxes,)``
 Warp arrays, or a ``WarpEnvironmentData`` container. Aggregate preflight,
 including supplied ``CondensationScratchBuffers`` metadata, completes before
-buffer allocation, Warp launch, vapor-pressure refresh, or mutation of
-caller-owned state. Private preparation freezes the exact validated primary
+fallback allocation, vapor-pressure refresh, or mutation of caller-owned
+state. Physical validation may launch scans and read private status flags.
+Private preparation freezes the exact validated primary
 arrays, supplied sidecars, and resolved fallback storage for a subsequent
 device-only enqueue. A required keyword-only ``ThermodynamicsConfig`` then
 executes exactly four equal substeps. Each substep refreshes the caller-owned
@@ -63,6 +71,7 @@ from particula.gpu.dynamics.condensation_funcs import (
     water_activity_ideal_wp,
     water_activity_kappa_wp,
 )
+from particula.gpu.kernels import _condensation_native as native_kernels
 from particula.gpu.kernels.environment import (
     _ensure_environment_arrays,
     _is_warp_array_like,
@@ -74,7 +83,12 @@ from particula.gpu.kernels.thermodynamics import (
     _validate_array_metadata,
     validate_thermodynamics_config,
 )
-from particula.gpu.population_metadata import require_legacy_particle_metadata
+from particula.gpu.population_metadata import (
+    DISCRETE,
+    PARTICLE_RESOLVED,
+    particle_distribution_code,
+    require_legacy_particle_metadata,
+)
 from particula.gpu.properties.gas_properties import (
     dynamic_viscosity_wp,
     molecule_mean_free_path_wp,
@@ -90,6 +104,7 @@ from particula.gpu.properties.particle_properties import (
     particle_radius_from_volume_wp,
     vapor_transition_correction_wp,
 )
+from particula.gpu.species_mapping import CondensationSpeciesBinding
 
 # type: ignore
 _DEFAULT_SURFACE_TENSION = 0.072
@@ -116,7 +131,8 @@ class CondensationActivitySurfaceConfig:
     The frozen dataclass prevents rebinding fields, but does not make its Warp
     arrays immutable. ``kappas`` and ``molar_mass_reference`` therefore remain
     caller-owned mutable ``wp.float64`` arrays with shape ``(n_species,)``;
-    callers must retain their lifetime and must not modify them concurrently
+    native species order is particle material order. Callers must retain
+    their lifetime and must not modify them concurrently
     with a launch. Activity is evaluated only for ``water_species_index``;
     every non-water vapor uses unit activity. Static tension uses the current
     condensing-species index, while composition-weighted tension computes one
@@ -133,7 +149,8 @@ class CondensationActivitySurfaceConfig:
             per-species kappa parameters with shape ``(n_species,)``.
         molar_mass_reference: Caller-owned positive ``wp.float64`` array of
             per-species molar masses [kg/mol], shaped ``(n_species,)`` and
-            exactly ordered as ``gas.molar_mass``.
+            equal to mapped full-gas values for native calls. Unmapped material
+            molar masses are independent. Legacy calls require gas order.
     """
 
     activity_mode: Any
@@ -152,8 +169,9 @@ class CondensationScratchBuffers:
     whose shape must remain stable: transfer fields have shape
     ``(n_boxes, n_particles, n_species)``, property fields have shape
     ``(n_boxes,)``, and P2-only limiting sidecars have shape
-    ``(n_boxes, n_species)``. Fields may be omitted independently; omitted
-    fields are
+    ``(n_boxes, n_gas)``. Native ``n_species`` is particle-material width and
+    ``n_gas`` is complete gas width; legacy calls require equal widths.
+    Fields may be omitted independently; omitted fields are
     step-local fallback allocations, while successful calls preserve every
     supplied object's identity. Transfer roles are deliberately separate: work
     retains the gated raw proposal from the final substep, while total records
@@ -261,6 +279,12 @@ class _PreparedCondensationCall:
     gas_partitioning: Any
     thermodynamics_modes: Any
     thermodynamics_parameters: Any
+    species_binding: Any = None
+    particle_to_gas: Any = None
+    gas_to_particle: Any = None
+    particle_volume: Any = None
+    distribution_kind: int = 0
+    gas_species_count: int = 0
 
 
 def _read_float64_array(array: Any) -> np.ndarray:
@@ -273,6 +297,7 @@ def validate_condensation_scratch_buffers(
     dimensions: tuple[int, int, int],
     device: Any,
     caller_name: str,
+    gas_species_count: int | None = None,
 ) -> CondensationScratchBuffers:
     """Validate scratch metadata without allocation, reads, or mutation.
 
@@ -287,6 +312,8 @@ def validate_condensation_scratch_buffers(
         dimensions: Expected ``(n_boxes, n_particles, n_species)`` dimensions.
         device: Active Warp device required for supplied fields.
         caller_name: Entry-point name included in validation errors.
+        gas_species_count: Full gas width for native reduction buffers; omitted
+            for legacy callers whose gas and particle widths match.
 
     Returns:
         The original validated ``CondensationScratchBuffers`` object.
@@ -301,14 +328,15 @@ def validate_condensation_scratch_buffers(
             f"in {caller_name}."
         )
     n_boxes, n_particles, n_species = dimensions
+    n_gas = n_species if gas_species_count is None else gas_species_count
     for name, shape in (
         ("work_mass_transfer", (n_boxes, n_particles, n_species)),
         ("total_mass_transfer", (n_boxes, n_particles, n_species)),
         ("dynamic_viscosity", (n_boxes,)),
         ("mean_free_path", (n_boxes,)),
-        ("positive_mass_transfer_demand", (n_boxes, n_species)),
-        ("negative_mass_transfer_release", (n_boxes, n_species)),
-        ("positive_mass_transfer_scale", (n_boxes, n_species)),
+        ("positive_mass_transfer_demand", (n_boxes, n_gas)),
+        ("negative_mass_transfer_release", (n_boxes, n_gas)),
+        ("positive_mass_transfer_scale", (n_boxes, n_gas)),
     ):
         values = getattr(candidate, name)
         if values is not None:
@@ -348,15 +376,19 @@ def validate_condensation_activity_surface_config(
     device: Any,
     gas_molar_mass: Any,
     caller_name: str,
+    *,
+    species_binding: CondensationSpeciesBinding | None = None,
 ) -> CondensationActivitySurfaceConfig:
     """Validate and return the identical activity/surface sidecar.
 
     Args:
         activity_surface: Candidate frozen sidecar to validate.
-        n_species: Number of ordered gas and particle species.
+        n_species: Number of particle material species (also gas for legacy).
         device: Active Warp device for all sidecar arrays.
         gas_molar_mass: Ordered caller-owned gas molar-mass array.
         caller_name: Entry-point name used in validation errors.
+        species_binding: Native full-gas mapping; declared pairs, including
+            skipped pairs, must match their material reference molar masses.
 
     Returns:
         The original validated ``CondensationActivitySurfaceConfig`` object.
@@ -411,7 +443,7 @@ def validate_condensation_activity_surface_config(
     _validate_array_metadata(
         "gas.molar_mass",
         gas_molar_mass,
-        (n_species,),
+        (len(species_binding.gas_names) if species_binding else n_species,),
         wp.float64,
         device,
         caller_name,
@@ -428,7 +460,15 @@ def validate_condensation_activity_surface_config(
         raise ValueError(
             "activity_surface.molar_mass_reference must be finite and positive."
         )
-    if not np.array_equal(references, gas_masses):
+    if species_binding is not None:
+        if any(
+            references[p] != gas_masses[g]
+            for g, p in species_binding.species_map.gas_to_particle
+        ):
+            raise ValueError(
+                "mapped activity molar masses must match gas.molar_mass"
+            )
+    elif not np.array_equal(references, gas_masses):
         raise ValueError(
             "activity_surface.molar_mass_reference must exactly match "
             "gas.molar_mass."
@@ -436,8 +476,284 @@ def validate_condensation_activity_surface_config(
     return activity_surface
 
 
-@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-# type: ignore[misc]
+@wp.func
+def _condensation_mass_transfer_impl(  # noqa: C901
+    masses: Any,
+    concentration: Any,
+    density: Any,
+    gas_concentration: Any,
+    vapor_pressure: Any,
+    molar_mass: Any,
+    surface_tension: Any,
+    kappas: Any,
+    molar_mass_reference: Any,
+    effective_surface_tension: Any,
+    activity_enabled: wp.int32,
+    activity_mode: wp.int32,
+    surface_tension_mode: wp.int32,
+    water_species_index: wp.int32,
+    mass_accommodation: Any,
+    diffusion_coefficient_vapor: Any,
+    latent_heat: Any,
+    latent_heat_enabled: wp.int32,
+    dynamic_viscosity: Any,
+    mean_free_path: Any,
+    gas_constant: Any,
+    boltzmann_constant: Any,
+    temperature: Any,
+    time_step: Any,
+    mass_transfer: Any,
+    particle_to_gas: Any,
+    native: wp.int32,
+    box_idx: int,
+    particle_idx: int,
+) -> None:
+    """Shared raw proposal with explicit gas lookup only for native calls."""
+    dynamic_viscosity_value = dynamic_viscosity[box_idx]
+    mean_free_path_value = mean_free_path[box_idx]
+    temperature_value = temperature[box_idx]
+    n_species = masses.shape[2]
+
+    if concentration[box_idx, particle_idx] == wp.float64(0.0):
+        if n_species == 1:
+            mass_transfer[box_idx, particle_idx, 0] = wp.float64(0.0)
+            return
+        for species_idx in range(n_species):
+            mass_transfer[box_idx, particle_idx, species_idx] = wp.float64(0.0)
+        return
+
+    # Warp does not replay dynamic loops in a backward pass.  Preserve the
+    # general multi-species path below, but keep the common one-species raw
+    # rate free of dynamic loops so its out-of-place Tape derivative remains
+    # available without changing P2 or the public step contract.
+    if n_species == 1:
+        gas_idx = int(0)
+        if native == wp.int32(1):
+            gas_idx = int(particle_to_gas[0])
+        if gas_idx < 0:
+            mass_transfer[box_idx, particle_idx, 0] = wp.float64(0.0)
+            return
+        species_mass = masses[box_idx, particle_idx, 0]
+        total_volume = species_mass / density[0]
+        if total_volume <= wp.float64(0.0):
+            mass_transfer[box_idx, particle_idx, 0] = wp.float64(0.0)
+            return
+
+        radius = particle_radius_from_volume_wp(total_volume)
+        effective_density = density[0]
+        knudsen_number = knudsen_number_wp(mean_free_path_value, radius)
+        slip_correction = cunningham_slip_correction_wp(knudsen_number)
+        mobility = aerodynamic_mobility_wp(
+            radius, slip_correction, dynamic_viscosity_value
+        )
+        diffusion_coefficient_particle = diffusion_coefficient_wp(
+            temperature_value,
+            mobility,
+            boltzmann_constant,
+        )
+        transition = vapor_transition_correction_wp(
+            knudsen_number,
+            mass_accommodation[gas_idx],
+        )
+        diffusion_value = diffusion_coefficient_vapor[gas_idx]
+        if diffusion_value <= wp.float64(0.0):
+            diffusion_value = diffusion_coefficient_particle
+        mass_transport = first_order_mass_transport_k_wp(
+            radius,
+            transition,
+            diffusion_value,
+        )
+        tension = surface_tension[0]
+        if surface_tension_mode == SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED:
+            tension = effective_surface_tension[box_idx, particle_idx]
+        kelvin_radius = kelvin_radius_wp(
+            tension,
+            effective_density,
+            molar_mass[gas_idx],
+            temperature_value,
+            gas_constant,
+        )
+        kelvin_term = kelvin_term_wp(radius, kelvin_radius)
+        partial_pressure_gas = partial_pressure_wp(
+            gas_concentration[box_idx, gas_idx],
+            molar_mass[gas_idx],
+            temperature_value,
+            gas_constant,
+        )
+        activity_factor = wp.float64(1.0)
+        if activity_enabled == wp.int32(1) and water_species_index == 0:
+            if activity_mode == ACTIVITY_MODE_IDEAL:
+                activity_factor = water_activity_ideal_wp(
+                    masses,
+                    molar_mass_reference,
+                    box_idx,
+                    particle_idx,
+                    0,
+                )
+            else:
+                activity_factor = water_activity_kappa_wp(
+                    masses,
+                    density,
+                    kappas,
+                    box_idx,
+                    particle_idx,
+                    0,
+                )
+        surface_vapor_pressure = (
+            activity_factor * vapor_pressure[box_idx, gas_idx] * kelvin_term
+        )
+        pressure_delta = partial_pressure_gas - surface_vapor_pressure
+        species_latent_heat = wp.float64(0.0)
+        thermal_conductivity = wp.float64(0.0)
+        if latent_heat_enabled == wp.int32(1):
+            species_latent_heat = latent_heat[gas_idx]
+            thermal_conductivity = _thermal_conductivity_wp(temperature_value)
+        if species_latent_heat == wp.float64(0.0):
+            mass_rate = mass_transfer_rate_wp(
+                pressure_delta,
+                mass_transport,
+                temperature_value,
+                molar_mass[gas_idx],
+                gas_constant,
+            )
+        else:
+            mass_rate = _mass_transfer_rate_latent_heat_wp(
+                pressure_delta,
+                mass_transport,
+                temperature_value,
+                molar_mass[gas_idx],
+                species_latent_heat,
+                thermal_conductivity,
+                surface_vapor_pressure,
+                diffusion_value,
+                gas_constant,
+            )
+        mass_transfer[box_idx, particle_idx, 0] = mass_rate * time_step
+        return
+
+    total_volume = wp.float64(0.0)
+    total_mass = wp.float64(0.0)
+    for species_idx in range(n_species):
+        species_mass = masses[box_idx, particle_idx, species_idx]
+        total_mass += species_mass
+        total_volume += species_mass / density[species_idx]
+
+    if total_volume <= wp.float64(0.0):  # type: ignore[operator]
+        for species_idx in range(n_species):
+            mass_transfer[box_idx, particle_idx, species_idx] = wp.float64(0.0)
+        return
+
+    radius = particle_radius_from_volume_wp(total_volume)
+    effective_density = total_mass / total_volume
+    if effective_density <= wp.float64(0.0):
+        effective_density = density[0]
+
+    knudsen_number = knudsen_number_wp(mean_free_path_value, radius)
+    slip_correction = cunningham_slip_correction_wp(knudsen_number)
+    mobility = aerodynamic_mobility_wp(
+        radius, slip_correction, dynamic_viscosity_value
+    )
+    diffusion_coefficient_particle = diffusion_coefficient_wp(
+        temperature_value,
+        mobility,
+        boltzmann_constant,
+    )
+    thermal_conductivity = wp.float64(0.0)
+    if latent_heat_enabled == wp.int32(1):
+        thermal_conductivity = _thermal_conductivity_wp(temperature_value)
+
+    for species_idx in range(n_species):
+        gas_idx = species_idx
+        if native == wp.int32(1):
+            gas_idx = int(particle_to_gas[species_idx])
+        if gas_idx < 0:
+            mass_transfer[box_idx, particle_idx, species_idx] = wp.float64(0.0)
+            continue
+        transition = vapor_transition_correction_wp(
+            knudsen_number,
+            mass_accommodation[gas_idx],
+        )
+        diffusion_value = diffusion_coefficient_vapor[gas_idx]
+        if diffusion_value <= wp.float64(0.0):
+            diffusion_value = diffusion_coefficient_particle
+        mass_transport = first_order_mass_transport_k_wp(
+            radius,
+            transition,
+            diffusion_value,
+        )
+        tension = surface_tension[species_idx]
+        if surface_tension_mode == SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED:
+            tension = effective_surface_tension[box_idx, particle_idx]
+        kelvin_radius = kelvin_radius_wp(
+            tension,
+            effective_density,
+            molar_mass[gas_idx],
+            temperature_value,
+            gas_constant,
+        )
+        kelvin_term = kelvin_term_wp(radius, kelvin_radius)
+        partial_pressure_gas = partial_pressure_wp(
+            gas_concentration[box_idx, gas_idx],
+            molar_mass[gas_idx],
+            temperature_value,
+            gas_constant,
+        )
+        activity_factor = wp.float64(1.0)
+        if (
+            activity_enabled == wp.int32(1)
+            and species_idx == water_species_index
+        ):
+            water_species_index_int = int(water_species_index)
+            if activity_mode == ACTIVITY_MODE_IDEAL:
+                activity_factor = water_activity_ideal_wp(
+                    masses,
+                    molar_mass_reference,
+                    box_idx,
+                    particle_idx,
+                    water_species_index_int,
+                )
+            else:
+                activity_factor = water_activity_kappa_wp(
+                    masses,
+                    density,
+                    kappas,
+                    box_idx,
+                    particle_idx,
+                    water_species_index_int,
+                )
+        surface_vapor_pressure = (
+            activity_factor * vapor_pressure[box_idx, gas_idx] * kelvin_term
+        )
+        pressure_delta = partial_pressure_gas - surface_vapor_pressure
+        species_latent_heat = wp.float64(0.0)
+        if latent_heat_enabled == wp.int32(1):
+            species_latent_heat = latent_heat[gas_idx]
+        if species_latent_heat == wp.float64(0.0):
+            mass_rate = mass_transfer_rate_wp(
+                pressure_delta,
+                mass_transport,
+                temperature_value,
+                molar_mass[gas_idx],
+                gas_constant,
+            )
+        else:
+            mass_rate = _mass_transfer_rate_latent_heat_wp(
+                pressure_delta,
+                mass_transport,
+                temperature_value,
+                molar_mass[gas_idx],
+                species_latent_heat,
+                thermal_conductivity,
+                surface_vapor_pressure,
+                diffusion_value,
+                gas_constant,
+            )
+        mass_transfer[box_idx, particle_idx, species_idx] = (
+            mass_rate * time_step
+        )
+
+
+@wp.kernel
 def condensation_mass_transfer_kernel(  # noqa: C901
     masses: Any,
     concentration: Any,
@@ -503,236 +819,101 @@ def condensation_mass_transfer_kernel(  # noqa: C901
         mass_transfer: Output raw mass-transfer proposal array.
     """  # type: ignore
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
-    dynamic_viscosity_value = dynamic_viscosity[box_idx]
-    mean_free_path_value = mean_free_path[box_idx]
-    temperature_value = temperature[box_idx]
-    n_species = masses.shape[2]
-
-    if concentration[box_idx, particle_idx] == wp.float64(0.0):
-        if n_species == 1:
-            mass_transfer[box_idx, particle_idx, 0] = wp.float64(0.0)
-            return
-        for species_idx in range(n_species):
-            mass_transfer[box_idx, particle_idx, species_idx] = wp.float64(0.0)
-        return
-
-    # Warp does not replay dynamic loops in a backward pass.  Preserve the
-    # general multi-species path below, but keep the common one-species raw
-    # rate free of dynamic loops so its out-of-place Tape derivative remains
-    # available without changing P2 or the public step contract.
-    if n_species == 1:
-        species_mass = masses[box_idx, particle_idx, 0]
-        total_volume = species_mass / density[0]
-        if total_volume <= wp.float64(0.0):
-            mass_transfer[box_idx, particle_idx, 0] = wp.float64(0.0)
-            return
-
-        radius = particle_radius_from_volume_wp(total_volume)
-        effective_density = density[0]
-        knudsen_number = knudsen_number_wp(mean_free_path_value, radius)
-        slip_correction = cunningham_slip_correction_wp(knudsen_number)
-        mobility = aerodynamic_mobility_wp(
-            radius, slip_correction, dynamic_viscosity_value
-        )
-        diffusion_coefficient_particle = diffusion_coefficient_wp(
-            temperature_value,
-            mobility,
-            boltzmann_constant,
-        )
-        transition = vapor_transition_correction_wp(
-            knudsen_number,
-            mass_accommodation[0],
-        )
-        diffusion_value = diffusion_coefficient_vapor[0]
-        if diffusion_value <= wp.float64(0.0):
-            diffusion_value = diffusion_coefficient_particle
-        mass_transport = first_order_mass_transport_k_wp(
-            radius,
-            transition,
-            diffusion_value,
-        )
-        tension = surface_tension[0]
-        if surface_tension_mode == SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED:
-            tension = effective_surface_tension[box_idx, particle_idx]
-        kelvin_radius = kelvin_radius_wp(
-            tension,
-            effective_density,
-            molar_mass[0],
-            temperature_value,
-            gas_constant,
-        )
-        kelvin_term = kelvin_term_wp(radius, kelvin_radius)
-        partial_pressure_gas = partial_pressure_wp(
-            gas_concentration[box_idx, 0],
-            molar_mass[0],
-            temperature_value,
-            gas_constant,
-        )
-        activity_factor = wp.float64(1.0)
-        if activity_enabled == wp.int32(1) and water_species_index == 0:
-            if activity_mode == ACTIVITY_MODE_IDEAL:
-                activity_factor = water_activity_ideal_wp(
-                    masses,
-                    molar_mass_reference,
-                    box_idx,
-                    particle_idx,
-                    0,
-                )
-            else:
-                activity_factor = water_activity_kappa_wp(
-                    masses,
-                    density,
-                    kappas,
-                    box_idx,
-                    particle_idx,
-                    0,
-                )
-        surface_vapor_pressure = (
-            activity_factor * vapor_pressure[box_idx, 0] * kelvin_term
-        )
-        pressure_delta = partial_pressure_gas - surface_vapor_pressure
-        species_latent_heat = wp.float64(0.0)
-        thermal_conductivity = wp.float64(0.0)
-        if latent_heat_enabled == wp.int32(1):
-            species_latent_heat = latent_heat[0]
-            thermal_conductivity = _thermal_conductivity_wp(temperature_value)
-        if species_latent_heat == wp.float64(0.0):
-            mass_rate = mass_transfer_rate_wp(
-                pressure_delta,
-                mass_transport,
-                temperature_value,
-                molar_mass[0],
-                gas_constant,
-            )
-        else:
-            mass_rate = _mass_transfer_rate_latent_heat_wp(
-                pressure_delta,
-                mass_transport,
-                temperature_value,
-                molar_mass[0],
-                species_latent_heat,
-                thermal_conductivity,
-                surface_vapor_pressure,
-                diffusion_value,
-                gas_constant,
-            )
-        mass_transfer[box_idx, particle_idx, 0] = mass_rate * time_step
-        return
-
-    total_volume = wp.float64(0.0)
-    total_mass = wp.float64(0.0)
-    for species_idx in range(n_species):
-        species_mass = masses[box_idx, particle_idx, species_idx]
-        total_mass += species_mass
-        total_volume += species_mass / density[species_idx]
-
-    if total_volume <= wp.float64(0.0):  # type: ignore[operator]
-        for species_idx in range(n_species):
-            mass_transfer[box_idx, particle_idx, species_idx] = wp.float64(0.0)
-        return
-
-    radius = particle_radius_from_volume_wp(total_volume)
-    effective_density = total_mass / total_volume
-    if effective_density <= wp.float64(0.0):
-        effective_density = density[0]
-
-    knudsen_number = knudsen_number_wp(mean_free_path_value, radius)
-    slip_correction = cunningham_slip_correction_wp(knudsen_number)
-    mobility = aerodynamic_mobility_wp(
-        radius, slip_correction, dynamic_viscosity_value
-    )
-    diffusion_coefficient_particle = diffusion_coefficient_wp(
-        temperature_value,
-        mobility,
+    _condensation_mass_transfer_impl(
+        masses,
+        concentration,
+        density,
+        gas_concentration,
+        vapor_pressure,
+        molar_mass,
+        surface_tension,
+        kappas,
+        molar_mass_reference,
+        effective_surface_tension,
+        activity_enabled,
+        activity_mode,
+        surface_tension_mode,
+        water_species_index,
+        mass_accommodation,
+        diffusion_coefficient_vapor,
+        latent_heat,
+        latent_heat_enabled,
+        dynamic_viscosity,
+        mean_free_path,
+        gas_constant,
         boltzmann_constant,
+        temperature,
+        time_step,
+        mass_transfer,
+        density,
+        wp.int32(0),
+        box_idx,
+        particle_idx,
     )
-    thermal_conductivity = wp.float64(0.0)
-    if latent_heat_enabled == wp.int32(1):
-        thermal_conductivity = _thermal_conductivity_wp(temperature_value)
 
-    for species_idx in range(n_species):
-        transition = vapor_transition_correction_wp(
-            knudsen_number,
-            mass_accommodation[species_idx],
-        )
-        diffusion_value = diffusion_coefficient_vapor[species_idx]
-        if diffusion_value <= wp.float64(0.0):
-            diffusion_value = diffusion_coefficient_particle
-        mass_transport = first_order_mass_transport_k_wp(
-            radius,
-            transition,
-            diffusion_value,
-        )
-        tension = surface_tension[species_idx]
-        if surface_tension_mode == SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED:
-            tension = effective_surface_tension[box_idx, particle_idx]
-        kelvin_radius = kelvin_radius_wp(
-            tension,
-            effective_density,
-            molar_mass[species_idx],
-            temperature_value,
-            gas_constant,
-        )
-        kelvin_term = kelvin_term_wp(radius, kelvin_radius)
-        partial_pressure_gas = partial_pressure_wp(
-            gas_concentration[box_idx, species_idx],
-            molar_mass[species_idx],
-            temperature_value,
-            gas_constant,
-        )
-        activity_factor = wp.float64(1.0)
-        if (
-            activity_enabled == wp.int32(1)
-            and species_idx == water_species_index
-        ):
-            water_species_index_int = int(water_species_index)
-            if activity_mode == ACTIVITY_MODE_IDEAL:
-                activity_factor = water_activity_ideal_wp(
-                    masses,
-                    molar_mass_reference,
-                    box_idx,
-                    particle_idx,
-                    water_species_index_int,
-                )
-            else:
-                activity_factor = water_activity_kappa_wp(
-                    masses,
-                    density,
-                    kappas,
-                    box_idx,
-                    particle_idx,
-                    water_species_index_int,
-                )
-        surface_vapor_pressure = (
-            activity_factor * vapor_pressure[box_idx, species_idx] * kelvin_term
-        )
-        pressure_delta = partial_pressure_gas - surface_vapor_pressure
-        species_latent_heat = wp.float64(0.0)
-        if latent_heat_enabled == wp.int32(1):
-            species_latent_heat = latent_heat[species_idx]
-        if species_latent_heat == wp.float64(0.0):
-            mass_rate = mass_transfer_rate_wp(
-                pressure_delta,
-                mass_transport,
-                temperature_value,
-                molar_mass[species_idx],
-                gas_constant,
-            )
-        else:
-            mass_rate = _mass_transfer_rate_latent_heat_wp(
-                pressure_delta,
-                mass_transport,
-                temperature_value,
-                molar_mass[species_idx],
-                species_latent_heat,
-                thermal_conductivity,
-                surface_vapor_pressure,
-                diffusion_value,
-                gas_constant,
-            )
-        mass_transfer[box_idx, particle_idx, species_idx] = (
-            mass_rate * time_step
-        )
+
+@wp.kernel
+def _mapped_condensation_mass_transfer_kernel(  # noqa: C901
+    masses: Any,
+    concentration: Any,
+    density: Any,
+    gas_concentration: Any,
+    vapor_pressure: Any,
+    molar_mass: Any,
+    surface_tension: Any,
+    kappas: Any,
+    molar_mass_reference: Any,
+    effective_surface_tension: Any,
+    activity_enabled: wp.int32,
+    activity_mode: wp.int32,
+    surface_tension_mode: wp.int32,
+    water_species_index: wp.int32,
+    mass_accommodation: Any,
+    diffusion_coefficient_vapor: Any,
+    latent_heat: Any,
+    latent_heat_enabled: wp.int32,
+    dynamic_viscosity: Any,
+    mean_free_path: Any,
+    gas_constant: Any,
+    boltzmann_constant: Any,
+    temperature: Any,
+    time_step: Any,
+    mass_transfer: Any,
+    particle_to_gas: Any,
+) -> None:
+    """Compute particle-ordered proposals from full-gas mapped sources."""
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
+    _condensation_mass_transfer_impl(
+        masses,
+        concentration,
+        density,
+        gas_concentration,
+        vapor_pressure,
+        molar_mass,
+        surface_tension,
+        kappas,
+        molar_mass_reference,
+        effective_surface_tension,
+        activity_enabled,
+        activity_mode,
+        surface_tension_mode,
+        water_species_index,
+        mass_accommodation,
+        diffusion_coefficient_vapor,
+        latent_heat,
+        latent_heat_enabled,
+        dynamic_viscosity,
+        mean_free_path,
+        gas_constant,
+        boltzmann_constant,
+        temperature,
+        time_step,
+        mass_transfer,
+        particle_to_gas,
+        wp.int32(1),
+        box_idx,
+        particle_idx,
+    )
 
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
@@ -1158,7 +1339,7 @@ def _validate_species_values_kernel(
     invalid: Any,
 ) -> None:
     """Record whether a species sidecar has an invalid numeric value."""
-    species_idx = wp.tid()
+    species_idx = wp.tid()  # type: ignore[misc]
     value = values[species_idx]
     if (
         not wp.isfinite(value)
@@ -1246,8 +1427,10 @@ def _warp_array_memory_range(array: Any) -> tuple[int, int]:
         raise ValueError(
             "overlap-checked Warp arrays must be contiguous, non-view arrays"
         )
-    start = int(array.ptr)
     item_count = int(np.prod(array.shape, dtype=np.int64))
+    if item_count == 0:
+        return 0, 0
+    start = int(array.ptr)
     return start, start + item_count * itemsize
 
 
@@ -1802,6 +1985,7 @@ def _finalize_inventory_limited_mass_transfer(
         failures leave caller-owned state unchanged; this does not promise
         rollback after a post-launch device-runtime failure.
     """
+    require_legacy_particle_metadata(particles)
     masses = particles.masses
     if not _is_warp_array_like(masses) or len(masses.shape) != 3:
         raise ValueError("particles.masses must be a 3D Warp array")
@@ -1895,6 +2079,97 @@ def _finalize_inventory_limited_mass_transfer(
     return finalized
 
 
+def _validate_native_ownership(
+    particles: Any,
+    gas: Any,
+    binding: CondensationSpeciesBinding,
+    thermodynamics: Any,
+    activity_surface: Any,
+    surface_tension: Any,
+    mass_accommodation: Any,
+    diffusion: Any,
+    latent_heat: Any,
+    thermal_work: Any,
+    mass_transfer: Any,
+    energy_transfer: Any,
+    scratch: Any,
+    temperature: Any,
+    pressure: Any,
+    environment: Any,
+) -> None:
+    """Reject overlaps involving any native writer before normalization.
+
+    Primary arrays, outputs and supplied scratch must not overwrite any peer
+    or configuration array. Read-only configuration may share storage.
+    """
+    writers = [
+        particles.masses,
+        gas.concentration,
+        gas.vapor_pressure,
+        mass_transfer,
+        energy_transfer,
+    ]
+    if scratch is not None:
+        writers.extend(
+            getattr(scratch, name)
+            for name in (
+                "work_mass_transfer",
+                "total_mass_transfer",
+                "dynamic_viscosity",
+                "mean_free_path",
+                "positive_mass_transfer_demand",
+                "negative_mass_transfer_release",
+                "positive_mass_transfer_scale",
+            )
+        )
+    protected = [
+        particles.concentration,
+        particles.density,
+        particles.charge,
+        particles.volume,
+        gas.molar_mass,
+        gas.partitioning,
+        binding.particle_to_gas,
+        binding.gas_to_particle,
+        thermodynamics.modes,
+        thermodynamics.parameters,
+        thermodynamics.molar_mass_reference,
+        surface_tension,
+        mass_accommodation,
+        diffusion,
+        latent_heat,
+        thermal_work,
+        temperature,
+        pressure,
+    ]
+    if activity_surface is not None:
+        protected.extend(
+            (activity_surface.kappas, activity_surface.molar_mass_reference)
+        )
+    if environment is not None:
+        protected.extend(
+            (
+                environment.temperature,
+                environment.pressure,
+                environment.saturation_ratio,
+            )
+        )
+    for index, writer in enumerate(writers):
+        if writer is None or not _is_warp_array_like(writer):
+            continue
+        start, end = _warp_array_memory_range(writer)
+        if start == end:
+            continue
+        for other in (*writers[index + 1 :], *protected):
+            if other is None or not _is_warp_array_like(other):
+                continue
+            other_start, other_end = _warp_array_memory_range(other)
+            if writer is other or (start < other_end and other_start < end):
+                raise ValueError(
+                    "native condensation writers must not overlap state"
+                )
+
+
 def _prepare_condensation_step_gpu(  # noqa: C901
     particles: Any,
     gas: Any,
@@ -1913,6 +2188,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
     latent_heat: Any | None = None,
     energy_transfer: Any | None = None,
     thermal_work: Any | None = None,
+    species_binding: CondensationSpeciesBinding | None = None,
 ) -> _PreparedCondensationCall:
     """Validate and bind a fixed four-substep condensation device call.
 
@@ -1920,7 +2196,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         particles: GPU-resident particle data.
         gas: GPU-resident gas data.
             ``gas.partitioning`` must be an active-device binary ``wp.int32``
-            mask shaped ``(n_boxes, n_species)``.
+            mask shaped ``(n_boxes, n_gas)``.
         temperature: Direct gas temperature as either a scalar or a Warp array
             with shape ``(n_boxes,)``. Use ``None`` only with
             ``environment=...``.
@@ -1956,7 +2232,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             total transfer buffer is returned by identity. Work retains the
             final P1-gated raw proposal; total accumulates P2-finalized applied
             transfers. P2 limiting sidecars have shape
-            ``(n_boxes, n_species)``, validate before launch, and are reused by
+            ``(n_boxes, n_gas)``, validate before launch, and are reused by
             all four P2 finalization cycles.
             Validation is performed before allocation or mutation. Arrays must
             remain alive and unmodified until launched work completes and may
@@ -1966,7 +2242,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             supplied, it is consumed in every fixed substep; zero entries use
             the exact isothermal rate path.
         energy_transfer: Optional caller-owned, active-device ``wp.float64``
-            write-only energy output [J] shaped ``(n_boxes, n_species)``. It
+            write-only energy output [J] shaped ``(n_boxes, n_gas)``. It
             requires valid ``latent_heat``. After successful preflight, the
             same buffer is cleared and overwritten with signed whole-call
             finalized applied transfer times per-species ``latent_heat``;
@@ -1978,6 +2254,11 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             [J/kg] as an active-device ``wp.float64`` array shaped
             ``(n_species,)``. It is validated but deferred and unused P3 state;
             this step does not allocate, initialize, modify, or consume it.
+        species_binding: Explicit native gas/material map pinned to these exact
+            carriers. Native transport/thermal arrays and reductions use full
+            gas width; activity/surface arrays and transfers use material width.
+            Native energy weights applied transfers by counts (density times
+            unit volume for PMF). Legacy untagged calls omit this binding.
 
     Returns:
         Private prepared call retaining validated inputs, resolved device
@@ -1987,7 +2268,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
     Raises:
         ValueError: If species counts, array lengths, or devices mismatch.
         ValueError: If ``gas.partitioning`` is not an active-device binary
-             ``wp.int32`` array shaped ``(n_boxes, n_species)``.
+             ``wp.int32`` array shaped ``(n_boxes, n_gas)``.
         ValueError: If direct ``temperature`` or ``pressure`` inputs are mixed
             with ``environment``.
         ValueError: If direct inputs are missing when ``environment`` is
@@ -2010,7 +2291,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             before launch to prevent non-isothermal arithmetic overflow.
         ValueError: If ``energy_transfer`` is supplied without valid
             ``latent_heat`` or lacks active-device ``wp.float64``
-            ``(n_boxes, n_species)`` metadata.
+            ``(n_boxes, n_gas)`` metadata.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
@@ -2083,7 +2364,17 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         only writes it. This write-only contract permits stale finite values and
         NaN/Inf before a call.
     """
-    require_legacy_particle_metadata(particles)
+    population_code = particle_distribution_code(particles)
+    if population_code in (DISCRETE, PARTICLE_RESOLVED):
+        if type(species_binding) is not CondensationSpeciesBinding:
+            raise ValueError("native condensation requires species_binding")
+        species_binding.validate(particles, gas)
+    else:
+        require_legacy_particle_metadata(particles)
+        if species_binding is not None:
+            raise ValueError(
+                "legacy condensation does not accept species_binding"
+            )
     if (
         isinstance(time_step, bool)
         or not isinstance(time_step, Real)
@@ -2095,7 +2386,8 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         )
 
     n_boxes, n_particles, n_species = particles.masses.shape
-    _validate_gas_arrays(gas, n_boxes, n_species)
+    n_gas = gas.concentration.shape[1] if species_binding else n_species
+    _validate_gas_arrays(gas, n_boxes, n_gas)
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
 
     device = particles.masses.device
@@ -2103,13 +2395,13 @@ def _prepare_condensation_step_gpu(  # noqa: C901
     _validate_partitioning_metadata(
         gas.partitioning,
         n_boxes,
-        n_species,
+        n_gas,
         device,
         "condensation_step_gpu",
     )
     thermodynamics = validate_thermodynamics_config(
         thermodynamics,
-        n_species,
+        n_gas,
         device,
         gas.molar_mass,
         "condensation_step_gpu",
@@ -2119,7 +2411,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         _validate_float64_species_array(
             "latent_heat",
             latent_heat,
-            n_species,
+            n_gas,
             device,
             nonnegative=True,
             maximum=1.0e9,
@@ -2129,14 +2421,14 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             raise ValueError("energy_transfer requires latent_heat")
         _validate_energy_transfer_buffer(
             energy_transfer,
-            (n_boxes, n_species),
+            (n_boxes, n_gas),
             device,
         )
     if thermal_work is not None:
         _validate_float64_species_array(
             "thermal_work",
             thermal_work,
-            n_species,
+            n_gas,
             device,
             nonnegative=True,
         )
@@ -2154,6 +2446,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             device,
             gas.molar_mass,
             "condensation_step_gpu",
+            species_binding=species_binding,
         )
 
     if surface_tension is not None:
@@ -2168,7 +2461,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         _validate_float64_species_array(
             "mass_accommodation",
             mass_accommodation,
-            n_species,
+            n_gas,
             device,
             nonnegative=True,
         )
@@ -2176,7 +2469,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         _validate_float64_species_array(
             "diffusion_coefficient_vapor",
             diffusion_coefficient_vapor,
-            n_species,
+            n_gas,
             device,
             nonnegative=True,
         )
@@ -2213,6 +2506,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             expected_shape,
             device,
             "condensation_step_gpu",
+            gas_species_count=n_gas,
         )
         if mass_transfer is not None and (
             scratch_buffers.work_mass_transfer is not None
@@ -2242,7 +2536,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
     _validate_partitioning_values(
         gas.partitioning,
         n_boxes,
-        n_species,
+        n_gas,
         device,
     )
     if environment is not None:
@@ -2256,7 +2550,28 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         )
     # P2 primary state and caller-owned sidecars validate before environment
     # normalization or fallback allocation, so invalid state is fully atomic.
-    _validate_p2_primary_state(particles, gas, expected_shape, device)
+    if species_binding:
+        native_kernels.validate_primary_state(particles, gas, population_code)
+        _validate_native_ownership(
+            particles,
+            gas,
+            species_binding,
+            thermodynamics,
+            activity_surface,
+            surface_tension,
+            mass_accommodation,
+            diffusion_coefficient_vapor,
+            latent_heat,
+            thermal_work,
+            mass_transfer,
+            energy_transfer,
+            scratch_buffers,
+            temperature,
+            pressure,
+            environment,
+        )
+    else:
+        _validate_p2_primary_state(particles, gas, expected_shape, device)
     if scratch_buffers is not None:
         direct_temperature = (
             temperature if _is_warp_array_like(temperature) else None
@@ -2392,7 +2707,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
 
     if mass_accommodation is None:
         mass_accommodation = wp.full(
-            n_species,
+            n_gas,
             wp.float64(_DEFAULT_MASS_ACCOMMODATION),
             dtype=wp.float64,
             device=device,
@@ -2400,7 +2715,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
 
     if diffusion_coefficient_vapor is None:
         diffusion_coefficient_vapor = wp.full(
-            n_species,
+            n_gas,
             wp.float64(_DEFAULT_DIFFUSION_COEFFICIENT),
             dtype=wp.float64,
             device=device,
@@ -2436,23 +2751,23 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         scratch_buffers.positive_mass_transfer_demand
         if scratch_buffers is not None
         and scratch_buffers.positive_mass_transfer_demand is not None
-        else wp.zeros((n_boxes, n_species), dtype=wp.float64, device=device)
+        else wp.zeros((n_boxes, n_gas), dtype=wp.float64, device=device)
     )
     release = (
         scratch_buffers.negative_mass_transfer_release
         if scratch_buffers is not None
         and scratch_buffers.negative_mass_transfer_release is not None
-        else wp.zeros((n_boxes, n_species), dtype=wp.float64, device=device)
+        else wp.zeros((n_boxes, n_gas), dtype=wp.float64, device=device)
     )
     scale = (
         scratch_buffers.positive_mass_transfer_scale
         if scratch_buffers is not None
         and scratch_buffers.positive_mass_transfer_scale is not None
-        else wp.zeros((n_boxes, n_species), dtype=wp.float64, device=device)
+        else wp.zeros((n_boxes, n_gas), dtype=wp.float64, device=device)
     )
     candidate = wp.zeros(expected_shape, dtype=wp.float64, device=device)
     finalized = wp.zeros(expected_shape, dtype=wp.float64, device=device)
-    gas_delta = wp.zeros((n_boxes, n_species), dtype=wp.float64, device=device)
+    gas_delta = wp.zeros((n_boxes, n_gas), dtype=wp.float64, device=device)
     dynamic_viscosity = (
         scratch_buffers.dynamic_viscosity
         if scratch_buffers is not None
@@ -2552,6 +2867,16 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         gas.partitioning,
         thermodynamics.modes,
         thermodynamics.parameters,
+        species_binding=species_binding,
+        particle_to_gas=species_binding.particle_to_gas
+        if species_binding
+        else None,
+        gas_to_particle=species_binding.gas_to_particle
+        if species_binding
+        else None,
+        particle_volume=particles.volume if species_binding else None,
+        distribution_kind=population_code,
+        gas_species_count=n_gas,
     )
 
 
@@ -2580,6 +2905,8 @@ def _enqueue_prepared_condensation_call(
     """
     p = prepared
     n_boxes, n_particles, n_species = p.dimensions
+    n_gas = p.gas_species_count or n_species
+    native = p.species_binding is not None
     wp.launch(
         _clear_mass_transfer_kernel,
         dim=(n_boxes, n_particles),
@@ -2610,7 +2937,7 @@ def _enqueue_prepared_condensation_call(
             )
         wp.launch(
             _refresh_vapor_pressure_kernel,
-            dim=(n_boxes, n_species),
+            dim=(n_boxes, n_gas),
             inputs=[
                 p.thermodynamics_modes,
                 p.thermodynamics_parameters,
@@ -2631,7 +2958,9 @@ def _enqueue_prepared_condensation_call(
             device=p.device,
         )
         wp.launch(
-            condensation_mass_transfer_kernel,
+            _mapped_condensation_mass_transfer_kernel
+            if native
+            else condensation_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
             inputs=[
                 p.particle_masses,
@@ -2659,17 +2988,21 @@ def _enqueue_prepared_condensation_call(
                 p.refresh_temperature,
                 p.substep_time_step,
                 p.work_mass_transfer,
-            ],
+            ]
+            + ([p.particle_to_gas] if native else []),
             device=p.device,
         )
         wp.launch(
-            _gate_mass_transfer_kernel,
+            native_kernels.gate_transfer
+            if native
+            else _gate_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
             inputs=[
                 p.gas_partitioning,
                 p.particle_concentration,
                 p.work_mass_transfer,
-            ],
+            ]
+            + ([p.particle_to_gas] if native else []),
             device=p.device,
         )
         wp.launch(
@@ -2679,32 +3012,57 @@ def _enqueue_prepared_condensation_call(
             device=p.device,
         )
         wp.launch(
-            _reduce_inventory_candidates_kernel,
-            dim=(n_boxes, n_species),
+            native_kernels.reduce_candidates
+            if native
+            else _reduce_inventory_candidates_kernel,
+            dim=(n_boxes, n_gas),
             inputs=[
                 p.candidate,
                 p.particle_concentration,
                 p.demand,
                 p.release,
-            ],
+            ]
+            + (
+                [
+                    p.gas_to_particle,
+                    p.particle_volume,
+                    wp.int32(p.distribution_kind),
+                ]
+                if native
+                else []
+            ),
             device=p.device,
         )
         wp.launch(
             _scale_inventory_uptake_kernel,
-            dim=(n_boxes, n_species),
+            dim=(n_boxes, n_gas),
             inputs=[p.gas_concentration, p.demand, p.release, p.scale],
             device=p.device,
         )
         wp.launch(
-            _finalize_and_apply_inventory_transfer_kernel,
+            native_kernels.finalize_transfer
+            if native
+            else _finalize_and_apply_inventory_transfer_kernel,
             dim=(n_boxes, n_particles),
-            inputs=[p.particle_masses, p.candidate, p.scale, p.finalized],
+            inputs=[p.particle_masses, p.candidate, p.scale, p.finalized]
+            + ([p.particle_to_gas] if native else []),
             device=p.device,
         )
         wp.launch(
-            _reduce_finalized_transfer_to_gas_kernel,
-            dim=(n_boxes, n_species),
-            inputs=[p.finalized, p.particle_concentration, p.gas_delta],
+            native_kernels.reduce_finalized
+            if native
+            else _reduce_finalized_transfer_to_gas_kernel,
+            dim=(n_boxes, n_gas),
+            inputs=[p.finalized, p.particle_concentration, p.gas_delta]
+            + (
+                [
+                    p.gas_to_particle,
+                    p.particle_volume,
+                    wp.int32(p.distribution_kind),
+                ]
+                if native
+                else []
+            ),
             device=p.device,
         )
         wp.launch(
@@ -2721,19 +3079,31 @@ def _enqueue_prepared_condensation_call(
         )
         wp.launch(
             _couple_finalized_transfer_to_gas_kernel,
-            dim=(n_boxes, n_species),
+            dim=(n_boxes, n_gas),
             inputs=[p.gas_delta, p.gas_concentration],
             device=p.device,
         )
         if p.energy_transfer is not None:
             wp.launch(
-                _accumulate_energy_transfer_kernel,
-                dim=(n_boxes, n_species),
+                native_kernels.energy_transfer
+                if native
+                else _accumulate_energy_transfer_kernel,
+                dim=(n_boxes, n_gas),
                 inputs=[
                     p.total_mass_transfer,
                     p.latent_heat,
                     p.energy_transfer,
-                ],
+                ]
+                + (
+                    [
+                        p.gas_to_particle,
+                        p.particle_concentration,
+                        p.particle_volume,
+                        wp.int32(p.distribution_kind),
+                    ]
+                    if native
+                    else []
+                ),
                 device=p.device,
             )
     return p.particles, p.total_mass_transfer
@@ -2757,6 +3127,7 @@ def condensation_step_gpu(
     latent_heat: Any | None = None,
     energy_transfer: Any | None = None,
     thermal_work: Any | None = None,
+    species_binding: CondensationSpeciesBinding | None = None,
 ) -> tuple[Any, Any]:
     """Validate a direct call, then enqueue its prepared device sequence.
 
@@ -2785,7 +3156,13 @@ def condensation_step_gpu(
         scratch_buffers: Optional reusable condensation scratch sidecar.
         latent_heat: Optional per-species latent heat [J/kg].
         energy_transfer: Optional caller-owned energy output [J].
-        thermal_work: Optional validated but unused thermal-work sidecar.
+        thermal_work: Optional validated but unused full-gas thermal sidecar.
+        species_binding: Required explicit binding for tagged discrete/resolved
+            state; prepare with ``prepare_condensation_species_map`` from
+            ``particula.gpu.species_mapping``. Material surface/activity arrays
+            use particle order. Thermodynamics, accommodation, diffusion, heat
+            and energy use full gas order. Transfer outputs remain particle
+            ordered kg per particle; native energy is extensive J per gas lane.
 
     Returns:
         A tuple ``(particles, total_mass_transfer)``. The particle container is
@@ -2814,5 +3191,6 @@ def condensation_step_gpu(
             latent_heat=latent_heat,
             energy_transfer=energy_transfer,
             thermal_work=thermal_work,
+            species_binding=species_binding,
         )
     )
