@@ -16,7 +16,6 @@ from numpy.typing import NDArray
 
 from particula.dynamics.coagulation import charged_dimensional_kernel as laws
 from particula.dynamics.coagulation import charged_kernel_strategy as models
-from particula.dynamics.coagulation import coagulation_rate
 from particula.dynamics.coagulation.particle_resolved_step import (
     particle_resolved_method,
 )
@@ -24,7 +23,6 @@ from particula.particles.particle_data import ParticleData
 
 from ._native_validation import (
     positive_scalar,
-    rate_radius,
     validate_controls,
     validate_particle,
     validate_rate_kernel,
@@ -142,7 +140,7 @@ def binned_kernel_data(
     return result
 
 
-def _validate_storage(particle: ParticleData) -> None:
+def _validate_storage(particle: ParticleData, resolved: bool) -> None:
     """Reject unwritable or overlapping destinations before draws."""
     fields = [
         particle.masses,
@@ -153,7 +151,7 @@ def _validate_storage(particle: ParticleData) -> None:
     ]
     if particle.radius_grid is not None:
         fields.append(particle.radius_grid)
-    for index in [0, 1, 2]:
+    for index in [0, 1, 2] if resolved else [1]:
         destination = fields[index]
         if not destination.flags.writeable:
             raise ValueError("native coagulation destinations must be writable")
@@ -256,71 +254,6 @@ def _merge(
     np.copyto(particle.charge, charge)
 
 
-def _density_moment_rate(
-    particle: ParticleData,
-    kernel: NDArray[np.float64],
-    loss: NDArray[np.float64],
-    moment: NDArray[np.float64],
-) -> NDArray[np.float64]:
-    """Transport an additive per-particle quantity through the existing gain.
-
-    The number quadrature is linear in its pair integrand. Weighting that
-    integrand by the sum of donor quantities gives the species-mass or signed
-    charge gain, instead of assigning gained particles the destination node's
-    old composition. PDF quantities use the explicit radius coordinate. Discrete
-    quantities retain the existing forward-width PMF/PDF conversion.
-    """
-    gain_function = (
-        coagulation_rate.get_coagulation_gain_rate_continuous
-        if particle.distribution_type == "continuous_pdf"
-        else coagulation_rate.get_coagulation_gain_rate_discrete
-    )
-    weighted_kernel = kernel * (moment[:, None] + moment[None, :])
-    gain = np.asarray(
-        gain_function(
-            radius=rate_radius(particle),
-            concentration=particle.concentration[0],
-            kernel=weighted_kernel,
-        ),
-        dtype=np.float64,
-    )
-    return gain - moment * loss
-
-
-def _stage_density_moment(
-    particle: ParticleData,
-    kernel: NDArray[np.float64],
-    loss: NDArray[np.float64],
-    moment: NDArray[np.float64],
-    updated_concentration: NDArray[np.float64],
-    time_step: float,
-    *,
-    nonnegative: bool,
-) -> NDArray[np.float64]:
-    """Stage a new per-particle mean from its density inventory tendency."""
-    inventory = particle.concentration[
-        0
-    ] * moment + time_step * _density_moment_rate(
-        particle, kernel, loss, moment
-    )
-    occupied = updated_concentration > 0
-    if (
-        not np.all(np.isfinite(inventory))
-        or (nonnegative and np.any(inventory < 0))
-        or np.any(inventory[~occupied] != 0)
-    ):
-        raise ValueError(
-            "coagulation moment requires a smaller finite time_step "
-            "or a better resolved grid"
-        )
-    updated = moment.copy()
-    # Unoccupied zero-inventory nodes keep their geometric/material carrier.
-    updated[occupied] = inventory[occupied] / updated_concentration[occupied]
-    if not np.all(np.isfinite(updated)):
-        raise ValueError("coagulation moment mean must remain finite")
-    return updated
-
-
 def _density_step(
     strategy: Any,
     particle: ParticleData,
@@ -328,7 +261,12 @@ def _density_step(
     pressure: float,
     time_step: float,
 ) -> ParticleData:
-    """Retain the number update and transport species mass and signed charge."""
+    """Stage the existing number update, retaining fixed masses and charge.
+
+    Size-dependent composition can produce persistent per-species inventory
+    defects. This accepted PMF/PDF limitation is documented separately from
+    the resolved merge's species/charge conservation contract.
+    """
     rate = np.asarray(strategy.net_rate(particle, temperature, pressure))
     if (
         rate.shape != (particle.n_particles,)
@@ -343,61 +281,7 @@ def _density_step(
         updated = particle.concentration + rate[None, :] * time_step
     if not np.all(np.isfinite(updated)) or np.any(updated < 0):
         raise ValueError("coagulation step requires a smaller finite time_step")
-    if not np.any(particle.concentration) and not np.any(updated):
-        return particle
-    kernel = validate_rate_kernel(
-        particle, strategy.kernel(particle, temperature, pressure)
-    )
-    if not np.any(kernel) and not np.any(rate):
-        return particle
-    loss = np.asarray(strategy.loss_rate(particle, kernel))
-    if (
-        loss.shape != (particle.n_particles,)
-        or not np.issubdtype(loss.dtype, np.number)
-        or np.iscomplexobj(loss)
-        or not np.all(np.isfinite(loss))
-        or np.any(loss < 0)
-    ):
-        raise ValueError(
-            "coagulation loss must have finite nonnegative slot shape"
-        )
-    masses = particle.masses.copy()
-    try:
-        with np.errstate(over="raise", invalid="raise", divide="raise"):
-            for species in range(particle.n_species):
-                masses[0, :, species] = _stage_density_moment(
-                    particle,
-                    kernel,
-                    loss,
-                    particle.masses[0, :, species],
-                    updated[0],
-                    time_step,
-                    nonnegative=True,
-                )
-            charge = _stage_density_moment(
-                particle,
-                kernel,
-                loss,
-                particle.charge[0],
-                updated[0],
-                time_step,
-                nonnegative=False,
-            )[None, :]
-    except FloatingPointError as error:
-        raise ValueError("native coagulation moment overflow") from error
-    candidate = ParticleData(
-        masses=masses,
-        concentration=updated,
-        charge=charge,
-        density=particle.density,
-        volume=particle.volume,
-        distribution_type=particle.distribution_type,
-        radius_grid=particle.radius_grid,
-    )
-    validate_particle(candidate, strategy.distribution_type)
-    np.copyto(particle.masses, masses)
     np.copyto(particle.concentration, updated)
-    np.copyto(particle.charge, charge)
     return particle
 
 
@@ -416,7 +300,7 @@ def step_native(
     positive_scalar(time_step, "time_step", zero_allowed=True)
     validate_controls(strategy, kind)
     resolved = kind == "particle_resolved"
-    _validate_storage(particle)
+    _validate_storage(particle, resolved)
     if not resolved:
         return _density_step(
             strategy, particle, temperature, pressure, time_step

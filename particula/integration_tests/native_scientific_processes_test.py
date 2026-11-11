@@ -242,23 +242,25 @@ def test_density_native_aggregate_through_three_processes(kind, strategy_type):
     aerosol = _aggregate(particle)
     _condense(aerosol, strategy_type)
     gas_before = aerosol.gas.concentration.copy()
-    before = _inventory(particle)
     coagulation = BrownianCoagulationStrategy(kind)
-    kernel = coagulation.kernel(particle, 298.15, 101325.0)
-    # Independent donor-loss integral bounds retained finite-grid moment error.
-    collision_rate = _integrate(
-        particle, kernel.T * particle.concentration[0, :, None]
-    )
-    gross_loss = _integrate(
-        particle,
-        particle.masses[0]
-        * (collision_rate * particle.concentration[0])[:, None],
-    )
     old_count = particle.concentration.copy()
+    old_mass = particle.masses.copy()
+    old_charge = particle.charge.copy()
+    expected_count = (
+        old_count + 10 * coagulation.net_rate(particle, 298.15, 101325.0)[None]
+    )
+    # Preserve the accepted fixed-composition method. Species closure is not
+    # promised here; the independent refinement characterization documents why.
     assert coagulation.step(particle, 298.15, 101325.0, 10.0) is particle
     assert not np.array_equal(particle.concentration, old_count)
-    assert np.all(
-        np.abs(_inventory(particle) - before) < 0.01 * 10 * gross_loss
+    npt.assert_array_equal(particle.concentration, expected_count)
+    npt.assert_array_equal(particle.masses, old_mass)
+    npt.assert_array_equal(particle.charge, old_charge)
+    npt.assert_allclose(
+        _inventory(particle),
+        _integrate(particle, old_mass[0] * expected_count[0, :, None]),
+        rtol=2e-15,
+        atol=0,
     )
     before_wall = _inventory(particle)
     old_count = particle.concentration.copy()

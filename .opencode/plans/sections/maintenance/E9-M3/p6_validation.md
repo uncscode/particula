@@ -1,4 +1,10 @@
-# P6 integration and final M3 evidence
+# P6 integration and original M3 validation evidence
+
+**Current scope amendment:** the maintainer subsequently chose to preserve
+fixed-composition PMF/PDF coagulation and document its limitation. The moment
+extension was removed; [p4_preserved_method.md](p4_preserved_method.md) records
+the current contract and replacement validation. Results below describe the
+original revision unless explicitly identified as current.
 
 M2 baseline: `fd114270a3e847a6b7b51a2c2ef2f7e5c27ecb4b` (merged #1630).
 P1–P5 implementation checkpoints end at `7540d991e`. This single PR implements
@@ -39,7 +45,7 @@ legacy fixture coverage remains alongside independent native successor suites:
 | Mass transfer, depletion, evaporation, gas-disabled reservoir, latent heat | `native_step_test.py`; `native_step_admission_test.py`; independent particle/gas assertions |
 | Staggered theta/batch/random controls, conservation, stability/current gas | `native_staggered_test.py` scalar oracle and ownership/RNG/repeated-evaporation cases; existing stability/performance suites retained |
 | Seven coagulation strategy modules and ABC kernels/rates | `native_rates_test.py` physical inputs, independent simple laws and independent inputs to existing complex laws, representation compatibility |
-| Resolved selection/binning/merge and density steps | `native_coagulation_step_test.py`, `native_coagulation_moments_test.py`; species/charge moments supersede invalid number-only mass assertions |
+| Resolved selection/binning/merge and density steps | `native_coagulation_step_test.py`, `native_coagulation_limitations_test.py`; fixed masses/charge assertions restored by explicit decision, with independent nonclosure characterization |
 | Both CPU wall-loss suites | All 15 normal-suite and 38 adjacent-suite test functions retained with native fixtures; parameterized counts differ; independent `native_wall_loss_test.py` supplies sinks, statistics, rejection and current-charge evidence |
 | GPU turbulent selector complexity diagnostic | Same `test_turbulent_public_dispatch_keeps_linear_majorant_path` assertion now inspects the shared selector implementation used by native and legacy wrappers |
 | Former `test_tagged_transfer_rejects_before_warp_probe` | `test_pdf_transfer_rejects_before_warp_probe` retains unsupported PDF provenance rejection; `population_metadata_test.py` adds raw resolved/PMF and explicit legacy round trips, bad-tag rejection and map binding checks |

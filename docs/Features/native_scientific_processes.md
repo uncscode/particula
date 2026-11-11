@@ -59,10 +59,11 @@ a fixed reservoir and does not establish closed-system conservation.
 Native coagulation supports the existing CPU mechanisms, including turbulent
 DNS and the charged strategy variants. Resolved merging requires **equal
 positive active counts within a box**; unequal weights reject before selection.
-Density steps retain the existing number law and transport species and signed
-charge moments through its gain/loss quadrature. They have finite-grid error,
-documented with independent collision integrals and refinement tests; this is
-not an exact discrete-conservation claim for arbitrary grids. See
+Density steps preserve the existing number-density update while keeping per-bin
+species masses and charge fixed. When composition varies with size, individual
+species and weighted charge need not be conserved, even if total-mass error
+converges under grid refinement. This accepted limitation is characterized by
+independent tests; conservative species transport is deferred. See
 [coagulation contracts](coagulation_strategy_system.md).
 
 Native CPU wall loss retains forward Euler for PMF/PDF and Bernoulli whole-
@@ -92,7 +93,8 @@ requires initialized caller-owned RNG and `initialize_rng=False`.
 
 The native integration suite verifies condensation deltas separately in
 particles and mapped gas, actual resolved coagulation conservation at
-V=.25/1/4, density-step finite-grid bounds, and wall-loss sinks. It keeps gas
+V=.25/1/4, the retained fixed-composition density update and its characterized
+limitation, and wall-loss sinks. It keeps gas
 and environment protected across particle-only processes. The owning unit
 suites provide the wider mechanism, control, rejection and stochastic matrices.
 

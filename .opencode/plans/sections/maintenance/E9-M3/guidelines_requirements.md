@@ -27,8 +27,10 @@ store density; only resolved counts use variable-V normalization.
    Treat `update_gases=False` as its specified reservoir behavior, not a
    closed-system conservation claim.
 5. Preserve current formulas, limiting/clipping, stepping/theta modes,
-   latent-heat behavior and stochastic controls. Coagulation conserves weighted
-   mass under documented discretization tolerance, not particle number. Wall
+   latent-heat behavior and stochastic controls. Resolved coagulation conserves
+   weighted species mass and charge. By explicit maintainer decision, PMF/PDF
+   retains its fixed-composition update and documented species-closure
+   limitation; see `p4_preserved_method.md`. Wall
    loss is a sink: compare remaining plus independently accounted removed
    inventory rather than asserting constant remaining particle mass.
 6. Require n_boxes=1 before CPU scientific writes, including directly mutated
