@@ -2361,7 +2361,7 @@ def _write_p4_final(
         count = wp.int32(demand[box])
     final_demand[box] = demand[box]
     if native != 0:
-        final_demand[box] = wp.float64(count) / volume[box]
+        final_demand[box] = demand[box] / volume[box]
     final_counts[box] = count
     for rank in range(final_indices.shape[1]):
         if rank < count:
