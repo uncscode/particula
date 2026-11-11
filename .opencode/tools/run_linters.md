@@ -41,7 +41,11 @@ nonblank, unique, canonical, non-option, confined repository-relative paths.
 absent. `autoFix: false` is validation-only and does not modify files.
 `autoFix: true` runs the mutating Ruff fix/format/final-check flow before mypy
 and requires confirmation. `targetDir`, when supplied, is the legacy scalar
-selector; an omitted value defers to project configuration.
+selector; an omitted value defers to project configuration. In particular,
+mypy receives no positional target by default, honoring `[tool.mypy]`
+`packages`/`files` instead of overriding them with `.`. In this repository,
+that checks `particula`, matching CI. An explicit `targetDir` still overrides
+configured discovery and retains path validation. Ruff's default stays `.`.
 
 Defaults remain entrypoint-specific when `mode` is absent: the direct
 TypeScript wrapper defaults `autoFix` to `true`, while the runtime adapter
