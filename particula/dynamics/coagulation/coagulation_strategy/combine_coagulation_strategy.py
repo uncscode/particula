@@ -15,6 +15,7 @@ from typing import List, Union
 import numpy as np
 from numpy.typing import NDArray
 
+from ._native_validation import native_kernel
 from .coagulation_strategy_abc import CoagulationStrategyABC, ParticleLike
 
 logger = logging.getLogger("particula")
@@ -115,6 +116,7 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
         logger.error(message)
         raise NotImplementedError(message)
 
+    @native_kernel
     def kernel(
         self,
         particle: ParticleLike,

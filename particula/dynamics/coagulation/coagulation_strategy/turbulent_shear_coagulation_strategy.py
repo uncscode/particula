@@ -19,6 +19,7 @@ from particula.dynamics.coagulation.turbulent_shear_kernel import (
     get_turbulent_shear_kernel_st1956_via_system_state,
 )
 
+from ._native_validation import native_kernel
 from .coagulation_strategy_abc import (
     CoagulationStrategyABC,
     ParticleLike,
@@ -150,6 +151,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         logger.error(message)
         raise NotImplementedError(message)
 
+    @native_kernel
     def kernel(
         self,
         particle: ParticleLike,

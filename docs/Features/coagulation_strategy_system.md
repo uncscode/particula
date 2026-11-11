@@ -19,6 +19,47 @@ This feature is built around user-facing APIs exposed via `particula.dynamics`:
 - `CoagulationFactory` – factory for selecting a coagulation strategy by name with builder defaults.
 - `Coagulation` runnable – delegates to a coagulation strategy, splits `time_step` across `sub_steps`, and composes with other runnables using the `|` operator.
 
+## Native kernel and rate contract (E9-M3)
+
+The six concrete CPU strategy families accept explicitly tagged `ParticleData`
+for native kernel evaluation: Brownian, charged, sedimentation, turbulent shear,
+turbulent DNS and compatible combinations. Configuration stays on strategies.
+Every native entry revalidates representation and physical state, requires one
+box and matching `distribution_type`, and checks scalar temperature/pressure.
+Mutated mechanism controls and combined child distributions are checked again.
+
+Kernel values have units m³/s and use per-particle material mass, geometry and
+charge. They do not multiply physical mass by population count. Zero-mass,
+zero-count slots retain zero rows/columns in the original slot layout; occupied
+zero-mass particles reject. Existing CPU sedimentation and DNS retain their
+arithmetic mean of per-particle mass-weighted effective density. DNS retains its
+existing ambient-pressure convention; this migration does not change its law.
+
+| Native quantity | Interpretation |
+|---|---|
+| Resolved concentration | Raw counts; density is N/V for positive physical volume |
+| Discrete PMF concentration | Bin number density, m⁻³; volume must be exactly 1 m³ |
+| Radius PDF concentration | dn/dr, m⁻⁴; integrate on explicit increasing `radius_grid`, at volume 1 m³ |
+| Discrete gain/loss/net rate | Number-density change, m⁻³ s⁻¹ |
+| Radius-PDF gain/loss/net rate | Radius-density change, m⁻⁴ s⁻¹ |
+| Friction factor | kg/s |
+
+PDF quadrature uses the declared radius coordinate; physical kernel radii are
+still derived from material mass and density. PMF gain uses its existing
+conversion to PDF on physical radii. The existing cubic gain interpolation
+requires at least four increasing positive nodes for a nonzero population;
+shared container metadata does not supply a lower-order alternative. Zero-work
+rates remain zero. Supplied pair kernels must be real, finite, nonnegative
+square matrices matching the population width.
+
+Gain/loss/net-rate APIs remain discrete/PDF operations. Native resolved kernel
+support does not introduce deterministic resolved rate APIs or establish which
+weights its stochastic selector can conserve. P4 owns resolved selection,
+temporary kernel binning and stepping. Existing untagged/facade examples below
+retain their temporary compatibility behavior; M4 owns runnable and adapter
+migration. Independent native fixtures are in
+`particula/dynamics/coagulation/coagulation_strategy/tests/native_rates_test.py`.
+
 ## Key Benefits
 
 - **Consistent dynamics workflow**: Same strategy-based API (`kernel`, `rate`, `step`, `distribution_type`) and runnable integration as condensation and wall loss.

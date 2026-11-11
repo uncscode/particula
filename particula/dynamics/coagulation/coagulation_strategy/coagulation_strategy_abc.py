@@ -24,6 +24,14 @@ from particula.particles import change_particle_representation
 from particula.particles.particle_data import ParticleData
 from particula.particles.representation import ParticleRepresentation
 
+from ._native_validation import (
+    is_native,
+    positive_scalar,
+    rate_radius,
+    validate_particle,
+    validate_rate_kernel,
+)
+
 logger = logging.getLogger("particula")
 
 ParticleLike = Union[ParticleRepresentation, ParticleData]
@@ -58,6 +66,8 @@ def _require_single_box_particle_data(particle: ParticleData) -> ParticleData:
     Raises:
         ValueError: If ``particle.n_boxes`` is not 1.
     """
+    if is_native(particle):
+        validate_particle(particle, cast(str, particle.distribution_type))
     if particle.n_boxes != 1:
         raise ValueError(
             "ParticleData must have n_boxes=1 for CPU coagulation "
@@ -90,6 +100,8 @@ def _get_concentration(particle: ParticleLike) -> NDArray[np.float64]:
     particle = _unwrap_particle(particle)
     if isinstance(particle, ParticleData):
         particle = _require_single_box_particle_data(particle)
+        if is_native(particle):
+            return particle.slot_concentration_density[0]
         return particle.concentration[0]
     return cast(ParticleRepresentation, particle).concentration
 
@@ -500,7 +512,9 @@ class CoagulationStrategyABC(ABC):
         particle: ParticleLike,
         kernel: NDArray[np.float64],
     ) -> Union[float, NDArray[np.float64]]:
-        """Calculate the coagulation loss rate [kg/s].
+        """Calculate the coagulation loss rate.
+
+        Rates use 1/m^3/s for PMF and 1/m^4/s for radius PDF.
 
         CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
 
@@ -510,7 +524,7 @@ class CoagulationStrategyABC(ABC):
             - kernel : The coagulation kernel [m^3/s].
 
         Returns:
-            - float or NDArray[np.float64] : The loss rate [kg/s].
+            The loss rate in 1/m^3/s for PMF or 1/m^4/s for radius PDF.
 
         Raises:
             - ValueError : If the distribution type is invalid.
@@ -522,6 +536,10 @@ class CoagulationStrategyABC(ABC):
             ```
         """
         particle = _unwrap_particle(particle)
+        if is_native(particle):
+            native_particle = cast(ParticleData, particle)
+            validate_particle(native_particle, self.distribution_type)
+            kernel = validate_rate_kernel(native_particle, kernel)
         if self.distribution_type == "discrete":
             return coagulation_rate.get_coagulation_loss_rate_discrete(
                 concentration=_get_concentration(particle),
@@ -529,7 +547,11 @@ class CoagulationStrategyABC(ABC):
             )
         if self.distribution_type == "continuous_pdf":
             return coagulation_rate.get_coagulation_loss_rate_continuous(
-                radius=_get_radius(particle),
+                radius=(
+                    rate_radius(cast(ParticleData, particle))
+                    if is_native(particle)
+                    else _get_radius(particle)
+                ),
                 concentration=_get_concentration(particle),
                 kernel=kernel,
             )
@@ -543,7 +565,9 @@ class CoagulationStrategyABC(ABC):
         particle: ParticleLike,
         kernel: NDArray[np.float64],
     ) -> Union[float, NDArray[np.float64]]:
-        """Calculate the coagulation gain rate [kg/s].
+        """Calculate the coagulation gain rate.
+
+        Rates use 1/m^3/s for PMF and 1/m^4/s for radius PDF.
 
         CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
 
@@ -553,7 +577,7 @@ class CoagulationStrategyABC(ABC):
             - kernel : The coagulation kernel [m^3/s].
 
         Returns:
-            - float or NDArray[np.float64] : The gain rate [kg/s].
+            The gain rate in 1/m^3/s for PMF or 1/m^4/s for radius PDF.
 
         Raises:
             - ValueError : If the distribution type is invalid.
@@ -565,15 +589,42 @@ class CoagulationStrategyABC(ABC):
             ```
         """
         particle = _unwrap_particle(particle)
+        if is_native(particle):
+            native_particle = cast(ParticleData, particle)
+            validate_particle(native_particle, self.distribution_type)
+            kernel = validate_rate_kernel(native_particle, kernel)
+            if self.distribution_type in ("discrete", "continuous_pdf"):
+                if not np.any(native_particle.concentration):
+                    return np.zeros(
+                        native_particle.n_particles, dtype=np.float64
+                    )
+                radius = rate_radius(native_particle)
+                if (
+                    radius.size < 4
+                    or np.any(radius <= 0)
+                    or np.any(np.diff(radius) <= 0)
+                ):
+                    raise ValueError(
+                        "coagulation gain requires at least four increasing "
+                        "positive radius nodes"
+                    )
         if self.distribution_type == "discrete":
             return coagulation_rate.get_coagulation_gain_rate_discrete(
-                radius=_get_radius(particle),
+                radius=(
+                    rate_radius(cast(ParticleData, particle))
+                    if is_native(particle)
+                    else _get_radius(particle)
+                ),
                 concentration=_get_concentration(particle),
                 kernel=kernel,
             )
         if self.distribution_type == "continuous_pdf":
             return coagulation_rate.get_coagulation_gain_rate_continuous(
-                radius=_get_radius(particle),
+                radius=(
+                    rate_radius(cast(ParticleData, particle))
+                    if is_native(particle)
+                    else _get_radius(particle)
+                ),
                 concentration=_get_concentration(particle),
                 kernel=kernel,
             )
@@ -588,7 +639,9 @@ class CoagulationStrategyABC(ABC):
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """Compute the net coagulation rate = gain - loss [kg/s].
+        """Compute the net coagulation rate as gain minus loss.
+
+        Rates use 1/m^3/s for PMF and 1/m^4/s for radius PDF.
 
         CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
 
@@ -599,7 +652,8 @@ class CoagulationStrategyABC(ABC):
 
         Returns:
             float or NDArray[np.float64] : The net coagulation rate
-            [kg/s]. (positive => net gain, negative => net loss).
+            in 1/m^3/s for PMF or 1/m^4/s for radius PDF.
+            Positive values mean net gain; negative values mean net loss.
 
         Raises:
             - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
@@ -939,6 +993,12 @@ class CoagulationStrategyABC(ABC):
             ```
         """
         particle = _unwrap_particle(particle)
+        if is_native(particle):
+            validate_particle(
+                cast(ParticleData, particle), self.distribution_type
+            )
+            positive_scalar(temperature, "temperature")
+            positive_scalar(pressure, "pressure")
         # properties calculation for friction factor
         friction_factor = self.friction_factor(
             particle=particle, temperature=temperature, pressure=pressure
@@ -980,6 +1040,11 @@ class CoagulationStrategyABC(ABC):
             ```
         """
         particle = _unwrap_particle(particle)
+        if is_native(particle):
+            validate_particle(
+                cast(ParticleData, particle), self.distribution_type
+            )
+            positive_scalar(temperature, "temperature")
         charge = _get_charge(particle)
         if charge is None:
             charge = np.zeros_like(_get_radius(particle), dtype=np.float64)
@@ -998,7 +1063,7 @@ class CoagulationStrategyABC(ABC):
         """Compute the friction factor for each particle in the aerosol.
 
         Considers dynamic viscosity, mean free path, and slip correction to
-        determine the friction factor [dimensionless]. CPU ``ParticleData``
+        determine the friction factor [kg/s]. CPU ``ParticleData``
         inputs are supported only for ``n_boxes == 1``.
 
         Arguments:
@@ -1008,7 +1073,7 @@ class CoagulationStrategyABC(ABC):
             - pressure : Gas pressure [Pa].
 
         Returns:
-            - NDArray[np.float64] : Friction factor(s) [dimensionless].
+            - NDArray[np.float64] : Friction factor(s) [kg/s].
 
         Raises:
             - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
@@ -1019,6 +1084,12 @@ class CoagulationStrategyABC(ABC):
             ```
         """
         particle = _unwrap_particle(particle)
+        if is_native(particle):
+            validate_particle(
+                cast(ParticleData, particle), self.distribution_type
+            )
+            positive_scalar(temperature, "temperature")
+            positive_scalar(pressure, "pressure")
         # assume standard atmospheric composition
         dynamic_viscosity = gas.get_dynamic_viscosity(temperature=temperature)
         mean_free_path = gas.get_molecule_mean_free_path(

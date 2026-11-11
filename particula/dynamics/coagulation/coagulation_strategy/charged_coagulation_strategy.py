@@ -11,6 +11,7 @@ from particula.dynamics.coagulation.charged_kernel_strategy import (
 )
 from particula.util.reduced_quantity import get_reduced_self_broadcast
 
+from ._native_validation import native_kernel
 from .coagulation_strategy_abc import (
     CoagulationStrategyABC,
     ParticleLike,
@@ -123,6 +124,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
             coulomb_potential_ratio=coulomb_potential_ratio,
         )
 
+    @native_kernel
     def kernel(
         self,
         particle: ParticleLike,
