@@ -101,6 +101,7 @@ lognormal_rep = (
     .set_density(1.26, "g/cm^3")
     .set_distribution_type("pmf")
     .set_radius_bins(bins, "m")
+    .set_charge(np.zeros_like(bins))
     .build()
 )
 
