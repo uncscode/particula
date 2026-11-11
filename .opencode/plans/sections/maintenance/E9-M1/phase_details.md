@@ -1,12 +1,11 @@
 # Phase Details
 
-At drafting time, all five phases were Not Started. P1 characterization for
-issue #1610 was committed (`5d8f36964`); P1 scientific and P2 specification
-approvals are recorded in `appendix.md`. P3 is merged, P4 validation is in
-progress, and P5 remains Not Started. Execute strictly in the order below; each
-is one bounded reviewable PR. Keep helper production changes near the template's
-rough 100-line increment; escalate a larger discovered requirement for review
-instead of pulling sibling migration work into this plan.
+Current reconciliation (2026-11-10, issue #1614): P1 scientific and P2
+replacement/ownership decisions were approved on 2026-09-28 as recorded in
+`appendix.md`. P3 and P4 implementation and their owning tests are accumulated
+on this branch. P5 adds the bounded developer reference and required data-only
+integration regression. Final-revision validation and Kyle's M1 handoff
+approval remain required; M2 is blocked until both are recorded.
 
 Maintainer representation/grid/volume/builder clarifications and explicit P1
 scientific/P2 specification approval from issue #1612 are recorded in this
@@ -39,15 +38,16 @@ merged workflow; the P3 completion reconciliation is recorded below.
     ledger, focused assertions pass, and P1 contract questions are resolved.
 
 - [ ] **E9-M1-P2: Specify identity-preserving whole-container replacement and rejection gates**
-  - Issue: TBD | Size: XS | Status: Acceptance/ownership specification approved 2026-09-28; aggregate implementation deferred to M2
+  - Issue: #1611 | Size: XS | Status: Acceptance/ownership specification approved 2026-09-28; aggregate implementation deferred to M2
   - Entry: P1 completed and validated.
   - Goal: Deliver an unambiguous aggregate acceptance contract to M2.
   - Work: Specify acceptance cases for approved properties and replace_data and
     cross-container validation order. Cover same-object assignment, compatible
     candidate identity, invalid individual replacement, valid all-three layout
     change, rejection with no partial publication, and no GPU/resident rebinding.
-    Use the proposed matrix in `appendix.md` as a review checklist, not an
-    already-approved outcome. Specify that candidate metadata and writable
+    Use the approved P2 matrix in `appendix.md` as the M2 implementation
+    checklist; its approval is not evidence of implemented aggregate behavior.
+    Specify that candidate metadata and writable
     input receive read-only representation validation; aggregate box, gas-name
     and environment width checks remain structural; distribution capability,
     lane mapping and single-box physics belong to process admission. Freeze
@@ -91,7 +91,7 @@ merged workflow; the P3 completion reconciliation is recorded below.
     approved metadata only, unchanged physics ownership, and passing tests/lint.
 
 - [ ] **E9-M1-P4: Implement necessary gas and environment helpers with alignment tests**
-  - Issue: #1613 | Size: S | Status: P4 fix implemented; final gate pending
+  - Issue: #1613 | Size: S | Status: P4 implementation accumulated; final M1 evidence pending
   - Entry: P3 completed and validated.
   - Goal: Make ordered mixed-gas and environment access safe for later consumers.
   - Work: Implement only P1-approved missing helpers or reusable read-only
@@ -106,11 +106,11 @@ merged workflow; the P3 completion reconciliation is recorded below.
     and focused tests/lint pass for every changed function.
 
 - [ ] **E9-M1-P5: Update development documentation**
-  - Issue: TBD | Size: XS | Status: Not Started
+  - Issue: #1614 | Size: XS | Status: Implementation complete; final evidence and maintainer handoff pending
   - Entry: P4 completed and validated.
   - Goal: Publish the developer contract and verified handoff, not broad M5 docs.
-  - Work: Update the bounded container reference, add a data-only integration
-    example/test of the approved helpers if needed, and finalize decision,
+  - Work: Update the bounded container reference, add a data-only
+    integration regression of the approved helpers, and finalize decision,
     helper and validation ledgers. Distinguish delivered helpers from specified
     future aggregate APIs. Reconcile cross-container units/order/copy examples.
   - Tests: Data-only integration regression with mixed gas and non-unit volume;
