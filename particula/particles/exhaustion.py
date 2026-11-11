@@ -526,6 +526,12 @@ def _validate_particle_schema(  # noqa: C901
     """Validate P2's exact writable CPU particle storage schema."""
     if not isinstance(particles, ParticleData):
         raise TypeError("particles must be a ParticleData")
+    if particles.distribution_type is not None:
+        particles.validate_representation()
+        if particles.distribution_type != "particle_resolved":
+            raise ValueError(
+                "native exhaustion requires particle_resolved storage"
+            )
     arrays = (
         ("masses", particles.masses, 3),
         ("concentration", particles.concentration, 2),

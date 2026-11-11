@@ -1,7 +1,8 @@
 """Define immutable P4 nucleation source-selection metadata.
 
 This module only selects an already-built potential-rate strategy and precursor
-species index. It deliberately does not import or provide concrete P2/P3
+species index, with an explicit full-gas map for native execution. It does not
+import or provide concrete P2/P3
 ``particle_source`` finalization, transaction, or state-mutation helpers.
 """
 
@@ -14,6 +15,7 @@ from particula.dynamics.nucleation.nucleation_strategies import (
     KineticNucleationStrategy,
     NucleationStrategy,
 )
+from particula.dynamics.nucleation.species_mapping import NucleationSpeciesMap
 
 
 @dataclass(frozen=True)
@@ -27,10 +29,13 @@ class NucleationSourceConfig:
         strategy: Immutable activation or kinetic potential-rate strategy.
         precursor_index: Nonnegative index of the precursor species selected for
             a later concrete source operation.
+        species_map: Explicit native gas order and injection mapping; None is
+            retained only for transitional legacy callers.
     """
 
     strategy: NucleationStrategy
     precursor_index: int
+    species_map: NucleationSpeciesMap | None = None
 
     def __post_init__(self) -> None:
         """Validate the supported strategy types and nonnegative index.
@@ -39,6 +44,10 @@ class NucleationSourceConfig:
             TypeError: If ``precursor_index`` is not a non-Boolean integer.
             ValueError: If the strategy is unsupported or the index is negative.
         """
+        if self.species_map is not None and not isinstance(
+            self.species_map, NucleationSpeciesMap
+        ):
+            raise TypeError("species_map must be NucleationSpeciesMap")
         if not isinstance(
             self.strategy,
             (ActivationNucleationStrategy, KineticNucleationStrategy),

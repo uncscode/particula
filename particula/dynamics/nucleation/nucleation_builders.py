@@ -26,6 +26,7 @@ from particula.dynamics.nucleation.nucleation_strategies import (
     _nonnegative_scalar,
     _positive_scalar,
 )
+from particula.dynamics.nucleation.species_mapping import NucleationSpeciesMap
 
 _REQUIRED = (
     "coefficient",
@@ -540,6 +541,14 @@ class NucleationSourceConfigBuilder(BuilderABC):
         super().__init__(required_parameters=["strategy", "precursor_index"])
         self.strategy: NucleationStrategy | None = None
         self.precursor_index: int | None = None
+        self.species_map: NucleationSpeciesMap | None = None
+
+    def set_species_map(self, species_map: NucleationSpeciesMap) -> Self:
+        """Bind explicit native gas order and injection lane pairs."""
+        if not isinstance(species_map, NucleationSpeciesMap):
+            raise TypeError("species_map must be NucleationSpeciesMap")
+        self.species_map = species_map
+        return self
 
     def set_strategy(self, strategy: object) -> Self:
         """Set the candidate supported nucleation strategy.
@@ -581,16 +590,22 @@ class NucleationSourceConfigBuilder(BuilderABC):
         """
         if not isinstance(parameters, dict):
             raise TypeError("parameters must be a dict")
-        if set(parameters) != {"strategy", "precursor_index"}:
+        if set(parameters) not in (
+            {"strategy", "precursor_index"},
+            {"strategy", "precursor_index", "species_map"},
+        ):
             raise ValueError(
                 "parameters must contain only strategy and precursor_index"
             )
         staged = type(self)()
         staged.set_strategy(parameters["strategy"])
         staged.set_precursor_index(parameters["precursor_index"])
+        if "species_map" in parameters:
+            staged.set_species_map(parameters["species_map"])
         staged.build()
         self.strategy = staged.strategy
         self.precursor_index = staged.precursor_index
+        self.species_map = staged.species_map
         return self
 
     def build(self) -> NucleationSourceConfig:
@@ -607,4 +622,5 @@ class NucleationSourceConfigBuilder(BuilderABC):
         return NucleationSourceConfig(
             cast(NucleationStrategy, self.strategy),
             cast(int, self.precursor_index),
+            self.species_map,
         )
