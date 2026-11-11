@@ -6,7 +6,7 @@ the CPU-only single-box nucleation process.
 
 from dataclasses import dataclass, fields
 from numbers import Integral, Real
-from typing import Any, Protocol, cast
+from typing import Any, Protocol, TypeVar, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -64,6 +64,7 @@ from .condensation.condensation_strategies import (
 from .wall_loss.wall_loss_strategies import WallLossStrategy
 
 _MAX_NUCLEATION_SUB_STEPS = 10_000
+_AerosolT = TypeVar("_AerosolT", bound=Aerosol | LegacyAerosol)
 
 
 def _native_process_state(
@@ -682,10 +683,10 @@ class MassCondensation(RunnableABC):
 
     def execute(
         self,
-        aerosol: Aerosol | LegacyAerosol,
+        aerosol: _AerosolT,
         time_step: float,
         sub_steps: int = 1,
-    ) -> Aerosol | LegacyAerosol:
+    ) -> _AerosolT:
         """Perform the mass condensation process over a given time step.
 
         Arguments:
@@ -811,10 +812,10 @@ class Coagulation(RunnableABC):
 
     def execute(
         self,
-        aerosol: Aerosol | LegacyAerosol,
+        aerosol: _AerosolT,
         time_step: float,
         sub_steps: int = 1,
-    ) -> Aerosol | LegacyAerosol:
+    ) -> _AerosolT:
         """Perform the coagulation process over a given time step.
 
         Arguments:
@@ -945,10 +946,10 @@ class WallLoss(RunnableABC):
 
     def execute(
         self,
-        aerosol: Aerosol | LegacyAerosol,
+        aerosol: _AerosolT,
         time_step: float,
         sub_steps: int = 1,
-    ) -> Aerosol | LegacyAerosol:
+    ) -> _AerosolT:
         """Apply wall loss over the provided time step.
 
         Concentrations are clamped to remain non-negative after each
@@ -1055,10 +1056,10 @@ class Dilution(RunnableABC):
 
     def execute(
         self,
-        aerosol: Aerosol | LegacyAerosol,
+        aerosol: _AerosolT,
         time_step: float | np.number,
         sub_steps: int | np.integer = 1,
-    ) -> Aerosol | LegacyAerosol:
+    ) -> _AerosolT:
         """Apply dilution as equal, sequential substeps over a total duration.
 
         The runnable validates the total duration and substep count before

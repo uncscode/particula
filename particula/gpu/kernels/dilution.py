@@ -490,7 +490,7 @@ def _prepare_dilution_step_gpu(
 
         primary = validate_population(particles)
         gas_width = gas_concentration.shape[1]
-        protected = (
+        protected: tuple[Any, ...] = (
             primary[0],
             primary[2],
             primary[3],
@@ -505,7 +505,7 @@ def _prepare_dilution_step_gpu(
         )
         if is_per_box_coefficient:
             protected += (normalized_coefficient,)
-        writers = (particle_concentration, gas_concentration)
+        writers: tuple[Any, ...] = (particle_concentration, gas_concentration)
         if factors is not None:
             # Caller-owned resident work storage is also a writer.
             from types import SimpleNamespace

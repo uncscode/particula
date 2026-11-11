@@ -23,7 +23,8 @@ from math import prod
 from numbers import Integral, Real
 from typing import Any, cast
 
-from particula._legacy_aerosol import Aerosol
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.aerosol import Aerosol as NativeAerosol
 from particula.dynamics import MassCondensation
 from particula.execution import (
     Backend,
@@ -36,6 +37,9 @@ from particula.execution import (
     _isfinite_real,
     require_condensation_profile,
 )
+
+# Legacy ownership-only callers remain supported until M6.
+Aerosol = NativeAerosol | LegacyAerosol
 
 
 @dataclass(frozen=True, eq=False)

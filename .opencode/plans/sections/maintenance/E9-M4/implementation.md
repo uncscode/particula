@@ -31,7 +31,7 @@ issue: #1606. This supersedes the old multiple-PR and issue-generation wording.
 | 3. CPU/direct/prepared GPU dilution | Implemented; focused checks pass |
 | 4. CPU nucleation, mapping and exhaustion transactions | Implemented; focused checks pass |
 | 5. Direct/prepared GPU nucleation and exhaustion | Implemented; focused checks pass |
-| 6. CPU adapters and remaining orchestration consumers | Pending |
+| 6. CPU adapters and remaining orchestration consumers | Implemented; focused checks pass |
 | 7. Communication and physical volume evolution | Pending |
 | 8. Native resident/prepared metadata and diagnostics | Pending |
 | 9. Schema-v5 checkpoints and exact-device continuation | Pending |
@@ -125,3 +125,18 @@ Focused checkpoint evidence follows. Final acceptance remains pending.
 - Old concrete `_execute_*` exhaustion and `_preflight_nucleation` legacy
   phase helpers remain fail-closed for tagged direct calls; migrated public and
   prepared boundaries have positive native successor tests.
+
+### Checkpoint 6
+
+- Native/legacy CPU adapters, coagulation integration, Equilibria and generic
+  execution: 302 passed, 2 skipped. Condensation integration, dilution and
+  native runnable coverage: 145 passed, 25 skipped in the restricted process.
+- Full package mypy: passed (546 source files). Full package Ruff check and
+  format check: passed (546 files).
+- Native adapters dispatch real scientific strategies with ownership, ordered
+  substeps, mapped inventory and exception identity checks. Equilibria recognizes
+  native replacement aggregates while retaining its existing solver contract.
+- CUDA access verified on NVIDIA GeForce RTX 5060 (8 GiB, sm_120), Warp 1.11.1.
+  Native and legacy dilution, nucleation, exhaustion and condensation/coagulation
+  integration suites rerun with hardware access: **424 passed, 1 skipped**.
+  Earlier optional CUDA skips reflected process device access, not absent hardware.
