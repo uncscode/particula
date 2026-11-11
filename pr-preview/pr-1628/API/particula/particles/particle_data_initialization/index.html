@@ -16699,8 +16699,10 @@ Canonical SI inputs do not require Pint; other unit spellings/conversions do.</p
               <code><span title="ValueError">ValueError</span></code>
             –
           <div class="doc-md-description">
-            <p>If inputs do not define a valid distribution. Both generator
-paths require at least two positive, strictly increasing nodes.</p>
+            <p>If inputs do not define a valid distribution. Discrete PMFs
+require at least three positive, strictly increasing nodes; PDFs
+require at least two. The existing PMF converter needs two
+intervals to extrapolate its last bin width.</p>
           </div>
         </li>
     </ul>
@@ -16786,7 +16788,15 @@ paths require at least two positive, strictly increasing nodes.</p>
 <span class="normal">245</span>
 <span class="normal">246</span>
 <span class="normal">247</span>
-<span class="normal">248</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_lognormal_binned_particle_data</span><span class="p">(</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_lognormal_binned_particle_data</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">radius_bins</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -16823,8 +16833,10 @@ paths require at least two positive, strictly increasing nodes.</p>
 <span class="sd">        whereas discrete bin densities are summed. No facade is constructed.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If inputs do not define a valid distribution. Both generator</span>
-<span class="sd">            paths require at least two positive, strictly increasing nodes.</span>
+<span class="sd">        ValueError: If inputs do not define a valid distribution. Discrete PMFs</span>
+<span class="sd">            require at least three positive, strictly increasing nodes; PDFs</span>
+<span class="sd">            require at least two. The existing PMF converter needs two</span>
+<span class="sd">            intervals to extrapolate its last bin width.</span>
 <span class="sd">    """</span>
     <span class="n">radius</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>
@@ -16832,7 +16844,13 @@ paths require at least two positive, strictly increasing nodes.</p>
         <span class="k">else</span> <span class="n">_vector</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="s2">"radius_bins"</span><span class="p">)</span>
         <span class="o">*</span> <span class="n">_unit_factor</span><span class="p">(</span><span class="n">radius_units</span><span class="p">,</span> <span class="s2">"m"</span><span class="p">)</span>
     <span class="p">)</span>
-    <span class="k">if</span> <span class="n">radius</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="n">minimum_nodes</span> <span class="o">=</span> <span class="mi">3</span> <span class="k">if</span> <span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">"discrete"</span> <span class="k">else</span> <span class="mi">2</span>
+    <span class="k">if</span> <span class="n">radius</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="n">minimum_nodes</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">distribution_type</span><span class="si">}</span><span class="s2"> lognormal radius grid requires at least "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">minimum_nodes</span><span class="si">}</span><span class="s2"> nodes"</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"lognormal radius grid must have increasing nodes"</span><span class="p">)</span>
     <span class="n">modes</span><span class="p">,</span> <span class="n">deviations</span><span class="p">,</span> <span class="n">numbers</span> <span class="o">=</span> <span class="n">_modal_parameters</span><span class="p">(</span>
         <span class="n">mode</span><span class="p">,</span>
