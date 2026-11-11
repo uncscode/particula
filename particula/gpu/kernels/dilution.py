@@ -41,7 +41,7 @@ except ImportError as exc:  # pragma: no cover - handled via import guards
     ) from exc
 
 from particula.gpu.kernels.environment import _is_warp_array_like
-from particula.gpu.population_metadata import require_legacy_particle_metadata
+from particula.gpu.population_metadata import particle_distribution_type
 
 
 @wp.kernel
@@ -433,7 +433,7 @@ def _prepare_dilution_step_gpu(
             real scalar.
         ValueError: If a schema, shape, device, or physical domain is invalid.
     """
-    require_legacy_particle_metadata(particles)
+    native_kind = particle_distribution_type(particles)
     is_per_box_coefficient = _is_warp_array_like(coefficient)
     if is_per_box_coefficient:
         validated_coefficient = _validate_warp_coefficient_form(coefficient)
@@ -480,6 +480,45 @@ def _prepare_dilution_step_gpu(
             (normalized_coefficient,),
             (particle_concentration, gas_concentration),
         )
+
+    if native_kind is not None:
+        from particula.gpu.kernels._population_validation import (
+            array_field,
+            reject_writer_aliases,
+            validate_population,
+        )
+
+        primary = validate_population(particles)
+        gas_width = gas_concentration.shape[1]
+        protected = (
+            primary[0],
+            primary[2],
+            primary[3],
+            primary[4],
+            array_field(gas, "molar_mass", (gas_width,), wp.float64, device),
+            array_field(
+                gas, "vapor_pressure", (n_boxes, gas_width), wp.float64, device
+            ),
+            array_field(
+                gas, "partitioning", (n_boxes, gas_width), wp.int32, device
+            ),
+        )
+        if is_per_box_coefficient:
+            protected += (normalized_coefficient,)
+        writers = (particle_concentration, gas_concentration)
+        if factors is not None:
+            # Caller-owned resident work storage is also a writer.
+            from types import SimpleNamespace
+
+            array_field(
+                SimpleNamespace(factors=factors),
+                "factors",
+                (n_boxes,),
+                wp.float64,
+                device,
+            )
+            writers += (factors,)
+        reject_writer_aliases(writers, protected)
 
     if (
         n_boxes == 0

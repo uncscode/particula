@@ -26,7 +26,6 @@ class _TaggedOnly:
     [
         ("wall_loss", "_prepare_selected_wall_loss_call"),
         ("wall_loss", "wall_loss_selected_boxes_step_gpu"),
-        ("dilution", "_prepare_dilution_step_gpu"),
         ("nucleation", "_preflight_nucleation"),
         ("nucleation", "_prepare_nucleation_step_gpu"),
         ("exhaustion", "_execute_resampling_step_gpu"),

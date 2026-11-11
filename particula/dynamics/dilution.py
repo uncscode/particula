@@ -20,15 +20,102 @@ GPU behavior.
 """
 
 from numbers import Number
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
 
+from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.aerosol import Aerosol
+from particula.aerosol_validation import validate_aerosol_structure
 from particula.util.validate_inputs import validate_inputs
 
-if TYPE_CHECKING:
-    from particula._legacy_aerosol import Aerosol
+
+def _preflight_native_dilution(
+    aerosol: Aerosol,
+    coefficient: np.float64,
+    time_step: np.float64,
+    *,
+    writable: bool = True,
+) -> dict[str, Any]:
+    """Stage native concentration updates without changing caller storage.
+
+    Every gas lane is treated equally. Raw resolved counts and PMF/PDF density
+    storage receive the same decay; volume normalization is only for rates.
+    Protected-field aliases reject even for zero-work calls.
+    """
+    particles, gas, environment = (
+        aerosol.particles,
+        aerosol.gas,
+        aerosol.environment,
+    )
+    validate_aerosol_structure(particles, gas, environment)
+    particles.validate_representation()
+    if particles.n_boxes != 1:
+        raise ValueError("CPU dilution requires exactly one box.")
+    coefficient = _validate_nonnegative_scalar(coefficient, "coefficient")
+    targets = (particles.concentration, gas.concentration)
+    protected = (
+        particles.masses,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        gas.molar_mass,
+        gas.partitioning,
+        environment.temperature,
+        environment.pressure,
+        environment.saturation_ratio,
+    )
+    if particles.radius_grid is not None:
+        protected += (particles.radius_grid,)
+    candidates = []
+    for index, target in enumerate(targets):
+        if writable and not target.flags.writeable:
+            raise ValueError("native dilution destinations must be writable")
+        if any(
+            np.shares_memory(target, other)
+            for other in (*targets[index + 1 :], *protected)
+        ):
+            raise ValueError(
+                "native dilution destinations must not alias state"
+            )
+        _preflight_concentration(target, target, "concentration")
+        candidates.append(
+            _preflight_concentration(
+                get_dilution_step(coefficient, target, time_step),
+                target,
+                "concentration",
+            )
+        )
+    return {
+        "targets": targets,
+        "candidates": tuple(candidates),
+        "snapshots": tuple(target.copy() for target in targets),
+    }
+
+
+def _commit_native_dilution(preflight: dict[str, Any]) -> None:
+    """Publish concentrations, restoring writes on an unexpected error."""
+    written = []
+    try:
+        for target, candidate, snapshot in zip(
+            preflight["targets"],
+            preflight["candidates"],
+            preflight["snapshots"],
+            strict=True,
+        ):
+            written.append((target, snapshot))
+            np.copyto(target, candidate)
+    except Exception as original_error:
+        rollback_error = None
+        for target, snapshot in reversed(written):
+            try:
+                target[...] = snapshot
+            except Exception as error:
+                rollback_error = error
+        if rollback_error is not None:
+            raise original_error from rollback_error
+        raise
 
 
 def _return_scalar_if_appropriate(
@@ -308,7 +395,18 @@ def _preflight_concentration(
 
 
 def _preflight_dilution_aerosol(
-    aerosol: "Aerosol",
+    aerosol: Aerosol | LegacyAerosol,
+    coefficient: np.float64,
+    time_step: np.float64,
+) -> dict[str, Any]:
+    """Select explicit native or retained legacy concentration admission."""
+    if isinstance(aerosol, Aerosol):
+        return _preflight_native_dilution(aerosol, coefficient, time_step)
+    return _preflight_legacy_dilution_aerosol(aerosol, coefficient, time_step)
+
+
+def _preflight_legacy_dilution_aerosol(
+    aerosol: LegacyAerosol,
     coefficient: np.float64,
     time_step: np.float64,
 ) -> dict[str, Any]:
@@ -502,10 +600,10 @@ def _restore_gas_backing_state(
 
 
 def dilute_aerosol(
-    aerosol: "Aerosol",
+    aerosol: "Aerosol | LegacyAerosol",
     coefficient: float | np.number,
     time_step: float | np.number,
-) -> "Aerosol":
+) -> "Aerosol | LegacyAerosol":
     """Dilute an aerosol's particle and gas concentrations in place.
 
     Applies ``c_new = c * exp(-coefficient * time_step)`` to physical
@@ -545,6 +643,9 @@ def dilute_aerosol(
         time_step_scalar,
     )
     if coefficient_scalar == 0.0 or time_step_scalar == 0.0:
+        return aerosol
+    if isinstance(aerosol, Aerosol):
+        _commit_native_dilution(preflight)
         return aerosol
     particle = preflight["particle"]
     gas_containers = preflight["gas_containers"]
@@ -610,7 +711,9 @@ class DilutionStrategy:
             coefficient, "coefficient"
         )
 
-    def rate(self, aerosol: "Aerosol") -> float | NDArray[np.float64]:
+    def rate(
+        self, aerosol: "Aerosol | LegacyAerosol"
+    ) -> float | NDArray[np.float64]:
         """Calculate the particle-number dilution rate.
 
         Args:
@@ -620,10 +723,21 @@ class DilutionStrategy:
             Particle-number concentration rate [1/(m³ s)] with the scalar or
             array shape of the physical particle-number concentration.
         """
+        if isinstance(aerosol, Aerosol):
+            _preflight_native_dilution(
+                aerosol, self.coefficient, np.float64(0), writable=False
+            )
+            concentration = aerosol.particles.concentration[0]
+            if aerosol.particles.distribution_type == "particle_resolved":
+                with np.errstate(over="ignore", invalid="ignore"):
+                    concentration = concentration / aerosol.particles.volume[0]
+            return get_dilution_rate(self.coefficient, concentration)
         concentration = aerosol.particles.get_concentration()
         return get_dilution_rate(self.coefficient, concentration)
 
-    def _preflight(self, aerosol: "Aerosol", time_step: np.float64) -> None:
+    def _preflight(
+        self, aerosol: "Aerosol | LegacyAerosol", time_step: np.float64
+    ) -> None:
         """Validate supported aerosol state before runnable substeps.
 
         Args:
@@ -639,9 +753,9 @@ class DilutionStrategy:
 
     def step(
         self,
-        aerosol: "Aerosol",
+        aerosol: "Aerosol | LegacyAerosol",
         time_step: float | np.number,
-    ) -> "Aerosol":
+    ) -> "Aerosol | LegacyAerosol":
         """Apply one validated, atomic in-place aerosol dilution step.
 
         Validates the concrete aerosol state and every candidate before its
