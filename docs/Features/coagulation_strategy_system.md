@@ -81,6 +81,14 @@ density is a bulk material approximation, not a replacement for transporting
 individual species between bins. Uniform composition does not remove the
 method's finite-domain and discretization errors.
 
+Use `particle_resolved` when species composition varies with radius or when
+tracking more complex interactions that depend on individual particles'
+composition, size, and charge. It retains per-particle species masses as
+particles evolve and merge. See the
+[native scientific process guide](native_scientific_processes.md) for supported
+process calls and constraints, including equal positive active counts for
+resolved coagulation.
+
 **Known limitation:** gained particles inherit the destination bin's fixed
 composition rather than the combined donor composition. With composition
 varying across particle size, this method does not generally conserve each

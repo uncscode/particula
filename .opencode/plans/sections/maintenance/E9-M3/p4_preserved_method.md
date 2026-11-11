@@ -31,6 +31,11 @@ radius. Effective density is a bulk approximation and does not supply missing
 species transport. This guidance does not introduce a new runtime rejection
 or claim that uniform composition eliminates discretization error.
 
+For radius-dependent species composition or more complex interactions tied
+to individual particle composition, size, and charge, the documentation directs
+users to `particle_resolved` and its supported process contracts. This includes
+the equal-positive-active-count restriction for resolved coagulation.
+
 The reproducible equal-density, constant-kernel lognormal fixture in
 `native_coagulation_limitations_test.py` independently integrates raw mass
 times population on 128/256/512/1024 nodes. Its PDF species defects approach
