@@ -15,6 +15,7 @@ from numpy.typing import NDArray
 from ..turbulent_dns_kernel.turbulent_dns_kernel_ao2008 import (
     get_turbulent_dns_kernel_ao2008_via_system_state,
 )
+from ._native_validation import native_kernel
 from .coagulation_strategy_abc import (
     CoagulationStrategyABC,
     ParticleLike,
@@ -187,6 +188,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         logger.error(message)
         raise NotImplementedError(message)
 
+    @native_kernel
     def kernel(
         self,
         particle: ParticleLike,

@@ -14,6 +14,7 @@ from numpy.typing import NDArray
 from ..sedimentation_kernel import (
     get_sedimentation_kernel_sp2016_via_system_state as get_kernel_sp2016,
 )
+from ._native_validation import native_kernel
 from .coagulation_strategy_abc import (
     CoagulationStrategyABC,
     ParticleLike,
@@ -95,6 +96,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         logger.error(message)
         raise NotImplementedError(message)
 
+    @native_kernel
     def kernel(
         self,
         particle: ParticleLike,
