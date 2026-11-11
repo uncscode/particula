@@ -17008,7 +17008,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ddb40f68">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a0f15bb1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17069,7 +17069,7 @@ np.random.seed(RANDOM_SEED)</div>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a3779911">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c1b37a89">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17196,7 +17196,7 @@ Saturation concentration: 2.302625e-02 kg/m^3
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2e6e86a5">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8a5e89c5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17347,7 +17347,7 @@ Mean particle radius: 111.3 nm
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2ca8258a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=09fa38ef">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17376,9 +17376,9 @@ Mean particle radius: 111.3 nm
     <span class="p">)</span>
 
     <span class="n">particle_mass</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">current_aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_mass</span><span class="p">()))</span>
-    <span class="n">gas_mass</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+    <span class="n">gas_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
         <span class="n">current_aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">()</span>
-    <span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
     <span class="n">mass_history</span> <span class="o">=</span> <span class="p">[</span><span class="n">particle_mass</span><span class="p">]</span>
     <span class="n">gas_mass_history</span> <span class="o">=</span> <span class="p">[</span><span class="n">gas_mass</span><span class="p">]</span>
 
@@ -17390,9 +17390,9 @@ Mean particle radius: 111.3 nm
 
         <span class="c1"># Record masses after step</span>
         <span class="n">particle_mass</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">current_aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_mass</span><span class="p">()))</span>
-        <span class="n">gas_mass</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+        <span class="n">gas_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
             <span class="n">current_aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">()</span>
-        <span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
         <span class="n">mass_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">particle_mass</span><span class="p">)</span>
         <span class="n">gas_mass_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gas_mass</span><span class="p">)</span>
 
@@ -17440,9 +17440,9 @@ Mean particle radius: 111.3 nm
     )
 
     particle_mass = float(np.sum(current_aerosol.particles.get_mass()))
-    gas_mass = float(
+    gas_mass = np.asarray(
         current_aerosol.atmosphere.partitioning_species.get_concentration()
-    )
+    ).item()
     mass_history = [particle_mass]
     gas_mass_history = [gas_mass]
 
@@ -17454,9 +17454,9 @@ Mean particle radius: 111.3 nm
 
         # Record masses after step
         particle_mass = float(np.sum(current_aerosol.particles.get_mass()))
-        gas_mass = float(
+        gas_mass = np.asarray(
             current_aerosol.atmosphere.partitioning_species.get_concentration()
-        )
+        ).item()
         mass_history.append(particle_mass)
         gas_mass_history.append(gas_mass)
 
@@ -17539,7 +17539,7 @@ for mode in modes:
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=32ea0076">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=01b64833">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17680,7 +17680,7 @@ Final Relative Mass Errors:
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a1e780bd">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7ae279e4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17913,7 +17913,7 @@ plt.show()</div>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=fe2fd6dd">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3ebb8726">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
