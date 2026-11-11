@@ -57,7 +57,7 @@ mass = np.array([0.5e-9, 0.5e-9])  # kg/m^3
 activity = strategy.activity(mass_concentration=mass)
 
 print("=== Ideal Activity (Raoult's Law) ===")
-print(f"Mass concentrations: {mass * 1e9} ng/m^3")
+print(f"Mass concentrations: {mass * 1e9} ug/m^3")
 print(f"Activity values: {activity}")
 
 # %% [markdown]
@@ -90,4 +90,9 @@ mole_fractions = moles / np.sum(moles)
 print(f"Mole fractions: {mole_fractions}")
 print(
     f"Activity = mole fraction (ideal): {np.allclose(activity, mole_fractions)}"
+)
+
+np.testing.assert_allclose(activity, mole_fractions, rtol=1e-12, atol=0)
+np.testing.assert_allclose(
+    partial_pressure, mole_fractions * pure_pressure, rtol=1e-12, atol=0
 )

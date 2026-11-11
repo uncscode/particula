@@ -162,3 +162,53 @@ A focused fixture checks two nuclei at non-unit volume and capacity failure.
 P3 gate: 507 focused tests passed with warnings as errors, including both CPU
 wall-loss strategy suites. All six notebook pairs executed without errors; 12
 plots inspected. Dilution and supported CPU nucleation standalone runs passed.
+
+
+### P4 migration and scientific audit (execution in progress)
+
+The six simulation sources now use native ordered gas/environment/particle
+containers and explicit condensation species maps. Preserved workloads include
+10,000 biomass particles with four 3,600 s/10,000-substep scenarios; the organic
+20 s/100,000-substep pulse followed by 60 coagulation steps; 1,000 cough droplets;
+5,000 soot particles, 24 species and 100 condensation substeps per update; and
+both original cloud-cycle workloads. None is replaced by its reduced fixture.
+
+Corrections found while auditing published quantities:
+- Organic process molar masses now use kg/mol rather than accidentally passing
+  g/mol. The later 600 s stage runs coagulation alone, as in the source; it
+  reports binned inventory drift without claiming exact conservation.
+- Biomass DNS uses its DNS kernel alone, not a separate added Brownian kernel.
+  Sedimentation is a collision mechanism, not a wall-removal process. Its
+  initial particles already contain water. Radius/duration labels are corrected.
+- Cough and soot retain their update counts, with time axes reporting actual
+  0..19.9 s and 0..19.96 s rather than the original inclusive-linspace labels.
+  Soot retains the additive cooling formula: its starting temperature is 1600 K,
+  not the incorrectly described 1200 K. The existing 1500 K table endpoint
+  clamp and illustrative forcing are now explicit; no new combustion fit.
+- Cloud histories retain prescribed humidity resets (external water sources)
+  and condensation followed by wall loss. Multi-cycle dilution was disabled;
+  the text now says so. Its separate dilution exercise decays represented
+  counts, not per-particle masses. Dry-material retention and removed original
+  particle identities replace misleading wet-size-bin subtraction. Peak water
+  fractions now select every humid-to-dry boundary, not an incorrect stride.
+- Adding particles reserves 120,000 slots, starts 100,000 unit-count particles,
+  and activates two 10,000-particle external sources at 1 cm³. It checks injected
+  mass, held arrays, gas preservation and exhaustion rejection without resizing.
+- Activity/Equilibria remain independent functional/strategy examples. Printed
+  kg/m³-to-microgram conversions were mislabeled nanograms and are corrected.
+  Equilibrium phase species entries include associated water; organic inventory
+  checks subtract it. Nonideal activity is not capped at one in the plot.
+
+`native_simulation_examples_test.py` and
+`native_activity_equilibria_examples_test.py` currently pass 17 focused checks:
+all six setup families, volume-aware per-species inventories, held storage,
+source/capacity behavior, cooled soot process order, all three short cloud
+compositions and forcing, independent dry-loss/phase-peak diagnostics, analytical
+ideal/kappa relations and bounded equilibrium outputs. Full standalone biomass,
+organic, cough, both clouds, injection and all seven activity/equilibrium scripts
+have passed (cloud multi has later reporting edits awaiting full notebook).
+The seven functional notebooks have executed; eleven functional plot outputs
+were visually inspected, including the refreshed activity axis. All seven
+functional pairs match their sources and retain successful execution counts.
+Full final-revision simulation notebook execution and plot inspection remain
+pending. P4 is not complete at this checkpoint.

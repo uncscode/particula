@@ -86,7 +86,7 @@ mass = np.array([0.5e-9, 0.5e-9])  # kg/m^3
 # Compute activity
 activity = ideal_strategy.activity(mass_concentration=mass)
 
-print(f"Mass concentrations: {mass * 1e9} ng/m^3")
+print(f"Mass concentrations: {mass * 1e9} ug/m^3")
 print(f"Activity values: water={activity[0]:.4f}, organic={activity[1]:.4f}")
 
 # Verify activity equals mole fraction
@@ -235,7 +235,7 @@ ideal_organic = [
 ax.plot(water_fractions, ideal_organic, "k--", linewidth=1.5, label="Ideal")
 
 # BAT at different O:C ratios (returns organic activity)
-colors = plt.cm.get_cmap("viridis")(np.linspace(0.2, 0.8, len(o2c_values)))
+colors = plt.colormaps["viridis"](np.linspace(0.2, 0.8, len(o2c_values)))
 for o2c, color in zip(o2c_values, colors):
     strat = (
         par.particles.ActivityNonIdealBinaryBuilder()
@@ -262,7 +262,7 @@ ax.set_ylabel("Organic Activity", fontsize=12)
 ax.set_title("Effect of O:C Ratio on Organic Activity (BAT Model)", fontsize=14)
 ax.legend(fontsize=10, loc="lower right")
 ax.set_xlim(0, 1)
-ax.set_ylim(0, 1)
+ax.set_ylim(bottom=0)  # Non-ideal activity may exceed one.
 plt.tight_layout()
 plt.show()
 
@@ -321,7 +321,7 @@ water_fractions = np.linspace(0.2, 0.95, 40)
 
 fig, ax = plt.subplots(figsize=(8, 5))
 
-colors = plt.cm.get_cmap("plasma")(np.linspace(0.2, 0.8, len(kappa_values)))
+colors = plt.colormaps["plasma"](np.linspace(0.2, 0.8, len(kappa_values)))
 for kappa, color in zip(kappa_values, colors):
     strat = par.particles.ActivityKappaParameter(
         kappa=np.array([0.0, kappa]),

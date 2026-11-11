@@ -49,7 +49,7 @@ Notebook sync/execution occurs in the owning phase, not deferred to P7.
     no advertised whole-call nucleation rollback or new wall-loss capability.
 
 - [ ] **E9-M5-P4: Migrate composed simulation notebooks with outcome regressions**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: TBD | Size: S | Status: In Progress
   - Work: Migrate the six Simulations/Notebooks pairs and Dynamics/Customization/
     Adding_Particles_During_Simulation pair. Audit Activity and Equilibria
     families for aggregate construction and migrate affected rows here.

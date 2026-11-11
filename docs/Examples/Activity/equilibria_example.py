@@ -96,7 +96,9 @@ print(f"Partition coefficients: {result.partition_coefficients}")
 print("  (fraction in condensed phase)")
 
 print("\nAlpha phase (water-rich):")
-print(f"  Species concentrations: {result.alpha_phase.species_concentrations}")
+print(
+    f"  Species-associated organic + water: {result.alpha_phase.species_concentrations}"
+)
 print(
     "  Water concentration: "
     f"{result.alpha_phase.water_concentration:.2f} ug/m^3"
@@ -109,7 +111,7 @@ print(
 if result.beta_phase is not None:
     print("\nBeta phase (organic-rich):")
     print(
-        f"  Species concentrations: {result.beta_phase.species_concentrations}"
+        f"  Species-associated organic + water: {result.beta_phase.species_concentrations}"
     )
     print(
         "  Water concentration: "
@@ -147,3 +149,20 @@ for rh in rh_values:
         f"RH={rh * 100:.0f}%: mean partition coeff = {mean_partition:.4f}, "
         f"water = {res.alpha_phase.water_concentration:.2f} ug/m^3"
     )
+
+# The phase species entries include associated water. Subtract total water
+# before comparing with the organic-only partitioned inventory.
+phases = [p for p in (result.alpha_phase, result.beta_phase) if p is not None]
+organic_condensed = sum(
+    phase.total_concentration - phase.water_concentration for phase in phases
+)
+np.testing.assert_allclose(
+    organic_condensed,
+    np.sum(result.partition_coefficients * concentration_organic),
+    rtol=1e-12,
+    atol=1e-12,
+)
+assert np.all(
+    (result.partition_coefficients >= 0) & (result.partition_coefficients <= 1)
+)
+assert np.isfinite(result.error) and result.error < 1e-8
