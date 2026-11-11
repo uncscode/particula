@@ -17,14 +17,15 @@ from particula.dynamics import (
 from particula.dynamics import (
     get_rectangle_wall_loss_rate,
 )
+from particula.dynamics.tests.wall_loss_native_helpers import (
+    _concentration,
+    _particle,
+    _total,
+)
 from particula.dynamics.wall_loss.wall_loss_strategies import (
     RectangularWallLossStrategy,
     SphericalWallLossStrategy,
     WallLossStrategy,
-)
-from particula.particles import (
-    PresetParticleRadiusBuilder,
-    PresetResolvedParticleMassBuilder,
 )
 
 
@@ -37,13 +38,12 @@ class TestWallLossStrategies(unittest.TestCase):
         self.pressure = 101325.0  # Pa
         self.time_step = 1.0  # s
 
-        # Discrete/continuous representations share the same preset builder
-        self.particle = PresetParticleRadiusBuilder().build()
+        # Native distributions carry explicit, distinct representation metadata
+        self.particle = _particle()
+        self.particle_continuous = _particle("continuous_pdf")
 
         # Particle-resolved representation with finite parcel volume
-        self.particle_resolved = (
-            PresetResolvedParticleMassBuilder().set_volume(1e-6, "m^3").build()
-        )
+        self.particle_resolved = _particle("particle_resolved", 1e-6)
 
         self.strategy_discrete = SphericalWallLossStrategy(
             wall_eddy_diffusivity=1e-3,
@@ -106,43 +106,43 @@ class TestWallLossStrategies(unittest.TestCase):
 
     def test_step_reduces_concentration_discrete(self):
         """Step must reduce total concentration for discrete distributions."""
-        initial_total = self.particle.get_total_concentration()
+        initial_total = _total(self.particle)
         self.strategy_discrete.step(
             particle=self.particle,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=self.time_step,
         )
-        final_total = self.particle.get_total_concentration()
+        final_total = _total(self.particle)
         self.assertLessEqual(final_total, initial_total)
 
     def test_step_reduces_concentration_continuous_pdf(self):
         """Step must reduce concentration for continuous_pdf distributions."""
-        initial_total = self.particle.get_total_concentration()
+        initial_total = _total(self.particle_continuous)
         self.strategy_continuous.step(
-            particle=self.particle,
+            particle=self.particle_continuous,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=self.time_step,
         )
-        final_total = self.particle.get_total_concentration()
+        final_total = _total(self.particle_continuous)
         self.assertLessEqual(final_total, initial_total)
 
     def test_step_particle_resolved_reduces_concentration(self):
         """Particle-resolved step should reduce total concentration."""
-        initial_total = self.particle_resolved.get_total_concentration()
+        initial_total = _total(self.particle_resolved)
         self.strategy_particle_resolved.step(
             particle=self.particle_resolved,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=100.0,
         )
-        final_total = self.particle_resolved.get_total_concentration()
+        final_total = _total(self.particle_resolved)
         self.assertLessEqual(final_total, initial_total)
 
     def test_zero_concentration_edge_case(self):
         """Zero concentration should remain zero after step."""
-        zero_particle = PresetParticleRadiusBuilder().build()
+        zero_particle = _particle()
         zero_particle.concentration[...] = 0.0
 
         rate = self.strategy_discrete.rate(
@@ -152,14 +152,14 @@ class TestWallLossStrategies(unittest.TestCase):
         )
         self.assertTrue(np.allclose(rate, 0.0))
 
-        initial_total = zero_particle.get_total_concentration()
+        initial_total = _total(zero_particle)
         self.strategy_discrete.step(
             particle=zero_particle,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=self.time_step,
         )
-        final_total = zero_particle.get_total_concentration()
+        final_total = _total(zero_particle)
         self.assertEqual(final_total, initial_total)
 
 
@@ -173,10 +173,8 @@ class TestRectangularWallLossStrategies(unittest.TestCase):
         self.time_step = 1.0
         self.chamber_dimensions = (1.0, 0.6, 0.3)
 
-        self.particle = PresetParticleRadiusBuilder().build()
-        self.particle_resolved = (
-            PresetResolvedParticleMassBuilder().set_volume(1e-6, "m^3").build()
-        )
+        self.particle = _particle()
+        self.particle_resolved = _particle("particle_resolved", 1e-6)
 
         self.strategy_discrete = RectangularWallLossStrategy(
             wall_eddy_diffusivity=1e-3,
@@ -230,7 +228,7 @@ class TestRectangularWallLossStrategies(unittest.TestCase):
 
     def test_zero_concentration_smoke(self):
         """Zero concentration remains zero via dynamics import path."""
-        zero_particle = PresetParticleRadiusBuilder().build()
+        zero_particle = _particle()
         zero_particle.concentration[...] = 0.0
         rate = self.strategy_discrete.rate(
             particle=zero_particle,
@@ -239,14 +237,14 @@ class TestRectangularWallLossStrategies(unittest.TestCase):
         )
         self.assertTrue(np.all(np.isfinite(rate)))
         self.assertTrue(np.allclose(rate, 0.0))
-        initial_total = zero_particle.get_total_concentration()
+        initial_total = _total(zero_particle)
         self.strategy_discrete.step(
             particle=zero_particle,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=self.time_step,
         )
-        final_total = zero_particle.get_total_concentration()
+        final_total = _total(zero_particle)
         self.assertEqual(final_total, initial_total)
 
     def test_parity_with_rectangle_wall_loss_rate(self):
@@ -259,9 +257,9 @@ class TestRectangularWallLossStrategies(unittest.TestCase):
 
         standalone_rate = get_rectangle_wall_loss_rate(
             wall_eddy_diffusivity=self.strategy_discrete.wall_eddy_diffusivity,
-            particle_radius=self.particle.get_radius(),
-            particle_density=self.particle.get_effective_density(),
-            particle_concentration=self.particle.get_concentration(),
+            particle_radius=self.particle.radii[0],
+            particle_density=self.particle.effective_density[0],
+            particle_concentration=_concentration(self.particle),
             temperature=self.temperature,
             pressure=self.pressure,
             chamber_dimensions=self.chamber_dimensions,
@@ -276,6 +274,6 @@ class TestRectangularWallLossStrategies(unittest.TestCase):
             pressure=self.pressure,
         )
         self.assertEqual(
-            rate.shape, self.particle_resolved.get_concentration().shape
+            rate.shape, _concentration(self.particle_resolved).shape
         )
         self.assertTrue(np.all(np.isfinite(rate)))
