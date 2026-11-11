@@ -88,3 +88,15 @@ Topic-index paths remain stable; discovery-based MkDocs navigation includes
 these pages. The inventory assigns later published snippet migration to P6/P7.
 P1 implementation gate is passed at the foundation checkpoint plus this
 record. Final M5-wide validation and acceptance remain pending.
+
+### P2 condensation checkpoint
+
+All five condensation source/notebook pairs now use native data and explicit
+process strategies/species maps. Full original workloads execute successfully;
+saved outputs are retained. Closed resolved cases assert species inventory
+conservation at rtol=1e-12 and atol=1e-30. The fixed-gas mass-bin experiment
+remains an open reservoir, explicitly distinguished from conservation tests.
+Native latent energy (J) is divided by represented volume for J/m³ reporting.
+Eleven focused tests pass. Plot inspection supports finite trajectories and
+roundoff-level conservation, not a universal stability ranking. P2 coagulation
+and helper starter migration remain pending; this is not the P2 completion gate.

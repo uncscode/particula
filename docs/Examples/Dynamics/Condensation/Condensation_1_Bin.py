@@ -15,10 +15,9 @@
 # %% [markdown]
 # # Condensation Tutorial: Radius Bin
 #
-# > **Note:** This notebook is a work in progress and demonstrates basic setup
-# > for condensation processes. For a complete working example, see
-# > `Staggered_Condensation_Example.ipynb` which uses particle-resolved
-# > representations that work seamlessly with the condensation framework.
+# This example constructs native binned data and evaluates the initial
+# condensation rate. For a time-evolving particle-resolved example, see
+# `Staggered_Condensation_Example.ipynb`.
 #
 # Condensation is the first process where this framework we have been building
 # up is applied. Here we need to account for the gas phase and the particle
@@ -45,7 +44,9 @@ import numpy as np
 
 # particula imports
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 
 # %% [markdown]
 # ## Setup Aerosol
@@ -72,40 +73,34 @@ sat_concentration = vapor_pressure_strategy.saturation_concentration(
 )
 print(f"Saturation concentration: {sat_concentration:.2e} kg/m^3")
 
-sat_factor = 0.01  # 50% of saturation concentration
+sat_factor = 0.01  # 1% of saturation concentration
 glycerol_gas = (
-    par.gas.GasSpeciesBuilder()
-    .set_molar_mass(molar_mass_glycerol, "kg/mol")
-    .set_vapor_pressure_strategy(vapor_pressure_strategy)
-    .set_concentration(sat_concentration * sat_factor, "kg/m^3")
-    .set_name("Glycerol")
-    .set_partitioning(True)
+    par.gas.GasDataBuilder()
+    .set_names(["Glycerol"])
+    .set_molar_mass([molar_mass_glycerol], "kg/mol")
+    .set_concentration([sat_concentration * sat_factor], "kg/m^3")
+    .set_partitioning([True])
     .build()
 )
-
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_more_partitioning_species(glycerol_gas)
-    .set_temperature(25, temperature_units="degC")
-    .set_pressure(1, pressure_units="atm")
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=[298.15],
+    pressure=[101325.0],
+    saturation_ratio=[[sat_factor]],
 )
-
-# Glycerol particle distribution
 bins = np.logspace(-8, -5, 500)
-lognormal_rep = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_mode(np.array([100]), "nm")
-    .set_geometric_standard_deviation(np.array([1.3]))
-    .set_number_concentration(np.array([1e4]), "1/cm^3")
-    .set_density(1.26, "g/cm^3")
-    .set_distribution_type("pmf")
-    .set_radius_bins(bins, "m")
-    .set_charge(np.zeros_like(bins))
-    .build()
+particles = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete",
+    radius_bins=bins,
+    mode=[100e-9],
+    geometric_standard_deviation=[1.3],
+    number_concentration=[1e10],
+    density=1260.0,
 )
-
-aerosol = LegacyAerosol(atmosphere=atmosphere, particles=lognormal_rep)
+aerosol = par.Aerosol(
+    particles=particles,
+    gas=glycerol_gas,
+    environment=environment,
+)
 
 print(aerosol)
 
@@ -123,7 +118,11 @@ print(aerosol)
 # %%
 # define the condensation process
 condensation_isothermal = par.dynamics.CondensationIsothermal(
-    molar_mass=molar_mass_glycerol,
+    molar_mass=glycerol_gas.molar_mass,
+    activity_strategy=par.particles.ActivityIdealMass(),
+    surface_strategy=par.particles.SurfaceStrategyVolume(density=1260.0),
+    vapor_pressure_strategy=vapor_pressure_strategy,
+    species_map=CondensationSpeciesMap(("Glycerol",), ((0, 0),)),
     diffusion_coefficient=2e-5,
     accommodation_coefficient=0.1,  # makes things go slower/faster
 )
@@ -135,8 +134,8 @@ print(f"Runnable: {condensation_process}")
 
 # %%
 # Get the initial state for plotting
-initial_radii = aerosol.particles.get_radius().copy()
-initial_concentration = aerosol.particles.concentration.copy()
+initial_radii = aerosol.particles.radii[0].copy()
+initial_concentration = aerosol.particles.slot_concentration_density[0].copy()
 
 # Calculate the condensation rate (mass change per particle per second)
 rate = condensation_process.rate(aerosol)
@@ -172,7 +171,7 @@ plt.show()
 # This notebook demonstrated the basic setup for condensation with:
 #
 # - **Vapor Pressure Strategy**: Clausius-Clapeyron equation for glycerol
-# - **Gas Species**: Built with `GasSpeciesBuilder` with partitioning enabled
+# - **Gas Species**: Native `GasData` with partitioning enabled
 # - **Particle Distribution**: PMF (bin-based) representation
 # - **Condensation Strategy**: `CondensationIsothermal` for simple mass transfer
 # - **Runnable Process**: `MassCondensation` wraps the strategy
