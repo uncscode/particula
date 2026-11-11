@@ -33,9 +33,12 @@ class _TaggedOnly:
         ("exhaustion", "_execute_representative_volume_scaling_step_gpu"),
         ("exhaustion", "_prepare_resampling_step_gpu"),
         ("exhaustion", "_prepare_representative_volume_scaling_step_gpu"),
+        ("communication", "volume_evolution_step_gpu"),
+        ("communication", "particle_communication_step_gpu"),
     ],
 )
-def test_unmigrated_consumers_reject_before_payload_access(module, name):
+@pytest.mark.parametrize("code", [1, 2, 3])
+def test_unmigrated_consumers_reject_before_payload_access(module, name, code):
     """Every direct/prepared route protects the newly transferable tag."""
     pytest.importorskip("warp")
     function = getattr(
@@ -47,6 +50,7 @@ def test_unmigrated_consumers_reject_before_payload_access(module, name):
         if parameter.default is inspect.Parameter.empty
     }
     kwargs["particles"] = _TaggedOnly()
+    kwargs["particles"].distribution_kind = code
     with pytest.raises(ValueError, match="require a migrated consumer"):
         function(**kwargs)
 

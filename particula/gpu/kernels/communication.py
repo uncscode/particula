@@ -46,6 +46,7 @@ from particula.execution.communication import (
     PrescribedVolumeUpdate,
 )
 from particula.gpu.kernels.environment import _is_warp_array_like
+from particula.gpu.population_metadata import require_legacy_particle_metadata
 
 # The serial, immutable-prestep planner deliberately rejects pathological map
 # sizes rather than issuing unbounded device work before the one gated commit.
@@ -551,6 +552,9 @@ def volume_evolution_step_gpu(
     This direct kernel performs no hidden transfer, synchronization, or CPU
     fallback; callers synchronize before inspection.
 
+    Tagged native populations reject before payload access until their M4
+    communication migration; this boundary still uses legacy number densities.
+
     Args:
         particles: Warp particle container with fixed-shape primary fields.
         gas: Warp gas container with fixed-shape primary fields sharing the
@@ -571,7 +575,8 @@ def volume_evolution_step_gpu(
         Rollback is not promised if an asynchronous apply writer fails after it
         launches.
     """
-    # Final-volume form intentionally precedes all container access.
+    require_legacy_particle_metadata(particles)
+    # Final-volume form precedes payload access after population admission.
     final_volumes_array, final_range = _validate_array(
         final_volumes, "final_volumes", wp.float64, 1
     )
@@ -1559,6 +1564,9 @@ def particle_communication_step_gpu(
     boundary does not transfer, resize, compact, implicitly activate slots, or
     provide a CPU fallback.
 
+    Tagged native populations reject before payload access until their M4
+    communication migration; this boundary still uses legacy number densities.
+
     Args:
         particles: Complete caller-owned fixed-shape Warp particle container.
         configuration: Exact P1 particle ``CommunicationConfiguration``.
@@ -1573,6 +1581,7 @@ def particle_communication_step_gpu(
         ValueError: If observable schemas, devices, aliases, or declaration
             metadata are invalid.
     """
+    require_legacy_particle_metadata(particles)
     step = _validate_time_step(time_step)
     typed = _validate_particle_communication_configuration(configuration)
     if type(buffers) is not ParticleCommunicationBuffers:
