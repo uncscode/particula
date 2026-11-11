@@ -2,29 +2,32 @@
 
 Current authority: [implementation contract and evidence](implementation_record.md).
 The 2026-11-11 single-PR plan supersedes historical volume rules, entry
-status and per-phase PR instructions below. PMF/PDF require V=1 and already
+status and per-phase PR instructions. PMF/PDF require V=1 and already
 store density; only resolved counts use variable-V normalization.
 
-All six phases are Not Started. Each is a bounded reviewed work unit with tests in
-the owning change. P1 requires M2 completed and validated; every later phase
-requires its predecessor's validated gate. No separate unit-testing phase.
+P1–P5 have implementation checkpoints and focused/full-package evidence linked
+from the implementation record. P6 supplies native integration, final gates and
+the M4 handoff. Scientific acceptance and M4 entry remain maintainer decisions.
+Each phase keeps tests in its owning commits within one PR; no separate
+unit-testing phase or per-phase implementation issue is required.
 
 The approved E9 appendix D1–D2 amendment adds direct/prepared GPU correction
-to the owning scientific phases below. Split expanded work into serial bounded
-PRs with adjacent tests; old S/XS estimates are provisional and must be re-sized
-before issue generation. Do not defer executable corrections to P6 docs.
+to the owning scientific phases below. Deliver serial commits with adjacent
+tests in the single authorized PR. The old S/XS estimates are historical;
+the expanded single-PR implementation is size L. Scientific corrections stay
+with their owning phase, including the P4 species/charge-moment follow-up.
 
 | Phase | Additional required normalization/metadata work |
 |---|---|
 | P1 | Shared distribution admission, explicit species maps and physical rate units; native and direct/prepared condensation |
-| P2 | N/V or radius-PDF quadrature/V for condensation inventories and gas deltas; direct/prepared GPU non-unit-volume conservation |
+| P2 | Resolved N/V or PMF density/PDF quadrature for gas deltas; direct/prepared GPU non-unit-volume conservation |
 | P3 | Density inputs to discrete/radius-PDF rate laws; compatible shared distribution metadata; no inferred GPU mode expansion |
 | P4 | Density-rate to raw-storage updates; volume factors in resolved selectors; reject unsupported unequal weights; direct/prepared GPU conservation |
 | P5 | Count/PDF-preserving losses and sink accounting on CPU/direct/prepared GPU; retain distinct stochastic contracts |
 | P6 | Reconcile CPU/GPU correction ledger, literal validation and downstream M4 integration requirements |
 
 - [ ] **E9-M3-P1: Complete native condensation admission and configuration with scientific tests**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1605 (single PR) | Status: Implemented; review pending
   - Work: Accept M1/M2 contracts and seed scientific/compatibility ledgers.
     Complete native configuration resolution, physical state admission and
     species alignment in `condensation_strategies.py`. Carry explicit activity,
@@ -39,7 +42,7 @@ before issue generation. Do not defer executable corrections to P6 docs.
     physical laws and supported algorithms remain unchanged.
 
 - [ ] **E9-M3-P2: Complete native condensation stepping with conservation and stability fixtures**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1605 (single PR) | Status: Implemented; review pending
   - Work: Finish isothermal, staggered and latent-heat native stepping using
     existing mass-transfer logic; preserve sequential current-gas coupling,
     theta selection, uptake/evaporation limiting and returned state identities.
@@ -54,7 +57,7 @@ before issue generation. Do not defer executable corrections to P6 docs.
     no hidden normalization or new solver/accuracy claim.
 
 - [ ] **E9-M3-P3: Complete native coagulation kernels and rates with scientific fixtures**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1605 (single PR) | Status: Implemented; review pending
   - Work: Complete ABC radius/mass/concentration/density/charge helpers and
     native kernel/rate consumers for Brownian, charged, sedimentation,
     turbulent-shear, turbulent-DNS and combined strategies. Preserve process
@@ -69,7 +72,7 @@ before issue generation. Do not defer executable corrections to P6 docs.
     combined-rate/scientific helper expectations remain independent.
 
 - [ ] **E9-M3-P4: Complete native coagulation stepping with weighted conservation tests**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1605 (single PR) | Status: Implemented; review pending
   - Work: Finish native discrete/PDF updates and resolved binning, selection
     and merge paths in the ABC and `particle_resolved_step/` consumers. Reuse
     existing algorithms; audit temporary binned data separately from
@@ -83,7 +86,7 @@ before issue generation. Do not defer executable corrections to P6 docs.
     or an invented cross-backend seeded-equality requirement.
 
 - [ ] **E9-M3-P5: Migrate neutral and charged wall-loss strategies with both CPU suites**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1605 (single PR) | Status: Implemented; review pending
   - Work: Replace native-path facade getters/mutators in
     `wall_loss/wall_loss_strategies.py` with approved quantities/writes.
     Preserve spherical/rectangular neutral/charged paths, binned/PDF loss,
@@ -99,7 +102,7 @@ before issue generation. Do not defer executable corrections to P6 docs.
     Do not substitute GPU laws or slot behavior for existing CPU science.
 
 - [ ] **E9-M3-P6: Update development documentation**
-  - Issue: TBD | Size: XS | Status: Not Started
+  - Issue: #1605 (single PR) | Status: Final validation in progress
   - Work: Document native scientific calls, units, mapping, process-owned
     configuration and mutation boundaries in narrow developer guidance, e.g.
     `docs/Features/condensation_strategy_system.md` where applicable. Finalize

@@ -1,9 +1,9 @@
 # Communication and Reporting
 
-- Send phase entry/exit summaries to the E9 maintainer on issue #1602 and phase
-  PRs; include scientific reviewers and M4 integration owner. Named assignees
-  remain to be confirmed. Preserve evidence in PRs and workflow messages.
-- Each PR records native call/configuration changes, assertion migration,
+- Preserve phase evidence in the repository records and the single M3 PR.
+  Do not generate separate phase PRs or send issue messages as a side effect.
+  The maintainer owns scientific acceptance and the M4 integration handoff.
+- The PR records native call/configuration changes, assertion migration,
   units/species/normalization decisions, commands/results and temporary seams
   with M6 removal ownership. Review metrics at every phase gate.
 - Escalate scientific drift, missing native paths, lost behavior, required
@@ -16,5 +16,5 @@
   call contracts, identity/failure semantics, ledgers and reviewer approval.
   M4 begins only after explicit completed-and-validated acceptance. M6 receives
   a deletion inventory, not permission for early removal.
-- Drafting completion is separate from implementation readiness. No production
-  edits or scientific test execution are part of this drafting task.
+- Implementation evidence is separate from reviewed acceptance; publishing
+  the PR does not authorize merging, releasing or starting M4.

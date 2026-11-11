@@ -1,0 +1,279 @@
+"""M2 construction through M3 science, without runnable or facade adapters."""
+
+import numpy as np
+import numpy.testing as npt
+import pytest
+from particula import AerosolBuilder
+from particula.dynamics import (
+    BrownianCoagulationStrategy,
+    ChargedWallLossStrategy,
+    CondensationIsothermal,
+    CondensationIsothermalStaggered,
+    CondensationLatentHeat,
+    SphericalWallLossStrategy,
+)
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
+from particula.gas import EnvironmentData, GasDataBuilder
+from particula.gas.latent_heat_strategies import ConstantLatentHeat
+from particula.gas.vapor_pressure_strategies import (
+    ConstantVaporPressureStrategy,
+)
+from particula.particles import (
+    ParticleDataBuilder,
+    create_resolved_particle_data,
+)
+from particula.particles.activity_strategies import ActivityIdealMass
+from particula.particles.surface_strategies import SurfaceStrategyVolume
+
+CONDENSATION = [
+    CondensationIsothermal,
+    CondensationIsothermalStaggered,
+    CondensationLatentHeat,
+]
+
+
+@pytest.fixture(autouse=True)
+def forbid_facade_construction(monkeypatch):
+    """Native integration must never fall back to temporary facade setup."""
+    from particula._legacy_aerosol import Aerosol as LegacyAerosol
+    from particula.gas.species import GasSpecies
+    from particula.particles.representation import ParticleRepresentation
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("native scientific integration constructed a facade")
+
+    for cls in (LegacyAerosol, GasSpecies, ParticleRepresentation):
+        monkeypatch.setattr(cls, "__init__", forbidden)
+
+
+def _aggregate(particles):
+    """Build full gas order with a distinct, unmapped inert lane."""
+    scale = (
+        1e-15 if particles.distribution_type == "particle_resolved" else 1e-9
+    )
+    gas = (
+        GasDataBuilder()
+        .set_names(["inert", "B", "A"])
+        .set_molar_mass([0.028, 0.046, 0.018])
+        .set_concentration(np.array([9.0, 2.0, 3.0]) * scale)
+        .set_partitioning([False, True, True])
+        .build()
+    )
+    return (
+        AerosolBuilder()
+        .set_particles(particles)
+        .set_gas(gas)
+        .set_environment(EnvironmentData([298.15], [101325.0], [[0, 1, 1]]))
+        .build()
+    )
+
+
+def _integrate(particle, values):
+    """Sum raw counts or integrate PDF products independently of containers."""
+    if particle.distribution_type != "continuous_pdf":
+        return np.sum(values, axis=0)
+    width = np.diff(particle.radius_grid)
+    if values.ndim == 2:
+        width = width[:, None]
+    return np.sum((values[1:] + values[:-1]) * width / 2, axis=0)
+
+
+def _inventory(particle):
+    return _integrate(
+        particle, particle.masses[0] * particle.concentration[0, :, None]
+    )
+
+
+def _condense(aerosol, strategy_type):
+    """Check particle/gas deltas separately at the explicit strategy boundary."""
+    particle, gas = aerosol.particles, aerosol.gas
+    extra = {}
+    if strategy_type is CondensationIsothermalStaggered:
+        extra = dict(theta_mode="random", random_state=123, num_batches=4)
+    elif strategy_type is CondensationLatentHeat:
+        extra = dict(latent_heat_strategy=ConstantLatentHeat(2e6))
+    strategy = strategy_type(
+        molar_mass=gas.molar_mass.copy(),
+        diffusion_coefficient=np.array([3e-5, 1e-5, 2e-5]),
+        activity_strategy=ActivityIdealMass(),
+        surface_strategy=SurfaceStrategyVolume(density=1000.0),
+        vapor_pressure_strategy=ConstantVaporPressureStrategy(0.0),
+        species_map=CondensationSpeciesMap(
+            ("inert", "B", "A"), ((2, 0), (1, 1))
+        ),
+        **extra,
+    )
+    old_mass = particle.masses.copy()
+    old_gas = gas.concentration.copy()
+    result = strategy.step(
+        particle,
+        gas,
+        float(aerosol.environment.temperature[0]),
+        float(aerosol.environment.pressure[0]),
+        0.1,
+    )
+    assert result[0] is particle and result[1] is gas
+    gain = _integrate(
+        particle,
+        (particle.masses[0] - old_mass[0]) * particle.concentration[0, :, None],
+    )
+    loss = (
+        old_gas[0, [2, 1]] - gas.concentration[0, [2, 1]]
+    ) * particle.volume[0]
+    assert np.all(gain > 0) and np.all(loss > 0)
+    npt.assert_allclose(
+        gain,
+        loss,
+        rtol=1e-12,
+        atol=8 * np.finfo(float).eps * np.max(old_gas) * particle.volume[0],
+    )
+    assert gas.concentration[0, 0] == old_gas[0, 0]
+    if strategy_type is CondensationLatentHeat:
+        npt.assert_allclose(strategy.last_latent_heat_energy, gain.sum() * 2e6)
+
+
+@pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+@pytest.mark.parametrize("weight", [0.25, 1.0, 4.0])
+@pytest.mark.parametrize("strategy_type", CONDENSATION)
+def test_resolved_native_aggregate_through_three_processes(
+    volume, weight, strategy_type
+):
+    """Actual selection conserves mapped species before an explicit wall sink."""
+    masses = np.tile([[2e-18, 3e-18], [5e-18, 7e-18]], (8, 1))
+    particle = create_resolved_particle_data(
+        masses=masses,
+        density=[1000.0, 1200.0],
+        concentration=weight,
+        charge=np.tile([2.0, -1.0], 8),
+        volume=volume,
+    )
+    aerosol = _aggregate(particle)
+    arrays = [particle.masses, particle.concentration, particle.charge]
+    protected = [
+        particle.density,
+        particle.volume,
+        aerosol.gas.molar_mass,
+        aerosol.gas.partitioning,
+        aerosol.environment.temperature,
+        aerosol.environment.pressure,
+        aerosol.environment.saturation_ratio,
+    ]
+    snapshots = [x.copy() for x in protected]
+    _condense(aerosol, strategy_type)
+    gas_before = aerosol.gas.concentration.copy()
+    mass_before = _inventory(particle)
+    charge_before = np.dot(particle.charge[0], particle.concentration[0])
+    coagulation = BrownianCoagulationStrategy("particle_resolved")
+    coagulation.random_generator = np.random.default_rng(123)
+    assert (
+        coagulation.step(particle, 298.15, 101325.0, 1e18 * volume / weight)
+        is particle
+    )
+    assert np.count_nonzero(particle.concentration) < len(masses)
+    npt.assert_allclose(_inventory(particle), mass_before, rtol=2e-15, atol=0)
+    assert (
+        np.dot(particle.charge[0], particle.concentration[0]) == charge_before
+    )
+
+    before_wall_mass = particle.masses.copy()
+    before_wall_count = particle.concentration.copy()
+    before_wall_charge = particle.charge.copy()
+    wall = ChargedWallLossStrategy(
+        wall_eddy_diffusivity=1e-3,
+        chamber_geometry="spherical",
+        chamber_radius=0.5,
+        wall_potential=0.0,
+        distribution_type="particle_resolved",
+    )
+    wall.random_generator = np.random.default_rng(456)
+    assert wall.step(particle, 298.15, 101325.0, 1e30) is particle
+    removed = before_wall_count[0] > particle.concentration[0]
+    assert np.any(removed)
+    sink = np.sum(
+        before_wall_mass[0, removed] * before_wall_count[0, removed, None],
+        axis=0,
+    )
+    npt.assert_allclose(
+        _inventory(particle) + sink, mass_before, rtol=2e-15, atol=0
+    )
+    npt.assert_array_equal(particle.charge, before_wall_charge)
+    npt.assert_array_equal(aerosol.gas.concentration, gas_before)
+    assert aerosol.particles is particle
+    for actual, original in zip(
+        (particle.masses, particle.concentration, particle.charge),
+        arrays,
+        strict=True,
+    ):
+        assert actual is original
+    for actual, original in zip(protected, snapshots, strict=True):
+        npt.assert_array_equal(actual, original)
+
+
+@pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
+@pytest.mark.parametrize("strategy_type", CONDENSATION)
+def test_density_native_aggregate_through_three_processes(kind, strategy_type):
+    """Retain explicit PDF quadrature through condensation, collisions and loss."""
+    radius = np.geomspace(1e-9, 1e-6, 512)
+    fraction = np.clip(0.5 + 0.3 * np.log(radius / 1e-7), 0.05, 0.95)
+    mass = 4 * np.pi * radius**3 / 3 / (fraction / 1000 + (1 - fraction) / 1200)
+    pdf = 1e9 * np.exp(-0.5 * (np.log(radius / 1e-7) / 0.35) ** 2)
+    pdf /= radius * 0.35 * np.sqrt(2 * np.pi)
+    counts = (
+        pdf
+        if kind == "continuous_pdf"
+        else pdf * np.diff(radius, append=2 * radius[-1] - radius[-2])
+    )
+    builder = (
+        ParticleDataBuilder()
+        .set_distribution_type(kind)
+        .set_masses(np.column_stack([mass * fraction, mass * (1 - fraction)]))
+        .set_density(np.array([1000.0, 1200.0]))
+        .set_concentration(
+            counts, units="1/m^4" if kind == "continuous_pdf" else "1/m^3"
+        )
+        .set_charge(np.zeros(512))
+        .set_volume(np.array(1.0))
+    )
+    if kind == "continuous_pdf":
+        builder.set_radius_grid(radius)
+    particle = builder.build()
+    aerosol = _aggregate(particle)
+    _condense(aerosol, strategy_type)
+    gas_before = aerosol.gas.concentration.copy()
+    before = _inventory(particle)
+    coagulation = BrownianCoagulationStrategy(kind)
+    kernel = coagulation.kernel(particle, 298.15, 101325.0)
+    # Independent donor-loss integral bounds retained finite-grid moment error.
+    collision_rate = _integrate(
+        particle, kernel.T * particle.concentration[0, :, None]
+    )
+    gross_loss = _integrate(
+        particle,
+        particle.masses[0]
+        * (collision_rate * particle.concentration[0])[:, None],
+    )
+    old_count = particle.concentration.copy()
+    assert coagulation.step(particle, 298.15, 101325.0, 10.0) is particle
+    assert not np.array_equal(particle.concentration, old_count)
+    assert np.all(
+        np.abs(_inventory(particle) - before) < 0.01 * 10 * gross_loss
+    )
+    before_wall = _inventory(particle)
+    old_count = particle.concentration.copy()
+    old_mass = particle.masses.copy()
+    wall = SphericalWallLossStrategy(1e-3, 0.5, kind)
+    assert wall.step(particle, 298.15, 101325.0, 0.1) is particle
+    sink = _integrate(
+        particle,
+        old_mass[0] * (old_count[0] - particle.concentration[0])[:, None],
+    )
+    assert np.all(sink > 0)
+    npt.assert_allclose(
+        _inventory(particle) + sink, before_wall, rtol=2e-15, atol=0
+    )
+    npt.assert_array_equal(particle.masses, old_mass)
+    npt.assert_array_equal(aerosol.gas.concentration, gas_before)
+    if kind == "continuous_pdf":
+        npt.assert_array_equal(particle.radius_grid, radius)
