@@ -10,8 +10,9 @@ next phase began. See their phase records for exact predecessor commits.
 
 Final implementation revision: `f6304ff70d6ba60a2c7af2e9c01cdc409472b89c`.
 All 15 final command groups completed with exit code 0. The revision remained
-unchanged throughout the run. Subsequent evidence updates change documentation
-only; the executable and test tree is identical to this tested revision.
+unchanged throughout the run. The initial evidence-only follow-up changed documentation only. Later notebook
+CI repairs are recorded separately below; the package implementation remains
+identical to this full-suite tested revision.
 
 **Final M2 acceptance is pending Kyle Gorkowski.** Metadata remains In Progress
 for review and final sign-off; this does not mean construction implementation is
@@ -103,3 +104,46 @@ and execute the two Python blocks in the construction guide, respectively.
 - **notebooks**: `/home/kyle/Code/particula/.venv/bin/python /tmp/e9_notebook_check.py`
 - **guide**: `/home/kyle/Code/particula/.venv/bin/python /tmp/e9_guide_check.py`
 - **diff-check**: `git diff --check`
+
+## Notebook CI follow-up (2026-11-10 local / 2026-11-11 UTC)
+
+The original P1 notebook run `42949672036` was cancelled at its 15-minute
+job limit while validating 21 changed notebooks serially. Earlier notebook
+pair checks established source synchronization, not complete notebook execution.
+
+P1 commits `8c6daa66a` and `77e04bef8` select the same changed-notebook set
+with NUL-delimited Git output and a JSON matrix, one notebook per 15-minute
+job, at most six concurrently, with fail-fast disabled and unbuffered output.
+The existing 300-second notebook timeout and timeout-skip policy are unchanged.
+Deleted files are excluded, filenames with spaces are preserved, and first
+pushes retain the existing all-tracked-notebooks behavior. Regression tests
+exercise real Git history for PR/push selection, deletion, spaces and empty diffs.
+
+That matrix exposed two execution errors. Commit `83f6d09a4` supplies the
+500-bin example's matching zero-charge array and extracts the staggered
+example's one-element gas concentration with `np.asarray(...).item()`, avoiding
+NumPy's rejected array-to-float conversion. Python/notebook code is synchronized
+and saved outputs remain unchanged. No scientific implementation was modified.
+
+The workflow and notebook fixes were merged sequentially through P2–P6, without
+rewriting phase history. At combined revision `d940aa1b3`, local validation:
+
+- `pytest scripts/tests -q -Werror --no-cov`: **130 passed in 26.39s**.
+- The unchanged notebook validator executed both repaired notebooks:
+  **2 passed, 0 failed, 0 skipped**.
+- Ruff checks passed for the selector and its tests; notebook-source commit
+  hooks passed.
+
+An initial isolated-checkout infrastructure attempt picked up the later-phase
+editable package in a subprocess (129 passed, 1 failed). Explicitly pointing
+PYTHONPATH to P1 resolved that environment mismatch: **130 passed**. The combined
+P6 run above required no such override.
+
+Final hosted notebook validation at P1 revision
+`83f6d09a47636120e04776130f79ee681288364d`:
+[run 42956553611](https://github.com/uncscode/particula/actions/runs/42956553611)
+completed **successfully: 20 executed passes, 0 failures, 1 timeout skip**.
+The skip is `Biomass_Burning_Cloud_Interactions.ipynb`; it is not evidence of a
+completed simulation. The run selected only the 21 notebooks changed in P1.
+The delayed dependency-install job eventually completed and its notebook passed.
+Strict documentation build passed after updating this record.
