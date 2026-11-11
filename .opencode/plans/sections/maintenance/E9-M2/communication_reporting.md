@@ -1,20 +1,15 @@
 # Communication and Reporting
 
-- Report phase entry/completion and blockers in the owning PR and issue
-  #1602/E9 handoff record. Notify the maintainer, scientific reviewer and
-  downstream M3/M4 owners. Named owners remain unassigned until maintainer review.
-- Before P1, obtain explicit M1 gate evidence and transitional seam approval.
-  Before P4/P5, review the retained construction capability inventory, native
-  module/API placement and sampling/default semantics.
-- Each implementation PR records changed construction functions, old-to-native
-  behavioral-test mapping, exact assertion commands/results, units/identity
-  decisions and any temporary compatibility addition. No new diagnostics track.
-- Review metrics and open questions at every phase gate. Escalate M1 contract
-  gaps and M3/M4 consumer incompatibilities instead of silently expanding M2.
-  A scope change must preserve strict completed-and-validated track order.
-- P6 publishes revision/date, required validation outputs, optional device
-  availability/skips, compatibility removal owners and explicit M3 admission
-  approval. Required unavailable checks are blockers, not passing evidence.
-- Reconcile parent/sibling records through their owner; this drafting task
-  edits E9-M2 only. Record significant decisions in this plan's change log.
-  There is no fixed calendar deadline or fabricated progress percentage.
+Issue #1608 owns the six-phase M2 implementation. P1–P5 PRs are #1625–#1629;
+P6 is the final handoff PR. Each PR includes its behavior, predecessor and
+validation results. Exact commands and evidence live with the phase records.
+
+The final packet contains the developer guide, capability/test mapping,
+temporary legacy consumer inventory, final tested revision and literal result
+summaries. Required unavailable/failing checks remain blockers. CUDA skips are
+not measured success; full host-access results are distinguished from failed
+restricted-environment diagnostics.
+
+Kyle Gorkowski is the final M2 handoff approver. Request acceptance only after
+all implementation and required checks are reviewable. Do not claim M3 admission,
+PR merge, release or downstream completion from this plan's approval alone.

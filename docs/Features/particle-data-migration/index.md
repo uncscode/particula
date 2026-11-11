@@ -14,6 +14,9 @@ page redirects here.
 
 ## Migration topics
 
+- [Native construction and replacement](construction.md): three-container
+  Aerosol, builders, initializers, units, ownership and transition limits.
+
 - [Container and facade migration](containers.md): before/after examples,
   field mappings, gradual migration, and conversion helpers.
 - [Dynamics migration](dynamics.md): current CPU support boundaries,
