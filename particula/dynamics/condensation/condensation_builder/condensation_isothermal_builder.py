@@ -1,6 +1,6 @@
 """Builder for the CondensationIsothermal strategy."""
 
-from typing import cast
+from typing import Any, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -17,6 +17,7 @@ from .condensation_builder_mixin import (
     BuilderDiffusionCoefficientMixin,
     BuilderUpdateGasesMixin,
 )
+from .native_configuration import BuilderNativeCondensationMixin
 
 
 class CondensationIsothermalBuilder(
@@ -25,6 +26,7 @@ class CondensationIsothermalBuilder(
     BuilderDiffusionCoefficientMixin,
     BuilderAccommodationCoefficientMixin,
     BuilderUpdateGasesMixin,
+    BuilderNativeCondensationMixin,
 ):
     """Fluent builder for :class:`CondensationIsothermal`."""
 
@@ -45,6 +47,16 @@ class CondensationIsothermalBuilder(
         BuilderDiffusionCoefficientMixin.__init__(self)
         BuilderAccommodationCoefficientMixin.__init__(self)
         BuilderUpdateGasesMixin.__init__(self)
+        BuilderNativeCondensationMixin.__init__(self)
+
+    def set_parameters(
+        self, parameters: dict[str, Any]
+    ) -> "CondensationIsothermalBuilder":
+        """Load transport inputs and optional native process configuration."""
+        BuilderABC.set_parameters(
+            self, self._load_native_parameters(parameters)
+        )
+        return self
 
     def build(self) -> CondensationStrategy:
         """Validate parameters and create a condensation strategy."""
@@ -62,4 +74,5 @@ class CondensationIsothermalBuilder(
             diffusion_coefficient=self.diffusion_coefficient,
             accommodation_coefficient=self.accommodation_coefficient,
             update_gases=self.update_gases,
+            **self._native_strategy_kwargs(),
         )

@@ -44,6 +44,11 @@ from particula.dynamics.condensation.mass_transfer_utils import (
     apply_per_bin_limit,
     calc_mass_to_change,
 )
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+    condensation_population_weights,
+    validate_condensation_state,
+)
 from particula.gas import get_molecule_mean_free_path
 from particula.gas.gas_data import GasData
 from particula.gas.latent_heat_strategies import (
@@ -235,6 +240,25 @@ def _normalize_first_order_mass_transport(
     return mass_transport
 
 
+def _native_kelvin_lane(
+    kelvin: NDArray[np.float64],
+    particle: ParticleData,
+    target: int,
+) -> NDArray[np.float64]:
+    """Select a declared particle lane from scalar or resolved Kelvin terms."""
+    if kelvin.ndim == 2:
+        if kelvin.shape == (particle.n_particles, 1):
+            kelvin = kelvin[:, 0]
+        elif kelvin.shape == particle.masses[0].shape:
+            kelvin = kelvin[:, target]
+        else:
+            raise ValueError("Kelvin terms must match particle lanes")
+    kelvin = np.broadcast_to(kelvin, (particle.n_particles,))
+    if not np.all(np.isfinite(kelvin)) or np.any(kelvin < 0):
+        raise ValueError("kelvin_term must be finite and nonnegative")
+    return kelvin
+
+
 # mass transfer abstract class
 class CondensationStrategy(ABC):
     """Abstract base class for condensation strategies.
@@ -296,6 +320,8 @@ class CondensationStrategy(ABC):
         vapor_pressure_strategy: VaporPressureStrategy
         | Sequence[VaporPressureStrategy]
         | None = None,
+        *,
+        species_map: CondensationSpeciesMap | None = None,
     ):
         """Initialize the CondensationStrategy instance.
 
@@ -313,7 +339,9 @@ class CondensationStrategy(ABC):
             surface_strategy: Surface strategy used when ParticleData inputs
                 are provided (required for data-only usage).
             vapor_pressure_strategy: Vapor pressure strategy or per-species
-                strategies used when GasData inputs are provided.
+                strategies in complete gas order for native inputs.
+            species_map: Explicit gas-name provenance and gas-to-particle pairs
+                required for tagged native data. Unmapped lanes do not transfer.
         """
         self.molar_mass = molar_mass
         self.diffusion_coefficient = diffusion_coefficient
@@ -323,6 +351,212 @@ class CondensationStrategy(ABC):
         self.activity_strategy = activity_strategy
         self.surface_strategy = surface_strategy
         self.vapor_pressure_strategy = vapor_pressure_strategy
+        self.species_map = species_map
+
+    def _uses_native_contract(
+        self, particle: ParticleRepresentation | ParticleData
+    ) -> bool:
+        """Identify explicit native state without reinterpreting legacy data."""
+        return isinstance(particle, ParticleData) and (
+            particle.distribution_type is not None
+            or self.species_map is not None
+        )
+
+    def _native_parameters(
+        self,
+        particle: ParticleData,
+        gas: GasData,
+        temperature: float,
+        pressure: float,
+    ) -> tuple[
+        NDArray[np.intp],
+        NDArray[np.intp],
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+    ]:
+        """Admit current state and full-gas transport parameters."""
+        sources, targets = validate_condensation_state(
+            particle,
+            gas,
+            self.species_map,
+            temperature,
+            pressure,
+            self.skip_partitioning_indices,
+        )
+        width = len(gas.name)
+        parameters = []
+        for value, label in (
+            (self.molar_mass, "molar_mass"),
+            (self.diffusion_coefficient, "diffusion_coefficient"),
+            (self.accommodation_coefficient, "accommodation_coefficient"),
+        ):
+            array = np.asarray(value, dtype=np.float64)
+            if array.ndim != 0 and array.shape != (width,):
+                raise ValueError(f"{label} must be scalar or full-gas ordered")
+            if not np.all(np.isfinite(array)) or np.any(array <= 0):
+                raise ValueError(f"{label} must be positive and finite")
+            parameters.append(np.broadcast_to(array, (width,)))
+        if not np.array_equal(parameters[0], gas.molar_mass):
+            raise ValueError(
+                "process molar_mass must match full ordered gas data"
+            )
+        if not isinstance(self.update_gases, (bool, np.bool_)):
+            raise ValueError("update_gases must be boolean")
+        return sources, targets, parameters[0], parameters[1], parameters[2]
+
+    def _native_pressure_terms(
+        self,
+        particle: ParticleData,
+        gas: GasData,
+        temperature: float,
+        radius: NDArray[np.float64],
+        sources: NDArray[np.intp],
+        targets: NDArray[np.intp],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Evaluate full composition and mapped pressure lanes in Pa."""
+        activity, surface, vapor = self._resolve_strategies(
+            particle, gas, False, False
+        )
+        if isinstance(vapor, Sequence) and len(vapor) != len(gas.name):
+            raise ValueError(
+                "vapor pressure strategies must follow full gas order"
+            )
+        pure = np.asarray(
+            _pure_vapor_pressure_from_strategy(vapor, float(temperature))
+            if isinstance(vapor, Sequence)
+            else vapor.pure_vapor_pressure(
+                np.full(len(gas.name), float(temperature))
+            )
+        )
+        if pure.ndim != 0 and pure.shape != (len(gas.name),):
+            raise ValueError(
+                "vapor pressure must be scalar or full-gas ordered"
+            )
+        pure = np.broadcast_to(pure, (len(gas.name),))
+        if not np.all(np.isfinite(pure)) or np.any(pure < 0):
+            raise ValueError(
+                "pure vapor pressure must be finite and nonnegative"
+            )
+        partial_gas = _partial_pressure_from_strategy(
+            vapor, gas.concentration[0], gas.molar_mass, temperature
+        )
+        if partial_gas.shape != (len(gas.name),):
+            raise ValueError("partial pressure must follow full gas order")
+        if not np.all(np.isfinite(partial_gas)):
+            raise ValueError("partial gas pressure must be finite")
+        # Evaluate activity using ALL material, including particle-only lanes.
+        fractions = np.asarray(
+            activity.partial_pressure(
+                pure_vapor_pressure=np.ones(particle.n_species),
+                mass_concentration=particle.masses[0],
+            ),
+            dtype=np.float64,
+        )
+        fractions = np.broadcast_to(fractions, particle.masses[0].shape)
+        if not np.all(np.isfinite(fractions)) or np.any(fractions < 0):
+            raise ValueError("particle activity must be finite and nonnegative")
+        delta = np.zeros_like(particle.masses[0])
+        equilibrium = np.zeros_like(delta)
+        for source, target in zip(sources, targets, strict=True):
+            kelvin = np.asarray(
+                surface.kelvin_term(
+                    radius=radius,
+                    molar_mass=float(gas.molar_mass[source]),
+                    mass_concentration=particle.masses[0],
+                    temperature=temperature,
+                ),
+                dtype=np.float64,
+            )
+            kelvin = _native_kelvin_lane(kelvin, particle, int(target))
+            equilibrium[:, target] = (
+                pure[source] * fractions[:, target] * kelvin
+            )
+            delta[:, target] = partial_gas[source] - equilibrium[:, target]
+        return delta, equilibrium
+
+    def _native_mass_transfer_rate(
+        self,
+        particle: ParticleRepresentation | ParticleData,
+        gas_species: GasSpecies | GasData,
+        temperature: float,
+        pressure: float,
+        dynamic_viscosity: float | None = None,
+    ) -> NDArray[np.float64]:
+        """Return native per-particle kg/s in full particle species order.
+
+        Transport and vapor parameters follow the full gas ordering. Activity
+        and surface strategies see the full particle composition. Pair-specific
+        scalar transport calls avoid accidental particle/species broadcasting.
+        """
+        particle_data, legacy_particle = _unwrap_particle(particle)
+        gas, legacy_gas = _unwrap_gas(gas_species)
+        _require_matching_types(legacy_particle, legacy_gas)
+        sources, targets, molar, diffusion, accommodation = (
+            self._native_parameters(particle_data, gas, temperature, pressure)
+        )
+        if dynamic_viscosity is not None and (
+            np.ndim(dynamic_viscosity) != 0
+            or not np.isfinite(dynamic_viscosity)
+            or dynamic_viscosity <= 0
+        ):
+            raise ValueError("dynamic_viscosity must be positive and finite")
+        # Resolve configuration even for no-work maps and empty populations.
+        self._resolve_strategies(particle, gas_species, False, False)
+        result = np.zeros_like(particle_data.masses[0])
+        radius = np.maximum(particle_data.radii[0], MIN_PARTICLE_RADIUS_M)
+        delta, equilibrium = self._native_pressure_terms(
+            particle_data, gas, temperature, radius, sources, targets
+        )
+        heat_strategy = getattr(self, "_latent_heat_strategy", None)
+        heat = None
+        if heat_strategy is not None:
+            heat = np.asarray(
+                heat_strategy.latent_heat(temperature), dtype=np.float64
+            )
+            if heat.ndim != 0 and heat.shape != (len(gas.name),):
+                raise ValueError(
+                    "latent heat must be scalar or full-gas ordered"
+                )
+            if not np.all(np.isfinite(heat)) or np.any(heat < 0):
+                raise ValueError("latent heat must be finite and nonnegative")
+            heat = np.broadcast_to(heat, (len(gas.name),))
+        for source, target in zip(sources, targets, strict=True):
+            mean_free_path = get_molecule_mean_free_path(
+                molar_mass=float(molar[source]),
+                temperature=temperature,
+                pressure=pressure,
+                dynamic_viscosity=dynamic_viscosity,
+            )
+            transition = get_vapor_transition_correction(
+                knudsen_number=mean_free_path / radius,
+                mass_accommodation=float(accommodation[source]),
+            )
+            transport = get_first_order_mass_transport_k(
+                particle_radius=radius,
+                vapor_transition=transition,
+                diffusion_coefficient=float(diffusion[source]),
+            )
+            pressure_delta = np.nan_to_num(
+                delta[:, target], nan=0, posinf=0, neginf=0
+            )
+            if heat is None:
+                result[:, target] = get_mass_transfer_rate(
+                    pressure_delta, transport, temperature, float(molar[source])
+                )
+            else:
+                result[:, target] = get_mass_transfer_rate_latent_heat(
+                    pressure_delta,
+                    transport,
+                    temperature,
+                    float(molar[source]),
+                    float(heat[source]),
+                    get_thermal_conductivity(temperature),
+                    equilibrium[:, target],
+                    float(diffusion[source]),
+                )
+        result[particle_data.concentration[0] == 0] = 0
+        return result
 
     def _resolve_strategies(
         self,
@@ -563,6 +797,30 @@ class CondensationStrategy(ABC):
             )
             ```
         """
+        if self._uses_native_contract(particle):
+            native_particle, particle_legacy = _unwrap_particle(particle)
+            native_gas, gas_legacy = _unwrap_gas(gas_species)
+            _require_matching_types(particle_legacy, gas_legacy)
+            # This pressure-only entry point does not consume ambient pressure.
+            sources, targets, *_ = self._native_parameters(
+                native_particle, native_gas, temperature, 1.0
+            )
+            radius = np.asarray(radius, dtype=np.float64)
+            if radius.shape != (native_particle.n_particles,) or not np.all(
+                np.isfinite(radius) & (radius >= 0)
+            ):
+                raise ValueError(
+                    "radius must be finite, nonnegative and per-particle"
+                )
+            return self._native_pressure_terms(
+                native_particle,
+                native_gas,
+                temperature,
+                radius,
+                sources,
+                targets,
+            )[0]
+
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
         _require_matching_types(particle_is_legacy, gas_is_legacy)
@@ -846,6 +1104,8 @@ class CondensationIsothermal(CondensationStrategy):
         vapor_pressure_strategy: VaporPressureStrategy
         | Sequence[VaporPressureStrategy]
         | None = None,
+        *,
+        species_map: CondensationSpeciesMap | None = None,
     ):
         """Initialize the CondensationIsothermal strategy.
 
@@ -859,7 +1119,9 @@ class CondensationIsothermal(CondensationStrategy):
             activity_strategy: Activity strategy used for ParticleData inputs.
             surface_strategy: Surface strategy used for ParticleData inputs.
             vapor_pressure_strategy: Vapor pressure strategy used for GasData
-                inputs.
+                inputs. Native parameters use the complete gas ordering.
+            species_map: Explicit gas-name provenance and gas-to-particle pairs
+                required for tagged native data. Unmapped lanes do not transfer.
         """
         super().__init__(
             molar_mass=molar_mass,
@@ -870,6 +1132,7 @@ class CondensationIsothermal(CondensationStrategy):
             activity_strategy=activity_strategy,
             surface_strategy=surface_strategy,
             vapor_pressure_strategy=vapor_pressure_strategy,
+            species_map=species_map,
         )
 
     def mass_transfer_rate(
@@ -907,6 +1170,11 @@ class CondensationIsothermal(CondensationStrategy):
             )
             ```
         """
+        if self._uses_native_contract(particle):
+            return self._native_mass_transfer_rate(
+                particle, gas_species, temperature, pressure, dynamic_viscosity
+            )
+
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
         _require_matching_types(particle_is_legacy, gas_is_legacy)
@@ -960,6 +1228,10 @@ class CondensationIsothermal(CondensationStrategy):
     ) -> NDArray[np.float64]:
         """Compute the condensation rate per particle or bin.
 
+        Native tagged data returns per-node contributions in kg/m^3/s using
+        number density or PDF quadrature weights, in full particle order.
+        Untagged temporary compatibility retains historical raw-weight rates.
+
         Mass transfer rates are multiplied by particle concentration, optional
         skip-partitioning is applied, and the result is returned as an array
         matching the particle inventory shape.
@@ -979,6 +1251,16 @@ class CondensationIsothermal(CondensationStrategy):
             ```
         """
         # Step 1: Calculate the mass transfer rate due to condensation
+        if self._uses_native_contract(particle):
+            native_particle = cast(ParticleData, particle)
+            rates = self._native_mass_transfer_rate(
+                particle, gas_species, temperature, pressure
+            )
+            return (
+                rates
+                * condensation_population_weights(native_particle)[:, None]
+            )
+
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
         _require_matching_types(particle_is_legacy, gas_is_legacy)
@@ -1232,6 +1514,8 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         vapor_pressure_strategy: VaporPressureStrategy
         | Sequence[VaporPressureStrategy]
         | None = None,
+        *,
+        species_map: CondensationSpeciesMap | None = None,
     ):
         """Initialize the staggered condensation strategy.
 
@@ -1256,7 +1540,9 @@ class CondensationIsothermalStaggered(CondensationStrategy):
             activity_strategy: Activity strategy used for ParticleData inputs.
             surface_strategy: Surface strategy used for ParticleData inputs.
             vapor_pressure_strategy: Vapor pressure strategy used for GasData
-                inputs.
+                inputs. Native parameters use the complete gas ordering.
+            species_map: Explicit gas-name provenance and gas-to-particle pairs
+                required for tagged native data. Unmapped lanes do not transfer.
 
         Raises:
             ValueError: If ``theta_mode`` is unsupported or ``num_batches`` is
@@ -1271,6 +1557,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
             activity_strategy=activity_strategy,
             surface_strategy=surface_strategy,
             vapor_pressure_strategy=vapor_pressure_strategy,
+            species_map=species_map,
         )
 
         if theta_mode not in self.VALID_THETA_MODES:
@@ -1424,6 +1711,11 @@ class CondensationIsothermalStaggered(CondensationStrategy):
             Mass transfer rate per particle per species (kg/s), shaped like
             ``particle.get_species_mass()``.
         """
+        if self._uses_native_contract(particle):
+            return self._native_mass_transfer_rate(
+                particle, gas_species, temperature, pressure, dynamic_viscosity
+            )
+
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
         _require_matching_types(particle_is_legacy, gas_is_legacy)
@@ -1462,6 +1754,10 @@ class CondensationIsothermalStaggered(CondensationStrategy):
     ) -> NDArray[np.float64]:
         """Compute staggered condensation rate per particle.
 
+        Tagged native outputs are per-node kg/m^3/s contributions in particle
+        order, using number density or PDF quadrature weights. Untagged
+        temporary compatibility retains historical raw-weight rates.
+
         Args:
             particle: Particle representation supplying concentrations.
             gas_species: Gas species with vapor properties and concentrations.
@@ -1472,6 +1768,16 @@ class CondensationIsothermalStaggered(CondensationStrategy):
             Condensation/evaporation rate (kg/s) scaled by particle
             concentration with skip-partitioning applied.
         """
+        if self._uses_native_contract(particle):
+            native_particle = cast(ParticleData, particle)
+            rates = self._native_mass_transfer_rate(
+                particle, gas_species, temperature, pressure
+            )
+            return (
+                rates
+                * condensation_population_weights(native_particle)[:, None]
+            )
+
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
         _require_matching_types(particle_is_legacy, gas_is_legacy)
@@ -2043,6 +2349,7 @@ class CondensationLatentHeat(CondensationStrategy):
         | Sequence[VaporPressureStrategy]
         | None = None,
         *,
+        species_map: CondensationSpeciesMap | None = None,
         latent_heat_strategy: LatentHeatStrategy | None = None,
         latent_heat: float | NDArray[np.float64] = 0.0,
     ):
@@ -2058,7 +2365,9 @@ class CondensationLatentHeat(CondensationStrategy):
             activity_strategy: Activity strategy used for ParticleData inputs.
             surface_strategy: Surface strategy used for ParticleData inputs.
             vapor_pressure_strategy: Vapor pressure strategy used for GasData
-                inputs.
+                inputs. Native parameters use the complete gas ordering.
+            species_map: Explicit gas-name provenance and gas-to-particle pairs
+                required for tagged native data. Unmapped lanes do not transfer.
             latent_heat_strategy: Optional latent heat strategy to use.
             latent_heat: Scalar latent heat fallback [J/kg].
         """
@@ -2071,6 +2380,7 @@ class CondensationLatentHeat(CondensationStrategy):
             activity_strategy=activity_strategy,
             surface_strategy=surface_strategy,
             vapor_pressure_strategy=vapor_pressure_strategy,
+            species_map=species_map,
         )
         self.latent_heat_strategy_input = latent_heat_strategy
         self.latent_heat_input = latent_heat
@@ -2199,6 +2509,11 @@ class CondensationLatentHeat(CondensationStrategy):
         Raises:
             ValueError: If pressure deltas or latent-heat inputs are non-finite.
         """
+        if self._uses_native_contract(particle):
+            return self._native_mass_transfer_rate(
+                particle, gas_species, temperature, pressure, dynamic_viscosity
+            )
+
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
         _require_matching_types(particle_is_legacy, gas_is_legacy)
@@ -2263,6 +2578,10 @@ class CondensationLatentHeat(CondensationStrategy):
     ) -> NDArray[np.float64]:
         """Compute the condensation rate per particle or bin.
 
+        Tagged native outputs are per-node kg/m^3/s contributions in particle
+        order, using number density or PDF quadrature weights. Untagged
+        temporary compatibility retains historical raw-weight rates.
+
         Mass transfer rates are scaled by the raw particle concentration and
         the configured skip-partitioning indices are applied.
 
@@ -2275,6 +2594,16 @@ class CondensationLatentHeat(CondensationStrategy):
         Returns:
             Condensation rate in kg/s per particle or bin.
         """
+        if self._uses_native_contract(particle):
+            native_particle = cast(ParticleData, particle)
+            rates = self._native_mass_transfer_rate(
+                particle, gas_species, temperature, pressure
+            )
+            return (
+                rates
+                * condensation_population_weights(native_particle)[:, None]
+            )
+
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
         _require_matching_types(particle_is_legacy, gas_is_legacy)

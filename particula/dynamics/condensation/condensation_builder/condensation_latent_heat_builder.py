@@ -23,6 +23,7 @@ from .condensation_builder_mixin import (
     BuilderDiffusionCoefficientMixin,
     BuilderUpdateGasesMixin,
 )
+from .native_configuration import BuilderNativeCondensationMixin
 
 logger = logging.getLogger("particula")
 
@@ -33,6 +34,7 @@ class CondensationLatentHeatBuilder(
     BuilderDiffusionCoefficientMixin,
     BuilderAccommodationCoefficientMixin,
     BuilderUpdateGasesMixin,
+    BuilderNativeCondensationMixin,
 ):
     """Fluent builder for :class:`CondensationLatentHeat`.
 
@@ -59,6 +61,7 @@ class CondensationLatentHeatBuilder(
         BuilderDiffusionCoefficientMixin.__init__(self)
         BuilderAccommodationCoefficientMixin.__init__(self)
         BuilderUpdateGasesMixin.__init__(self)
+        BuilderNativeCondensationMixin.__init__(self)
 
         self.latent_heat_strategy: LatentHeatStrategy | None = None
         self.latent_heat: float | None = None
@@ -87,6 +90,7 @@ class CondensationLatentHeatBuilder(
         Raises:
             ValueError: If required keys are missing or any key is invalid.
         """
+        parameters = self._load_native_parameters(parameters)
         required = self.required_parameters
         missing = [param for param in required if param not in parameters]
         if missing:
@@ -234,6 +238,7 @@ class CondensationLatentHeatBuilder(
                 self.accommodation_coefficient,
             ),
             "update_gases": self.update_gases,
+            **self._native_strategy_kwargs(),
         }
         if self.latent_heat_strategy is not None:
             build_kwargs["latent_heat_strategy"] = self.latent_heat_strategy

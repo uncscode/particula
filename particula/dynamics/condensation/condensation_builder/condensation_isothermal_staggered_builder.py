@@ -39,6 +39,7 @@ from .condensation_builder_mixin import (
     BuilderDiffusionCoefficientMixin,
     BuilderUpdateGasesMixin,
 )
+from .native_configuration import BuilderNativeCondensationMixin
 
 logger = logging.getLogger("particula")
 
@@ -49,6 +50,7 @@ class CondensationIsothermalStaggeredBuilder(
     BuilderDiffusionCoefficientMixin,
     BuilderAccommodationCoefficientMixin,
     BuilderUpdateGasesMixin,
+    BuilderNativeCondensationMixin,
 ):
     """Fluent builder for :class:`CondensationIsothermalStaggered`.
 
@@ -69,6 +71,7 @@ class CondensationIsothermalStaggeredBuilder(
         BuilderDiffusionCoefficientMixin.__init__(self)
         BuilderAccommodationCoefficientMixin.__init__(self)
         BuilderUpdateGasesMixin.__init__(self)
+        BuilderNativeCondensationMixin.__init__(self)
 
         self.theta_mode: str = "half"
         self.num_batches: int = 1
@@ -81,6 +84,7 @@ class CondensationIsothermalStaggeredBuilder(
         self, parameters: dict[str, Any]
     ) -> "CondensationIsothermalStaggeredBuilder":
         """Set required and optional parameters from a dictionary."""
+        parameters = self._load_native_parameters(parameters)
         required = self.required_parameters
         missing = [param for param in required if param not in parameters]
         if missing:
@@ -223,4 +227,5 @@ class CondensationIsothermalStaggeredBuilder(
             num_batches=self.num_batches,
             shuffle_each_step=self.shuffle_each_step,
             random_state=self.random_state,
+            **self._native_strategy_kwargs(),
         )
