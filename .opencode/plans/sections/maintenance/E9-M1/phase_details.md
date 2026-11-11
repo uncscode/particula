@@ -4,8 +4,8 @@ Current reconciliation (2026-11-10, issue #1614): P1 scientific and P2
 replacement/ownership decisions were approved on 2026-09-28 as recorded in
 `appendix.md`. P3 and P4 implementation and their owning tests are accumulated
 on this branch. P5 adds the bounded developer reference and required data-only
-integration regression. Final-revision validation and Kyle's M1 handoff
-approval remain required; M2 is blocked until both are recorded.
+integration regression. All required checks pass at `0db7e42b2`; see `validation_evidence.md`.
+Kyle's final M1 handoff approval is the only pending gate for M2.
 
 Maintainer representation/grid/volume/builder clarifications and explicit P1
 scientific/P2 specification approval from issue #1612 are recorded in this
@@ -91,7 +91,7 @@ merged workflow; the P3 completion reconciliation is recorded below.
     approved metadata only, unchanged physics ownership, and passing tests/lint.
 
 - [ ] **E9-M1-P4: Implement necessary gas and environment helpers with alignment tests**
-  - Issue: #1613 | Size: S | Status: P4 implementation accumulated; final M1 evidence pending
+  - Issue: #1613 | Size: S | Status: P4 implementation validated in the passing M1 check matrix
   - Entry: P3 completed and validated.
   - Goal: Make ordered mixed-gas and environment access safe for later consumers.
   - Work: Implement only P1-approved missing helpers or reusable read-only
@@ -106,7 +106,7 @@ merged workflow; the P3 completion reconciliation is recorded below.
     and focused tests/lint pass for every changed function.
 
 - [ ] **E9-M1-P5: Update development documentation**
-  - Issue: #1614 | Size: XS | Status: Implementation complete; final evidence and maintainer handoff pending
+  - Issue: #1614 | Size: XS | Status: Implementation and required checks complete; final maintainer handoff pending
   - Entry: P4 completed and validated.
   - Goal: Publish the developer contract and verified handoff, not broad M5 docs.
   - Work: Update the bounded container reference, add a data-only

@@ -1,20 +1,21 @@
 # Success Criteria
 
-All checks are pending implementation acceptance, not drafting achievements.
+Implementation checks pass at `0db7e42b2`; final maintainer handoff approval
+remains pending. See `validation_evidence.md` for commands and provenance.
 
-- [ ] Approved ordered mapping covers particle/density, all gas categories,
+- [x] Approved ordered mapping covers particle/density, all gas categories,
   environment and process parameters, with mismatches rejected explicitly.
-- [ ] Every supported distribution has explicit concentration semantics;
+- [x] Every supported distribution has explicit concentration semantics;
   resolved data has independent non-unit-volume regression evidence and
   fixed-V=1 PMF/PDF have independent sum/quadrature evidence.
-- [ ] Needed helper inventory identifies reused versus added APIs and their
+- [x] Needed helper inventory identifies reused versus added APIs and their
   units, shapes, validation, copy/view, mutation and empty/zero behavior.
-- [ ] No new facade, physics-bearing container or duplicate authoritative state.
-- [ ] Whole-container and coordinated replacement specification is approved
+- [x] No new facade, physics-bearing container or duplicate authoritative state.
+- [x] Whole-container and coordinated replacement specification is approved
   and handed to M2; no aggregate implementation is claimed by M1.
-- [ ] Helper rejection leaves protected input state unchanged; direct mutation
+- [x] Helper rejection leaves protected input state unchanged; direct mutation
   is visible to subsequent derived reads and validation, not hidden by caches.
-- [ ] Adjacent tests, retained transfer/export assertions, required lint/type
+- [x] Adjacent tests, retained transfer/export assertions, required lint/type
   checks, untargeted full-suite coverage and bounded strict docs checks pass.
 - [ ] M2 start authorization records revision, evidence and reviewer approval;
   unresolved contract questions or required unavailable checks block handoff.
