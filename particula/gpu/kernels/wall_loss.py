@@ -50,7 +50,12 @@ from particula.gpu.kernels.environment import (
     _is_warp_array_like,
     validate_environment_inputs,
 )
-from particula.gpu.population_metadata import require_legacy_particle_metadata
+from particula.gpu.population_metadata import (
+    LEGACY_UNTAGGED,
+    PARTICLE_RESOLVED,
+    particle_distribution_code,
+    require_legacy_particle_metadata,
+)
 from particula.gpu.properties import (
     dynamic_viscosity_wp,
     effective_density_wp,
@@ -1216,6 +1221,12 @@ def _prepare_wall_loss_step_gpu(
     concentration, and charge for removed slots. Zero time is a post-preflight
     write-free no-op.
 
+    Native tagged particles must be resolved raw counts, with positive box
+    volumes and representable material geometry. Unequal positive counts are
+    supported: each surviving representative retains its entire count.
+    Native writers must not overlap each other or protected input storage.
+    Untagged legacy admission remains available; tagged PMF/PDF reject.
+
     Omitted ``rng_states`` uses a private per-call sidecar initialized from
     ``rng_seed`` after successful positive-time preflight. A supplied
     same-device ``uint32`` sidecar with shape ``(n_boxes,)`` remains
@@ -1254,11 +1265,17 @@ def _prepare_wall_loss_step_gpu(
             including an invalid charged field or combining ``environment``
             with direct environment inputs.
     """
-    require_legacy_particle_metadata(particles)
+    population = particle_distribution_code(particles)
+    if population not in (LEGACY_UNTAGGED, PARTICLE_RESOLVED):
+        raise ValueError("native GPU wall loss supports only particle_resolved")
     validated_config = _validate_config(config)
     n_boxes, device = _validate_particle_schema(particles)
     _validate_charged_rectangular_field(validated_config, device)
     _validate_particle_values(particles)
+    if population == PARTICLE_RESOLVED:
+        from . import _wall_loss_native
+
+        _wall_loss_native.validate_physics(particles)
     validated_time_step = _validate_time_step(time_step)
     validate_environment_inputs(
         temperature,
@@ -1269,6 +1286,22 @@ def _prepare_wall_loss_step_gpu(
         caller_name="wall_loss_step_gpu",
     )
     _validate_rng(rng_seed, rng_states, initialize_rng, n_boxes, device)
+    protected_inputs = (
+        (
+            temperature,
+            pressure,
+            validated_config.wall_electric_field,
+            getattr(environment, "temperature", None),
+            getattr(environment, "pressure", None),
+            getattr(environment, "saturation_ratio", None),
+        )
+        if population == PARTICLE_RESOLVED
+        else ()
+    )
+    if population == PARTICLE_RESOLVED:
+        _wall_loss_native.validate_ownership(
+            particles, rng_states, protected_inputs
+        )
     if validated_time_step == 0.0:
         return _PreparedWallLossCall(particles, None, 0, (), device)
 
@@ -1286,6 +1319,12 @@ def _prepare_wall_loss_step_gpu(
     pressure_array = _normalize_execution_environment_array(
         pressure_array, n_boxes
     )
+    if population == PARTICLE_RESOLVED:
+        _wall_loss_native.validate_ownership(
+            particles,
+            rng_states,
+            (*protected_inputs, temperature_array, pressure_array),
+        )
     n_particles = particles.masses.shape[1]
     n_species = particles.masses.shape[2]
     execution_rng_states = rng_states
@@ -1374,8 +1413,10 @@ def _enqueue_prepared_wall_loss_call(prepared: _PreparedWallLossCall) -> Any:
 
     This private enqueue boundary performs no validation, allocation,
     normalization, readback, transfer, synchronization, lookup, rebinding, or
-    RNG initialization. The selected no-op is write-free; rollback is not
-    promised after a writer launches.
+    host RNG initialization. The frozen kernel reset flag is still honored
+    on every launch. Persistent replay requires supplied initialized state and
+    ``initialize_rng=False`` during preparation. The selected no-op is
+    write-free; rollback is not promised after a writer launches.
 
     Args:
         prepared: Validated call record produced by
@@ -1623,6 +1664,7 @@ def wall_loss_selected_boxes_step_gpu(
         ValueError: If selected lanes, particle, environment, configuration,
             or RNG inputs violate the direct-kernel contract.
     """
+    require_legacy_particle_metadata(particles)
     validated_config = _validate_config(config)
     n_boxes, device = _validate_particle_schema(particles)
     if (
