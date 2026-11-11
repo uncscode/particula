@@ -56,6 +56,11 @@ changes, evaporation, available gas and PDF quadrature. Staggered modes retain
 their existing sequential current-gas coupling. Disabling gas updates models
 a fixed reservoir and does not establish closed-system conservation.
 
+Complete evaporation retires a resolved particle by clearing its count and
+charge after gas/energy accounting. A remaining nonvolatile or unmapped core
+keeps the particle active. The resulting free slots are valid for subsequent
+coagulation and wall loss; gas-phase charge transport is not modeled.
+
 Native coagulation supports the existing CPU mechanisms, including turbulent
 DNS and the charged strategy variants. Resolved merging requires **equal
 positive active counts within a box**; unequal weights reject before selection.

@@ -283,6 +283,7 @@ class _PreparedCondensationCall:
     particle_to_gas: Any = None
     gas_to_particle: Any = None
     particle_volume: Any = None
+    particle_charge: Any = None
     distribution_kind: int = 0
     gas_species_count: int = 0
 
@@ -2875,6 +2876,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         if species_binding
         else None,
         particle_volume=particles.volume if species_binding else None,
+        particle_charge=particles.charge if species_binding else None,
         distribution_kind=population_code,
         gas_species_count=n_gas,
     )
@@ -2905,8 +2907,8 @@ def _enqueue_prepared_condensation_call(
     """
     p = prepared
     n_boxes, n_particles, n_species = p.dimensions
-    n_gas = p.gas_species_count or n_species
     native = p.species_binding is not None
+    n_gas = p.gas_species_count if native else n_species
     wp.launch(
         _clear_mass_transfer_kernel,
         dim=(n_boxes, n_particles),
@@ -2920,6 +2922,14 @@ def _enqueue_prepared_condensation_call(
             inputs=[p.energy_transfer],
             device=p.device,
         )
+    if native and n_gas == 0:
+        wp.launch(
+            _clear_mass_transfer_kernel,
+            dim=(n_boxes, n_particles),
+            inputs=[p.work_mass_transfer],
+            device=p.device,
+        )
+        return p.particles, p.total_mass_transfer
     for _ in range(4):
         if int(p.surface_tension_mode) == int(
             SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED
@@ -3027,6 +3037,7 @@ def _enqueue_prepared_condensation_call(
                     p.gas_to_particle,
                     p.particle_volume,
                     wp.int32(p.distribution_kind),
+                    p.particle_masses,
                 ]
                 if native
                 else []
@@ -3059,6 +3070,8 @@ def _enqueue_prepared_condensation_call(
                     p.gas_to_particle,
                     p.particle_volume,
                     wp.int32(p.distribution_kind),
+                    p.particle_masses,
+                    p.gas_concentration,
                 ]
                 if native
                 else []
@@ -3106,6 +3119,17 @@ def _enqueue_prepared_condensation_call(
                 ),
                 device=p.device,
             )
+    if native and p.distribution_kind == 3:
+        wp.launch(
+            native_kernels.retire_evaporated_slots,
+            dim=(n_boxes, n_particles),
+            inputs=[
+                p.particle_masses,
+                p.particle_concentration,
+                p.particle_charge,
+            ],
+            device=p.device,
+        )
     return p.particles, p.total_mass_transfer
 
 

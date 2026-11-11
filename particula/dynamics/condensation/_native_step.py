@@ -43,6 +43,8 @@ def validate_native_step_storage(
     if particle.radius_grid is not None:
         fields.append(particle.radius_grid)
     writers = [0, 5] if update_gases else [0]
+    if particle.distribution_type == "particle_resolved":
+        writers.extend([1, 2])
     for index in writers:
         destination = fields[index]
         if not destination.flags.writeable:
@@ -57,6 +59,21 @@ def validate_native_step_storage(
             raise ValueError(
                 "native condensation fields must not alias writers"
             )
+
+
+def retire_evaporated_slots(particle: ParticleData) -> None:
+    """Release fully evaporated resolved slots after inventory accounting.
+
+    The particle no longer exists: clear its count and charge, preserving
+    fixed storage and every surviving particle. No gas-phase charge model is
+    implied. Density-grid populations retain their prescribed bin semantics.
+    """
+    if particle.distribution_type == "particle_resolved":
+        empty = np.all(particle.masses == 0, axis=2) & (
+            particle.concentration > 0
+        )
+        particle.concentration[empty] = 0
+        particle.charge[empty] = 0
 
 
 def _weighted_sum(

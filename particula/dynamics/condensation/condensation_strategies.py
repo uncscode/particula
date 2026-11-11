@@ -34,6 +34,7 @@ from numpy.typing import NDArray
 
 from particula.dynamics.condensation._native_step import (
     finalize_native_transfer,
+    retire_evaporated_slots,
     validate_native_step_storage,
     validate_native_time_step,
 )
@@ -663,6 +664,7 @@ class CondensationStrategy(ABC):
         np.copyto(particle.masses[0], new_masses)
         if self.update_gases:
             np.copyto(gas.concentration[0], new_gas)
+        retire_evaporated_slots(particle)
         if isinstance(self, CondensationLatentHeat):
             self.last_latent_heat_energy = energy
         return particle, gas
@@ -1906,11 +1908,14 @@ class CondensationIsothermalStaggered(CondensationStrategy):
                     targets,
                 )
                 working_masses[indices] = updated
+                if particle.distribution_type == "particle_resolved":
+                    weights[indices[np.all(updated == 0, axis=1)]] = 0
                 if self.update_gases:
                     working_gas.concentration[0] = remaining
         np.copyto(particle.masses[0], working_masses)
         if self.update_gases:
             np.copyto(gas.concentration, working_gas.concentration)
+        retire_evaporated_slots(particle)
         return particle, gas
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
