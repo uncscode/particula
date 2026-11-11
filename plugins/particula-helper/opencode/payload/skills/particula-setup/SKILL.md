@@ -5,7 +5,7 @@ description: "Set up and inspect a local Particula Python environment; use for i
 
 # Set up Particula
 1. Establish the user's project directory and existing interpreter/environment. Check Python and installed Particula before installing anything. Use the bundled `../../scripts/doctor.py` with that interpreter; it does not install packages.
-2. For a fresh CPU demonstration, use an isolated `.venv` and `../../requirements.txt`. See `../../references/local-setup.md` for commands. These requirements pin the tested Particula version, not the user's existing research environment.
+2. For a fresh CPU demonstration, use an isolated `.venv` and `../../requirements.txt`. See `../../references/local-setup.md` for commands. These requirements pin plotting dependencies; install the selected native Particula checkout separately. Do not replace the user's research environment.
 3. Do not install GPU drivers or change system Python. Determine GPU needs separately; availability does not establish compatibility or correctness.
 4. Re-run the doctor and report Python, Particula, NumPy, plotting availability, and required API checks. Missing optional components are different from broken core imports.
 5. Run a small example into a new output directory. Confirm actual numerical outputs and files before saying setup works. Route failures to particula-debug.

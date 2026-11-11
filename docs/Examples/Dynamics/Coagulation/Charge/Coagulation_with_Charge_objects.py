@@ -22,7 +22,7 @@ grid.
 
 Examples:
     >>> builder = par.dynamics.ChargedCoagulationBuilder()
-    >>> builder.set_distribution_type("discrete").set_charge_kernel(...)
+    >>> builder.set_distribution_type("discrete").set_charged_kernel_strategy(kernel_strategy)
 """
 
 # %% [markdown]
@@ -41,10 +41,10 @@ import particula as par
 plt.rcParams["figure.dpi"] = 110
 
 # %% [markdown]
-# ## Define the particle size distribution We build a logarithmic radius grid (1 nm to 10 μm) and the corresponding mass bins assuming unit density.
+# ## Define the particle size distribution We build a logarithmic radius grid (1 nm to 100 μm) and the corresponding mass bins assuming unit density.
 
 # %%
-radius_bins = np.logspace(start=-9, stop=-4, num=250)  # m (1 nm to 10 μm)
+radius_bins = np.logspace(start=-9, stop=-4, num=250)  # m (1 nm to 100 μm)
 mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg (ρ = 1000 kg/m³)
 n_bins = len(radius_bins)
 
@@ -142,13 +142,20 @@ dimensional_kernel: np.ndarray = kernel_strategy.kernel(
 
 # %% [markdown]
 # ## Visualize the kernel
+# This broad charge/radius range produces underflow warnings in intermediate
+# expressions. The final kernel is finite and nonnegative; exactly zero
+# entries are masked on the logarithmic plot, not replaced by positive values.
 # Plot the dimensional coagulation kernel on a logarithmic grid.
 
 # %%
-fig, ax = plt.subplots()
-mesh = ax.pcolormesh(
-    radius_bins, radius_bins, np.log10(dimensional_kernel), shading="auto"
+assert np.all(np.isfinite(dimensional_kernel))
+assert np.all(dimensional_kernel >= 0)
+np.testing.assert_allclose(
+    dimensional_kernel, dimensional_kernel.T, rtol=1e-12, atol=0
 )
+log_kernel = np.ma.log10(np.ma.masked_less_equal(dimensional_kernel, 0))
+fig, ax = plt.subplots()
+mesh = ax.pcolormesh(radius_bins, radius_bins, log_kernel, shading="auto")
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel("Particle radius r_i (m)")

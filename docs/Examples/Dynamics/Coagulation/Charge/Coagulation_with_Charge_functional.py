@@ -22,7 +22,8 @@ visualizes the resulting kernel on a log-log grid.
 Examples:
     >>> par.dynamics.CoagulationFactory().get_strategy(
     ...     "charged",
-    ...     parameters={"distribution_type": "discrete"},
+    ...     parameters={"distribution_type": "discrete",
+    ...                 "charged_kernel_strategy": par.dynamics.CoulombGatti2008KernelStrategy()},
     ... )
 """
 
@@ -43,10 +44,10 @@ plt.rcParams["figure.dpi"] = 110
 
 # %% [markdown]
 # ## Define the particle size distribution
-# Logarithmic grid (1 nm to 10 μm) with unit-density mass bins.
+# Logarithmic grid (1 nm to 100 μm) with unit-density mass bins.
 
 # %%
-radius_bins = np.logspace(start=-9, stop=-4, num=250)  # m (1 nm to 10 μm)
+radius_bins = np.logspace(start=-9, stop=-4, num=250)  # m (1 nm to 100 μm)
 mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg (ρ = 1000 kg/m³)
 n_bins = len(radius_bins)
 
@@ -144,13 +145,20 @@ dimensional_kernel = coagulation_strategy.kernel_strategy.kernel(
 
 # %% [markdown]
 # ## Visualize the kernel
+# This broad charge/radius range produces underflow warnings in intermediate
+# expressions. The final kernel is finite and nonnegative; exactly zero
+# entries are masked on the logarithmic plot, not replaced by positive values.
 # Plot the dimensional coagulation kernel returned by the factory-built strategy.
 
 # %%
-fig, ax = plt.subplots()
-mesh = ax.pcolormesh(
-    radius_bins, radius_bins, np.log10(dimensional_kernel), shading="auto"
+assert np.all(np.isfinite(dimensional_kernel))
+assert np.all(dimensional_kernel >= 0)
+np.testing.assert_allclose(
+    dimensional_kernel, dimensional_kernel.T, rtol=1e-12, atol=0
 )
+log_kernel = np.ma.log10(np.ma.masked_less_equal(dimensional_kernel, 0))
+fig, ax = plt.subplots()
+mesh = ax.pcolormesh(radius_bins, radius_bins, log_kernel, shading="auto")
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel("Particle radius r_i (m)")

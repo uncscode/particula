@@ -43,12 +43,11 @@ Example:
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 # %% [markdown]
 # ## Build a PMF aerosol
 #
-# We create a modest lognormal PMF and attach it to an ambient atmosphere.
+# We create a modest lognormal PMF and combine it with a native ambient environment.
 
 # %%
 # Radius bins (log-spaced, extended to 10 microns for visibility)
@@ -64,27 +63,31 @@ concentration_pmf = par.particles.get_lognormal_pmf_distribution(
     ),  # m^-3 total (increased for visibility)
 )
 
-# Atmosphere (ambient, non-condensing)
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(25, "degC")
-    .set_pressure(1, "atm")
-    .build()
+# Native ambient environment. GasData requires a species axis, so a
+# zero-concentration, non-partitioning carrier fills that axis. Coagulation
+# does not consume it; ambient pressure is specified independently.
+environment = par.gas.EnvironmentData(
+    temperature=np.array([298.15]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.zeros((1, 1)),
 )
-
-# PMF particle representation
-particles_pmf = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_distribution_type("pmf")
-    .set_radius_bins(radius_bins, radius_bins_units="m")
-    .set_concentration(concentration_pmf, concentration_units="m^-3")
-    .set_density(np.array([1_000.0]), density_units="kg/m^3")
-    .set_charge(np.zeros_like(radius_bins))
-    .build()
+gas = par.gas.GasData(
+    name=["carrier"],
+    molar_mass=np.array([0.02897]),
+    partitioning=np.array([False]),
+    concentration=np.zeros((1, 1)),
 )
-
-# Aerosol object
-pmf_aerosol = LegacyAerosol(atmosphere=atmosphere, particles=particles_pmf)
+particles_pmf = par.particles.create_particle_data_from_radii(
+    radii=radius_bins,
+    concentration=concentration_pmf,
+    distribution_type="discrete",
+    density=1000.0,
+)
+pmf_aerosol = par.Aerosol(
+    particles=particles_pmf,
+    gas=gas,
+    environment=environment,
+)
 
 # %% [markdown]
 # ## Configure coagulation (discrete)
@@ -116,22 +119,35 @@ print(coagulation_process)
 time_step = 3600  # 1 hour per step
 sub_steps = 100
 
-radii = pmf_aerosol.particles.get_radius()
-pmf_before = np.copy(pmf_aerosol.particles.concentration)
+radii = pmf_aerosol.particles.radii[0]
+pmf_before = np.copy(pmf_aerosol.particles.concentration[0])
 
 # Perform coagulation process for step 1
 pmf_aerosol = coagulation_process.execute(
     pmf_aerosol, time_step=time_step, sub_steps=sub_steps
 )
-radii_after_step_1 = pmf_aerosol.particles.get_radius()
-pmf_after_step_1 = np.copy(pmf_aerosol.particles.concentration)
+radii_after_step_1 = pmf_aerosol.particles.radii[0]
+pmf_after_step_1 = np.copy(pmf_aerosol.particles.concentration[0])
 
 # Perform coagulation process for step 2
 pmf_aerosol = coagulation_process.execute(
     pmf_aerosol, time_step=time_step, sub_steps=sub_steps
 )
-radii_after_step_2 = pmf_aerosol.particles.get_radius()
-pmf_after_step_2 = np.copy(pmf_aerosol.particles.concentration)
+radii_after_step_2 = pmf_aerosol.particles.radii[0]
+pmf_after_step_2 = np.copy(pmf_aerosol.particles.concentration[0])
+
+# %%
+# Independently account for material mass; PDF values require radius integration.
+bin_mass = 4.0 / 3.0 * np.pi * radius_bins**3 * 1000.0
+mass_history = np.array(
+    [
+        np.sum(values * bin_mass)
+        for values in (pmf_before, pmf_after_step_1, pmf_after_step_2)
+    ]
+)
+print("Relative material mass drift:", mass_history / mass_history[0] - 1)
+assert np.all(np.isfinite(pmf_after_step_2))
+assert np.all(pmf_after_step_2 >= 0)
 
 # %% [markdown]
 # ## Plot: concentration before/after
@@ -161,9 +177,20 @@ ax.grid(alpha=0.3)
 plt.show()
 
 # %% [markdown]
+# ## Native initialization and numerical limits
+#
+# Native construction retains the explicitly generated concentration array.
+# Earlier versions used a preset builder that regenerated its default bimodal
+# distribution, replacing the declared inputs. The plots here therefore use
+# the stated mode and total number concentration, not that old preset result.
+# Finite-grid coagulation is not exactly mass conservative. Number loss and
+# distribution changes illustrate this workload; they are not a convergence
+# study or evidence of exact agreement between representations.
+
+# %% [markdown]
 # ## Summary
 #
 # - Strategy: `BrownianCoagulationBuilder().set_distribution_type("discrete")`
 # - Runnable: `par.dynamics.Coagulation`
 # - Representation: PMF (bin-based number concentration)
-# - Runtime guardrails: small grid, short horizon for fast execution
+# - Workload: 150 radius nodes, two one-hour calls with 100 substeps each

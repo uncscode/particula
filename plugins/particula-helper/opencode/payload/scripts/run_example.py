@@ -35,33 +35,37 @@ def parse_args():
 
 
 def build(args, np, par):
-    # E9-M5 migrates this example; M6 removes the legacy branch.
-    try:
-        from particula._legacy_aerosol import AerosolBuilder
-    except ModuleNotFoundError as error:
-        if error.name != "particula._legacy_aerosol":
-            raise
-        AerosolBuilder = par.AerosolBuilder  # Released 0.2.x packages.
+    from particula.dynamics.condensation.species_mapping import CondensationSpeciesMap
 
-    gas = (par.gas.GasSpeciesBuilder().set_name("illustrative-organic")
-           .set_molar_mass(0.18, "kg/mol")
-           .set_vapor_pressure_strategy(par.gas.ConstantVaporPressureStrategy(1e-5))
-           .set_partitioning(True).set_concentration(np.array([1e-8]), "kg/m^3").build())
-    atmosphere = (par.gas.AtmosphereBuilder().set_temperature(298.15, "K")
-                  .set_pressure(101325, "Pa").set_more_partitioning_species(gas).build())
+    gas = par.gas.GasData(
+        name=["illustrative-organic"], molar_mass=np.array([0.18]),
+        partitioning=np.array([True]), concentration=np.array([[1e-8]]),
+    )
+    environment = par.gas.EnvironmentData(
+        temperature=np.array([298.15]), pressure=np.array([101325.0]),
+        saturation_ratio=np.zeros((1, 1)),
+    )
     radii = np.geomspace(args.radius / 2, args.radius * 4, 40)
     weights = np.exp(-0.5 * (np.log(radii / args.radius) / np.log(1.2)) ** 2)
     weights = weights / weights.sum() * args.number
-    particles = par.particles.ParticleRepresentation(
-        strategy=par.particles.SpeciatedMassMovingBin(),
-        activity=par.particles.ActivityIdealMass(),
-        surface=par.particles.SurfaceStrategyVolume(surface_tension=0.072, density=1000),
-        distribution=(4 / 3 * np.pi * radii ** 3 * 1000)[:, np.newaxis],
-        density=np.array([1000.0]), concentration=weights, charge=np.zeros(40),
+    particles = par.particles.create_particle_data_from_radii(
+        radii=radii, concentration=weights,
+        distribution_type="discrete", density=1000.0,
     )
-    aerosol = AerosolBuilder().set_atmosphere(atmosphere).set_particles(particles).build()
+    aerosol = par.Aerosol(particles=particles, gas=gas, environment=environment)
     if args.process == "condensation":
-        process = par.dynamics.MassCondensation(par.dynamics.CondensationIsothermal(molar_mass=0.18, diffusion_coefficient=2e-5, accommodation_coefficient=1.0))
+        process = par.dynamics.MassCondensation(
+            par.dynamics.CondensationIsothermal(
+                molar_mass=0.18, diffusion_coefficient=2e-5,
+                accommodation_coefficient=1.0,
+                activity_strategy=par.particles.ActivityIdealMass(),
+                surface_strategy=par.particles.SurfaceStrategyVolume(
+                    surface_tension=0.072, density=1000,
+                ),
+                vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(1e-5),
+                species_map=CondensationSpeciesMap(("illustrative-organic",), ((0, 0),)),
+            )
+        )
     else:
         process = par.dynamics.Coagulation(par.dynamics.BrownianCoagulationStrategy(distribution_type="discrete"))
     return aerosol, process
@@ -69,13 +73,13 @@ def build(args, np, par):
 
 def snapshot(aerosol, time, np):
     p = aerosol.particles
-    for name, value in (("radius", p.get_radius()), ("particle mass", p.get_mass()), ("concentration", p.get_concentration()), ("gas concentration", aerosol.atmosphere.partitioning_species.get_concentration())):
+    for name, value in (("radius", p.radii[0]), ("particle mass", p.total_mass[0]), ("concentration", p.concentration[0]), ("gas concentration", aerosol.gas.concentration[0])):
         values = np.asarray(value)
         if not np.isfinite(values).all() or (values < 0).any():
             raise RuntimeError(f"Nonfinite or negative {name} at time {time}; inspect time step and configuration")
-    pm = float(p.get_mass_concentration())
-    gm = float(np.sum(aerosol.atmosphere.partitioning_species.get_concentration()))
-    return {"time_s": time, "number_m-3": float(p.get_total_concentration()), "particle_mass_kg_m-3": pm, "gas_mass_kg_m-3": gm, "total_mass_kg_m-3": pm + gm}
+    pm = float(np.sum(p.species_mass_density[0]))
+    gm = float(np.sum(aerosol.gas.concentration[0]))
+    return {"time_s": time, "number_m-3": float(p.number_density[0]), "particle_mass_kg_m-3": pm, "gas_mass_kg_m-3": gm, "total_mass_kg_m-3": pm + gm}
 
 
 def write_csv(path, rows):
@@ -117,8 +121,8 @@ def main():
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     aerosol, process = build(args, np, par)
-    initial_radius = np.array(aerosol.particles.get_radius(), copy=True)
-    initial_number = np.array(aerosol.particles.get_concentration(), copy=True)
+    initial_radius = np.array(aerosol.particles.radii[0], copy=True)
+    initial_number = np.array(aerosol.particles.concentration[0], copy=True)
     rows = [snapshot(aerosol, 0.0, np)]
     for step in range(args.steps):
         aerosol = process.execute(aerosol, time_step=args.duration / args.steps, sub_steps=1)
@@ -131,8 +135,8 @@ def main():
         checks["number_nonincreasing"] = all(b["number_m-3"] <= a["number_m-3"] * (1 + 1e-12) for a, b in zip(rows, rows[1:]))
     if not checks["mass_balance_pass"] or not all(v for k, v in checks.items() if k in ("number_conserved", "number_nonincreasing")):
         raise RuntimeError("Scientific checks failed: " + json.dumps(checks))
-    final_radius = aerosol.particles.get_radius()
-    final_number = aerosol.particles.get_concentration()
+    final_radius = aerosol.particles.radii[0]
+    final_number = aerosol.particles.concentration[0]
     args.output.mkdir(parents=True, exist_ok=False)
     write_csv(args.output / "time_series.csv", rows)
     write_csv(args.output / "distribution.csv", [{"initial_radius_m": float(r0), "initial_number_per_bin_m-3": float(n0), "final_radius_m": float(r1), "final_number_per_bin_m-3": float(n1)} for r0,n0,r1,n1 in zip(initial_radius,initial_number,final_radius,final_number)])

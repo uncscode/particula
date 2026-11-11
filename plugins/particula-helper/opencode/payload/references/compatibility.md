@@ -6,6 +6,13 @@ differ from the installed distribution metadata; inspect both.
 
 ## Numerical evidence
 
+The current starters use native Aerosol, ParticleData, GasData and
+EnvironmentData. Install the selected E9 native checkout as described in
+local-setup.md; the older release evidence below is historical, not a claim
+that this script still supports that facade API. Native default 1 s/100-step
+smokes passed: condensation total-mass error 7.9e-16, coagulation particle-mass
+error 2.5e-9, with the existing 1e-6 helper tolerance unchanged.
+
 - Particula 0.2.14, Python 3.12.12, NumPy 2.3.4, SciPy 1.16.2,
   Matplotlib 3.10.7: a 10 s CPU condensation run with 1,000 steps passed
   finite/nonnegative, number, and total-mass checks. Maximum relative mass
@@ -16,8 +23,8 @@ differ from the installed distribution metadata; inspect both.
   error was about 1.3%. Its cause is not established. Preserve the failure;
   do not loosen conservation tolerance or call arbitrary coagulation runs
   validated. Use condensation for first-run instructions.
-- `requirements.txt` pins the original CPU starter environment for Particula
-  0.2.15. CI smoke tests verify the current source checkout separately.
+- `requirements.txt` pins plotting dependencies only. CI smoke tests verify
+  the current native source checkout; no new release compatibility is claimed.
 - GPU execution is not qualified by this plugin's CPU smoke tests.
 
 ## Host boundaries

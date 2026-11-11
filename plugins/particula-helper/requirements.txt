@@ -1,4 +1,4 @@
-# Tested CPU starter environment; use an isolated venv.
-particula==0.2.15
+# CPU plotting dependencies; install the native Particula checkout separately.
+# See references/local-setup.md. No released Particula compatibility is implied.
 numpy==2.5.4
 matplotlib==3.11.2

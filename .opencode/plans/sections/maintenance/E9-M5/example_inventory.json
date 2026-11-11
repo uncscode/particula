@@ -161,156 +161,211 @@
       "source": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.py",
       "notebook": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional audit completed",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_coagulation_examples_test.py; embedded resolved inventory and charged-kernel checks",
+      "scientific_expectation": "Correct PMF sums/PDF radius integrals; nonnegative number decay; resolved weighted inventory rtol=1e-12, atol=1e-30; charged final kernel finite nonnegative symmetric. Binned discretization mass drift is reported, not called exact conservation.",
+      "execution": "full standalone source and saved notebook executed",
+      "evidence": [
+        "All 11 coagulation pairs executed with saved outputs",
+        "16 plot outputs visually inspected",
+        "Preset regeneration corrected to retain declared modal inputs",
+        "Main 50k-particle 12x600s comparison retained"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.py",
       "notebook": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional audit completed",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_coagulation_examples_test.py; embedded resolved inventory and charged-kernel checks",
+      "scientific_expectation": "Correct PMF sums/PDF radius integrals; nonnegative number decay; resolved weighted inventory rtol=1e-12, atol=1e-30; charged final kernel finite nonnegative symmetric. Binned discretization mass drift is reported, not called exact conservation.",
+      "execution": "full standalone source and saved notebook executed",
+      "evidence": [
+        "All 11 coagulation pairs executed with saved outputs",
+        "16 plot outputs visually inspected",
+        "Preset regeneration corrected to retain declared modal inputs",
+        "Main 50k-particle 12x600s comparison retained"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.py",
       "notebook": "docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "AtmosphereBuilder",
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_coagulation_examples_test.py; embedded resolved inventory and charged-kernel checks",
+      "scientific_expectation": "Correct PMF sums/PDF radius integrals; nonnegative number decay; resolved weighted inventory rtol=1e-12, atol=1e-30; charged final kernel finite nonnegative symmetric. Binned discretization mass drift is reported, not called exact conservation.",
+      "execution": "full standalone source and saved notebook executed",
+      "evidence": [
+        "All 11 coagulation pairs executed with saved outputs",
+        "16 plot outputs visually inspected",
+        "Preset regeneration corrected to retain declared modal inputs",
+        "Main 50k-particle 12x600s comparison retained"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.py",
       "notebook": "docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "AtmosphereBuilder",
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_coagulation_examples_test.py; embedded resolved inventory and charged-kernel checks",
+      "scientific_expectation": "Correct PMF sums/PDF radius integrals; nonnegative number decay; resolved weighted inventory rtol=1e-12, atol=1e-30; charged final kernel finite nonnegative symmetric. Binned discretization mass drift is reported, not called exact conservation.",
+      "execution": "full standalone source and saved notebook executed",
+      "evidence": [
+        "All 11 coagulation pairs executed with saved outputs",
+        "16 plot outputs visually inspected",
+        "Preset regeneration corrected to retain declared modal inputs",
+        "Main 50k-particle 12x600s comparison retained"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.py",
       "notebook": "docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_coagulation_examples_test.py; embedded resolved inventory and charged-kernel checks",
+      "scientific_expectation": "Correct PMF sums/PDF radius integrals; nonnegative number decay; resolved weighted inventory rtol=1e-12, atol=1e-30; charged final kernel finite nonnegative symmetric. Binned discretization mass drift is reported, not called exact conservation.",
+      "execution": "full standalone source and saved notebook executed",
+      "evidence": [
+        "All 11 coagulation pairs executed with saved outputs",
+        "16 plot outputs visually inspected",
+        "Preset regeneration corrected to retain declared modal inputs",
+        "Main 50k-particle 12x600s comparison retained"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.py",
       "notebook": "docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "AtmosphereBuilder",
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_coagulation_examples_test.py; embedded resolved inventory and charged-kernel checks",
+      "scientific_expectation": "Correct PMF sums/PDF radius integrals; nonnegative number decay; resolved weighted inventory rtol=1e-12, atol=1e-30; charged final kernel finite nonnegative symmetric. Binned discretization mass drift is reported, not called exact conservation.",
+      "execution": "full standalone source and saved notebook executed",
+      "evidence": [
+        "All 11 coagulation pairs executed with saved outputs",
+        "16 plot outputs visually inspected",
+        "Preset regeneration corrected to retain declared modal inputs",
+        "Main 50k-particle 12x600s comparison retained"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.py",
       "notebook": "docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "AtmosphereBuilder",
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_coagulation_examples_test.py; embedded resolved inventory and charged-kernel checks",
+      "scientific_expectation": "Correct PMF sums/PDF radius integrals; nonnegative number decay; resolved weighted inventory rtol=1e-12, atol=1e-30; charged final kernel finite nonnegative symmetric. Binned discretization mass drift is reported, not called exact conservation.",
+      "execution": "full standalone source and saved notebook executed",
+      "evidence": [
+        "All 11 coagulation pairs executed with saved outputs",
+        "16 plot outputs visually inspected",
+        "Preset regeneration corrected to retain declared modal inputs",
+        "Main 50k-particle 12x600s comparison retained"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.py",
       "notebook": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "AtmosphereBuilder",
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_coagulation_examples_test.py; embedded resolved inventory and charged-kernel checks",
+      "scientific_expectation": "Correct PMF sums/PDF radius integrals; nonnegative number decay; resolved weighted inventory rtol=1e-12, atol=1e-30; charged final kernel finite nonnegative symmetric. Binned discretization mass drift is reported, not called exact conservation.",
+      "execution": "full standalone source and saved notebook executed",
+      "evidence": [
+        "All 11 coagulation pairs executed with saved outputs",
+        "16 plot outputs visually inspected",
+        "Preset regeneration corrected to retain declared modal inputs",
+        "Main 50k-particle 12x600s comparison retained"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.py",
       "notebook": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "AtmosphereBuilder",
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_coagulation_examples_test.py; embedded resolved inventory and charged-kernel checks",
+      "scientific_expectation": "Correct PMF sums/PDF radius integrals; nonnegative number decay; resolved weighted inventory rtol=1e-12, atol=1e-30; charged final kernel finite nonnegative symmetric. Binned discretization mass drift is reported, not called exact conservation.",
+      "execution": "full standalone source and saved notebook executed",
+      "evidence": [
+        "All 11 coagulation pairs executed with saved outputs",
+        "16 plot outputs visually inspected",
+        "Preset regeneration corrected to retain declared modal inputs",
+        "Main 50k-particle 12x600s comparison retained"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.py",
       "notebook": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "AtmosphereBuilder",
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_coagulation_examples_test.py; embedded resolved inventory and charged-kernel checks",
+      "scientific_expectation": "Correct PMF sums/PDF radius integrals; nonnegative number decay; resolved weighted inventory rtol=1e-12, atol=1e-30; charged final kernel finite nonnegative symmetric. Binned discretization mass drift is reported, not called exact conservation.",
+      "execution": "full standalone source and saved notebook executed",
+      "evidence": [
+        "All 11 coagulation pairs executed with saved outputs",
+        "16 plot outputs visually inspected",
+        "Preset regeneration corrected to retain declared modal inputs",
+        "Main 50k-particle 12x600s comparison retained"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.py",
       "notebook": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb",
       "phase": "P2",
-      "disposition": "pending audit",
+      "disposition": "native migration or functional audit completed",
       "legacy_patterns": [
         "LegacyAerosol",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_coagulation_examples_test.py; embedded resolved inventory and charged-kernel checks",
+      "scientific_expectation": "Correct PMF sums/PDF radius integrals; nonnegative number decay; resolved weighted inventory rtol=1e-12, atol=1e-30; charged final kernel finite nonnegative symmetric. Binned discretization mass drift is reported, not called exact conservation.",
+      "execution": "full standalone source and saved notebook executed",
+      "evidence": [
+        "All 11 coagulation pairs executed with saved outputs",
+        "16 plot outputs visually inspected",
+        "Preset regeneration corrected to retain declared modal inputs",
+        "Main 50k-particle 12x600s comparison retained"
+      ]
     },
     {
       "source": "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.py",
@@ -1367,8 +1422,8 @@
     {
       "source": "plugins/particula-helper/scripts/run_example.py",
       "phase": "P2",
-      "disposition": "migrate native construction and access; regenerate OpenCode payload",
-      "execution": "pending"
+      "disposition": "native starter and diagnostics migrated; OpenCode payload regenerated",
+      "execution": "both default process runs and eight plugin distribution tests passed"
     },
     {
       "source": "particula/integration_tests/quick_start_test.py",

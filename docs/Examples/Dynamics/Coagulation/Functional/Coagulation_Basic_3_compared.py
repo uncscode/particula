@@ -33,7 +33,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from scipy.integrate import trapezoid
 
 # %% [markdown]
@@ -64,39 +63,44 @@ concentration_pdf = par.particles.get_lognormal_pdf_distribution(
     number_of_particles=number_conc,
 )
 
-# Atmosphere
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(25, "degC")
-    .set_pressure(1, "atm")
-    .build()
+# Native ambient environment. GasData requires a species axis, so a
+# zero-concentration, non-partitioning carrier fills that axis. Coagulation
+# does not consume it; ambient pressure is specified independently.
+environment = par.gas.EnvironmentData(
+    temperature=np.array([298.15]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.zeros((1, 1)),
+)
+gas = par.gas.GasData(
+    name=["carrier"],
+    molar_mass=np.array([0.02897]),
+    partitioning=np.array([False]),
+    concentration=np.zeros((1, 1)),
 )
 
 # PMF particles
-particles_pmf = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_distribution_type("pmf")
-    .set_radius_bins(radius_bins, radius_bins_units="m")
-    .set_concentration(concentration_pmf, concentration_units="m^-3")
-    .set_density(np.array([1_000.0]), density_units="kg/m^3")
-    .set_charge(np.zeros_like(radius_bins))
-    .build()
+particles_pmf = par.particles.create_particle_data_from_radii(
+    radii=radius_bins,
+    concentration=concentration_pmf,
+    distribution_type="discrete",
+    density=1000.0,
 )
 
-aerosol_pmf = LegacyAerosol(atmosphere=atmosphere, particles=particles_pmf)
+aerosol_pmf = par.Aerosol(
+    particles=particles_pmf, gas=gas.copy(), environment=environment.copy()
+)
 
 # PDF particles
-particles_pdf = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_distribution_type("pdf")
-    .set_radius_bins(radius_bins, radius_bins_units="m")
-    .set_concentration(concentration_pdf, concentration_units="m^-3")
-    .set_density(np.array([1_000.0]), density_units="kg/m^3")
-    .set_charge(np.zeros_like(radius_bins))
-    .build()
+particles_pdf = par.particles.create_particle_data_from_radii(
+    radii=radius_bins,
+    concentration=concentration_pdf,
+    distribution_type="continuous_pdf",
+    density=1000.0,
 )
 
-aerosol_pdf = LegacyAerosol(atmosphere=atmosphere, particles=particles_pdf)
+aerosol_pdf = par.Aerosol(
+    particles=particles_pdf, gas=gas.copy(), environment=environment.copy()
+)
 
 # %% [markdown]
 # ## Configure coagulation runnables
@@ -129,18 +133,18 @@ time_step = 200  # seconds
 sub_steps = 10
 
 # PMF run
-pmf_before = aerosol_pmf.particles.get_concentration()
+pmf_before = aerosol_pmf.particles.concentration[0].copy()
 aerosol_pmf_after = coagulation_pmf.execute(
     aerosol_pmf, time_step=time_step, sub_steps=sub_steps
 )
-pmf_after = aerosol_pmf_after.particles.get_concentration()
+pmf_after = aerosol_pmf_after.particles.concentration[0].copy()
 
 # PDF run
-pdf_before = aerosol_pdf.particles.get_concentration()
+pdf_before = aerosol_pdf.particles.concentration[0].copy()
 aerosol_pdf_after = coagulation_pdf.execute(
     aerosol_pdf, time_step=time_step, sub_steps=sub_steps
 )
-pdf_after = aerosol_pdf_after.particles.get_concentration()
+pdf_after = aerosol_pdf_after.particles.concentration[0].copy()
 
 # %% [markdown]
 # ## Convert for apples-to-apples comparison
@@ -233,3 +237,9 @@ plt.show()
 # - Conversions use `par.particles.get_pdf_distribution_in_pmf` for consistent
 #   comparisons across representations.
 # - Runtime kept short with modest grids and a single 200 s step.
+
+# %% [markdown]
+# Native construction uses the explicitly generated distribution above. The old
+# preset construction regenerated default modal inputs instead. Finite-grid
+# coagulation has numerical mass drift; these curves illustrate number loss,
+# not exact conservation or a time-step/grid-convergence claim.

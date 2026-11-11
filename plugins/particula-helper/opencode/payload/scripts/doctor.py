@@ -18,16 +18,18 @@ def main():
         par = importlib.import_module("particula")
         report["particula_source"] = str(par.__file__)
         report["particula_source_version"] = getattr(par, "__version__", None)
-        for name in ("AerosolBuilder", "gas.GasSpeciesBuilder", "gas.AtmosphereBuilder", "particles.ParticleRepresentation", "particles.SpeciatedMassMovingBin", "particles.ActivityIdealMass", "particles.SurfaceStrategyVolume", "dynamics.MassCondensation", "dynamics.CondensationIsothermal", "dynamics.BrownianCoagulationStrategy", "dynamics.Coagulation"):
+        for name in ("Aerosol", "gas.GasData", "gas.EnvironmentData", "particles.create_particle_data_from_radii", "particles.ActivityIdealMass", "particles.SurfaceStrategyVolume", "dynamics.MassCondensation", "dynamics.CondensationIsothermal", "dynamics.BrownianCoagulationStrategy", "dynamics.Coagulation"):
             obj = par
             for part in name.split("."):
                 obj = getattr(obj, part, None)
                 if obj is None:
                     break
             report["api"][name] = obj is not None
+        mapping = importlib.import_module("particula.dynamics.condensation.species_mapping")
+        report["api"]["CondensationSpeciesMap"] = hasattr(mapping, "CondensationSpeciesMap")
     except Exception as exc:
         report["import_error"] = f"{type(exc).__name__}: {exc}"
-    report["starter_ready"] = bool(report["api"]) and all(report["api"].values()) and all(report["packages"][p] for p in ("particula", "numpy", "matplotlib"))
+    report["starter_ready"] = "import_error" not in report and bool(report["api"]) and all(report["api"].values()) and all(report["packages"][p] for p in ("particula", "numpy", "matplotlib"))
     report["gpu_tested"] = False
     print(json.dumps(report, indent=2))
     return 0 if report["starter_ready"] else 1
