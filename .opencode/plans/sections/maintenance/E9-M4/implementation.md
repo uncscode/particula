@@ -257,3 +257,26 @@ Delivery is one PR to `uncscode/particula:main` with eleven serial commits,
 closing #1606 and preserving the accepted M3 base. Implementation and required
 validation are complete. Maintainer review, merge and authorization to begin M5
 remain separate; this record does not mark E9 or its release shipped.
+
+## PR review corrections — 2026-11-11
+
+PR #1633 review identified two native-path defects. The condensation adapter now
+validates latent heat against full gas width, preserving particle-sized activity
+and surface sidecars. The unequal-width adapter regression now exercises latent
+heat on both Warp CPU and CUDA.
+
+Native nucleation now stages P3's admitted integer counts directly and preserves
+count authority through exhaustion and P4/P5. Density is derived for gas debit
+without requiring its rounded product with volume to reproduce an exact integer.
+P5 checks density against the count-derived value. Legacy density semantics and
+exact integral admission remain unchanged. A volume-0.09 regression verifies one
+admitted event and tight material conservation on CPU and CUDA.
+
+Validation used the same repository environment and RTX 5060 as above:
+
+- `WARP_CACHE_PATH=/tmp/particula-m4-warp .venv/bin/pytest particula/execution/tests/native_resident_test.py particula/execution/tests/condensation_adapter_test.py particula/gpu/kernels/tests/nucleation_native_test.py particula/gpu/kernels/tests/nucleation_test.py particula/gpu/kernels/tests/exhaustion_native_test.py particula/gpu/kernels/tests/exhaustion_test.py particula/execution/tests/native_full_loop_test.py -q --no-cov`: **308 passed, 1 skipped**.
+- Ruff check and format check passed for all four changed Python files.
+- Mypy passed for both changed production modules; `git diff --check` passed.
+
+This focused review validation supplements the earlier full-suite gate; the
+full suite was not rerun for these corrections.

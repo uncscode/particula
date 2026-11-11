@@ -2319,12 +2319,15 @@ def _validate_p4_final(  # noqa: C901
     free_counts: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
+    native: wp.int32,
 ) -> None:
     """Validate final P4 counts before finalized diagnostic writes."""
     box = wp.tid()
     if upstream_invalid[0] != 0:
         return
-    events = demand[box] * volume[box]
+    events = demand[box]
+    if native == 0:
+        events *= volume[box]
     if (
         not wp.isfinite(demand[box])
         or demand[box] < 0.0
@@ -2347,13 +2350,18 @@ def _write_p4_final(
     final_indices: wp.array2d(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
+    native: wp.int32,
 ) -> None:
     """Commit finalized P4 demand, counts, and ascending free-slot prefixes."""
     box = wp.tid()
     if invalid[0] != 0 or upstream_invalid[0] != 0:
         return
     count = wp.int32(demand[box] * volume[box])
+    if native != 0:
+        count = wp.int32(demand[box])
     final_demand[box] = demand[box]
+    if native != 0:
+        final_demand[box] = wp.float64(count) / volume[box]
     final_counts[box] = count
     for rank in range(final_indices.shape[1]):
         if rank < count:
@@ -2751,6 +2759,7 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             current_count,
             final_invalid,
             upstream_invalid,
+            0,
         ],
         device=preflight.device,
     )
@@ -2768,6 +2777,7 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             buffers.final_selected_slot_indices,
             final_invalid,
             upstream_invalid,
+            0,
         ],
         device=preflight.device,
     )
@@ -2835,6 +2845,7 @@ def _validate_p5_handoff(  # noqa: C901
     selected_indices: wp.array2d(dtype=wp.int32),
     status: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
+    native: wp.int32,
 ) -> None:
     """Validate P4's final handoff before the sole P5 writer launches."""
     box = wp.tid()
@@ -2842,6 +2853,8 @@ def _validate_p5_handoff(  # noqa: C901
         return
     count = final_counts[box]
     events = final_demand[box] * volume[box]
+    if native != 0:
+        events = wp.float64(count)
     invalid = bool(
         not wp.isfinite(final_demand[box])
         or final_demand[box] < 0.0
@@ -2853,6 +2866,8 @@ def _validate_p5_handoff(  # noqa: C901
         or events > wp.float64(2147483647)
         or count != wp.int32(events)
     )
+    if native != 0 and final_demand[box] != wp.float64(count) / volume[box]:
+        invalid = True
     previous = wp.int32(-1)
     for rank in range(selected_indices.shape[1]):
         selected = selected_indices[box, rank]
@@ -3016,6 +3031,7 @@ def _commit_nucleation_p5(
             buffers.final_selected_slot_indices,
             status,
             upstream_invalid,
+            0,
         ],
         device=preflight.device,
     )
@@ -3639,27 +3655,14 @@ def _prepare_nucleation_step_gpu(  # noqa: C901
 
 @wp.kernel
 def _native_source_counts(
-    density: wp.array(dtype=wp.float64),
-    volume: wp.array(dtype=wp.float64),
+    accepted_counts: wp.array(dtype=wp.int32),
     counts: wp.array(dtype=wp.float64),
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Stage density events as represented counts before exhaustion scaling."""
+    """Stage admitted integer counts before native exhaustion scaling."""
     box = wp.tid()
     if invalid[0] == 0:
-        counts[box] = density[box] * volume[box]
-
-
-@wp.kernel
-def _native_source_density(
-    counts: wp.array(dtype=wp.float64),
-    volume: wp.array(dtype=wp.float64),
-    invalid: wp.array(dtype=wp.int32),
-) -> None:
-    """Restore finalized event density after count/volume scaling."""
-    box = wp.tid()
-    if invalid[0] == 0:
-        counts[box] /= volume[box]
+        counts[box] = wp.float64(accepted_counts[box])
 
 
 @wp.kernel
@@ -3985,8 +3988,7 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
             _native_source_counts,
             dim=b,
             inputs=[
-                finalized[1],
-                particles[4],
+                finalized[0],
                 p4[0],
                 prepared.pipeline_invalid,
             ],
@@ -4033,13 +4035,6 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
             inputs=[prepared.scaling.status, 0, prepared.pipeline_invalid],
             device=prepared.device,
         )
-    if prepared.native:
-        wp.launch(
-            _native_source_density,
-            dim=b,
-            inputs=[p4[0], particles[4], prepared.pipeline_invalid],
-            device=prepared.device,
-        )
     if n:
         wp.launch(
             _classify_slots,
@@ -4068,6 +4063,7 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
             p4_work[5],
             prepared.p4_final_status,
             prepared.pipeline_invalid,
+            int(prepared.native),
         ],
         device=prepared.device,
     )
@@ -4089,6 +4085,7 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
             p4[10],
             prepared.p4_final_status,
             prepared.pipeline_invalid,
+            int(prepared.native),
         ],
         device=prepared.device,
     )
@@ -4109,6 +4106,7 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
             p4[10],
             prepared.p5_status,
             prepared.pipeline_invalid,
+            int(prepared.native),
         ],
         device=prepared.device,
     )
