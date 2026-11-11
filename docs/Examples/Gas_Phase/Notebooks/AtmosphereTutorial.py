@@ -13,105 +13,49 @@
 # ---
 
 # %% [markdown]
-# # Atmosphere Tutorial
+# # Gas Mixture and Environment Tutorial
 #
-# Gases, alongside particles, constitute the essential components of an aerosol system. In their natural state, gases are collections of molecules that move freely, not bound to one another. We introduce the `Atmosphere` class, a composite that encapsulates `GasSpecies`, with additional parameters for the atmospheric state.
-#
-# - **`Atmosphere`**: This class represents the atmospheric environment by detailing properties such as temperature and pressure, alongside a dynamic list of gas species
-#     present.
-# - **`AtmosphericBuilder`**: A builder class that simplifies the creation of `Atmosphere` objects.
-#
-# We'll continue with our organics and water example, combining the two into a single `Atmosphere` object.
+# Native `GasData` holds all species in one explicit order. `EnvironmentData`
+# holds temperature, pressure, and saturation ratios in that same gas order.
+# Vapor-pressure strategies remain separate scientific configuration. See the
+# [gas tutorial](Gas_Species.ipynb) for the water and organic properties.
 
 # %%
-# In Colab uncomment the following command to install particula:
-# #!pip install particula[extra] --quiet
 import matplotlib.pyplot as plt
 import numpy as np
-
-# import particula
 import particula as par
 
-# %% [markdown]
-# ## Build Gas Species
-#
-# First we will build the, `GasSpecies` objects for the organics and water. Following the same procedure from previously in [`Gas Species`](./next_gas_species.ipynb).
-
 # %%
-# Define the coefficients for Butanol using the Antoine equation.
-butanol_coefficients = {"a": 7.838, "b": 1558.19, "c": 196.881}
-butanol_antione = par.gas.VaporPressureFactory().get_strategy(
-    "antoine", butanol_coefficients
-)
-styrene_coefficients = {"a": 6.924, "b": 1420, "c": 226}
-styrene_antione = par.gas.VaporPressureFactory().get_strategy(
-    "antoine", styrene_coefficients
-)
-
-# Water uses a different model for vapor pressure calculation called the Buck equation.
 water_buck = par.gas.VaporPressureFactory().get_strategy("water_buck")
-
-# Create the GasSpecies using the GasSpeciesBuilder
-# water species
-water_species = (
-    par.gas.GasSpeciesBuilder()
-    .set_name("water")
-    .set_molar_mass(18.01528e-3, "kg/mol")
-    .set_vapor_pressure_strategy(water_buck)
-    .set_partitioning(True)
-    .set_concentration(1e-3, "kg/m^3")
-    .build()
+butanol_antione = par.gas.VaporPressureFactory().get_strategy(
+    "antoine", {"a": 7.838, "b": 1558.19, "c": 196.881}
 )
-
-# organic species
-organic_molar_mass = np.array([0.074121, 104.15e-3])
-organic_vapor_pressure = [butanol_antione, styrene_antione]
-organic_concentration = np.array([2e-6, 1e-9])
-organic_names = np.array(["butanol", "styrene"])
-organic_species = (
-    par.gas.GasSpeciesBuilder()
-    .set_name(organic_names)
-    .set_molar_mass(organic_molar_mass, "kg/mol")
-    .set_vapor_pressure_strategy(organic_vapor_pressure)
-    .set_partitioning(True)
-    .set_concentration(organic_concentration, "kg/m^3")
-    .build()
+styrene_antione = par.gas.VaporPressureFactory().get_strategy(
+    "antoine", {"a": 6.924, "b": 1420, "c": 226}
 )
-
-# Print the species
-print(water_species)
-print(organic_species)
-
-# %% [markdown]
-# ## Atmosphere Builder
-#
-# The `AtmosphereBuilder` class is a builder class that simplifies the creation of `Atmosphere` objects. It provides a fluent interface for adding `GasSpecies` objects to the `Atmosphere` object. We will use it to build the `Atmosphere` object for the organics and water. The builder requries the following parameters:
-#
-# - `pressure`: The total pressure of the gas mixture, in Pascals, or provided pressure_units string for conversion.
-# - `temperature`: The temperature of the gas mixture, in Kelvin, or provided temperature_units string for conversion.
-# - `species`: A list of `GasSpecies` objects, representing the gases in the mixture. This can be added one by one using the `add_species` method.
-#
-# ### Air
-#
-# Air is assumed to be the non-specified component of the gas mixture, making up the remainder of the gas mixture. We do not explicitly add air to the gas mixture, but it is implicitly included in most calculations.
-
-# %%
+vapor_pressure_strategies = [water_buck, butanol_antione, styrene_antione]
 gas_mixture = (
-    par.gas.AtmosphereBuilder()
-    .set_more_partitioning_species(water_species)
-    .set_more_partitioning_species(organic_species)
-    .set_temperature(25, temperature_units="degC")
-    .set_pressure(1, pressure_units="atm")
+    par.gas.GasDataBuilder()
+    .set_names(["water", "butanol", "styrene"])
+    .set_molar_mass([18.01528e-3, 0.074121, 104.15e-3], "kg/mol")
+    .set_partitioning([True, True, True])
+    .set_concentration([1e-3, 2e-6, 1e-9], "kg/m^3")
     .build()
 )
-
-print("Notice the units conversion to base SI:")
+environment = par.gas.EnvironmentData(
+    temperature=np.array([298.15]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.zeros((1, 3)),
+)
 print(gas_mixture)
+print(environment)
 
 # %% [markdown]
-# ## Iterating Over Gas Species
+# ## Prescribed altitude history
 #
-# Once the `Gas` object has been established, it enables us to iterate over each `GasSpecies` within the mixture. This functionality is particularly valuable for evaluating and adjusting properties dynamically, such as when changes in temperature and pressure occur due to environmental alterations.
+# This diagnostic sweep holds gas mass concentrations fixed while prescribing
+# temperature and pressure. It is not an expanding-parcel transport model.
+# Background air sets the pressure without adding an implicit gas storage lane.
 #
 # ### Practical Example: Altitude Impact
 #
@@ -148,9 +92,6 @@ print(gas_mixture)
 #    - $L$ = 0.0065 K/m
 #    - $h$ = 10000 m
 #
-# ### Application
-# By iterating through each `GasSpecies`, we can apply these formulas to adjust their properties based on the calculated pressure and temperature at 10 km altitude, aiding in simulations or real-world applications where altitude plays a crucial role in gas behavior.
-#
 
 # %%
 # Constants for calculations
@@ -180,25 +121,22 @@ pressure_at_altitudes = sea_level_pressure * (
 )
 
 
-# Initialize a matrix to hold saturation ratios for each species at each
-# altitude
+# Only water is evaluated over this cold altitude range. The organic Antoine
+# coefficients are not qualified here; gas storage still retains those lanes.
+# Saturation-ratio lanes for organics remain their prescribed initial values.
 saturation_ratio = np.zeros(len(altitude_range))
-
-# Loop over each altitude's temperature and pressure
 for index, (temperature, pressure) in enumerate(
-    zip(temperature_at_altitudes, pressure_at_altitudes)
+    zip(temperature_at_altitudes, pressure_at_altitudes, strict=True)
 ):
-    # Set the current temperature and pressure of the gas mixture
-    gas_mixture.temperature = temperature
-    gas_mixture.total_pressure = pressure
-
-    # Loop over water
-    saturation_ratio[index] = (
-        gas_mixture.partitioning_species.get_saturation_ratio(
-            gas_mixture.temperature
-        )[0]
+    environment.temperature[0] = temperature
+    environment.pressure[0] = pressure
+    saturation = water_buck.saturation_concentration(
+        gas_mixture.molar_mass[0], temperature
     )
-
+    environment.saturation_ratio[0, 0] = (
+        gas_mixture.concentration[0, 0] / saturation
+    )
+    saturation_ratio[index] = environment.saturation_ratio[0, 0]
 
 # Plot the saturation ratio of water vapor at each altitude
 fig, ax = plt.subplots()
@@ -211,8 +149,7 @@ ax.legend()
 plt.show()
 
 # %% [markdown]
-# # Summary
-#
-# In this notebook, we learned how to create an `Atmosphere` object using the `AtmosphereBuilder` class. We also explored how to iterate over each `GasSpecies` within the mixture, enabling us to adjust properties dynamically based on environmental changes. This functionality is particularly useful for simulating real-world scenarios where temperature and pressure variations significantly impact gas behavior.
-#
-# We now need to build the particle representation, so that combined with the `Atmosphere`, we can create an aerosol system.
+# We retain the complete gas order while updating held environment arrays.
+# The water plot uses lane zero explicitly. A native Aerosol can hold these
+# two containers together with particle data; processes own species mappings
+# and validate their scientific requirements independently.

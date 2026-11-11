@@ -60,7 +60,7 @@
       "source": "docs/Examples/Aerosol/Aerosol_Tutorial.py",
       "notebook": "docs/Examples/Aerosol/Aerosol_Tutorial.ipynb",
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "native migration implemented; P1 review pending",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
@@ -68,9 +68,9 @@
         "ParticleRepresentation",
         "PresetParticle"
       ],
-      "regression": null,
+      "regression": "examples_tests/native_foundations_example_test.py",
       "scientific_expectation": null,
-      "execution": "pending",
+      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
       "evidence": []
     },
     {
@@ -144,11 +144,11 @@
       "source": "docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py",
       "notebook": null,
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "canonical native population migration; guide delegates unchanged",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
+      "regression": "examples_tests/data_containers_example_test.py",
+      "scientific_expectation": "counts [1,0.25] / volume 1e-6; density [1e6,2.5e5]; independent material inventory and preserved transfer metadata",
+      "execution": "both standalone entrypoints and 14 tests passed 2026-11-11",
       "evidence": []
     },
     {
@@ -422,38 +422,38 @@
       "source": "docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.py",
       "notebook": "docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.ipynb",
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "native migration implemented; P1 review pending",
       "legacy_patterns": [
         "GasSpecies",
         "AtmosphereBuilder"
       ],
-      "regression": null,
+      "regression": "examples_tests/native_foundations_example_test.py",
       "scientific_expectation": null,
-      "execution": "pending",
+      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
       "evidence": []
     },
     {
       "source": "docs/Examples/Gas_Phase/Notebooks/Gas_Species.py",
       "notebook": "docs/Examples/Gas_Phase/Notebooks/Gas_Species.ipynb",
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "native migration implemented; P1 review pending",
       "legacy_patterns": [
         "GasSpecies"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
+      "regression": "examples_tests/native_foundations_example_test.py",
+      "scientific_expectation": "SI gas conversion, ordered species and independent Antoine/ideal-gas ratios; coefficients retained, not physically requalified",
+      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
       "evidence": []
     },
     {
       "source": "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.py",
       "notebook": "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.ipynb",
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "pending",
+      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
       "evidence": []
     },
     {
@@ -498,69 +498,69 @@
       "source": "docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.py",
       "notebook": "docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb",
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "pending",
+      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
       "evidence": []
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.py",
       "notebook": "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.ipynb",
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "pending",
+      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
       "evidence": []
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.py",
       "notebook": "docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.ipynb",
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "pending",
+      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
       "evidence": []
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.py",
       "notebook": "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.ipynb",
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "pending",
+      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
       "evidence": []
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.py",
       "notebook": "docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.ipynb",
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "native constructors and builder replace facades; three plots retained with corrected histogram units",
       "legacy_patterns": [
         "ParticleRepresentation",
         "PresetParticle"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
+      "regression": "examples_tests/native_foundations_example_test.py",
+      "scientific_expectation": "spherical particle masses; three independent material inventories; total modal number 2e10 m^-3",
+      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
       "evidence": []
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.py",
       "notebook": "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.ipynb",
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
       "scientific_expectation": null,
-      "execution": "pending",
+      "execution": "full notebook passed after source-first sync; outputs retained, 2026-11-11",
       "evidence": []
     },
     {
@@ -673,11 +673,11 @@
       "source": "docs/Examples/data_containers_and_gpu_foundations.py",
       "notebook": null,
       "phase": "P1",
-      "disposition": "pending audit",
+      "disposition": "canonical native population migration; guide delegates unchanged",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
+      "regression": "examples_tests/data_containers_example_test.py",
+      "scientific_expectation": "counts [1,0.25] / volume 1e-6; density [1e6,2.5e5]; independent material inventory and preserved transfer metadata",
+      "execution": "both standalone entrypoints and 14 tests passed 2026-11-11",
       "evidence": []
     },
     {

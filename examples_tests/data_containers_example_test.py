@@ -92,6 +92,23 @@ def test_build_particle_data_returns_documented_shapes(
     assert particle_data.density.shape == (2,)
     assert particle_data.volume.shape == (1,)
     np.testing.assert_allclose(particle_data.volume, np.array([1.0e-6]))
+    assert particle_data.distribution_type == "particle_resolved"
+    particle_data.validate_representation()
+    np.testing.assert_array_equal(particle_data.concentration, [[1.0, 0.25]])
+    np.testing.assert_allclose(
+        particle_data.concentration / particle_data.volume[:, None],
+        [[1e6, 2.5e5]],
+        rtol=1e-14,
+    )
+    np.testing.assert_allclose(
+        np.sum(
+            particle_data.masses * particle_data.concentration[:, :, None],
+            axis=1,
+        )
+        / particle_data.volume[:, None],
+        [[1.875e-12, 2.625e-12]],
+        rtol=1e-14,
+    )
 
 
 def test_build_gas_data_returns_documented_shapes_and_names(
@@ -153,7 +170,7 @@ def test_run_example_stops_transfers_after_optional_warp_failure(
     monkeypatch: pytest.MonkeyPatch,
     example_module: types.ModuleType,
 ) -> None:
-    """An optional transfer failure stops later transfers without escaping."""
+    """Enabled transfer failures propagate without fallback or later transfers."""
     monkeypatch.setattr(example_module, "WARP_AVAILABLE", True)
     monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
 
@@ -175,7 +192,8 @@ def test_run_example_stops_transfers_after_optional_warp_failure(
             name,
             lambda *a, **k: pytest.fail("continued after failed transfer"),
         )
-    example_module.run_example()
+    with pytest.raises(RuntimeError, match="warp backend unavailable"):
+        example_module.run_example()
     assert events == ["transfer-failed"]
 
 
@@ -322,6 +340,8 @@ def test_run_example_warp_path_reports_round_trip_shapes_and_names(
                 np.testing.assert_array_equal(
                     getattr(result, field), getattr(sources[family], field)
                 )
+            if family == "particle":
+                assert result.distribution_type == "particle_resolved"
             if family == "gas":
                 assert kwargs["name"] is sources[family].name
                 assert result.name == ["Water", "H2SO4"]

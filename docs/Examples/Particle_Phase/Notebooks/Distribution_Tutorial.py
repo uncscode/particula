@@ -1,3 +1,4 @@
+# %%
 """Distribution strategy tutorial for particle property calculations.
 
 This tutorial covers the distribution strategies implemented in particula
@@ -34,112 +35,99 @@ Example:
 # ---
 
 # %% [markdown]
-# # Distribution Strategy Tutorial
+# # Native Distribution Storage
 #
-# The representation of particle distributions is core to the simulation, but it can vary depending on what you are trying to achieve. In this tutorial, we will cover the  distribution strategies currently implemented.
-#
-# The distribution strategies define how to calculate properties derived from the particle distribution. These include particle mass, radius, and total mass, all of which can have different methods depending on whether the distribution is mass-based, radius-based, or speciated-mass based.
-#
-# We will cover the following distribution strategies:
-#
-# - `MassBasedMovingBin`
-# - `RadiiBasedMovingBin`
-# - `SpeciatedMassMovingBin`
-#
-# As they are just operational strategies, they do not have any specific parameters to be set. They are just used to calculate the properties of the particles.
+# Native particles store material masses consistently, independent of whether
+# initialization starts with mass or radius. Distribution metadata determines
+# how population weights are integrated: discrete bins sum number densities,
+# continuous PDFs integrate dN/dr on a radius grid, and resolved slots sum
+# represented counts before division by physical volume.
 
 # %%
-# In Colab uncomment the following command to install particula:
-# #!pip install particula[extra] --quiet
 import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## Strategy: MassBasedMovingBin
+# ## Mass-based bins
 #
-# The `MassBasedMovingBin` strategy is used when the distribution is mass-based. This
-# means that the mass of the particles is known and the radius is calculated from the mass. The `MassBasedMovingBin` strategy calculates the radius of the particles using the following equation:
-#
-# $$
-# r = \left(\frac{3m}{4\pi\rho}\right)^{1/3}
-# $$
-#
-# where $r$ is the radius of the particle, $m$ is the mass of the particle, and $\rho$ is the density of the particle.
-#
+# Retain five illustrative masses from zero to 10 kg at density 1000 kg/m^3.
+# These large values demonstrate arithmetic, not a realistic aerosol spectrum.
+# Each bin has number density 1 m^-3 at unit reference volume.
 
 # %%
-mass_distribution = np.linspace(0, 10, 5)  # kg
-density = np.array([1000.0])  # kg/m^3
-
-radius = par.particles.MassBasedMovingBin().get_radius(
-    mass_distribution, density
+mass_distribution = np.linspace(0, 10, 5)
+mass_bins = (
+    par.particles.ParticleDataBuilder()
+    .set_distribution_type("discrete")
+    .set_masses(mass_distribution[:, None])
+    .set_density(np.array([1000.0]))
+    .set_concentration(np.ones(5))
+    .set_charge(np.zeros(5))
+    .set_volume(np.array([1.0]))
+    .build()
 )
-print(f"Radius of the particles: {radius} m")
-
-total_mass = par.particles.MassBasedMovingBin().get_total_mass(
-    mass_distribution,
-    concentration=np.ones_like(mass_distribution),
-    density=density,
-)
-print(f"Total mass of the particles: {total_mass} kg")
-print(f"Same as the sum*concentration: {np.sum(mass_distribution)} kg")
+print("Radii [m]:", mass_bins.radii)
+print("Material mass density [kg/m^3]:", mass_bins.species_mass_density)
+print("Material inventory [kg]:", mass_bins.species_mass_inventory)
 
 # %% [markdown]
-# ## Builder: RadiiBasedMovingBin
+# ## Radius-based initialization
 #
-# The `RadiiBasedMovingBin` strategy is used when the distribution is radius-based. This means that the radius of the particles is known and the mass is calculated from the radius. The `RadiiBasedMovingBin` strategy calculates the mass of the particles using the following equation:
-#
-# $$
-# m = \frac{4\pi\rho r^3}{3}
-# $$
-#
-# where $m$ is the mass of the particle, $r$ is the radius of the particle, and $\rho$ is the density of the particle.
-#
-# The builder does nothing in this case, as we just have no parameters to set. We use the builder pattern here to keep the code consistent with the other strategies.
+# Preserve the illustrative zero-radius endpoint as zero mass in the builder.
+# The convenience radius initializer accepts strictly positive radii; direct
+# mass construction also expresses this zero-material bin explicitly.
 
 # %%
-radii_distribution = np.linspace(0, 0.1, 5)  # m
-density_radii = np.array([1000.0])  # kg/m^3
-
-radii_strategy = par.particles.RadiiBasedMovingBinBuilder().build()
-
-mass_distribution = radii_strategy.get_mass(radii_distribution, density_radii)
-print(f"Mass of the particles: {mass_distribution} kg")
-
-total_mass = radii_strategy.get_total_mass(
-    radii_distribution,
-    concentration=np.ones_like(radii_distribution),
-    density=density_radii,
+radii_distribution = np.linspace(0, 0.1, 5)
+radius_masses = 4 * np.pi / 3 * 1000 * radii_distribution**3
+radius_bins = (
+    par.particles.ParticleDataBuilder()
+    .set_distribution_type("discrete")
+    .set_masses(radius_masses[:, None])
+    .set_density(np.array([1000.0]))
+    .set_concentration(np.ones(5))
+    .set_charge(np.zeros(5))
+    .set_volume(np.array([1.0]))
+    .build()
 )
-print(f"Total mass of the particles: {total_mass} kg")
+print("Per-particle masses [kg]:", radius_bins.total_mass)
+print("Material inventory [kg]:", radius_bins.species_mass_inventory)
 
 # %% [markdown]
-# ## Factory: SpeciatedMassMovingBin
+# ## Speciated mass bins
 #
-# The `SpeciatedMassMovingBin` strategy is used when the distribution is speciated-mass based. This means that the mass of the particles is known and the radius is calculated from the mass. The `SpeciatedMassMovingBin` has multiple species, and the mass of each species is known for that given bin or particle.
+# For two materials, particle volume is the sum of mass/density over material
+# lanes. Keep each material's inventory separately instead of losing species
+# information in a total-mass scalar.
 
 # %%
-mass_distribution1 = np.linspace(0, 10, 5)  # kg
-mass_distribution2 = np.linspace(0, 10, 5)  # kg
-masses_combined = np.vstack((mass_distribution1, mass_distribution2)).T
-density = np.array([1000.0, 2000.0])  # kg/m^3
-
-speciated_mass = par.particles.DistributionFactory().get_strategy(
-    "speciated_mass_moving_bin"
+masses_combined = np.column_stack((mass_distribution, mass_distribution))
+speciated_bins = (
+    par.particles.ParticleDataBuilder()
+    .set_distribution_type("discrete")
+    .set_masses(masses_combined)
+    .set_density(np.array([1000.0, 2000.0]))
+    .set_concentration(np.ones(5))
+    .set_charge(np.zeros(5))
+    .set_volume(np.array([1.0]))
+    .build()
 )
-
-radius = speciated_mass.get_radius(masses_combined, density)
-
-print(f"Radius of the particles: {radius} m")
-
-total_mass = speciated_mass.get_total_mass(
-    masses_combined,
-    concentration=np.ones_like(mass_distribution1),
-    density=density,
-)
-print(f"Total mass of the particles: {total_mass} kg")
+print("Radii [m]:", speciated_bins.radii)
+print("Material inventory [kg]:", speciated_bins.species_mass_inventory)
 
 # %% [markdown]
-# ## Summary
+# ## Resolved count/volume interpretation
 #
-# In this tutorial, we covered the distribution strategies implemented in the simulation. We covered the `MassBasedMovingBin`, `RadiiBasedMovingBin`, and `SpeciatedMassMovingBin` strategies. These strategies are used to calculate the properties of the particles based on the distribution type.
+# The same positive-material particles can represent weighted physical counts.
+# At volume 0.25 m^3, counts of two give density eight per slot. Changing a
+# distribution tag alone is not a conversion: construct the intended weights.
+
+# %%
+resolved = par.particles.create_resolved_particle_data(
+    masses=masses_combined[1:],
+    density=[1000.0, 2000.0],
+    concentration=np.full(4, 2.0),
+    volume=0.25,
+)
+print("Number density [m^-3]:", resolved.number_density)
+print("Material inventory [kg]:", resolved.species_mass_inventory)

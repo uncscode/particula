@@ -41,4 +41,37 @@ untargeted repository coverage, examples and infrastructure suites, both explici
 CPU wall-loss suites, GPU/resident boundary checks, lint/type checks, payload
 consistency and strict MkDocs. Preserve thresholds and scientific tolerances.
 
-No implementation tests or notebook executions have passed for M5 yet.
+## P1 partial validation — 2026-11-11
+
+- Aerosol, gas species and gas/environment tutorials migrated; each standalone
+  source and synchronized notebook executed successfully. Three numerical
+  fixtures pass in `examples_tests/native_foundations_example_test.py`.
+- Canonical data-container example now stores explicit resolved counts at
+  physical volume, with the guide forwarding to it. Both entrypoints execute;
+  `WARP_CACHE_PATH=/tmp/particula-m5-warp .venv/bin/pytest
+  examples_tests/data_containers_example_test.py -q --no-cov`: 14 passed.
+  Enabled transfer failures propagate instead of claiming CPU-only success.
+- Notebook tools require `PYTHONPATH=/home/kyle/Code/Agent` for the existing
+  ADW utility dependency. Execution uses repository `.venv` on PATH and local
+  Jupyter kernel access. Initial restricted-kernel failures were rerun with
+  access; no failed attempt is counted as a successful run.
+- Gas-species coefficients and their convention are retained as illustrative
+  inputs, not requalified scientific data. The altitude tutorial evaluates
+  only its published water diagnostic over the cold range, retaining all gas
+  lanes without extrapolating unqualified organic coefficients.
+
+P1 remains incomplete. Particle tutorials, remaining functional foundations,
+landing-page reconciliation, plot inspection and strict rendering are pending.
+These working-tree results are provisional until the P1 commit and closeout.
+
+### Foundation checkpoint validation
+
+All ten P1 notebooks passed source-first sync followed by full execution;
+all ten retain output cells. Three unchanged Python sources were restored after
+bidirectional sync exposed stale notebook text; execution was then repeated.
+Do not sync output-bearing notebooks back through stale sources after execution.
+The six native-foundation assertions and fourteen transfer assertions pass
+(20 total). Strict MkDocs passed. Plot montages were inspected; radius-PDF
+coordinate conversion now includes the explicit 2e6 Jacobian and an independent
+population/material-integral regression. Final P1 ledger and snippet audit
+remain pending; this checkpoint does not complete M5.

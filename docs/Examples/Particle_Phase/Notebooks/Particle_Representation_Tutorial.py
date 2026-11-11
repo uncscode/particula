@@ -12,175 +12,121 @@
 #     name: python3
 # ---
 
-"""Tutorial on building particle representations with builders and factories."""
-
 # %% [markdown]
-# # Particle Representation
+# # Native Particle Construction
 #
-# With the different aspects of particles laid out in the previous sections, we can now focus on how to represent them in a simulation. The representation of particles is crucial for having a unified way to handle particles in a system. This section will discuss building a particle representation that can be used in simulations and analyses.
-#
-#
-#
+# ParticleData holds per-material masses, population weights, charge, density
+# and volume. Its explicit distribution type defines how to interpret weights.
+# This tutorial builds radius bins, speciated mass bins and a lognormal preset.
+# Activity and surface strategies remain separate process configuration.
 
 # %%
-# In Colab uncomment the following command to install particula:
-# #!pip install particula[extra] --quiet
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## Builder: Particle Representation
+# ## Initialize from radii with explicit units
 #
-# In this section, we will demonstrate how to create a particle distribution using specific particle properties such as radius, density, and concentration. This example will help illustrate the practical application of object-oriented programming in simulating and analyzing particle systems in scientific research. We'll utilize a builder pattern to construct an instance of a Particle class, allowing for flexible configuration of particle characteristics and behaviors.
-#
-# Key Components:
-#
-# - Radius and Concentration: Define the size and number of particles in nanometers and their concentration per cubic centimeter, respectively.
-# Density and Surface Tension: Specify the material's density and the surface tension for the particles, which are critical for calculating various physical and chemical properties.
-# - Builder Pattern: Use a builder pattern for creating a particle representation, which facilitates the step-by-step configuration of different strategies for distribution, activity, and surface approximations.
-#
-# The code snippet below sets up a particle distribution with defined properties using multiple factory methods to specify behavior strategies for distribution, activity, and surface interactions. The use of a builder pattern enhances readability and maintainability of the code by separating the construction of a complex object from its representation.
+# Discrete concentrations are number densities. Binned data uses a unit
+# reference volume; per-particle masses follow the spherical volume formula.
 
 # %%
-# Creating particle distribution examples
-radius = np.array([100, 200, 300], dtype=np.float64)  # in nm
-density = 2.5
-concentration = np.array([1e2, 1e3, 1e4], dtype=np.float64)
-
-# parameters
-surface_tension_strategy = (
+input_radius_nm = np.array([100, 200, 300], dtype=np.float64)
+input_concentration_cm3 = np.array([1e2, 1e3, 1e4], dtype=np.float64)
+particle_data = par.particles.create_particle_data_from_radii(
+    radii=input_radius_nm,
+    radius_units="nm",
+    concentration=input_concentration_cm3,
+    concentration_units="1/cm^3",
+    density=2.5,
+    density_units="g/cm^3",
+    distribution_type="discrete",
+)
+surface_strategy = (
     par.particles.SurfaceStrategyMassBuilder()
     .set_surface_tension(0.072, "N/m")
     .set_density(2.5, "g/cm^3")
     .build()
 )
-
-# Create a Particle instance using the RadiusParticleRepresentationBuilder
-particle_rep_mass = (
-    par.particles.ParticleRadiusRepresentationBuilder()
-    .set_distribution_strategy(par.particles.RadiiBasedMovingBin())
-    .set_activity_strategy(par.particles.ActivityIdealMass())
-    .set_surface_strategy(surface_tension_strategy)
-    .set_concentration(
-        concentration=concentration, concentration_units="1/cm^3"
-    )
-    .set_density(density=density, density_units="g/cm^3")
-    .set_radius(radius=radius, radius_units="nm")
-    .set_charge(charge=0)
-    .build()
-)
-
-# Accessing calculated properties
-print("Mass of particles:", particle_rep_mass.get_mass())
-print("Radius of particles:", particle_rep_mass.get_radius())
-print(
-    "Total mass of the particle distribution:",
-    particle_rep_mass.get_mass_concentration(),
-)
+activity_strategy = par.particles.ActivityFactory().get_strategy("mass_ideal")
+print("Per-particle mass [kg]:", particle_data.total_mass)
+print("Radius [m]:", particle_data.radii)
+print("Material mass density [kg/m^3]:", particle_data.species_mass_density)
 
 # %% [markdown]
-# ## Factory: Particle Representation Implementation
+# ## Build speciated mass bins
 #
-# The factory pattern plays a crucial role in the flexibility and extensibility of particle property computations, such as mass, radius, and total mass, within different computational models. It allows for dynamic selection of computational strategies based on the scenario, facilitating accurate and tailored simulations of real-world conditions.
-#
-# In this section, we'll demonstrate how to use a factory to construct speciated particles characterized by varied properties, enhancing our ability to simulate diverse environmental scenarios. Initially, it's beneficial to directly manipulate builders to familiarize yourself with various strategies. Subsequently, parameters can be saved in JSON format. In future iterations, these saved configurations can be rapidly deployed through the factory, streamlining particle creation and modification.
-#
+# The native builder replaces facade construction. Three material lanes each
+# have density 2500 kg/m^3. Use an explicit seed for reproducible illustrations.
+# Picograms are converted to kg explicitly (1 pg = 1e-15 kg). Activity and
+# surface strategy factories remain useful independently of data construction.
 
 # %%
-# Generating random properties for speciated particles
-mass_distribution = np.random.rand(500, 3).astype(np.float64)
-concentration = np.random.rand(500, 1).astype(np.float64) * 1e3
-
-# Defining surface tension parameters
-surface_tension_parameter = {
-    "surface_tension": 0.072,  # in N/m
-    "surface_tension_units": "N/m",
-    "density": 2.5,  # Density in g/cm^3
-    "density_units": "g/cm^3",
-}
-surface_strategy = par.particles.SurfaceFactory().get_strategy(
-    "mass", surface_tension_parameter
+rng = np.random.default_rng(42)
+mass_distribution_pg = rng.random((500, 3))
+concentration_cm3 = rng.random(500) * 1e3
+speciated_data = (
+    par.particles.ParticleDataBuilder()
+    .set_distribution_type("discrete")
+    .set_masses(mass_distribution_pg * 1e-15)
+    .set_density(np.full(3, 2500.0))
+    .set_concentration(concentration_cm3, "1/cm^3")
+    .set_charge(np.zeros(500))
+    .set_volume(np.array([1.0]))
+    .build()
 )
-distribution_strategy = par.particles.DistributionFactory().get_strategy(
-    "speciated_mass_moving_bin"
-)
-activity_strategy = par.particles.ActivityFactory().get_strategy("mass_ideal")
+print("Material mass density [kg/m^3]:", speciated_data.species_mass_density)
+radius = speciated_data.radii[0]
+masses = speciated_data.total_mass[0]
+concentration = speciated_data.slot_concentration_density[0]
 
-# Setting up parameters for the particle representation factory
-parameters = {
-    "distribution_strategy": distribution_strategy,
-    "activity_strategy": activity_strategy,
-    "surface_strategy": surface_strategy,
-    "density": 2.5,
-    "density_units": "g/cm^3",
-    "concentration": concentration,
-    "concentration_units": "1/cm^3",
-    "mass": mass_distribution,
-    "mass_units": "pg",  # picograms
-    "charge": 0,
-}
+# %% [markdown]
+# The mass histogram counts computational bins. The radius histogram weights
+# bins by their number density, so its vertical axis is a physical density.
 
-# Using the factory to create a speciated particle representation
-speciated_mass_rep = par.particles.ParticleRepresentationFactory().get_strategy(
-    "mass", parameters
-)
-
-# Outputting the total mass of the particle distribution
-print(
-    f"Total mass of the particle distribution: {speciated_mass_rep.get_mass_concentration()}"
-)
-
-# Plot histogram of the mass distribution and number distribution vs radius
-radius = speciated_mass_rep.get_radius()
-masses = speciated_mass_rep.get_mass()
-concentration = speciated_mass_rep.get_concentration(clone=True)
-
+# %%
+fig, ax = plt.subplots(figsize=(8, 6))
+ax.hist(masses * 1e15, bins=20, color="blue", alpha=0.7)
+ax.set_xlabel("Per-particle mass (pg)")
+ax.set_ylabel("Computational bins")
+ax.set_title("Speciated particle masses")
+plt.show()
 
 fig, ax = plt.subplots(figsize=(8, 6))
-ax.hist(masses * 1e6, bins=20, color="blue", alpha=0.7)
-ax.set_xlabel("Mass (ug)")
-ax.set_ylabel("Number of Particles (Droplets)")
-ax.set_title("Mass Distribution Particles")
-plt.show()
-
-fig, ax2 = plt.subplots(figsize=(8, 6))
-ax2.hist(radius * 1e9, bins=20, color="red", alpha=0.7)
-ax2.set_ylabel("Concentration (1/m^3)")
-ax2.set_xlabel("Radius (nm)")
-ax2.set_title("Number Distribution Particles")
+ax.hist(radius * 1e9, weights=concentration, bins=20, color="red", alpha=0.7)
+ax.set_ylabel("Number density per histogram bin (1/m^3)")
+ax.set_xlabel("Radius (nm)")
+ax.set_title("Particle number distribution")
 plt.show()
 
 # %% [markdown]
-# ## Limited Representation Builder
+# ## Initialize a lognormal population
 #
-# The last representation, is a modification of the radii builder, where we can specify a lognomal distribution parameters. This is useful when we want a to start a simulation quick and are not trying to explicitly reproduce a specific system.
+# Preserve the two 100 nm and 2000 nm modes, each contributing 1e4 cm^-3.
+# The discrete preset normalizes the sampled bins to the specified number.
 
 # %%
-lognormal_rep = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_mode(np.array([100, 2000]), "nm")
-    .set_geometric_standard_deviation(np.array([1.5, 2.0]))
-    .set_number_concentration(np.array([1e4, 1e4]), "1/cm^3")
-    .set_distribution_type("pmf")
-    .build()
+lognormal_data = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete",
+    mode=[100e-9, 2000e-9],
+    geometric_standard_deviation=[1.5, 2.0],
+    number_concentration=[1e10, 1e10],
 )
-
-# plot
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.semilogx(
-    lognormal_rep.get_radius(),
-    lognormal_rep.get_concentration(),
-    label="Number Distribution",
+    lognormal_data.radii[0],
+    lognormal_data.slot_concentration_density[0],
+    label="Number distribution",
     color="blue",
 )
 ax.set_xlabel("Radius (m)")
-ax.set_ylabel("Concentration (1/m^3)")
-ax.set_title("Number Distribution of Particles")
-plt.legend()
+ax.set_ylabel("Bin number density (1/m^3)")
+ax.set_title("Lognormal particle population")
+ax.legend()
 plt.show()
 
 # %% [markdown]
-# ## Summary
-#
-# In this notebook, we have discussed the importance of particle representation in simulations and analyses. We have demonstrated how to create a particle distribution using specific particle properties such as radius, density, and concentration. We have also shown how to use a builder pattern to construct an instance of a Particle class, allowing for flexible configuration of particle characteristics and behaviors. Finally, we have discussed the factory pattern and how it can be used to construct speciated particles characterized by varied properties.
+# Native constructors and builders retain useful initialization choices.
+# Raw fields remain mutable; derived properties return computed values. Use
+# `copy()` for independent storage and validate after directly changing arrays.
