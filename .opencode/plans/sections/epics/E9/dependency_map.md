@@ -33,3 +33,10 @@ authorizing parallel work.
 
 v0.3.0 release readiness and subsequent Epic I work depend on this migration.
 This plan neither implements Epic I nor claims release approval.
+
+## M1 → M2 handoff accepted (2026-11-10)
+
+Kyle approved PR #1624 revision `a7c1eb63c` after the required implementation
+checks passed at `0db7e42b2`. M1 is Shipped in the plan; M2 is Ready to begin
+from the approved branch. See the M1 `validation_evidence.md` record. The PR
+has not been merged by this approval; no downstream milestone is complete.

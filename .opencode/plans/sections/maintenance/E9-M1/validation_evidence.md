@@ -37,18 +37,26 @@ The literal `.opencode/tools/run_linters.py` now reports
 regressions that preserve detection of errors in the configured package and
 explicit targets despite duplicate unrelated source/payload files.
 All required checks now pass at the lint-fix revision, as recorded below.
-Historical failures remain below for provenance; final maintainer sign-off is
-the only pending M1 handoff gate.
+Historical failures remain below for provenance. Kyle approved the final M1
+handoff on 2026-11-10; all M1 gates are satisfied.
 
-## Handoff decision
+## Handoff decision — approved 2026-11-10
 
-All required implementation checks pass at `0db7e42b2`. Final maintainer
-handoff approval remains pending; a direct approval question was presented to
-Kyle after the fix and regression tests passed. No approval is inferred from
-the request to fix the blockers. M2 remains pending that sign-off, not a lint
-failure.
-P1 scientific and P2 specification approval was recorded on 2026-09-28.
-No M2–M6 implementation or release completion is claimed.
+**M1 complete (Shipped); M2 unblocked (Ready, not started).** Kyle Gorkowski
+responded **“I approve”** in this chat to the explicit question asking for final
+M1 handoff approval after all required checks passed. This is final handoff
+sign-off, separate from the September P1/P2 scientific/specification approvals.
+
+Approved PR #1624 revision: `a7c1eb63c67f7dc3ac2e35859c9c08de5f44cfd0`.
+Implementation validation: `0db7e42b27b0d031c2680af037ea11e7776641b0`;
+the approved follow-up changed only evidence Markdown and passed strict docs
+checks. All required results, including the default lint runner, are below.
+This subsequent approval/status recording changes no implementation or tests.
+
+M2 may begin from the approved accumulation branch with the recorded contract,
+helpers and replacement specification. PR merge remains a separate action;
+this approval does not claim the PR has merged or a release has shipped.
+M2–M6 implementation is not completed by this handoff.
 
 ## Preliminary restricted-environment checks
 

@@ -5,7 +5,8 @@ replacement/ownership decisions were approved on 2026-09-28 as recorded in
 `appendix.md`. P3 and P4 implementation and their owning tests are accumulated
 on this branch. P5 adds the bounded developer reference and required data-only
 integration regression. All required checks pass at `0db7e42b2`; see `validation_evidence.md`.
-Kyle's final M1 handoff approval is the only pending gate for M2.
+Kyle approved the final M1 handoff on 2026-11-10 at PR revision `a7c1eb63c`.
+M1 is complete; M2 is Ready to begin from the approved branch.
 
 Maintainer representation/grid/volume/builder clarifications and explicit P1
 scientific/P2 specification approval from issue #1612 are recorded in this
@@ -14,7 +15,7 @@ Historical characterization does not become revised-contract test evidence by
 approval. P3 implementation and independent tests are present in #1612's
 merged workflow; the P3 completion reconciliation is recorded below.
 
-- [ ] **E9-M1-P1: Freeze ordered species, units and ownership contracts with characterization tests**
+- [x] **E9-M1-P1: Freeze ordered species, units and ownership contracts with characterization tests**
   - Issue: #1610 | Size: S | Status: Characterization committed; revised scientific contract approved 2026-09-28; historical tests remain characterization
   - Entry: E9 scope approved; no prior maintenance track required.
   - Goal: Remove semantic ambiguity before any new helper or constructor.
@@ -37,7 +38,7 @@ merged workflow; the P3 completion reconciliation is recorded below.
   - Gate: Scientific reviewer approves a complete normalization/alignment
     ledger, focused assertions pass, and P1 contract questions are resolved.
 
-- [ ] **E9-M1-P2: Specify identity-preserving whole-container replacement and rejection gates**
+- [x] **E9-M1-P2: Specify identity-preserving whole-container replacement and rejection gates**
   - Issue: #1611 | Size: XS | Status: Acceptance/ownership specification approved 2026-09-28; aggregate implementation deferred to M2
   - Entry: P1 completed and validated.
   - Goal: Deliver an unambiguous aggregate acceptance contract to M2.
@@ -65,7 +66,7 @@ merged workflow; the P3 completion reconciliation is recorded below.
     evidence and Kyle's explicit P2 approval before P3. Neither approval is
     inferred from this plan update.
 
-- [ ] **E9-M1-P3: Implement necessary particle data helpers with non-unit-volume tests**
+- [x] **E9-M1-P3: Implement necessary particle data helpers with non-unit-volume tests**
   - Issue: #1612 | Size: S | Status: Implemented; completed and merged in workflow state 2026-09-29
   - Entry: P2 completed and validated.
   - Goal: Fill only approved particle access/mutation gaps for later migration.
@@ -90,7 +91,7 @@ merged workflow; the P3 completion reconciliation is recorded below.
   - Gate: All changed helpers have independent oracles, no double normalization,
     approved metadata only, unchanged physics ownership, and passing tests/lint.
 
-- [ ] **E9-M1-P4: Implement necessary gas and environment helpers with alignment tests**
+- [x] **E9-M1-P4: Implement necessary gas and environment helpers with alignment tests**
   - Issue: #1613 | Size: S | Status: P4 implementation validated in the passing M1 check matrix
   - Entry: P3 completed and validated.
   - Goal: Make ordered mixed-gas and environment access safe for later consumers.
@@ -105,8 +106,8 @@ merged workflow; the P3 completion reconciliation is recorded below.
   - Gate: No species dropped/reordered, no hidden mutation during validation,
     and focused tests/lint pass for every changed function.
 
-- [ ] **E9-M1-P5: Update development documentation**
-  - Issue: #1614 | Size: XS | Status: Implementation and required checks complete; final maintainer handoff pending
+- [x] **E9-M1-P5: Update development documentation**
+  - Issue: #1614 | Size: XS | Status: Shipped; required checks passed and final maintainer handoff approved 2026-11-10
   - Entry: P4 completed and validated.
   - Goal: Publish the developer contract and verified handoff, not broad M5 docs.
   - Work: Update the bounded container reference, add a data-only

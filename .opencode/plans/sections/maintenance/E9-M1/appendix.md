@@ -419,3 +419,11 @@ helper or scientific process change. See `validation_evidence.md` for literal
 checks and revision provenance. Required failed/unavailable checks or missing
 final maintainer approval keep M1 incomplete and M2 blocked. The existing
 P1/P2 decision approval is not final M1 handoff approval.
+
+## Final handoff approval (2026-11-10)
+
+Kyle Gorkowski explicitly approved the final M1 handoff at PR revision
+`a7c1eb63c`, following the passing required checks at `0db7e42b2` and the
+evidence-only documentation update. See `validation_evidence.md` for the
+approval and complete check record. M1 is complete; M2 is unblocked and Ready.
+This supersedes historical pending-approval notes, not downstream scope gates.

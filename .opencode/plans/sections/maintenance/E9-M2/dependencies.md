@@ -16,8 +16,12 @@ Internally P1 → P2 → P3 → P4 → P5 → P6 follows the same serial evidenc
 | E9-M5 | Starts after M4; owns supported examples/notebooks and broad migration docs |
 | E9-M6 | Starts after M5; owns temporary compatibility and legacy API removal, final release-readiness validation |
 
-M1 is still a drafted plan in this planning context; reviewed/completed
-contracts are implementation prerequisites, not assumed available now.
+M1 is complete and its prerequisite is satisfied as of 2026-11-10. Kyle
+Gorkowski approved the M1 handoff at PR #1624 revision `a7c1eb63c`, with all
+required implementation checks passing at `0db7e42b2`. M2 is Ready and may
+begin from the approved accumulation branch; it has not started. The approval
+and literal evidence are recorded in `../E9-M1/validation_evidence.md`. This
+handoff does not claim PR #1624 has merged.
 Unresolved or changed M1 contracts reopen the relevant entry gates; do not
 invent alternate mapping/normalization authority inside Aerosol or its builder.
 

@@ -2,14 +2,14 @@
   "id": "E9-M2",
   "type": "maintenance",
   "title": "Migrate construction and introduce flat Aerosol",
-  "status": "Draft",
+  "status": "Ready",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-09-27",
+  "last_updated": "2026-11-10",
   "dependencies": [
     "E9-M1"
   ],

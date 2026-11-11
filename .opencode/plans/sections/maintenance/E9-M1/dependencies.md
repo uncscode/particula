@@ -34,3 +34,11 @@ M1 handoff requires the final revision, resolved blocking decisions, complete
 helper/acceptance matrices, required test/lint/docs evidence and maintainer
 approval. Contract changes reopen affected gates; do not silently update
 downstream assumptions. This drafter does not modify sibling dependency records.
+
+## Final handoff approval (2026-11-10)
+
+Kyle Gorkowski explicitly approved the final M1 handoff at PR revision
+`a7c1eb63c`, following the passing required checks at `0db7e42b2` and the
+evidence-only documentation update. See `validation_evidence.md` for the
+approval and complete check record. M1 is complete; M2 is unblocked and Ready.
+This supersedes historical pending-approval notes, not downstream scope gates.

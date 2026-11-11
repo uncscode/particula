@@ -33,3 +33,10 @@ overriding it with the repository root. No exclusions or error suppressions
 were added. All required checks pass, including the literal default runner,
 6,771 package tests (92% coverage), and 46 lint-runner tests. Final M1 handoff
 approval was requested explicitly and remains the only pending gate.
+
+## 2026-11-10 — Final maintainer approval and M2 admission
+
+Kyle explicitly replied “I approve” to the final M1 handoff question for
+PR #1624 at `a7c1eb63c`. Recorded M1 and its five phases as Shipped, reconciled
+the parent milestone, and marked M2 Ready with its prerequisite satisfied.
+No M2 implementation, PR merge, or release is claimed.
