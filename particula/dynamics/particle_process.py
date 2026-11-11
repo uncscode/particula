@@ -4,7 +4,7 @@ Includes condensation and evaporation, coagulation, wall loss, dilution, and
 the CPU-only single-box nucleation process.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from numbers import Integral, Real
 from typing import Any, Protocol, cast
 
@@ -39,6 +39,10 @@ from particula.dynamics.nucleation.particle_source import (
 )
 from particula.dynamics.nucleation.particle_source import (
     finalize_particle_source as _finalize_particle_source,
+)
+from particula.dynamics.nucleation.species_mapping import (
+    NucleationSpeciesMap,
+    validate_nucleation_mapping,
 )
 from particula.gas.environment_data import EnvironmentData
 from particula.gas.gas_data import GasData
@@ -90,7 +94,7 @@ def _native_process_state(
     return particles, gas, temperature, pressure
 
 
-def _native_duration(time_step: float, sub_steps: int) -> float:
+def _native_duration(time_step: object, sub_steps: object) -> float:
     """Validate equal-substep controls before any native process mutation."""
     if (
         isinstance(sub_steps, (bool, np.bool_))
@@ -98,7 +102,7 @@ def _native_duration(time_step: float, sub_steps: int) -> float:
         or sub_steps <= 0
     ):
         raise ValueError("sub_steps must be a positive integer.")
-    return _validate_nonnegative_scalar(time_step, "time_step") / sub_steps
+    return _validate_nonnegative_scalar(time_step, "time_step") / int(sub_steps)
 
 
 class DilutionStrategyProtocol(Protocol):
@@ -168,8 +172,8 @@ class NucleationCommitConfig:
     create a transaction spanning a complete ``Nucleation.execute`` call.
 
     Args:
-        maximum_slot_weight: Positive maximum represented event concentration
-            per activated slot [#/m³].
+        maximum_slot_weight: Positive maximum represented events per slot:
+            counts for native Nucleation, #/m³ for LegacyNucleation.
         source_charge: Finite dimensionless elementary-charge count assigned to
             activated source slots.
         exhaustion_controls: Immutable fixed-capacity policy controls.
@@ -234,7 +238,7 @@ class NucleationCommitConfig:
             )
 
 
-class Nucleation(RunnableABC):
+class LegacyNucleation(RunnableABC):
     """Apply CPU-only single-box nucleation as equal sequential substeps.
 
     The runnable adapts the legacy aerosol facades to their existing backing
@@ -282,6 +286,8 @@ class Nucleation(RunnableABC):
         self, aerosol: Aerosol | LegacyAerosol
     ) -> tuple[ParticleRepresentation, ParticleData, GasData]:
         """Validate and return the supported facade backing containers."""
+        if not isinstance(aerosol, LegacyAerosol):
+            raise TypeError("LegacyNucleation requires legacy aerosol facades")
         try:
             particle_facade = aerosol.particles
             gas_facade = aerosol.atmosphere.partitioning_species
@@ -497,6 +503,136 @@ class Nucleation(RunnableABC):
                 self._commit_config(),
             )
             self._synchronize_particle_facade(particle_facade, particles)
+        return aerosol
+
+
+class Nucleation(RunnableABC):
+    """Apply mapped single-box nucleation to a native resolved population.
+
+    Source rates and P2 finalization use densities. The commit converts event
+    density to represented counts using the current physical volume. Each
+    attempted substep is atomic; earlier successful substeps remain applied.
+    Gas and environment are read from the currently held aerosol every time.
+    """
+
+    def __init__(
+        self,
+        source_config: NucleationSourceConfig,
+        commit_config: NucleationCommitConfig,
+    ) -> None:
+        """Bind immutable source selection and count-based commit controls."""
+        if not isinstance(source_config, NucleationSourceConfig):
+            raise TypeError("source_config must be NucleationSourceConfig")
+        if not isinstance(commit_config, NucleationCommitConfig):
+            raise TypeError("commit_config must be NucleationCommitConfig")
+        if not isinstance(source_config.species_map, NucleationSpeciesMap):
+            raise TypeError("native nucleation requires NucleationSpeciesMap")
+        self.source_config = source_config
+        self.commit_config = commit_config
+
+    def _state(
+        self, aerosol: Aerosol | LegacyAerosol
+    ) -> tuple[ParticleData, GasData, EnvironmentData]:
+        """Validate current topology and configured injection alignment."""
+        if not isinstance(aerosol, Aerosol):
+            raise TypeError("Nucleation requires a native Aerosol")
+        particles, gas, _, _ = _native_process_state(aerosol)
+        strategy = cast(
+            ActivationNucleationStrategy | KineticNucleationStrategy,
+            self.source_config.strategy,
+        )
+        validate_nucleation_mapping(
+            particles,
+            gas,
+            self.source_config.species_map,
+            np.asarray(strategy.injection_composition.molecule_counts),
+        )
+        if self.source_config.precursor_index >= gas.n_species:
+            raise ValueError("precursor_index is out of range for gas species")
+        writers = (
+            particles.masses,
+            particles.concentration,
+            particles.charge,
+            particles.volume,
+            gas.concentration,
+        )
+        protected = (
+            aerosol.environment.temperature,
+            aerosol.environment.pressure,
+            aerosol.environment.saturation_ratio,
+        )
+        if any(
+            np.shares_memory(writer, field)
+            for writer in writers
+            for field in protected
+        ):
+            raise ValueError(
+                "source writers must not alias environment storage"
+            )
+        return particles, gas, aerosol.environment
+
+    def _rate(self, gas: GasData, environment: EnvironmentData) -> float:
+        """Evaluate the current precursor and optional saturation gate."""
+        precursor = self.source_config.precursor_index
+        strategy = cast(
+            ActivationNucleationStrategy | KineticNucleationStrategy,
+            self.source_config.strategy,
+        )
+        saturation = None
+        if strategy.validity_domain.saturation is not None:
+            saturation = float(environment.saturation_ratio[0, precursor])
+        return strategy.potential_rate(
+            precursor_mass_concentration=float(gas.concentration[0, precursor]),
+            precursor_molar_mass=float(gas.molar_mass[precursor]),
+            temperature=float(environment.temperature[0]),
+            saturation=saturation,
+        )
+
+    def rate(self, aerosol: Aerosol | LegacyAerosol) -> float:
+        """Return the current potential event density rate [m^-3 s^-1]."""
+        _, gas, environment = self._state(aerosol)
+        return self._rate(gas, environment)
+
+    def execute(
+        self,
+        aerosol: Aerosol | LegacyAerosol,
+        time_step: float | np.number,
+        sub_steps: int | np.integer = 1,
+    ) -> Aerosol | LegacyAerosol:
+        """Commit equal sequential source substeps and retain all identities."""
+        duration = _native_duration(time_step, sub_steps)
+        if sub_steps > _MAX_NUCLEATION_SUB_STEPS:
+            raise ValueError(
+                f"sub_steps must not exceed {_MAX_NUCLEATION_SUB_STEPS}."
+            )
+        self._state(aerosol)
+        if duration == 0:
+            return aerosol
+        config = _ParticleSourceCommitConfig(
+            **{
+                field.name: getattr(self.commit_config, field.name)
+                for field in fields(self.commit_config)
+            },
+            species_map=self.source_config.species_map,
+        )
+        for _ in range(sub_steps):
+            particles, gas, environment = self._state(aerosol)
+            rate = self._rate(gas, environment)
+            if rate == 0:
+                continue
+            demand, diagnostics = _finalize_particle_source(
+                _PotentialEventData(
+                    np.array([rate], dtype=np.float64), duration
+                ),
+                cast(
+                    ActivationNucleationStrategy | KineticNucleationStrategy,
+                    self.source_config.strategy,
+                ).injection_composition,
+                gas,
+            )
+            if np.all(diagnostics.gas_admitted_event_count == 0):
+                break
+            _commit_particle_source(demand, diagnostics, particles, gas, config)
         return aerosol
 
 

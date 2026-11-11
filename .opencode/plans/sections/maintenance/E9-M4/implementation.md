@@ -29,7 +29,7 @@ issue: #1606. This supersedes the old multiple-PR and issue-generation wording.
 | 1. Accepted contracts and delivery record | Recorded |
 | 2. Native scientific runnables and CPU slot retirement | Implemented; focused checks pass |
 | 3. CPU/direct/prepared GPU dilution | Implemented; focused checks pass |
-| 4. CPU nucleation, mapping and exhaustion transactions | Pending |
+| 4. CPU nucleation, mapping and exhaustion transactions | Implemented; focused checks pass |
 | 5. Direct/prepared GPU nucleation and exhaustion | Pending |
 | 6. CPU adapters and remaining orchestration consumers | Pending |
 | 7. Communication and physical volume evolution | Pending |
@@ -90,3 +90,20 @@ Focused checkpoint evidence follows. Final acceptance remains pending.
   writer aliases. Prepared repeated enqueue retains its allocation/transfer/
   synchronization-free boundary. Native positive tests replace dilution's
   temporary rejection row in the population-boundary inventory.
+
+### Checkpoint 4
+
+- CPU source finalization/commit, configuration/builders, native and legacy
+  runnables, integration, and exhaustion: 381 passed.
+- Native CPU nucleation example: 4 passed with `-Werror`; this focused usage
+  example was migrated to native containers, non-unit volume and unified inert
+  gas. Its import/behavior assertions now verify that native successor.
+- Changed-file Ruff/format, focused source mypy, whitespace checks: passed.
+- Native events convert density to counts at commit; explicit gas order/pairs
+  support unequal widths and particle-only lanes. Native representative volume
+  reduction preserves gas concentration and old particle mass density.
+- Final diagnostics declare event units. CPU partial writes restore the
+  attempted transaction; tests retain earlier successful substeps.
+- `LegacyNucleation` is concrete-only in `particle_process.py`; only the
+  transitional runnable regression module imports it. Public `Nucleation` has
+  two constructor arguments and always uses the current aggregate environment.

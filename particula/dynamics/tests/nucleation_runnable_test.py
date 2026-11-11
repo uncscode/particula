@@ -17,7 +17,9 @@ from particula.dynamics.nucleation import (
     NucleationValidityDomain,
 )
 from particula.dynamics.particle_process import (
-    Nucleation,
+    LegacyNucleation as Nucleation,
+)
+from particula.dynamics.particle_process import (
     NucleationCommitConfig,
 )
 from particula.gas.atmosphere import Atmosphere
@@ -128,7 +130,7 @@ def _runnable(coefficient: float = 1.0e-2) -> Nucleation:
 
 def test_public_surface_exports_only_supported_p5_types():
     """Dynamics exports P5 types without exposing P2/P3 transaction records."""
-    assert particula.dynamics.Nucleation is Nucleation
+    assert particula.dynamics.Nucleation is particle_process.Nucleation
     assert particula.dynamics.NucleationCommitConfig is NucleationCommitConfig
     assert not hasattr(particula.dynamics, "ParticleSourceCommitConfig")
     assert not hasattr(particula.dynamics.nucleation, "commit_particle_source")

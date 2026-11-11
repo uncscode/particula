@@ -1,32 +1,21 @@
 """Run the supported bounded CPU-only nucleation example.
 
-The public ``Nucleation`` runnable supports one legacy ``Aerosol`` box with
-fixed particle slots. It transfers partitioning gas to particles in place;
+The native ``Nucleation`` runnable reads a unified gas container and the current
+aerosol environment. It transfers mapped gas into fixed resolved particle slots;
 zero duration or zero rate paths are no-ops.
 """
 
 import numpy as np
-from particula._legacy_aerosol import Aerosol
+from particula import Aerosol
 from particula.dynamics import (
     ActivationNucleationBuilder,
     Nucleation,
     NucleationCommitConfig,
     NucleationSourceConfig,
 )
-from particula.gas import (
-    Atmosphere,
-    ConstantVaporPressureStrategy,
-    EnvironmentData,
-    GasData,
-    GasSpecies,
-)
-from particula.particles import (
-    ActivityIdealMass,
-    MassBasedMovingBin,
-    ParticleData,
-    ParticleRepresentation,
-    SurfaceStrategyVolume,
-)
+from particula.dynamics.nucleation.species_mapping import NucleationSpeciesMap
+from particula.gas import EnvironmentData, GasData
+from particula.particles import ParticleData
 from particula.particles.exhaustion import ExhaustionControls
 
 
@@ -35,15 +24,17 @@ def _total_mass(particles: ParticleData, gas: GasData) -> np.ndarray:
 
     Args:
         particles: One-box particle data with masses in kg and concentrations
-            in 1/m³.
+            in represented counts.
         gas: One-box gas data with concentrations in kg/m³.
 
     Returns:
         Total mass concentration in kg/m³ for each species.
     """
-    return np.sum(
-        particles.masses * particles.concentration[..., None], axis=1
-    ) + (gas.concentration)
+    return (
+        np.sum(particles.masses * particles.concentration[..., None], axis=1)
+        / particles.volume[:, None]
+        + gas.concentration[:, :1]
+    )
 
 
 def run_example() -> Aerosol:
@@ -61,38 +52,24 @@ def run_example() -> Aerosol:
         concentration=np.zeros((1, 3), dtype=np.float64),
         charge=np.zeros((1, 3), dtype=np.float64),
         density=np.array([1000.0], dtype=np.float64),
-        volume=np.array([1.0], dtype=np.float64),
+        volume=np.array([0.25], dtype=np.float64),
+        distribution_type="particle_resolved",
     )
     gas = GasData(
-        name=["precursor"],
-        molar_mass=np.array([0.1], dtype=np.float64),
-        concentration=np.array([[1.0e-12]], dtype=np.float64),
-        partitioning=np.array([True]),
+        name=["precursor", "inert"],
+        molar_mass=np.array([0.1, 0.04], dtype=np.float64),
+        concentration=np.array([[1.0e-12, 2.0e-6]], dtype=np.float64),
+        partitioning=np.array([True, False]),
     )
-    gas_only = GasData(
-        name=["inert"],
-        molar_mass=np.array([0.04], dtype=np.float64),
-        concentration=np.array([[2.0e-6]], dtype=np.float64),
-        partitioning=np.array([False]),
-    )
-    particle_facade = ParticleRepresentation.from_data(
-        particles,
-        strategy=MassBasedMovingBin(),
-        activity=ActivityIdealMass(),
-        surface=SurfaceStrategyVolume(),
-        distribution=np.zeros(3, dtype=np.float64),
-    )
-    atmosphere = Atmosphere(
-        temperature=298.15,
-        total_pressure=101325.0,
-        partitioning_species=GasSpecies.from_data(
-            gas, ConstantVaporPressureStrategy(0.0)
-        ),
-        gas_only_species=GasSpecies.from_data(
-            gas_only, ConstantVaporPressureStrategy(0.0)
+    aerosol = Aerosol(
+        particles=particles,
+        gas=gas,
+        environment=EnvironmentData(
+            temperature=np.array([298.15], dtype=np.float64),
+            pressure=np.array([101325.0], dtype=np.float64),
+            saturation_ratio=np.array([[1.0, 1.0]], dtype=np.float64),
         ),
     )
-    aerosol = Aerosol(atmosphere, particle_facade)
     strategy = (
         ActivationNucleationBuilder()
         .set_parameters(
@@ -110,7 +87,7 @@ def run_example() -> Aerosol:
                 "temperature_lower_units": "K",
                 "temperature_upper": 400.0,
                 "temperature_upper_units": "K",
-                "injection_composition": [1],
+                "injection_composition": [1, 0],
                 "formation_diameter": 1.0,
                 "formation_diameter_units": "nm",
             }
@@ -118,19 +95,18 @@ def run_example() -> Aerosol:
         .build()
     )
     nucleation = Nucleation(
-        NucleationSourceConfig(strategy=strategy, precursor_index=0),
+        NucleationSourceConfig(
+            strategy=strategy,
+            precursor_index=0,
+            species_map=NucleationSpeciesMap(tuple(gas.name), ((0, 0),)),
+        ),
         NucleationCommitConfig(
             maximum_slot_weight=1.0e20,
             source_charge=0.0,
             exhaustion_controls=ExhaustionControls(),
             requested_scale=np.array([1.0], dtype=np.float64),
             minimum_scale=np.array([1.0], dtype=np.float64),
-            minimum_volume=np.array([1.0], dtype=np.float64),
-        ),
-        EnvironmentData(
-            temperature=np.array([298.15], dtype=np.float64),
-            pressure=np.array([101325.0], dtype=np.float64),
-            saturation_ratio=np.array([[1.0]], dtype=np.float64),
+            minimum_volume=np.array([0.01], dtype=np.float64),
         ),
     )
     before = _total_mass(particles, gas)

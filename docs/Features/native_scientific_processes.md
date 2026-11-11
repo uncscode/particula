@@ -119,3 +119,33 @@ tagged-state boundaries currently reject. M5 owns broad tutorial/notebook
 migration. Temporary facades and untagged dispatch remain for those consumers;
 M6 owns deletion after downstream migration. This milestone does not authorize
 a release or establish resident/GPU performance claims.
+
+## Native source integration (M4)
+
+`Nucleation(source_config, commit_config)` reads the currently held native
+`Aerosol.gas` and `Aerosol.environment` on each equal substep. Its source config
+requires an explicit `NucleationSpeciesMap` from
+`particula.dynamics.nucleation.species_mapping`: full expected gas names and
+unique `(gas_index, particle_index)` pairs. Gas and particle species widths may
+be different. Positive injection composition entries must map to a particle
+lane and have partitioning enabled; unmapped gas and particle-only species are
+preserved. Native CPU source commits require one resolved box.
+
+Potential rates and immutable finalization records retain number-density units.
+At commit, admitted event density is multiplied by current physical volume.
+`maximum_slot_weight` limits represented **counts** per newly activated slot.
+Native final diagnostics expose `event_count_units="count"`; gas transfer and
+mapped conservation residuals remain mass densities. Representative-volume
+scaling reduces existing counts and provisional source counts with volume;
+it preserves pre-existing particle density and gas concentration. Physical
+volume evolution is a separate operation. Resampling retains count-weighted
+species mass and charge under its existing bounded moment checks.
+
+Each source attempt stages before writing, retains array identities, and
+restores attempted particle/gas writes if a CPU writer fails. Earlier committed
+substeps remain applied when a later attempt fails. The small
+`docs/Examples/Nucleation/cpu_nucleation.py` example exercises this native API
+at non-unit volume with inert gas in the unified container. Transitional
+`LegacyNucleation`, available only in `particula.dynamics.particle_process`,
+retains the old constructor environment and facade behavior for compatibility
+tests until M6; it is not exported from `particula.dynamics`.

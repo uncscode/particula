@@ -20,6 +20,10 @@ from numpy.typing import NDArray
 from particula.dynamics.nucleation.nucleation_strategies import (
     InjectionComposition,
 )
+from particula.dynamics.nucleation.species_mapping import (
+    NucleationSpeciesMap,
+    validate_nucleation_mapping,
+)
 from particula.gas.gas_data import GasData
 from particula.particles.exhaustion import (
     POLICY_RESAMPLE_DEFERRED,
@@ -427,7 +431,7 @@ class ParticleSourceCommitConfig:
 
     Attributes:
         maximum_slot_weight: Positive maximum represented events per activated
-            slot [#/m³].
+            slot: counts for native resolved storage, #/m³ for legacy.
         source_charge: Finite charge assigned to each activated source slot
             [elementary-charge counts].
         exhaustion_controls: Immutable controls selecting exhaustion policies.
@@ -456,6 +460,7 @@ class ParticleSourceCommitConfig:
     mean_radius_relative_error: float = 1.0
     surface_relative_error: float = 1.0
     diversity_absolute_error: float = 1.0
+    species_map: NucleationSpeciesMap | None = None
 
     def __post_init__(self) -> None:
         """Validate scalar controls and defensively own P4 inputs."""
@@ -496,10 +501,11 @@ class ParticleSourceCommitConfig:
 class FinalizedSourceDiagnostics:
     """Own immutable diagnostics from a committed P3 source transaction.
 
-    All arrays are fresh read-only copies. Event counts are [#/m³], gas mass
-    fields are [kg/m³], and slot counts and policy codes are ``int32``. The
-    conservation residual is ``particle_post + gas_post - scale *
-    (particle_pre + gas_pre)`` for every box and species.
+    All arrays are fresh read-only copies. ``event_count_units`` is ``count``
+    for native resolved storage and ``m^-3`` for legacy. Gas mass fields are
+    [kg/m³]; slot counts and policy codes are ``int32``. Native conservation
+    residuals compare mapped particle-plus-gas density before and after, with
+    particle-only lanes included. Legacy residuals use the scaled-domain sum.
 
     Attributes:
         potential_event_count: P2 potential event count, shape ``(n_boxes,)``.
@@ -545,6 +551,7 @@ class FinalizedSourceDiagnostics:
     exhaustion_policy_code: NDArray[np.int32]
     representative_volume_scale: NDArray[np.float64]
     conservation_residual: NDArray[np.float64]
+    event_count_units: str = "m^-3"
 
     def __post_init__(self) -> None:
         """Defensively own all finalized diagnostic arrays."""
@@ -698,6 +705,22 @@ def _validate_commit_inputs(  # noqa: C901
     if not isinstance(config, ParticleSourceCommitConfig):
         raise TypeError("config must be ParticleSourceCommitConfig")
     boxes, _, species = particles.masses.shape
+    if particles.distribution_type is not None:
+        validate_nucleation_mapping(
+            particles, gas, config.species_map, demand.per_event_mass
+        )
+        species = gas.n_species
+        if any(
+            np.shares_memory(writer, metadata)
+            for writer in (
+                particles.masses,
+                particles.concentration,
+                particles.charge,
+                particles.volume,
+            )
+            for metadata in (gas.molar_mass, gas.partitioning)
+        ):
+            raise ValueError("particle writers must not alias gas metadata")
     if gas.concentration.shape != (boxes, species):
         raise ValueError("gas concentration shape must match particles")
     _validate_gas(gas, boxes, species)
@@ -886,7 +909,10 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
 ) -> FinalizedSourceDiagnostics:
     """Commit a gas-admitted source into staged fixed-capacity particle storage.
 
-    P2 event counts and represented event counts are [#/m³]. P2 demand and
+    P2 event counts are [#/m³]; native commits convert them to counts at the
+    current volume. Native representative scaling preserves gas density and
+    scales existing counts with volume. Legacy commits retain density events
+    and scale pre-existing gas. P2 demand and
     final gas removal are mass concentrations [kg/m³], while per-event particle
     mass is [kg/event] and ``source_charge`` is in elementary-charge counts.
     Policy resolution, resampling, representative-volume scaling, and
@@ -915,13 +941,34 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
     demand, diagnostics, particles, gas, config = _validate_commit_inputs(
         demand, diagnostics, particles, gas, config
     )
+    native = particles.distribution_type is not None
+    source_mass = demand.per_event_mass
+    event_volume = np.ones(particles.n_boxes, dtype=np.float64)
+    if native:
+        source_mass = validate_nucleation_mapping(
+            particles, gas, config.species_map, demand.per_event_mass
+        )
+        event_volume = particles.volume.copy()
+    with np.errstate(over="ignore", invalid="ignore"):
+        admitted_events = diagnostics.gas_admitted_event_count * event_volume
+        potential_events = diagnostics.potential_event_count * event_volume
+        limited_events = diagnostics.gas_limited_event_count * event_volume
+    if not all(
+        np.all(np.isfinite(values))
+        for values in (admitted_events, potential_events, limited_events)
+    ):
+        raise ValueError("represented source counts must be finite")
+    if native and np.any(
+        (diagnostics.gas_admitted_event_count > 0) & (admitted_events == 0)
+    ):
+        raise ValueError("represented source counts underflowed")
     particle_pre = _weighted_particle_mass(particles)
     gas_pre = gas.concentration.copy()
     staged_particles = particles.copy()
     boxes, capacity, species = staged_particles.masses.shape
 
     provisional_counts = _request_counts(
-        diagnostics.gas_admitted_event_count,
+        admitted_events,
         config.maximum_slot_weight,
         capacity,
         enforce_capacity=False,
@@ -965,7 +1012,7 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
     )
 
     provisional_demand = np.ascontiguousarray(
-        diagnostics.gas_admitted_event_count.copy(), dtype=np.float64
+        admitted_events.copy(), dtype=np.float64
     )
     scaling_required = np.ascontiguousarray(
         policy_codes == POLICY_SCALE_DEFERRED, dtype=np.bool_
@@ -987,7 +1034,7 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
         minimum_volume,
         resolved_scale,
     )
-    reduction = diagnostics.gas_admitted_event_count - represented_events
+    reduction = admitted_events - represented_events
     if (
         not np.all(np.isfinite(represented_events))
         or np.any(represented_events < 0.0)
@@ -1011,7 +1058,7 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
     for box_index, count in enumerate(requested_counts):
         prefix = int(count)
         if prefix:
-            request_masses[box_index, :prefix] = demand.per_event_mass
+            request_masses[box_index, :prefix] = source_mass
             request_concentration[box_index, :prefix] = (
                 represented_events[box_index] / prefix
             )
@@ -1023,10 +1070,15 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
         request_charge,
         requested_counts,
     )
-    gas_mass_removed = (
-        represented_events[:, None] * demand.per_event_mass[None, :]
-    )
-    staged_gas = resolved_scale[:, None] * gas_pre - gas_mass_removed
+    density_events = represented_events
+    if native:
+        density_events = np.minimum(
+            represented_events / staged_particles.volume,
+            diagnostics.gas_admitted_event_count,
+        )
+    gas_mass_removed = density_events[:, None] * demand.per_event_mass[None, :]
+    gas_scale = np.ones_like(resolved_scale) if native else resolved_scale
+    staged_gas = gas_scale[:, None] * gas_pre - gas_mass_removed
     if (
         not np.all(np.isfinite(staged_gas))
         or np.any(staged_gas < 0.0)
@@ -1036,8 +1088,20 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
             "final gas concentration must be finite and nonnegative"
         )
     particle_post = _weighted_particle_mass(staged_particles)
-    expected_total = resolved_scale[:, None] * (particle_pre + gas_pre)
-    post_total = particle_post + staged_gas
+    if native:
+        particle_pre = particle_pre / event_volume[:, None]
+        particle_post = particle_post / staged_particles.volume[:, None]
+        mapped_pre = np.zeros_like(particle_pre)
+        mapped_post = np.zeros_like(particle_post)
+        mapping = cast(NucleationSpeciesMap, config.species_map)
+        for gas_index, particle_index in mapping.gas_to_particle:
+            mapped_pre[:, particle_index] = gas_pre[:, gas_index]
+            mapped_post[:, particle_index] = staged_gas[:, gas_index]
+        expected_total = particle_pre + mapped_pre
+        post_total = particle_post + mapped_post
+    else:
+        expected_total = resolved_scale[:, None] * (particle_pre + gas_pre)
+        post_total = particle_post + staged_gas
     residual = post_total - expected_total
     if not np.all(np.isfinite(residual)) or not np.allclose(
         post_total, expected_total, rtol=1e-12, atol=1e-30
@@ -1047,10 +1111,10 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
         )
     residual_events = np.zeros(boxes, dtype=np.float64)
     finalized = FinalizedSourceDiagnostics(
-        potential_event_count=diagnostics.potential_event_count,
-        gas_admitted_event_count=diagnostics.gas_admitted_event_count,
+        potential_event_count=potential_events,
+        gas_admitted_event_count=admitted_events,
         represented_event_count=represented_events,
-        gas_limited_event_count=diagnostics.gas_limited_event_count,
+        gas_limited_event_count=limited_events,
         representation_reduction_event_count=reduction,
         residual_event_count=residual_events,
         limiting_species_index=diagnostics.limiting_species_index,
@@ -1061,10 +1125,33 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
         exhaustion_policy_code=policy_codes,
         representative_volume_scale=resolved_scale,
         conservation_residual=residual,
+        event_count_units="count" if native else "m^-3",
     )
-    particles.masses[:] = staged_particles.masses
-    particles.concentration[:] = staged_particles.concentration
-    particles.charge[:] = staged_particles.charge
-    particles.volume[:] = staged_particles.volume
-    gas.concentration[:] = staged_gas
+    targets = (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.volume,
+        gas.concentration,
+    )
+    candidates = (
+        staged_particles.masses,
+        staged_particles.concentration,
+        staged_particles.charge,
+        staged_particles.volume,
+        staged_gas,
+    )
+    snapshots = tuple(target.copy() for target in targets)
+    attempted = 0
+    try:
+        for target, candidate in zip(targets, candidates, strict=True):
+            attempted += 1
+            np.copyto(target, candidate)
+    except Exception as error:
+        try:
+            for index in reversed(range(attempted)):
+                targets[index][...] = snapshots[index]
+        except Exception as rollback_error:
+            raise error from rollback_error
+        raise
     return finalized
