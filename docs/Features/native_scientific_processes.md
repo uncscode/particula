@@ -149,3 +149,22 @@ at non-unit volume with inert gas in the unified container. Transitional
 `LegacyNucleation`, available only in `particula.dynamics.particle_process`,
 retains the old constructor environment and facade behavior for compatibility
 tests until M6; it is not exported from `particula.dynamics`.
+
+The direct GPU `nucleation_step_gpu` requires a separately prepared
+`NucleationSpeciesBinding` for tagged resolved storage. Create it with
+`prepare_nucleation_species_map` from
+`particula.gpu.nucleation_species_mapping`, supplying retained full gas names
+and the explicit source map. Preparation uploads only lane configuration and
+pins exact carrier arrays; replacing storage or metadata requires preparation
+again. Full-gas P2 outputs use gas width; resampling scratch uses particle width.
+
+GPU source rates/final demand are densities. The existing direct algorithm
+requires admitted density times volume to be an integral int32 event count and
+activates one unit-count slot per event. It does not adopt the CPU weighted-slot
+packing algorithm. Native representative scaling acts on count demand and
+volume once, preserves gas concentration, and restores density units before
+final gas removal. Prepared repeated enqueue performs no allocation, transfer,
+readback or synchronization; device validation gates invalid live state before
+primary writers, with explicit observation afterward. Standalone GPU
+resampling and representative scaling likewise admit only resolved native
+storage, retaining count-weighted moments or count/volume density respectively.
