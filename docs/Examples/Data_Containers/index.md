@@ -15,7 +15,15 @@ supporting context only.
 
 The CPU container portion always runs. Warp-backed particle and gas round
 trips run only when Warp is available, and they use `device="cpu"` so CUDA is
-not required.
+not required. Enabled transfer failures propagate; they are not reported as
+successful CPU-only runs. Set `PARTICULA_EXAMPLE_FORCE_NO_WARP=1` to deliberately
+inspect CPU construction without requesting transfers.
+
+The particle example declares `particle_resolved`: storage contains represented
+counts `[1, 0.25]` at physical volume `1e-6 m³`. Dividing once by that volume
+produces number densities `[1e6, 2.5e5] m⁻³`. Particle masses are per-particle
+material masses; multiply by counts and divide by volume for mass density.
+Explicit round trips preserve the population declaration and raw counts.
 
 For the low-level direct condensation path, use the separate canonical
 quick-start:

@@ -103,7 +103,7 @@ plt.plot(x_values, single_mode_distribution, label="Single Mode", linewidth=4)
 plt.plot(x_values, multi_mode_distribution, label="Multi Mode")
 plt.title("Lognormal Particle Size Distribution")
 plt.xlabel("Particle Diameter (μm)")
-plt.ylabel("Frequency")
+plt.ylabel("Number per micrometre of diameter")
 plt.xscale("log")
 plt.legend()
 plt.grid(True)
@@ -183,3 +183,24 @@ print(f"Total Concentration for Multi Mode: {multi_mode_total_concentration}")
 # - **Particle Mass Function (PMF)**: Conversely, the PMF directly quantifies the actual number of particles in each size interval. This discrete representation is especially useful for practical applications such as air quality monitoring and aerosol delivery systems where knowing the exact count of particles at different sizes is necessary. The PMF is straightforward as it adds up to the total particle count directly, providing a more tangible grasp of particle distribution without requiring integration.
 #
 # Both methods play critical roles in aerosol science, each complementing the other by offering different perspectives on particle size distributions. Understanding when to use each can significantly enhance the accuracy and relevance of aerosol studies.
+
+
+# %% [markdown]
+# ## Native radius-PDF storage
+#
+# The plots use diameter D in micrometres. Native continuous_pdf storage uses
+# radius r in metres and dN/dr. Since D = 2e6 r, the Jacobian is 2e6:
+# dN/dr = (dN/dD) * 2e6. In this native example interpret the modal totals as
+# number densities in m^-3, so dN/dr has units m^-4. This changes coordinates,
+# not the integrated population. The radius grid must accompany PDF storage.
+
+# %%
+radius_grid_m = x_values * 1e-6 / 2
+radius_pdf = multi_mode_distribution * 2e6
+native_pdf = par.particles.create_particle_data_from_radii(
+    radii=radius_grid_m,
+    concentration=radius_pdf,
+    distribution_type="continuous_pdf",
+    density=1000.0,
+)
+print("Native radius-PDF number density [m^-3]:", native_pdf.number_density)

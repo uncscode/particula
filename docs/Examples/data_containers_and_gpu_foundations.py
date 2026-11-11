@@ -33,10 +33,11 @@ def _build_particle_data() -> ParticleData:
     """
     return ParticleData(
         masses=np.array([[[1.0e-18, 2.5e-18], [3.5e-18, 0.5e-18]]]),
-        concentration=np.array([[1.0e6, 2.5e5]]),
+        concentration=np.array([[1.0, 0.25]]),  # represented counts
         charge=np.array([[0.0, 1.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0e-6]),
+        distribution_type="particle_resolved",
     )
 
 
@@ -73,6 +74,7 @@ def run_example() -> list[str]:
             containers and any optional Warp round-trip results.
     """
     particle_data = _build_particle_data()
+    particle_data.validate_representation()
     gas_data = _build_gas_data()
     vapor_pressure = np.array([[2330.0, 120.0]], dtype=np.float64)
 
@@ -100,38 +102,32 @@ def run_example() -> list[str]:
         )
         return output
 
-    try:
-        gpu_particle_data = to_warp_particle_data(particle_data, device="cpu")
-        restored_particle_data = from_warp_particle_data(gpu_particle_data)
-        output.append(
-            "Warp particle round trip: "
-            f"restored_masses={restored_particle_data.masses.shape}, "
-            f"restored_concentration={restored_particle_data.concentration.shape}"
-        )
+    gpu_particle_data = to_warp_particle_data(particle_data, device="cpu")
+    restored_particle_data = from_warp_particle_data(gpu_particle_data)
+    output.append(
+        "Warp particle round trip: "
+        f"restored_masses={restored_particle_data.masses.shape}, "
+        f"restored_concentration={restored_particle_data.concentration.shape}"
+    )
 
-        gpu_gas_data = to_warp_gas_data(
-            gas_data,
-            device="cpu",
-            vapor_pressure=vapor_pressure,
-        )
-        restored_gas_data = from_warp_gas_data(
-            gpu_gas_data,
-            name=gas_data.name,
-        )
-        output.append(
-            "Warp gas round trip: "
-            f"restored_concentration={restored_gas_data.concentration.shape}, "
-            f"restored_names={restored_gas_data.name}"
-        )
-        output.append(
-            "Gas restore note: names are caller-supplied on restore and "
-            "vapor_pressure remains GPU-only helper state."
-        )
-    except Exception:
-        output.append(
-            "Warp-backed transfers are optional; CPU container example "
-            "completed without Warp."
-        )
+    gpu_gas_data = to_warp_gas_data(
+        gas_data,
+        device="cpu",
+        vapor_pressure=vapor_pressure,
+    )
+    restored_gas_data = from_warp_gas_data(
+        gpu_gas_data,
+        name=gas_data.name,
+    )
+    output.append(
+        "Warp gas round trip: "
+        f"restored_concentration={restored_gas_data.concentration.shape}, "
+        f"restored_names={restored_gas_data.name}"
+    )
+    output.append(
+        "Gas restore note: names are caller-supplied on restore and "
+        "vapor_pressure remains GPU-only helper state."
+    )
     return output
 
 

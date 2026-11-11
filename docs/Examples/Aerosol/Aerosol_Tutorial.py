@@ -15,27 +15,22 @@
 # %% [markdown]
 # # Aerosol Tutorial
 #
-# Aerosols are complex systems comprising both gaseous components and particulate matter. To accurately model such systems, we introduce the `Aerosol` class, which serves as a collection the `Atmosphere` and `ParticleRepresentation` objects.
-#
-# In this quick tutorial, we will demonstrate how to create an `Aerosol` object, as this is the key object that will track the state of the aerosol system during dynamics.
+# An aerosol holds three native containers: particle material and population,
+# ordered gas species, and environment. Physics configuration stays separate.
+# Here we initialize glycerol at half its saturation concentration and a
+# lognormal particle population. Construction retains the supplied objects.
 
 # %%
-# In Colab uncomment the following command to install particula:
-# #!pip install particula[extra] --quiet
-
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 # %% [markdown]
-# ## Gas->Atmosphere and Particles
+# ## Glycerol thermodynamics
 #
-# First we'll create a simple `Atmosphere` object, which will represent the gas phase of the aerosol system. We'll also create a `ParticleRepresentation` object, which will represent the particulate phase of the aerosol system.
-#
-# For the chemical species, we will use a pure component glycerol system.
+# A vapor-pressure strategy computes the initial saturation concentration.
+# It is not stored in gas data; a subsequent process owns its configuration.
 
 # %%
-# Glycerol gas
 molar_mass_glycerol = 92.09382e-3  # kg/mol
 parameters_clausius = {
     "latent_heat": 71.5 * molar_mass_glycerol,
@@ -54,51 +49,58 @@ sat_concentration = vapor_pressure_strategy.saturation_concentration(
 )
 print(f"Saturation concentration: {sat_concentration:.2e} kg/m^3")
 
-sat_factor = 0.5  # 50% of saturation concentration
+sat_factor = 0.5
 glycerol_gas = (
-    par.gas.GasSpeciesBuilder()
-    .set_molar_mass(molar_mass_glycerol, "kg/mol")
-    .set_vapor_pressure_strategy(vapor_pressure_strategy)
-    .set_concentration(sat_concentration * sat_factor, "kg/m^3")
-    .set_name("Glycerol")
-    .set_partitioning(True)
+    par.gas.GasDataBuilder()
+    .set_names(["Glycerol"])
+    .set_molar_mass([molar_mass_glycerol], "kg/mol")
+    .set_concentration([sat_concentration * sat_factor], "kg/m^3")
+    .set_partitioning([True])
     .build()
 )
-print(glycerol_gas)
-
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_more_partitioning_species(glycerol_gas)
-    .set_temperature(25, temperature_units="degC")
-    .set_pressure(1, pressure_units="atm")
-    .build()
-)
-print(atmosphere)
-
-# Glycerol particle distribution
-lognormal_rep = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_mode(np.array([100]), "nm")
-    .set_geometric_standard_deviation(np.array([1.5]))
-    .set_number_concentration(np.array([1e4]), "1/cm^3")
-    .set_density(1.26, "g/cm^3")
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=np.array([298.15]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.array([[sat_factor]]),
 )
 
 # %% [markdown]
-# > Notice, that there are two different types of gas phase species possible. `partitioning` and `gas_only_spcies`. The `partitioning` species are the ones that will be partitioned between the gas and particle phase, while the `gas_only_species` are the ones that will only be in the gas phase.
-
-# %% [markdown]
-# ## Creating an Aerosol object
+# ## Native particle initialization
 #
-# With both the `Atmosphere` and `ParticleRepresentation` objects created, we can now create an `Aerosol` object. This object will contain both the gas and particle phase objects, and will be used to track the state of the aerosol system during dynamics.
+# Discrete bins store number density in m^-3 at reference volume 1 m^3.
+# Each mass lane is per-particle mass in kg, not population mass. The preset
+# retains the original 100 nm mode, geometric spread, and number density.
 
 # %%
-aerosol = LegacyAerosol(atmosphere=atmosphere, particles=lognormal_rep)
-
-print(aerosol)
+particles = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete",
+    mode=[100e-9],
+    geometric_standard_deviation=[1.5],
+    number_concentration=[1e10],  # 1e4 cm^-3
+    density=1260.0,  # 1.26 g/cm^3
+)
 
 # %% [markdown]
-# # Summary
+# ## Assemble and inspect the held state
 #
-# In this tutorial, we demonstrated how to create an `Aerosol` object, which is the key object that will track the state of the aerosol system during dynamics. It is pretty simple, as the `Aerosol` object is just a collection of the `Atmosphere` and `ParticleRepresentation` objects and only functions as a container for these objects. It can also iterate over the `Atmosphere` and `ParticleRepresentation` objects.
+# Partitioning flags distinguish condensable species from inert gas lanes in
+# one ordered gas container. No species list is filtered during construction.
+
+# %%
+aerosol = par.Aerosol(
+    particles=particles, gas=glycerol_gas, environment=environment
+)
+assert aerosol.particles is particles
+assert aerosol.gas is glycerol_gas
+assert aerosol.environment is environment
+print(aerosol)
+print("Number density [m^-3]:", particles.concentration.sum(axis=1))
+print(
+    "Particle mass density [kg/m^3]:",
+    np.sum(particles.masses * particles.concentration[:, :, None], axis=1),
+)
+
+# %% [markdown]
+# The aggregate exposes its held containers through properties. Mutating their
+# arrays changes the held state; use `copy()` for detached inspection. Processes
+# validate their own scientific requirements before using this state.
