@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
 
 
 class ExampleResult:
@@ -67,37 +66,28 @@ class ExampleResult:
         raise AttributeError("ExampleResult is immutable")
 
 
-def _build_aerosol() -> LegacyAerosol:
+def _build_aerosol() -> par.Aerosol:
     """Build a deterministic CPU aerosol with three concentration domains."""
-    particles = par.particles.ParticleRepresentation(
-        strategy=par.particles.MassBasedMovingBin(),
-        activity=par.particles.ActivityIdealMass(),
-        surface=par.particles.SurfaceStrategyVolume(),
-        distribution=np.array([1.0e-18, 2.0e-18]),
+    # Raw represented counts [4, 8] in 2 m³ give densities [2, 4] m^-3.
+    particles = par.particles.create_resolved_particle_data(
+        masses=np.array([1.0e-18, 2.0e-18]),
         density=np.array([1000.0]),
         concentration=np.array([4.0, 8.0]),
         charge=np.array([1.0, -1.0]),
         volume=2.0,
     )
-    partitioning = par.gas.GasSpecies(
-        name="partitioning",
-        molar_mass=0.1,
-        concentration=3.0,
-        partitioning=True,
+    gas = par.gas.GasData(
+        name=["partitioning", "gas_a", "gas_b"],
+        molar_mass=np.array([0.1, 0.02, 0.03]),
+        concentration=np.array([[3.0, 5.0, 7.0]]),
+        partitioning=np.array([True, False, False]),
     )
-    gas_only = par.gas.GasSpecies(
-        name=np.array(["gas_a", "gas_b"]),
-        molar_mass=np.array([0.02, 0.03]),
-        concentration=np.array([5.0, 7.0]),
-        partitioning=False,
+    environment = par.gas.EnvironmentData(
+        temperature=np.array([298.15]),
+        pressure=np.array([101325.0]),
+        saturation_ratio=np.zeros((1, 3)),
     )
-    atmosphere = par.gas.Atmosphere(
-        temperature=298.15,
-        total_pressure=101325.0,
-        partitioning_species=partitioning,
-        gas_only_species=gas_only,
-    )
-    return LegacyAerosol(atmosphere=atmosphere, particles=particles)
+    return par.Aerosol(particles=particles, gas=gas, environment=environment)
 
 
 def run_example() -> ExampleResult:
@@ -107,13 +97,17 @@ def run_example() -> ExampleResult:
     sub_steps = 2
     aerosol = _build_aerosol()
 
-    particle_initial = aerosol.particles.get_concentration().copy()
-    partitioning_initial = np.asarray(
-        aerosol.atmosphere.partitioning_species.get_concentration()
-    ).copy()
-    gas_only_initial = (
-        aerosol.atmosphere.gas_only_species.get_concentration().copy()
+    particles, gas, environment = (
+        aerosol.particles,
+        aerosol.gas,
+        aerosol.environment,
     )
+    initial_masses = particles.masses.copy()
+    initial_charge = particles.charge.copy()
+    initial_volume = particles.volume.copy()
+    particle_initial = aerosol.particles.slot_concentration_density[0].copy()
+    partitioning_initial = np.asarray(aerosol.gas.concentration[0, :1]).copy()
+    gas_only_initial = aerosol.gas.concentration[0, 1:].copy()
 
     strategy = par.dynamics.DilutionStrategy(coefficient=coefficient)
     dilution = par.dynamics.Dilution(strategy)
@@ -123,14 +117,16 @@ def run_example() -> ExampleResult:
         sub_steps=sub_steps,
     )
     assert result is aerosol
+    assert aerosol.particles is particles
+    assert aerosol.gas is gas
+    assert aerosol.environment is environment
+    np.testing.assert_array_equal(particles.masses, initial_masses)
+    np.testing.assert_array_equal(particles.charge, initial_charge)
+    np.testing.assert_array_equal(particles.volume, initial_volume)
 
-    particle_final = aerosol.particles.get_concentration().copy()
-    partitioning_final = np.asarray(
-        aerosol.atmosphere.partitioning_species.get_concentration()
-    ).copy()
-    gas_only_final = (
-        aerosol.atmosphere.gas_only_species.get_concentration().copy()
-    )
+    particle_final = aerosol.particles.slot_concentration_density[0].copy()
+    partitioning_final = np.asarray(aerosol.gas.concentration[0, :1]).copy()
+    gas_only_final = aerosol.gas.concentration[0, 1:].copy()
     decay_factor = np.exp(-coefficient * time_step)
 
     for initial, final in (

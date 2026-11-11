@@ -22,7 +22,7 @@
 # You will:
 #
 # - Build a simple radius-based particle distribution using
-# `PresetParticleRadiusBuilder`.
+# `create_lognormal_binned_particle_data`.
 # - Configure `SphericalWallLossStrategy` for a spherical chamber.
 # - Integrate wall loss over time and visualize concentration decay.
 # - See how wall loss strategies can plug into other dynamics components.
@@ -55,18 +55,20 @@ from matplotlib import pyplot as plt
 # %% [markdown]
 # ## 1. Build a lognormal particle distribution
 #
-# We use `PresetParticleRadiusBuilder` to create a `ParticleRepresentation`
+# We use `create_lognormal_binned_particle_data` to create a `ParticleData`
 # with radius bins, number concentration, and default physical properties.
 
 # %%
 # Build a simple radius-based particle distribution (discrete bins)
-particle = par.particles.PresetParticleRadiusBuilder().build()
+particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete"
+)
 
-print("Radius shape:", particle.get_radius().shape)
-print("Concentration shape:", particle.get_concentration().shape)
+print("Radius shape:", particle.radii[0].shape)
+print("Concentration shape:", particle.concentration[0].shape)
 print(
     "Total concentration (initial):",
-    f"{particle.get_total_concentration():.3e} 1/m^3",
+    f"{particle.number_density[0]:.3e} 1/m^3",
 )
 
 # %% [markdown]
@@ -79,7 +81,7 @@ print(
 # %%
 # Configure spherical wall loss strategy
 wall_loss = par.dynamics.SphericalWallLossStrategy(
-    wall_eddy_diffusivity=1e-3,  # m^2/s
+    wall_eddy_diffusivity=1e-3,  # 1/s
     chamber_radius=0.5,  # m
     distribution_type="discrete",
 )
@@ -108,21 +110,53 @@ final_time = 6000.0  # s (= 100 minutes)
 dt = 1.0  # s
 n_steps = int(final_time / dt)
 
+# Native Euler updates reject negative concentrations. Retain the output
+# interval and full duration, but bound each internal step by max(k) * dt < 1.
+sub_steps = max(
+    1,
+    int(
+        np.ceil(
+            np.max(
+                wall_loss.loss_coefficient(particle, temperature=T, pressure=P)
+            )
+            * dt
+            / 0.9
+        )
+    ),
+)
+print("Internal substeps per output interval:", sub_steps)
 times = np.arange(n_steps + 1) * dt
 total_concentration = np.zeros_like(times, dtype=float)
 
+initial_counts = particle.concentration.copy()
+initial_masses = particle.masses.copy()
+loss_coefficients = wall_loss.loss_coefficient(
+    particle, temperature=T, pressure=P
+)
 # Record initial concentration
-total_concentration[0] = particle.get_total_concentration()
+total_concentration[0] = particle.number_density[0]
 
 # Time loop: apply only wall loss
 for i in range(1, n_steps + 1):
-    particle = wall_loss.step(
-        particle=particle,
-        temperature=T,
-        pressure=P,
-        time_step=dt,
-    )
-    total_concentration[i] = particle.get_total_concentration()
+    for _substep in range(sub_steps):
+        particle = wall_loss.step(
+            particle=particle,
+            temperature=T,
+            pressure=P,
+            time_step=dt / sub_steps,
+        )
+    total_concentration[i] = particle.number_density[0]
+
+# Fixed radii give an independent repeated-Euler decay prediction.
+np.testing.assert_allclose(
+    particle.concentration,
+    initial_counts
+    * (1 - loss_coefficients * dt / sub_steps) ** (n_steps * sub_steps),
+    rtol=1e-12,
+    atol=1e-30,
+)
+np.testing.assert_array_equal(particle.masses, initial_masses)
+assert np.all(particle.concentration >= 0)
 
 print(
     "Total concentration (final):",
@@ -156,18 +190,20 @@ plt.show()
 
 # %%
 # Rebuild the initial distribution for comparison
-initial_particle = par.particles.PresetParticleRadiusBuilder().build()
+initial_particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete"
+)
 
 fig, ax = plt.subplots(figsize=(6, 4))
 
 ax.plot(
-    initial_particle.get_radius(),
-    initial_particle.get_concentration(),
+    initial_particle.radii[0],
+    initial_particle.concentration[0],
     label="Initial",
 )
 ax.plot(
-    particle.get_radius(),
-    particle.get_concentration(),
+    particle.radii[0],
+    particle.concentration[0],
     label="After wall loss",
 )
 
@@ -194,7 +230,9 @@ plt.show()
 
 # %% tags=["example"]
 # Pseudo-code: combine condensation and wall loss
-particle = par.particles.PresetParticleRadiusBuilder().build()
+particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete"
+)
 
 wall_loss = par.dynamics.SphericalWallLossStrategy(
     wall_eddy_diffusivity=1e-3,
@@ -202,18 +240,20 @@ wall_loss = par.dynamics.SphericalWallLossStrategy(
     distribution_type="discrete",
 )
 
-# Note: CondensationIsothermal requires a GasSpecies object. For a complete
+# Condensation uses native gas/environment data and explicit process
+# configuration. For a complete
 # example that includes gas-particle condensation, see the condensation
 # tutorials in docs/Examples/Dynamics/.
 
 for _ in range(10):
     # Apply wall loss to the particle distribution
-    particle = wall_loss.step(
-        particle=particle,
-        temperature=T,
-        pressure=P,
-        time_step=dt,
-    )
+    for _substep in range(sub_steps):
+        particle = wall_loss.step(
+            particle=particle,
+            temperature=T,
+            pressure=P,
+            time_step=dt / sub_steps,
+        )
 
 # %% [markdown]
 # ## Summary
@@ -221,7 +261,7 @@ for _ in range(10):
 # In this notebook you:
 #
 # - Built a lognormal radius-based particle distribution using
-# `PresetParticleRadiusBuilder`.
+# `create_lognormal_binned_particle_data`.
 # - Configured `SphericalWallLossStrategy` and computed wall loss rates.
 # - Integrated wall loss over time and visualized concentration decay.
 # - Saw how wall loss strategies can be composed with other dynamics

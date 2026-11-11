@@ -17,7 +17,7 @@
 #
 # This notebook shows how to use `particula.dynamics.RectangularWallLossStrategy`
 # to compute wall loss rates and apply time stepping in a box-shaped chamber.
-# Runtime is kept small (<1 s) with tiny arrays and short integration horizons.
+# The full published duration is retained with explicit positivity substeps.
 
 # %% [markdown]
 # ## Prerequisites
@@ -44,11 +44,13 @@ np.set_printoptions(precision=3, suppress=True)
 # We use the preset radius-binned distribution to keep setup minimal.
 
 # %%
-particle = par.particles.PresetParticleRadiusBuilder().build()
-print("Bins:", particle.get_radius().size)
+particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete"
+)
+print("Bins:", particle.radii[0].size)
 print(
     "Initial total concentration:",
-    f"{particle.get_total_concentration():.3e} 1/m^3",
+    f"{particle.number_density[0]:.3e} 1/m^3",
 )
 
 # %% [markdown]
@@ -66,12 +68,12 @@ P = 101325.0  # Pa
 
 # %% [markdown]
 # ## 3) Compute instantaneous wall loss rate
-# This returns a per-bin rate array (1/s).
+# This returns a per-bin concentration loss rate (m^-3 s^-1).
 
 # %%
 rate = wall_loss.rate(particle=particle, temperature=T, pressure=P)
 print("Rate shape:", rate.shape)
-print("First three rates (1/s):", rate[:3])
+print("First three rates (m^-3 s^-1):", rate.ravel()[:3])
 
 # %% [markdown]
 # ## 4) Apply a short transient (30 min, 5 s steps)
@@ -80,14 +82,49 @@ print("First three rates (1/s):", rate[:3])
 # %%
 dt = 5.0  # seconds
 steps = int((30 * 60) / dt)
+# Native Euler updates reject negative concentrations. Retain the output
+# interval and full duration, but bound each internal step by max(k) * dt < 1.
+sub_steps = max(
+    1,
+    int(
+        np.ceil(
+            np.max(
+                wall_loss.loss_coefficient(particle, temperature=T, pressure=P)
+            )
+            * dt
+            / 0.9
+        )
+    ),
+)
+print("Internal substeps per output interval:", sub_steps)
+initial_counts = particle.concentration.copy()
+initial_masses = particle.masses.copy()
+loss_coefficients = wall_loss.loss_coefficient(
+    particle, temperature=T, pressure=P
+)
 history = np.zeros(steps + 1)
-history[0] = particle.get_total_concentration()
+history[0] = particle.number_density[0]
 
 for i in range(1, steps + 1):
-    particle = wall_loss.step(
-        particle=particle, temperature=T, pressure=P, time_step=dt
-    )
-    history[i] = particle.get_total_concentration()
+    for _substep in range(sub_steps):
+        particle = wall_loss.step(
+            particle=particle,
+            temperature=T,
+            pressure=P,
+            time_step=dt / sub_steps,
+        )
+    history[i] = particle.number_density[0]
+
+# Fixed radii give an independent repeated-Euler decay prediction.
+np.testing.assert_allclose(
+    particle.concentration,
+    initial_counts
+    * (1 - loss_coefficients * dt / sub_steps) ** (steps * sub_steps),
+    rtol=1e-12,
+    atol=1e-30,
+)
+np.testing.assert_array_equal(particle.masses, initial_masses)
+assert np.all(particle.concentration >= 0)
 
 print("Final concentration:", f"{history[-1]:.3e} 1/m^3")
 print("Relative decay:", f"{history[-1] / history[0]:.3f}")
@@ -119,10 +156,15 @@ wall_loss_pdf = par.dynamics.RectangularWallLossStrategy(
     chamber_dimensions=(1.0, 1.2, 0.8),
     distribution_type="continuous_pdf",
 )
-# rate_pdf = wall_loss_pdf.rate(particle, temperature=T, pressure=P)
+particle_pdf = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="continuous_pdf"
+)
+rate_pdf = wall_loss_pdf.rate(particle_pdf, temperature=T, pressure=P)
+assert np.all(np.isfinite(rate_pdf)) and np.all(rate_pdf <= 0)
 
 # Particle-resolved example
-resolved = par.particles.PresetResolvedParticleMassBuilder().build()
+np.random.seed(42)
+resolved = par.particles.create_lognormal_resolved_particle_data()
 wall_loss_resolved = par.dynamics.RectangularWallLossStrategy(
     wall_eddy_diffusivity=1e-3,
     chamber_dimensions=(1.0, 1.2, 0.8),
@@ -135,7 +177,7 @@ wall_loss_resolved = par.dynamics.RectangularWallLossStrategy(
 # %% [markdown]
 # ## Summary
 # - Configure rectangular chambers with `chamber_dimensions` (x, y, z).
-# - Use `rate` for instantaneous loss coefficients.
+# - Use `rate` for concentration loss rates; `loss_coefficient` gives 1/s.
 # - Use `step` to update particle concentrations over time.
 # - Switch `distribution_type` to target discrete, continuous PDF, or
 #   particle-resolved representations.

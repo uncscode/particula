@@ -34,7 +34,7 @@ from matplotlib import pyplot as plt
 
 # %%
 # Define initial simulation parameters
-mode = np.array([100e-9, 500e-9])  # Median diameter of the particles in meters
+mode = np.array([100e-9, 500e-9])  # Modal radius of the particles in meters
 geometric_standard_deviation = np.array(
     [1.3, 1.5]
 )  # Geometric standard deviation of particle size distribution
@@ -229,18 +229,18 @@ for i in range(1, len(time_array)):
     dilution_loss_matrix[i, :] = dilution_loss
     chamber_wall_loss_rate_matrix[i, :] = chamber_wall_loss_rate
 
+assert np.all(np.isfinite(concentration_matrix))
+assert np.all(concentration_matrix >= 0)
+assert np.all(np.diff(concentration_matrix.sum(axis=1)) <= 0)
 print("Done")
 
 # %% [markdown]
 # ## Visualization of Particle Size Distribution Over Time
 #
-# In our chamber simulation, the output solution is a matrix representing the evolution of particle size distribution over time. Specifically, the solution is a 500x100 matrix where each row corresponds to a specific particle size (500 size bins in total), and each column represents the particle distribution at a given time point (100 time steps in total).
-#
-# The semi-logarithmic plot visualizes how the particle size distribution changes over the course of the simulation. We are focusing on three specific time points to illustrate these dynamics:
-#
-# - **Initial Distribution**: This is the distribution at the beginning of the simulation (t=0). It sets the baseline for how particles are initially distributed across different sizes.
-# - **Mid-Time Distribution**: Represents the distribution at a midpoint in time (here, at the 50th time step out of 100). This snapshot provides insight into the evolution of the distribution as particles undergo processes like coagulation, dilution, and wall loss.
-# - **Final Distribution**: Shows the distribution at the end of the simulation (at the 100th time step). It indicates the final state of the particle sizes after all the simulated processes have taken place over the full time course.
+# The output has 1000 time rows and 250 radius-bin columns. The plots compare
+# the initial, midpoint, and final distributions over the one-hour workload.
+# This retained functional example integrates explicit rates and provides a
+# reference independent of the native container/runnable examples.
 #
 # By comparing these three distributions, we can observe and analyze how the particle sizes have coalesced, dispersed, or shifted due to the underlying aerosol dynamics within the chamber.
 

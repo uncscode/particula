@@ -125,3 +125,40 @@ the native checkout from old released packages. OpenCode payload regenerated.
 
 P2 gate: 64 focused native/example scientific tests and eight plugin distribution
 tests passed; generated payload check and diff whitespace check passed.
+
+### P3 implementation and validation
+
+CPU dilution now uses unified gas with three ordered species and native resolved
+counts [4,8] in 2 m³, retaining reported densities [2,4]. Identity and protected
+mass/charge/volume assertions supplement exact exponential decay. The supported
+CPU nucleation script was already native after M4 and remains unchanged.
+
+Wall-loss strategy tutorials retain the original 250-node grid and full 6000 s
+(spherical) / 1800 s (rectangular) horizons. Native Euler rejects negative updates,
+so internal substeps use ceil(max(k)*output_dt/0.9), respectively 2 and 9.
+Independent repeated-Euler expressions check final densities at rtol=1e-12,
+atol=1e-30; fixed masses remain identical. Rate labels are m^-3 s^-1, not 1/s.
+The combined tutorial uses 150 nodes over 10 nm–10 µm: the original 1 nm–100 µm
+coagulation tails produced negative interpolated gains after depletion. The
+native admission failure was not bypassed. The formerly skipped condensation
+snippet now uses an explicit low-volatility organic fixed reservoir (1e-8 kg/m³,
+1e-5 Pa, molar mass 0.12), with full ordered gas configuration. This is an
+illustrative input correction, not preservation of the old placeholder physics.
+The independent chamber functional example keeps all 1000 times/250 nodes and
+asserts finite nonnegative distributions and monotonic total-number loss.
+
+Custom nucleation retains the saturation-dependent law, initial 100-particle
+400 nm-radius sample, 0.1 cm³ volume, five stored times and two process substeps.
+It removes facade monkeypatches, uses 100,000 fixed slots with unit weights,
+and debits gas by newly represented mass divided by volume. Capacity rejects
+before gas debit. The original debit omitted the volume factor. Full runs
+activate 2,281 then 10,481 nuclei for the seeded initial sample; stochastic
+coagulation is assessed through inventory, not exact particle identities.
+Independent extensive inventory includes the external vapor source at every
+stored time (rtol=1e-12, atol=1e-30). Plot bounds now include the initial 400 nm
+mode and 2 nm-radius nuclei; prior 100 nm upper bounds hid the initial population.
+A focused fixture checks two nuclei at non-unit volume and capacity failure.
+
+P3 gate: 507 focused tests passed with warnings as errors, including both CPU
+wall-loss strategy suites. All six notebook pairs executed without errors; 12
+plots inspected. Dilution and supported CPU nucleation standalone runs passed.
