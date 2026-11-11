@@ -5,8 +5,8 @@
 The approved M1 handoff and merged PR #1624 preceded M2. All six phases are
 implemented on stacked branches in P1 → P2 → P3 → P4 → P5 → P6 order. Each
 implementation phase began after its predecessor's local validation passed.
-PR merge/review and final maintainer M3 admission are separate gates; no merge
-or M3 implementation is claimed. Final-revision evidence is in
+P1–P5 merged on 2026-11-11; P6 review and final maintainer M3 admission
+remain separate gates. No M3 implementation is claimed. Final-revision evidence is in
 `validation_evidence.md`.
 
 | Phase | Delivered behavior | PR / evidence |

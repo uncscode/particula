@@ -167,3 +167,32 @@ The final guide now incorporates all merged review/CI corrections:
   use, while large finite totals remain supported.
 
 Final M2 acceptance remains separate from the five merged phase PRs.
+
+### Updated final validation
+
+Tested revision: `ead8878dbbb349e9d09a0f475fae8407f6e9a861`, containing
+merged main plus the reconciled final guide and phase status. All **18 command
+groups passed**, and HEAD remained unchanged for the whole run. The following
+record-only commit changes documentation, not the tested implementation.
+
+| Gate | Outcome |
+|---|---|
+| Focused construction, M1 and data-only integration | 280 passed |
+| Retained processes, including both wall-loss suites | 243 passed |
+| Transfer/export checks | 150 passed |
+| Untargeted repository runner | 6,910 passed, 19 skipped; 92% coverage, unchanged 80% threshold |
+| Source examples, configured warnings as errors | 150 passed, 1 skipped |
+| Infrastructure, configured warnings as errors | 130 passed |
+| Repository lint runner, exact CI Ruff check/format scope, explicit mypy | All passed |
+| Strict documentation validation and build | Both passed |
+| Generated plugin check | Passed |
+| Notebook source synchronization and saved-output preservation | 24 pairs passed; this is not notebook execution |
+| Construction guide snippets | Both executed successfully |
+| Both initializer suites and P6 integration with Pint import blocked | 88 passed, 7 non-SI conversion cases skipped |
+| Diff whitespace | Passed |
+
+Local command manifest and literal logs: `/tmp/e9-m2-final-updated/results.json`
+and adjacent logs. Commands follow the earlier exact ledger with the current
+worktree and repository `.venv`, plus CI-scope Ruff check/format and the Pint-free
+initializer/integration run. Native CUDA and Warp CPU were available. Previous
+notebook execution results remain separately attributed to their tested revision.
