@@ -74,6 +74,7 @@ from particula.gpu.kernels.thermodynamics import (
     _validate_array_metadata,
     validate_thermodynamics_config,
 )
+from particula.gpu.population_metadata import require_legacy_particle_metadata
 from particula.gpu.properties.gas_properties import (
     dynamic_viscosity_wp,
     molecule_mean_free_path_wp,
@@ -2082,6 +2083,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         only writes it. This write-only contract permits stale finite values and
         NaN/Inf before a call.
     """
+    require_legacy_particle_metadata(particles)
     if (
         isinstance(time_step, bool)
         or not isinstance(time_step, Real)

@@ -64,6 +64,7 @@ from particula.gpu.kernels.slot_management import (
     _write_diagnostics,
     _write_empty_diagnostics,
 )
+from particula.gpu.population_metadata import require_legacy_particle_metadata
 from particula.util.constants import AVOGADRO_NUMBER
 
 _AVOGADRO_NUMBER = wp.constant(wp.float64(AVOGADRO_NUMBER))
@@ -1079,6 +1080,7 @@ def _preflight_nucleation(  # noqa: C901
         ValueError: If schemas, ownership, physical values, or species settings
             violate the P1 contract.
     """
+    require_legacy_particle_metadata(particles)
     if not isinstance(config, NucleationConfig):
         raise ValueError("config must be NucleationConfig.")
     try:
@@ -3414,6 +3416,7 @@ def _prepare_nucleation_step_gpu(
         ValueError: If fixed schemas, identities, controls, or sidecars are
             invalid.
     """
+    require_legacy_particle_metadata(particles)
     if not isinstance(scratch, NucleationScratchBuffers):
         raise ValueError("scratch must be NucleationScratchBuffers.")
     if not isinstance(finalized_demand, NucleationFinalizedDemandBuffers):

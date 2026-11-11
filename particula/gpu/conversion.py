@@ -122,16 +122,16 @@ def to_warp_particle_data(
     device: str = "cuda",
     copy: bool = True,
 ) -> "WarpParticleData":
-    """Transfer untagged ParticleData to Warp with explicit control.
+    """Transfer ParticleData to Warp without changing population values.
 
     Use this for long GPU-resident simulations where you want to:
     1. Transfer data to GPU once at simulation start
     2. Run many timesteps without CPU round-trips
     3. Transfer back only when needed (checkpoints, final result)
 
-    Explicitly tagged distributions are rejected before Warp availability
-    checks or uploads: the Warp particle struct has no durable kind or
-    radius-grid carrier. This also excludes tagged PDFs from direct kernels.
+    Explicit discrete and resolved distributions retain their kind. Tagged
+    PDFs reject before Warp availability checks or uploads because no GPU
+    radius-grid algorithm is supported. Untagged legacy data stays untagged.
 
     Args:
         data: CPU-side ParticleData container.
@@ -144,8 +144,7 @@ def to_warp_particle_data(
         WarpParticleData with Warp arrays on specified device.
 
     Raises:
-        ValueError: If ``data`` has an explicit distribution type; its
-            interpretation cannot survive this transfer boundary.
+        ValueError: If tagged data is malformed or uses continuous_pdf.
         RuntimeError: If Warp is not available or device not found.
 
     Example:
@@ -156,15 +155,17 @@ def to_warp_particle_data(
     """
     if data.distribution_type is not None:
         data.validate_representation()
-        raise ValueError(
-            "tagged particle data has no durable Warp metadata carrier"
-        )
+        if data.distribution_type == "continuous_pdf":
+            raise ValueError("GPU continuous_pdf populations are unsupported")
     wp = _ensure_warp_available()
     _validate_device(wp, device)
 
     from particula.gpu.warp_types import WarpParticleData
 
     gpu_data = WarpParticleData()
+    gpu_data.distribution_kind = wp.int32(
+        {None: 0, "discrete": 1, "particle_resolved": 3}[data.distribution_type]
+    )
 
     if copy:
         gpu_data.masses = wp.array(data.masses, dtype=wp.float64, device=device)
@@ -434,13 +435,14 @@ def from_warp_particle_data(
     gpu_data: "WarpParticleData",
     sync: bool = True,
 ) -> "ParticleData":
-    """Restore WarpParticleData as an untagged CPU particle carrier.
+    """Restore WarpParticleData with its supported population provenance.
 
     Use this to transfer GPU-resident particle data back to CPU after
     GPU simulation steps. The returned ParticleData can be used for
-    checkpointing, analysis, or continuing with CPU-based operations. Warp
-    stores no distribution kind or PDF radius grid; the restored carrier
-    does not qualify for kind-dependent population helpers.
+    analysis or continuing with CPU-based operations. Discrete and resolved
+    tags survive restoration; legacy untagged input stays untagged. No density
+    conversion occurs. Unknown tags and unsupported PDF metadata reject before
+    synchronization or readback.
 
     Args:
         gpu_data: GPU-resident WarpParticleData container.
@@ -450,7 +452,7 @@ def from_warp_particle_data(
             batched transfers).
 
     Returns:
-        CPU-side untagged ParticleData with NumPy arrays.
+        CPU-side ParticleData with NumPy arrays and preserved population kind.
 
     Example:
         >>> # After GPU simulation
@@ -462,6 +464,9 @@ def from_warp_particle_data(
         >>> data1 = from_warp_particle_data(gpu_data1, sync=False)
         >>> data2 = from_warp_particle_data(gpu_data2, sync=False)
     """
+    from particula.gpu.population_metadata import particle_distribution_type
+
+    distribution_type = particle_distribution_type(gpu_data)
     wp = _ensure_warp_available()
 
     if sync:
@@ -475,6 +480,7 @@ def from_warp_particle_data(
         charge=gpu_data.charge.numpy(),
         density=gpu_data.density.numpy(),
         volume=gpu_data.volume.numpy(),
+        distribution_type=distribution_type,
     )
 
 

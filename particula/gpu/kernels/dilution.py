@@ -41,6 +41,7 @@ except ImportError as exc:  # pragma: no cover - handled via import guards
     ) from exc
 
 from particula.gpu.kernels.environment import _is_warp_array_like
+from particula.gpu.population_metadata import require_legacy_particle_metadata
 
 
 @wp.kernel
@@ -432,6 +433,7 @@ def _prepare_dilution_step_gpu(
             real scalar.
         ValueError: If a schema, shape, device, or physical domain is invalid.
     """
+    require_legacy_particle_metadata(particles)
     is_per_box_coefficient = _is_warp_array_like(coefficient)
     if is_per_box_coefficient:
         validated_coefficient = _validate_warp_coefficient_form(coefficient)

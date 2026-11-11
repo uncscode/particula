@@ -62,6 +62,56 @@ resident setup/checkpoint paths must reject newly tagged state they cannot
 preserve, rather than discard metadata. Minimal rejection guards protecting
 that boundary belong with M3 metadata changes; no M4 functionality is claimed.
 
+### Concrete P1 metadata design
+
+- `WarpParticleData.distribution_kind` is one `wp.int32` scalar: 0 unknown
+  legacy, 1 discrete bin density, 2 unsupported radius PDF, 3 resolved counts.
+  The existing five numerical arrays keep their shapes, precision and values.
+  Explicit uploads validate native CPU representation; supported tags survive
+  restore. Invalid/unsupported restore tags reject before synchronization.
+- Concrete-only `prepare_condensation_species_map` takes exact particle/gas
+  carriers, the caller-retained actual full gas names, an immutable CPU
+  `CondensationSpeciesMap`, and optional full-gas skip indices. Names must match
+  the process expectation. It uploads two newly owned int32 configuration arrays
+  of lengths particle-species and gas-species respectively, with -1 for absent
+  links. This explicit configuration upload does not transfer simulation state.
+- `CondensationSpeciesBinding` pins exact carriers, primary array identities,
+  layouts/devices, population code and full gas order. Validation rejects
+  incompatible reuse without allocation, launch, synchronization or readback.
+  Callers must keep these arrays and map contents alive/unmodified while bound;
+  new names, maps, storage or semantics require fresh preparation. Partitioning
+  remains dynamic full-gas device state, not a compacted or frozen host mask.
+- These host preparation helpers are concrete-only, not new package exports.
+  P2 integrates the binding into the existing fixed-four-substep implementation;
+  it must not add per-enqueue host resolution or transfers.
+
+| GPU boundary | P1 executable evidence | Numerical acceptance owner |
+|---|---|---|
+| Tagged discrete/resolved transfer | population_metadata_test: raw round trips, nonunit resolved inventory, explicit legacy retention | transfer complete |
+| Tagged PDF / unknown code | particle_population_test and population_metadata_test: rejection before Warp probe/readback | no PDF execution |
+| Species maps / independent widths | population_metadata_test: full gas order, skipped/unmapped lanes, stale binding and no-device-work checks | condensation P2 |
+| Condensation direct/prepared | population_boundary_test: interim rejection before payload access | P2 admits discrete/resolved with independent science tests |
+| Coagulation direct/prepared | population_boundary_test: interim rejection before payload access | P4 admits only verified resolved mechanism/weight combinations |
+| Wall loss direct/selected/prepared | population_boundary_test: interim rejection before payload access | P5 admits resolved removal with sink accounting |
+| Dilution/nucleation/exhaustion and resident setup/revalidation | population_boundary_test and gpu_session_test: reject newly tagged consumers before mutation or metadata loss | M4 |
+
+Interim science rejection rows are replaced, not counted as completed scientific
+support, by their owning M3 numerical commits. Legacy untagged regressions remain
+separate. A population tag alone never expands an algorithm's support matrix.
+
+The inspected GPU coagulation selector currently executes masks 1, 2, 4, 8,
+3, 5, 6, 9, 10, 12 and 15 (Brownian, charged hard sphere, SP2016 sedimentation,
+ST1956 turbulent shear, their approved pairs, and all four). Triple masks
+7/11/13/14 and GPU DNS remain unsupported. M3 preserves these mechanism gates.
+`apply_coagulation_kernel` retains recipient concentration while adding donor
+mass and charge, then clears the donor. Therefore native active weights must
+be equal within each box for that merge to conserve weighted species mass and
+charge. P4 must verify positive equal fractional/multiple weights, reject
+unequal weights, and account for common weight in collision scheduling. The
+current selector applies a scheduling weight only to sedimentation-containing
+masks; this is a concrete normalization audit item, not evidence that the
+other tagged paths already support arbitrary multiplicities.
+
 ## Serial commits and gates
 
 1. Entry contracts, matrix, ledgers and M2 status reconciliation.

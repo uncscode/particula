@@ -50,6 +50,7 @@ from particula.gpu.kernels.environment import (
     _is_warp_array_like,
     validate_environment_inputs,
 )
+from particula.gpu.population_metadata import require_legacy_particle_metadata
 from particula.gpu.properties import (
     dynamic_viscosity_wp,
     effective_density_wp,
@@ -1253,6 +1254,7 @@ def _prepare_wall_loss_step_gpu(
             including an invalid charged field or combining ``environment``
             with direct environment inputs.
     """
+    require_legacy_particle_metadata(particles)
     validated_config = _validate_config(config)
     n_boxes, device = _validate_particle_schema(particles)
     _validate_charged_rectangular_field(validated_config, device)
@@ -1476,6 +1478,7 @@ def _prepare_selected_wall_loss_call(
         ValueError: If selected lanes, particle, environment, configuration,
             or RNG inputs violate the direct-kernel contract.
     """
+    require_legacy_particle_metadata(particles)
     validated_config = _validate_config(config)
     n_boxes, device = _validate_particle_schema(particles)
     if (

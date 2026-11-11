@@ -93,6 +93,14 @@ def _validate_cpu_shape(
         raise ValueError(f"{name} must have shape {expected_shape}.")
 
 
+def _reject_tagged_cpu_population(particles: "ParticleData") -> None:
+    """Prevent population provenance loss until the resident M4 migration."""
+    if particles.distribution_type is not None:
+        raise ValueError(
+            "tagged particle populations require resident metadata migration"
+        )
+
+
 def _preflight_cpu_session(
     particles: object,
     gas: object,
@@ -121,6 +129,7 @@ def _preflight_cpu_session(
 
     if not isinstance(particles, ParticleData):
         raise TypeError("particles must be a ParticleData.")
+    _reject_tagged_cpu_population(particles)
     if not isinstance(gas, GasData):
         raise TypeError("gas must be a GasData.")
     if not isinstance(environment, EnvironmentData):
@@ -462,6 +471,11 @@ def _validate_generated_containers(
         raise TypeError("gas must be a WarpGasData.")
     if not isinstance(environment, environment_type):
         raise TypeError("environment must be a WarpEnvironmentData.")
+    from particula.gpu.population_metadata import (
+        require_legacy_particle_metadata,
+    )
+
+    require_legacy_particle_metadata(particles)
 
 
 def _validate_schema(

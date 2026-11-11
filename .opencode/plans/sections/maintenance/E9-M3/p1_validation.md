@@ -1,4 +1,4 @@
-# P1 implementation evidence (in progress)
+# P1 implementation evidence
 
 Entry commit: `81ba14f02`, based on merged M2 `fd114270a`.
 
@@ -58,7 +58,49 @@ temperature broadcasting; native vector evaluation now supplies a full-gas
 float temperature vector and ordered per-species model sequences remain
 supported. Factory tests use their existing explicit unit-key contract.
 
-P1 remains incomplete until GPU metadata/mapping admission and its tests pass.
-P2 owns mapped native stepping, limiting, conservation and latent energy. The
-new rate path alone does not establish correct mapped steps. Later phases and
-M3 completion are not claimed by these results.
+## GPU metadata and explicit mapping
+
+The concrete design and bounded support matrix are recorded in
+`implementation_record.md`. New co-located tests:
+
+- `particula/gpu/tests/population_metadata_test.py`: raw discrete/resolved
+  round trips, V=.25/1/4 independent species inventories, legacy retention,
+  unsupported restore rejection before runtime probe, independent lane widths,
+  full gas order, skipped lanes, stale bindings, and metadata-only validation.
+- `particula/gpu/tests/population_boundary_test.py`: newly tagged consumers
+  reject before payload access until their owning science phase (or M4).
+- `particula/execution/tests/gpu_session_test.py`: native CPU setup rejects
+  before transfer; resident revalidation rejects a later population-tag change.
+
+Assertion migration: the old all-tag transfer rejection in
+`particle_population_test.py` becomes unsupported-PDF rejection, retaining the
+before-runtime boundary. The M2 aggregate construction integration test now
+verifies that supported resolved metadata reaches the explicit runtime probe,
+without requiring Warp for CPU construction evidence. Actual device round trips
+and independent inventory checks are covered by `population_metadata_test.py`.
+Its six old rejection assertions were the only failures in the first full GPU
+slice run; no scientific tolerances or coverage policy were weakened.
+
+Validation with the repository environment and normal cache/hardware access:
+
+- `pytest particula/gpu/tests/population_metadata_test.py
+  particula/gpu/tests/population_boundary_test.py
+  particula/execution/tests/gpu_session_test.py -q --no-cov --tb=short`:
+  223 passed in 39.85 s, including Warp CPU and CUDA. Two subsequent no-device-
+  work parameter cases are included in the following focused/full runs.
+- `pytest particula/integration_tests/native_aerosol_construction_test.py
+  particula/gpu/tests/population_metadata_test.py
+  particula/gpu/tests/population_boundary_test.py -q --no-cov --tb=short`:
+  78 passed, including Warp CPU and CUDA. Log:
+  `.artifacts/e9-m3/p1-gpu/focused-tests.log`.
+- `.opencode/tools/run_linters.py`: Ruff and mypy passed. Log:
+  `.artifacts/e9-m3/p1-gpu/linters.log`.
+- Untargeted `.opencode/tools/run_pytest.py`: 7,078 passed, 19 skipped;
+  coverage 92% against unchanged 80% threshold. Log:
+  `.artifacts/e9-m3/p1-gpu/package-tests-host-final.log`.
+
+P1 implementation and its validation checkpoint are complete on the M3 branch;
+PR review/merge remain pending. P2 owns mapped native stepping, limiting,
+conservation and latent energy, including replacement of interim GPU science
+guards. The new rate and configuration paths alone do not establish correct
+mapped steps. Later phases and M3 completion are not claimed by these results.
