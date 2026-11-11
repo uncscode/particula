@@ -63,11 +63,17 @@ Density steps preserve the existing number-density update while keeping per-bin
 species masses and charge fixed. Their intended use is uniform composition
 across radius or a single effective material with prescribed effective density,
 rather than tracking radius-dependent composition. Effective density alone
-does not provide per-species transport. When composition varies with size, individual
-species and weighted charge need not be conserved, even if total-mass error
+does not provide per-species transport. When composition varies with size,
+individual species and weighted charge need not be conserved, even if total-mass error
 converges under grid refinement. This accepted limitation is characterized by
 independent tests; conservative species transport is deferred. See
 [coagulation contracts](coagulation_strategy_system.md).
+
+Choose `particle_resolved` to track species composition that varies with radius
+or more complex interactions involving individual particles' composition,
+size, and charge. Resolved particles retain their own species masses as they
+evolve and merge. Use the supported process models and their constraints
+described here; resolved coagulation requires equal positive active counts.
 
 Native CPU wall loss retains forward Euler for PMF/PDF and Bernoulli whole-
 representative removal for resolved counts, including unequal weights.
