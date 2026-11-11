@@ -45,6 +45,7 @@ except ImportError as exc:  # pragma: no cover - guarded by Warp tests
     ) from exc
 
 from particula.gpu.kernels.environment import _is_warp_array_like
+from particula.gpu.population_metadata import require_legacy_particle_metadata
 
 PLANNING_SUCCESS = 0
 PLANNING_EXACT_INVENTORY_FAILURE = 1
@@ -1068,6 +1069,7 @@ def _execute_resampling_step_gpu(  # noqa: C901, PLR0913
         ValueError: If schemas, physical values, ownership, release counts, or
             planning diagnostics are invalid.
     """
+    require_legacy_particle_metadata(particles)
     bounds = (
         _require_exact_bound(
             "radius_cubed_relative_error", radius_cubed_relative_error
@@ -1298,6 +1300,7 @@ def _execute_representative_volume_scaling_step_gpu(  # noqa: C901, PLR0913
             values, factor bounds, flags, or selected scaled-volume bounds are
             invalid. Rejection occurs before any diagnostic or scaling write.
     """
+    require_legacy_particle_metadata(particles)
     masses = _field(particles, "masses")
     if not _is_warp_array_like(masses):
         raise TypeError("masses must be a Warp array")
@@ -1575,6 +1578,7 @@ def _prepare_resampling_step_gpu(
     inspect mutable payload values. Enqueue owns device validation and all
     writes; observation is the sole status readback.
     """
+    require_legacy_particle_metadata(particles)
     bounds = (
         _require_exact_bound(
             "radius_cubed_relative_error", radius_cubed_relative_error
@@ -1789,6 +1793,7 @@ def _prepare_representative_volume_scaling_step_gpu(  # noqa: C901
     This private setup phase validates fixed schemas but leaves mutable payload
     validation to enqueue and bounded status observation to the observer.
     """
+    require_legacy_particle_metadata(particles)
     masses = _field(particles, "masses")
     if not _is_warp_array_like(masses):
         raise TypeError("masses must be a Warp array")

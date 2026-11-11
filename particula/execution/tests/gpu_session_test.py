@@ -39,6 +39,40 @@ def _metadata(species: int = 1) -> ResidentMetadata:
     )
 
 
+@pytest.mark.parametrize("kind", ["discrete", "particle_resolved"])
+def test_tagged_cpu_setup_rejects_before_transfer(monkeypatch, kind):
+    """M3 transfer support must not silently discard tags in resident setup."""
+    from particula.gpu import conversion
+
+    particles, gas, environment = _cpu_resources()
+    particles.distribution_type = kind
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("tagged resident setup must not transfer")
+
+    monkeypatch.setattr(conversion, "to_warp_particle_data", forbidden)
+    with pytest.raises(ValueError, match="resident metadata migration"):
+        setup_resident_session(
+            particles, gas, environment, Device(Backend.WARP, "cpu")
+        )
+
+
+def test_resident_revalidation_rejects_new_population_tag():
+    """A later tag mutation cannot enter registry/checkpoint revalidation."""
+    particles, gas, environment = _warp_resources()
+    session = ResidentSession(
+        particles=particles,
+        gas=gas,
+        environment=environment,
+        dimensions=ResidentDimensions(1, 2, 1),
+        metadata=_metadata(),
+        lifecycle=ResidentLifecycle.ACTIVE,
+    )
+    particles.distribution_kind = 3
+    with pytest.raises(ValueError, match="require a migrated consumer"):
+        session.__post_init__()
+
+
 @pytest.mark.parametrize(
     ("pointer", "capacity", "match"),
     (

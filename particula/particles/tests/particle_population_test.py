@@ -170,18 +170,19 @@ def test_builder_kind_grid_and_volume() -> None:
         builder.build()
 
 
-def test_tagged_transfer_rejects_before_warp_probe(
+def test_pdf_transfer_rejects_before_warp_probe(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """No tag or grid may be silently lost at the existing Warp boundary."""
-    data = _particles("discrete")
+    """Unsupported PDF grid provenance must not be lost at the Warp boundary."""
+    data = _particles("continuous_pdf")
+    data.radius_grid = np.array([1e-9, 2e-9, 4e-9])
 
     def unexpected_probe() -> None:
         raise AssertionError("Warp must not be probed for tagged data")
 
     monkeypatch.setattr(conversion, "_ensure_warp_available", unexpected_probe)
     for copy in (True, False):
-        with pytest.raises(ValueError, match="no durable Warp metadata"):
+        with pytest.raises(ValueError, match="continuous_pdf.*unsupported"):
             conversion.to_warp_particle_data(data, device="cpu", copy=copy)
 
 

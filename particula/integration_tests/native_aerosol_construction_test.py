@@ -112,10 +112,20 @@ def test_native_construction_replacement_and_accounting(
         aerosol.replace_data(particles=particles, gas=gas, environment=bad)
     assert aerosol.particles is next_particles and aerosol.gas is next_gas
     assert_unchanged(saved)
-    # Tagged native data must reject at the existing explicit transfer boundary.
-    monkeypatch.setattr(conversion, "_ensure_warp_available", no_legacy)
-    with pytest.raises(ValueError, match="no durable Warp metadata"):
+
+    # M3 supports resolved provenance. Check admission without making this CPU
+    # construction test depend on Warp; real raw round trips and independent
+    # inventories live in gpu/tests/population_metadata_test.py.
+    class ExplicitWarpProbeError(RuntimeError):
+        """Observe the optional-runtime boundary without importing it."""
+
+    def explicit_probe():
+        raise ExplicitWarpProbeError
+
+    monkeypatch.setattr(conversion, "_ensure_warp_available", explicit_probe)
+    with pytest.raises(ExplicitWarpProbeError):
         conversion.to_warp_particle_data(aerosol.particles, device="cpu")
+    assert_unchanged(saved)
 
 
 @pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])

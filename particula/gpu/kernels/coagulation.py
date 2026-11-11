@@ -112,6 +112,7 @@ from particula.gpu.kernels.environment import (
     _is_warp_array_like,
     _validate_positive_finite_array,
 )
+from particula.gpu.population_metadata import require_legacy_particle_metadata
 from particula.gpu.properties.gas_properties import (
     dynamic_viscosity_wp,
     molecule_mean_free_path_wp,
@@ -2418,6 +2419,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     if not turbulent_requested:
         validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
 
+    require_legacy_particle_metadata(particles)
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
 
