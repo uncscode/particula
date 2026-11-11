@@ -43,3 +43,14 @@ Lognormal grid minimum: discrete PMFs require three strictly increasing positive
 nodes because the retained converter extrapolates its final bin width from two
 intervals; continuous PDFs require two. Direct radius initialization still
 supports two discrete bins because it takes caller-supplied weights.
+
+## P5 native resolved evidence
+
+`resolved_initialization_test.py` owns direct resolved counts/density and
+sampled initialization. All legacy singleton/redundant forms that retain values
+are supported; differing density rows or differing charge species lanes reject.
+Independent species inventories cover V=.25/1/4, fractional and zero weights,
+multiple boxes, empty slots, controlled sample radii, defaults and global RNG
+preservation. Direct counts never multiply by volume; explicit density inputs
+do so once. Sampled modal numbers only determine mixture weights, and each
+sample retains count one. No scientific algorithm support is broadened.
