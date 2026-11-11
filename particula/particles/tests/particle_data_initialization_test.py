@@ -268,3 +268,34 @@ def test_conversion_without_pint_is_explicit(monkeypatch, kwargs):
             distribution_type="discrete",
             **kwargs,
         )
+
+
+@pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
+@pytest.mark.parametrize("count", [1, 2, 3])
+def test_lognormal_minimum_grid_size(kind, count):
+    """Minimum grids succeed or reject clearly before the PMF converter."""
+    radii = np.geomspace(1e-7, 1e-6, count)
+    saved = radii.copy()
+    if count < (3 if kind == "discrete" else 2):
+        with pytest.raises(ValueError, match="requires at least"):
+            create_lognormal_binned_particle_data(
+                distribution_type=kind, radius_bins=radii
+            )
+        np.testing.assert_array_equal(radii, saved)
+        return
+    data = create_lognormal_binned_particle_data(
+        distribution_type=kind, radius_bins=radii
+    )
+    assert data.masses.shape == (1, count, 1)
+    np.testing.assert_allclose(data.number_density, [1.1e10], rtol=1e-12)
+    np.testing.assert_array_equal(radii, saved)
+
+
+def test_direct_two_bin_discrete_remains_supported():
+    """Direct weights do not need the lognormal converter's third node."""
+    data = create_particle_data_from_radii(
+        radii=[1e-7, 2e-7],
+        concentration=[2.0, 3.0],
+        distribution_type="discrete",
+    )
+    np.testing.assert_array_equal(data.number_density, [5.0])

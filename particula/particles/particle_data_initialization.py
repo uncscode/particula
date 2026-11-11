@@ -204,8 +204,10 @@ def create_lognormal_binned_particle_data(
         whereas discrete bin densities are summed. No facade is constructed.
 
     Raises:
-        ValueError: If inputs do not define a valid distribution. Both generator
-            paths require at least two positive, strictly increasing nodes.
+        ValueError: If inputs do not define a valid distribution. Discrete PMFs
+            require at least three positive, strictly increasing nodes; PDFs
+            require at least two. The existing PMF converter needs two
+            intervals to extrapolate its last bin width.
     """
     radius = (
         np.logspace(-9, -4, 250)
@@ -213,7 +215,13 @@ def create_lognormal_binned_particle_data(
         else _vector(radius_bins, "radius_bins")
         * _unit_factor(radius_units, "m")
     )
-    if radius.size < 2 or np.any(np.diff(radius) <= 0):
+    minimum_nodes = 3 if distribution_type == "discrete" else 2
+    if radius.size < minimum_nodes:
+        raise ValueError(
+            f"{distribution_type} lognormal radius grid requires at least "
+            f"{minimum_nodes} nodes"
+        )
+    if np.any(np.diff(radius) <= 0):
         raise ValueError("lognormal radius grid must have increasing nodes")
     modes, deviations, numbers = _modal_parameters(
         mode,
