@@ -24,7 +24,6 @@ class _TaggedOnly:
 @pytest.mark.parametrize(
     "module,name",
     [
-        ("condensation", "_prepare_condensation_step_gpu"),
         ("coagulation", "_prepare_coagulation_step_gpu"),
         ("wall_loss", "_prepare_wall_loss_step_gpu"),
         ("wall_loss", "_prepare_selected_wall_loss_call"),
@@ -51,3 +50,14 @@ def test_unmigrated_consumers_reject_before_payload_access(module, name):
     kwargs["particles"] = _TaggedOnly()
     with pytest.raises(ValueError, match="require a migrated consumer"):
         function(**kwargs)
+
+
+def test_native_condensation_requires_binding_before_payload_access():
+    """A tag alone never implies an identity species map."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels.condensation import (
+        _prepare_condensation_step_gpu,
+    )
+
+    with pytest.raises(ValueError, match="requires species_binding"):
+        _prepare_condensation_step_gpu(_TaggedOnly(), None, None, None, 0.1)

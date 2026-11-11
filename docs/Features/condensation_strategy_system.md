@@ -45,6 +45,45 @@ This feature is built around user-facing APIs exposed via
   transport_k`, `get_mass_transfer`, `get_radius_transfer_rate` for reference
   and lower-level workflows.
 
+## Native data contract (E9-M3)
+
+Direct native calls to `CondensationIsothermal`,
+`CondensationIsothermalStaggered`, and `CondensationLatentHeat` accept tagged
+`ParticleData` and `GasData`. Supply process-owned activity, surface and vapor
+pressure models plus an explicit `CondensationSpeciesMap` from
+`particula.dynamics.condensation.species_mapping`. Its expected full gas-name
+order and unique `(gas_index, particle_material_index)` pairs are checked at
+admission. Equal species widths do not establish an identity map. Transport,
+vapor-pressure and latent parameters follow full gas order; activity and
+surface composition use all particle materials, including nonvolatile ones.
+
+Native `mass_transfer_rate` is kg/s per particle and material. Native `rate`
+returns each node's contribution in kg/m³/s: resolved counts use count/volume,
+PMF uses stored bin density, and radius PDF uses full-grid trapezoidal weights.
+PMF/PDF require volume exactly 1 m³; resolved volume is positive and finite.
+PDF inventory integrates mass times dn/dr on its explicit radius grid.
+
+Native steps stage particle and mapped gas updates, bound evaporation by
+remaining particle mass, and limit uptake by available mapped gas plus actual
+released inventory. Unmapped/skipped/nonpartitioning lanes remain unchanged.
+`update_gases=False` keeps the external reservoir unchanged while retaining the
+finite-stage availability limiter. Native latent energy is extensive J, using
+counts (density integrated over volume for PMF/PDF), rather than energy density.
+
+The native staggered step preserves two theta sweeps, seeded or caller-owned
+random generators, shuffle and batching. Each node uses its own local theta
+duration. Material/radius evaluation is frozen from the original particle
+state during the two sweeps; current private gas and remaining mass determine
+coupling and limiting. Full-grid PDF weights are computed before selecting
+batches. Physical arrays publish only after successful staging; late model
+failure does not promise rollback of already consumed random draws.
+
+CPU native calls require one box and revalidate mutable state at each entry.
+They preserve carrier and destination-array identities and reject protected
+storage overlap before writes. Existing facade/untagged examples below retain
+their temporary compatibility behavior. Runnable, adapter and resident
+integration are owned by M4; broad tutorial migration is owned by M5.
+
 ## Key Benefits
 
 - **Consistent dynamics workflow**: Same strategy-based API (`rate`, `step`,
@@ -636,6 +675,51 @@ aerosol, gas = selective.step(
    operator-splitting error when coupling with wall loss or coagulation.
 
 ### Low-level Warp GPU condensation
+
+#### Tagged native populations and species binding
+
+Tagged discrete/resolved GPU calls require `species_binding=`. Create it
+explicitly with `prepare_condensation_species_map` from
+`particula.gpu.species_mapping`, using the exact Warp carriers, actual complete
+gas-name order retained at transfer, and the process's
+`CondensationSpeciesMap`. The binding owns fresh device lane maps and pins
+array identities, layouts, devices and population metadata. Keep its map
+contents unchanged; new storage, names, mapping or metadata requires fresh
+preparation. Full-gas partitioning remains live device state.
+
+| Native quantity | Species order / units |
+|---|---|
+| Particle masses and work/total transfer | Full material order; kg per particle, `(boxes, slots, materials)` |
+| Activity kappas, reference molar masses and surface tension | Full material order; mapped reference masses must match the declared gas species |
+| Thermodynamics, accommodation, diffusion and latent/thermal arrays | Full gas order, including unused/nonpartitioning gas species |
+| Demand/release/scale scratch and energy output | Full gas width, `(boxes, gas_species)` |
+| Gas inventory coupling | kg/m³: transfer weighted by N/V for resolved counts, stored density for PMF |
+| Native energy output | Extensive J: applied transfer weighted by counts and mapped latent heat |
+
+The direct and private prepared routes use the same four equal substeps. Each
+refreshes full-gas vapor pressure, evaluates full particle composition, gates
+mapped proposals, bounds evaporation and gas-limits uptake, then couples the
+representable particle change to gas. Whole-call transfer and energy outputs
+are cleared at entry and accumulated from the applied substeps. PMF requires
+V=1; resolved volumes need not be one. PDF execution rejects explicitly.
+
+Setup validates configuration, physical state and nonoverlapping writers;
+validation may launch read-only device scans and read private status flags.
+Enqueue uses retained references without allocation, upload, readback,
+synchronization or rebinding. No rollback is promised after a writer launches.
+The standalone private inventory-finalization test helper remains legacy-only;
+it is not a mapped native entry point. Untagged legacy direct/prepared callers
+retain the same-width contract described below. Native transfer does not
+establish resident/checkpoint support; that remains an M4 migration boundary.
+
+Native scientific evidence is in
+`particula/gpu/kernels/tests/condensation_native_test.py`: independent scalar
+four-substep equations, separate particle/gas changes, V=.25/1/4 conservation,
+unequal counts, unequal species widths, latent energy, activity/surface modes,
+rejection snapshots and prepared execution. Warp CPU is required when Warp is
+installed; CUDA is optional and skips explicitly when unavailable.
+
+#### Temporary untagged direct path
 
 This is a direct low-level Warp path, separate from the CPU strategies and the
 `MassCondensation` runnable described above. Its canonical step import is:
