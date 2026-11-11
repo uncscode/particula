@@ -26,11 +26,17 @@ References:
 import logging
 import warnings
 from abc import ABC, abstractmethod
+from math import fsum
 from typing import Optional, Sequence, Tuple, Union, cast, overload
 
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.dynamics.condensation._native_step import (
+    finalize_native_transfer,
+    validate_native_step_storage,
+    validate_native_time_step,
+)
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
     get_latent_heat_energy_released,
@@ -492,35 +498,58 @@ class CondensationStrategy(ABC):
         particle_data, legacy_particle = _unwrap_particle(particle)
         gas, legacy_gas = _unwrap_gas(gas_species)
         _require_matching_types(legacy_particle, legacy_gas)
-        sources, targets, molar, diffusion, accommodation = (
-            self._native_parameters(particle_data, gas, temperature, pressure)
+        parameters = self._native_parameters(
+            particle_data, gas, temperature, pressure
         )
         if dynamic_viscosity is not None and (
-            np.ndim(dynamic_viscosity) != 0
+            isinstance(dynamic_viscosity, (bool, np.bool_))
+            or np.ndim(dynamic_viscosity) != 0
             or not np.isfinite(dynamic_viscosity)
             or dynamic_viscosity <= 0
         ):
             raise ValueError("dynamic_viscosity must be positive and finite")
         # Resolve configuration even for no-work maps and empty populations.
         self._resolve_strategies(particle, gas_species, False, False)
-        result = np.zeros_like(particle_data.masses[0])
         radius = np.maximum(particle_data.radii[0], MIN_PARTICLE_RADIUS_M)
+        return self._native_rate_from_parameters(
+            particle_data,
+            gas,
+            temperature,
+            pressure,
+            parameters,
+            radius,
+            dynamic_viscosity,
+        )
+
+    def _native_rate_from_parameters(
+        self,
+        particle_data: ParticleData,
+        gas: GasData,
+        temperature: float,
+        pressure: float,
+        parameters: tuple[
+            NDArray[np.intp],
+            NDArray[np.intp],
+            NDArray[np.float64],
+            NDArray[np.float64],
+            NDArray[np.float64],
+        ],
+        radius: NDArray[np.float64],
+        dynamic_viscosity: float | None,
+    ) -> NDArray[np.float64]:
+        """Evaluate admitted material lanes without rescanning a population.
+
+        Internal batch material carriers may be untagged: population weights
+        have already been admitted on the complete grid and are passed to the
+        inventory finalizer separately. This helper never interprets their
+        concentration as density or performs public process admission.
+        """
+        sources, targets, molar, diffusion, accommodation = parameters
+        result = np.zeros_like(particle_data.masses[0])
         delta, equilibrium = self._native_pressure_terms(
             particle_data, gas, temperature, radius, sources, targets
         )
-        heat_strategy = getattr(self, "_latent_heat_strategy", None)
-        heat = None
-        if heat_strategy is not None:
-            heat = np.asarray(
-                heat_strategy.latent_heat(temperature), dtype=np.float64
-            )
-            if heat.ndim != 0 and heat.shape != (len(gas.name),):
-                raise ValueError(
-                    "latent heat must be scalar or full-gas ordered"
-                )
-            if not np.all(np.isfinite(heat)) or np.any(heat < 0):
-                raise ValueError("latent heat must be finite and nonnegative")
-            heat = np.broadcast_to(heat, (len(gas.name),))
+        heat = self._native_latent_heat_values(gas, temperature)
         for source, target in zip(sources, targets, strict=True):
             mean_free_path = get_molecule_mean_free_path(
                 molar_mass=float(molar[source]),
@@ -557,6 +586,86 @@ class CondensationStrategy(ABC):
                 )
         result[particle_data.concentration[0] == 0] = 0
         return result
+
+    def _native_latent_heat_values(
+        self, gas: GasData, temperature: float
+    ) -> NDArray[np.float64] | None:
+        """Validate optional latent heat in the complete gas ordering."""
+        heat_strategy = getattr(self, "_latent_heat_strategy", None)
+        if heat_strategy is None:
+            return None
+        heat = np.asarray(
+            heat_strategy.latent_heat(temperature), dtype=np.float64
+        )
+        if heat.ndim != 0 and heat.shape != (len(gas.name),):
+            raise ValueError("latent heat must be scalar or full-gas ordered")
+        if not np.all(np.isfinite(heat)) or np.any(heat < 0):
+            raise ValueError("latent heat must be finite and nonnegative")
+        return np.broadcast_to(heat, (len(gas.name),))
+
+    def _native_single_step(
+        self,
+        particle: ParticleData,
+        gas: GasData,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+        dynamic_viscosity: float | None,
+    ) -> tuple[ParticleData, GasData]:
+        """Stage one mapped isothermal/latent update, then commit by identity.
+
+        A disabled gas update keeps the caller's reservoir fixed; the same
+        finite-stage inventory limiter still bounds the particle proposal.
+        Latent energy is extensive J, including resolved volume or PDF
+        quadrature, and follows actual representable particle mass changes.
+        """
+        validate_native_time_step(time_step)
+        sources, targets, _, _, _ = self._native_parameters(
+            particle, gas, temperature, pressure
+        )
+        validate_native_step_storage(particle, gas, self.update_gases)
+        weights = condensation_population_weights(particle)
+        rate = np.asarray(
+            self.mass_transfer_rate(
+                particle, gas, temperature, pressure, dynamic_viscosity
+            ),
+            dtype=np.float64,
+        )
+        try:
+            with np.errstate(over="raise", invalid="raise"):
+                proposal = rate * time_step
+        except FloatingPointError as error:
+            raise ValueError(
+                "native condensation proposal must remain finite"
+            ) from error
+        new_masses, new_gas = finalize_native_transfer(
+            particle.masses[0],
+            weights,
+            gas.concentration[0],
+            proposal,
+            sources,
+            targets,
+        )
+        heat = self._native_latent_heat_values(gas, temperature)
+        energy = 0.0
+        if heat is not None:
+            energy = fsum(
+                fsum(
+                    (new_masses[:, target] - particle.masses[0, :, target])
+                    * weights
+                )
+                * float(particle.volume[0])
+                * float(heat[source])
+                for source, target in zip(sources, targets, strict=True)
+            )
+            if not np.isfinite(energy):
+                raise ValueError("native latent heat energy must remain finite")
+        np.copyto(particle.masses[0], new_masses)
+        if self.update_gases:
+            np.copyto(gas.concentration[0], new_gas)
+        if isinstance(self, CondensationLatentHeat):
+            self.last_latent_heat_energy = energy
+        return particle, gas
 
     def _resolve_strategies(
         self,
@@ -998,8 +1107,9 @@ class CondensationStrategy(ABC):
         """Compute the net condensation rate per particle, scaled by
         concentration.
 
-        Calculates the mass transfer rate and multiplies it by particle
-        concentration, yielding the total mass condensation rate per particle.
+        Native data uses number density or radius-PDF quadrature weights to
+        return each node's contribution to the population mass-density rate.
+        Temporary legacy inputs retain their historical concentration scaling.
 
         Arguments:
             - particle : ParticleRepresentation object with distribution and
@@ -1009,7 +1119,7 @@ class CondensationStrategy(ABC):
             - pressure : The pressure in Pascals.
 
         Returns:
-            - Condensation rate per particle or bin, in kg/s.
+            Per-node, per-species contributions in kg/m^3/s for native data.
 
         Examples:
             ```py title="Example Usage of rate"
@@ -1243,7 +1353,8 @@ class CondensationIsothermal(CondensationStrategy):
             pressure: System pressure in Pascals.
 
         Returns:
-            Condensation rate in kg/s per particle or bin.
+            Native per-node, per-species contributions in kg/m^3/s; legacy
+            inputs retain their historical concentration-scaled rates.
 
         Examples:
             ```py title="Example – Condensation rate array"
@@ -1362,6 +1473,16 @@ class CondensationIsothermal(CondensationStrategy):
         _require_matching_types(particle_is_legacy, gas_is_legacy)
         _require_single_box(particle_data.n_boxes, "ParticleData")
         _require_single_box(gas_data.n_boxes, "GasData")
+
+        if self._uses_native_contract(particle):
+            return self._native_single_step(
+                particle_data,
+                gas_data,
+                temperature,
+                pressure,
+                time_step,
+                dynamic_viscosity,
+            )
 
         mass_rate = self.mass_transfer_rate(
             particle=particle,
@@ -1683,6 +1804,115 @@ class CondensationIsothermalStaggered(CondensationStrategy):
 
         return list(np.array_split(indices, effective_batches))
 
+    def _validate_native_staggered_controls(self) -> None:
+        """Revalidate mutable controls before drawing randomness or writing."""
+        if self.theta_mode not in self.VALID_THETA_MODES:
+            raise ValueError("invalid native theta_mode")
+        if (
+            isinstance(self.num_batches, (bool, np.bool_))
+            or not isinstance(self.num_batches, (int, np.integer))
+            or self.num_batches < 1
+        ):
+            raise ValueError("num_batches must be a positive integer")
+        if not isinstance(self.shuffle_each_step, (bool, np.bool_)):
+            raise ValueError("shuffle_each_step must be boolean")
+        random = self.random_state
+        if random is None or isinstance(
+            random, (np.random.Generator, np.random.RandomState)
+        ):
+            return
+        if (
+            isinstance(random, (bool, np.bool_))
+            or not isinstance(random, (int, np.integer))
+            or random < 0
+        ):
+            raise ValueError(
+                "random_state must be a generator or nonnegative seed"
+            )
+
+    def _native_staggered_step(
+        self,
+        particle: ParticleData,
+        gas: GasData,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+        dynamic_viscosity: float | None,
+    ) -> tuple[ParticleData, GasData]:
+        """Apply two conservative Gauss-Seidel sweeps to private working state.
+
+        Preserve the existing frozen particle composition, radii and transport
+        over both sweeps. Gas pressure reads the latest batch inventory, while
+        evaporation is bounded by actual remaining staged particle mass.
+        Local theta durations are applied per node, including mixed durations
+        in a vectorized batch. PDF weights come from the entire original grid.
+        A disabled gas update retains fixed reservoir pressure between batches.
+        """
+        validate_native_time_step(time_step)
+        self._validate_native_staggered_controls()
+        parameters = self._native_parameters(
+            particle, gas, temperature, pressure
+        )
+        sources, targets = parameters[:2]
+        validate_native_step_storage(particle, gas, self.update_gases)
+        # Resolve all physical/model configuration before touching caller RNG.
+        self._native_mass_transfer_rate(
+            particle, gas, temperature, pressure, dynamic_viscosity
+        )
+        weights = condensation_population_weights(particle)
+        n_particles = particle.n_particles
+        if time_step == 0 or n_particles == 0 or sources.size == 0:
+            return particle, gas
+        radius = np.maximum(particle.radii[0], MIN_PARTICLE_RADIUS_M)
+        theta = self._get_theta_values(n_particles)
+        batches = self._make_batches(n_particles)
+        working_masses = particle.masses[0].copy()
+        working_gas = gas.copy()
+        for duration in (theta * time_step, (1 - theta) * time_step):
+            for batch in batches:
+                indices = batch[(duration[batch] > 0) & (weights[batch] > 0)]
+                if indices.size == 0:
+                    continue
+                # A material-only slice, not a separately interpreted PDF.
+                material = ParticleData(
+                    masses=particle.masses[:, indices, :],
+                    concentration=particle.concentration[:, indices],
+                    charge=particle.charge[:, indices],
+                    density=particle.density,
+                    volume=particle.volume,
+                )
+                rate = self._native_rate_from_parameters(
+                    material,
+                    working_gas,
+                    temperature,
+                    pressure,
+                    parameters,
+                    radius[indices],
+                    dynamic_viscosity,
+                )
+                try:
+                    with np.errstate(over="raise", invalid="raise"):
+                        proposal = rate * duration[indices, None]
+                except FloatingPointError as error:
+                    raise ValueError(
+                        "native staggered proposal overflow"
+                    ) from error
+                updated, remaining = finalize_native_transfer(
+                    working_masses[indices],
+                    weights[indices],
+                    working_gas.concentration[0],
+                    proposal,
+                    sources,
+                    targets,
+                )
+                working_masses[indices] = updated
+                if self.update_gases:
+                    working_gas.concentration[0] = remaining
+        np.copyto(particle.masses[0], working_masses)
+        if self.update_gases:
+            np.copyto(gas.concentration, working_gas.concentration)
+        return particle, gas
+
     # pylint: disable=too-many-positional-arguments, too-many-arguments
     def mass_transfer_rate(
         self,
@@ -1765,8 +1995,9 @@ class CondensationIsothermalStaggered(CondensationStrategy):
             pressure: System pressure in pascals.
 
         Returns:
-            Condensation/evaporation rate (kg/s) scaled by particle
-            concentration with skip-partitioning applied.
+            Native per-node, per-species contributions in kg/m^3/s with
+            skip-partitioning applied; legacy inputs retain their historical
+            concentration-scaled rates.
         """
         if self._uses_native_contract(particle):
             native_particle = cast(ParticleData, particle)
@@ -2128,6 +2359,16 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         _require_matching_types(particle_is_legacy, gas_is_legacy)
         _require_single_box(particle_data.n_boxes, "ParticleData")
         _require_single_box(gas_data.n_boxes, "GasData")
+
+        if self._uses_native_contract(particle):
+            return self._native_staggered_step(
+                particle_data,
+                gas_data,
+                temperature,
+                pressure,
+                time_step,
+                dynamic_viscosity,
+            )
 
         n_particles = particle_data.concentration[0].shape[0]
         if time_step == 0.0 or n_particles == 0:
@@ -2582,8 +2823,7 @@ class CondensationLatentHeat(CondensationStrategy):
         order, using number density or PDF quadrature weights. Untagged
         temporary compatibility retains historical raw-weight rates.
 
-        Mass transfer rates are scaled by the raw particle concentration and
-        the configured skip-partitioning indices are applied.
+        The configured skip-partitioning indices are applied before weighting.
 
         Args:
             particle: Particle representation providing concentration data.
@@ -2592,7 +2832,8 @@ class CondensationLatentHeat(CondensationStrategy):
             pressure: System pressure in Pascals.
 
         Returns:
-            Condensation rate in kg/s per particle or bin.
+            Native per-node, per-species contributions in kg/m^3/s; legacy
+            inputs retain their historical concentration-scaled rates.
         """
         if self._uses_native_contract(particle):
             native_particle = cast(ParticleData, particle)
@@ -2814,6 +3055,16 @@ class CondensationLatentHeat(CondensationStrategy):
         _require_matching_types(particle_is_legacy, gas_is_legacy)
         _require_single_box(particle_data.n_boxes, "ParticleData")
         _require_single_box(gas_data.n_boxes, "GasData")
+
+        if self._uses_native_contract(particle):
+            return self._native_single_step(
+                particle_data,
+                gas_data,
+                temperature,
+                pressure,
+                time_step,
+                dynamic_viscosity,
+            )
 
         mass_rate = self.mass_transfer_rate(
             particle=particle,

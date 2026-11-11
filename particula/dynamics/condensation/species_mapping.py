@@ -153,7 +153,12 @@ def validate_condensation_state(
     _validate_gas_state(gas, species_map)
     width = len(species_map.gas_names)
     for value, label in ((temperature, "temperature"), (pressure, "pressure")):
-        if np.ndim(value) != 0 or not np.isfinite(value) or value <= 0:
+        if (
+            isinstance(value, (bool, np.bool_))
+            or np.ndim(value) != 0
+            or not np.isfinite(value)
+            or value <= 0
+        ):
             raise ValueError(f"{label} must be a positive finite scalar")
     if any(
         target >= particle.n_species
