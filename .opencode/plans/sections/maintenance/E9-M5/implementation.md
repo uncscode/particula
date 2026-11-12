@@ -565,3 +565,29 @@ Inventory records these three page dispositions. The activity feature guide
 still contains incomplete recipes, and remaining theory/reference boundaries,
 API targets, navigation, P7 and full final gates remain outstanding. P6 remains
 In Progress and no PR has been opened.
+
+### P6 functional activity/reference checkpoint (2026-11-11)
+
+Audited the activity feature guide and both activity/equilibria theory pages.
+These are functional calculations, not native aggregate consumers. Completed
+previously undefined partial-pressure and equilibrium inputs, corrected the
+factory key to molar_ideal and provided required molar-mass units. Retained
+existing example physical values; the placeholder equilibrium call now uses
+the page's already specified three-species case. All 11 feature-guide and
+three theory Python fences execute in their stated shared context.
+
+Clarified the equilibrium interface's µg/m³ and g/mol inputs versus activity
+strategy kg/mol inputs. Corrected the false [0,1] bound for non-ideal activity,
+separated reservoir water from organic-species mass balance and corrected the
+theory output label to liquid organic concentration. Replaced the universal
+1e-16 solver-convergence claim with inspection of optimizer status and actual
+residual; no new accuracy/domain claim is made. The existing activity-theory
+code itself is unchanged.
+
+Three added numerical checks verify BAT coefficient-times-mole-fraction
+identities and organic mass balances for both object and functional solver
+paths with water excluded. Theory suite now reports **6 passed in 1.67s**;
+scoped Ruff check/format, git diff --check and strict MkDocs pass (log
+`/tmp/m5-p6-activity-reference-mkdocs.log`). The inventory records these three
+functional dispositions. P6 still has remaining backend/foundations, GPU theory,
+roadmap, API-target and navigation audits; P7 and final gates are outstanding.

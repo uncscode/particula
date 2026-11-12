@@ -65,3 +65,66 @@ def test_design_pattern_function_and_strategy_examples():
         namespace["coagulation_process"].coagulation_strategy
         is namespace["combined_strategy"]
     )
+
+
+def test_activity_feature_equilibrium_organic_balance():
+    """The completed recipes separate reservoir water from organic inventory."""
+    namespace = execute_page("docs/Features/activity_system.md")
+    result = namespace["result"]
+    organic = np.array([1.0, 5.0, 10.0])
+    fractions = result.partition_coefficients
+    assert np.all(np.isfinite(fractions))
+    assert np.all((fractions >= 0) & (fractions <= 1))
+    phases = [result.alpha_phase, result.beta_phase]
+    liquid_organic = sum(
+        phase.total_concentration - phase.water_concentration
+        for phase in phases
+    )
+    np.testing.assert_allclose(
+        liquid_organic, np.sum(organic * fractions), rtol=1e-12
+    )
+    np.testing.assert_allclose(
+        liquid_organic + np.sum(organic * (1 - fractions)),
+        organic.sum(),
+        rtol=1e-12,
+    )
+    assert sum(phase.water_concentration for phase in phases) > 0
+
+
+def test_activity_theory_coefficient_identity():
+    """BAT activity equals its coefficient times the appropriate mole fraction."""
+    namespace = execute_page(
+        "docs/Theory/Activity_Calculations/activity_theory.md"
+    )
+    np.testing.assert_allclose(
+        namespace["activity_water"],
+        namespace["gamma_water"] * 0.7,
+        rtol=1e-12,
+    )
+    np.testing.assert_allclose(
+        namespace["activity_organic"],
+        namespace["gamma_organic"] * 0.3,
+        rtol=1e-12,
+    )
+
+
+def test_equilibrium_theory_species_balance():
+    """The functional solver preserves each organic species with water separate."""
+    namespace = execute_page(
+        "docs/Theory/Activity_Calculations/equilibria_theory.md"
+    )
+    assert namespace["result"].success
+    alpha, beta, system = (
+        namespace["alpha"],
+        namespace["beta"],
+        namespace["system"],
+    )
+    organic = np.array([1.0, 2.0, 3.0])
+    fraction = system[2]
+    assert np.all((fraction >= 0) & (fraction <= 1))
+    np.testing.assert_allclose(
+        alpha[0] + beta[0] + organic * (1 - fraction), organic, rtol=1e-12
+    )
+    np.testing.assert_allclose(
+        alpha[2] + beta[2] - alpha[3] - beta[3], system[0], rtol=1e-12
+    )

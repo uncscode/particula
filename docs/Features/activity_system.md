@@ -176,9 +176,10 @@ factory = par.particles.ActivityFactory()
 
 # Select ideal molar strategy
 ideal = factory.get_strategy(
-    strategy_type="ideal_molar",
+    strategy_type="molar_ideal",
     parameters={
         "molar_mass": np.array([18.015e-3, 200.0e-3]),
+        "molar_mass_units": "kg/mol",
     },
 )
 
@@ -198,7 +199,10 @@ kappa = factory.get_strategy(
 
 ### Integration with equilibria
 
-Activity strategies integrate with liquid-vapor partitioning calculations:
+Activity strategies integrate with liquid-vapor partitioning calculations.
+This equilibrium interface uses matching µg/m³ concentration inputs and g/mol
+molar masses; activity strategies above use kg/mol. Water supplied by the
+prescribed humidity reservoir is separate from the organic species balance:
 
 ```python
 import numpy as np
@@ -211,7 +215,7 @@ partitioning = par.equilibria.LiquidVaporPartitioningStrategy(
 
 # Solve for equilibrium
 result = partitioning.solve(
-    c_star_j_dry=np.array([1e-6, 1e-4, 1e-2]),  # saturation concentrations
+    c_star_j_dry=np.array([1e-6, 1e-4, 1e-2]),  # ug/m³, matching organic inventory units
     concentration_organic_matter=np.array([1.0, 5.0, 10.0]),  # ug/m^3
     molar_mass=np.array([200.0, 200.0, 200.0]),  # g/mol
     oxygen2carbon=np.array([0.2, 0.3, 0.5]),
@@ -222,6 +226,10 @@ result = partitioning.solve(
 print(f"Partition coefficients: {result.partition_coefficients}")
 print(f"Alpha phase water: {result.alpha_phase.water_concentration}")
 ```
+
+Run the Python snippets in page order so imports and example arrays are
+available to the later workflow snippets. These functional calculations do
+not construct or mutate an `Aerosol`.
 
 ## Getting Started
 
@@ -288,7 +296,7 @@ Call the strategy methods with mass concentration arrays:
 
 ```python
 activity = strategy.activity(mass_concentration=mass)
-partial_p = strategy.partial_pressure(pure_vapor_pressure, mass_concentration=mass)
+partial_p = strategy.partial_pressure(pure_pressure, mass_concentration=mass)
 ```
 
 ### 4. Integrate with equilibria
@@ -297,9 +305,15 @@ Combine with partitioning strategies for full thermodynamic calculations:
 
 ```python
 partitioning = par.equilibria.LiquidVaporPartitioningStrategy(
-    water_activity=target_rh,
+    water_activity=0.75,
 )
-result = partitioning.solve(...)
+result = partitioning.solve(
+    c_star_j_dry=np.array([1e-6, 1e-4, 1e-2]),  # ug/m³
+    concentration_organic_matter=np.array([1.0, 5.0, 10.0]),  # ug/m³
+    molar_mass=np.array([200.0, 200.0, 200.0]),  # g/mol
+    oxygen2carbon=np.array([0.2, 0.3, 0.5]),
+    density=np.array([1200.0, 1200.0, 1200.0]),  # kg/m³
+)
 ```
 
 ## Use Cases
@@ -351,7 +365,7 @@ result = partitioning.solve(...)
 
 1. **Match model to system**: Use ideal strategies for simple mixtures, kappa for inorganic hygroscopic aerosols, and BAT for organic-water systems
 2. **Use builder validation**: Set parameters through builders to ensure unit conversion and validity checks
-3. **Check activity ranges**: Activity values should be in [0, 1] for condensed phases
+3. **Check finite, nonnegative activities**: Non-ideal activity can exceed one; do not clip it to a mole-fraction bound.
 4. **Consider temperature effects**: The BAT model includes temperature-dependent parameters; ensure consistency
 5. **Validate with experiments**: Compare model predictions against measured hygroscopic growth or partitioning data
 6. **Use consistent units**: Mass concentrations are expected in kg/m^3; use builders for automatic conversion
