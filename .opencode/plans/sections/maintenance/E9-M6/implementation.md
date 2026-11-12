@@ -340,3 +340,22 @@ Validation: six mechanism suites **47 passed**; full coagulation tree
 **757 passed in 3.06s** (`/tmp/m6-coag-fixtures-broad.log`). Full-package mypy
 passed for 552 files (`/tmp/m6-coag-fixtures-mypy.log`). These are fixture
 migration checks, not evidence that shared legacy dispatch is removed.
+
+## Native charged-coagulation integration scenarios
+
+Replaced the legacy aggregate, atmosphere and resolved representation builder
+in the three charged comparison scenarios with native resolved data, a held
+explicit environment and an independent inert gas lane. All original merger,
+mass and charge assertions remain, recorded in
+`charged_integration_assertions.json`. Added the removal-safe facade guard,
+per-material extensive conservation, held-object identity and protected
+gas/environment assertions. The strategy RNG is explicitly seeded; original
+physical inputs, timesteps and merger assertions are unchanged.
+
+Validation: the three migrated cases pass; together with native scientific
+integration and the full coagulation tree, **811 passed in 4.07s**
+(`/tmp/m6-charged-integration-broad.log`). Focused mypy, Ruff, formatting and
+whitespace checks passed. The initial collection attempt used an incorrect
+EnvironmentData import; the corrected supported package import passed all
+checks above. Shared coagulation dispatch and the remaining integration
+fixtures still require migration/removal before facade definitions can go.

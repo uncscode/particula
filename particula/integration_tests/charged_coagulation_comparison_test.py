@@ -12,7 +12,13 @@ Each case asserts mass/charge conservation and physical merger behavior.
 import numpy as np
 import numpy.testing as npt
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+import pytest
+from particula.gas import EnvironmentData, GasDataBuilder
+
+
+@pytest.fixture(autouse=True)
+def forbid_facades(forbid_legacy_facades):
+    """Require real native execution without legacy construction."""
 
 
 def _run_coagulation(
@@ -53,13 +59,6 @@ def _run_coagulation(
 
     temperature_k = 216.65
     pressure_pa = 5066.25
-    atmosphere = (
-        par.gas.AtmosphereBuilder()
-        .set_temperature(temperature_k)
-        .set_pressure(pressure_pa, "Pa")
-        .build()
-    )
-
     # -- particles (fixed radii, no randomness) --
     calcite_r = np.full(nn, 100e-9)  # 100nm radius = 200nm diameter
     ions_r = np.full(nd, 50e-9)  # 50nm radius = 100nm diameter
@@ -76,25 +75,30 @@ def _run_coagulation(
     charge_array[:nn] = calcite_charge
     charge_array[nn:] = ion_charge
 
+    species_mass_before = mass_speciation.sum(axis=0)
     total_mass_before = np.sum(mass_speciation)
     total_charge_before = charge_array.sum()
 
     # -- build aerosol --
-    resolved_masses = (
-        par.particles.ResolvedParticleMassRepresentationBuilder()
-        .set_distribution_strategy(
-            par.particles.ParticleResolvedSpeciatedMass()
-        )
-        .set_activity_strategy(par.particles.ActivityIdealMass())
-        .set_surface_strategy(par.particles.SurfaceStrategyVolume())
-        .set_mass(mass_speciation, "kg")
-        .set_density(np.array([calcite_density, ions_density]), "kg/m^3")
-        .set_charge(charge_array)
-        .set_volume(volume, "m^3")
+    resolved_masses = par.particles.create_resolved_particle_data(
+        masses=mass_speciation,
+        density=np.array([calcite_density, ions_density]),
+        charge=charge_array,
+        volume=volume,
+    )
+    gas = (
+        GasDataBuilder()
+        .set_names(["inert"])
+        .set_molar_mass([0.028])
+        .set_concentration([0.0])
+        .set_partitioning([False])
         .build()
     )
-
-    aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
+    aerosol = par.Aerosol(
+        particles=resolved_masses,
+        gas=gas,
+        environment=EnvironmentData([temperature_k], [pressure_pa], [[0.0]]),
+    )
 
     # -- coagulation --
     hs_strategy = par.dynamics.HardSphereKernelStrategy()
@@ -105,6 +109,7 @@ def _run_coagulation(
         .set_use_direct_kernel(use_direct_kernel)
     )
     charged_brownian = charged_builder.build()
+    charged_brownian.random_generator = np.random.default_rng(seed)
     coagulation = par.dynamics.Coagulation(
         coagulation_strategy=charged_brownian,
     )
@@ -116,10 +121,25 @@ def _run_coagulation(
     for _ in range(n_steps):
         aerosol = coagulation.execute(aerosol, dt, sub_steps=1)
 
+    assert aerosol.particles is resolved_masses
+    assert aerosol.gas is gas
+    npt.assert_array_equal(gas.concentration, [[0.0]])
+    npt.assert_array_equal(aerosol.environment.temperature, [temperature_k])
+    npt.assert_array_equal(aerosol.environment.pressure, [pressure_pa])
+    npt.assert_allclose(
+        (
+            resolved_masses.masses[0]
+            * resolved_masses.concentration[0, :, None]
+        ).sum(axis=0),
+        species_mass_before,
+        rtol=1e-12,
+        atol=0,
+    )
+
     # -- analyze after --
-    dist = aerosol.particles.distribution
-    charges = aerosol.particles.get_charge(clone=True)
-    masses = aerosol.particles.get_mass(clone=True)
+    dist = aerosol.particles.masses[0]
+    charges = aerosol.particles.charge[0].copy()
+    masses = aerosol.particles.masses[0].sum(axis=1)
     assert charges is not None, "charges should not be None"
     assert masses is not None, "masses should not be None"
 
