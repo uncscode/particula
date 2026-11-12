@@ -19,7 +19,7 @@
 
 # %%
 # In Colab uncomment the following command to install particula:
-# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
+# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
 # Importing necessary libraries
 import matplotlib.pyplot as plt  # For creating plots and visualizations
 import numpy as np  # For numerical operations
@@ -142,7 +142,7 @@ print("Calculation complete")
 # ## Plotting the Equilibrium Composition vs. Relative Humidity
 #
 # This functional example is independent of the native aerosol containers.
-# Its equilibrium solver and phase-transfer model are unchanged by M5; the
+# Its equilibrium solver and phase-transfer model are unchanged by v0.3.0; the
 # plot is illustrative, not a new validation of two-phase thermodynamics.
 #
 # Now that we have calculated the equilibrium composition for a range of RH values, we will visualize these results. The plot will show how the total organic aerosol concentration and the water concentration in the aerosol vary with changing RH. This visualization is crucial for understanding the dynamic behavior of aerosols in different atmospheric humidity conditions.

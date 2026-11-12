@@ -77,7 +77,7 @@ tape.backward(grads={y: wp.ones_like(y)})    # reverse pass
 gradient = x.grad.numpy().copy()
 print(gradient)                              # -> [5. 7. 9.]
 
-# reuse buffers for another backward pass only after:
+# Reuse buffers for another backward pass only after:
 tape.zero()
 ```
 
@@ -175,7 +175,7 @@ def sum_kernel(x: wp.array(dtype=float), out: wp.array(dtype=float), iters: int)
     out[0] = s                 # correct grads (add-only)
 
 # A product (prod *= x[i]) over a dynamic loop gives WRONG gradients,
-# because adjoints depend on intermediate prod values that are not recomputed.
+# Because adjoints depend on intermediate prod values that are not recomputed.
 ```
 
 Workarounds: use a static loop (`range(3)`) that Warp unrolls up to
@@ -367,19 +367,19 @@ are already gradient-friendly; the stochastic control flow is not.
   `condensation_mass_transfer_kernel` computes a smooth rate and
   `apply_mass_transfer_kernel` applies it with `+=`-style updates plus a clamp
   (`particula/gpu/kernels/condensation.py`). This is the model to follow for a
-  differentiable coagulation rate kernel. The P4 condensation stiffness
+  differentiable coagulation rate kernel. The API validation condensation stiffness
   recommendation builds on a fixed-count substepping variant of this pattern,
   because fixed iteration counts fit Warp autodiff and graph-capture
   expectations better than adaptive loop structures.
 
-### Bounded P4 condensation evidence
+### Bounded API validation condensation evidence
 
 `particula/gpu/kernels/tests/condensation_autodiff_test.py` records a narrow
-P4 result, rather than support for differentiating the public condensation
+API validation result, rather than support for differentiating the public condensation
 step. On Warp CPU, its one-box fp64, out-of-place raw-rate
 `condensation_mass_transfer_kernel` Tape derivative with respect to gas
 concentration agrees with a centered finite-difference reference only when
-positivity and inventory margins keep P2 boundaries inactive. CUDA runs are
+positivity and inventory margins keep numerical validation boundaries inactive. CUDA runs are
 optional additive evidence and skip cleanly when unavailable; this work neither
 requires CUDA nor promises `wp.autograd.gradcheck` support.
 
@@ -387,9 +387,9 @@ The test scopes `verify_autograd_array_access` and restores its prior value even
 when an exception occurs. A missing Tape, backward, or access-verification
 capability is a precise skip, not evidence for a gradient path.
 
-P2 remains forward-only evidence at its boundaries: the evaporation clamp is
+numerical validation remains forward-only evidence at its boundaries: the evaporation clamp is
 non-smooth, uptake inventory limiting is a boundary, and finalized transfer
-mutates particle and gas state in place. Therefore, P4 does not establish a
+mutates particle and gas state in place. Therefore, API validation does not establish a
 derivative for the complete public step, a multi-step loop, or a production
 optimization API.
 
@@ -412,7 +412,7 @@ differentiate correctly as written.
 
 ### Recommended direction
 
-- Treat the bounded raw-rate P4 Tape check as a starting point, not a complete
+- Treat the bounded raw-rate API validation Tape check as a starting point, not a complete
   public-step or multi-step gradient claim. Any future broader path requires
   independent boundary-aware validation; it is not currently promised through
   `wp.autograd.gradcheck`.

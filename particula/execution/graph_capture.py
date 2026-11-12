@@ -2,12 +2,12 @@
 
 This concrete, direct-import-only authority resolves caller-provided
 graph-capture support and records identity-based compatibility for an
-already-built resident request. P1 qualification retains a native callable
-vocabulary for one exact READY binding. P2 capture calls native begin, frozen
+already-built resident request. Qualification retains a native callable
+vocabulary for one exact READY binding. Capture calls native begin, frozen
 operation dispatch, and end in order; it issues an authentic record for the
 resulting opaque handle in private provenance and releases it after
 post-capture
- rejection or lifecycle teardown. P3 replay accepts only that issued record,
+ rejection or lifecycle teardown. Replay accepts only that issued record,
  revalidates its exact binding metadata, and performs one guard-token/native-
  launch/completion path.
 
@@ -147,7 +147,8 @@ class GraphCaptureNativeCallables:
     """Retain an adapter's native callable vocabulary by exact identity.
 
     This record is vocabulary only: it holds no graph or executable handle.
-    P2 invokes ``capture_begin()``, ``capture_end()``, and, after a post-end
+    capture invokes ``capture_begin()``, ``capture_end()``, and, after a
+    post-end
     rejection, ``capture_release()``. A failure after begin invokes
     ``capture_abort()`` and releases a non-``None`` abort result.
     It never invokes ``capture_instantiate`` or ``capture_launch``. In
@@ -185,7 +186,7 @@ class GraphCaptureNativeCallables:
 
 
 class GraphCaptureRuntimeAdapter(GraphCaptureRuntimeProbe, Protocol):
-    """Declare lazy runtime probes and callable resolution for P1.
+    """Declare lazy runtime probes and callable resolution for qualification.
 
     The adapter owns runtime-specific behavior and treats ``Device.native`` as
     opaque. Qualification resolves runtime, device, and API availability in
@@ -1190,7 +1191,9 @@ def _lifecycle_successor(
     state: GraphCaptureLifecycleState,
     reason: GraphCaptureDriftReason | None,
 ) -> GraphCaptureLifecycle:
-    """Create a successor retaining P1 capability and signature identities."""
+    """Create a successor retaining qualification capability and signature
+    identities.
+    """
     return GraphCaptureLifecycle(
         capability=lifecycle.capability,
         signature=lifecycle.signature,
@@ -1216,7 +1219,7 @@ def create_graph_capture_lifecycle(
         A new ready lifecycle record retaining both input carriers by identity.
 
     Raises:
-        TypeError: If either P1 carrier is inexact.
+        TypeError: If either qualification carrier is inexact.
         ValueError: If graph capture is not available.
     """
     if type(capability) is not GraphCaptureCapability:
@@ -1270,7 +1273,8 @@ def invalidate_graph_capture(
 
     Args:
         lifecycle: Captured or already-invalidated lifecycle metadata.
-        compatibility: P1 compatibility result containing the drift outcome.
+        compatibility: qualification compatibility result containing the drift
+            outcome.
 
     Returns:
         The original record for compatible or repeated invalidation, otherwise
@@ -1642,11 +1646,13 @@ def complete_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
 class PreparedGraphCaptureQualification:
     """Retain one exact READY qualification without a native handle or cleanup.
 
-    P1 retains the prepared resident binding, published capture resources, and
+    Qualification retains the prepared resident binding, published capture
+    resources, and
     native callable vocabulary by identity; it copies no payloads. It creates
     no graph or executable handle, owns no cleanup callback, and does not
     invoke any retained callable. Successful qualification leaves the binding's
-    lifecycle in READY; P2/P3 alone own native capture, handles, release, and
+    lifecycle in READY; capture/replay alone own native capture, handles,
+    release, and
     cleanup.
 
     Attributes:
@@ -1703,11 +1709,13 @@ class PreparedGraphCaptureQualification:
 class CapturedResidentGraph:
     """Retain one completed native capture and its exact resident binding.
 
-    Authentic records are issued only after P2 capture completes and publishes
-    CAPTURED metadata. The opaque ``handle`` is retained by identity only; P2
-    rejects only a literal ``None`` handle, while P3 compares provenance and
+    Authentic records are issued only after capture completes and publishes
+    CAPTURED metadata. The opaque ``handle`` is retained by identity only;
+    capture
+    rejects only a literal ``None`` handle, while replay compares provenance and
     forwards it by identity without inspecting its type, equality, truthiness,
-    or serialization. P2 owns native begin/end/release work; P3 may only
+    or serialization. Capture owns native begin/end/release work; replay may
+    only
     forward an authentic handle to ``capture_launch`` under one guard token.
     This direct-module-only carrier does not expose cleanup or a public export.
 
@@ -1803,11 +1811,12 @@ _NATIVE_HANDLE_PROVENANCE: dict[int, _NativeGraphRecord] = {}
 def _release_issued_captured_graphs_for_binding(
     binding: ResidentGraphCaptureBinding,
 ) -> None:
-    """Release and unregister P2-issued handles owned by one binding.
+    """Release and unregister capture-issued handles owned by one binding.
 
     Removing each record before its native release makes the operation
-    exactly-once even when native cleanup fails.  This P2 lifecycle helper is
-    deliberately not used by P3 replay, which only authenticates and launches
+    exactly-once even when native cleanup fails.  This capture lifecycle helper
+    is
+    deliberately not used by replay, which only authenticates and launches
     an issued handle.
     """
     with _ISSUED_CAPTURED_GRAPHS_CONDITION:
@@ -1955,7 +1964,7 @@ def _notify_resident_graph_capture(
 
 
 def _require_issued_captured_graph(captured: object) -> CapturedResidentGraph:
-    """Require an authentic P2-issued record and its exact opaque handle.
+    """Require an authentic capture-issued record and its exact opaque handle.
 
     This provenance lookup is metadata-only. It does not inspect the opaque
     handle, allocate a resource, transfer data, read back, synchronize, or
@@ -2061,18 +2070,20 @@ def qualify_prepared_resident_graph_capture(  # noqa: C901
 ) -> PreparedGraphCaptureQualification:
     """Qualify one exact prepared READY binding for later native capture.
 
-    This metadata-only P1 boundary validates existing exact identities, then
+    This metadata-only qualification boundary validates existing exact
+    identities, then
     lazily resolves the adapter vocabulary in runtime, device, API, and
     callable order. It returns a fresh frozen record by reference only. It does
     not open a guard token; invoke native callables; capture, enqueue, allocate,
     synchronize, or transfer; create or release an opaque handle; register
     cleanup; or transition the READY lifecycle. Every rejection is read-only;
-    P2/P3 own capture, handle lifetime, release, and cleanup.
+    capture/replay own capture, handle lifetime, release, and cleanup.
 
     Args:
         binding: Exact attached READY resident graph-capture binding.
-        prepared: Exact E8-F2 prepared resident simulation.
-        capture_set: Exact E8-F3 published capture resource set.
+        prepared: Exact capture-ready enqueue prepared resident simulation.
+        capture_set: Exact resource preallocation published capture resource
+            set.
         adapter: Caller-owned lazy native runtime adapter.
 
     Returns:
@@ -2416,7 +2427,7 @@ def capture_prepared_resident_graph(  # noqa: C901
 
     Only native ``capture_begin()``, retained prepared dispatch, and
     ``capture_end()`` run inside the capture window. A literal ``None`` end
-    result is rejected. Only a successful P2 capture that publishes CAPTURED
+    result is rejected. Only a successful capture that publishes CAPTURED
     metadata issues a replay-authentic record and registers its opaque handle
     by identity. A successful end handle is released exactly once only if
     post-end validation or lifecycle completion rejects it. This concrete-only
@@ -2528,7 +2539,7 @@ def _validate_replay_captured_graph(
     may change; their retained object identities may not.
 
     Args:
-        captured: Candidate P2-issued captured graph.
+        captured: Candidate capture-issued captured graph.
         duration: Requested replay duration.
 
     Returns:
@@ -2660,7 +2671,8 @@ def _raise_replay_operational_failure(
 def replay_captured_resident_graph(captured: object, duration: object) -> None:
     """Replay one authentic captured graph under exactly one resident token.
 
-    This direct-module-only entry point accepts only a P2-issued record whose
+    This direct-module-only entry point accepts only a capture-issued record
+    whose
     opaque handle retains registered identity. After exact metadata admission,
     it opens one token, invokes ``capture_launch`` once, and completes that
     token once. Pinned array values and resident RNG words may change while
@@ -2668,13 +2680,13 @@ def replay_captured_resident_graph(captured: object, duration: object) -> None:
 
     Accepted replay performs no prepared-host dispatch, native capture,
     instantiation, release, allocation, runtime probe, payload scan, resource
-    acquisition, transfer, readback, synchronization, RNG initialization or
+    Acquisition, transfer, readback, synchronization, RNG initialization or
     reset, fallback, retry, or automatic recapture. Native-launch and
     post-launch completion failures are writer-capable and fault resident and
     capture metadata without a rollback guarantee.
 
     Args:
-        captured: Exact P2-issued ``CapturedResidentGraph`` to replay.
+        captured: Exact capture-issued ``CapturedResidentGraph`` to replay.
         duration: Finite nonnegative replay duration matching the qualification.
 
     Raises:
@@ -2891,7 +2903,7 @@ def close_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
     """Close lifecycle metadata owned by one exact attached binding.
 
     Repeated closure returns the identical closed lifecycle. This operation does
-    not dispatch or mutate resident payloads. It makes any P2-issued record
+    not dispatch or mutate resident payloads. It makes any capture-issued record
     stale and releases its native handle exactly once before terminal closure.
 
     Args:

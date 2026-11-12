@@ -1,8 +1,8 @@
-"""Define immutable P4 nucleation source-selection metadata.
+"""Define immutable public construction nucleation source-selection metadata.
 
 This module only selects an already-built potential-rate strategy and precursor
 species index, with an explicit full-gas map for native execution. It does not
-import or provide concrete P2/P3
+import or provide concrete demand planning/source transaction
 ``particle_source`` finalization, transaction, or state-mutation helpers.
 """
 
@@ -20,10 +20,11 @@ from particula.dynamics.nucleation.species_mapping import NucleationSpeciesMap
 
 @dataclass(frozen=True)
 class NucleationSourceConfig:
-    """Select a P4 nucleation strategy and its precursor species index.
+    """Select a public construction nucleation strategy and its precursor
+        species index.
 
     This record is metadata only; source-demand finalization and mutation remain
-    at concrete P2/P3 boundaries.
+    at concrete demand planning/source transaction boundaries.
 
     Attributes:
         strategy: Immutable activation or kinetic potential-rate strategy.

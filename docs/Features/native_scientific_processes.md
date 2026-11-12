@@ -1,11 +1,11 @@
 # Native scientific process calls
 
-E9-M3 connects the native `Aerosol` aggregate to explicit CPU scientific
+V0.3.0 connects the native `Aerosol` aggregate to explicit CPU scientific
 strategies. The aggregate owns `ParticleData`, full-order `GasData`, and
 `EnvironmentData` references; strategies own physical configuration and RNG.
 The integration regression is
 `particula/integration_tests/native_scientific_processes_test.py`. It builds
-through the M2 public initializers/builders and forbids facade construction.
+through the v0.3.0 public initializers/builders and forbids facade construction.
 
 ## Representation and inventory
 
@@ -29,7 +29,7 @@ Pass `aerosol.particles`, `aerosol.gas`, and scalar values from
 import particula as par
 from docs.Examples.native_state_access import build_aerosol, build_condensation
 
-# Run from the selected E9 checkout; the fixture includes ordered inert gas.
+# Run from the v0.3.0 development checkout; the fixture includes ordered inert gas.
 aerosol = build_aerosol()
 condensation = build_condensation(aerosol.gas).condensation_strategy
 coagulation = par.dynamics.BrownianCoagulationStrategy("particle_resolved")
@@ -96,10 +96,10 @@ described here; resolved coagulation requires equal positive active counts.
 
 Native CPU wall loss retains forward Euler for PMF/PDF and Bernoulli whole-
 representative removal for resolved counts, including unequal weights.
-Account for removed inventory as an explicit sink. M4 native CPU resolved removal
+Account for removed inventory as an explicit sink. V0.3.0 native CPU resolved removal
 clears charge together with mass/count, so removed slots satisfy the activation
 free-slot contract. Surviving and untouched inactive storage is preserved. This
-amends M3 charge retention without changing the CPU removal law. GPU removal
+amends v0.3.0 charge retention without changing the CPU removal law. GPU removal
 also clears charge. See [wall-loss contracts](wall_loss_strategy_system.md).
 
 ## Direct/prepared Warp boundary
@@ -132,10 +132,10 @@ resident/checkpoint integration are available under their bounded contracts.
 See the source, communication and resident sections below, the
 [migration guide](particle-data-migration/index.md), and the
 [complete direct sequence](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py).
-Temporary facades and untagged compatibility dispatch remain until M6; these
+Temporary facades and untagged compatibility dispatch remain until v0.3.0; these
 examples do not authorize deletion, a release, or GPU performance claims.
 
-## Native source integration (M4)
+## Native source integration (v0.3.0)
 
 `Nucleation(source_config, commit_config)` reads the currently held native
 `Aerosol.gas` and `Aerosol.environment` on each equal substep. Its source config
@@ -172,7 +172,7 @@ The direct GPU `nucleation_step_gpu` requires a separately prepared
 `particula.gpu.nucleation_species_mapping`, supplying retained full gas names
 and the explicit source map. Preparation uploads only lane configuration and
 pins exact carrier arrays; replacing storage or metadata requires preparation
-again. Full-gas P2 outputs use gas width; resampling scratch uses particle width.
+again. Full-gas numerical validation outputs use gas width; resampling scratch uses particle width.
 
 GPU source rates/final demand are densities. The existing direct algorithm
 requires admitted density times volume to be an integral int32 event count and

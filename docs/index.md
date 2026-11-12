@@ -38,7 +38,7 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
   validation before mutating mass, concentration, or charge, and returns fresh
   per-box `np.int32` activation counts. It is not exported through
   `particula.particles` and does not resize storage. For caller-managed Warp
-  storage, import `activate_slots_gpu` from `particula.gpu.kernels`. This P4
+  storage, import `activate_slots_gpu` from `particula.gpu.kernels`. This API validation
   boundary maps selected request-prefix records to ascending free slots in
   place and returns supplied `wp.int32` activation/diagnostic sidecars.
   Particle/request storage must be same-device `wp.float64`; it performs no
@@ -55,7 +55,7 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
   latent heat diagnostics. The bounded, low-level direct GPU condensation
    path optionally applies a latent-rate correction during each of its four
    equal substeps, with deterministic fp64 CPU-oracle/Warp parity coverage.
-   Omitted latent heat, or a zero per-species value, retains that species' isothermal rate path. The direct hook couples each P2-finalized particle transfer to gas
+   Omitted latent heat, or a zero per-species value, retains that species' isothermal rate path. The direct hook couples each inventory-limited particle transfer to gas
    using particle concentration and has separate particle-mass, gas-
    concentration, and per-box/per-species inventory-conservation regressions.
     Broader temperature feedback and CPU-strategy/runnable-level support remain
@@ -127,7 +127,7 @@ If you are new to Python or plan on going through the Examples, head to [Setup P
 ### Quick Start Example
 
 This native single-box example initializes a lognormal PMF and performs one
-10-second condensation step. Use the selected E9 checkout (`pip install -e .`);
+10-second condensation step. Use the v0.3.0 development checkout (`pip install -e .`);
 older published wheels need not contain these migration APIs. The retained
 100 kg/m³ vapor concentration is an exaggerated illustration, not a calibrated
 atmospheric case or an accuracy/convergence claim.
@@ -199,7 +199,7 @@ and [access and replacement](Features/particle-data-migration/containers.md).
   `Runnable`, scheduler/backend integration, or performance guarantee. See the
   [nucleation contract](Features/nucleation_strategy_system.md#direct-warp-low-level-step)
   and [direct-Warp example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py).
-- GPU dilution P1–P4 is a direct, low-level operation imported with
+- GPU dilution is a direct, low-level operation imported with
    `from particula.gpu.kernels import dilution_step_gpu`. It applies
    `c_new = c * exp(-alpha * time_step)` in place to particle and gas
    concentrations, where `alpha = Q / V` `[s^-1]`, returns the identical
@@ -302,7 +302,7 @@ and [access and replacement](Features/particle-data-migration/containers.md).
     selected-adapter Brownian particle-resolved dispatches with caller-owned
     collision and persistent RNG sidecars on Warp CPU by default before
      explicitly restoring CPU particle data. The adapter is concrete-only; see the
-    [coagulation strategy guide](Features/coagulation_strategy_system.md#e7-f3-concrete-selected-brownian-adapter)
+    [coagulation strategy guide](Features/coagulation_strategy_system.md#concrete-selected-brownian-adapter)
     for its import and capability boundary. When Warp is unavailable or
     disabled, the example runs no conversion or dispatch and provides no CPU
     fallback. It makes no public adapter, `Runnable`, CUDA, or performance
@@ -315,18 +315,18 @@ and [access and replacement](Features/particle-data-migration/containers.md).
   — current schema inventory,
   [authoritative CPU/GPU field ownership policy](Features/Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),
   shipped coagulation RNG ownership and graph-capture setup guidance,
-  and the [final downstream handoff map for sibling E2
+  and the [final downstream handoff map for sibling container foundations
   features](Features/Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features).
 - [Mass Precision Recommendation Report](Features/Roadmap/mass-precision-study.md)
-  — final E2-F6 policy report covering deterministic NPF-to-droplet GPU
+  — final mass-precision study policy report covering deterministic NPF-to-droplet GPU
   evidence, the accepted unchanged `fp64`/`wp.float64` production baseline,
-  study-only candidate fidelity checks, executable P3 thresholds, clamp
+  study-only candidate fidelity checks, executable candidate evaluation thresholds, clamp
   accounting, memory-footprint examples, and focused reproduction commands.
 - **Resident graph capture** uses a qualified native CUDA device with fixed
   identities and shapes plus explicit capture, retirement, and renewal actions.
-  It is concrete-only and has no CPU or Warp-CPU fallback. E8 and its features
+  It is concrete-only and has no CPU or Warp-CPU fallback. Graph capture and its features
   are Shipped by maintainer decision; measured results remain unshipped
-  pending reviewed evidence. E8-F7/T7 owns profiling and machine-bounded
-  recommendations; E8-F8 owns the example, runbook, limitations, and closeout.
+  pending reviewed evidence. CUDA profiling owns profiling and machine-bounded
+  recommendations; graph-capture documentation owns the example, runbook, limitations, and closeout.
   See the [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py),
   [operator runbook](Features/gpu_graph_capture.md), and [roadmap closeout record](Features/Roadmap/graph-capture-closeout.md).

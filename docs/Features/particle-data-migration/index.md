@@ -5,12 +5,12 @@ title: Native aerosol migration
 # Native aerosol migration
 
 Migrate supported workflows to the flat native `Aerosol`, holding `ParticleData`,
-full ordered `GasData`, and `EnvironmentData`. Use the selected E9-native checkout
+full ordered `GasData`, and `EnvironmentData`. Use the v0.3.0 development checkout
 for these examples; their presence here does not announce a published wheel or
-release. M6 removes the legacy APIs and validates the resulting native-only
-execution boundaries after the M5 handoff.
+release. V0.3.0 removes the legacy APIs and validates the resulting native-only
+execution boundaries after the v0.3.0 handoff.
 
-See the [M6 closeout record](../Roadmap/data-native-v030-closeout.md) for
+See the [v0.3.0 closeout record](../Roadmap/data-native-v030-closeout.md) for
 revision-specific validation and outstanding readiness gates.
 
 ## Migration topics
@@ -49,7 +49,7 @@ bytes, not those inspection carriers, govern explicit compatible restart.
 
 ## Historical release context
 
-The E8 closeout planned coexistence in 0.2.13 and a breaking native migration in
+The graph capture closeout planned coexistence in 0.2.13 and a breaking native migration in
 0.3.0. These are release plans, not publication claims. This guide documents the
 native development API: particle, gas species, and atmosphere facades and their
 obsolete constructors have been removed. Native gas storage uses explicit
@@ -60,5 +60,5 @@ remains caller-owned and does not provide transactional validation. Direct and
 prepared GPU steps, CPU-Warp population transfers, and resident lifecycle
 boundaries now require explicit supported population metadata. Untagged v5
 checkpoints reject before setup or upload without inferring their meaning.
-Final M6 readiness validation and review remain pending.
+Final v0.3.0 readiness validation and review remain pending.
 No performance qualification or cross-device continuation is implied.

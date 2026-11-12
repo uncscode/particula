@@ -5,7 +5,8 @@ native sidecar families, one capture resource selection, and one atomically
 prepared capture resource set to one exact ``ACTIVE`` :class:`ResidentSession`.
 It allocates and validates resources only: it neither executes a process,
 transfers, synchronizes, nor resizes. Coagulation and wall-loss acquisition
-initialize distinct P1-derived persistent RNG streams exactly once before
+initialize distinct resource setup-derived persistent RNG streams exactly once
+before
 publishing their resident resources. The checkpoint-private restoration seam
 instead publishes prevalidated current stream words without reseeding. The
 manifests and views here are concrete-only and are deliberately not exported
@@ -25,7 +26,7 @@ inspects payloads nor acquires, allocates, binds, or mutates sidecars. Explicit
  failure faults the exact resident binding and notifies any attached
  graph-capture owner to tear down issued handles.
 
-Capture-set preparation is setup-only. It stages all requested sidecars,
+capture-set preparation is setup-only. It stages all requested sidecars,
 validates metadata and nonaliasing, and initializes only newly created resident
 RNG streams before one final publication. Compatible repeats return the exact
 published set; failed candidates do not publish staged bindings. Its matching
@@ -366,7 +367,8 @@ class CondensationResources:
 
 @dataclass(frozen=True, eq=False)
 class CoagulationResources:
-    """Expose native coagulation outputs and one P1-initialized RNG sidecar.
+    """Expose native coagulation outputs and one resource setup-initialized RNG
+        sidecar.
 
     The registry publishes this identity-bound view only after validating all
     supplied sidecars and initializing the coagulation-only ``rng_states`` once
@@ -450,7 +452,8 @@ class NucleationResources:
 class CommunicationResources:
     """Expose one exact resident communication configuration and work record.
 
-    The registry publishes this identity-bound view only after P1 configuration
+    The registry publishes this identity-bound view only after resource setup
+    configuration
     validation and complete sidecar schema/nonaliasing checks. The
     configuration, native work record, and optional final volumes remain
     caller- or registry-owned device state; this view performs no transfer,
@@ -531,7 +534,7 @@ class CaptureResourceRequirements:
     Attributes:
         session: Exact resident session pinned by the target registry.
         capacities: Exact immutable logical inventory capacities.
-        inventory: Exact P3 selected resource inventory.
+        inventory: Exact resource inventory selected resource inventory.
         prepared_views: Canonical process views required by preparation.
         communication_resources: Exact selected communication view, if present.
         enabled_process_families: Canonically ordered process families retained
@@ -709,7 +712,7 @@ class CaptureResourceSet:
     Attributes:
         requirements: Exact setup request retained by identity.
         capacities: Exact logical inventory capacities from the request.
-        inventory: Exact P3-selected resource inventory.
+        inventory: Exact resource inventory-selected resource inventory.
         report: Immutable logical resource report for the published set.
         prepared_views: Canonical process views retained for preparation.
         communication_resources: Selected communication view, if present.
@@ -1138,7 +1141,7 @@ class GPUResourceRegistry:
     validates identity and nonaliasing, not unverifiable allocator provenance.
     No payload is read, copied, synchronized, or mutated by acquisition, except
     that first coagulation or wall-loss acquisition initializes its distinct
-    P1-derived RNG sidecar before publication. Its
+    Resource setup-derived RNG sidecar before publication. Its
     concrete-only :meth:`validate_pinned_session` seam lets lifecycle guards
     verify the exact active binding without resource acquisition or execution.
     Its private checkpoint enumeration reports ordinary acquired sidecars in
@@ -1146,7 +1149,7 @@ class GPUResourceRegistry:
     without changing ownership or creating host copies. Checkpoint restart may
     privately publish prevalidated fresh RNG bindings without reseeding.
 
-    Capture registration is a separate concrete-only host-metadata seam. It
+    capture registration is a separate concrete-only host-metadata seam. It
     pins one optional published closed communication view and one ordered
     diagnostic registration tuple by identity after complete schema and
     nonaliasing validation. It neither changes normal resource enumeration nor
@@ -1347,7 +1350,8 @@ class GPUResourceRegistry:
     ) -> None:
         """Validate request identities before capture allocation or staging.
 
-        This setup-only helper checks only the existing pinned session and P3
+        This setup-only helper checks only the existing pinned session and
+        resource inventory
         selection relationships. Schema, alias, and candidate-resource checks
         remain in the preparation transaction.
         """
@@ -1418,7 +1422,9 @@ class GPUResourceRegistry:
         return values
 
     def _validate_capture_collision_capacity(self, capacity: Any) -> int:
-        """Validate P4 collision capacity using ordinary acquisition bounds."""
+        """Validate preallocation collision capacity using ordinary acquisition
+        bounds.
+        """
         if isinstance(capacity, bool) or not isinstance(capacity, Integral):
             raise TypeError(
                 "collision_capacity must be a non-boolean integral."
@@ -1574,7 +1580,9 @@ class GPUResourceRegistry:
         supplied: dict[str, Any],
         capacity: int | None,
     ) -> None:
-        """Validate one requested P4 family without allocating or publishing."""
+        """Validate one requested preallocation family without allocating or
+        publishing.
+        """
         existing = self._bindings.get(manifest.family)
         if existing is not None:
             if (
@@ -1599,7 +1607,9 @@ class GPUResourceRegistry:
         self,
         supplied_families: tuple[dict[str, Any], ...],
     ) -> None:
-        """Reject cross-family supplied aliases before any P4 allocation."""
+        """Reject cross-family supplied aliases before any preallocation
+        allocation.
+        """
         values = [
             value
             for family in supplied_families
@@ -3793,7 +3803,8 @@ class GPUResourceRegistry:
     ) -> CommunicationResources:
         """Pin one closed resident communication map and native work record.
 
-        This is the sole P1 validation and optional-allocation boundary for this
+        This is the sole resource setup validation and optional-allocation
+        boundary for this
         family. It accepts only GAS or PARTICLES closed maps, validates the
         configuration once, then pins maps, work arrays, and optional prescribed
         volumes by identity after schema and byte-range nonaliasing checks.
@@ -3802,7 +3813,8 @@ class GPUResourceRegistry:
         transfer, synchronize, initialize RNG state, or recover a writer error.
 
         Args:
-            configuration: Exact P1-validated closed resident map and optional
+            configuration: Exact resource setup-validated closed resident map
+                and optional
                 prescribed-volume update.
             buffers: Optional complete native mode-matched work record. Omitted
                 work arrays are allocated on the pinned device.
@@ -3813,7 +3825,8 @@ class GPUResourceRegistry:
         Raises:
             TypeError: If the configuration or supplied buffer record has an
                 inexact or mode-incompatible type.
-            ValueError: If P1 validation, session identity, resource schema,
+            ValueError: If resource setup validation, session identity, resource
+                schema,
                 capacity, or nonaliasing checks fail, or a binding is replaced.
         """
         self._validate_session_signature()
@@ -3975,7 +3988,8 @@ class GPUResourceRegistry:
         This execution-time seam requires the exact active pinned session and
         published view, then rechecks mode, identities, shapes, device,
         contiguity, and nonaliasing metadata. It intentionally does not repeat
-        P1 payload validation, allocate, acquire, inspect values, transfer,
+        Resource setup payload validation, allocate, acquire, inspect values,
+        transfer,
         synchronize, mutate bindings, or invoke a native primitive.
 
         Args:

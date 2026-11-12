@@ -60,7 +60,9 @@ def _configuration(
 
 
 def _aerosol() -> Aerosol:
-    """Create a deliberately unbuilt aerosol for ownership-only P2 checks."""
+    """Create a deliberately unbuilt aerosol for ownership-only inventory
+    finalization checks.
+    """
     return object.__new__(Aerosol)
 
 
@@ -92,7 +94,9 @@ def test_config_rejects_nonexact_configuration(value: object) -> None:
 
 
 def test_config_rejects_configuration_subclass() -> None:
-    """Test the P2 config boundary requires the exact configuration class."""
+    """Test the inventory finalization config boundary requires the exact
+    configuration class.
+    """
 
     class DerivedConfiguration(CondensationConfiguration):
         """Unsupported configuration subtype."""
@@ -329,7 +333,9 @@ def _assert_warp_resources_unchanged(
 def _primary_warp_resources(
     particles: Any, gas: Any, environment: Any
 ) -> tuple[Any, ...]:
-    """Return all mutable primary arrays from a P2 Warp state."""
+    """Return all mutable primary arrays from a inventory finalization Warp
+    state.
+    """
     return (
         particles.masses,
         particles.concentration,
@@ -884,7 +890,9 @@ def test_cpu_execution_adapter_propagates_delegate_errors_by_identity(
 
 
 def test_execution_states_retain_p2_carriers_and_require_exact_types() -> None:
-    """Test P3 carriers are frozen identity carriers with exact boundaries."""
+    """Test thermal correction carriers are frozen identity carriers with exact
+    boundaries.
+    """
     from particula.dynamics import MassCondensation
 
     p2_state = CPUCondensationState(
@@ -916,11 +924,13 @@ def test_execution_states_retain_p2_carriers_and_require_exact_types() -> None:
 
 
 def test_execution_states_reject_p2_and_runnable_subclasses() -> None:
-    """Test P3 construction excludes P2 and runnable subclasses."""
+    """Test thermal correction construction excludes inventory finalization and
+    runnable subclasses.
+    """
     from particula.dynamics import MassCondensation
 
     class DerivedState(CPUCondensationState):
-        """Unsupported P2 CPU state subtype."""
+        """Unsupported inventory finalization CPU state subtype."""
 
     class DerivedRunnable(MassCondensation):
         """Unsupported runnable subtype."""
@@ -1324,7 +1334,9 @@ def test_warp_execution_rejects_required_profile_sidecar_before_resolution(
 
 @pytest.mark.warp
 def test_warp_execution_state_is_frozen_identity_carrier() -> None:
-    """Test the P3 Warp state retains the P2 carrier without rebinding."""
+    """Test the thermal correction Warp state retains the inventory finalization
+    carrier without rebinding.
+    """
     import particula.execution.adapters.condensation as condensation
 
     particles, gas, environment = _warp_state_inputs()

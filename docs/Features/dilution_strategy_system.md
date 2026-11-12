@@ -3,12 +3,12 @@
 ## Complete direct-process context
 
 CPU dilution remains the semantic source. The direct GPU step is one call in the
-illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), backed by [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and its [P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). It does not create public coordination, hidden transfer, CPU fallback, or a resident loop.
+illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), backed by [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and its [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). It does not create public coordination, hidden transfer, CPU fallback, or a resident loop.
 
 The CPU dilution system provides a bounded chamber-loss process for a single
-`Aerosol`. It is the completed CPU contract from parent **E6**. **E6-F2** is a
+`Aerosol`. It is the completed CPU contract from parent **GPU process completeness**. **GPU dilution** is a
 downstream consumer of this CPU reference only; this guide does not deliver
-E6-F2 or CPU/GPU parity.
+GPU dilution or CPU/GPU parity.
 
 ## Public API and equation
 
@@ -50,7 +50,7 @@ PMF storage holds bin number density (m⁻³), and PDF storage holds `dn/dr`
 (m⁻⁴). All receive the same multiplicative decay at fixed volume. All lanes of
 the unified `GasData.concentration` (kg/m³) decay, regardless of partitioning.
 The native runnable supports one box; storage shapes do not imply multi-box
-transport support. Use the selected E9 checkout (`pip install -e .`).
+transport support. Use the v0.3.0 development checkout (`pip install -e .`).
 
 ## Execution, validation, and recovery
 

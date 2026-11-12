@@ -340,7 +340,9 @@ def test_native_source_rejects_p4_alias_with_protected_vapor_pressure(device):
 
 
 def test_nonbinary_volume_preserves_admitted_count(device):
-    """P4/P5 retain one admitted event without a density round trip."""
+    """Exhaustion resolution/commit retain one admitted event without a density
+    round trip.
+    """
     from dataclasses import replace
 
     from particula.gpu.kernels import nucleation_step_gpu
@@ -435,7 +437,7 @@ def test_standalone_native_phases_preserve_independent_species_inventory(
 
 
 def test_standalone_p5_rejects_rebound_binding_storage(device):
-    """Even unused full-gas storage cannot silently drift across staged P5."""
+    """Even unused full-gas storage cannot silently drift across staged commit."""
     from particula.gpu.kernels import nucleation as module
 
     p, g, config, kwargs = setup(device)

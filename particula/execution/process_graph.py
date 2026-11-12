@@ -417,7 +417,8 @@ def resolve_canonical_topological_order(
     Ready nodes and successor traversal use lexical node identifiers, so the
     result never depends on declaration order. This read-only helper validates
     tuple/member shape, unique node IDs, and edge endpoints, but does not
-    validate the closed P1 catalogue, resolve scheduler policy, or execute
+    validate the closed declaration catalogue, resolve scheduler policy, or
+    execute
     graph nodes.
 
     Args:

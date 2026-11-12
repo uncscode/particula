@@ -1,13 +1,17 @@
 """Plan and atomically commit CPU particle-source transactions.
 
-The concrete-module-only P2 boundary converts survival-adjusted potential event
+The concrete-module-only demand planning boundary converts survival-adjusted
+potential event
 rates [#/m³/s] and a duration [s] into immutable, gas-admitted source-demand
-records without accessing particle capacity or mutating caller state. The P3
+records without accessing particle capacity or mutating caller state. The source
+transaction
 boundary consumes those records, stages slot activation and exhaustion policy on
 a private ``ParticleData`` copy, and writes validated particle and gas arrays
-atomically. P3 scales pre-existing particle and gas concentrations for
+atomically. Source transaction scales pre-existing particle and gas
+concentrations for
 selected representative-volume rows before removing finalized source mass.
-Neither P2 nor P3 is exported through public package namespaces.
+Neither demand planning nor source transaction is exported through public
+package namespaces.
 """
 
 from dataclasses import dataclass
@@ -158,14 +162,15 @@ class PotentialEventData:
 
 @dataclass(frozen=True)
 class SourceDemandData:
-    """Immutable P2 gas mass demand for one common event count per box.
+    """Immutable demand planning gas mass demand for one common event count per
+        box.
 
     Attributes:
         per_event_mass: Species mass per formed event [kg/event] with shape
             ``(n_species,)``. The record owns a fresh read-only float64 copy.
         gas_mass_removed: Provisional gas demand [kg/m³], shape
             ``(n_boxes, n_species)``. The record owns a fresh read-only
-            float64 copy. P2 does not apply this demand to gas.
+            float64 copy. Demand planning does not apply this demand to gas.
     """
 
     per_event_mass: NDArray[np.float64]
@@ -295,7 +300,8 @@ def finalize_particle_source(  # noqa: C901
 
     Every box receives one common admitted event count constrained by its
     tightest participating gas inventory. The returned records own fresh,
-    read-only arrays. This concrete P2 boundary only plans demand: it neither
+    read-only arrays. This concrete demand planning boundary only plans demand:
+    it neither
     mutates inputs or ``gas`` nor accesses particle slots or exhaustion state.
 
     Args:
@@ -422,10 +428,13 @@ def finalize_particle_source(  # noqa: C901
 
 @dataclass(frozen=True)
 class ParticleSourceCommitConfig:
-    """Own controls and representative-volume inputs for a P3 transaction.
+    """Own controls and representative-volume inputs for a source transaction
+        transaction.
 
-    The configuration owns read-only float64 P4 sidecars. Their length is
-    checked against the P2 box count by ``commit_particle_source``. The four
+    The configuration owns read-only float64 public construction sidecars. Their
+    length is
+    checked against the demand planning box count by ``commit_particle_source``.
+    The four
     resampling bounds intentionally require exact Python ``float`` values to
     match the exhaustion-policy boundary.
 
@@ -463,7 +472,9 @@ class ParticleSourceCommitConfig:
     species_map: NucleationSpeciesMap | None = None
 
     def __post_init__(self) -> None:
-        """Validate scalar controls and defensively own P4 inputs."""
+        """Validate scalar controls and defensively own public construction
+        inputs.
+        """
         for name, positive in (
             ("maximum_slot_weight", True),
             ("source_charge", False),
@@ -499,7 +510,8 @@ class ParticleSourceCommitConfig:
 
 @dataclass(frozen=True)
 class FinalizedSourceDiagnostics:
-    """Own immutable diagnostics from a committed P3 source transaction.
+    """Own immutable diagnostics from a committed source transaction source
+        transaction.
 
     All arrays are fresh read-only copies. ``event_count_units`` is ``count``
     for native resolved storage and ``m^-3`` for legacy. Gas mass fields are
@@ -508,18 +520,22 @@ class FinalizedSourceDiagnostics:
     particle-only lanes included. Legacy residuals use the scaled-domain sum.
 
     Attributes:
-        potential_event_count: P2 potential event count, shape ``(n_boxes,)``.
-        gas_admitted_event_count: P2 gas-admitted event count, shape
+        potential_event_count: demand planning potential event count, shape
+            ``(n_boxes,)``.
+        gas_admitted_event_count: demand planning gas-admitted event count,
+            shape
             ``(n_boxes,)``.
         represented_event_count: Final event count represented in particle
             storage, shape ``(n_boxes,)``.
-        gas_limited_event_count: P2 event count excluded by gas inventory,
+        gas_limited_event_count: demand planning event count excluded by gas
+            inventory,
             shape ``(n_boxes,)``.
         representation_reduction_event_count: Event count removed by
             representative-volume scaling, shape ``(n_boxes,)``.
         residual_event_count: Unpackaged final source demand, shape
             ``(n_boxes,)``; successful transactions report zero.
-        limiting_species_index: P2 limiting gas-species index or ``-1``, shape
+        limiting_species_index: demand planning limiting gas-species index or
+            ``-1``, shape
             ``(n_boxes,)``.
         gas_mass_removed: Final source mass removed from gas, shape
             ``(n_boxes, n_species)``.
@@ -592,7 +608,8 @@ class FinalizedSourceDiagnostics:
 def _validate_commit_particle_schema(  # noqa: C901
     particles: object,
 ) -> ParticleData:
-    """Validate writable, physically valid, non-overlapping P3 particle storage.
+    """Validate writable, physically valid, non-overlapping source transaction
+        particle storage.
 
     Args:
         particles: Candidate fixed-capacity particle container.
@@ -603,7 +620,7 @@ def _validate_commit_particle_schema(  # noqa: C901
     Raises:
         TypeError: If ``particles`` or a required field has an invalid type.
         ValueError: If field schemas, mutability, aliasing, or physical values
-            violate the P3 transaction boundary.
+            violate the source transaction transaction boundary.
     """
     if not isinstance(particles, ParticleData):
         raise TypeError("particles must be a ParticleData")
@@ -672,7 +689,8 @@ def _validate_commit_inputs(  # noqa: C901
     GasData,
     ParticleSourceCommitConfig,
 ]:
-    """Validate immutable P2 records and mutable P3 state before staging.
+    """Validate immutable demand planning records and mutable source transaction
+        state before staging.
 
     This read-only preflight verifies record consistency, writable particle and
     gas schemas, nonaliasing, and representative-volume sidecars. It performs
@@ -680,20 +698,22 @@ def _validate_commit_inputs(  # noqa: C901
     boundary if validation fails.
 
     Args:
-        demand: Candidate P2 per-event mass and provisional gas-demand record.
-        diagnostics: Candidate P2 event-count diagnostic record.
+        demand: Candidate demand planning per-event mass and provisional
+            gas-demand record.
+        diagnostics: Candidate demand planning event-count diagnostic record.
         particles: Candidate writable fixed-capacity particle container.
         gas: Candidate writable gas inventory.
-        config: Candidate P3 capacity and scaling configuration.
+        config: Candidate source transaction capacity and scaling configuration.
 
     Returns:
-        Validated, type-narrowed P2 records, particle data, gas data, and
+        Validated, type-narrowed demand planning records, particle data, gas
+        data, and
         transaction configuration.
 
     Raises:
         TypeError: If a top-level boundary object has an invalid type.
         ValueError: If records, schemas, aliasing, physical values, or scaling
-            controls violate the P3 transaction boundary.
+            controls violate the source transaction transaction boundary.
     """
     if not isinstance(demand, SourceDemandData):
         raise TypeError("demand must be SourceDemandData")
@@ -909,10 +929,11 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
 ) -> FinalizedSourceDiagnostics:
     """Commit a gas-admitted source into staged fixed-capacity particle storage.
 
-    P2 event counts are [#/m³]; native commits convert them to counts at the
+    Demand planning event counts are [#/m³]; native commits convert them to
+    counts at the
     current volume. Native representative scaling preserves gas density and
     scales existing counts with volume. Legacy commits retain density events
-    and scale pre-existing gas. P2 demand and
+    and scale pre-existing gas. Demand planning demand and
     final gas removal are mass concentrations [kg/m³], while per-event particle
     mass is [kg/event] and ``source_charge`` is in elementary-charge counts.
     Policy resolution, resampling, representative-volume scaling, and
@@ -923,11 +944,13 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
     ``volume``, and gas concentration arrays are mutated, after all validation.
 
     Args:
-        demand: Immutable P2 per-event mass and provisional gas-demand record.
-        diagnostics: Immutable P2 event-count diagnostics.
+        demand: Immutable demand planning per-event mass and provisional
+            gas-demand record.
+        diagnostics: Immutable demand planning event-count diagnostics.
         particles: Writable fixed-capacity particle data.
         gas: Writable gas concentration inventory.
-        config: Immutable capacity, resampling, and P4 scaling controls.
+        config: Immutable capacity, resampling, and public construction scaling
+            controls.
 
     Returns:
         Immutable final event, slot, policy, gas-transfer, and conservation
@@ -935,7 +958,8 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
 
     Raises:
         TypeError: If a boundary object has the wrong type.
-        ValueError: If schemas, physical values, P2 records, capacity policy,
+        ValueError: If schemas, physical values, demand planning records,
+            capacity policy,
             scaling, activation, gas inventory, or conservation are invalid.
     """
     demand, diagnostics, particles, gas, config = _validate_commit_inputs(

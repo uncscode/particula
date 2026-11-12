@@ -2,10 +2,12 @@
 
 This module composes condensation ``@wp.func`` building blocks into end-to-end
 kernels and provides the high-level ``condensation_step_gpu`` API. The private
-P2 inventory finalizer is direct-test-only: it accepts an already P1-gated raw
-proposal, bounds and finalizes it, and mutates particle masses and P2 scratch
+Inventory finalization inventory finalizer is direct-test-only: it accepts an
+already partitioning-gated raw
+proposal, bounds and finalizes it, and mutates particle masses and inventory
+finalization scratch
 sidecars without coupling gas. The public step performs that coupling after
-each finalized P2 transfer.
+each finalized inventory finalization transfer.
 
 Tagged native calls require an explicit ``CondensationSpeciesBinding``.
 Particle-material arrays retain full composition; gas properties, partitioning,
@@ -18,14 +20,15 @@ Entry-point validation accepts scalar direct inputs, explicit ``(n_boxes,)``
 Warp arrays, or a ``WarpEnvironmentData`` container. Aggregate preflight,
 including supplied ``CondensationScratchBuffers`` metadata, completes before
 fallback allocation, vapor-pressure refresh, or mutation of caller-owned
-state. Physical validation may launch scans and read private status flags.
+State. Physical validation may launch scans and read private status flags.
 Private preparation freezes the exact validated primary
 arrays, supplied sidecars, and resolved fallback storage for a subsequent
 device-only enqueue. A required keyword-only ``ThermodynamicsConfig`` then
 executes exactly four equal substeps. Each substep refreshes the caller-owned
 pure-vapor-pressure buffer, updates box-level environment properties, proposes
-transfer from current particle and gas state, P1-gates disabled species and
-zero-concentration slots, P2-finalizes the inventory-limited applied transfer,
+transfer from current particle and gas state, proposal gating-gates disabled
+species and
+zero-concentration slots, finalizes the inventory-limited applied transfer,
 updates particle mass and gas concentration, and accumulates the finalized
 whole-call total. Float32 temperatures are cast to a step-owned float64 device
 buffer for refresh. Latent heat, when supplied, corrects each fixed substep.
@@ -35,7 +38,7 @@ validated caller-owned state reserved for later work.
 
 Private prepared calls preserve this validation ordering, normalization, and
 fallback allocation during setup; retained-reference enqueue performs no
-validation, allocation, readback, transfer, synchronization, lookup, rebinding,
+Validation, allocation, readback, transfer, synchronization, lookup, rebinding,
 or reset. Rejection is pre-writer; rollback is not promised after a writer
 launches.
 """
@@ -167,7 +170,7 @@ class CondensationScratchBuffers:
     non-``None`` field is a caller-owned, active-device ``wp.float64`` array
     whose shape must remain stable: transfer fields have shape
     ``(n_boxes, n_particles, n_species)``, property fields have shape
-    ``(n_boxes,)``, and P2-only limiting sidecars have shape
+    ``(n_boxes,)``, and inventory finalization-only limiting sidecars have shape
     ``(n_boxes, n_gas)``. Native ``n_species`` is particle-material width and
     ``n_gas`` is complete gas width and may differ from material width.
     Fields may be omitted independently; omitted fields are
@@ -177,7 +180,7 @@ class CondensationScratchBuffers:
     the applied transfer over the complete four-substep step.
 
     Each call performs four fixed updates. The total buffer is cleared once
-        after preflight and accumulates the P2-finalized, inventory-limited
+        after preflight and accumulates the inventory-limited, inventory-limited
         transfer applied in each substep; a supplied ``total_mass_transfer`` is
         returned by identity.
     Callers must keep supplied arrays alive and unmodified until launched work
@@ -195,12 +198,18 @@ class CondensationScratchBuffers:
             array with shape ``(n_boxes,)`` [Pa·s].
         mean_free_path: Optional caller-owned per-box mean-free-path array with
             shape ``(n_boxes,)`` [m].
-        positive_mass_transfer_demand: Optional P2-only per-box, per-species
-            reduction storage. P1 validates but does not read or write it.
-        negative_mass_transfer_release: Optional P2-only per-box, per-species
-            reduction storage. P1 validates but does not read or write it.
-        positive_mass_transfer_scale: Optional P2-only per-box, per-species
-            scale storage. P1 validates but does not read or write it.
+        positive_mass_transfer_demand: Optional inventory finalization-only
+            per-box, per-species
+            reduction storage. Proposal gating validates but does not read or
+            write it.
+        negative_mass_transfer_release: Optional inventory finalization-only
+            per-box, per-species
+            reduction storage. Proposal gating validates but does not read or
+            write it.
+        positive_mass_transfer_scale: Optional inventory finalization-only
+            per-box, per-species
+            scale storage. Proposal gating validates but does not read or write
+            it.
     """
 
     work_mass_transfer: Any | None = None
@@ -1060,7 +1069,7 @@ def _accumulate_finalized_mass_transfer_kernel(
     finalized: Any,
     total_mass_transfer: Any,
 ) -> None:
-    """Add one P2-finalized transfer to the whole-call total."""
+    """Add one inventory-limited transfer to the whole-call total."""
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     for species_idx in range(finalized.shape[2]):
         total_mass_transfer[box_idx, particle_idx, species_idx] += finalized[
@@ -1101,7 +1110,8 @@ def _bound_evaporation_candidate_kernel(
 
     Args:
         masses: Particle masses ``(n_boxes, n_particles, n_species)`` [kg].
-        gated_transfer: Already P1-gated transfer proposal matching ``masses``
+        gated_transfer: Already partitioning-gated transfer proposal matching
+            ``masses``
             [kg].
         candidate: Output bounded proposal matching ``masses`` [kg].
     """
@@ -1469,7 +1479,9 @@ def _validate_p2_primary_values_kernel(
     gas_concentration: Any,
     invalid: Any,
 ) -> None:
-    """Record invalid primary P2 state without changing caller data."""
+    """Record invalid primary inventory finalization state without changing
+    caller data.
+    """
     box_idx, species_idx = wp.tid()  # type: ignore[misc]
     gas_value = gas_concentration[box_idx, species_idx]
     if not wp.isfinite(gas_value) or gas_value < 0.0:
@@ -1486,7 +1498,7 @@ def _validate_p2_primary_values_kernel(
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
 def _validate_p2_proposal_values_kernel(proposal: Any, invalid: Any) -> None:
-    """Record a non-finite freshly generated P1 proposal."""
+    """Record a non-finite freshly generated proposal gating proposal."""
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     for species_idx in range(proposal.shape[2]):
         if not wp.isfinite(proposal[box_idx, particle_idx, species_idx]):
@@ -1512,7 +1524,9 @@ def _validate_p2_commit_values_kernel(
     gas_delta: Any,
     invalid: Any,
 ) -> None:
-    """Record invalid prospective P2 values before mutating public state."""
+    """Record invalid prospective inventory finalization values before mutating
+    public state.
+    """
     box_idx, species_idx = wp.tid()  # type: ignore[misc]
     updated_gas = (
         gas_concentration[box_idx, species_idx]
@@ -1544,7 +1558,9 @@ def _validate_p2_primary_state(
     dimensions: tuple[int, int, int],
     device: Any,
 ) -> None:
-    """Validate finite, non-negative primary P2 state before launch."""
+    """Validate finite, non-negative primary inventory finalization state before
+    launch.
+    """
     n_boxes, _, n_species = dimensions
     if not getattr(device, "is_cuda", False):
         values = (
@@ -1585,7 +1601,9 @@ def _validate_p2_primary_state(
 def _validate_p2_proposal_finiteness(
     proposal: Any, dimensions: tuple[int, int, int], device: Any
 ) -> None:
-    """Validate a freshly written P1 proposal immediately before P2 mutation."""
+    """Validate a freshly written proposal gating proposal immediately before
+    inventory finalization mutation.
+    """
     if not getattr(device, "is_cuda", False):
         if not np.all(np.isfinite(_read_float64_array(proposal))):
             raise ValueError("gated_mass_transfer must be finite")
@@ -1626,7 +1644,9 @@ def _validate_p2_commit_values(
     gas_delta: Any,
     device: Any,
 ) -> None:
-    """Validate every prospective P2 state value before its first commit."""
+    """Validate every prospective inventory finalization state value before its
+    first commit.
+    """
     if not getattr(device, "is_cuda", False):
         masses = _read_float64_array(particles.masses)
         transfers = _read_float64_array(finalized)
@@ -1669,7 +1689,9 @@ def _validate_p2_sidecar_ownership(
     scale: Any | None,
     protected_arrays: tuple[tuple[str, Any | None], ...],
 ) -> None:
-    """Reject P2 reduction sidecars overlapping protected or peer storage."""
+    """Reject inventory finalization reduction sidecars overlapping protected or
+    peer storage.
+    """
     sidecars = (
         ("positive_mass_transfer_demand", demand),
         ("negative_mass_transfer_release", release),
@@ -1883,10 +1905,12 @@ def _finalize_inventory_limited_mass_transfer(
 ) -> Any:
     """Finalize a pre-gated proposal under particle and gas inventory limits.
 
-    This private, direct-test-only P2 primitive first bounds evaporation by
+    This private, direct-test-only inventory finalization primitive first bounds
+    evaporation by
     owned particle mass. It then limits concentration-weighted positive uptake
     for each box and species to gas inventory plus permitted evaporation
-    release. It mutates particle masses and any supplied P2 sidecars, but
+    release. It mutates particle masses and any supplied inventory finalization
+    sidecars, but
     deliberately does not mutate ``gas.concentration``. This primitive accepts
     explicitly discrete number-density weights and equal particle/gas lanes.
     The public mapped step owns its separate gas coupling and supports resolved
@@ -1896,10 +1920,13 @@ def _finalize_inventory_limited_mass_transfer(
         particles: GPU particle data with float64 masses and concentrations.
         gas: GPU gas data whose concentration supplies read-only inventory.
         gated_mass_transfer: Float64 ``(n_boxes, n_particles, n_species)``
-            proposal [kg] already P1-gated for partitioning and inactive slots.
-        scratch_buffers: Optional validated scratch sidecar. Only its P2 demand,
+            proposal [kg] already partitioning-gated for partitioning and
+            inactive slots.
+        scratch_buffers: Optional validated scratch sidecar. Only its inventory
+            finalization demand,
             release, and scale fields are resolved or mutated.
-        energy_transfer: Optional public-step energy output to protect from P2
+        energy_transfer: Optional public-step energy output to protect from
+            inventory finalization
             sidecar aliasing. It is never read or written by this helper.
 
     Returns:
@@ -1908,7 +1935,8 @@ def _finalize_inventory_limited_mass_transfer(
 
     Raises:
         ValueError: If physical inputs are invalid, buffers have incompatible
-            metadata, or P2 sidecars overlap protected or peer storage.
+            metadata, or inventory finalization sidecars overlap protected or
+            peer storage.
 
     Notes:
         Preflight validation finishes before this helper resolves fallback
@@ -2143,7 +2171,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         diffusion_coefficient_vapor: Optional per-species vapor diffusion
             coefficient [m^2/s].
         mass_transfer: Optional preallocated whole-call accumulator for the
-            P2-finalized applied transfer [kg], with shape
+            inventory-limited applied transfer [kg], with shape
             ``(n_boxes, n_particles, n_species)``. It is not raw proposal
             workspace.
         environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``
@@ -2164,11 +2192,12 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             field must be active-device ``wp.float64``. Fields may be omitted
             independently and use step-local fallback allocation. A supplied
             total transfer buffer is returned by identity. Work retains the
-            final P1-gated raw proposal; total accumulates P2-finalized applied
-            transfers. P2 limiting sidecars have shape
+            final partitioning-gated raw proposal; total accumulates
+            inventory-limited applied
+            transfers. Inventory finalization limiting sidecars have shape
             ``(n_boxes, n_gas)``, validate before launch, and are reused by
-            all four P2 finalization cycles.
-            Validation is performed before allocation or mutation. Arrays must
+            all four inventory finalization finalization cycles.
+            validation is performed before allocation or mutation. Arrays must
             remain alive and unmodified until launched work completes and may
             be reused only after a successful completion.
         latent_heat: Optional caller-owned per-species latent heat [J/kg] as an
@@ -2186,7 +2215,8 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             a third tuple item.
         thermal_work: Optional caller-owned per-species thermal-work sidecar
             [J/kg] as an active-device ``wp.float64`` array shaped
-            ``(n_species,)``. It is validated but deferred and unused P3 state;
+            ``(n_species,)``. It is validated but deferred and unused thermal
+            correction state;
             this step does not allocate, initialize, modify, or consume it.
         species_binding: Explicit native gas/material map pinned to these exact
             carriers. Native transport/thermal arrays and reductions use full
@@ -2239,7 +2269,8 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         both fields and of caller-owned output buffers.
 
         Exactly four equal substeps run for every valid timestep. The returned
-        transfer buffer accumulates the P2-finalized applied transfer from all
+        transfer buffer accumulates the inventory-limited applied transfer from
+        all
         four substeps. A supplied scratch work buffer holds only the final
         gated raw proposal. Each proposal is zeroed before application for
         disabled ``gas.partitioning`` species and zero-concentration particle
@@ -2261,7 +2292,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         mutation.
         Each substep overwrites ``gas.vapor_pressure`` from the normalized
         current temperature, prepares box-level properties, calculates and
-        gates a raw proposal from current particle mass, then P2-finalizes,
+        gates a raw proposal from current particle mass, then finalizes,
         applies, couples, and accumulates it. Setup performs all host-visible
         validation; the prepared enqueue uses only frozen device references and
         does not allocate, read back, synchronize, or validate dynamically
@@ -2821,7 +2852,8 @@ def _enqueue_prepared_condensation_call(
     readback, or synchronization. It uses exact primary and sidecar references
     frozen by setup, so rebinding a container attribute after setup cannot alter
     the launched work. The call clears supplied output accumulators once, then
-    executes the refresh, proposal, P2 finalization, particle update, gas
+    executes the refresh, proposal, inventory finalization finalization,
+    particle update, gas
     coupling, and diagnostic sequence four times.
 
     Args:

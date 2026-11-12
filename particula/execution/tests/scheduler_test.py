@@ -338,7 +338,9 @@ def test_p1_validation_precedes_selection_and_profile_resolution() -> None:
 def test_p1_dependency_failures_precede_empty_selection(
     plan: TimestepPlan, message: str
 ) -> None:
-    """Test P1 dependency errors cannot be hidden by disabled selections."""
+    """Test declaration dependency errors cannot be hidden by disabled
+    selections.
+    """
     with pytest.raises(ValueError, match=f"^{message}$"):
         resolve_timestep_schedule(
             plan,

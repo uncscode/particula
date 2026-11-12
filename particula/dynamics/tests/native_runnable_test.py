@@ -50,7 +50,7 @@ def state(volume=0.25, kind="particle_resolved"):
 
 
 def condensation(gas):
-    """Return a real M3 strategy with explicit reordered lane provenance."""
+    """Return a real v0.3.0 strategy with explicit reordered lane provenance."""
     return CondensationIsothermal(
         molar_mass=gas.molar_mass.copy(),
         activity_strategy=ActivityIdealMass(),
@@ -133,7 +133,9 @@ def test_full_cycle_order_and_current_environment_replacement():
 
 @pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
 def test_density_coagulation_rate_keeps_measure_and_does_not_mutate(kind):
-    """The runnable forwards M3 PMF/PDF rates without volume renormalization."""
+    """The runnable forwards v0.3.0 PMF/PDF rates without volume
+    renormalization.
+    """
     aerosol = state(1.0, kind)
     aerosol.particles = ParticleData(
         masses=np.array([[[2, 3], [4, 5], [8, 9], [16, 17]]], dtype=float)

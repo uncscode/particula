@@ -80,7 +80,7 @@ def test_lognormal_defaults_number_and_mass(kind):
 @pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
 @pytest.mark.parametrize("volume", [0.25, 4.0])
 def test_nonunit_binned_volume_rejects(kind, volume):
-    """Non-unit-volume binned examples are invalid under delivered M1."""
+    """Non-unit-volume binned examples are invalid under delivered v0.3.0."""
     with pytest.raises(ValueError, match="exactly 1"):
         create_particle_data_from_radii(
             radii=[1e-9, 2e-9],

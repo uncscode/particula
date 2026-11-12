@@ -1,7 +1,7 @@
 # Mass Precision Recommendation Report
 
-This page is the final `E2-F6` acceptance artifact for particle mass precision
-policy. It records the shipped P1-P3 evidence, publishes the current
+This page is the final `mass-precision study` acceptance artifact for particle mass precision
+policy. It records the shipped baseline-candidate evaluation evidence, publishes the current
 recommendation for downstream dtype/schema work, and keeps measured evidence
 separate from follow-up constraints.
 
@@ -19,7 +19,7 @@ change.
 
 ## Recommendation boundaries
 
-- This report summarizes only evidence already executed in the shipped P1-P3
+- This report summarizes only evidence already executed in the shipped baseline-candidate evaluation
   test surface.
 - The recommendation is an approval gate for downstream dtype/schema proposals,
   not approval to change production defaults now.
@@ -87,7 +87,7 @@ The shipped evidence comes from the deterministic baseline fixture in
 `particula/gpu/tests/mass_precision_metrics_test.py`, and the fast benchmark
 helper coverage in `particula/gpu/tests/benchmark_helpers_test.py`.
 
-### P1 baseline coverage
+### Baseline coverage
 
 - Deterministic cases span NPF-scale through droplet-scale particles:
   `npf_cluster`, `five_to_ten_nm`, `accumulation_mode`, and `cloud_droplet`.
@@ -96,7 +96,7 @@ helper coverage in `particula/gpu/tests/benchmark_helpers_test.py`.
 - Mixed-species baselines reconstruct expected radii from authored total volume,
   fixed species volume fractions, and documented densities.
 
-### P2 executed candidates
+### Precision comparison executed candidates
 
 The focused comparison module `particula/gpu/tests/mass_precision_metrics_test.py`
 evaluates exactly three study-only candidates against the `fp64` baseline:
@@ -122,9 +122,9 @@ For all three candidates, the study compares reconstructed per-species masses
 and derived radii against the baseline `np.float64` fixture values with bounded
 `numpy.testing.assert_allclose` tolerances.
 
-### P3 thresholds and conservation-sensitive checks
+### Candidate evaluation thresholds and conservation-sensitive checks
 
-Phase P3 extends the same case-candidate matrix with cached executable metrics:
+Candidate evaluation extends the same case-candidate matrix with cached executable metrics:
 
 - pure reconstruction error:
   - relative mass error threshold: `5e-7`
@@ -141,12 +141,12 @@ Phase P3 extends the same case-candidate matrix with cached executable metrics:
   - enforce aggregate species-total relative tolerance
     `_AGGREGATE_DELTA_RTOL = 5e-7` separately from per-particle checks
 
-The fast P3 suite keeps representative coverage bounded to the shipped four
+The fast candidate evaluation suite keeps representative coverage bounded to the shipped four
 deterministic cases plus one mixed-scale stress case where nanometer particles
 and droplet-scale particles coexist in the same
 `(n_boxes, n_particles, n_species)` array.
 
-### P3 mixed-scale fidelity finding
+### Candidate evaluation mixed-scale fidelity finding
 
 The mixed-scale stress case uses a single-species deterministic array that puts
 `1.5e-9 m` particles in the same boxes as `8.0e-6 m` to `1.5e-5 m` droplets.
@@ -159,7 +159,7 @@ slice checks. The aggregate assertion applies to species totals over the full
 array, while the mixed-scale smallest-particle assertions remain the guardrail
 for nanometer-scale fidelity.
 
-### P3 zero-mass and zero-volume edge handling
+### Candidate evaluation zero-mass and zero-volume edge handling
 
 - Zero-total-mass reconstruction remains deterministic for
   `fp32_total_mass_fp32_mass_fraction`:
@@ -171,7 +171,7 @@ for nanometer-scale fidelity.
 - The fast metric suite is rerun under `pytest -Werror` to keep these paths
   divide-by-zero-warning free.
 
-### P3 clamp accounting
+### Candidate evaluation clamp accounting
 
 When evaporation-oriented comparisons would drive raw updated mass below zero,
 the study records three separate quantities:
@@ -184,7 +184,7 @@ The executable metrics also report clamp frequency as the number of entries
 where `raw_updated_mass < 0.0`, and aggregate clamp delta per species. This
 keeps raw reconstruction error distinct from clamp-induced mass changes.
 
-### P3 memory-footprint examples
+### Candidate evaluation memory-footprint examples
 
 These examples use analytic `shape × dtype-size` accounting only.
 
@@ -198,13 +198,13 @@ These examples use analytic `shape × dtype-size` accounting only.
 These examples document storage tradeoffs only. They do not change production
 runtime schemas or default dtypes.
 
-### P3 throughput evidence availability
+### Candidate evaluation throughput evidence availability
 
 - Fast default validation remains in
   `particula/gpu/tests/mass_precision_metrics_test.py`.
 - Optional throughput evidence lives on the existing benchmark surface in
   `particula/gpu/tests/benchmark_test.py`.
-- The P3 benchmark path records bounded study-only candidate-payload timings for
+- The candidate evaluation benchmark path records bounded study-only candidate-payload timings for
   three representative case/candidate pairs, including the full documented
   projection payload for each candidate rather than reconstruction-only mass
   casts, and still requires the explicit `--benchmark` opt-in plus CUDA
@@ -246,8 +246,8 @@ These follow-up areas are out of scope for this issue.
 
 Any future proposal that changes production defaults must, at minimum:
 
-- preserve the deterministic P1 case coverage from NPF to droplet scale,
-- satisfy the shipped P3 reconstruction and mixed-scale thresholds with exact
+- preserve the deterministic baseline case coverage from NPF to droplet scale,
+- satisfy the shipped candidate evaluation reconstruction and mixed-scale thresholds with exact
   candidate ids and warning-clean validation,
 - demonstrate acceptable conservation-sensitive mass-transfer deltas,
 - account for clamp behavior explicitly rather than hiding it inside aggregate

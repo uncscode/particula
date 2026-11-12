@@ -36,7 +36,9 @@ def _prepared_request(
     monkeypatch: pytest.MonkeyPatch,
     mode: CommunicationTransportMode,
 ) -> tuple[Any, Any]:
-    """Build a production READY request and its P1 carrier for one mode."""
+    """Build a production READY request and its map validation carrier for one
+    mode.
+    """
     from particula.execution.graph_capture import (
         GraphCaptureAvailability,
         GraphCaptureCapability,

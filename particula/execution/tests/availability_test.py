@@ -813,7 +813,9 @@ def test_warp_device_resolution_failure_maps_to_unavailable_device(
 
 
 def test_resolver_validates_carriers_before_registry_access() -> None:
-    """Invalid P1 carriers raise TypeError before optional registry work."""
+    """Invalid declaration carriers raise TypeError before optional registry
+    work.
+    """
     with pytest.raises(TypeError, match="request"):
         availability.resolve_availability(object(), object())  # type: ignore[arg-type]
 

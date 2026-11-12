@@ -1,6 +1,7 @@
 """Resolve declared execution availability without selecting execution work.
 
-This concrete, direct-import-only boundary validates P1 request metadata,
+This concrete, direct-import-only boundary validates declaration request
+metadata,
 capability declarations, optional runtime and device status, and
 request-associated state in a fixed order. It neither selects adapters nor
 allocates execution resources, transfers, synchronizes, mutates, or executes
@@ -313,7 +314,7 @@ def resolve_availability(
     declarations, runtime status, device status, and request-associated state.
 
     Args:
-        request: Validated P1 request declaration.
+        request: Validated declaration request declaration.
         matrix: Capability declarations applicable to the exact device.
         providers: Optional complete CPU/Warp availability registry.
         state_validator: Optional request-associated state validator. Omitting
@@ -324,7 +325,7 @@ def resolve_availability(
         An immutable decision retaining the exact request by identity.
 
     Raises:
-        TypeError: If a P1 carrier has an invalid type.
+        TypeError: If a declaration carrier has an invalid type.
         UnknownDeviceError: If the selected provider rejects the device.
         UnsupportedProcessError: If no declaration matches the device/process.
         UnsupportedCapabilityError: If no declaration satisfies requirements.

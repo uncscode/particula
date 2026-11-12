@@ -1,19 +1,25 @@
 """Define direct-Warp GPU nucleation planning seams and one public step.
 
 This unexported module validates fixed-capacity particle, gas, environment,
-and caller-owned sidecar schemas for a direct-Warp nucleation path. P1 is
-read-only. Private P2 calculates source demand [#/m³], admits one shared
-inventory-safe demand per box, and commits only its designated sidecars. P2
+and caller-owned sidecar schemas for a direct-Warp nucleation path. Input
+validation is
+read-only. Private demand planning calculates source demand [#/m³], admits one
+shared
+inventory-safe demand per box, and commits only its designated sidecars. Demand
+planning
 does not select or activate slots, resolve exhaustion, resize storage, mutate
 particle fields or ``gas.concentration``, transfer data to the host, or use a
-CPU physics fallback. Private P3 converts admitted demand times particle volume
-to representable ``int32`` provisional event counts, reuses E6-F5 slot
+CPU physics fallback. Private capacity staging converts admitted demand times
+particle volume
+to representable ``int32`` provisional event counts, reuses fixed-slot
 diagnostics, and records only the deterministic free-slot prefix that is
 currently selectable. It retains counts beyond free capacity and performs no
-activation or particle/gas transaction. Private P4 consumes immutable P2/P3
+activation or particle/gas transaction. Private exhaustion resolution consumes
+immutable demand planning/capacity staging
 handoffs, applies resampling before optional representative-volume scaling, and
 writes only its caller-owned finalized diagnostics. The public
-``nucleation_step_gpu`` then validates P4's handoff and performs one fused P5
+``nucleation_step_gpu`` then validates exhaustion resolution's handoff and
+performs one fused
 particle/gas commit.
 
 The preflight accepts only same-device, contiguous Warp arrays with fixed
@@ -267,16 +273,18 @@ class NucleationConfig:
 
 @dataclass(frozen=True)
 class NucleationScratchBuffers:
-    """Reference caller-owned P2 planning sidecars without taking ownership.
+    """Reference caller-owned demand planning sidecars without taking ownership.
 
     Attributes:
-        precursor_number_concentration: P2-owned, same-device contiguous
+        precursor_number_concentration: demand planning-owned, same-device
+            contiguous
             ``wp.float64`` array shaped ``(B,)`` for selected precursor number
             concentration [#/m³].
         potential_rate: Same-device contiguous ``wp.float64`` array shaped
-            ``(B,)`` for P2 potential formation rate [#/m³/s].
+            ``(B,)`` for demand planning potential formation rate [#/m³/s].
         potential_demand: Same-device contiguous ``wp.float64`` array shaped
-            ``(B,)`` for P2 potential source demand [#/m³]. P3 does not write
+            ``(B,)`` for demand planning potential source demand [#/m³].
+            Capacity staging does not write
             this field.
     """
 
@@ -287,17 +295,22 @@ class NucleationScratchBuffers:
 
 @dataclass(frozen=True)
 class NucleationFinalizedDemandBuffers:
-    """Reference caller-owned P2/P3 finalized demand and transfer sidecars.
+    """Reference caller-owned demand planning/capacity staging finalized demand
+        and transfer sidecars.
 
     Attributes:
-        accepted_counts: P3-owned, same-device contiguous ``wp.int32`` array
+        accepted_counts: capacity staging-owned, same-device contiguous
+            ``wp.int32`` array
             shaped ``(B,)`` for full provisional event counts. Counts retain
-            demand beyond current free capacity; P2 leaves this field
+            demand beyond current free capacity; demand planning leaves this
+            field
             byte-for-byte unchanged.
         accepted_demand: Same-device contiguous ``wp.float64`` array shaped
-            ``(B,)`` for P2 inventory-admitted source demand [#/m³].
+            ``(B,)`` for demand planning inventory-admitted source demand
+            [#/m³].
         precursor_mass_change: Same-device contiguous ``wp.float64`` array
-            shaped ``(B, S)`` for P2 planned positive species removal [kg/m³].
+            shaped ``(B, S)`` for demand planning planned positive species
+            removal [kg/m³].
     """
 
     accepted_counts: Any
@@ -307,25 +320,33 @@ class NucleationFinalizedDemandBuffers:
 
 @dataclass(frozen=True)
 class NucleationDiagnosticBuffers:
-    """Reference caller-owned P2/P3 diagnostic sidecars.
+    """Reference caller-owned demand planning/capacity staging diagnostic
+        sidecars.
 
     Attributes:
-        gate_codes: P2-owned, same-device contiguous ``wp.int32`` array shaped
+        gate_codes: demand planning-owned, same-device contiguous ``wp.int32``
+            array shaped
             ``(B,)`` for gate diagnostics. Zero denotes eligible; codes 1--6
             denote the documented zero/low gates; and ``7 + s`` records an
             inventory-limited box whose limiting species index is ``s``.
         selected_slot_indices: Same-device contiguous ``wp.int32`` array
-            shaped ``(B, N)`` for P3's deterministic selectable free-slot
+            shaped ``(B, N)`` for capacity staging's deterministic selectable
+            free-slot
             prefix, limited by current free capacity rather than provisional
-            demand. P2 leaves it byte-for-byte unchanged. P3 reserves ``-1``
-            for unused tails; P1 does not inspect, initialize, or otherwise
+            demand. Demand planning leaves it byte-for-byte unchanged. Capacity
+            staging reserves ``-1``
+            for unused tails; input validation does not inspect, initialize, or
+            otherwise
             alter stale output values.
-        free_slot_indices: P3/E6-F5-owned, same-device contiguous ``wp.int32``
+        free_slot_indices: capacity staging/fixed-slot management-owned,
+            same-device contiguous ``wp.int32``
             array shaped ``(B, N)`` for ascending free slot indices with ``-1``
             tails.
-        active_slot_counts: P3/E6-F5-owned, same-device contiguous ``wp.int32``
+        active_slot_counts: capacity staging/fixed-slot management-owned,
+            same-device contiguous ``wp.int32``
             array shaped ``(B,)`` for active slot counts.
-        free_slot_counts: P3/E6-F5-owned, same-device contiguous ``wp.int32``
+        free_slot_counts: capacity staging/fixed-slot management-owned,
+            same-device contiguous ``wp.int32``
             array shaped ``(B,)`` for free slot counts.
     """
 
@@ -338,10 +359,12 @@ class NucleationDiagnosticBuffers:
 
 @dataclass(frozen=True)
 class NucleationExhaustionControls:
-    """Store exact-boolean private P4 capacity-policy controls.
+    """Store exact-boolean private exhaustion resolution capacity-policy
+        controls.
 
     ``resampling`` is considered first for a row only when it can release its
-    entire P3 deficit. ``representative_volume_scaling`` is then considered for
+    entire capacity staging deficit. ``representative_volume_scaling`` is then
+    considered for
     any remaining exhausted row. Exact Python booleans deliberately prevent
     integer or NumPy scalar substitutes at this concrete-only seam.
 
@@ -366,38 +389,49 @@ class NucleationExhaustionControls:
 
 @dataclass(frozen=True)
 class NucleationExhaustionBuffers:
-    """Reference caller-owned P4 policy workspace and finalized diagnostics.
+    """Reference caller-owned exhaustion resolution policy workspace and
+        finalized diagnostics.
 
-    P2 admitted demand and P3 provisional counts are historical immutable
-    handoffs. P4 copies admitted event counts into ``demand_workspace``.
+    Demand planning admitted demand and capacity staging provisional counts are
+    historical immutable
+    handoffs. Exhaustion resolution copies admitted event counts into
+    ``demand_workspace``.
     Post-policy counts become ``final_counts``; dividing them by current box
     volume produces ``final_demand``.
-    Expected P4 all-box preflight rejections occur before workspace writes or
+    Expected exhaustion resolution all-box preflight rejections occur before
+    workspace writes or
     either primitive and preserve every supplied sidecar. Once a selected
     primitive begins, its own planning and commit failure contract applies;
-    P4 does not provide cross-primitive rollback. This concrete-only record is
+    Exhaustion resolution does not provide cross-primitive rollback. This
+    concrete-only record is
     not exported through ``particula.gpu.kernels`` or ``particula.gpu``.
 
     Attributes:
-        resampling_buffers: Caller-owned E6-F6 resampling scratch and
+        resampling_buffers: Caller-owned slot exhaustion resampling scratch and
             diagnostic storage.
         demand_workspace: Mutable ``wp.float64`` ``(B,)`` admitted event
             counts, scaled with representative volume before finalization.
-        final_demand: ``wp.float64`` ``(B,)`` P4-finalized demand [#/m³].
+        final_demand: ``wp.float64`` ``(B,)`` exhaustion resolution-finalized
+            demand [#/m³].
         requested_scale: ``wp.float64`` ``(B,)`` requested volume scales.
         minimum_scale: ``wp.float64`` ``(B,)`` lower bounds for volume scales.
         minimum_volume: ``wp.float64`` ``(B,)`` minimum allowed box volumes
             [m³].
-        resolved_scale: ``wp.float64`` ``(B,)`` scale selected by P4; unscaled
+        resolved_scale: ``wp.float64`` ``(B,)`` scale selected by exhaustion
+            resolution; unscaled
             rows receive ``1.0``.
         resampling_releasable_counts: ``wp.int32`` ``(B,)`` maximum counts
             resampling may release.
-        required_release_counts: ``wp.int32`` ``(B,)`` P4 output deficits
+        required_release_counts: ``wp.int32`` ``(B,)`` exhaustion resolution
+            output deficits
             before policy application.
-        scaling_required: ``wp.int32`` ``(B,)`` P4 output flags for rows
+        scaling_required: ``wp.int32`` ``(B,)`` exhaustion resolution output
+            flags for rows
             selected for scaling.
-        final_counts: ``wp.int32`` ``(B,)`` P4-finalized event counts.
-        final_selected_slot_indices: ``wp.int32`` ``(B, N)`` P4-finalized
+        final_counts: ``wp.int32`` ``(B,)`` exhaustion resolution-finalized
+            event counts.
+        final_selected_slot_indices: ``wp.int32`` ``(B, N)`` exhaustion
+            resolution-finalized
             ascending free-slot prefixes with ``-1`` tails.
     """
 
@@ -417,7 +451,8 @@ class NucleationExhaustionBuffers:
 
 @dataclass(frozen=True)
 class _NucleationPreflight:
-    """Retain normalized read-only P1 metadata for private phase handoff.
+    """Retain normalized read-only input validation metadata for private phase
+        handoff.
 
     This private test seam is not a supported API. Its references preserve
     caller identity and never authorize mutation. Zero-valued diagnostic
@@ -434,7 +469,8 @@ class _NucleationPreflight:
         device: Shared Warp device for all retained arrays.
         temperature: Validated scalar or same-device ``(B,)`` temperature [K].
         saturation: Validated same-device ``(B, S)`` saturation, if configured.
-        has_eligible_boxes: Whether at least one box can proceed past P1.
+        has_eligible_boxes: Whether at least one box can proceed past input
+            validation.
         has_gated_boxes: Whether at least one valid box is currently gated.
         gate_reason: All-box gate reason, or ``None`` for mixed/no gates.
         potential_rate: All-box gate diagnostic potential rate [#/m³/s].
@@ -472,7 +508,9 @@ class _NucleationPreflight:
     protected_inputs: tuple[Any, ...] = ()
 
     def __post_init__(self) -> None:
-        """Capture P1 storage identities for later mutable P4 validation."""
+        """Capture input validation storage identities for later mutable
+        exhaustion resolution validation.
+        """
         if not self.particle_arrays:
             object.__setattr__(
                 self,
@@ -1058,7 +1096,8 @@ def _preflight_nucleation(  # noqa: C901
     validate_payload: bool = True,
     _native_binding: NucleationSpeciesBinding | None = None,
 ) -> _NucleationPreflight:
-    """Validate the deferred P1 boundary without writing caller-owned arrays.
+    """Validate the deferred input validation boundary without writing
+        caller-owned arrays.
 
     This private, concrete-only seam performs ordered schema, ownership,
     physical-domain, and species checks. It accepts caller-owned same-device
@@ -1088,7 +1127,7 @@ def _preflight_nucleation(  # noqa: C901
     Raises:
         TypeError: If a direct scalar has an unsupported type.
         ValueError: If schemas, ownership, physical values, or species settings
-            violate the P1 contract.
+            violate the input validation contract.
     """
     if particle_distribution_code(particles) != 3:
         raise ValueError("native nucleation supports only particle_resolved")
@@ -1601,7 +1640,8 @@ def _plan_demand_work(  # noqa: C901
     invalid: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Plan one box of P2 demand in private device-resident work storage.
+    """Plan one box of demand planning demand in private device-resident work
+        storage.
 
     Calculates ``C`` [#/m³], ``J`` [#/m³/s], and ``E_pot = J × dt`` [#/m³],
     then limits one common admitted demand by participating precursor
@@ -1634,7 +1674,8 @@ def _plan_demand_work(  # noqa: C901
             ``(B,)``.
         removal: Private output for planned species removal [kg/m³], shaped
             ``(B, S)``.
-        gate_codes: Private output for P2 gate and limiter codes, shaped
+        gate_codes: Private output for demand planning gate and limiter codes,
+            shaped
             ``(B,)``.
         invalid: Private two-lane counters for derived-domain and
             inventory-safety failures.
@@ -1761,7 +1802,7 @@ def _commit_demand_plan(
     invalid: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Commit exactly the P2-owned sidecar fields for one box.
+    """Commit exactly the demand planning-owned sidecar fields for one box.
 
     Args:
         number_concentration: Validated private precursor concentration [#/m³].
@@ -1769,14 +1810,15 @@ def _commit_demand_plan(
         potential: Validated private potential demand [#/m³].
         admitted: Validated private inventory-admitted demand [#/m³].
         removal: Validated private planned species removal [kg/m³].
-        gate_codes: Validated private P2 gate and limiter codes.
+        gate_codes: Validated private demand planning gate and limiter codes.
         species_count: Fixed number of species ``S``.
-        scratch_number_concentration: P2-owned precursor-concentration sidecar.
-        scratch_rate: P2-owned potential-rate sidecar.
-        scratch_demand: P2-owned potential-demand sidecar.
-        finalized_demand: P2-owned admitted-demand sidecar.
-        finalized_removal: P2-owned planned-removal sidecar.
-        diagnostics: P2-owned gate-code sidecar.
+        scratch_number_concentration: demand planning-owned
+            precursor-concentration sidecar.
+        scratch_rate: demand planning-owned potential-rate sidecar.
+        scratch_demand: demand planning-owned potential-demand sidecar.
+        finalized_demand: demand planning-owned admitted-demand sidecar.
+        finalized_removal: demand planning-owned planned-removal sidecar.
+        diagnostics: demand planning-owned gate-code sidecar.
     """
     box = wp.tid()
     if invalid[0] != 0 or invalid[1] != 0 or upstream_invalid[0] != 0:
@@ -1806,7 +1848,8 @@ def _plan_nucleation_demand(
 ) -> None:
     """Privately plan inventory-safe nucleation demand without state mutation.
 
-    This concrete-only direct-Warp P2 seam calculates selected precursor number
+    This concrete-only direct-Warp demand planning seam calculates selected
+    precursor number
     concentration ``C`` [#/m³], formation rate ``J`` [#/m³/s], and potential
     demand ``E_pot = J × dt`` [#/m³]. It admits one common demand per box from
     participating gas inventories, so every planned removal is
@@ -1815,39 +1858,48 @@ def _plan_nucleation_demand(
     ``particula.gpu.kernels`` or ``particula.gpu``.
 
     Private scalar status readback is permitted for validation; no caller-state
-    transfer or CPU physics fallback occurs. After read-only P1 and
-    derived-state validation, P2 commits only
+    transfer or CPU physics fallback occurs. After read-only input validation
+    and
+    derived-state validation, demand planning commits only
     ``scratch.precursor_number_concentration``, ``scratch.potential_rate``,
     ``scratch.potential_demand``, ``finalized_demand.accepted_demand``,
     ``finalized_demand.precursor_mass_change``, and ``diagnostics.gate_codes``.
     It reads gas state for planning but never mutates particle state,
-    ``gas.concentration``, P3 ``accepted_counts``, or P3 selected-slot indices.
-    It neither selects/activates slots nor resolves exhaustion; P3 only stages
+    ``gas.concentration``, capacity staging ``accepted_counts``, or capacity
+    staging selected-slot indices.
+    It neither selects/activates slots nor resolves exhaustion; capacity staging
+    only stages
     metadata for a later capacity-policy and activation phase.
 
     Args:
-        particles: Caller-owned Warp particle container used only for P1 schema
+        particles: Caller-owned Warp particle container used only for input
+            validation schema
             and physical-state validation.
         gas: Caller-owned Warp gas container; its concentration [kg/m³] and
-            molar mass [kg/mol] determine P2 rates and inventory admission.
+            molar mass [kg/mol] determine demand planning rates and inventory
+            admission.
         config: Immutable rate-law controls, event composition, and bounds.
         time_step: Finite nonnegative source-planning interval [s].
-        scratch: Exact caller-owned P2 planning-sidecar record.
-        finalized_demand: Exact caller-owned P2/P3 demand-sidecar record; P2
+        scratch: Exact caller-owned demand planning-sidecar record.
+        finalized_demand: Exact caller-owned demand planning/capacity staging
+            demand-sidecar record; demand planning
             writes only admitted demand and planned precursor removal.
-        diagnostics: Exact caller-owned P2/P3 diagnostic-sidecar record; P2
+        diagnostics: Exact caller-owned demand planning/capacity staging
+            diagnostic-sidecar record; demand planning
             writes only gate codes.
         temperature: Positive scalar [K] or same-device ``wp.float64`` array
-            shaped ``(B,)`` for P1 validation.
+            shaped ``(B,)`` for input validation.
         saturation: Configured same-device dimensionless ``wp.float64`` array
-            shaped ``(B, S)`` for P1 validation and P2 gating.
+            shaped ``(B, S)`` for input validation and demand planning gating.
         environment: Optional owner of temperature and configured saturation.
         species_binding: Required explicit native species binding.
 
     Raises:
         TypeError: If a direct scalar has an unsupported type.
-        ValueError: If P1 schemas, ownership, physical inputs, sidecars, or
-            derived P2 demand are invalid, or inventory cannot be made safe.
+        ValueError: If input validation schemas, ownership, physical inputs,
+            sidecars, or
+            derived demand planning demand are invalid, or inventory cannot be
+            made safe.
     """
     if not isinstance(scratch, NucleationScratchBuffers):
         raise ValueError("scratch must be NucleationScratchBuffers.")
@@ -1881,10 +1933,11 @@ def _plan_nucleation_demand_from_preflight(
     finalized_demand: NucleationFinalizedDemandBuffers,
     diagnostics: NucleationDiagnosticBuffers,
 ) -> None:
-    """Run P2 using an already validated P1 handoff.
+    """Run demand planning using an already validated input validation handoff.
 
-    This internal helper keeps the standalone P2 seam intact while allowing the
-    public P5 boundary to perform P1 exactly once.
+    This internal helper keeps the standalone demand planning seam intact while
+    allowing the
+    public commit boundary to perform input validation exactly once.
     """
     if preflight.n_boxes == 0:
         return
@@ -1983,12 +2036,15 @@ def _convert_admitted_demand_to_counts(
 ) -> None:
     """Convert per-volume admitted demand to integral provisional counts.
 
-    This private P3 kernel writes only private workspace. It rejects derived
+    This private capacity staging kernel writes only private workspace. It
+    rejects derived
     counts that are nonfinite, negative, nonintegral, or outside the inclusive
-    ``int32`` range before any caller-owned P3 or E6-F5 sidecar is written.
+    ``int32`` range before any caller-owned capacity staging or fixed-slot
+    management sidecar is written.
 
     Args:
-        accepted_demand: P2-admitted demand [#/m³], shaped ``(B,)``.
+        accepted_demand: demand planning-admitted demand [#/m³], shaped
+            ``(B,)``.
         volume: Validated particle-box volume [m³], shaped ``(B,)``.
         maximum_count: Largest representable provisional ``int32`` count.
         counts: Private output for provisional counts, shaped ``(B,)``.
@@ -2025,7 +2081,8 @@ def _commit_staged_nucleation_slots(
     invalid: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Commit full P3 counts and the selectable E6-F5 free-slot prefix.
+    """Commit full capacity staging counts and the selectable fixed-slot
+        management free-slot prefix.
 
     Full provisional counts are retained even when they exceed free capacity.
     Every selected-index lane outside the deterministic selectable prefix is
@@ -2033,10 +2090,14 @@ def _commit_staged_nucleation_slots(
 
     Args:
         counts: Validated private provisional event counts, shaped ``(B,)``.
-        free_slot_indices: E6-F5 ascending free-slot indices, shaped ``(B, N)``.
-        free_slot_counts: E6-F5 free-slot counts, shaped ``(B,)``.
-        accepted_counts: P3 output for full provisional counts, shaped ``(B,)``.
-        selected_slot_indices: P3 output for selectable free-slot indices,
+        free_slot_indices: fixed-slot management ascending free-slot indices,
+            shaped ``(B, N)``.
+        free_slot_counts: fixed-slot management free-slot counts, shaped
+            ``(B,)``.
+        accepted_counts: capacity staging output for full provisional counts,
+            shaped ``(B,)``.
+        selected_slot_indices: capacity staging output for selectable free-slot
+            indices,
             shaped ``(B, N)``.
         n_particles: Fixed particle capacity ``N`` per box.
     """
@@ -2058,7 +2119,7 @@ def _validate_staged_nucleation_sidecars(
     finalized_demand: NucleationFinalizedDemandBuffers,
     diagnostics: NucleationDiagnosticBuffers,
 ) -> None:
-    """Validate exact P3 handoff records before staging writes."""
+    """Validate exact capacity staging handoff records before staging writes."""
     if preflight.finalized_demand is not finalized_demand:
         raise ValueError(
             "finalized_demand must be the preflight-validated record."
@@ -2115,7 +2176,9 @@ def _write_staged_nucleation_diagnostics(
     categories: Any,
     diagnostics: NucleationDiagnosticBuffers,
 ) -> None:
-    """Write E6-F5 classification outputs to the supplied diagnostics."""
+    """Write fixed-slot management classification outputs to the supplied
+    diagnostics.
+    """
     if preflight.n_particles:
         wp.launch(
             _write_diagnostics,
@@ -2145,27 +2208,35 @@ def _stage_nucleation_slots(
     finalized_demand: NucleationFinalizedDemandBuffers,
     diagnostics: NucleationDiagnosticBuffers,
 ) -> None:
-    """Privately stage P3 event counts and selectable free-slot metadata.
+    """Privately stage capacity staging event counts and selectable free-slot
+        metadata.
 
-    P3 consumes P2's inventory-admitted demand [#/m³] and validated particle
+    Capacity staging consumes demand planning's inventory-admitted demand [#/m³]
+    and validated particle
     volume [m³] to calculate full ``int32`` provisional event counts. It
     delegates active/free classification and ascending free-slot ordering to
-    E6-F5, retains counts beyond free capacity, and writes only the supplied
+    Fixed-slot management, retains counts beyond free capacity, and writes only
+    the supplied
     count and slot-diagnostic sidecars. It does not activate slots, resolve
     exhaustion, resize storage, or mutate particles or gas.
 
-    P3 shares one private scalar status readback between its conversion and the
-    E6-F5 slot-state classification before either output writer launches.
-    After a successful E6-F5 or P3 writer launch, callers must synchronize
+    Capacity staging shares one private scalar status readback between its
+    conversion and the
+    fixed-slot-state classification before either output writer launches.
+    After a successful fixed-slot management or capacity staging writer launch,
+    callers must synchronize
     before consuming outputs; asynchronous writer failures do not promise
     rollback.
 
     Args:
-        preflight: Exact private P1 result reused without repeated validation.
-        finalized_demand: Exact P2/P3 sidecar record containing admitted demand
+        preflight: Exact private input validation result reused without repeated
+            validation.
+        finalized_demand: Exact demand planning/capacity staging sidecar record
+            containing admitted demand
             and receiving full provisional counts.
-        diagnostics: Exact P2/P3 diagnostic record receiving E6-F5 layouts and
-            P3's capacity-limited selectable prefix.
+        diagnostics: Exact demand planning/capacity staging diagnostic record
+            receiving fixed-slot management layouts and
+            Capacity staging's capacity-limited selectable prefix.
 
     Raises:
         ValueError: If private handoff records are invalid, slots are invalid,
@@ -2252,7 +2323,9 @@ def _validate_p4_handoff(  # noqa: C901
     invalid: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Validate immutable P2/P3 handoffs and P4 policy inputs per box."""
+    """Validate immutable demand planning/capacity staging handoffs and
+    exhaustion resolution policy inputs per box.
+    """
     box = wp.tid()
     if upstream_invalid[0] != 0:
         return
@@ -2351,7 +2424,9 @@ def _validate_p4_final(  # noqa: C901
     invalid: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Validate final P4 counts before finalized diagnostic writes."""
+    """Validate final exhaustion resolution counts before finalized diagnostic
+    writes.
+    """
     box = wp.tid()
     if upstream_invalid[0] != 0:
         return
@@ -2379,7 +2454,9 @@ def _write_p4_final(
     invalid: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Commit finalized P4 demand, counts, and ascending free-slot prefixes."""
+    """Commit finalized exhaustion resolution demand, counts, and ascending
+    free-slot prefixes.
+    """
     box = wp.tid()
     if invalid[0] != 0 or upstream_invalid[0] != 0:
         return
@@ -2399,7 +2476,9 @@ def _write_current_p4_diagnostics(
     free_indices: wp.array2d(dtype=wp.int32),
     free_counts: wp.array(dtype=wp.int32),
 ) -> None:
-    """Write private ascending current free-slot diagnostics for P4."""
+    """Write private ascending current free-slot diagnostics for exhaustion
+    resolution.
+    """
     box = wp.tid()
     free = wp.int32(0)
     for particle in range(categories.shape[1]):
@@ -2417,7 +2496,9 @@ def _write_unscaled_p4_resolution(
     resolved_scale: wp.array(dtype=wp.float64),
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Set the P4 resolved scale to one for unselected policy rows."""
+    """Set the exhaustion resolution resolved scale to one for unselected policy
+    rows.
+    """
     box = wp.tid()
     if invalid[0] == 0 and scaling[box] == 0:
         resolved_scale[box] = wp.float64(1.0)
@@ -2432,7 +2513,9 @@ def _write_p4_policy_diagnostics(
     scaling_required: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Commit validated private policy selection to P4 diagnostic sidecars."""
+    """Commit validated private policy selection to exhaustion resolution
+    diagnostic sidecars.
+    """
     box = wp.tid()
     if invalid[0] != 0:
         return
@@ -2447,7 +2530,9 @@ def _aggregate_p4_preflight_status(
     scaling: wp.array(dtype=wp.int32),
     status: wp.array(dtype=wp.int32),
 ) -> None:
-    """Aggregate all P4 preflight results into one scalar status word."""
+    """Aggregate all exhaustion resolution preflight results into one scalar
+    status word.
+    """
     box = wp.tid()
     if invalid[0] != 0:
         status[0] = 1
@@ -2461,7 +2546,9 @@ def _validate_p4_buffers(
     preflight: _NucleationPreflight,
     buffers: NucleationExhaustionBuffers,
 ) -> tuple[Any, ...]:
-    """Validate P4 and nested E6-F6 storage before any P4 writer runs."""
+    """Validate exhaustion resolution and nested slot exhaustion storage before
+    any exhaustion resolution writer runs.
+    """
     if not isinstance(buffers, NucleationExhaustionBuffers):
         raise ValueError("buffers must be NucleationExhaustionBuffers.")
     if not isinstance(buffers.resampling_buffers, ResamplingBuffers):
@@ -2519,7 +2606,9 @@ def _validate_public_p4_inputs(
     controls: NucleationExhaustionControls,
     buffers: NucleationExhaustionBuffers,
 ) -> None:
-    """Validate public P4 controls and storage before any no-work return."""
+    """Validate public exhaustion resolution controls and storage before any
+    no-work return.
+    """
     if not isinstance(controls, NucleationExhaustionControls):
         raise ValueError("controls must be NucleationExhaustionControls.")
     controls.__post_init__()
@@ -2527,7 +2616,9 @@ def _validate_public_p4_inputs(
 
 
 def _revalidate_p4_particle_state(preflight: _NucleationPreflight) -> None:
-    """Revalidate mutable P1 particle storage before P4 writes or primitives."""
+    """Revalidate mutable input validation particle storage before exhaustion
+    resolution writes or primitives.
+    """
     b, n, s, device = (
         preflight.n_boxes,
         preflight.n_particles,
@@ -2568,31 +2659,42 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
     controls: NucleationExhaustionControls,
     buffers: NucleationExhaustionBuffers,
 ) -> tuple[Any, ...]:
-    """Privately apply P4 capacity policy and write finalized diagnostics.
+    """Privately apply exhaustion resolution capacity policy and write finalized
+        diagnostics.
 
-    P4 validates immutable P2/P3 handoffs, then selects resampling only when it
+    Exhaustion resolution validates immutable demand planning/capacity staging
+    handoffs, then selects resampling only when it
     can release a row's complete deficit. It selects representative-volume
-    scaling only for remaining exhausted rows, invokes each selected E6-F6
+    scaling only for remaining exhausted rows, invokes each selected slot
+    exhaustion
     primitive once, and derives final demand/count/free-slot diagnostics from
-    the resulting device state. P2/P3 handoffs remain unchanged.
+    the resulting device state. Demand planning/capacity staging handoffs remain
+    unchanged.
 
-    All expected P4 rejections are detected before P4 workspace writes or an
-    E6-F6 primitive call, preserving particle, gas, P2/P3/P4, and nested
+    All expected exhaustion resolution rejections are detected before exhaustion
+    resolution workspace writes or an
+    slot exhaustion primitive call, preserving particle, gas, demand
+    planning/capacity staging/exhaustion resolution, and nested
     sidecar state. Once a selected primitive begins, its independent
-    planning/commit failure contract applies; P4 intentionally provides no
+    planning/commit failure contract applies; exhaustion resolution
+    intentionally provides no
     cross-primitive rollback. This concrete-only, unexported seam does not
     activate slots, mutate gas or source mass, resize storage, transfer data to
-    the host, use a CPU fallback, or provide E6-F9 integration.
+    the host, use a CPU fallback, or provide direct-process integration.
 
     Args:
-        preflight: Exact private P1 metadata with validated particle and gas
+        preflight: Exact private input validation metadata with validated
+            particle and gas
             containers.
-        finalized_demand: Exact immutable P2/P3 record containing admitted
+        finalized_demand: Exact immutable demand planning/capacity staging
+            record containing admitted
             demand and provisional counts.
-        diagnostics: Exact immutable P2/P3 record containing slot diagnostics
+        diagnostics: Exact immutable demand planning/capacity staging record
+            containing slot diagnostics
             and the provisional selected prefix.
         controls: Exact-Boolean resampling-first/scaling-fallback controls.
-        buffers: Exact caller-owned P4 and nested E6-F6 workspace/diagnostic
+        buffers: Exact caller-owned exhaustion resolution and nested slot
+            exhaustion workspace/diagnostic
             record.
 
     Raises:
@@ -2821,7 +2923,9 @@ def _validate_participating_molecule_counts(
 def _validate_public_molecule_eligibility(
     preflight: _NucleationPreflight,
 ) -> None:
-    """Validate P5 gas-removal eligibility before P4 can mutate particles."""
+    """Validate commit gas-removal eligibility before exhaustion resolution can
+    mutate particles.
+    """
     if preflight.n_boxes == 0:
         return
     molecule_counts: Any = wp.array(
@@ -2864,7 +2968,9 @@ def _validate_p5_handoff(  # noqa: C901
     status: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Validate P4's final handoff before the sole P5 writer launches."""
+    """Validate exhaustion resolution's final handoff before the sole commit
+    writer launches.
+    """
     box = wp.tid()
     if upstream_invalid[0] != 0:
         return
@@ -2926,7 +3032,9 @@ def _validate_p5_handoff(  # noqa: C901
 
 
 def _revalidate_p5_storage(preflight: _NucleationPreflight) -> None:
-    """Reject rebound P1 storage before P5's device handoff validation."""
+    """Reject rebound input validation storage before commit's device handoff
+    validation.
+    """
     b, n, s, device = (
         preflight.n_boxes,
         preflight.n_particles,
@@ -2977,7 +3085,9 @@ def _commit_nucleation_p5(
     buffers: NucleationExhaustionBuffers,
     p4_storage: tuple[Any, ...],
 ) -> bool:
-    """Validate the final P4 record and launch one fused P5 commit if needed."""
+    """Validate the final exhaustion resolution record and launch one fused
+    commit if needed.
+    """
     _revalidate_p5_storage(preflight)
     if any(
         expected is not supplied
@@ -3101,7 +3211,9 @@ def _validate_prepared_nucleation_p1(  # noqa: C901, PLR0913
     status: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Validate all live P1 payloads and retain ordered error lanes."""
+    """Validate all live input validation payloads and retain ordered error
+    lanes.
+    """
     box = wp.tid()
     if box == 0:
         for species in range(density.shape[0]):
@@ -3221,7 +3333,9 @@ def _commit_prepared_p3_diagnostics(
     invalid: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Commit E6-F5 diagnostics only after complete P3 validation."""
+    """Commit fixed-slot management diagnostics only after complete capacity
+    staging validation.
+    """
     box = wp.tid()
     if invalid[0] != 0 or invalid[1] != 0 or upstream_invalid[0] != 0:
         return
@@ -3241,7 +3355,8 @@ def _commit_prepared_p3_diagnostics(
 
 @dataclass(frozen=True)
 class _PreparedNucleationCall:
-    """Pin one allocation-complete P1--P5 nucleation launch sequence.
+    """Pin one allocation-complete preflight through commit nucleation launch
+        sequence.
 
     Preparation fixes container-array identities, dimensions, device, scalar
     controls, immutable policy controls, and private workspace allocations.
@@ -3253,28 +3368,35 @@ class _PreparedNucleationCall:
     Attributes:
         result: Original particle and gas containers returned by the public
             boundary.
-        particle_arrays: Pinned particle fields in P1 validation order.
-        gas_arrays: Pinned gas fields in P1 validation order.
+        particle_arrays: Pinned particle fields in input validation order.
+        gas_arrays: Pinned gas fields in input validation order.
         temperature: Pinned or preparation-owned temperature array [K].
         saturation: Pinned or preparation-owned saturation array.
-        scalar_controls: Validated scalar P1--P2 controls.
-        policy_controls: Frozen integer P4 resampling and scaling controls.
+        scalar_controls: Validated scalar input validation--demand planning
+            controls.
+        policy_controls: Frozen integer exhaustion resolution resampling and
+            scaling controls.
         molecule_counts: Preparation-owned molecule counts per event.
-        scratch_arrays: Pinned caller-owned P2 planning sidecars.
-        finalized_arrays: Pinned caller-owned P2/P3 finalized sidecars.
-        diagnostic_arrays: Pinned caller-owned P2/P3 diagnostic sidecars.
-        p4_arrays: Pinned caller-owned P4 workspace and diagnostic sidecars.
-        p2_work: Preparation-owned P2 work arrays.
-        p3_work: Preparation-owned P3 work arrays.
-        p4_work: Preparation-owned P4 work arrays.
-        p1_status: Preparation-owned ordered P1 status counters.
+        scratch_arrays: Pinned caller-owned demand planning sidecars.
+        finalized_arrays: Pinned caller-owned demand planning/capacity staging
+            finalized sidecars.
+        diagnostic_arrays: Pinned caller-owned demand planning/capacity staging
+            diagnostic sidecars.
+        p4_arrays: Pinned caller-owned exhaustion resolution workspace and
+            diagnostic sidecars.
+        p2_work: Preparation-owned demand planning work arrays.
+        p3_work: Preparation-owned capacity staging work arrays.
+        p4_work: Preparation-owned exhaustion resolution work arrays.
+        p1_status: Preparation-owned ordered input validation status counters.
         pipeline_invalid: Preparation-owned aggregate device failure gate.
-        p2_status: Preparation-owned P2 status counters.
-        p3_status: Preparation-owned P3 status counters.
-        molecule_status: Preparation-owned P5 molecule-eligibility status.
-        p4_status: Preparation-owned P4 handoff and policy status.
-        p4_final_status: Preparation-owned P4 finalized-capacity status.
-        p5_status: Preparation-owned P5 handoff status.
+        p2_status: Preparation-owned demand planning status counters.
+        p3_status: Preparation-owned capacity staging status counters.
+        molecule_status: Preparation-owned commit molecule-eligibility status.
+        p4_status: Preparation-owned exhaustion resolution handoff and policy
+            status.
+        p4_final_status: Preparation-owned exhaustion resolution
+            finalized-capacity status.
+        p5_status: Preparation-owned commit handoff status.
         resampling: Prepared nested resampling call, when dimensions permit it.
         scaling: Prepared nested scaling call, when dimensions permit it.
         dimensions: Fixed ``(B, N, S)`` dimensions.
@@ -3341,11 +3463,15 @@ def _prepare_nucleation_step_gpu(  # noqa: C901
         gas: Caller-owned same-device Warp gas container.
         config: Immutable scalar nucleation controls.
         time_step: Finite nonnegative step duration [s].
-        scratch: Caller-owned P2 planning sidecars.
-        finalized_demand: Caller-owned P2/P3 finalized-demand sidecars.
-        diagnostics: Caller-owned P2/P3 diagnostic sidecars.
-        exhaustion_controls: Exact-Boolean P4 resampling and scaling controls.
-        exhaustion_buffers: Caller-owned P4 workspace and diagnostics.
+        scratch: Caller-owned demand planning sidecars.
+        finalized_demand: Caller-owned demand planning/capacity staging
+            finalized-demand sidecars.
+        diagnostics: Caller-owned demand planning/capacity staging diagnostic
+            sidecars.
+        exhaustion_controls: Exact-Boolean exhaustion resolution resampling and
+            scaling controls.
+        exhaustion_buffers: Caller-owned exhaustion resolution workspace and
+            diagnostics.
         temperature: Positive scalar [K] or same-device ``wp.float64 (B,)``.
         saturation: Configured same-device ``wp.float64 (B, S)`` ratios.
         environment: Optional same-device owner of temperature and saturation.
@@ -3586,10 +3712,11 @@ def _commit_native_nucleation(
 def _enqueue_prepared_nucleation_call(  # noqa: C901
     prepared: _PreparedNucleationCall,
 ) -> tuple[Any, Any]:
-    """Enqueue one fixed P1--P5 sequence using only pinned arrays.
+    """Enqueue one fixed preflight through commit sequence using only pinned
+        arrays.
 
     The device-only phase performs no allocation, readback, synchronization,
-    policy resolution, or container lookup. There is no rollback after a writer
+    Policy resolution, or container lookup. There is no rollback after a writer
     launch.
 
     Args:
@@ -4012,7 +4139,8 @@ def _observe_prepared_nucleation_call(  # noqa: C901
         The original ``(particles, gas)`` containers when every phase succeeds.
 
     Raises:
-        ValueError: If P1--P5 validation or a nested exhaustion operation
+        ValueError: If stage validation or a nested
+            exhaustion operation
             recorded an error.
     """
     p1 = prepared.p1_status.numpy()
@@ -4102,11 +4230,15 @@ def nucleation_step_gpu(
         gas: Caller-owned same-device Warp gas container.
         config: Immutable scalar nucleation controls.
         time_step: Finite nonnegative step duration [s].
-        scratch: Caller-owned P2 planning sidecars.
-        finalized_demand: Caller-owned P2/P3 finalized-demand sidecars.
-        diagnostics: Caller-owned P2/P3 diagnostic sidecars.
-        exhaustion_controls: Concrete P4 resampling and scaling controls.
-        exhaustion_buffers: Caller-owned P4 workspace and diagnostics.
+        scratch: Caller-owned demand planning sidecars.
+        finalized_demand: Caller-owned demand planning/capacity staging
+            finalized-demand sidecars.
+        diagnostics: Caller-owned demand planning/capacity staging diagnostic
+            sidecars.
+        exhaustion_controls: Concrete exhaustion resolution resampling and
+            scaling controls.
+        exhaustion_buffers: Caller-owned exhaustion resolution workspace and
+            diagnostics.
         temperature: Positive scalar [K] or same-device ``wp.float64 (B,)``.
         saturation: Configured same-device ``wp.float64 (B, S)`` ratios.
         environment: Optional same-device owner of temperature and saturation.
@@ -4117,7 +4249,8 @@ def nucleation_step_gpu(
     Raises:
         TypeError: If a required scalar or configuration has an unsupported
             type.
-        ValueError: If P1--P5 validation, ownership, physical state, or a
+        ValueError: If stage validation, ownership, physical
+            state, or a
             finalized handoff is invalid.
     """
     prepared = _prepare_nucleation_step_gpu(

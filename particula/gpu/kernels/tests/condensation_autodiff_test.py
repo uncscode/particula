@@ -152,7 +152,9 @@ def _assert_interior_margins(
     raw_transfer: float,
     gas_concentration: float,
 ) -> None:
-    """Assert the raw proposal stays away from P2 clamp boundaries."""
+    """Assert the raw proposal stays away from inventory finalization clamp
+    boundaries.
+    """
     particle_mass = 1.0e-15
     particle_concentration = 1.0e6
     assert np.isfinite(raw_transfer)
@@ -216,7 +218,9 @@ def _make_p2_state(
     concentration: float,
     gas_concentration: float,
 ) -> tuple[Any, Any]:
-    """Build minimal valid particle and gas state for direct P2 semantics."""
+    """Build minimal valid particle and gas state for direct inventory
+    finalization semantics.
+    """
     particles = dataclasses.replace(
         support._make_particle_data(1, 1, 1),
         masses=np.array([[[mass]]], dtype=np.float64),
@@ -276,7 +280,9 @@ def test_condensation_raw_rate_tape_matches_centered_difference_on_cuda() -> (
 
 
 def test_p2_evaporation_boundary_clamps_transfer_to_owned_mass() -> None:
-    """P2 forward semantics clamp evaporation at owned particle mass."""
+    """Inventory finalization forward semantics clamp evaporation at owned
+    particle mass.
+    """
     runtime = support._load_warp_runtime()
     particles, gas = _make_p2_state(runtime, "cpu", 2.0, 1.0, 1.0)
     proposal = runtime.wp.array(
@@ -293,7 +299,9 @@ def test_p2_evaporation_boundary_clamps_transfer_to_owned_mass() -> None:
 def test_p2_uptake_inventory_boundary_limits_concentration_weighted_transfer() -> (
     None
 ):
-    """P2 forward semantics scale uptake to available gas inventory."""
+    """Inventory finalization forward semantics scale uptake to available gas
+    inventory.
+    """
     runtime = support._load_warp_runtime()
     particles, gas = _make_p2_state(runtime, "cpu", 1.0, 2.0, 1.0)
     wp = runtime.wp
@@ -321,7 +329,9 @@ def test_p2_uptake_inventory_boundary_limits_concentration_weighted_transfer() -
 
 
 def test_p2_in_place_mass_mutation_is_forward_semantics_non_claim() -> None:
-    """Forward-only non-claim: P2 applies finalized transfer in place."""
+    """Forward-only non-claim: inventory finalization applies finalized transfer
+    in place.
+    """
     runtime = support._load_warp_runtime()
     particles, gas = _make_p2_state(runtime, "cpu", 1.0, 1.0, 10.0)
     finalized = runtime._finalize_inventory_limited_mass_transfer(

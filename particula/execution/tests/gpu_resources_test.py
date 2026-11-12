@@ -1157,7 +1157,9 @@ def test_registry_rejects_incomplete_and_inexact_nucleation_records() -> None:
 
 @pytest.mark.warp
 def test_capture_resource_set_reuses_exact_p3_and_family_identities() -> None:
-    """A compatible P4 request publishes and returns one exact frozen set."""
+    """A compatible preallocation request publishes and returns one exact frozen
+    set.
+    """
     session = _session()
     registry = GPUResourceRegistry(session)
     condensation = registry.acquire_condensation()
@@ -1411,7 +1413,7 @@ def test_capture_resource_view_drift_rejects_before_allocation(
 def test_capture_resource_capacity_rejects_before_allocation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """P4 reuses ordinary collision bounds before any candidate work."""
+    """Preallocation reuses ordinary collision bounds before any candidate work."""
     session = _session(particle_count=2)
     registry = GPUResourceRegistry(session)
     inventory = registry.register_capture_resources(session, None, ())
@@ -1442,7 +1444,9 @@ def test_capture_resource_capacity_rejects_before_allocation(
 def test_capture_resource_rejects_inventory_alias_before_allocation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """P4 protects retained diagnostic inventory storage from staged aliases."""
+    """Preallocation protects retained diagnostic inventory storage from staged
+    aliases.
+    """
     session = _session()
     registry = GPUResourceRegistry(session)
     wp = pytest.importorskip("warp")

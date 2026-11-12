@@ -1,9 +1,9 @@
 # Condensation Stiffness Study and Recommendation Record
 
 This note is the canonical decision record for GPU condensation integration.
-The shipped production path uses four fixed equal substeps; P2/P3 candidate
+The shipped production path uses four fixed equal substeps; baseline and candidate study candidate
 comparisons remain historical evidence only. The current production GPU path is
-`float64` bounded and couples P2-finalized particle transfer to gas
+`float64` bounded and couples inventory-limited particle transfer to gas
 concentration; this remains a narrow direct-kernel contract rather than a
 general GPU production claim.
 
@@ -12,20 +12,20 @@ general GPU production claim.
 - Production path: explicit fixed-four GPU condensation. Every successful
   `condensation_step_gpu(...)` call performs exactly four `time_step / 4.0`
   substeps.
-- Particle and gas update: each raw proposal is P2-finalized against inventory,
+- Particle and gas update: each raw proposal is inventory-limited against inventory,
   then applied to particle mass and coupled to gas concentration by the matching
   particle-concentration-weighted transfer.
 - Per-substep order: optionally refresh composition-weighted surface tension,
   overwrite `gas.vapor_pressure`, refresh environment properties, produce a raw
-  transfer proposal, P2-finalize and apply it, accumulate the finalized
+  transfer proposal, finalize and apply it against the inventory limits, accumulate the finalized
   transfer, and couple gas concentration. Later proposals read coupled gas;
   vapor-pressure refresh does not read gas concentration.
 - Transfer buffers: the resolved total transfer is cleared once after preflight
-  and accumulates P2-finalized transfer over all four substeps. A supplied total
+  and accumulates inventory-limited transfer over all four substeps. A supplied total
   buffer is returned by identity; the separate work buffer retains only the
   final raw proposal.
-- Failure boundary: invalid aggregate P2 state or sidecars fail before launches
-  or mutation. A later non-finite fresh proposal fails before P2 mutation in
+- Failure boundary: invalid aggregate inventory finalization state or sidecars fail before launches
+  or mutation. A later non-finite fresh proposal fails before inventory finalization mutation in
   that cycle but does not roll back earlier completed substeps.
 - Baseline backend for this phase: `np.float64` inputs and Warp CPU execution.
 - Accepted study inputs: scalar `temperature` and `pressure`, direct Warp
@@ -34,8 +34,8 @@ general GPU production claim.
 - Study cases are deterministic fixed-shape builders that should be recreated
   from clean inputs after failed validation or intentionally unstable runs.
 - Recommendation dependency boundary: the conclusions below assume the shipped
-  E2-F2 environment-shape contract for scalar or direct Warp `(n_boxes,)`
-  temperature and pressure inputs, and they stay inside the E2-F6 `float64`
+  CPU environment-shape contract for scalar or direct Warp `(n_boxes,)`
+  temperature and pressure inputs, and they stay inside the mass-precision study `float64`
   evidence envelope.
 
 ## Shared Case Catalog
@@ -105,7 +105,7 @@ case, the collected tests:
 - reuse one caller-owned preallocated `mass_transfer` buffer per case/device
 - rebuild particle, gas, and vapor-pressure inputs before every trial
 - historical baseline: record the then-current particle-only behavior; these
-  rows do not describe the later P2-finalized gas-coupled runtime
+  rows do not describe the later inventory-limited gas-coupled runtime
 - keep scalar `temperature` / `pressure` inputs for single-box cases and direct
   Warp `(n_boxes,)` arrays for the multi-box `droplet_like` case
 
@@ -132,7 +132,7 @@ gas-coupled conservation contract or a general stable-timestep limit.
 
 ## Candidate Evaluation Evidence
 
-P2/P3 recorded two deterministic prototype candidates implemented in
+baseline and candidate study recorded two deterministic prototype candidates implemented in
 `particula/gpu/kernels/tests/_condensation_test_support.py` and collected
 through `particula/gpu/kernels/tests/condensation_stiffness_test.py`. They
 remain test-local evidence only; the public `condensation_step_gpu(...)`
@@ -141,12 +141,12 @@ does ship gas coupling, but these candidates remain historical evidence only.
 
 | Candidate | Family | Buffer reuse | Determinism | Finite/non-negative masses | CPU-reference agreement | Graph capture | Autodiff note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `fixed_count_substeps_4` | Historical P2/P3 fixed-count explicit sub-stepping evidence; its fixed-four behavior is now shipped. | Pass: one caller-owned `mass_transfer` array plus fixed-shape `work`/`accumulator` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 5e-2` at the baseline timestep and `max relative error <= 5e-2` across the recorded grids for `nanometer`, `accumulation_mode`, and `droplet_like`. These bounds are case-specific evidence, not a general accuracy tolerance or stable-timestep limit. | Not evaluated as production graph-capture evidence. | Not evaluated as production autodiff evidence. |
+| `fixed_count_substeps_4` | Historical baseline and candidate study fixed-count explicit sub-stepping evidence; its fixed-four behavior is now shipped. | Pass: one caller-owned `mass_transfer` array plus fixed-shape `work`/`accumulator` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 5e-2` at the baseline timestep and `max relative error <= 5e-2` across the recorded grids for `nanometer`, `accumulation_mode`, and `droplet_like`. These bounds are case-specific evidence, not a general accuracy tolerance or stable-timestep limit. | Not evaluated as production graph-capture evidence. | Not evaluated as production autodiff evidence. |
 | `asymptotic_relaxation` | Asymptotic first-order bounded relaxation | Pass: one caller-owned `mass_transfer` array plus one fixed-shape `work` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 3.5e-1` at the baseline timestep and `max relative error <= 3.5e-1` across the recorded grid. This looser bound is recorded as prototype evidence only and is not suitable for a production recommendation by itself. | Pass: fixed-shape algebra with no adaptive search or variable-length loops. | `exp(...)` relaxation remains differentiable away from the same clamp boundary, so it is a plausible autodiff target but not yet production-qualified. |
 
 ### Historical Phase Boundary Decision
 
-- This decision preceded the shipped P2-finalized gas-coupled production path.
+- This decision preceded the shipped inventory-limited gas-coupled production path.
   The candidate coverage remains deterministic evaluation evidence, not a
   current runtime description.
 - The asymptotic candidate remains evidence-only because the tolerance required
@@ -162,15 +162,15 @@ does ship gas coupling, but these candidates remain historical evidence only.
 `fixed_count_substeps_4` is the shipped production integration behavior of
 `condensation_step_gpu(...)`, not a future prototype. Each valid call uses four
 equal substeps, updates particle mass and gas concentration using the same
-P2-finalized transfer, and keeps production calculations device resident.
+inventory-limited transfer, and keeps production calculations device resident.
 
 Why this is the recommended path:
 
-- The historical P2/P3 comparison recorded `rtol <= 5e-2` at the baseline
+- The historical baseline and candidate study comparison recorded `rtol <= 5e-2` at the baseline
   timestep and maximum relative error `<= 5e-2` only for the named
   `nanometer`, `accumulation_mode`, and `droplet_like` grids.
 - Successful calls preserve supplied total-buffer identity, clear that total
-  once after preflight, and accumulate P2-finalized transfer. A
+  once after preflight, and accumulate inventory-limited transfer. A
   separate work buffer retains the final raw proposal.
 - `CondensationScratchBuffers` remains a concrete-module-only sidecar. Its
   supplied active-device, stable-shape `wp.float64` fields may be omitted
@@ -178,19 +178,19 @@ Why this is the recommended path:
 - This shipped behavior does not establish graph capture/replay or autodiff
   readiness.
 
-### P1--P4 production-hook evidence boundary
+### Production-hook evidence boundary
 
 The historical candidate comparisons above used case-specific `5e-2` agreement
 thresholds. They are distinct from current production-hook evidence:
 
 | Evidence | Wrapper | Scope |
 | --- | --- | --- |
-| P1 | `particula/gpu/kernels/tests/condensation_test.py` | Independent NumPy-oracle parity for final particle mass and gas concentration, including one/multi-box and multi-species fixtures. |
-| P2 | `particula/gpu/kernels/tests/condensation_test.py` | Separate strict concentration-weighted particle-plus-gas conservation at `rtol=1e-12`, plus mutation and output-buffer contracts. |
-| P3 | `particula/gpu/kernels/tests/condensation_graph_capture_test.py` | CPU capture is capability-skipped; on CUDA, only the public-step host-validation readback during capture is strict-xfailed. Setup and normal calls remain ordinary assertions. This is a limitation, not support. |
-| P4 | `particula/gpu/kernels/tests/condensation_autodiff_test.py` | Raw-rate-only, one-box fp64 interior Tape derivative evidence; P2 clamps and inventory limits remain outside the derivative claim. |
+| Independent parity | `particula/gpu/kernels/tests/condensation_test.py` | Independent NumPy-oracle parity for final particle mass and gas concentration, including one/multi-box and multi-species fixtures. |
+| Conservation | `particula/gpu/kernels/tests/condensation_test.py` | Separate strict concentration-weighted particle-plus-gas conservation at `rtol=1e-12`, plus mutation and output-buffer contracts. |
+| Capture limitation | `particula/gpu/kernels/tests/condensation_graph_capture_test.py` | CPU capture is capability-skipped; on CUDA, only the public-step host-validation readback during capture is strict-xfailed. Setup and normal calls remain ordinary assertions. This is a limitation, not support. |
+| Interior autodiff | `particula/gpu/kernels/tests/condensation_autodiff_test.py` | Raw-rate-only, one-box fp64 interior Tape derivative evidence; inventory finalization clamps and inventory limits remain outside the derivative claim. |
 
-Warp CPU is the standard backend for supported P1/P2 and P4 probes when Warp is
+Warp CPU is the standard backend for supported parity, conservation, and interior-autodiff probes when Warp is
 installed. CUDA is optional local/manual evidence. Fixed-four looping and stable
 caller-owned buffers enable deterministic evaluation, but neither supplies a
 graph-replay or general autodiff guarantee. The scope remains fp64,
@@ -213,7 +213,7 @@ pytest particula/gpu/kernels/tests/condensation_autodiff_test.py -q -m "warp and
 
 ### Alternatives considered but not selected
 
-- **Historical single-step explicit update:** retained only as a P2/P3
+- **Historical single-step explicit update:** retained only as historical baseline and candidate study
   comparison baseline; it is not the shipped production path.
 - **`asymptotic_relaxation`:** retain as evidence-only. It remains interesting
   for differentiability because the algebra is smooth away from clamp
@@ -229,25 +229,25 @@ The shipped direct kernel couples each finalized transfer to gas concentration;
 later mass-transfer proposals observe that updated gas state. This is not
 temperature feedback, a strategy or `Runnable` path, adaptive stepping, graph
 capture/replay, autodiff support, or general CPU-strategy parity. A failed
-aggregate P2 preflight is atomic, while a later raw-proposal failure retains
+aggregate inventory finalization preflight is atomic, while a later raw-proposal failure retains
 completed earlier substeps rather than rolling back the whole call.
 
 ### Downstream gates and dependency boundaries
 
-E4-F4 P2 ships a low-level, per-substep latent-heat rate correction with
+The GPU latent-heat hook supplies a low-level, per-substep latent-heat rate correction with
 CPU-oracle/Warp parity. Issue #1272 also ships its caller-owned, signed
 `energy_transfer` diagnostic: after successful preflight, its active-device
-`wp.float64` `(n_boxes, n_species)` output is overwritten with P2-finalized
+`wp.float64` `(n_boxes, n_species)` output is overwritten with inventory-limited
 transfer times latent heat. It does not add temperature-state
-feedback, E4-F6
-independent-device plus graph/autodiff evidence, or E4-F7 strategy/runnable
+feedback, condensation parity
+independent-device plus graph/autodiff evidence, or condensation support documentation strategy/runnable
 and final support work.
 
-- **E2-F2 environment-shape dependency:** the recommendation assumes the shipped
+- **CPU environment-shape dependency:** the recommendation assumes the shipped
   contract for scalar inputs and explicit direct Warp `(n_boxes,)` environment
   arrays. Broader conclusions should not be inferred for different environment
   ownership or shape models.
-- **E2-F6 precision dependency:** the recommendation is supported only inside
+- **mass-precision study precision dependency:** the recommendation is supported only inside
   the current `float64` / `wp.float64` evidence envelope. It does not approve a
   lower-precision or mixed-precision production migration.
 
@@ -260,7 +260,7 @@ This record does **not** publish:
 - general CPU-strategy parity or accuracy claims beyond the documented direct
   kernel cases
 - temperature-feedback, general graph-capture/replay, or general autodiff
-  claims. P3 records an unsupported public-step capture constraint, and P4 is
+  claims. The capture probe records an unsupported public-step capture constraint, and autodiff is
   raw-rate-only interior evidence. Issue #1272's caller-owned signed
   `energy_transfer` diagnostic is shipped bookkeeping, not temperature feedback.
 - strategy/runnable-level latent-heat support

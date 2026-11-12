@@ -2,14 +2,14 @@
 
 ## Scope and current disposition
 
-**Plan disposition: Shipped by maintainer decision on 2026-09-27.** E8 and
-E8-F1 through E8-F8 are closed based on the maintainer's completion report.
+**Plan disposition: Shipped by maintainer decision on 2026-09-27.** The graph-capture work and all eight supporting features are closed based on
+the maintainer's completion report.
 The decision supersedes the original requirement to keep plan metadata open
 until the designated-device evidence gate passes. It does not supply or
 certify missing measurements.
 
-**Measured-evidence disposition: UNSHIPPED/BLOCKED.** E8-F7/T7 owns profiling
-and machine-bounded recommendations. F8-P3 records the evidence ledger;
+**Measured-evidence disposition: UNSHIPPED/BLOCKED.** CUDA profiling owns profiling
+and machine-bounded recommendations. This closeout records the evidence ledger;
 missing evidence remains unavailable and unmeasured, not zero or passing.
 The original 2026-09-07 evidence snapshot below is retained for follow-up.
 
@@ -37,21 +37,15 @@ evidence is collected and reviewed.
 
 ## Target-derivation ledger
 
-Future producers must inspect the E8-F1 through E8-F7 implementation records
-and final executable diff, exclude tests, docs, `.opencode/plans/`, and
-`.artifacts/`, then freeze a sorted, deduplicated repository-relative
-production-module list. These static refresh inputs are not a live dependency
-of this record or its test:
-
-| Track | Inline repository plan path |
-| --- | --- |
-| E8-F1 | `.opencode/plans/sections/features/E8-F1/implementation_tasks.md` |
-| E8-F2 | `.opencode/plans/sections/features/E8-F2/implementation_tasks.md` |
-| E8-F3 | `.opencode/plans/sections/features/E8-F3/implementation_tasks.md` |
-| E8-F4 | `.opencode/plans/sections/features/E8-F4/implementation_tasks.md` |
-| E8-F5 | `.opencode/plans/sections/features/E8-F5/implementation_tasks.md` |
-| E8-F6 | `.opencode/plans/sections/features/E8-F6/implementation_tasks.md` |
-| E8-F7 | `.opencode/plans/sections/features/E8-F7/implementation_tasks.md` |
+Future producers must inspect the capture capability, enqueue, preallocation,
+capture/replay, parity, benchmark, and profiling implementations and their final
+executable diff. Exclude tests, documentation, internal plans, and artifacts;
+then freeze a sorted, deduplicated repository-relative production-module list.
+Use the [operator runbook](../gpu_graph_capture.md),
+[benchmark record](../resident_benchmark_memory_budget.md), and
+[profiling record](../gpu_graph_capture_performance.md) to locate the supported
+boundaries and their evidence requirements. These are static refresh inputs,
+not a live dependency of this record or its test.
 
 Final executable diff: **UNAVAILABLE — final executable diff not collected**.
 
@@ -73,7 +67,7 @@ Future coverage rows use exactly this format:
 | Target list | Frozen production targets | UNAVAILABLE |
 | Aggregate changed-module coverage | `>=80%` | UNAVAILABLE |
 
-The P3 closeout document and its test are excluded from production targets.
+The integration validation closeout document and its test are excluded from production targets.
 
 ## Required evidence matrix
 
@@ -84,15 +78,15 @@ metadata only.
 
 | ID | Required evidence | Final revision | Designated device | Status | Evidence / blocker |
 | --- | --- | --- | --- | --- | --- |
-| H1 | Qualified capture/replay with no replay-time allocation, host transfer, or bulk synchronization | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2, C7; E8-F2 incomplete; A1 |
-| H2 | Deterministic rejection or explicit recapture for structural changes | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2; E8-F2 incomplete; A1 |
-| H3 | CPU, uncaptured Warp, and captured CUDA parity plus tight concentration-weighted conservation | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2, C7; E8-F2 incomplete; A1 |
-| H4 | Persistent nonaliasing RNG continuation, reset, and restart behavior | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2; E8-F2 and E8-F3 incomplete; A1 |
+| H1 | Qualified capture/replay with no replay-time allocation, host transfer, or bulk synchronization | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2, C7; capture-ready enqueue incomplete; A1 |
+| H2 | Deterministic rejection or explicit recapture for structural changes | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2; capture-ready enqueue incomplete; A1 |
+| H3 | CPU, uncaptured Warp, and captured CUDA parity plus tight concentration-weighted conservation | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2, C7; capture-ready enqueue incomplete; A1 |
+| H4 | Persistent nonaliasing RNG continuation, reset, and restart behavior | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2; capture-ready enqueue and resource preallocation incomplete; A1 |
 | H5 | Co-located tests and configured `>=80%` coverage | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C4; frozen targets and aggregate gate unavailable |
-| H6 | 1/10/100/1000-box scaling evidence or explicit unavailable rows | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; F6 artifact unavailable; A1 |
-| H7 | Small/medium captured-versus-uncaptured launch-overhead provenance | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; F6 artifact unavailable; A1 |
-| H8 | Logical memory model and observed peak-memory comparison | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; F6 artifact unavailable; A1 |
-| H9 | Nsight occupancy/memory-access evidence and bounded follow-up | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C9; F7 artifact unavailable; A2 |
+| H6 | 1/10/100/1000-box scaling evidence or explicit unavailable rows | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; benchmark artifact unavailable; A1 |
+| H7 | Small/medium captured-versus-uncaptured launch-overhead provenance | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; benchmark artifact unavailable; A1 |
+| H8 | Logical memory model and observed peak-memory comparison | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; benchmark artifact unavailable; A1 |
+| H9 | Nsight occupancy/memory-access evidence and bounded follow-up | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C9; profiling artifact unavailable; A2 |
 | H10 | Example/runbook/limitations and strict MkDocs result | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C5, C6; final closeout output unavailable |
 | H11 | Exact closeout command matrix and literal results before promotion | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C1–C9; literal results unavailable |
 
@@ -186,15 +180,15 @@ and copied summaries.
 
 | Record ID | Manifest pointer | Schema/version | Final revision | Workload | Provenance | Raw filename | Byte size | SHA-256 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A1 | UNAVAILABLE — absent reviewed F6 CUDA artifact | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE |
-| A2 | UNAVAILABLE — absent reviewed F7 CUDA artifact | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE |
+| A1 | UNAVAILABLE — absent reviewed benchmark CUDA artifact | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE |
+| A2 | UNAVAILABLE — absent reviewed profiling CUDA artifact | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE |
 
 ## Blockers and promotion rule
 
-The original evidence snapshot cited outstanding E8-F2 and E8-F3 work.
+The original evidence snapshot cited outstanding capture-ready enqueue and resource preallocation work.
 Those plan statuses are superseded by the 2026-09-27 maintainer closeout;
 historical matrix references are not current implementation status.
-Absent reviewed F6/F7 CUDA artifacts still block measured-evidence promotion.
+Absent reviewed benchmark and profiling CUDA artifacts still block measured-evidence promotion.
 Measured-evidence promotion requires H1–H11 `PASS` on one final revision and designated qualified
 CUDA device, reviewed safe artifacts where applicable, all literal command
 outputs, and frozen coverage targets/gate. Otherwise retain the measured-evidence

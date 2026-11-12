@@ -2,14 +2,14 @@
 
 ## Complete direct-process context
 
-Fixed-shape slot sidecars remain caller-owned in the illustrative [direct-process example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). See [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and the [P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). This documentation does not add resizing, hidden transfer, CPU fallback, or a production scheduler.
+Fixed-shape slot sidecars remain caller-owned in the illustrative [direct-process example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). See [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and the [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). This documentation does not add resizing, hidden transfer, CPU fallback, or a production scheduler.
 
 This guide documents shipped fixed-capacity CPU primitives and direct Warp
-primitives. The concrete CPU-only P3
+primitives. The concrete CPU-only GPU diagnostics
 `particula.dynamics.nucleation.particle_source.commit_particle_source`
 transaction is a shipped consumer that composes slot discovery, policy
 resolution, and activation, but is not package-exported or a public API.
-E6-F5 owns the authoritative discovery, free-index classification, and
+Fixed-slot management owns the authoritative discovery, free-index classification, and
 activation boundary. The shipped public, CPU-only one-box
 `particula.dynamics.Nucleation` runnable consumes these primitives; scheduler
 integration and broader policy orchestration remain deferred.
@@ -26,12 +26,12 @@ existing counts, provisional source counts and volume together, preserving
 pre-existing number/mass density and gas concentration. This is distinct from
 physical volume evolution, which retains particle counts and dilutes gas.
 The native source consumer supplies explicit ordered species mapping; see
-[native source integration](native_scientific_processes.md#native-source-integration-m4).
+[native source integration](native_scientific_processes.md#native-source-integration-v030).
 Direct and prepared GPU exhaustion calls reject untagged, discrete, and PDF
 metadata before payload access. Native source staging requires an explicit
 species binding and carries raw event counts through scaling; final demand
 density is computed from those counts and the current volume. The import
-snippets below require the selected E9 checkout, with Warp installed for GPU
+snippets below require the v0.3.0 development checkout, with Warp installed for GPU
 imports.
 
 ## CPU planning contract
@@ -81,21 +81,21 @@ implementation plan, so applications must not expose or depend on
 box and the target state before its first assignment, then commits the complete
 fixed-capacity remap.
 
-CPU P2 consumes writable `ParticleData` NumPy `float64` arrays with these
+CPU CPU activation consumes writable `ParticleData` NumPy `float64` arrays with these
 schemas: `masses (B, N, S)`, `concentration (B, N)`, `charge (B, N)`,
 `density (S,)`, and `volume (B,)`. The arrays must not share writable memory.
 An inactive slot has zero concentration and literal-zero mass and charge.
 These are CPU-only planning and commit helpers, not a CPU-to-Warp transfer or
 parity interface.
 
-P4 scaling consumes writable, contiguous, nonaliasing NumPy sidecars:
+GPU activation scaling consumes writable, contiguous, nonaliasing NumPy sidecars:
 
 | Sidecar | CPU dtype and shape |
 | --- | --- |
 | `provisional_source_demand`, `requested_scale`, `minimum_scale`, `minimum_volume`, `resolved_scale` | `float64 (B,)` |
 | `scaling_required` | `bool (B,)` |
 
-CPU P4 rejects invalid schemas, physical values, bounds, aliasing, or selected
+CPU GPU activation rejects invalid schemas, physical values, bounds, aliasing, or selected
 minimum volumes before diagnostic or particle writes. A row is selected only
 when `scaling_required` is true and demand is positive. Even when no rows are
 selected, a successful call writes `resolved_scale`: it is `1.0` for unselected
@@ -117,9 +117,9 @@ from particula.gpu.kernels.exhaustion import (
 concrete-module-only. The direct functions consume caller-owned, same-device,
 fixed-shape particle state, counts, sidecars, and buffers. Callers perform
 CPU/Warp transfer and synchronization. In particular, synchronize Warp before
-observing successful asynchronous P4 results.
+observing successful asynchronous GPU activation results.
 
-Warp P2 accepts same-device `int32 (B,)` `required_release_counts`. Its
+Warp CPU activation accepts same-device `int32 (B,)` `required_release_counts`. Its
 caller-owned `ResamplingBuffers` fields are all distinct, same-device arrays:
 
 | Fields | dtype and shape |
@@ -131,28 +131,28 @@ caller-owned `ResamplingBuffers` fields are all distinct, same-device arrays:
 | `radius_cubed_relative_error`, `mean_radius_relative_error`, `surface_relative_error`, `diversity_absolute_error` | `float64 (B,)` |
 
 After successful nonzero-demand planning, unused index lanes are `-1` and
-unused replacement lanes are zero. P2 preflight rejects before caller writes.
+unused replacement lanes are zero. CPU activation preflight rejects before caller writes.
 A zero-demand call is write-free. Planning may alter documented buffer lanes;
 if a planning diagnostic fails, particles remain unchanged and the commit is
 skipped. No rollback is promised after a commit launch.
 
-Warp P4 sidecars are same-device, contiguous, nonaliasing arrays: all numeric
+Warp GPU activation sidecars are same-device, contiguous, nonaliasing arrays: all numeric
 sidecars (`provisional_source_demand`, `requested_scale`, `minimum_scale`,
 `minimum_volume`, and `resolved_scale`) are `float64 (B,)`, while
 `scaling_required` is `int32 (B,)` containing `0` or `1`. Preflight rejects
-before a caller write. Successful P4 writes `resolved_scale` as the requested
+before a caller write. Successful GPU activation writes `resolved_scale` as the requested
 factor for selected rows and `1.0` otherwise; no-selected-row calls are
 otherwise write-free.
 
 ## Mutation boundaries
 
-CPU P1 resolution and CPU P2 `plan_resampling` are read-only. CPU P2
+CPU slot classification resolution and CPU CPU activation `plan_resampling` are read-only. CPU CPU activation
 `apply_resampling` validates every target box and its detached plan before its
-first assignment, then commits the all-box remap. CPU P4 rejects invalid input
+first assignment, then commits the all-box remap. CPU GPU activation rejects invalid input
 before writing either diagnostics or particle state.
 
-Warp P2 and P4 preflight rejection likewise preserves caller-owned state. A
-zero-demand Warp P2 call is write-free. A failed Warp P2 planning diagnostic
+Warp CPU activation and GPU activation preflight rejection likewise preserves caller-owned state. A
+zero-demand Warp CPU activation call is write-free. A failed Warp CPU activation planning diagnostic
 may alter documented buffer lanes, but it preserves particles and skips the
 commit. Neither direct Warp primitive promises rollback after a commit kernel
 has launched.
@@ -171,15 +171,15 @@ are box totals, while the helper-normalized values $N/V$, $M_s/V$, and $Q/V$
 are their corresponding volume densities. Supported resolved storage contains
 counts; apply volume normalization exactly once when comparing with gas density.
 
-P2 has tolerance-bounded conservation diagnostics. Its radius-cubed,
+CPU activation has tolerance-bounded conservation diagnostics. Its radius-cubed,
 mean-radius, surface-area, and Riemer-diversity diagnostics are separate,
 non-exact properties, not extra physics guarantees. The four configurable
 bounds are `radius_cubed_relative_error`, `mean_radius_relative_error`,
-`surface_relative_error`, and `diversity_absolute_error`. Warp P2 records the
+`surface_relative_error`, and `diversity_absolute_error`. Warp CPU activation records the
 result in `planning_status` (`0` is success; nonzero values identify inventory,
 moment, diversity, or non-finite planning failures).
 
-For a selected P4 row, with $s = requested\_scale$,
+For a selected GPU activation row, with $s = requested\_scale$,
 
 \[
 V_{new} = s V_{old}, \qquad w_{new} = s w_{old}, \qquad
@@ -190,7 +190,7 @@ where $0 < minimum\_scale \le requested\_scale = s \le 1$ and
 `minimum_volume` is in `[m^3]`. `resolved_scale` is $s$ for a selected row and
 `1.0` otherwise. Masses, charge, density, configuration sidecars, and
 unselected rows are preserved. Later unscaled source work targets
-`pre_state + source`; selected P4 work targets `s * pre_state + source`.
+`pre_state + source`; selected GPU activation work targets `s * pre_state + source`.
 These primitives do not construct a source, deplete gas, activate slots, or
 implement nucleation physics.
 

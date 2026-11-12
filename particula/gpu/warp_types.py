@@ -104,7 +104,8 @@ class WarpGasData:
         - The ``partitioning`` field is the version-2 active-device, per-box
           ``(n_boxes, n_species)`` int32 mask rather than a CPU bool vector.
           Its values must remain binary (1 = True, 0 = False). The public
-          condensation step gates raw proposals with this mask; its private P2
+          condensation step gates raw proposals with this mask; its private
+          inventory finalization
           inventory finalizer instead requires an already gated proposal. The
           public step applies finalized transfer to particle mass and couples
           its concentration-weighted opposite to ``concentration`` after every
@@ -131,7 +132,8 @@ class WarpGasData:
             Shared across all boxes - not batched.
         concentration: Mass concentrations in kg/m^3.
             Shape: (n_boxes, n_species). The public condensation step updates
-            this field after each P2-finalized substep transfer; it supplies
+            this field after each inventory-limited substep transfer; it
+            supplies
             inventory for subsequent transfer proposals.
         vapor_pressure: Vapor pressures in Pa.
             Shape: (n_boxes, n_species)

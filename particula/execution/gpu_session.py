@@ -17,7 +17,8 @@ Direct owners explicitly classify failures: read-only failures release the open
  Checkpoint, restart, and raw low-level helpers remain separate concrete-only
  boundaries.
 
-Each factory-created session also retains immutable host-only P1 stream
+Each factory-created session also retains immutable host-only session metadata
+stream
 metadata. Setup validates that metadata before importing conversion helpers or
 uploading CPU carriers; it does not allocate, initialize, inspect, or persist
 an RNG sidecar. First coagulation resource acquisition owns that later,
@@ -136,7 +137,8 @@ def _preflight_cpu_session(
     """Validate local CPU session inputs before importing conversion helpers.
 
     This function intentionally does not probe native-device availability. That
-    policy is an upstream E7-F6 responsibility and the selected device is
+    policy is an upstream execution capability policy responsibility and the
+    selected device is
     assumed to have been capability-approved before this boundary.
     """
     if type(device) is not Device:
@@ -255,18 +257,20 @@ class ResidentDimensions:
 
 @dataclass(frozen=True)
 class ResidentStreamMetadata:
-    """Retain immutable host-only P1 stream identity for one session.
+    """Retain immutable host-only session metadata stream identity for one
+        session.
 
-    This metadata validates P1 root-seed, logical-box-ID, and lane-permutation
+    This metadata validates session metadata root-seed, logical-box-ID, and
+    lane-permutation
     rules without importing Warp. It identifies a future resident coagulation
     stream but does not allocate, initialize, inspect, reset, synchronize, or
     persist any native RNG state.
 
     Attributes:
         n_boxes: Number of resident boxes represented by the metadata.
-        root_seed: Unsigned P1 root seed.
+        root_seed: Unsigned session metadata root seed.
         logical_box_ids: Unique logical identifiers in box order.
-        lanes: P1 lane permutation for the resident boxes.
+        lanes: session metadata lane permutation for the resident boxes.
     """
 
     n_boxes: int
@@ -275,13 +279,13 @@ class ResidentStreamMetadata:
     lanes: tuple[int, ...]
 
     def __post_init__(self) -> None:
-        """Validate the host-only P1 stream manifest metadata.
+        """Validate the host-only session metadata stream manifest metadata.
 
         Raises:
             TypeError: If metadata fields have invalid exact container or scalar
                 types.
             ValueError: If the seed, ID uniqueness, lengths, or lane permutation
-                violates the P1 contract.
+                violates the session metadata contract.
         """
         from particula.execution.rng import MAX_ROOT_SEED
 
@@ -290,7 +294,9 @@ class ResidentStreamMetadata:
         self._validate_stream_arrays()
 
     def _validate_root_seed(self, maximum: int) -> None:
-        """Validate the immutable root seed against the P1 unsigned range."""
+        """Validate the immutable root seed against the session metadata
+        unsigned range.
+        """
         if isinstance(self.root_seed, bool) or not isinstance(
             self.root_seed, Integral
         ):
@@ -361,7 +367,8 @@ class ResidentMetadata:
         device: Exact Warp-backed execution device declaration.
         gas_names: Ordered caller-declared gas names; entries are not inspected
             or normalized at this boundary.
-        stream: Immutable host-only P1 stream identity matching resident boxes.
+        stream: Immutable host-only session metadata stream identity matching
+            resident boxes.
     """
 
     device: Device
@@ -1532,14 +1539,16 @@ def setup_resident_session(
 ) -> ResidentSession:
     """Upload CPU carriers once and publish one active resident session.
 
-    This concrete-only, unexported factory is P2's only CPU-to-Warp upload
+    This concrete-only, unexported factory is session creation's only
+    CPU-to-Warp upload
     point. Local CPU preflight completes before conversion helpers are imported.
     It then converts particles, gas, and environment once in that order,
     snapshots ordered gas names into immutable CPU-owned tuple metadata, and
     publishes one complete, validated ACTIVE session retaining converted
     containers by identity. It provides no lifecycle operations, fallback,
     synchronization, restore, or process sidecars. The selected native Warp
-    device must already be availability-approved by upstream E7-F6; this
+    device must already be availability-approved by upstream execution
+    capability policy; this
     revision does not probe it.
 
     Args:
@@ -1547,10 +1556,13 @@ def setup_resident_session(
         gas: CPU gas carrier to upload; its ordered names remain CPU metadata.
         environment: CPU environment carrier to upload.
         device: Exact, upstream-approved Warp device declaration.
-        root_seed: Unsigned P1 root seed retained in immutable session metadata.
-        logical_box_ids: Optional unique P1 box IDs. ``None`` uses stringified
+        root_seed: Unsigned session metadata root seed retained in immutable
+            session metadata.
+        logical_box_ids: Optional unique session metadata box IDs. ``None`` uses
+            stringified
             ascending box indices.
-        lanes: Optional P1 lane permutation. ``None`` uses ascending box lanes.
+        lanes: Optional session metadata lane permutation. ``None`` uses
+            ascending box lanes.
 
     Returns:
         One complete ACTIVE session retaining conversion results by identity.
@@ -1558,7 +1570,8 @@ def setup_resident_session(
     Raises:
         TypeError: If a local device, carrier, gas-name, or stream declaration
             is invalid.
-        ValueError: If the backend, CPU schema, or P1 stream metadata is
+        ValueError: If the backend, CPU schema, or session metadata stream
+            metadata is
             invalid.
         RuntimeError: If optional Warp conversion or session validation requires
             an unavailable runtime.

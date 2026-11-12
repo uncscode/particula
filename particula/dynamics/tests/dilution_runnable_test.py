@@ -88,7 +88,7 @@ def test_dilution_strategy_rate_and_step_follow_primitive_contract():
 def test_dilution_strategy_step_propagates_validation_without_mutation(
     time_step, exception, message
 ):
-    """Direct steps retain P2 validation and atomicity unchanged."""
+    """Direct steps retain state validation and atomicity unchanged."""
     aerosol = _make_aerosol()
     sources = _concentrations(aerosol)
 

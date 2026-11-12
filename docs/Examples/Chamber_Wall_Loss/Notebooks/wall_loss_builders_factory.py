@@ -22,7 +22,7 @@
 # ## Prerequisites
 #
 # - Python 3.12+
-# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
+# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
 # - NumPy included with `particula` for sample particle presets
 
 # %%

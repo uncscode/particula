@@ -495,7 +495,9 @@ def sigma_tolerance(case: StochasticCase) -> float:
 
 
 def _stochastic_fixture() -> Fixture:
-    """Build discriminating four-box P3 state with inactive slot sentinels."""
+    """Build discriminating four-box integration validation state with inactive
+    slot sentinels.
+    """
     base = _fixture(
         "stochastic",
         [

@@ -1,7 +1,7 @@
 """Apply fixed-shape direct GPU dilution to caller-owned concentrations.
 
 The dilution coefficient is ``alpha = Q / V`` [s^-1], where ``Q`` is flow
-rate and ``V`` is volume. This P3 module applies
+rate and ``V`` is volume. This finite-step execution module applies
 ``c_new = c * exp(-alpha * time_step)`` in place to particle and gas
 concentrations and returns the identical containers.
 
@@ -392,7 +392,8 @@ def _prepare_dilution_step_gpu(
     SI units [s^-1], and ``time_step`` is in seconds. The matching private
     enqueue helper applies ``c_new = c * exp(-alpha * time_step)`` in place.
 
-    P3 retains P1's coefficient-input contract: a finite, nonnegative
+    Finite-step execution retains coefficient validation's coefficient-input
+    contract: a finite, nonnegative
     Python/NumPy real scalar or a caller-owned, active-device ``wp.float64``
     array shaped ``(n_boxes,)``. Valid per-box arrays are retained by identity
     and their values are read only during preflight. Masses must be a
@@ -410,7 +411,7 @@ def _prepare_dilution_step_gpu(
     values, then gas concentration schema and values. Array values are scanned
     on their active device, with only a scalar validation result observed by the
     host; preflight never materializes a caller-owned array on the CPU.
-    Validation scans may allocate or launch, but rejected calls perform no
+    validation scans may allocate or launch, but rejected calls perform no
     update-kernel launch or caller mutation. A zero scalar coefficient or zero
     time step returns only after full preflight, without private scalar/factor
     allocation or an update launch. This atomicity guarantee applies only

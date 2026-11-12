@@ -72,7 +72,7 @@ def _activate(
     requested_counts,
     *sidecars,
 ):
-    """Call the supported P4 boundary through the package export."""
+    """Call the supported GPU activation boundary through the package export."""
     from particula.gpu.kernels import activate_slots_gpu
 
     return activate_slots_gpu(

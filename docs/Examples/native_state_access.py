@@ -1,6 +1,6 @@
 """Inspect and replace native CPU aerosol state without facade conversions.
 
-Run from the selected E9-native checkout with
+Run from the v0.3.0 development checkout with
 ``python docs/Examples/native_state_access.py``. This single-box example uses
 resolved counts in 0.25 m³ and full ordered gas storage including inert gas.
 Replacement selects supplied state; it neither conserves the old inventory

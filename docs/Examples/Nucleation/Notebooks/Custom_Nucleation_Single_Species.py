@@ -26,7 +26,7 @@ runnables. Its native fixed-slot custom source is illustrative only; use
 #
 # In this *How-to Guide*, we demonstrate an illustrative custom single-species
 # workflow with a saturation-dependent rate. Its custom slot activation and
-# saturation-based mass source are not the supported E6-F7 public API. Use the
+# saturation-based mass source are not the supported CPU nucleation public API. Use the
 # supported `cpu_nucleation.py` script and CPU Nucleation Strategy System guide
 # for public `Nucleation` runnable usage.
 #
@@ -39,7 +39,7 @@ runnables. Its native fixed-slot custom source is illustrative only; use
 
 # %%
 # In Colab uncomment the following command to install particula:
-# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
+# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
 import matplotlib.pyplot as plt
 import numpy as np
 

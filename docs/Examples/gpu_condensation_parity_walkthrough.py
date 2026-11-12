@@ -476,7 +476,9 @@ def _proposal(state: OracleInput) -> np.ndarray:  # noqa: C901
 
 
 def _finalize_transfer(state: OracleInput, proposal: np.ndarray) -> np.ndarray:
-    """Apply P2 bounds and ordered concentration-weighted inventory limiting."""
+    """Apply inventory finalization bounds and ordered concentration-weighted
+    inventory limiting.
+    """
     bounded = np.maximum(proposal, -state.particles.masses)
     applied = bounded.copy()
     for box in range(2):

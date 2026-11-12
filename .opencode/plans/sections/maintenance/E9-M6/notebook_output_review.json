@@ -473,5 +473,135 @@
   ],
   "visual_findings": "Plots 0-23 visually reviewed on sheets 00-03: activity, chamber/wall-loss, charge kernels and PMF/PDF/resolved comparisons render with visible axes, legends and expected qualitative trends. No blank or clipped plots found. This visual check does not broaden the scientific qualification. Plots 24-69 reviewed on sheets 04-11: coagulation, condensation, activity/equilibria, gas, nucleation and particle property illustrations have visible axes, legends and nonblank output. Log axes, explicit viewport bounds and illustrative scientific limitations are retained; visual review does not establish new numerical accuracy. Plots 70-87 reviewed on sheets 11-14: biomass, cloud and cough outputs render with visible axes/legends. Cloud dry-phase oscillations remain visible and retain their documented unqualified limitation; these outputs are not evidence of newly qualified physical accuracy. Plots 88-89 visually reviewed: organic partitioning and coagulation distributions have visible axes, legends and nonblank curves. Plots 90-97 reviewed on sheets 15-16: soot property tables, temperature, growth and composition outputs render with visible labels and nonblank data. The extreme extrapolated vapor pressures and property floors retain the documented illustrative limitations; no new physical qualification is inferred.",
   "scope": "Publication inspection only; existing scientific limitations remain.",
-  "output_revision": "3cf7c6ae43e90824c60984244080b850a8c3cf01"
+  "output_revision": "3cf7c6ae43e90824c60984244080b850a8c3cf01",
+  "documentation_refresh": {
+    "base_revision": "514e5aa88dce9f8bc7cfc44f313c365ffe6c7b35",
+    "scope": "Planning-label cleanup only. Executable Python AST unchanged; paired notebook execution counts and outputs preserved exactly. Original execution/review hashes above remain evidence for their recorded revision; refreshed file hashes are listed separately. No re-execution claimed.",
+    "files": [
+      {
+        "path": "docs/Examples/Activity/activity_tutorial.ipynb",
+        "content_sha256": "1300aac8c139d3875587a22c3863676df5351077a7d5a7b0075d281fa38bef96"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.ipynb",
+        "content_sha256": "274c83fa69c4a97b3ad8cdb510894b8273eed12dcc7bb9558caf113d4b9abfb3"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.ipynb",
+        "content_sha256": "debc2b568729f3257b5452214a724b0ee6e091fc67e297779f0c14d62deed8ac"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb",
+        "content_sha256": "b9d55fff5385d882d2ee5e8c515e00a951c5f7411fb9a3bb1c3c6cf0d08f7a25"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.ipynb",
+        "content_sha256": "45af6d0974a4f71437d6430057ffa13f8347e8e85200b5daf39854997b579553"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.ipynb",
+        "content_sha256": "0f2b1370977aeb4264115255f1b771a3fed8e69524d2d3661e74c69f94f73d60"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.ipynb",
+        "content_sha256": "c32a1f57fba55e120da4e5134db82157071faa589dc59c18abc67692a0dccb0b"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb",
+        "content_sha256": "81b89733aa0c0c3418ada6307890c7f76d5137a6dc32e700d486d3e0428c4f01"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.ipynb",
+        "content_sha256": "0e64ca694a9fc85f3f94e14ff25fe40d66247724b2e16a9e58b6004b039747c2"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.ipynb",
+        "content_sha256": "e91a6055cf93cbb840ee466f0e9d1bd6720a24c31764006a2c54a879420467de"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.ipynb",
+        "content_sha256": "3f09f88afcad5a9c0389e860ec9212ac838eb03fc514d5c751557f8d51a92c55"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.ipynb",
+        "content_sha256": "0b718ed7f2987514e0ee160b73529f9a3702df669986f8152ffcea32b58e83a0"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.ipynb",
+        "content_sha256": "c49070663b9f87bbc694252c42616082bdaa70f69653a4582fdd7807989e869b"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb",
+        "content_sha256": "dd1e125a4f0f0462a8839b6ce8152e121826f674ebc002c55d9f51fd112d299d"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.ipynb",
+        "content_sha256": "0b0b73df52634b39b41ad3205a287aba56418ac74fbb1bf22a3f61655e0d9b29"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.ipynb",
+        "content_sha256": "aaf25910aa96d8d5a7c6319b39618d574b1304bdce489f485dc79a9583bbb221"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.ipynb",
+        "content_sha256": "5d7e0d6a3c8b7a70f0e9378b3c06fb87506010791fef3af094d0ba0d40c604dd"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.ipynb",
+        "content_sha256": "ace5dc2658944cde4015c2799663457377ae61de971998b26dd09f4e09dafdcc"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.ipynb",
+        "content_sha256": "423a54ea349e820a26f140a9c61fc67185100b73ccff23c21207f3a2bedc70cb"
+      },
+      {
+        "path": "docs/Examples/Equilibria/Notebooks/activity_part1.ipynb",
+        "content_sha256": "09da36e71141883df5bbe602e28ad1ff0876c9d1a7293895cb3dcc2f7e353955"
+      },
+      {
+        "path": "docs/Examples/Equilibria/Notebooks/equilibria_part1.ipynb",
+        "content_sha256": "f5b79bb242301cd34f42d5f938d352c10f04a079c6d043fb09aeb251f3452653"
+      },
+      {
+        "path": "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.ipynb",
+        "content_sha256": "349a676842272f9d46513b8f0e3a48116aa34134dec3ce87d11872b17307f2e2"
+      },
+      {
+        "path": "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb",
+        "content_sha256": "881fe839ec61b0b6017d1657c9c8f6f4414c3d78323716a11310f2e404232b29"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb",
+        "content_sha256": "d308d2f9e6d2045fc013740dd9d6fb714bc50c2a83d4633ea4c6d77381d215c9"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.ipynb",
+        "content_sha256": "dfc9954876f3b773a98132872a0868acd70c48b27afdb50802ce80030cda126a"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.ipynb",
+        "content_sha256": "54a7cac89add9ce65871e1c02a90efd9fa6faca074711e886d924f219832fb90"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.ipynb",
+        "content_sha256": "42df978887d8dd45e464f3abeae1f292d4884720238fe007c437169a5c5d14b9"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb",
+        "content_sha256": "9387fdbaa95b428c54619530b2459201492b4cb188a92729dd412ccec346310f"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb",
+        "content_sha256": "11daa524412247998c1d8a2248f6d9ee80618f386ec3d5e5e9a09e765c15cf38"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb",
+        "content_sha256": "e5437674fe0bc6c18d1fe274db3d3e23842c7d6150db3e8b5f8f76a1b6a89893"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb",
+        "content_sha256": "5c47fae3c86112a3dcc654850984244dc9e7677c3cc91103f2174f8c2d375ffb"
+      }
+    ]
+  }
 }

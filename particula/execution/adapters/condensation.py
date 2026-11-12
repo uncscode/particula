@@ -2,8 +2,10 @@
 
 Import these carriers from ``particula.execution.adapters.condensation``, not
 from ``particula.execution`` or top-level ``particula``. They retain
-caller-owned resources by identity. P2 carriers perform read-only
-construction-time metadata checks; P3 adapters prepare then make one selected
+caller-owned resources by identity. Inventory finalization carriers perform
+read-only
+construction-time metadata checks; thermal correction adapters prepare then make
+one selected
 native call. Adapter carriers and bindings neither transfer, restore,
 synchronize, retry, nor fall back. Kernel preparation owns any direct-kernel
 fallback allocation, while a prepared binding reuses its retained resources for
@@ -42,7 +44,8 @@ from particula.execution import (
 class CondensationExecutionConfig:
     """Retain an exact semantic condensation configuration by identity.
 
-    This concrete-only P2 carrier does not select a profile or inspect its
+    This concrete-only inventory finalization carrier does not select a profile
+    or inspect its
     configuration. A future selection caller remains responsible for calling
     ``require_condensation_profile()`` when that semantic check is needed.
     Frozen status prevents field rebinding but does not copy the configuration.
@@ -74,14 +77,16 @@ class CondensationExecutionConfig:
 class CPUCondensationState:
     """Retain caller-owned CPU condensation state without executing it.
 
-    This concrete-only P2 carrier validates only the configuration and aerosol
+    This concrete-only inventory finalization carrier validates only the
+    configuration and aerosol
     types, in that order. It does not inspect aerosol backing data, validate
     condensation physics, add execution controls, copy resources, or invoke a
     runnable. Frozen status prevents field rebinding only; ``aerosol`` remains
     caller-owned and mutable.
 
     Args:
-        config: Exact P2 condensation execution configuration.
+        config: Exact inventory finalization condensation execution
+            configuration.
         aerosol: Caller-owned aerosol retained by identity.
 
     Raises:
@@ -270,10 +275,12 @@ def _validate_output_ownership(
 
 
 def _dtype_itemsize(dtype: Any) -> int:
-    """Return the fixed byte size of a P2 primary Warp dtype.
+    """Return the fixed byte size of a inventory finalization primary Warp
+        dtype.
 
     Args:
-        dtype: P2-validated ``wp.float64`` or ``wp.int32`` dtype metadata.
+        dtype: inventory finalization-validated ``wp.float64`` or ``wp.int32``
+            dtype metadata.
 
     Returns:
         The dtype item size in bytes.
@@ -304,7 +311,8 @@ def _overlaps(first: tuple[int, int], second: tuple[int, int] | None) -> bool:
 class WarpCondensationState:
     """Retain validated caller-owned resident Warp condensation resources.
 
-    This concrete-only P2 carrier lazily imports Warp during construction. It
+    This concrete-only inventory finalization carrier lazily imports Warp during
+    construction. It
     validates primary-container metadata and writable-output ownership only.
     Thermodynamics need only be non-None. ``latent_heat`` and deferred
     ``thermal_work`` remain opaque, while writable ``mass_transfer`` and
@@ -320,7 +328,8 @@ class WarpCondensationState:
     containers and sidecars remain caller-owned and mutable.
 
     Args:
-        config: Exact P2 condensation execution configuration.
+        config: Exact inventory finalization condensation execution
+            configuration.
         particles: Resident ``WarpParticleData`` primary container.
         gas: Resident ``WarpGasData`` primary container.
         environment: Resident ``WarpEnvironmentData`` primary container.
@@ -603,14 +612,15 @@ class WarpCondensationState:
 class CPUCondensationExecutionState:
     """Retain selected CPU condensation controls and runnable by identity.
 
-    Import this concrete-only P3 carrier from
+    Import this concrete-only thermal correction carrier from
     ``particula.execution.adapters.condensation``. Construction validates only
-    exact P2 state and runnable types; execution controls remain opaque until
-    dispatch. The retained runnable and aerosol are caller-owned and mutable;
+    exact inventory finalization state and runnable types; execution controls
+    remain opaque until
+    Dispatch. The retained runnable and aerosol are caller-owned and mutable;
     frozen fields prevent rebinding only.
 
     Args:
-        state: Exact P2 CPU state retained by identity.
+        state: Exact inventory finalization CPU state retained by identity.
         time_step: Original execution time step in s, validated at dispatch.
         sub_steps: Original number of CPU substeps, validated at dispatch.
         runnable: Exact caller-owned ``MassCondensation`` runnable.
@@ -625,7 +635,8 @@ class CPUCondensationExecutionState:
     runnable: MassCondensation
 
     def __post_init__(self) -> None:
-        """Validate exact P2-state and runnable carrier types.
+        """Validate exact inventory finalization-state and runnable carrier
+            types.
 
         Raises:
             TypeError: If ``state`` or ``runnable`` is not the required exact
@@ -641,7 +652,7 @@ class CPUCondensationExecutionState:
         """Return the exact caller-owned CPU aerosol payload.
 
         Returns:
-            The aerosol retained by the P2 state.
+            The aerosol retained by the inventory finalization state.
         """
         return self.state.backend_payload
 
@@ -650,11 +661,12 @@ class CPUCondensationExecutionState:
 class WarpCondensationExecutionState:
     """Retain selected resident-Warp condensation controls by identity.
 
-    This concrete-only P3 carrier preserves the exact P2 state and time step.
+    This concrete-only thermal correction carrier preserves the exact inventory
+    finalization state and time step.
     Construction neither imports a kernel nor inspects retained resources.
 
     Args:
-        state: Exact P2 Warp state retained by identity.
+        state: Exact inventory finalization Warp state retained by identity.
         time_step: Original execution time step in s, validated at dispatch.
 
     Raises:
@@ -665,7 +677,7 @@ class WarpCondensationExecutionState:
     time_step: object
 
     def __post_init__(self) -> None:
-        """Validate the exact P2 Warp state carrier type.
+        """Validate the exact inventory finalization Warp state carrier type.
 
         Raises:
             TypeError: If ``state`` is not an exact ``WarpCondensationState``.
@@ -678,7 +690,8 @@ class WarpCondensationExecutionState:
         """Return the exact caller-owned resident primary payload.
 
         Returns:
-            The ``(particles, gas, environment)`` tuple from the P2 state.
+            The ``(particles, gas, environment)`` tuple from the inventory
+            finalization state.
         """
         return self.state.backend_payload
 
@@ -791,10 +804,11 @@ class CPUCondensationExecutionAdapter:
     """
 
     def execute(self, state: ExecutionState) -> ExecutionResult:
-        """Execute one exact CPU P3 state without fallback or recovery.
+        """Execute one exact CPU thermal correction state without fallback or
+            recovery.
 
         Args:
-            state: Exact selected CPU P3 execution state.
+            state: Exact selected CPU thermal correction execution state.
 
         Returns:
             A result retaining ``state`` and the original aerosol by identity.
@@ -856,7 +870,7 @@ class WarpCondensationExecutionAdapter:
         """Validate and bind one resident state for repeated device enqueues.
 
         Args:
-            state: Exact selected Warp P3 execution state.
+            state: Exact selected Warp thermal correction execution state.
 
         Returns:
             A concrete binding retaining the prepared kernel record and enqueue
@@ -905,7 +919,8 @@ class WarpCondensationExecutionAdapter:
         return _PreparedWarpCondensationBinding(state, prepared, enqueue)
 
     def execute(self, state: ExecutionState) -> ExecutionResult:
-        """Execute one exact Warp P3 state with no post-launch recovery.
+        """Execute one exact Warp thermal correction state with no post-launch
+            recovery.
 
         Profile preflight occurs before lazy kernel resolution. After that
         preflight, this method forwards the caller-owned thermal sidecars by
@@ -913,7 +928,7 @@ class WarpCondensationExecutionAdapter:
         the direct kernel.
 
         Args:
-            state: Exact selected Warp P3 execution state.
+            state: Exact selected Warp thermal correction execution state.
 
         Returns:
             A result retaining ``state`` and the native kernel result by
@@ -944,7 +959,8 @@ def _validate_selected_warp_sidecars(
     """Validate semantic-profile sidecars before native kernel resolution.
 
     Args:
-        state: Validated P2 state holding caller-owned sidecars.
+        state: Validated inventory finalization state holding caller-owned
+            sidecars.
         configuration: Selected semantic configuration.
 
     Raises:

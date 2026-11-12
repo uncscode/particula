@@ -12,16 +12,13 @@ Coag-comparison scenarios on a 4-bin grid [50, 75, 100, 150] nm:
   5) Calcite(-6)+Ion(0):  neutral ions, Brownian only
   6) Calcite(-6)+Ion(+6): opposite sign, attractive
 
-Known issue documented by scenarios 5 and 6 (M6-P2):
+Known issue documented by scenarios 5 and 6:
   The kernel interpolator is radius-only.  When the kernel matrix
   has charge-dependent structure (e.g., attractive ion-calcite vs
   repulsive calcite-calcite), the interpolator linearly blends
   them based on radius alone.  This causes wrong kernel values
   in the transition zone between ion and calcite radii.
 
-  See maintenance plan M6:
-    adw-docs/dev-plans/maintenance/
-        M6-particle-resolved-coagulation-fixes.md
 """
 
 import numpy as np

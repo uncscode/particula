@@ -1,4 +1,6 @@
-"""M2 construction through M3 science, without runnable or facade adapters."""
+"""v0.3.0 construction through v0.3.0 science, without runnable or facade
+adapters.
+"""
 
 import numpy as np
 import numpy.testing as npt

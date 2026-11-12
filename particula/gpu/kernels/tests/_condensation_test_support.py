@@ -286,7 +286,9 @@ def _inventory_reference(
     gas_concentration: np.ndarray,
     proposal: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Return the independent fixed-order P2 inventory finalization oracle."""
+    """Return the independent fixed-order inventory finalization inventory
+    finalization oracle.
+    """
     candidate = np.maximum(proposal, -masses)
     demand = np.zeros(gas_concentration.shape, dtype=np.float64)
     release = np.zeros(gas_concentration.shape, dtype=np.float64)
@@ -381,7 +383,9 @@ def test_finalize_inventory_limited_transfer_matches_numpy_oracle(
     gas_concentration: np.ndarray,
     proposal: np.ndarray,
 ) -> None:
-    """The direct P2 helper matches fixed-order fp64 inventory accounting."""
+    """The direct inventory finalization helper matches fixed-order fp64
+    inventory accounting.
+    """
     n_boxes, n_particles, n_species = masses.shape
     particles = _make_particle_data(n_boxes, n_particles, n_species)
     particles = dataclasses.replace(
@@ -467,7 +471,9 @@ def test_finalize_inventory_limited_transfer_matches_numpy_oracle(
 def test_finalize_inventory_limited_transfer_preflight_is_atomic(
     warp_cpu_device: str, invalid_kind: str, message: str
 ) -> None:
-    """Malformed P2 direct-helper inputs leave every caller buffer unchanged."""
+    """Malformed inventory finalization direct-helper inputs leave every caller
+    buffer unchanged.
+    """
     particles = _make_particle_data(1, 2, 2)
     gas = _make_gas_data(1, 2)
     gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
@@ -552,7 +558,9 @@ def test_finalize_inventory_rejects_invalid_physical_inputs_atomically(
     invalid_value: float,
     message: str,
 ) -> None:
-    """Invalid direct-P2 physical inputs fail before caller-state mutation."""
+    """Invalid direct-inventory finalization physical inputs fail before
+    caller-state mutation.
+    """
     particles = _make_particle_data(1, 1, 1)
     gas = _make_gas_data(1, 1)
     gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
@@ -636,7 +644,9 @@ def test_finalize_inventory_rejects_invalid_physical_inputs_atomically(
 def test_finalize_inventory_rejects_p2_sidecar_aliases_atomically(
     warp_cpu_device: str, alias_kind: str
 ) -> None:
-    """P2 reduction sidecars cannot alias peers or protected input/output."""
+    """Inventory finalization reduction sidecars cannot alias peers or protected
+    input/output.
+    """
     particles = _make_particle_data(1, 1, 1)
     gas = _make_gas_data(1, 1)
     gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
@@ -703,7 +713,9 @@ def test_finalize_inventory_limited_transfer_rejects_cuda_p2_sidecar(
     warp_cpu_device: str,
     cuda_device: str,
 ) -> None:
-    """A P2 sidecar on another device fails before mutating caller state."""
+    """A inventory finalization sidecar on another device fails before mutating
+    caller state.
+    """
     particles = _make_particle_data(1, 2, 1)
     gas = _make_gas_data(1, 1)
     gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
@@ -759,7 +771,9 @@ def test_finalize_inventory_limited_transfer_rejects_cuda_p2_sidecar(
 def test_finalize_inventory_limited_transfer_is_exactly_repeatable(
     warp_cpu_device: str,
 ) -> None:
-    """Fresh identical P2 inputs produce bitwise-identical finalized state."""
+    """Fresh identical inventory finalization inputs produce bitwise-identical
+    finalized state.
+    """
     masses = np.array([[[2.0], [4.0]]], dtype=np.float64)
     concentration = np.array([[1.0, 3.0]], dtype=np.float64)
     gas_concentration = np.array([[2.0]], dtype=np.float64)
@@ -817,7 +831,9 @@ def test_finalize_inventory_limited_transfer_is_exactly_repeatable(
 def test_finalize_inventory_limited_transfer_allocates_omitted_sidecars(
     warp_cpu_device: str,
 ) -> None:
-    """The direct P2 helper uses private fp64 fallback reduction storage."""
+    """The direct inventory finalization helper uses private fp64 fallback
+    reduction storage.
+    """
     masses = np.array([[[1.0], [2.0]]], dtype=np.float64)
     concentration = np.array([[1.0, 2.0]], dtype=np.float64)
     gas_concentration = np.array([[1.0]], dtype=np.float64)
@@ -872,7 +888,9 @@ def test_condensation_step_gpu_invalid_primary_p2_state_is_atomic(
     invalid_value: float,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Invalid P2 physical state fails before public outputs are changed."""
+    """Invalid inventory finalization physical state fails before public outputs
+    are changed.
+    """
     particles = _make_particle_data(1, 1, 1)
     gas = _make_gas_data(1, 1)
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -952,7 +970,9 @@ def test_condensation_step_gpu_invalid_primary_p2_state_is_atomic(
 def test_condensation_step_gpu_empty_particle_axis_preserves_gas_and_outputs(
     device: str,
 ) -> None:
-    """An empty particle axis completes four P2 cycles without gas loss."""
+    """An empty particle axis completes four inventory finalization cycles
+    without gas loss.
+    """
     particles = _make_particle_data(2, 0, 2)
     gas = _make_gas_data(2, 2)
     initial_gas = gas.concentration.copy()
@@ -987,7 +1007,7 @@ def test_condensation_step_gpu_empty_particle_axis_preserves_gas_and_outputs(
 def test_condensation_step_gpu_couples_four_substeps_to_numpy_oracle(
     warp_cpu_device: str,
 ) -> None:
-    """Four P2-finalized substeps agree with the coupled NumPy oracle."""
+    """Four inventory-limited substeps agree with the coupled NumPy oracle."""
     particles = _make_particle_data(2, 2, 2)
     gas = _make_gas_data(2, 2)
     vapor_pressure = np.full((2, 2), 800.0, dtype=np.float64)
@@ -1039,7 +1059,9 @@ def test_condensation_step_gpu_rejects_p2_vapor_pressure_alias_atomically(
     device: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """P2 sidecars cannot overwrite vapor pressure before refresh launches."""
+    """Inventory finalization sidecars cannot overwrite vapor pressure before
+    refresh launches.
+    """
     particles = _make_particle_data(1, 1, 1)
     gas = _make_gas_data(1, 1)
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -1234,7 +1256,9 @@ def test_condensation_scratch_ownership_aliases_are_atomic(
 def test_condensation_step_gpu_stale_nonfinite_work_buffer_is_overwritten(
     device: str,
 ) -> None:
-    """Fresh P1 output replaces stale non-finite caller work storage."""
+    """Fresh proposal gating output replaces stale non-finite caller work
+    storage.
+    """
     particles = _make_particle_data(1, 1, 1)
     gas = _make_gas_data(1, 1)
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -1272,7 +1296,9 @@ def test_condensation_step_gpu_nonfinite_fresh_proposal_is_p2_atomic(
     device: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A non-finite fresh P1 proposal cannot mutate P2-owned state."""
+    """A non-finite fresh proposal gating proposal cannot mutate inventory
+    finalization-owned state.
+    """
     particles = _make_particle_data(1, 1, 1)
     gas = _make_gas_data(1, 1)
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -1534,7 +1560,9 @@ def test_condensation_public_insufficient_inventory_scales_uptake_and_conserves(
     device: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Public P2 coupling limits uptake while conserving weighted inventory."""
+    """Public inventory finalization coupling limits uptake while conserving
+    weighted inventory.
+    """
     particles = dataclasses.replace(
         _make_particle_data(1, 1, 1),
         masses=np.array([[[1.0e-18]]]),
@@ -2798,7 +2826,9 @@ def _assert_p4_gpu_matches_reference(
     surface_mode: int,
     device: str,
 ) -> None:
-    """Execute one P4 matrix element and assert parity plus ownership rules."""
+    """Execute one validation matrix element and assert parity plus ownership
+    rules.
+    """
     runtime = _load_warp_runtime()
     wp = runtime.wp
     (
@@ -2896,7 +2926,7 @@ def test_condensation_activity_surface_warp_cpu_matches_numpy_reference(
     activity_mode: int,
     surface_mode: int,
 ) -> None:
-    """Warp CPU matches the independent P4 NumPy reference matrix."""
+    """Warp CPU matches the independent validation NumPy reference matrix."""
     _assert_p4_gpu_matches_reference(
         case, activity_mode, surface_mode, warp_cpu_device
     )
@@ -2913,7 +2943,7 @@ def test_condensation_activity_surface_cuda_matches_numpy_reference(
     activity_mode: int,
     surface_mode: int,
 ) -> None:
-    """Optional CUDA matches the independent P4 NumPy reference matrix."""
+    """Optional CUDA matches the independent NumPy reference matrix."""
     _assert_p4_gpu_matches_reference(
         case, activity_mode, surface_mode, cuda_device
     )
@@ -3482,9 +3512,11 @@ def _assert_particle_gas_inventory_conserved(
 
 
 def _contract_atol(*values: np.ndarray) -> np.ndarray:
-    """Return element-wise P2 accounting floors for the compared quantities.
+    """Return element-wise inventory finalization accounting floors for the
+        compared quantities.
 
-    P2 values are fp64 mass-concentration quantities, so use the documented
+    Inventory finalization values are fp64 mass-concentration quantities, so use
+    the documented
     ``1e-30`` absolute floor and ``1e-12`` relative contract per element.
     """
     if not values:
@@ -3498,7 +3530,9 @@ def _assert_contract_allclose(
     expected: np.ndarray,
     *scale_values: np.ndarray,
 ) -> None:
-    """Assert a strict P2 accounting equality with element-wise tolerances."""
+    """Assert a strict inventory finalization accounting equality with
+    element-wise tolerances.
+    """
     tolerance = _contract_atol(actual, expected, *scale_values)
     flattened_tolerance = tolerance.ravel()
     npt.assert_array_compare(
@@ -3541,7 +3575,9 @@ def test_elementwise_tolerances_protect_tiny_species() -> None:
 
 
 def test_contract_atol_enforces_tiny_value_boundary() -> None:
-    """The P2 floor is 1e-30 and preserves the 1e-12 relative contract."""
+    """The inventory finalization floor is 1e-30 and preserves the 1e-12
+    relative contract.
+    """
     expected = np.array([1.0e-18], dtype=np.float64)
     within = expected * (1.0 + 0.5e-12)
     outside = expected * (1.0 + 2.0e-12)
@@ -3572,7 +3608,9 @@ def _assert_warp_arrays_unchanged(
 
 
 def _run_p2_contract_case(device: str) -> dict[str, Any]:
-    """Execute the mixed P2 case with fresh caller-owned output sidecars."""
+    """Execute the mixed inventory finalization case with fresh caller-owned
+    output sidecars.
+    """
     runtime = _load_warp_runtime()
     case = next(
         item
@@ -3702,7 +3740,9 @@ def _run_p2_contract_case(device: str) -> dict[str, Any]:
 def test_condensation_p2_contract_conserves_per_box_species_and_energy(
     warp_cpu_device: str,
 ) -> None:
-    """P2 transfers conserve every box/species and retain caller ownership."""
+    """Inventory finalization transfers conserve every box/species and retain
+    caller ownership.
+    """
     result = _run_p2_contract_case(warp_cpu_device)
     transfer = result["total_transfer"].numpy()
     mass_delta = result["final_masses"] - result["initial_masses"]
@@ -3772,7 +3812,9 @@ def test_condensation_p2_contract_conserves_per_box_species_and_energy(
 def test_condensation_p2_contract_inventory_limited_uptake_is_consistent(
     warp_cpu_device: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Check finalized-transfer accounting for inventory-limited P2 uptake."""
+    """Check finalized-transfer accounting for inventory-limited inventory
+    finalization uptake.
+    """
     runtime = _load_warp_runtime()
     particles = dataclasses.replace(
         _make_particle_data(1, 1, 1),
@@ -3869,7 +3911,9 @@ def test_condensation_p2_contract_inventory_limited_uptake_is_consistent(
 def test_condensation_p2_contract_repeat_is_deterministic(
     warp_cpu_device: str,
 ) -> None:
-    """Fresh P2 executions reproduce outputs and populated scratch fields."""
+    """Fresh inventory finalization executions reproduce outputs and populated
+    scratch fields.
+    """
     first = _run_p2_contract_case(warp_cpu_device)
     second = _run_p2_contract_case(warp_cpu_device)
     assert first["total_transfer"] is not second["total_transfer"]
@@ -3915,7 +3959,9 @@ def test_condensation_p2_contract_invalid_buffers_are_atomic(
     invalid_kind: str,
     request: pytest.FixtureRequest,
 ) -> None:
-    """Representative invalid P2 metadata leaves all caller arrays untouched."""
+    """Representative invalid inventory finalization metadata leaves all caller
+    arrays untouched.
+    """
     runtime = _load_warp_runtime()
     particles = _make_particle_data(1, 1, 2)
     gas = _make_gas_data(1, 2)
@@ -4485,7 +4531,9 @@ def test_condensation_scratch_buffer_wrong_shape_is_atomic(
 def test_condensation_p2_scratch_non_warp_value_is_atomic(
     warp_cpu_device: str, field: str
 ) -> None:
-    """P2 scratch fields reject non-Warp objects without changing state."""
+    """Inventory finalization scratch fields reject non-Warp objects without
+    changing state.
+    """
     particles = _make_particle_data(1, 2, 2)
     gas = _make_gas_data(1, 2)
     gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
@@ -4550,7 +4598,9 @@ def test_condensation_p2_scratch_non_warp_value_is_atomic(
     ),
 )
 def test_condensation_p2_scratch_wrong_device_is_atomic(field: str) -> None:
-    """P2 scratch fields reject alternate-device storage before mutation."""
+    """Inventory finalization scratch fields reject alternate-device storage
+    before mutation.
+    """
     runtime = _load_warp_runtime()
     if not runtime.cuda_available(runtime.wp):
         pytest.skip(runtime.CUDA_SKIP_REASON)
@@ -5652,7 +5702,9 @@ def test_condensation_step_gpu_nonzero_execution_launches_four_p2_sequences(
     device: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Each public substep finalizes, accumulates, and couples P2 transfer."""
+    """Each public substep finalizes, accumulates, and couples inventory
+    finalization transfer.
+    """
     particles = _make_particle_data(1, 1, 1)
     gas = _make_gas_data(1, 1)
     gpu_particles = to_warp_particle_data(particles, device=device)

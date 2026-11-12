@@ -154,10 +154,12 @@ def _is_real_scalar(value: object) -> bool:
 class NucleationCommitConfig:
     """Immutable one-box controls for CPU nucleation source commits.
 
-    The record mirrors the P3 transaction controls while retaining public P5
+    The record mirrors the source transaction transaction controls while
+    retaining public runnable execution
     ownership. Its rank-one sidecars are copied into read-only float64 arrays;
     their required one-box length is checked immediately before every nonzero
-    substep commit. The configuration is not a P3 configuration and does not
+    substep commit. The configuration is not a source transaction configuration
+    and does not
     create a transaction spanning a complete ``Nucleation.execute`` call.
 
     Args:
@@ -230,7 +232,8 @@ class NucleationCommitConfig:
 class Nucleation(RunnableABC):
     """Apply mapped single-box nucleation to a native resolved population.
 
-    Source rates and P2 finalization use densities. The commit converts event
+    Source rates and demand planning finalization use densities. The commit
+    converts event
     density to represented counts using the current physical volume. Each
     attempted substep is atomic; earlier successful substeps remain applied.
     Gas and environment are read from the currently held aerosol every time.

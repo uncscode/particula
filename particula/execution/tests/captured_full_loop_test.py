@@ -1,7 +1,10 @@
-"""P1-P3 full-loop evidence boundaries for resident graph-capture loops.
+"""NumPy oracle-captured-loop validation full-loop evidence boundaries for
+    resident graph-capture loops.
 
-This test-only module supplies the P1 NumPy oracle and P2 uncaptured Warp-CPU
-READY-path parity, conservation, forbidden-work, and no-work evidence. P3 adds
+This test-only module supplies the NumPy oracle NumPy oracle and uncaptured
+reference uncaptured Warp-CPU
+READY-path parity, conservation, forbidden-work, and no-work evidence.
+captured-loop validation adds
 optional native-CUDA capture/replay evidence, which cleanly skips per candidate
 before capture when qualification is unavailable and is never emulated on CPU.
 """
@@ -955,7 +958,9 @@ class _FakeNativeCapture:
         self.handle = object()
 
     def callables(self) -> GraphCaptureNativeCallables:
-        """Return the complete opaque native vocabulary used by P1--P3."""
+        """Return the complete opaque native vocabulary used by NumPy
+        oracle--captured-loop validation.
+        """
 
         def capture_begin() -> None:
             self.calls.append("begin")
@@ -1306,7 +1311,9 @@ def _build_prepared_loop(
 
 @dataclass
 class _ScenarioPreparedLoop:
-    """Retain the P1 scenario's exact READY binding and owned test arrays."""
+    """Retain the NumPy oracle scenario's exact READY binding and owned test
+    arrays.
+    """
 
     loop: _PreparedLoop
     communication_resources: Any
@@ -1330,7 +1337,9 @@ def _build_scenario_prepared_loop_impl(
     ),
     scenario: _CapturedLoopScenario | None = None,
 ) -> _ScenarioPreparedLoop:
-    """Build the P1 two-box scenario without shared fixture update sources."""
+    """Build the NumPy oracle two-box scenario without shared fixture update
+    sources.
+    """
     import particula.execution.resident_scheduler as resident_scheduler
     from particula.dynamics.condensation.species_mapping import (
         CondensationSpeciesMap,
@@ -1467,7 +1476,7 @@ def _build_scenario_prepared_loop_impl(
     )
 
     def matrix() -> Any:
-        """Allocate one P1 diagnostic matrix on the resident device."""
+        """Allocate one NumPy oracle diagnostic matrix on the resident device."""
         return wp.zeros((2, 2), dtype=wp.float64, device=warp_device)
 
     latent_energy = matrix()
@@ -1769,7 +1778,9 @@ def _prepared_snapshot(loop: _PreparedLoop) -> dict[str, np.ndarray]:
 
 
 def _scenario_snapshot(loop: _ScenarioPreparedLoop) -> dict[str, np.ndarray]:
-    """Synchronize once at an assertion boundary and detach P1 outputs."""
+    """Synchronize once at an assertion boundary and detach NumPy oracle
+    outputs.
+    """
     prepared = loop.loop
     prepared.wp.synchronize_device(prepared.session.particles.masses.device)
     snapshot = _prepared_snapshot_without_sync(prepared)
@@ -2182,7 +2193,7 @@ def _assert_scenario_parity(
     scenario: _CapturedLoopScenario,
     steps: int,
 ) -> None:
-    """Compare every P1 field and diagnostic to detached expectations."""
+    """Compare every NumPy oracle field and diagnostic to detached expectations."""
     expected = _run_captured_full_loop_oracle(scenario, steps)
     float_fields = {
         "particle_masses": expected.state.particle_masses,
@@ -2640,7 +2651,9 @@ def test_real_uncaptured_warp_cpu_nonzero_loop_matches_numpy() -> None:
 def test_p1_ready_warp_cpu_loop_matches_detached_oracle(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Exercise P1's real READY-only barriers without enqueue-time host work."""
+    """Exercise NumPy oracle's real READY-only barriers without enqueue-time
+    host work.
+    """
     from particula.gpu import conversion
 
     scenario = _captured_full_loop_scenario()
@@ -2743,7 +2756,9 @@ def test_p1_ready_warp_cpu_loop_matches_detached_oracle(
 def test_p1_ready_warp_cpu_zero_duration_is_write_free(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Keep the exact P1 READY binding and payload state unchanged at zero time."""
+    """Keep the exact NumPy oracle READY binding and payload state unchanged at
+    zero time.
+    """
     from particula.gpu import conversion
 
     scenario_loop = _build_scenario_prepared_loop(monkeypatch, 0.0)

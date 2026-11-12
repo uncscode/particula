@@ -151,7 +151,9 @@ def _communication_validate_map(
     active: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Validate enabled edges, including the P3 ``-1`` boundary sentinel."""
+    """Validate enabled edges, including the gas transport ``-1`` boundary
+    sentinel.
+    """
     edge = wp.tid()
     if enabled[edge] != 0 and enabled[edge] != 1:
         wp.atomic_max(invalid, 0, 1)
@@ -804,7 +806,7 @@ def _validate_time_step(time_step: object) -> float:
 
 
 def _validate_resource_shapes(resource_shapes: object) -> None:
-    """Validate the exact P1 resource-shape declaration metadata."""
+    """Validate the exact map validation resource-shape declaration metadata."""
     if type(resource_shapes) is not tuple:
         raise TypeError("resource_shapes must be an exact tuple.")
     roles: set[str] = set()
@@ -830,7 +832,9 @@ def _validate_resource_shapes(resource_shapes: object) -> None:
 def _validate_gas_communication_configuration(
     configuration: object,
 ) -> CommunicationConfiguration:
-    """Exact-check the P1 declaration carriers needed by the P3 boundary."""
+    """Exact-check the map validation declaration carriers needed by the gas
+    transport boundary.
+    """
     if type(configuration) is not CommunicationConfiguration:
         raise TypeError(
             "configuration must be an exact CommunicationConfiguration."
@@ -862,7 +866,9 @@ def _validate_gas_communication_configuration(
 def _validate_particle_communication_configuration(
     configuration: object,
 ) -> CommunicationConfiguration:
-    """Exact-check the P1 declaration carriers for particle transport."""
+    """Exact-check the map validation declaration carriers for particle
+    transport.
+    """
     if type(configuration) is not CommunicationConfiguration:
         raise TypeError(
             "configuration must be an exact CommunicationConfiguration."
@@ -1234,7 +1240,7 @@ def gas_communication_step_gpu(
     Args:
         particles: Complete caller-owned Warp particle container.
         gas: Complete caller-owned Warp gas container.
-        configuration: Exact P1 gas ``CommunicationConfiguration``.
+        configuration: Exact map validation gas ``CommunicationConfiguration``.
         time_step: Finite nonnegative explicit-Euler step in seconds.
         amounts: Work ledger or concrete-only ``GasCommunicationBuffers``
             carrier.
@@ -1596,7 +1602,8 @@ def particle_communication_step_gpu(
 
     Args:
         particles: Complete caller-owned fixed-shape Warp particle container.
-        configuration: Exact P1 particle ``CommunicationConfiguration``.
+        configuration: Exact map validation particle
+            ``CommunicationConfiguration``.
         time_step: Finite nonnegative explicit-Euler time step in seconds.
         buffers: Exact concrete ``ParticleCommunicationBuffers`` carrier.
 
@@ -2226,7 +2233,7 @@ def resident_gas_communication_step_gpu(
     invalid: Any,
     active: Any,
 ) -> tuple[Any, Any]:
-    """Dispatch acquired closed GAS resources without public P1 validation.
+    """Dispatch acquired closed GAS resources without public map validation.
 
     This private resident seam assumes acquisition has already established every
     schema, identity, alias, and static map invariant. It intentionally has no
@@ -2275,7 +2282,8 @@ def resident_particle_communication_step_gpu(
     initial_concentration: Any,
     initial_charge: Any,
 ) -> Any:
-    """Dispatch acquired closed PARTICLES resources without public P1 checks.
+    """Dispatch acquired closed PARTICLES resources without public map
+        validation checks.
 
     Acquisition owns payload validation and allocation. This resident-only seam
     uses the registry-pinned planner, status, and snapshot storage by identity.
@@ -2330,7 +2338,7 @@ def resident_volume_evolution_step_gpu(
     invalid: Any,
     changed: Any,
 ) -> tuple[Any, Any]:
-    """Apply acquired prescribed volumes without public P1 validation.
+    """Apply acquired prescribed volumes without public map validation.
 
     Args:
         particles: Acquired resident particle container.

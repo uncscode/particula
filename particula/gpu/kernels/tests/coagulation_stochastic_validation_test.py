@@ -221,7 +221,9 @@ def test_public_materializer_rejects_invalid_concentration_override_shape() -> (
 def test_public_materializer_retains_p3_overrides_and_inactive_sentinels() -> (
     None
 ):
-    """Explicit P3 active values do not overwrite inactive sentinel state."""
+    """Explicit integration validation active values do not overwrite inactive
+    sentinel state.
+    """
     case = STOCHASTIC_CASES[0]
     particles = _materialize_public_particles(
         case.fixture,

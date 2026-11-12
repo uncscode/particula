@@ -6,7 +6,7 @@ workload of scientific simulations and record their longer runtime explicitly.
 
 ## Native construction and process ownership
 
-Use the selected E9 checkout (`python -m pip install -e ".[extra]"`), not an
+Use the v0.3.0 development checkout (`python -m pip install -e ".[extra]"`), not an
 older released wheel. Construct native `Aerosol` from `ParticleData`, `GasData`
 and `EnvironmentData`; use process-owned physics and explicit species maps.
 Start with [native state access and replacement](../../../Features/particle-data-migration/index.md)
@@ -62,4 +62,4 @@ coverage and lint gates. For a migration, record every source, notebook,
 public snippet and historical exception with literal dated execution evidence.
 Historical API sketches must be labeled before a nonexecutable text fence.
 Do not remove compatibility facades as part of an example migration; that
-requires the separately reviewed M6 removal milestone.
+requires the separately reviewed v0.3.0 removal milestone.

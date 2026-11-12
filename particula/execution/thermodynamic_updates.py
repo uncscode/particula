@@ -135,7 +135,7 @@ class ResidentThermodynamicUpdateRequest:
 
 @dataclass(frozen=True, eq=False)
 class PreparedResidentThermodynamicBinding:
-    """Bind validated P1 thermodynamic writer identities.
+    """Bind validated declaration thermodynamic writer identities.
 
     This concrete-only record retains the exact arrays and configuration
     selected during setup. Enqueue uses those references only and does not
@@ -224,7 +224,8 @@ def setup_prepared_thermodynamic_sequence(
     """Validate and freeze the condensation and diagnostics windows.
 
     Args:
-        prepared_timestep: Exact READY P1 timestep retaining resident arrays.
+        prepared_timestep: Exact READY declaration timestep retaining resident
+            arrays.
         request: Exact thermodynamic request associated with the timestep.
         condensation_node: Resolver-produced condensation consumer node.
         diagnostics_node: Resolver-produced diagnostics consumer node.
@@ -270,10 +271,10 @@ def setup_prepared_thermodynamic_sequence(
 def setup_prepared_thermodynamic_binding(
     prepared_timestep: object, request: object
 ) -> PreparedResidentThermodynamicBinding:
-    """Validate a P1 timestep and bind thermodynamic arrays once.
+    """Validate a declaration timestep and bind thermodynamic arrays once.
 
     Args:
-        prepared_timestep: Exact P1 timestep retaining the request
+        prepared_timestep: Exact declaration timestep retaining the request
             configuration.
         request: Exact thermodynamic update request to validate and bind.
 
@@ -282,7 +283,8 @@ def setup_prepared_thermodynamic_binding(
 
     Raises:
         TypeError: If either carrier has an unsupported exact type.
-        ValueError: If retained P1 identities, resident ownership, metadata, or
+        ValueError: If retained declaration identities, resident ownership,
+            metadata, or
             primary arrays are invalid.
     """
     if type(prepared_timestep) is not PreparedResidentTimestep:
@@ -723,12 +725,14 @@ class ResidentThermodynamicUpdateCoordinator:
     ) -> PreparedResidentThermodynamicConsumer:
         """Bind the current consumer window without changing coordinator state.
 
-        This P1-consumer seam intentionally reads the coordinator's current
+        This declaration-consumer seam intentionally reads the coordinator's
+        current
         state on every call. It does not execute writers or consume schedule
         entries; the caller must report successful completion separately.
 
         Args:
-            binding: Exact common P1 binding for this coordinator request.
+            binding: Exact common declaration binding for this coordinator
+                request.
             node: Exact expected condensation or diagnostics consumer node.
 
         Returns:

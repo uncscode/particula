@@ -1810,5 +1810,267 @@
       "local_log": "/tmp/m6-example-execution/58-source.log",
       "content_sha256": "90cbcc43459032b7373572f7b69bde248df9ff2ef5796ad634361214f407d12f"
     }
-  ]
+  ],
+  "documentation_refresh": {
+    "base_revision": "514e5aa88dce9f8bc7cfc44f313c365ffe6c7b35",
+    "scope": "Planning-label cleanup only. Executable Python AST unchanged; paired notebook execution counts and outputs preserved exactly. Original execution/review hashes above remain evidence for their recorded revision; refreshed file hashes are listed separately. No re-execution claimed.",
+    "files": [
+      {
+        "path": "docs/Examples/Activity/activity_tutorial.py",
+        "content_sha256": "0cad48f05307317a072d208c8a7a1abefb8b2a4754fb80fde9eeeac8227b8a23"
+      },
+      {
+        "path": "docs/Examples/Activity/activity_tutorial.ipynb",
+        "content_sha256": "1300aac8c139d3875587a22c3863676df5351077a7d5a7b0075d281fa38bef96"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.py",
+        "content_sha256": "97eb95ef6c3696f27b4d072c74eb9511b0d8daf1d7b731b4ddadb64b9b991ea4"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.ipynb",
+        "content_sha256": "274c83fa69c4a97b3ad8cdb510894b8273eed12dcc7bb9558caf113d4b9abfb3"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.py",
+        "content_sha256": "8e74f946a3b94e81dbcb6f416a0f189070a54d381371866fba117a01897334a2"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.ipynb",
+        "content_sha256": "debc2b568729f3257b5452214a724b0ee6e091fc67e297779f0c14d62deed8ac"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.py",
+        "content_sha256": "40def963b8fd4815f22179507681bb317ce4999db7846ab795efe579388a371c"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb",
+        "content_sha256": "b9d55fff5385d882d2ee5e8c515e00a951c5f7411fb9a3bb1c3c6cf0d08f7a25"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.py",
+        "content_sha256": "7a433ed36ddb851002f03ef483d33443d94231d534c86700252b385ebd828409"
+      },
+      {
+        "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.ipynb",
+        "content_sha256": "45af6d0974a4f71437d6430057ffa13f8347e8e85200b5daf39854997b579553"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.py",
+        "content_sha256": "ffacddb63f4db1d7e40eff3d93e702bad12166c22dca2a20fd8e6d6381564a3b"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.ipynb",
+        "content_sha256": "0f2b1370977aeb4264115255f1b771a3fed8e69524d2d3661e74c69f94f73d60"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.py",
+        "content_sha256": "da9c21f3cf43fb45131d3f27e38869bee67cfbe87403a3f1f2707cd46a1707a0"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.ipynb",
+        "content_sha256": "c32a1f57fba55e120da4e5134db82157071faa589dc59c18abc67692a0dccb0b"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.py",
+        "content_sha256": "3a0101e9305ba8d04d4e6be511e0ed9ee161e3983920f15a8472f308f7ee8403"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb",
+        "content_sha256": "81b89733aa0c0c3418ada6307890c7f76d5137a6dc32e700d486d3e0428c4f01"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.py",
+        "content_sha256": "716af273426d9fe297518225aa53e2758437a890b03d02860aa3a81b78d133d8"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.ipynb",
+        "content_sha256": "0e64ca694a9fc85f3f94e14ff25fe40d66247724b2e16a9e58b6004b039747c2"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.py",
+        "content_sha256": "5fd233bf88eea01909b4e2bba231f822149276babf7d39dfa1ea0ae3405e6f83"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.ipynb",
+        "content_sha256": "e91a6055cf93cbb840ee466f0e9d1bd6720a24c31764006a2c54a879420467de"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.py",
+        "content_sha256": "7c3c66ef83dd5bd0fe5e143660843a3be2f70ec4fd1cd6eabbbdae3e7a9c3c50"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.ipynb",
+        "content_sha256": "3f09f88afcad5a9c0389e860ec9212ac838eb03fc514d5c751557f8d51a92c55"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.py",
+        "content_sha256": "257f775e7195067b55779d60536872b4c55a29a02b98312708739b234562bcc8"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.ipynb",
+        "content_sha256": "0b718ed7f2987514e0ee160b73529f9a3702df669986f8152ffcea32b58e83a0"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.py",
+        "content_sha256": "c9e7f75c809fcdb1a5c470ef4e7180af8aa85b264279512f92fdf33eb08d5408"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.ipynb",
+        "content_sha256": "c49070663b9f87bbc694252c42616082bdaa70f69653a4582fdd7807989e869b"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.py",
+        "content_sha256": "407a0336895b6fc87ed65a066b6cb62e369cb2940c7ca9e3276def7dee26914c"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb",
+        "content_sha256": "dd1e125a4f0f0462a8839b6ce8152e121826f674ebc002c55d9f51fd112d299d"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.py",
+        "content_sha256": "f57737012cf41b3b38d4d6fcafbe8f6f1458ef87537ed7cac029d251f22e8a66"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.ipynb",
+        "content_sha256": "0b0b73df52634b39b41ad3205a287aba56418ac74fbb1bf22a3f61655e0d9b29"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.py",
+        "content_sha256": "abf303cf19c3c36aa8d2d831b9073aad8426d9d97d48e2486bf07b847155be0a"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.ipynb",
+        "content_sha256": "aaf25910aa96d8d5a7c6319b39618d574b1304bdce489f485dc79a9583bbb221"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.py",
+        "content_sha256": "9b450fca78403090faba067238f07ba8a08e4e13fdd4a43a357c95eaf185d141"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.ipynb",
+        "content_sha256": "5d7e0d6a3c8b7a70f0e9378b3c06fb87506010791fef3af094d0ba0d40c604dd"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.py",
+        "content_sha256": "06204d6ca61cb7ecf47d72f4b4694a8f367548a14329a93ba24d095398ffe89e"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.ipynb",
+        "content_sha256": "ace5dc2658944cde4015c2799663457377ae61de971998b26dd09f4e09dafdcc"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.py",
+        "content_sha256": "81dbb9078b0732414877e71ab45aa2fff2cdb1a0f616e8e7db5a566f6b175f47"
+      },
+      {
+        "path": "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.ipynb",
+        "content_sha256": "423a54ea349e820a26f140a9c61fc67185100b73ccff23c21207f3a2bedc70cb"
+      },
+      {
+        "path": "docs/Examples/Equilibria/Notebooks/activity_part1.py",
+        "content_sha256": "bf01d1ff1003242616bee33ab5f95733f0a7233dbfdbe07cdc101c1e70923e7b"
+      },
+      {
+        "path": "docs/Examples/Equilibria/Notebooks/activity_part1.ipynb",
+        "content_sha256": "09da36e71141883df5bbe602e28ad1ff0876c9d1a7293895cb3dcc2f7e353955"
+      },
+      {
+        "path": "docs/Examples/Equilibria/Notebooks/equilibria_part1.py",
+        "content_sha256": "c216e58c4cda62e9da6611aef6dd3b6606c41d68fcbb9bde03bfbdc9025386cc"
+      },
+      {
+        "path": "docs/Examples/Equilibria/Notebooks/equilibria_part1.ipynb",
+        "content_sha256": "f5b79bb242301cd34f42d5f938d352c10f04a079c6d043fb09aeb251f3452653"
+      },
+      {
+        "path": "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.py",
+        "content_sha256": "525e3bea518ac5f68a2f36221cc559f2d6f7a3838219656922361c3a39b520a1"
+      },
+      {
+        "path": "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.ipynb",
+        "content_sha256": "349a676842272f9d46513b8f0e3a48116aa34134dec3ce87d11872b17307f2e2"
+      },
+      {
+        "path": "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.py",
+        "content_sha256": "d6e16dfe40d7611992f191bf925b2f0f03b5ca57028b429aa32c76187ed447de"
+      },
+      {
+        "path": "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb",
+        "content_sha256": "881fe839ec61b0b6017d1657c9c8f6f4414c3d78323716a11310f2e404232b29"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.py",
+        "content_sha256": "4c7ea3f85bcbf62f992d6659c9d5c4f8d09a5cd4cf88ddcff11c5bab3fb95201"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb",
+        "content_sha256": "d308d2f9e6d2045fc013740dd9d6fb714bc50c2a83d4633ea4c6d77381d215c9"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.py",
+        "content_sha256": "a3292c5831c34975b839f85a9224586e14828343ba28a82de0b976545d29b904"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.ipynb",
+        "content_sha256": "dfc9954876f3b773a98132872a0868acd70c48b27afdb50802ce80030cda126a"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.py",
+        "content_sha256": "9c619ae9c55dc8fcf80bdf32d5357684a69ec5076e084ebd98da743c1879413c"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.ipynb",
+        "content_sha256": "54a7cac89add9ce65871e1c02a90efd9fa6faca074711e886d924f219832fb90"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.py",
+        "content_sha256": "cb53c026bb012792c9ead6723a2170b7f8954d042b02ed7052f823471c33b763"
+      },
+      {
+        "path": "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.ipynb",
+        "content_sha256": "42df978887d8dd45e464f3abeae1f292d4884720238fe007c437169a5c5d14b9"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.py",
+        "content_sha256": "81b1e18824b5817ca3c697c74cac23851d8ed13bd6374e8a05136ba39bdd93c5"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb",
+        "content_sha256": "9387fdbaa95b428c54619530b2459201492b4cb188a92729dd412ccec346310f"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.py",
+        "content_sha256": "2d590302ce2f01aededb7325a26d8fb8546150aebb3abef073bfbf344a60dd1c"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb",
+        "content_sha256": "11daa524412247998c1d8a2248f6d9ee80618f386ec3d5e5e9a09e765c15cf38"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.py",
+        "content_sha256": "9dcc5c1aa3d6cbac19546c280d35319fd8c77f9ca06aa791c5daa1f9553fbe65"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb",
+        "content_sha256": "e5437674fe0bc6c18d1fe274db3d3e23842c7d6150db3e8b5f8f76a1b6a89893"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.py",
+        "content_sha256": "b974d2e7143ca21416e816f0d4e2e987b49a444567b2ff5e322dd274c43fa77d"
+      },
+      {
+        "path": "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb",
+        "content_sha256": "5c47fae3c86112a3dcc654850984244dc9e7677c3cc91103f2174f8c2d375ffb"
+      },
+      {
+        "path": "docs/Examples/gpu_condensation_parity_walkthrough.py",
+        "content_sha256": "9675bb072e799ba36e5c513528ac27dd46b92f99d6a133f084e8039985e82109"
+      },
+      {
+        "path": "docs/Examples/native_state_access.py",
+        "content_sha256": "82bf547d840a0a426bbc1c7a6c29487118f85bca75151417691e5fe303d96ec7"
+      }
+    ]
+  }
 }

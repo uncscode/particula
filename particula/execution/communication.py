@@ -1,16 +1,19 @@
 """Declare and preflight fixed-shape resident communication maps.
 
-This concrete-only, direct-import boundary performs read-only P1 validation of
+This concrete-only, direct-import boundary performs read-only map validation of
 caller-owned Warp map arrays. It neither reads resident primaries, copies map
 payloads, nor launches a writer, and is deliberately absent from
 ``particula.execution`` exports. Empty and all-disabled maps are successful
 write-free cases only after complete applicable carrier, schema, alias, and
 domain preflight.
 
-P1 validates topology and rates in 1/s, but receives neither source inventory
+Map validation validates topology and rates in 1/s, but receives neither source
+inventory
 nor time step. Population-dependent outbound-overdraw validation therefore
-belongs to P3, before its writers launch. P2 owns volume writers, P4 owns
-particle transport, and P5 owns resident binding and primary/sidecar aliasing.
+belongs to gas transport, before its writers launch. Volume evolution owns
+volume writers, particle transport owns
+Particle transport, and resident binding owns resident binding and
+primary/sidecar aliasing.
 This module provides none of those operations, synchronization, host
 conversion, fallback, or scheduling.
 """
@@ -41,7 +44,8 @@ class CommunicationMapForm(str, Enum):
 class CommunicationTransportMode(str, Enum):
     """Declare the resident payload class a later phase may transport.
 
-    P1 records this immutable mode but does not read, transport, or otherwise
+    Map validation records this immutable mode but does not read, transport, or
+    otherwise
     validate resident gas or particle payloads.
     """
 
@@ -143,8 +147,9 @@ class PrescribedVolumeUpdate:
 
     ``final_volumes`` is retained by identity and is ``None`` or later validates
     as a distinct, nonoverlapping, same-device contiguous pointer-backed
-    ``wp.float64`` array shaped ``(B,)`` in m³ with finite positive values. P1
-    only preflights it; P2 owns any volume write.
+    ``wp.float64`` array shaped ``(B,)`` in m³ with finite positive values. Map
+    validation
+    only preflights it; volume evolution owns any volume write.
 
     Attributes:
         final_volumes: Optional caller-owned final volumes in m³ with shape
@@ -161,13 +166,15 @@ class CommunicationConfiguration:
     The configuration preserves nested carrier and Warp-array identities, has
     no session or registry binding, and carries no resident primary state. It
     neither reads source population nor accepts a time step, so it cannot
-    validate population-dependent outbound totals; P3 must do so before its
+    validate population-dependent outbound totals; gas transport must do so
+    before its
     writers run.
 
     Attributes:
         communication_map: Fixed-capacity map declaration and caller-owned
             arrays.
-        prescribed_volume: Optional final-volume declaration; P2 owns writes.
+        prescribed_volume: Optional final-volume declaration; volume evolution
+            owns writes.
         resource_shapes: Unique-role metadata declarations that own no arrays.
     """
 
@@ -781,7 +788,8 @@ def validate_communication_configuration(
         Empty and all-disabled maps still receive full applicable preflight and
         are write-free on success. This validates map topology and rate domains
         only. It has neither source-inventory nor time-step input and cannot
-        validate outbound population totals; P3 must enforce that condition
+        validate outbound population totals; gas transport must enforce that
+        condition
         before writers run.
     """
     typed, boxes = _validate_metadata(configuration, dimensions, device)

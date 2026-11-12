@@ -265,7 +265,9 @@ def _ledger_counts(seams: ForbiddenSeams) -> tuple[int, ...]:
 
 
 def _reject_availability() -> RejectedAvailability:
-    """Return fresh P1 data and the exact P2 unavailable-device error."""
+    """Return fresh declaration data and the exact selection unavailable-device
+    error.
+    """
     request = _request()
     matrix = _matrix(request)
     request_snapshot = (
@@ -324,7 +326,9 @@ def _state() -> tuple[CPUExecutionState, list[float], tuple[int, list[float]]]:
 
 
 def test_unavailable_device_short_circuits_before_dispatch() -> None:
-    """P2 device rejection stops before state validation or adapter lookup."""
+    """Selection device rejection stops before state validation or adapter
+    lookup.
+    """
     rejected = _reject_availability()
     seams = ForbiddenSeams()
     cpu_adapter = RecordingAdapter(seams)
@@ -363,7 +367,9 @@ def test_unavailable_device_short_circuits_before_dispatch() -> None:
 
 
 def test_explicit_cpu_fallback_dispatches_once_with_provenance() -> None:
-    """Caller-authored P3 fallback retains CPU state and exact provenance."""
+    """Caller-authored state ownership fallback retains CPU state and exact
+    provenance.
+    """
     rejected = _reject_availability()
     seams = ForbiddenSeams()
     cpu_adapter = RecordingAdapter(seams)

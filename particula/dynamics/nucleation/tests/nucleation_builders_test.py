@@ -1,4 +1,4 @@
-"""Regression tests for strict P4 nucleation builders."""
+"""Regression tests for strict public construction nucleation builders."""
 
 import sys
 from dataclasses import FrozenInstanceError
@@ -284,7 +284,9 @@ def test_source_configuration_record_accepts_supported_strategies(
         ActivationNucleationStrategy | KineticNucleationStrategy
     ],
 ) -> None:
-    """Direct source metadata accepts each concrete P4 strategy type."""
+    """Direct source metadata accepts each concrete public construction strategy
+    type.
+    """
     parameters = _parameters()
     if builder_type is KineticNucleationBuilder:
         parameters["coefficient_units"] = "m^3/s"
@@ -314,7 +316,9 @@ def test_source_configuration_rejects_abstract_strategy_subclass() -> None:
     """Source metadata does not accept arbitrary strategy implementations."""
 
     class UnsupportedStrategy(NucleationStrategy):
-        """Concrete strategy outside the approved P4 source boundary."""
+        """Concrete strategy outside the approved public construction source
+        boundary.
+        """
 
         def potential_rate(
             self,
@@ -398,7 +402,9 @@ def test_strategy_mapping_rejects_incomplete_schema(
 
 
 def test_source_builder_rejects_extra_keys_atomically() -> None:
-    """Source builder rejects P2-style keys without altering prior metadata."""
+    """Source builder rejects demand planning-style keys without altering prior
+    metadata.
+    """
     strategy = (
         ActivationNucleationBuilder().set_parameters(_parameters()).build()
     )
@@ -459,6 +465,8 @@ def test_source_builder_mapping_rejects_invalid_p4_only_schema(
     payload: dict[str, object],
     message: str,
 ) -> None:
-    """P4 source metadata rejects units, P2 fields, and invalid strategies."""
+    """Public construction source metadata rejects units, demand planning
+    fields, and invalid strategies.
+    """
     with pytest.raises((TypeError, ValueError), match=message):
         NucleationSourceConfigBuilder().set_parameters(payload)

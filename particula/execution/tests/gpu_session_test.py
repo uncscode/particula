@@ -1,4 +1,4 @@
-"""Tests for concrete-only GPU-resident session P1 carriers."""
+"""Tests for concrete-only GPU-resident session session metadata carriers."""
 
 import os
 import subprocess
@@ -141,7 +141,7 @@ def _warp_resources(
 
 
 def _guard() -> ResidentStepGuard:
-    """Construct a valid P4 guard with its exact pinned registry."""
+    """Construct a valid step guard guard with its exact pinned registry."""
     from particula.execution.gpu_resources import GPUResourceRegistry
 
     particles, gas, environment = _warp_resources()
@@ -165,7 +165,7 @@ class _MetadataArray:
         self.device = device
 
     def numpy(self) -> object:
-        """Fail if P1 attempts a host readback."""
+        """Fail if session metadata attempts a host readback."""
         raise AssertionError("P1 must not read resident array payloads.")
 
 
@@ -354,9 +354,11 @@ assert not any(name == 'warp' or name.startswith('particula.gpu') for name in sy
 def test_session_retains_valid_resources_by_identity(
     shape: tuple[int, int, int],
 ) -> None:
-    """Test every declared lifecycle is accepted as immutable P1 state.
+    """Test every declared lifecycle is accepted as immutable session metadata
+        state.
 
-    P4 owns transition legality; P1 only accepts each declared value.
+    Step guard owns transition legality; session metadata only accepts each
+    declared value.
     """
     boxes, particle_count, species = shape
     particles, gas, environment = _warp_resources(
@@ -612,7 +614,9 @@ def test_missing_warp_runtime_is_covered_without_loading_generated_types(
 
 
 def test_session_carriers_remain_concrete_only() -> None:
-    """Test P1 names do not alter public execution, adapter, or root exports."""
+    """Test session metadata names do not alter public execution, adapter, or
+    root exports.
+    """
     import particula
     import particula.execution as execution
     import particula.execution.adapters as adapters

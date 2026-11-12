@@ -1,4 +1,6 @@
-"""Focused P1 validation plus sidecar-only P2 and P3 staging tests."""
+"""Focused input validation plus sidecar-only demand planning and capacity
+staging tests.
+"""
 
 from dataclasses import FrozenInstanceError
 from types import SimpleNamespace
@@ -351,7 +353,7 @@ def _assert_snapshot_unchanged(snapshot):
 
 
 def _oracle_plan(concentration, molar_mass, config, time_step):
-    """Compute a NumPy reference for the private P2 demand planner."""
+    """Compute a NumPy reference for the private demand planning demand planner."""
     precursor = (
         concentration[:, config.precursor_index]
         * AVOGADRO_NUMBER
@@ -377,7 +379,9 @@ def _oracle_plan(concentration, molar_mass, config, time_step):
 
 
 def _stage_slots(counts, particle_slots, device="cpu"):
-    """Stage explicit integral P3 counts against a fixed particle-slot layout."""
+    """Stage explicit integral capacity staging counts against a fixed
+    particle-slot layout.
+    """
     boxes, particles = particle_slots.shape
     particle_data, gas_data = _state(boxes, particles, 1, device)
     particle_data.concentration = wp.array(
@@ -414,7 +418,7 @@ def _stage_slots(counts, particle_slots, device="cpu"):
 
 
 def _exhaustion_buffers(boxes, particles, species, device="cpu"):
-    """Build distinct P4 and nested resampling sidecars."""
+    """Build distinct exhaustion resolution and nested resampling sidecars."""
     resampling_buffers = ResamplingBuffers(
         retained_counts=wp.zeros(boxes, dtype=wp.int32, device=device),
         released_counts=wp.zeros(boxes, dtype=wp.int32, device=device),
@@ -472,7 +476,9 @@ def _exhaustion_buffers(boxes, particles, species, device="cpu"):
 
 
 def test_public_nucleation_step_commits_selected_slots_and_gas() -> None:
-    """P5 activates the P4 prefix and removes the matching gas inventory."""
+    """Commit activates the exhaustion resolution prefix and removes the
+    matching gas inventory.
+    """
     particles, gas = _state(particles=2)
     particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
@@ -683,7 +689,9 @@ def test_p5_preserves_gas_density_after_volume_scaling() -> None:
 def test_public_empty_step_validates_p4_inputs_before_noop(
     exhaustion_controls, exhaustion_buffers, message
 ) -> None:
-    """Empty public calls still validate P4 controls and buffers."""
+    """Empty public calls still validate exhaustion resolution controls and
+    buffers.
+    """
     particles, gas = _state(boxes=0)
     scratch, finalized, diagnostics = _sidecars(0, 2, 1)
     buffers = _exhaustion_buffers(0, 2, 1)
@@ -714,7 +722,9 @@ def test_public_empty_step_validates_p4_inputs_before_noop(
 def test_public_step_rejects_nonparticipating_demand_before_p4(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Positive non-participant demand device-gates P4 and P5 mutation."""
+    """Positive non-participant demand device-gates exhaustion resolution and
+    commit mutation.
+    """
     particles, gas = _state(boxes=2, particles=2, species=2)
     particles.masses = wp.ones((2, 2, 2), dtype=wp.float64, device="cpu")
     gas.partitioning = wp.array([[1, 0], [1, 0]], dtype=wp.int32, device="cpu")
@@ -757,7 +767,9 @@ def test_public_step_rejects_nonparticipating_demand_before_p4(
 def test_public_nucleation_step_commits_multi_box_multispecies_state(
     input_mode: str,
 ) -> None:
-    """P5 commits each finalized box prefix using direct or environment inputs."""
+    """Commit commits each finalized box prefix using direct or environment
+    inputs.
+    """
     particles, gas = _state(boxes=2, particles=2, species=2)
     particles.concentration = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
     gas.molar_mass = wp.array([0.1, 0.2], dtype=wp.float64, device="cpu")
@@ -826,7 +838,9 @@ def test_public_nucleation_step_commits_multi_box_multispecies_state(
 def test_public_nucleation_step_rejects_corrupt_p5_handoff_without_commit(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A malformed finalized prefix prevents the public P5 particle/gas commit."""
+    """A malformed finalized prefix prevents the public commit particle/gas
+    commit.
+    """
     particles, gas = _state(particles=2)
     particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
@@ -937,7 +951,7 @@ def test_public_nucleation_step_rejects_corrupt_p5_handoff_without_commit(
 def test_public_nucleation_step_rejects_invalid_p5_handoffs_without_commit(
     corrupt, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Every malformed P5 handoff preserves particle and gas state."""
+    """Every malformed commit handoff preserves particle and gas state."""
     particles, gas = _state(particles=2)
     particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
@@ -972,7 +986,9 @@ def test_public_nucleation_step_rejects_invalid_p5_handoffs_without_commit(
 
 
 def test_prepared_nucleation_p4_rebinding_cannot_redirect_dispatch() -> None:
-    """Prepared P4 writes and P5 reads retain the originally pinned arrays."""
+    """Prepared exhaustion resolution writes and commit reads retain the
+    originally pinned arrays.
+    """
     particles, gas = _state(particles=2)
     particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
@@ -1020,7 +1036,9 @@ def test_prepared_nucleation_p4_rebinding_cannot_redirect_dispatch() -> None:
 def test_stage_nucleation_slots_writes_expected_layout(
     counts, slots, expected_selected, device
 ):
-    """P3 retains full counts and selects the ascending free-slot prefix."""
+    """Capacity staging retains full counts and selects the ascending free-slot
+    prefix.
+    """
     particles, gas, scratch, finalized, diagnostics = _stage_slots(
         counts, slots, device
     )
@@ -1064,7 +1082,9 @@ def test_p4_controls_require_exact_python_booleans(value):
 
 
 def test_p4_finalizes_free_capacity_without_mutating_p2_or_p3_handoffs():
-    """P4 copies immutable demand and writes the current free-slot prefix."""
+    """Exhaustion resolution copies immutable demand and writes the current
+    free-slot prefix.
+    """
     particles, gas, scratch, finalized, diagnostics = _stage_slots(
         [1.0], np.array([[False, False]])
     )
@@ -1114,7 +1134,9 @@ def test_p4_finalizes_free_capacity_without_mutating_p2_or_p3_handoffs():
 
 
 def test_p4_rejects_unresolved_capacity_before_writing_any_sidecar():
-    """An exhausted row without a viable policy preserves all P4 state."""
+    """An exhausted row without a viable policy preserves all exhaustion
+    resolution state.
+    """
     particles, gas, scratch, finalized, diagnostics = _stage_slots(
         [1.0], np.array([[True, True]])
     )
@@ -1173,7 +1195,9 @@ def test_p4_rejects_unresolved_capacity_before_writing_any_sidecar():
 def test_p4_expected_handoff_rejections_preserve_complete_snapshots(
     corrupt, monkeypatch
 ):
-    """Expected P4 rejections precede primitive calls and every sidecar write."""
+    """Expected exhaustion resolution rejections precede primitive calls and
+    every sidecar write.
+    """
     particles, gas, scratch, finalized, diagnostics = _stage_slots(
         [1.0], np.array([[False, False]])
     )
@@ -1245,7 +1269,9 @@ def test_p4_expected_handoff_rejections_preserve_complete_snapshots(
     ids=["stale_demand", "stale_volume", "stale_density"],
 )
 def test_p4_mutable_input_rejections_precede_all_writes(corrupt, monkeypatch):
-    """P4 revalidates mutable P1/P2 state before diagnostics or primitives."""
+    """Exhaustion resolution revalidates mutable input validation/demand
+    planning state before diagnostics or primitives.
+    """
     particles, gas, scratch, finalized, diagnostics = _stage_slots(
         [1.0], np.array([[False, False]])
     )
@@ -1295,7 +1321,9 @@ def test_p4_mutable_input_rejections_precede_all_writes(corrupt, monkeypatch):
 
 
 def test_p4_protects_retained_p2_scratch_from_output_aliasing():
-    """P4 rejects output aliases to retained P2 scratch before any write."""
+    """Exhaustion resolution rejects output aliases to retained demand planning
+    scratch before any write.
+    """
     particles, gas, scratch, finalized, diagnostics = _stage_slots(
         [1.0], np.array([[False, False]])
     )
@@ -1384,7 +1412,9 @@ def test_p4_scaling_records_full_deficit_and_finalized_count():
 
 
 def test_p4_resampling_precedes_scaling_and_refreshes_final_free_slots():
-    """P4 resampling resolves a viable deficit before considering scaling."""
+    """Exhaustion resolution resampling resolves a viable deficit before
+    considering scaling.
+    """
     particles, gas, scratch, finalized, diagnostics = _stage_slots(
         [2.0], np.array([[True, True, False]])
     )
@@ -1426,7 +1456,9 @@ def test_p4_resampling_precedes_scaling_and_refreshes_final_free_slots():
 
 
 def test_stage_nucleation_slots_rejects_replacement_records_without_writes():
-    """P3 accepts only the exact P2/P3 sidecar records validated by P1."""
+    """Capacity staging accepts only the exact demand planning/capacity staging
+    sidecar records validated by input validation.
+    """
     particles, gas = _state()
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     finalized = NucleationFinalizedDemandBuffers(
@@ -1475,7 +1507,9 @@ def test_stage_nucleation_slots_rejects_replacement_records_without_writes():
 
 
 def test_stage_nucleation_slots_rejects_replaced_record_buffer_without_writes():
-    """P3 rejects a record whose validated storage was substituted after P1."""
+    """Capacity staging rejects a record whose validated storage was substituted
+    after input validation.
+    """
     particles, gas = _state()
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     finalized = NucleationFinalizedDemandBuffers(
@@ -1506,7 +1540,9 @@ def test_stage_nucleation_slots_rejects_replaced_record_buffer_without_writes():
 
 
 def test_stage_nucleation_slots_excludes_scratch_from_identity_validation():
-    """P3 accepts scratch replacement because it does not receive scratch."""
+    """Capacity staging accepts scratch replacement because it does not receive
+    scratch.
+    """
     particles, gas = _state()
     particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
@@ -1538,7 +1574,9 @@ def test_stage_nucleation_slots_excludes_scratch_from_identity_validation():
 
 
 def test_stage_nucleation_slots_preserves_nonzero_particle_gas_and_p2_state():
-    """Successful P3 modifies only its count and slot-diagnostic outputs."""
+    """Successful capacity staging modifies only its count and slot-diagnostic
+    outputs.
+    """
     particles, gas = _state()
     particles.masses = wp.ones((1, 2, 1), dtype=wp.float64, device="cpu")
     particles.charge = wp.array([[-2.0, 3.0]], dtype=wp.float64, device="cpu")
@@ -1586,7 +1624,9 @@ def test_stage_nucleation_slots_preserves_nonzero_particle_gas_and_p2_state():
     ["free_slot_indices", "active_slot_counts", "free_slot_counts"],
 )
 def test_p3_diagnostic_sidecars_require_int32_nonoverlapping_storage(field):
-    """P1 rejects malformed or aliased P3 diagnostic sidecars unchanged."""
+    """Input validation rejects malformed or aliased capacity staging diagnostic
+    sidecars unchanged.
+    """
     particles, gas = _state()
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     values = dict(diagnostics.__dict__)
@@ -1648,7 +1688,9 @@ def test_p3_diagnostic_sidecars_require_int32_nonoverlapping_storage(field):
 def test_stage_nucleation_slots_rejects_invalid_event_conversion_without_writes(
     accepted_demand,
 ):
-    """Invalid P3 conversions preserve every caller-owned P3 output."""
+    """Invalid capacity staging conversions preserve every caller-owned capacity
+    staging output.
+    """
     particle_data, gas_data = _state(1, 2, 1)
     particle_data.concentration = wp.zeros(
         (1, 2), dtype=wp.float64, device="cpu"
@@ -1677,7 +1719,9 @@ def test_stage_nucleation_slots_rejects_invalid_event_conversion_without_writes(
 
 
 def test_stage_nucleation_slots_handles_zero_capacity():
-    """P3 retains a count and produces empty diagnostics at zero capacity."""
+    """Capacity staging retains a count and produces empty diagnostics at zero
+    capacity.
+    """
     _, _, _, finalized, diagnostics = _stage_slots(
         [3.0], np.zeros((1, 0), dtype=bool)
     )
@@ -1698,7 +1742,9 @@ def test_stage_nucleation_slots_accepts_int32_maximum_event_count():
 
 
 def test_stage_nucleation_slots_e6_f5_failure_preserves_p3_sidecars():
-    """E6-F5 slot-state rejection occurs before P3 count or selection writes."""
+    """fixed-slot-state rejection occurs before capacity staging count or
+    selection writes.
+    """
     particles, gas = _state()
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     finalized = NucleationFinalizedDemandBuffers(
@@ -1724,7 +1770,9 @@ def test_stage_nucleation_slots_e6_f5_failure_preserves_p3_sidecars():
 
 
 def test_stage_nucleation_slots_zero_boxes_is_write_free():
-    """P3 returns without sidecar writes after valid empty-shape preflight."""
+    """Capacity staging returns without sidecar writes after valid empty-shape
+    preflight.
+    """
     particles, gas = _state(boxes=0)
     scratch, finalized, diagnostics = _sidecars(0, 2, 1)
     before = _snapshot_arrays(finalized, diagnostics)
@@ -1744,7 +1792,9 @@ def test_stage_nucleation_slots_zero_boxes_is_write_free():
 
 
 def test_p2_to_p3_zero_demand_seam_preserves_p2_outputs():
-    """P3 stages zero P2 demand without changing P2-owned sidecars or state."""
+    """Capacity staging stages zero demand planning demand without changing
+    demand planning-owned sidecars or state.
+    """
     particles, gas = _state()
     particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
@@ -1875,7 +1925,9 @@ def test_config_rejects_inconsistent_metadata_and_intervals(changes):
 
 
 def test_preflight_is_read_only_for_valid_inputs():
-    """Valid P1 preflight retains state and returns normalized metadata."""
+    """Valid input validation preflight retains state and returns normalized
+    metadata.
+    """
     particles, gas = _state()
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     environment = SimpleNamespace(
@@ -1903,7 +1955,9 @@ def test_preflight_is_read_only_for_valid_inputs():
 
 
 def test_preflight_accepts_finite_signed_particle_charge():
-    """Finite signed elementary-charge state remains valid P1 input."""
+    """Finite signed elementary-charge state remains valid input validation
+    input.
+    """
     particles, gas = _state()
     particles.charge = wp.array(
         np.array([[-1.0, 1.0]], dtype=np.float64),
@@ -1978,7 +2032,9 @@ def test_preflight_empty_capacity_returns_no_eligible_boxes():
 def test_p2_empty_capacity_validates_before_writing_sidecars(
     config, saturation, message
 ):
-    """Invalid nonempty-box inputs reject before P2 writes any sidecar."""
+    """Invalid nonempty-box inputs reject before demand planning writes any
+    sidecar.
+    """
     particles, gas = _state(particles=0)
     scratch, finalized, diagnostics = _sidecars(1, 0, 1)
     saturation_data = None
@@ -2009,7 +2065,9 @@ def test_p2_empty_capacity_validates_before_writing_sidecars(
 
 
 def test_p2_derived_invalid_demand_preserves_all_caller_state():
-    """A derived overflow rejects before P2 commits its owned sidecars."""
+    """A derived overflow rejects before demand planning commits its owned
+    sidecars.
+    """
     particles, gas = _state()
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)
@@ -2401,7 +2459,9 @@ def test_mixed_gate_union_retains_eligible_box():
 
 
 def test_p2_plans_activation_demand_and_preserves_p3_sidecars():
-    """P2 commits only demand diagnostics using shared inventory admission."""
+    """Demand planning commits only demand diagnostics using shared inventory
+    admission.
+    """
     particles, gas = _state(boxes=2, particles=0, species=2)
     gas.molar_mass = wp.array(
         np.array([0.1, 0.2], dtype=np.float64), dtype=wp.float64, device="cpu"
@@ -2474,7 +2534,7 @@ def test_p2_plans_activation_demand_and_preserves_p3_sidecars():
 def test_p2_matches_numpy_oracle_across_devices_and_scales(
     device, boxes, species, rate_law
 ):
-    """P2 rate, demand, and removal match a NumPy float64 oracle."""
+    """Demand planning rate, demand, and removal match a NumPy float64 oracle."""
     if device.startswith("cuda") and not wp.is_cuda_available():
         pytest.skip("CUDA is unavailable")
     particles, gas = _state(
@@ -2547,7 +2607,7 @@ def test_p2_matches_numpy_oracle_across_devices_and_scales(
 
 
 def test_p2_zero_time_writes_zero_outputs_and_gate_code():
-    """P2 scalar gates commit their defined zero diagnostics."""
+    """Demand planning scalar gates commit their defined zero diagnostics."""
     particles, gas = _state()
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
 
@@ -2587,7 +2647,9 @@ def test_p2_zero_time_writes_zero_outputs_and_gate_code():
 def test_p2_writes_all_non_time_gate_codes(
     changes, concentration, saturation_value, expected_code
 ):
-    """P2 commits zero demand for each valid gate with defined precedence."""
+    """Demand planning commits zero demand for each valid gate with defined
+    precedence.
+    """
     particles, gas = _state()
     gas.concentration = wp.full(
         (1, 1), wp.float64(concentration), dtype=wp.float64, device="cpu"
@@ -2642,7 +2704,9 @@ def test_p2_writes_all_non_time_gate_codes(
 
 
 def test_p2_kinetic_tied_inventory_uses_lowest_limiting_species():
-    """Kinetic P2 demand uses its squared rate law and stable limiter tie."""
+    """Kinetic demand planning demand uses its squared rate law and stable
+    limiter tie.
+    """
     particles, gas = _state(species=2)
     gas.molar_mass = wp.array(
         np.array([0.1, 0.2], dtype=np.float64), dtype=wp.float64, device="cpu"
@@ -2682,7 +2746,9 @@ def test_p2_kinetic_tied_inventory_uses_lowest_limiting_species():
 
 
 def test_p2_gate_precedence_is_scalar_then_precursor_then_saturation():
-    """P2 emits the documented deterministic gate precedence per box."""
+    """Demand planning emits the documented deterministic gate precedence per
+    box.
+    """
     particles, gas = _state(boxes=2)
     gas.concentration = wp.array(
         np.array([[0.0], [1.0]], dtype=np.float64),
@@ -2734,7 +2800,9 @@ def test_p2_gate_precedence_is_scalar_then_precursor_then_saturation():
 
 
 def test_p2_shared_admission_preserves_nonparticipant_zero_removal():
-    """P2 limits each box independently and never removes nonparticipants."""
+    """Demand planning limits each box independently and never removes
+    nonparticipants.
+    """
     particles, gas = _state(boxes=2, particles=0, species=3)
     molar_mass = np.array([0.1, 0.3, 0.2], dtype=np.float64)
     event_mass = np.array([0.1, 0.0, 0.4], dtype=np.float64) / AVOGADRO_NUMBER
@@ -2828,7 +2896,9 @@ def test_p2_empty_boxes_are_an_exact_write_free_noop():
     ],
 )
 def test_p2_rejects_missing_or_wrong_sidecar_records(field, value, message):
-    """P2 refuses missing or wrong records before any caller-owned writes."""
+    """Demand planning refuses missing or wrong records before any caller-owned
+    writes.
+    """
     particles, gas = _state()
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)
@@ -2854,7 +2924,9 @@ def test_p2_rejects_missing_or_wrong_sidecar_records(field, value, message):
 
 
 def test_p2_inventory_rounding_uses_bounded_nextafter_correction():
-    """P2 corrects an unsafe division-product ULP without a coarse scale loss."""
+    """Demand planning corrects an unsafe division-product ULP without a coarse
+    scale loss.
+    """
     event_mass = np.float64(0.1 / AVOGADRO_NUMBER)
     inventory = None
     expected_demand = None
@@ -2911,7 +2983,9 @@ def test_p2_inventory_rounding_uses_bounded_nextafter_correction():
 def test_p2_inventory_rounding_raises_exact_failure_after_four_corrections(
     monkeypatch,
 ):
-    """P2 surfaces the exact inventory-safety failure when correction stalls."""
+    """Demand planning surfaces the exact inventory-safety failure when
+    correction stalls.
+    """
     particles, gas = _state(particles=0)
     gas.molar_mass = wp.array([0.1], dtype=wp.float64, device="cpu")
     gas.concentration = wp.array(
