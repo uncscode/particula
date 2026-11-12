@@ -1,0 +1,72 @@
+[
+  {
+    "file": "particula/particles/tests/representation_builders_test.py",
+    "test": "test_mass_particle_representation_builder",
+    "original": "def test_mass_particle_representation_builder():\n    \"\"\"Test MassParticleRepresentationBuilder Builds.\"\"\"\n    builder = ParticleMassRepresentationBuilder()\n    builder.set_distribution_strategy(RadiiBasedMovingBin())\n    builder.set_activity_strategy(ActivityIdealMass())\n    builder.set_surface_strategy(SurfaceStrategyVolume())\n    builder.set_mass(np.array([1.0, 2.0, 3.0]), \"kg\")\n    builder.set_density(np.array([1.0, 2.0, 3.0]), \"kg/m^3\")\n    builder.set_concentration(np.array([10, 20, 30]), \"1/m^3\")\n    builder.set_charge(1.0)\n    particle_representation = builder.build()\n    assert isinstance(particle_representation, ParticleRepresentation)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_mass_species_construction",
+    "disposition": "Native explicit material construction replaces facade-builder instance assertion; process physics is supplied separately and ambiguous species shapes are not inferred."
+  },
+  {
+    "file": "particula/particles/tests/representation_builders_test.py",
+    "test": "test_particle_radius_representation_builder",
+    "original": "def test_particle_radius_representation_builder():\n    \"\"\"Test RadiusParticleRepresentationBuilder Builds.\"\"\"\n    builder = ParticleRadiusRepresentationBuilder()\n    builder.set_distribution_strategy(RadiiBasedMovingBin())\n    builder.set_activity_strategy(ActivityIdealMass())\n    builder.set_surface_strategy(SurfaceStrategyVolume())\n    builder.set_radius(np.array([1.0, 2.0, 3.0]), \"m\")\n    builder.set_density(np.array([1.0, 2.0, 3.0]), \"kg/m^3\")\n    builder.set_concentration(np.array([10, 20, 30]), \"1/m^3\")\n    builder.set_charge(np.array([1.0, 2.0, 3.0]))\n    particle_representation = builder.build()\n    assert isinstance(particle_representation, ParticleRepresentation)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_radius_storage",
+    "disposition": "Native radius initializer preserves valid single-material radius/concentration/charge data. Nonuniform population density cannot be flattened into a material density and rejects in native initialization tests."
+  },
+  {
+    "file": "particula/particles/tests/representation_builders_test.py",
+    "test": "test_limited_particle_radius_builder",
+    "original": "def test_limited_particle_radius_builder():\n    \"\"\"Test LimitedRadiusParticleBuilder Builds.\"\"\"\n    # default values\n    builder = PresetParticleRadiusBuilder()\n    particle_representation_defaults = builder.build()\n    assert isinstance(particle_representation_defaults, ParticleRepresentation)\n\n    # set values\n    builder = PresetParticleRadiusBuilder()\n    builder.set_mode(np.array([100, 2000]) * 1e-9, \"m\")\n    builder.set_geometric_standard_deviation(np.array([1.4, 1.5]))\n    builder.set_number_concentration(np.array([1e3, 1e3]) * 1e6, \"1/m^3\")\n    particle_representation = builder.build()\n    assert isinstance(particle_representation, ParticleRepresentation)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_native_presets_retain_factory_configurations",
+    "disposition": "Native explicit lognormal presets retain default and configured construction, modes, deviations, density and resolved capacity; existing numerical quadrature/sampling tests remain."
+  },
+  {
+    "file": "particula/particles/tests/representation_builders_test.py",
+    "test": "test_resolved_mass_particle_representation_builder",
+    "original": "def test_resolved_mass_particle_representation_builder():\n    \"\"\"Test ResolvedMassParticleRepresentationBuilder Builds.\"\"\"\n    builder = ResolvedParticleMassRepresentationBuilder()\n    builder.set_distribution_strategy(ParticleResolvedSpeciatedMass())\n    builder.set_activity_strategy(ActivityIdealMass())\n    builder.set_surface_strategy(SurfaceStrategyVolume())\n    builder.set_mass(np.array([1.0, 2.0, 3.0]), \"kg\")\n    builder.set_density(np.array([1.0, 2.0, 3.0]), \"kg/m^3\")\n    builder.set_charge(1.0)\n    builder.set_volume(1, \"m^3\")\n    particle_representation = builder.build()\n    assert isinstance(particle_representation, ParticleRepresentation)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_mass_species_construction",
+    "disposition": "Native explicit material construction replaces facade-builder instance assertion; process physics is supplied separately and ambiguous species shapes are not inferred."
+  },
+  {
+    "file": "particula/particles/tests/representation_builders_test.py",
+    "test": "test_resolved_mass_builder_flattens_singleton_density_and_charge",
+    "original": "def test_resolved_mass_builder_flattens_singleton_density_and_charge() -> None:\n    \"\"\"Singleton 2D density/charge inputs should remain build-compatible.\"\"\"\n    builder = ResolvedParticleMassRepresentationBuilder()\n    builder.set_distribution_strategy(ParticleResolvedSpeciatedMass())\n    builder.set_activity_strategy(ActivityIdealMass())\n    builder.set_surface_strategy(SurfaceStrategyVolume())\n    builder.set_mass(np.array([[1.0], [2.0], [3.0]]), \"kg\")\n    builder.set_density(np.full((3, 1), 1000.0), \"kg/m^3\")\n    builder.set_charge(np.zeros((3, 1)))\n    builder.set_volume(1, \"m^3\")\n\n    particle_representation = builder.build()\n\n    assert isinstance(particle_representation, ParticleRepresentation)\n    np.testing.assert_array_equal(\n        particle_representation.get_density(), np.array([1000.0])\n    )\n    np.testing.assert_array_equal(\n        particle_representation.get_charge(), np.zeros(3)\n    )",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_native_builder_successor_charge_shapes",
+    "disposition": "Lossless scalar/None/row/column charge and redundant density normalization retained by native initialization. Legacy truncation of unequal species-charge lanes is intentionally replaced by read-only rejection in test_invalid_inputs_are_read_only."
+  },
+  {
+    "file": "particula/particles/tests/representation_builders_test.py",
+    "test": "test_resolved_mass_builder_flattens_singleton_row_charge",
+    "original": "def test_resolved_mass_builder_flattens_singleton_row_charge() -> None:\n    \"\"\"Singleton-row charge arrays should flatten across all particles.\"\"\"\n    builder = ResolvedParticleMassRepresentationBuilder()\n    builder.set_distribution_strategy(ParticleResolvedSpeciatedMass())\n    builder.set_activity_strategy(ActivityIdealMass())\n    builder.set_surface_strategy(SurfaceStrategyVolume())\n    builder.set_mass(np.array([[1.0], [2.0], [3.0]]), \"kg\")\n    builder.set_density(np.array([[1000.0], [1000.0], [1000.0]]), \"kg/m^3\")\n    builder.set_charge(np.array([[1.0, 2.0, 3.0]]))\n    builder.set_volume(1, \"m^3\")\n\n    particle_representation = builder.build()\n\n    assert isinstance(particle_representation, ParticleRepresentation)\n    np.testing.assert_array_equal(\n        particle_representation.get_charge(),\n        np.array([1.0, 2.0, 3.0]),\n    )",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_native_builder_successor_charge_shapes",
+    "disposition": "Lossless scalar/None/row/column charge and redundant density normalization retained by native initialization. Legacy truncation of unequal species-charge lanes is intentionally replaced by read-only rejection in test_invalid_inputs_are_read_only."
+  },
+  {
+    "file": "particula/particles/tests/representation_builders_test.py",
+    "test": "test_preset_resolved_mass_particle_builder",
+    "original": "def test_preset_resolved_mass_particle_builder():\n    \"\"\"Test PresetResolvedMassParticleBuilder Builds.\"\"\"\n    # default values\n    builder = PresetResolvedParticleMassBuilder()\n    particle_representation_defaults = builder.build()\n    assert isinstance(particle_representation_defaults, ParticleRepresentation)\n\n    # set values\n    builder = PresetResolvedParticleMassBuilder()\n    builder.set_mode(np.array([100, 2000]) * 1e-9, \"m\")\n    builder.set_geometric_standard_deviation(np.array([1.4, 1.5]))\n    builder.set_particle_resolved_count(1000)\n    builder.set_volume(1.0, \"m^3\")\n    particle_representation = builder.build()\n    assert isinstance(particle_representation, ParticleRepresentation)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_native_presets_retain_factory_configurations",
+    "disposition": "Native explicit lognormal presets retain default and configured construction, modes, deviations, density and resolved capacity; existing numerical quadrature/sampling tests remain."
+  },
+  {
+    "file": "particula/particles/tests/representation_builders_test.py",
+    "test": "test_normalize_resolved_density_input_handles_matching_and_empty_shapes",
+    "original": "def test_normalize_resolved_density_input_handles_matching_and_empty_shapes() -> (\n    None\n):\n    \"\"\"Resolved density normalization should reduce to the species axis.\"\"\"\n    mass = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)\n\n    np.testing.assert_array_equal(\n        _normalize_resolved_density_input(\n            np.array([[1000.0, 900.0], [1000.0, 900.0]]),\n            mass,\n        ),\n        np.array([1000.0, 900.0]),\n    )\n    np.testing.assert_array_equal(\n        _normalize_resolved_density_input(\n            np.zeros((0, 2), dtype=np.float64),\n            np.zeros((0, 2), dtype=np.float64),\n        ),\n        np.zeros(2, dtype=np.float64),\n    )",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_redundant_density_charge_and_empty_population",
+    "disposition": "Equal population density rows reduce to species metadata. Inventing zero material density from empty population rows is retired; explicit native empty-population density is required and tested by test_empty_population_requires_material_density."
+  },
+  {
+    "file": "particula/particles/tests/representation_builders_test.py",
+    "test": "test_normalize_resolved_charge_input_handles_none_matching_and_singleton",
+    "original": "def test_normalize_resolved_charge_input_handles_none_matching_and_singleton() -> (\n    None\n):\n    \"\"\"Resolved charge normalization should reduce to the particle axis.\"\"\"\n    mass = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)\n\n    assert _normalize_resolved_charge_input(None, mass) is None\n    np.testing.assert_array_equal(\n        _normalize_resolved_charge_input(\n            np.array([[1.0, 9.0], [2.0, 8.0]]),\n            mass,\n        ),\n        np.array([1.0, 2.0]),\n    )\n    np.testing.assert_array_equal(\n        _normalize_resolved_charge_input(\n            np.array([[1.0], [2.0]]),\n            mass,\n        ),\n        np.array([1.0, 2.0]),\n    )",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_native_builder_successor_charge_shapes",
+    "disposition": "Lossless scalar/None/row/column charge and redundant density normalization retained by native initialization. Legacy truncation of unequal species-charge lanes is intentionally replaced by read-only rejection in test_invalid_inputs_are_read_only."
+  },
+  {
+    "file": "particula/particles/tests/representation_zero_particle_test.py",
+    "test": "test_resolved_mass_builder_handles_zero_particles_with_array_charge",
+    "original": "def test_resolved_mass_builder_handles_zero_particles_with_array_charge():\n    \"\"\"Zero-particle resolved builds should not warn or fail on charge shape.\"\"\"\n    masses = np.zeros((0, 1), dtype=np.float64)\n\n    particle = (\n        ResolvedParticleMassRepresentationBuilder()\n        .set_distribution_strategy(ParticleResolvedSpeciatedMass())\n        .set_activity_strategy(ActivityIdealMass())\n        .set_surface_strategy(SurfaceStrategyVolume())\n        .set_mass(masses, \"kg\")\n        .set_density(np.full_like(masses, 1000.0), \"kg/m^3\")\n        .set_charge(np.zeros_like(masses))\n        .set_volume(1.0, \"m^3\")\n        .build()\n    )\n\n    assert particle.get_mass().size == 0\n    assert particle.get_charge().size == 0",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_native_empty_population_with_array_charge",
+    "disposition": "Retain zero-mass/zero-charge-length construction with explicit positive species density. Empty legacy density matrices cannot supply material metadata and are no longer converted to zero density."
+  }
+]

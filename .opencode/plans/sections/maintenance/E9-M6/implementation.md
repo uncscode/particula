@@ -833,3 +833,33 @@ Validation:
   only the explicit negative removal checks.
 Particle facade/builders, gas APIs, GPU admission and final publication/readiness
 remain pending.
+
+## Remove obsolete particle builders and lossy normalization
+
+Deleted representation_builders.py, its five package exports and the two old
+builder suites after mapping all ten original tests in
+particle_builder_assertions.json. Native mass/radius/lognormal construction
+remains supported and unchanged. Added lossless singleton row/column/None
+charge cases with redundant species density, plus explicit empty population
+mass/charge checks. Old normalization that discarded unequal charge lanes or
+invented zero density from empty population rows is intentionally retired;
+existing native invalid-input tests and the new empty-density rejection cover
+those boundaries. Removed-module and root/package builder-symbol checks cover
+all five obsolete constructors.
+
+Updated the remaining rectangular wall-loss docstring construction to the
+native lognormal initializer. Executing its five statements exposed the old
+1-second example step exceeding native admission (maximum rate coefficient
+2.3753/s); changed only the example step to 0.1 seconds. All five docstring
+statements now execute. No wall-loss executable code or admission changed.
+
+Validation:
+- Particle, removed-API and native-construction integration suites:
+  **504 passed in 0.23s**, `/tmp/m6-particle-builder-tests.log`.
+- Full-package mypy: **547 files passed**, `/tmp/m6-particle-builder-mypy.log`.
+- Rectangular strategy docstring: **5 attempted, 0 failed**,
+  `/tmp/m6-particle-builder-docstring.log`.
+- Base strict docs: **1.43s**, `/tmp/m6-particle-builder-docs.log`.
+- All ten native successors resolve; scoped Ruff/format and whitespace passed.
+The particle facade itself and a scientific sorted-bin helper still require
+review before removal. Gas/GPU and final publication gates remain pending.

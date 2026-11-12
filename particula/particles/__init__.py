@@ -48,13 +48,6 @@ from particula.particles.slot_management import (
 from particula.particles.particle_data_builder import (
     ParticleDataBuilder,
 )
-from particula.particles.representation_builders import (
-    ParticleMassRepresentationBuilder,
-    ParticleRadiusRepresentationBuilder,
-    PresetParticleRadiusBuilder,
-    ResolvedParticleMassRepresentationBuilder,
-    PresetResolvedParticleMassBuilder,
-)
 from particula.particles.surface_strategies import (
     SurfaceStrategyVolume,
     SurfaceStrategyMass,

@@ -827,7 +827,9 @@ class RectangularWallLossStrategy(WallLossStrategy):
 
     Examples:
         >>> import particula as par
-        >>> particle = par.particles.PresetParticleRadiusBuilder().build()
+        >>> particle = par.particles.create_lognormal_binned_particle_data(
+        ...     distribution_type="discrete",
+        ... )
         >>> strategy = par.dynamics.RectangularWallLossStrategy(
         ...     wall_eddy_diffusivity=0.001,
         ...     chamber_dimensions=(1.0, 0.5, 0.5),
@@ -842,7 +844,7 @@ class RectangularWallLossStrategy(WallLossStrategy):
         ...     particle=particle,
         ...     temperature=298.0,
         ...     pressure=101325.0,
-        ...     time_step=1.0,
+        ...     time_step=0.1,
         ... )
 
     References:
