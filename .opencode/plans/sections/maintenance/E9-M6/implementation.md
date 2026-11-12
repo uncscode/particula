@@ -2180,3 +2180,18 @@ and `/tmp/m6-closeout-final-full.log`). Subsequent plan-only status reconciliati
 corrected historical draft/pending claims in open questions, success criteria,
 change log and reporting. It does not change production, examples or published
 API content. Final maintainer acceptance remains explicitly unchecked.
+
+### PR delivery
+
+Opened [PR #1635](https://github.com/uncscode/particula/pull/1635), targeting
+upstream main from `Gorkowski:codex/e9-m6-legacy-removal`. The initial published
+head `109d7d6ce` matches the clean local/fork branch, and GitHub reports it
+mergeable. Automated review is running; no hosted review/CI success is claimed.
+The PR contains the full implementation, documentation and validation record.
+
+Machine-readable phase status is reconciled from obsolete Not Started entries
+to In Progress with issue/evidence pointers. Here In Progress includes the
+remaining named maintainer acceptance review; implementation and validation
+are complete as detailed in the success criteria. No completion date or final
+release approval is fabricated. This final bookkeeping commit does not change
+production, tests, examples or published documentation.
