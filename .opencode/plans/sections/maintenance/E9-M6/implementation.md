@@ -622,3 +622,45 @@ Validation:
   `/tmp/m6-native-latent-types-final.log`.
 - Scoped Ruff/format and whitespace checks passed.
 Isothermal/staggered fixture migration and shared strategy removal remain.
+
+## Native isothermal/staggered fixtures and empty multi-species admission
+
+Migrated the remaining main condensation fixtures to tagged resolved data,
+full ordered gas, explicit process physics and species maps. Removed all facade
+construction and conversion calls from the condensation test tree. Native
+multi-box rejection fixtures now construct repeated storage directly. Native
+input/type/identity tests replace obsolete unwrapping flag assertions; free-slot
+zero-rate tests replace the legacy one-metre/max-radius fallback and warning.
+Scalar/full-gas transport checks replace the legacy per-particle stepping
+helper. Batch-coupling/order tests now inject rates into the active native
+batch path, preserving nonzero outcome and current-gas assertions.
+
+Corrected the original staggered total-mass test's mixed-unit expression to
+particle mass density plus gas concentration, retaining rtol=1e-10. Empty-state
+gas comparison now uses a pre-step snapshot rather than mutated aliases.
+Four facade-only comparisons of legacy and untagged routes are removed with
+explicit dispositions; existing independent native physics/scalar oracles
+retain the scientific checks, unchanged. All 144 original main-suite test
+nodes now have reviewed successors/dispositions in condensation_assertions.json.
+
+Migrating the original empty-population case exposed a native empty-material
+Kelvin broadcasting error with a two-species surface model. After gas and
+activity validation, native pressure evaluation now returns its empty arrays
+without asking the surface law to evaluate nonexistent radii. This is an empty
+no-op boundary correction, not a change to nonempty numerical stepping. Added
+three strategy-specific cases proving empty rate shape, held identity,
+unchanged gas, and rejection of nonfinite vapor-pressure configuration despite
+empty material.
+
+Validation:
+- Migrated main suite before three added empty regressions: **52 passed in
+  0.08s**, `/tmp/m6-native-iso-third.log`.
+- Condensation tree, dynamics runnables, integration, and CPU condensation
+  adapter suites: **1590 passed, 4 skipped in 13.70s**,
+  `/tmp/m6-native-iso-broad.log` (four obsolete comparisons removed, three
+  empty regressions added relative to the prior equivalent group).
+- Full-package mypy: **555 files passed**, `/tmp/m6-native-iso-mypy.log`.
+- Scoped Ruff/format and whitespace checks passed.
+The now-unneeded production legacy condensation dispatch can be removed next.
+Final coverage, examples/notebooks, publication and installed-wheel gates remain
+pending; none are inferred from these focused runs.
