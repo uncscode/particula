@@ -12089,7 +12089,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -12117,7 +12117,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12555,7 +12555,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12583,7 +12583,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14247,7 +14247,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14275,7 +14275,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14303,7 +14303,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14552,7 +14552,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17250,7 +17250,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=759e01e9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a1261ea7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17262,15 +17262,15 @@ setters and distribution type options.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8777cccf">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fbb26d02">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="prerequisites">Prerequisites<a class="anchor-link" href="#prerequisites">¶</a></h2><ul>
-<li>Python 3.12+</li>
-<li><code>particula</code> installed (<code>pip install particula</code>)</li>
+<li>Python 3.12+
+Use the selected E9 checkout: <code>python -m pip install -e ".[extra]"</code></li>
 <li>NumPy included with <code>particula</code> for sample particle presets</li>
 </ul>
 </div>
@@ -17278,7 +17278,7 @@ setters and distribution type options.</p>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9d5f2d31">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fe7862a3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17299,14 +17299,18 @@ setters and distribution type options.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="c1"># Light-weight particle distribution for rate calculations</span>
-<span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span>
+<span class="p">)</span>
 <span class="n">T</span> <span class="o">=</span> <span class="mf">298.0</span>  <span class="c1"># K</span>
 <span class="n">P</span> <span class="o">=</span> <span class="mf">101325.0</span>  <span class="c1"># Pa</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import particula as par
 
 # Light-weight particle distribution for rate calculations
-particle = par.particles.PresetParticleRadiusBuilder().build()
+particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete"
+)
 T = 298.0  # K
 P = 101325.0  # Pa</div>
 </div>
@@ -17315,7 +17319,7 @@ P = 101325.0  # Pa</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3fe44255">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d89e4de4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17328,7 +17332,7 @@ the default (<code>"discrete"</code>).</p>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0e19ae94">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=333d4e44">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17358,7 +17362,7 @@ the default (<code>"discrete"</code>).</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"eddy diffusivity [1/s]"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">spherical</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"chamber radius [m]"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">spherical</span><span class="o">.</span><span class="n">chamber_radius</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"distribution type"</span><span class="p">,</span> <span class="n">spherical</span><span class="o">.</span><span class="n">distribution_type</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"rate[0]"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">rate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2"> 1/s"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"rate[0]"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">rate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2"> m^-3 s^-1"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">spherical = (
     par.dynamics.SphericalWallLossBuilder()
@@ -17372,7 +17376,7 @@ rate = spherical.rate(particle=particle, temperature=T, pressure=P)
 print("eddy diffusivity [1/s]", f"{spherical.wall_eddy_diffusivity:.3e}")
 print("chamber radius [m]", f"{spherical.chamber_radius:.2f}")
 print("distribution type", spherical.distribution_type)
-print("rate[0]", f"{rate[0]:.3e} 1/s")</div>
+print("rate[0]", f"{rate[0]:.3e} m^-3 s^-1")</div>
 </div>
 </div>
 </div>
@@ -17387,7 +17391,7 @@ print("rate[0]", f"{rate[0]:.3e} 1/s")</div>
 <pre>eddy diffusivity [1/s] 1.000e-03
 chamber radius [m] 0.60
 distribution type discrete
-rate[0] -1.897e-88 1/s
+rate[0] -1.897e-88 m^-3 s^-1
 </pre>
 </div>
 </div>
@@ -17395,7 +17399,7 @@ rate[0] -1.897e-88 1/s
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=88260829">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1ec83224">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17408,7 +17412,7 @@ suffixes) and <code>distribution_type</code>. Strategy names are case-insensitiv
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7f4b6194">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=fd254473">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17480,7 +17484,7 @@ diffusivity [1/s] 3.333e-04
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4fc6bd25">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ee678048">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

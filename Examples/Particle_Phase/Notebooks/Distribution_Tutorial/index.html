@@ -25,7 +25,7 @@
     
     
       
-        <title>Distribution Strategy Tutorial - Particula</title>
+        <title>Native Distribution Storage - Particula</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#distribution-strategy-tutorial" class="md-skip">
+        <a href="#native-distribution-storage" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Distribution Strategy Tutorial
+              Native Distribution Storage
             
           </span>
         </div>
@@ -11969,7 +11969,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11997,7 +11997,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12448,7 +12448,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12466,7 +12466,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12495,10 +12495,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#strategy-massbasedmovingbin" class="md-nav__link">
+  <a href="#mass-based-bins" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Strategy: MassBasedMovingBin
+        Mass-based bins
       
     </span>
   </a>
@@ -12506,10 +12506,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#builder-radiibasedmovingbin" class="md-nav__link">
+  <a href="#radius-based-initialization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Builder: RadiiBasedMovingBin
+        Radius-based initialization
       
     </span>
   </a>
@@ -12517,10 +12517,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#factory-speciatedmassmovingbin" class="md-nav__link">
+  <a href="#speciated-mass-bins" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Factory: SpeciatedMassMovingBin
+        Speciated mass bins
       
     </span>
   </a>
@@ -12528,10 +12528,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#summary" class="md-nav__link">
+  <a href="#resolved-countvolume-interpretation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Summary
+        Resolved count/volume interpretation
       
     </span>
   </a>
@@ -12583,7 +12583,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14247,7 +14247,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14275,7 +14275,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14303,7 +14303,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14552,7 +14552,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -16946,10 +16946,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#strategy-massbasedmovingbin" class="md-nav__link">
+  <a href="#mass-based-bins" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Strategy: MassBasedMovingBin
+        Mass-based bins
       
     </span>
   </a>
@@ -16957,10 +16957,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#builder-radiibasedmovingbin" class="md-nav__link">
+  <a href="#radius-based-initialization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Builder: RadiiBasedMovingBin
+        Radius-based initialization
       
     </span>
   </a>
@@ -16968,10 +16968,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#factory-speciatedmassmovingbin" class="md-nav__link">
+  <a href="#speciated-mass-bins" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Factory: SpeciatedMassMovingBin
+        Speciated mass bins
       
     </span>
   </a>
@@ -16979,10 +16979,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#summary" class="md-nav__link">
+  <a href="#resolved-countvolume-interpretation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Summary
+        Resolved count/volume interpretation
       
     </span>
   </a>
@@ -17250,32 +17250,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1d5ec9fe">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="distribution-strategy-tutorial">Distribution Strategy Tutorial<a class="anchor-link" href="#distribution-strategy-tutorial">¶</a></h1><p>The representation of particle distributions is core to the simulation, but it can vary depending on what you are trying to achieve. In this tutorial, we will cover the  distribution strategies currently implemented.</p>
-<p>The distribution strategies, define how to calculate properties derived from the particle distribution. These include particle mass, radius, and total mass. All of which can have different methods depending if the distribution is mass-based, radius-based, or speciated-mass based.</p>
-<p>We will cover the following distribution strategies:</p>
-<ul>
-<li><code>MassBasedMovingBin</code></li>
-<li><code>RadiiBasedMovingBin</code></li>
-<li><code>SpeciatedMassMovingBin</code></li>
-</ul>
-<p>As they are just operational strategies, they do not have any specific parameters to be set. They are just used to calculate the properties of the particles.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=068760e8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e1b0cc62">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -17288,44 +17269,115 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># In Colab uncomment the following command to install particula:</span>
-<span class="c1">#!pip install particula[extra] --quiet</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="sd">"""Distribution strategy tutorial for particle property calculations.</span>
+
+<span class="sd">This tutorial covers the distribution strategies implemented in particula</span>
+<span class="sd">for calculating particle properties. Strategies define how to compute</span>
+<span class="sd">derived properties like particle mass, radius, and total mass based on</span>
+<span class="sd">the distribution type (mass-based, radius-based, or speciated-mass).</span>
+
+<span class="sd">Strategies covered:</span>
+<span class="sd">    - MassBasedMovingBin: Calculate radius from known particle mass</span>
+<span class="sd">    - RadiiBasedMovingBin: Calculate mass from known particle radius</span>
+<span class="sd">    - SpeciatedMassMovingBin: Multi-species mass-based calculations</span>
+
+<span class="sd">Example:</span>
+<span class="sd">    Calculate particle radius from mass::</span>
+
+<span class="sd">        import numpy as np</span>
+<span class="sd">        import particula as par</span>
+<span class="sd">        mass = np.linspace(0, 10, 5)  # kg</span>
+<span class="sd">        density = np.array([1000.0])  # kg/m^3</span>
+<span class="sd">        radius = par.particles.MassBasedMovingBin().get_radius(mass, density)</span>
+<span class="sd">"""</span>
+<span class="c1"># ---</span>
+<span class="c1"># jupyter:</span>
+<span class="c1">#   jupytext:</span>
+<span class="c1">#     text_representation:</span>
+<span class="c1">#       extension: .py</span>
+<span class="c1">#       format_name: percent</span>
+<span class="c1">#       format_version: '1.3'</span>
+<span class="c1">#       jupytext_version: 1.17.3</span>
+<span class="c1">#   kernelspec:</span>
+<span class="c1">#     display_name: particula_dev312</span>
+<span class="c1">#     language: python</span>
+<span class="c1">#     name: python3</span>
+<span class="c1"># ---</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1"># In Colab uncomment the following command to install particula:
-#!pip install particula[extra] --quiet
-import numpy as np
-import particula as par</div>
+<div class="clipboard-copy-txt" id="cell-1">"""Distribution strategy tutorial for particle property calculations.
+
+This tutorial covers the distribution strategies implemented in particula
+for calculating particle properties. Strategies define how to compute
+derived properties like particle mass, radius, and total mass based on
+the distribution type (mass-based, radius-based, or speciated-mass).
+
+Strategies covered:
+    - MassBasedMovingBin: Calculate radius from known particle mass
+    - RadiiBasedMovingBin: Calculate mass from known particle radius
+    - SpeciatedMassMovingBin: Multi-species mass-based calculations
+
+Example:
+    Calculate particle radius from mass::
+
+        import numpy as np
+        import particula as par
+        mass = np.linspace(0, 10, 5)  # kg
+        density = np.array([1000.0])  # kg/m^3
+        radius = par.particles.MassBasedMovingBin().get_radius(mass, density)
+"""
+# ---
+# jupyter:
+#   jupytext:
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.17.3
+#   kernelspec:
+#     display_name: particula_dev312
+#     language: python
+#     name: python3
+# ---</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>'Distribution strategy tutorial for particle property calculations.\n\nThis tutorial covers the distribution strategies implemented in particula\nfor calculating particle properties. Strategies define how to compute\nderived properties like particle mass, radius, and total mass based on\nthe distribution type (mass-based, radius-based, or speciated-mass).\n\nStrategies covered:\n    - MassBasedMovingBin: Calculate radius from known particle mass\n    - RadiiBasedMovingBin: Calculate mass from known particle radius\n    - SpeciatedMassMovingBin: Multi-species mass-based calculations\n\nExample:\n    Calculate particle radius from mass::\n\n        import numpy as np\n        import particula as par\n        mass = np.linspace(0, 10, 5)  # kg\n        density = np.array([1000.0])  # kg/m^3\n        radius = par.particles.MassBasedMovingBin().get_radius(mass, density)\n'</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dcd3846f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=91c872f2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="strategy-massbasedmovingbin">Strategy: MassBasedMovingBin<a class="anchor-link" href="#strategy-massbasedmovingbin">¶</a></h2><p>The <code>MassBasedMovingBin</code> strategy is used when the distribution is mass-based. This
-means that the mass of the particles is known and the radius is calculated from the mass. The <code>MassBasedMovingBin</code> strategy calculates the radius of the particles using the following equation:</p>
-<p><div class="arithmatex">\[
-r = \left(\frac{3m}{4\pi\rho}\right)^{1/3}
-\]</div></p>
-<p>where <span class="arithmatex">\(r\)</span> is the radius of the particle, <span class="arithmatex">\(m\)</span> is the mass of the particle, and <span class="arithmatex">\(\rho\)</span> is the density of the particle.</p>
+<h1 id="native-distribution-storage">Native Distribution Storage<a class="anchor-link" href="#native-distribution-storage">¶</a></h1><p>Native particles store material masses consistently, independent of whether
+initialization starts with mass or radius. Distribution metadata determines
+how population weights are integrated: discrete bins sum number densities,
+continuous PDFs integrate dN/dr on a radius grid, and resolved slots sum
+represented counts before division by physical volume.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=330ebc8f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=06673ab6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -17338,66 +17390,37 @@ r = \left(\frac{3m}{4\pi\rho}\right)^{1/3}
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">mass_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># kg</span>
-<span class="n">density</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># kg/m^3</span>
-
-<span class="n">radius</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">MassBasedMovingBin</span><span class="p">()</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span>
-    <span class="n">mass_distribution</span><span class="p">,</span> <span class="n">density</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Radius of the particles: </span><span class="si">{</span><span class="n">radius</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>
-
-<span class="n">total_mass</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">MassBasedMovingBin</span><span class="p">()</span><span class="o">.</span><span class="n">get_total_mass</span><span class="p">(</span>
-    <span class="n">mass_distribution</span><span class="p">,</span>
-    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">mass_distribution</span><span class="p">),</span>
-    <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total mass of the particles: </span><span class="si">{</span><span class="n">total_mass</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Same as the sum*concentration: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mass_distribution</span><span class="p">)</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">mass_distribution = np.linspace(0, 10, 5)  # kg
-density = 1000  # kg/m^3
-
-radius = par.particles.MassBasedMovingBin().get_radius(
-    mass_distribution, density
-)
-print(f"Radius of the particles: {radius} m")
-
-total_mass = par.particles.MassBasedMovingBin().get_total_mass(
-    mass_distribution,
-    concentration=np.ones_like(mass_distribution),
-    density=density,
-)
-print(f"Total mass of the particles: {total_mass} kg")
-print(f"Same as the sum*concentration: {np.sum(mass_distribution)} kg")</div>
+<div class="clipboard-copy-txt" id="cell-2">import numpy as np
+import particula as par</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=112a0fef">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0fb147b9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="builder-radiibasedmovingbin">Builder: RadiiBasedMovingBin<a class="anchor-link" href="#builder-radiibasedmovingbin">¶</a></h2><p>The <code>RadiiBasedMovingBin</code> strategy is used when the distribution is radius-based. This means that the radius of the particles is known and the mass is calculated from the radius. The <code>RadiiBasedMovingBin</code> strategy calculates the mass of the particles using the following equation:</p>
-<p><div class="arithmatex">\[
-m = \frac{4\pi\rho r^3}{3}
-\]</div></p>
-<p>where <span class="arithmatex">\(m\)</span> is the mass of the particle, <span class="arithmatex">\(r\)</span> is the radius of the particle, and <span class="arithmatex">\(\rho\)</span> is the density of the particle.</p>
-<p>The builder does nothing in this case, as we just have no parameters to set. We use the builder pattern here to keep the code consistent with the other strategies.</p>
+<h2 id="mass-based-bins">Mass-based bins<a class="anchor-link" href="#mass-based-bins">¶</a></h2><p>Retain five illustrative masses from zero to 10 kg at density 1000 kg/m^3.
+These large values demonstrate arithmetic, not a realistic aerosol spectrum.
+Each bin has number density 1 m^-3 at unit reference volume.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=053e7342">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3a7fcd58">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -17410,59 +17433,76 @@ m = \frac{4\pi\rho r^3}{3}
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">radii_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># m</span>
-<span class="n">density</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># kg/m^3</span>
-
-<span class="n">radii_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">RadiiBasedMovingBinBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-
-<span class="n">mass_distribution</span> <span class="o">=</span> <span class="n">radii_strategy</span><span class="o">.</span><span class="n">get_mass</span><span class="p">(</span><span class="n">radii_distribution</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Mass of the particles: </span><span class="si">{</span><span class="n">mass_distribution</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
-
-<span class="n">total_mass</span> <span class="o">=</span> <span class="n">radii_strategy</span><span class="o">.</span><span class="n">get_total_mass</span><span class="p">(</span>
-    <span class="n">radii_distribution</span><span class="p">,</span>
-    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">radii_distribution</span><span class="p">),</span>
-    <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">mass_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">mass_bins</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleDataBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_masses</span><span class="p">(</span><span class="n">mass_distribution</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">]))</span>
+    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]))</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total mass of the particles: </span><span class="si">{</span><span class="n">total_mass</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Radii [m]:"</span><span class="p">,</span> <span class="n">mass_bins</span><span class="o">.</span><span class="n">radii</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Material mass density [kg/m^3]:"</span><span class="p">,</span> <span class="n">mass_bins</span><span class="o">.</span><span class="n">species_mass_density</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Material inventory [kg]:"</span><span class="p">,</span> <span class="n">mass_bins</span><span class="o">.</span><span class="n">species_mass_inventory</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">radii_distribution = np.linspace(0, 0.1, 5)  # m
-density = 1000  # kg/m^3
-
-radii_strategy = par.particles.RadiiBasedMovingBinBuilder().build()
-
-mass_distribution = radii_strategy.get_mass(radii_distribution, density)
-print(f"Mass of the particles: {mass_distribution} kg")
-
-total_mass = radii_strategy.get_total_mass(
-    radii_distribution,
-    concentration=np.ones_like(radii_distribution),
-    density=density,
+<div class="clipboard-copy-txt" id="cell-3">mass_distribution = np.linspace(0, 10, 5)
+mass_bins = (
+    par.particles.ParticleDataBuilder()
+    .set_distribution_type("discrete")
+    .set_masses(mass_distribution[:, None])
+    .set_density(np.array([1000.0]))
+    .set_concentration(np.ones(5))
+    .set_charge(np.zeros(5))
+    .set_volume(np.array([1.0]))
+    .build()
 )
-print(f"Total mass of the particles: {total_mass} kg")</div>
+print("Radii [m]:", mass_bins.radii)
+print("Material mass density [kg/m^3]:", mass_bins.species_mass_density)
+print("Material inventory [kg]:", mass_bins.species_mass_inventory)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Radii [m]: [[0.         0.08419452 0.10607844 0.1214295  0.13365046]]
+Material mass density [kg/m^3]: [[25.]]
+Material inventory [kg]: [[25.]]
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=813112c1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0550c052">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="factory-speciatedmassmovingbin">Factory: SpeciatedMassMovingBin<a class="anchor-link" href="#factory-speciatedmassmovingbin">¶</a></h2><p>The <code>SpeciatedMassMovingBin</code> strategy is used when the distribution is speciated-mass based. This means that the mass of the particles is known and the radius is calculated from the mass. The <code>SpeciatedMassMovingBin</code> has multiple species, and the mass of each species is known for that given bin or particle.</p>
+<h2 id="radius-based-initialization">Radius-based initialization<a class="anchor-link" href="#radius-based-initialization">¶</a></h2><p>Preserve the illustrative zero-radius endpoint as zero mass in the builder.
+The convenience radius initializer accepts strictly positive radii; direct
+mass construction also expresses this zero-material bin explicitly.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4995e9f3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6942d8e6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -17475,58 +17515,199 @@ print(f"Total mass of the particles: {total_mass} kg")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">mass_distribution1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># kg</span>
-<span class="n">mass_distribution2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># kg</span>
-<span class="n">masses_combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">mass_distribution1</span><span class="p">,</span> <span class="n">mass_distribution2</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
-<span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">2000.0</span><span class="p">])</span>  <span class="c1"># kg/m^3</span>
-
-<span class="n">speciated_mass</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">DistributionFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="s2">"speciated_mass_moving_bin"</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">radii_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">radius_masses</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">radii_distribution</span><span class="o">**</span><span class="mi">3</span>
+<span class="n">radius_bins</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleDataBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_masses</span><span class="p">(</span><span class="n">radius_masses</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">]))</span>
+    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]))</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
-
-<span class="n">radius</span> <span class="o">=</span> <span class="n">speciated_mass</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">masses_combined</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Radius of the particles: </span><span class="si">{</span><span class="n">radius</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>
-
-<span class="n">total_mass</span> <span class="o">=</span> <span class="n">speciated_mass</span><span class="o">.</span><span class="n">get_total_mass</span><span class="p">(</span>
-    <span class="n">masses_combined</span><span class="p">,</span>
-    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">mass_distribution1</span><span class="p">),</span>
-    <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total mass of the particles: </span><span class="si">{</span><span class="n">total_mass</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Per-particle masses [kg]:"</span><span class="p">,</span> <span class="n">radius_bins</span><span class="o">.</span><span class="n">total_mass</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Material inventory [kg]:"</span><span class="p">,</span> <span class="n">radius_bins</span><span class="o">.</span><span class="n">species_mass_inventory</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">mass_distribution1 = np.linspace(0, 10, 5)  # kg
-mass_distribution2 = np.linspace(0, 10, 5)  # kg
-masses_combined = np.vstack((mass_distribution1, mass_distribution2)).T
-density = np.array([1000.0, 2000.0])  # kg/m^3
-
-speciated_mass = par.particles.DistributionFactory().get_strategy(
-    "speciated_mass_moving_bin"
+<div class="clipboard-copy-txt" id="cell-4">radii_distribution = np.linspace(0, 0.1, 5)
+radius_masses = 4 * np.pi / 3 * 1000 * radii_distribution**3
+radius_bins = (
+    par.particles.ParticleDataBuilder()
+    .set_distribution_type("discrete")
+    .set_masses(radius_masses[:, None])
+    .set_density(np.array([1000.0]))
+    .set_concentration(np.ones(5))
+    .set_charge(np.zeros(5))
+    .set_volume(np.array([1.0]))
+    .build()
 )
-
-radius = speciated_mass.get_radius(masses_combined, density)
-
-print(f"Radius of the particles: {radius} m")
-
-total_mass = speciated_mass.get_total_mass(
-    masses_combined,
-    concentration=np.ones_like(mass_distribution1),
-    density=density,
-)
-print(f"Total mass of the particles: {total_mass} kg")</div>
+print("Per-particle masses [kg]:", radius_bins.total_mass)
+print("Material inventory [kg]:", radius_bins.species_mass_inventory)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Per-particle masses [kg]: [[0.         0.06544985 0.52359878 1.76714587 4.1887902 ]]
+Material inventory [kg]: [[6.54498469]]
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c553621a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a0966a90">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="summary">Summary<a class="anchor-link" href="#summary">¶</a></h2><p>In this tutorial, we covered the distribution strategies implemented in the simulation. We covered the <code>MassBasedMovingBin</code>, <code>RadiiBasedMovingBin</code>, and <code>SpeciatedMassMovingBin</code> strategies. These strategies are used to calculate the properties of the particles based on the distribution type.</p>
+<h2 id="speciated-mass-bins">Speciated mass bins<a class="anchor-link" href="#speciated-mass-bins">¶</a></h2><p>For two materials, particle volume is the sum of mass/density over material
+lanes. Keep each material's inventory separately instead of losing species
+information in a total-mass scalar.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8bb27733">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">masses_combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">mass_distribution</span><span class="p">,</span> <span class="n">mass_distribution</span><span class="p">))</span>
+<span class="n">speciated_bins</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleDataBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_masses</span><span class="p">(</span><span class="n">masses_combined</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">2000.0</span><span class="p">]))</span>
+    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]))</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Radii [m]:"</span><span class="p">,</span> <span class="n">speciated_bins</span><span class="o">.</span><span class="n">radii</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Material inventory [kg]:"</span><span class="p">,</span> <span class="n">speciated_bins</span><span class="o">.</span><span class="n">species_mass_inventory</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-5">masses_combined = np.column_stack((mass_distribution, mass_distribution))
+speciated_bins = (
+    par.particles.ParticleDataBuilder()
+    .set_distribution_type("discrete")
+    .set_masses(masses_combined)
+    .set_density(np.array([1000.0, 2000.0]))
+    .set_concentration(np.ones(5))
+    .set_charge(np.zeros(5))
+    .set_volume(np.array([1.0]))
+    .build()
+)
+print("Radii [m]:", speciated_bins.radii)
+print("Material inventory [kg]:", speciated_bins.species_mass_inventory)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Radii [m]: [[0.         0.09637866 0.1214295  0.13900208 0.15299159]]
+Material inventory [kg]: [[25. 25.]]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=adef5541">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="resolved-countvolume-interpretation">Resolved count/volume interpretation<a class="anchor-link" href="#resolved-countvolume-interpretation">¶</a></h2><p>The same positive-material particles can represent weighted physical counts.
+At volume 0.25 m^3, counts of two give density eight per slot. Changing a
+distribution tag alone is not a conversion: construct the intended weights.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6f3e7719">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">resolved</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_resolved_particle_data</span><span class="p">(</span>
+    <span class="n">masses</span><span class="o">=</span><span class="n">masses_combined</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="n">density</span><span class="o">=</span><span class="p">[</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">2000.0</span><span class="p">],</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">volume</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Number density [m^-3]:"</span><span class="p">,</span> <span class="n">resolved</span><span class="o">.</span><span class="n">number_density</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Material inventory [kg]:"</span><span class="p">,</span> <span class="n">resolved</span><span class="o">.</span><span class="n">species_mass_inventory</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-6">resolved = par.particles.create_resolved_particle_data(
+    masses=masses_combined[1:],
+    density=[1000.0, 2000.0],
+    concentration=np.full(4, 2.0),
+    volume=0.25,
+)
+print("Number density [m^-3]:", resolved.number_density)
+print("Material inventory [kg]:", resolved.species_mass_inventory)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Number density [m^-3]: [32.]
+Material inventory [kg]: [[50. 50.]]
+</pre>
+</div>
+</div>
 </div>
 </div>
 </div>

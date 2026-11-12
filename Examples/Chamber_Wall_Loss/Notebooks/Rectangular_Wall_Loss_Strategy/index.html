@@ -12150,7 +12150,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -12178,7 +12178,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12616,7 +12616,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12644,7 +12644,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14308,7 +14308,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14336,7 +14336,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14364,7 +14364,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14613,7 +14613,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17372,7 +17372,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9daae829">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7949f8d0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17380,12 +17380,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1 id="rectangular-wall-loss-strategy-interactive-quick-start">Rectangular Wall Loss Strategy (interactive quick start)<a class="anchor-link" href="#rectangular-wall-loss-strategy-interactive-quick-start">¶</a></h1><p>This notebook shows how to use <code>particula.dynamics.RectangularWallLossStrategy</code>
 to compute wall loss rates and apply time stepping in a box-shaped chamber.
-Runtime is kept small (&lt;1 s) with tiny arrays and short integration horizons.</p>
+The full published duration is retained with explicit positivity substeps.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a9301802">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f9ebca8d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17397,13 +17397,13 @@ Runtime is kept small (&lt;1 s) with tiny arrays and short integration horizons.
 <li>NumPy for light array handling</li>
 </ul>
 <p>To run locally:</p>
-<div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>particula
+<div class="highlight"><pre><span></span>Use<span class="w"> </span>the<span class="w"> </span>selected<span class="w"> </span>E9<span class="w"> </span>checkout:<span class="w"> </span><span class="sb">`</span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[extra]"</span><span class="sb">`</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2c8b3220">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=93d52abb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17415,12 +17415,12 @@ Runtime is kept small (&lt;1 s) with tiny arrays and short integration horizons.
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8a4579e9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d80cc501">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -17448,7 +17448,7 @@ np.set_printoptions(precision=3, suppress=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b8d0c4e0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7f4bb355">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17459,13 +17459,13 @@ np.set_printoptions(precision=3, suppress=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b9ba59ef">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5bcae7d6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -17478,26 +17478,44 @@ np.set_printoptions(precision=3, suppress=True)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Bins:"</span><span class="p">,</span> <span class="n">particle</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Bins:"</span><span class="p">,</span> <span class="n">particle</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">"Initial total concentration:"</span><span class="p">,</span>
-    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">particle</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2"> 1/m^3"</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">particle</span><span class="o">.</span><span class="n">number_density</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2"> 1/m^3"</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">particle = par.particles.PresetParticleRadiusBuilder().build()
-print("Bins:", particle.get_radius().size)
+<div class="clipboard-copy-txt" id="cell-2">particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete"
+)
+print("Bins:", particle.radii[0].size)
 print(
     "Initial total concentration:",
-    f"{particle.get_total_concentration():.3e} 1/m^3",
+    f"{particle.number_density[0]:.3e} 1/m^3",
 )</div>
 </div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Bins: 250
+Initial total concentration: 1.100e+10 1/m^3
+</pre>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2219761b">
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ddf289c0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17509,12 +17527,12 @@ print(
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=002c426c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=15f07eca">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -17548,24 +17566,24 @@ P = 101325.0  # Pa</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6af7c749">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0e3ef115">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="3-compute-instantaneous-wall-loss-rate">3) Compute instantaneous wall loss rate<a class="anchor-link" href="#3-compute-instantaneous-wall-loss-rate">¶</a></h2><p>This returns a per-bin rate array (1/s).</p>
+<h2 id="3-compute-instantaneous-wall-loss-rate">3) Compute instantaneous wall loss rate<a class="anchor-link" href="#3-compute-instantaneous-wall-loss-rate">¶</a></h2><p>This returns a per-bin concentration loss rate (m^-3 s^-1).</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cb5a725b">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=eb449d9f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -17580,18 +17598,32 @@ P = 101325.0  # Pa</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">rate</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span><span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Rate shape:"</span><span class="p">,</span> <span class="n">rate</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"First three rates (1/s):"</span><span class="p">,</span> <span class="n">rate</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"First three rates (m^-3 s^-1):"</span><span class="p">,</span> <span class="n">rate</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[:</span><span class="mi">3</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">rate = wall_loss.rate(particle=particle, temperature=T, pressure=P)
 print("Rate shape:", rate.shape)
-print("First three rates (1/s):", rate[:3])</div>
+print("First three rates (m^-3 s^-1):", rate.ravel()[:3])</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Rate shape: (250,)
+First three rates (m^-3 s^-1): [-0. -0. -0.]
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=03789db7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4f85151f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17602,13 +17634,13 @@ print("First three rates (1/s):", rate[:3])</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9563ac75">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8cb84a1c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -17623,28 +17655,98 @@ print("First three rates (1/s):", rate[:3])</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dt</span> <span class="o">=</span> <span class="mf">5.0</span>  <span class="c1"># seconds</span>
 <span class="n">steps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">30</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span> <span class="o">/</span> <span class="n">dt</span><span class="p">)</span>
+<span class="c1"># Native Euler updates reject negative concentrations. Retain the output</span>
+<span class="c1"># interval and full duration, but bound each internal step by max(k) * dt &lt; 1.</span>
+<span class="n">sub_steps</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+    <span class="mi">1</span><span class="p">,</span>
+    <span class="nb">int</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
+                <span class="n">wall_loss</span><span class="o">.</span><span class="n">loss_coefficient</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="o">*</span> <span class="n">dt</span>
+            <span class="o">/</span> <span class="mf">0.9</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Internal substeps per output interval:"</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">)</span>
+<span class="n">initial_counts</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">initial_masses</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">loss_coefficients</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">loss_coefficient</span><span class="p">(</span>
+    <span class="n">particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span>
+<span class="p">)</span>
 <span class="n">history</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">steps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">history</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span>
+<span class="n">history</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">number_density</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">steps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="n">particle</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-        <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">dt</span>
-    <span class="p">)</span>
-    <span class="n">history</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">_substep</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sub_steps</span><span class="p">):</span>
+        <span class="n">particle</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+            <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">,</span>
+            <span class="n">time_step</span><span class="o">=</span><span class="n">dt</span> <span class="o">/</span> <span class="n">sub_steps</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">history</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">number_density</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Fixed radii give an independent repeated-Euler decay prediction.</span>
+<span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span>
+    <span class="n">particle</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+    <span class="n">initial_counts</span>
+    <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">loss_coefficients</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">sub_steps</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">steps</span> <span class="o">*</span> <span class="n">sub_steps</span><span class="p">),</span>
+    <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+    <span class="n">atol</span><span class="o">=</span><span class="mf">1e-30</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span> <span class="n">initial_masses</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">concentration</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Final concentration:"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">history</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2"> 1/m^3"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Relative decay:"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">history</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">history</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">dt = 5.0  # seconds
 steps = int((30 * 60) / dt)
+# Native Euler updates reject negative concentrations. Retain the output
+# interval and full duration, but bound each internal step by max(k) * dt &lt; 1.
+sub_steps = max(
+    1,
+    int(
+        np.ceil(
+            np.max(
+                wall_loss.loss_coefficient(particle, temperature=T, pressure=P)
+            )
+            * dt
+            / 0.9
+        )
+    ),
+)
+print("Internal substeps per output interval:", sub_steps)
+initial_counts = particle.concentration.copy()
+initial_masses = particle.masses.copy()
+loss_coefficients = wall_loss.loss_coefficient(
+    particle, temperature=T, pressure=P
+)
 history = np.zeros(steps + 1)
-history[0] = particle.get_total_concentration()
+history[0] = particle.number_density[0]
 
 for i in range(1, steps + 1):
-    particle = wall_loss.step(
-        particle=particle, temperature=T, pressure=P, time_step=dt
-    )
-    history[i] = particle.get_total_concentration()
+    for _substep in range(sub_steps):
+        particle = wall_loss.step(
+            particle=particle,
+            temperature=T,
+            pressure=P,
+            time_step=dt / sub_steps,
+        )
+    history[i] = particle.number_density[0]
+
+# Fixed radii give an independent repeated-Euler decay prediction.
+np.testing.assert_allclose(
+    particle.concentration,
+    initial_counts
+    * (1 - loss_coefficients * dt / sub_steps) ** (steps * sub_steps),
+    rtol=1e-12,
+    atol=1e-30,
+)
+np.testing.assert_array_equal(particle.masses, initial_masses)
+assert np.all(particle.concentration &gt;= 0)
 
 print("Final concentration:", f"{history[-1]:.3e} 1/m^3")
 print("Relative decay:", f"{history[-1] / history[0]:.3f}")</div>
@@ -17652,9 +17754,24 @@ print("Relative decay:", f"{history[-1] / history[0]:.3f}")</div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Internal substeps per output interval: 9
+Final concentration: 1.065e+10 1/m^3
+Relative decay: 0.968
+</pre>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e31c0d13">
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f93414c4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17666,12 +17783,12 @@ print("Relative decay:", f"{history[-1] / history[0]:.3f}")</div>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4568b387">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=25e0fbba">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -17709,7 +17826,7 @@ print("Relative decay:", f"{history[-1] / history[0]:.3f}")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=166ed852">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3d309fe3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17722,12 +17839,12 @@ Only the underlying particle representation changes.</p>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=753bcab3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d5fca6f0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
@@ -17746,10 +17863,15 @@ Only the underlying particle representation changes.</p>
     <span class="n">chamber_dimensions</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">),</span>
     <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"continuous_pdf"</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="c1"># rate_pdf = wall_loss_pdf.rate(particle, temperature=T, pressure=P)</span>
+<span class="n">particle_pdf</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"continuous_pdf"</span>
+<span class="p">)</span>
+<span class="n">rate_pdf</span> <span class="o">=</span> <span class="n">wall_loss_pdf</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span><span class="n">particle_pdf</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">rate_pdf</span><span class="p">))</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">rate_pdf</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
 
 <span class="c1"># Particle-resolved example</span>
-<span class="n">resolved</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetResolvedParticleMassBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">resolved</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_resolved_particle_data</span><span class="p">()</span>
 <span class="n">wall_loss_resolved</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">RectangularWallLossStrategy</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
     <span class="n">chamber_dimensions</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">),</span>
@@ -17765,10 +17887,15 @@ wall_loss_pdf = par.dynamics.RectangularWallLossStrategy(
     chamber_dimensions=(1.0, 1.2, 0.8),
     distribution_type="continuous_pdf",
 )
-# rate_pdf = wall_loss_pdf.rate(particle, temperature=T, pressure=P)
+particle_pdf = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="continuous_pdf"
+)
+rate_pdf = wall_loss_pdf.rate(particle_pdf, temperature=T, pressure=P)
+assert np.all(np.isfinite(rate_pdf)) and np.all(rate_pdf &lt;= 0)
 
 # Particle-resolved example
-resolved = par.particles.PresetResolvedParticleMassBuilder().build()
+np.random.seed(42)
+resolved = par.particles.create_lognormal_resolved_particle_data()
 wall_loss_resolved = par.dynamics.RectangularWallLossStrategy(
     wall_eddy_diffusivity=1e-3,
     chamber_dimensions=(1.0, 1.2, 0.8),
@@ -17783,7 +17910,7 @@ wall_loss_resolved = par.dynamics.RectangularWallLossStrategy(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4de01742">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=93a4d5c7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17791,7 +17918,7 @@ wall_loss_resolved = par.dynamics.RectangularWallLossStrategy(
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="summary">Summary<a class="anchor-link" href="#summary">¶</a></h2><ul>
 <li>Configure rectangular chambers with <code>chamber_dimensions</code> (x, y, z).</li>
-<li>Use <code>rate</code> for instantaneous loss coefficients.</li>
+<li>Use <code>rate</code> for concentration loss rates; <code>loss_coefficient</code> gives 1/s.</li>
 <li>Use <code>step</code> to update particle concentrations over time.</li>
 <li>Switch <code>distribution_type</code> to target discrete, continuous PDF, or
 particle-resolved representations.</li>

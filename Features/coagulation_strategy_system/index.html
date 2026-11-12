@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -13687,10 +13687,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-build-a-particlerepresentation" class="md-nav__link">
+  <a href="#1-build-native-particledata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Build a ParticleRepresentation
+        1. Build native ParticleData
       
     </span>
   </a>
@@ -14668,7 +14668,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14696,7 +14696,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14724,7 +14724,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14973,7 +14973,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17628,10 +17628,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-build-a-particlerepresentation" class="md-nav__link">
+  <a href="#1-build-native-particledata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Build a ParticleRepresentation
+        1. Build native ParticleData
       
     </span>
   </a>
@@ -17911,7 +17911,7 @@
 <p>Strategy-based coagulation kernels with unified builders, factory selection, runnable integration, and particle-resolved support.</p>
 </blockquote>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The coagulation strategy system lets you model particle collisions using the same object-oriented patterns as condensation and wall loss. Instead of calling standalone kernel functions, you work with strategy objects that operate on <code>ParticleRepresentation</code>, support multiple distribution types, and expose a consistent <code>kernel</code> / <code>rate</code> / <code>step</code> interface. Strategies cover Brownian motion, electrostatic enhancement, turbulence (shear and DNS), gravitational sedimentation, and user-defined combinations.</p>
+<p>The coagulation strategy system lets you model particle collisions using the same object-oriented patterns as condensation and wall loss. Instead of calling standalone kernel functions, you work with strategy objects that operate on native <code>ParticleData</code>, support multiple distribution types, and expose a consistent <code>kernel</code> / <code>rate</code> / <code>step</code> interface. Strategies cover Brownian motion, electrostatic enhancement, turbulence (shear and DNS), gravitational sedimentation, and user-defined combinations.</p>
 <p>This feature is built around user-facing APIs exposed via <code>particula.dynamics</code>:</p>
 <ul>
 <li><code>CoagulationStrategyABC</code> – abstract base class defining kernel, gain/loss/net rate, and <code>step</code> for discrete, continuous, or particle-resolved distributions.</li>
@@ -17976,10 +17976,8 @@ shared container metadata does not supply a lower-order alternative. Zero-work
 rates remain zero. Supplied pair kernels must be real, finite, nonnegative
 square matrices matching the population width.</p>
 <p>Gain/loss/net-rate APIs remain discrete/PDF operations. Native resolved kernel
-support does not introduce deterministic resolved rate APIs. Existing
-untagged/facade examples below
-retain their temporary compatibility behavior; M4 owns runnable and adapter
-migration. Independent native fixtures are in
+support does not introduce deterministic resolved rate APIs. The examples below use native state. Legacy untagged/facade
+execution remains available for compatibility until the separate M6 removal. Independent native fixtures are in
 <code>particula/dynamics/coagulation/coagulation_strategy/tests/native_rates_test.py</code>.</p>
 <h3 id="native-cpu-stepping-and-conservation">Native CPU stepping and conservation<a class="headerlink" href="#native-cpu-stepping-and-conservation" title="Permanent link">&para;</a></h3>
 <p>Native <code>step</code> preserves the input container and its arrays. It validates
@@ -18042,7 +18040,7 @@ equality.</p>
 <li><strong>Builder/factory parity with validation</strong>: Fluent builders enforce distribution type, turbulent parameters, fluid density, and charged kernel strategy selection with optional unit conversion.</li>
 <li><strong>Coverage of major coagulation regimes</strong>: Brownian, charged/electrostatic, turbulent shear, turbulent DNS, and sedimentation kernels plus additive combinations.</li>
 <li><strong>Distribution-type flexibility</strong>: Works with "discrete", "continuous_pdf", and "particle_resolved" modes so you can reuse existing particle builders.</li>
-<li><strong>Pipeline ready</strong>: <code>Coagulation</code> runnable uses <code>sub_steps</code>, clamps through strategy logic, and chains with other runnables via <code>|</code> for end-to-end simulations.</li>
+<li><strong>Pipeline ready</strong>: <code>Coagulation</code> runnable uses <code>sub_steps</code>, rejects negative native density proposals, and chains with other runnables via <code>|</code> for end-to-end simulations.</li>
 </ul>
 <h2 id="who-its-for">Who It's For<a class="headerlink" href="#who-its-for" title="Permanent link">&para;</a></h2>
 <p>This feature is designed for:</p>
@@ -18080,9 +18078,23 @@ equality.</p>
 </ul>
 <h3 id="runnable-entry-point-coagulation">Runnable entry point: <code>Coagulation</code><a class="headerlink" href="#runnable-entry-point-coagulation" title="Permanent link">&para;</a></h3>
 <p><code>Coagulation</code> is a <code>RunnableABC</code> exported as <code>par.dynamics.Coagulation</code>. It operates on an <code>Aerosol</code>, delegates <code>step</code> to the provided coagulation strategy, splits <code>time_step</code> across any <code>sub_steps</code>, and composes with other runnables using <code>|</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
-<span class="n">aerosol</span> <span class="o">=</span> <span class="o">...</span>  <span class="c1"># your Aerosol instance</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
+    <span class="n">radius_bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mf">50e-9</span><span class="p">,</span> <span class="mf">500e-9</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+    <span class="n">mode</span><span class="o">=</span><span class="p">[</span><span class="mf">100e-9</span><span class="p">],</span> <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="p">[</span><span class="mf">1.5</span><span class="p">],</span>
+    <span class="n">number_concentration</span><span class="o">=</span><span class="p">[</span><span class="mf">1e8</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">gas</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasData</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s2">"organic"</span><span class="p">],</span> <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.180</span><span class="p">]),</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1e-6</span><span class="p">]]),</span> <span class="n">partitioning</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">]),</span>
+<span class="p">)</span>
+<span class="n">environment</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">EnvironmentData</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="p">[</span><span class="mf">298.15</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="p">[</span><span class="mf">101325.0</span><span class="p">],</span> <span class="n">saturation_ratio</span><span class="o">=</span><span class="p">[[</span><span class="mf">1.0</span><span class="p">]],</span>
+<span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">(</span><span class="n">particles</span><span class="o">=</span><span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="o">=</span><span class="n">gas</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">)</span>
 <span class="n">coagulation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
     <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
         <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
@@ -18093,7 +18105,7 @@ equality.</p>
 <span class="n">updated</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="n">aerosol</span><span class="p">,</span>
     <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span>
-    <span class="n">sub_steps</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">sub_steps</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># Chain with wall loss or condensation in one pipeline</span>
@@ -18105,7 +18117,7 @@ equality.</p>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">coagulation</span> <span class="o">|</span> <span class="n">wall_loss</span>
-<span class="n">updated</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">)</span>
+<span class="n">updated</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="brownian-coagulation-strategy">Brownian coagulation strategy<a class="headerlink" href="#brownian-coagulation-strategy" title="Permanent link">&para;</a></h3>
 <p><code>BrownianCoagulationStrategy</code> implements the classical Brownian kernel using <code>get_brownian_kernel_via_system_state</code>. It works across discrete, continuous, and particle-resolved distributions.</p>
@@ -18163,10 +18175,13 @@ equality.</p>
     <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"turbulent_dns"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">"distribution_type"</span><span class="p">:</span> <span class="s2">"discrete"</span><span class="p">,</span>
-        <span class="s2">"turbulent_dissipation"</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span>      <span class="c1"># m^2/s^3</span>
-        <span class="s2">"fluid_density"</span><span class="p">:</span> <span class="mf">1.225</span><span class="p">,</span>             <span class="c1"># kg/m^3</span>
+        <span class="s2">"turbulent_dissipation"</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span>
+        <span class="s2">"turbulent_dissipation_units"</span><span class="p">:</span> <span class="s2">"m^2/s^3"</span><span class="p">,</span>
+        <span class="s2">"fluid_density"</span><span class="p">:</span> <span class="mf">1.225</span><span class="p">,</span>
+        <span class="s2">"fluid_density_units"</span><span class="p">:</span> <span class="s2">"kg/m^3"</span><span class="p">,</span>
         <span class="s2">"reynolds_lambda"</span><span class="p">:</span> <span class="mf">150.0</span><span class="p">,</span>           <span class="c1"># dimensionless</span>
-        <span class="s2">"relative_velocity"</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>           <span class="c1"># m/s</span>
+        <span class="s2">"relative_velocity"</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+        <span class="s2">"relative_velocity_units"</span><span class="p">:</span> <span class="s2">"m/s"</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -18189,17 +18204,21 @@ equality.</p>
 <p>The strategy system operates on the same distribution types used elsewhere in particula:</p>
 <ul>
 <li>"discrete" – radius-binned distributions.</li>
-<li>"continuous_pdf" – continuous probability-density representations.</li>
+<li>"continuous_pdf" – radius number-density PDFs (<code>dn/dr</code> in m⁻⁴).</li>
 <li>"particle_resolved" – ensembles of individual particles with stochastic pair selection.</li>
 </ul>
-<p>Select the appropriate mode at initialization (or via builders/factory). Particle-resolved paths use kernel-radius binning and <code>collide_pairs</code> updates; discrete/continuous paths apply gain/loss rate updates.</p>
+<p>Select the appropriate mode at initialization (or via builders/factory). Particle-resolved paths use kernel-radius binning and count-weighted merges; discrete/continuous paths apply gain/loss rate updates.</p>
 <h3 id="particle-resolved-coagulation">Particle-resolved coagulation<a class="headerlink" href="#particle-resolved-coagulation" title="Permanent link">&para;</a></h3>
 <p><code>CoagulationStrategyABC.step</code> handles particle-resolved updates by mapping to a kernel radius grid, drawing collision pairs, and updating via <code>collide_pairs</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="n">particle_resolved</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">resolved_particles</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_resolved_particle_data</span><span class="p">(</span>
+    <span class="n">masses</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-18</span><span class="p">,</span> <span class="mf">2e-18</span><span class="p">],</span> <span class="n">density</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">volume</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">particle_resolved</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
     <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"particle_resolved"</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particle_resolved</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-    <span class="n">particle</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
+<span class="n">resolved_particles</span> <span class="o">=</span> <span class="n">particle_resolved</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+    <span class="n">particle</span><span class="o">=</span><span class="n">resolved_particles</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
     <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
     <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -18212,7 +18231,7 @@ equality.</p>
 <span class="c1"># Brownian via builder</span>
 <span class="n">brownian</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"continuous_pdf"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -18230,16 +18249,25 @@ equality.</p>
     <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"combine"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">"strategies"</span><span class="p">:</span> <span class="p">[</span><span class="n">brownian</span><span class="p">,</span> <span class="n">charged</span><span class="p">],</span>
-        <span class="s2">"distribution_type"</span><span class="p">:</span> <span class="s2">"continuous_pdf"</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 </code></pre></div>
+<p>The snippets on this page use the selected E9 checkout. CPU snippets share
+imports and the native aerosol constructed in the runnable section above;
+optional GPU snippets only declare their separate low-level interfaces.
+That runnable fixture uses an explicitly truncated 50–500 nm, 64-bin PMF
+with a 100 nm mode, GSD 1.5 and 1e8 m⁻³ number density. Its finite interval is
+an illustration, not a converged distribution or atmospheric calibration.
+The 60/120-second runs use 0.25-second substeps to keep this fixture's native
+proposals admissible. This does not establish a general timestep bound.</p>
 <h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
 <h3 id="quick-start-brownian-coagulation-on-a-discrete-distribution">Quick start: Brownian coagulation on a discrete distribution<a class="headerlink" href="#quick-start-brownian-coagulation-on-a-discrete-distribution" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="c1"># 1. Build a radius-binned particle distribution</span>
-<span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># 2. Configure Brownian coagulation</span>
 <span class="n">brownian</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
@@ -18262,18 +18290,20 @@ equality.</p>
 </code></pre></div>
 <h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>particula</code> version 0.2.6 or later installed.</li>
-<li>A <code>ParticleRepresentation</code> instance (e.g., from preset particle builders).</li>
+<li>The selected E9 checkout installed with <code>pip install -e .</code>; no older-wheel compatibility is implied.</li>
+<li>A native <code>ParticleData</code> instance (with an explicit population kind).</li>
 <li>Basic familiarity with particula dynamics and the runnable pipeline (<code>|</code>).</li>
 </ul>
 <h2 id="typical-workflows">Typical Workflows<a class="headerlink" href="#typical-workflows" title="Permanent link">&para;</a></h2>
-<h3 id="1-build-a-particlerepresentation">1. Build a ParticleRepresentation<a class="headerlink" href="#1-build-a-particlerepresentation" title="Permanent link">&para;</a></h3>
+<h3 id="1-build-native-particledata">1. Build native ParticleData<a class="headerlink" href="#1-build-native-particledata" title="Permanent link">&para;</a></h3>
 <p>Use preset builders or custom particle-resolved constructors:</p>
-<div class="highlight"><pre><span></span><code><span class="n">particle</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">"m^3"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">radius_bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mf">50e-9</span><span class="p">,</span> <span class="mf">500e-9</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+    <span class="n">mode</span><span class="o">=</span><span class="p">[</span><span class="mf">100e-9</span><span class="p">],</span> <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="p">[</span><span class="mf">1.5</span><span class="p">],</span>
+    <span class="n">number_concentration</span><span class="o">=</span><span class="p">[</span><span class="mf">1e8</span><span class="p">],</span>
 <span class="p">)</span>
+<span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particle</span>
 </code></pre></div>
 <h3 id="2-configure-a-coagulation-strategy">2. Configure a coagulation strategy<a class="headerlink" href="#2-configure-a-coagulation-strategy" title="Permanent link">&para;</a></h3>
 <p>Pick a physical model and distribution type:</p>
@@ -18288,17 +18318,23 @@ equality.</p>
 <span class="n">updated</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="n">aerosol</span><span class="p">,</span>
     <span class="n">time_step</span><span class="o">=</span><span class="mf">120.0</span><span class="p">,</span>
-    <span class="n">sub_steps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">sub_steps</span><span class="o">=</span><span class="mi">480</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="4-compose-with-other-dynamics-in-a-single-pipeline">4. Compose with other dynamics in a single pipeline<a class="headerlink" href="#4-compose-with-other-dynamics-in-a-single-pipeline" title="Permanent link">&para;</a></h3>
 <p>Order processes explicitly using the <code>|</code> operator:</p>
-<div class="highlight"><pre><span></span><code><span class="n">condensation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span>
-    <span class="n">condensation_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
-        <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.18</span><span class="p">,</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.condensation.species_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">CondensationSpeciesMap</span>
+
+<span class="n">condensation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+        <span class="n">molar_mass</span><span class="o">=</span><span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
         <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
         <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="p">),</span>
+        <span class="n">activity_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">(),</span>
+        <span class="n">surface_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyVolume</span><span class="p">(</span><span class="n">density</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">),</span>
+        <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">),</span>
+        <span class="n">species_map</span><span class="o">=</span><span class="n">CondensationSpeciesMap</span><span class="p">((</span><span class="s2">"organic"</span><span class="p">,),</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),)),</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 <span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLoss</span><span class="p">(</span>
     <span class="n">wall_loss_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
@@ -18308,7 +18344,7 @@ equality.</p>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">condensation</span> <span class="o">|</span> <span class="n">coagulation</span> <span class="o">|</span> <span class="n">wall_loss</span>
-<span class="n">updated</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">updated</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="5-builderfactory-workflow-for-reproducibility">5. Builder/factory workflow for reproducibility<a class="headerlink" href="#5-builderfactory-workflow-for-reproducibility" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CoagulationFactory</span><span class="p">()</span>
@@ -18319,11 +18355,15 @@ equality.</p>
 <span class="n">coagulation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span><span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">coag_strategy</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="6-particle-resolved-collision-loop">6. Particle-resolved collision loop<a class="headerlink" href="#6-particle-resolved-collision-loop" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="n">particle_resolved</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">resolved_particles</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_resolved_particle_data</span><span class="p">(</span>
+    <span class="n">masses</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-18</span><span class="p">,</span> <span class="mf">2e-18</span><span class="p">],</span> <span class="n">density</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">volume</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">particle_resolved</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
     <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"particle_resolved"</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particle_resolved</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-    <span class="n">particle</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
+<span class="n">resolved_particles</span> <span class="o">=</span> <span class="n">particle_resolved</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+    <span class="n">particle</span><span class="o">=</span><span class="n">resolved_particles</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">300.0</span><span class="p">,</span>
     <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
     <span class="n">time_step</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
@@ -18414,7 +18454,7 @@ equality.</p>
 </table>
 <h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Match distribution type to particle builder:</strong> Keep <code>distribution_type</code> consistent with how <code>ParticleRepresentation</code> was constructed to avoid unintended kernel application.</li>
+<li><strong>Match distribution type to particle builder:</strong> Keep <code>distribution_type</code> consistent with how native <code>ParticleData</code> was constructed to avoid unintended kernel application.</li>
 <li><strong>Use builders/factory for validation:</strong> Let builders enforce turbulence units, fluid density, and charged-kernel selection; avoid manual instantiation when sharing configurations.</li>
 <li><strong>Start with smaller <code>time_step</code> and use <code>sub_steps</code>:</strong> Especially for particle-resolved or highly turbulent cases to reduce overshoot in collisions.</li>
 <li><strong>Combine kernels deliberately:</strong> Use <code>CombineCoagulationStrategy</code> when you need additive physics (e.g., Brownian + turbulent shear); ensure all strategies share the same distribution type.</li>
@@ -18472,7 +18512,9 @@ references. Enqueue uses current counts from the pinned device arrays and
 performs no allocation, readback, synchronization, reset or host configuration
 resolution. Callers keep arrays alive and state compatible between enqueues;
 new bindings or semantics require preparation again. This is direct/prepared
-science evidence; native resident/checkpoint integration remains M4-owned.</p>
+science evidence. Native resident continuation is illustrated in the
+<a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py">resident walkthrough</a>; it requires
+fresh exact-device containers and bindings after explicit restart.</p>
 <p>Native regression coverage uses resolved volumes 0.25/&frac14; m³, common counts
 0.25/&frac14;, independent species/charge inventories and independent one-pair
 stochastic expectations for all eleven supported masks on Warp CPU and optional

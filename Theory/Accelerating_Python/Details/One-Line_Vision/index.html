@@ -25,7 +25,7 @@
     
     
       
-        <title>One-line Vision - Particula</title>
+        <title>One-line Vision — historical proposal - Particula</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#one-line-vision" class="md-skip">
+        <a href="#one-line-vision-historical-proposal" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              One-line Vision
+              One-line Vision — historical proposal
             
           </span>
         </div>
@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14089,7 +14089,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14117,7 +14117,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14145,7 +14145,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14415,7 +14415,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -14433,7 +14433,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17100,7 +17100,15 @@
   
 
 
-<h1 id="one-line-vision">One-line Vision<a class="headerlink" href="#one-line-vision" title="Permanent link">&para;</a></h1>
+<h1 id="one-line-vision-historical-proposal">One-line Vision — historical proposal<a class="headerlink" href="#one-line-vision-historical-proposal" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Historical, unimplemented design sketch.</strong> The <code>par.use_backend</code>,
+<code>par.get_backend</code>, <code>par.dispatchable</code> and <code>par.register</code> names below are not
+current Particula APIs. All code blocks on this page are nonexecutable proposal
+text. Silent fallback was a proposed design, not the current execution
+contract. Use <a href="../../../../Features/backend_selection/">explicit backend selection</a>
+and the <a href="../../../../Features/particle-data-migration/">native migration guide</a>.</p>
+</blockquote>
 <p><strong>Objective</strong>
 Give users a <em>single</em> statement—<code>par.use_backend("taichi")</code>, <code>par.use_backend("warp")</code>, or nothing at all—to decide whether each heavy-duty kernel runs as plain-Python/NumPy or on an accelerated backend.  All builders, simulators, and analysis notebooks continue to call the same public functions (<code>par.coagulation_gain_rate</code>, <code>par.foo</code>, …).  In other words: “flip a switch, get speed, keep code.”</p>
 <h4 id="design-constraints-we-start-with">Design constraints we start with<a class="headerlink" href="#design-constraints-we-start-with" title="Permanent link">&para;</a></h4>
@@ -17161,13 +17169,13 @@ Give users a <em>single</em> statement—<code>par.use_backend("taichi")</code>,
 </tbody>
 </table>
 <p><strong>Dispatch layer</strong> centralizes the decision in <em>one</em> lightweight wrapper:</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@par</span><span class="o">.</span><span class="n">dispatchable</span>        <span class="c1"># decorates the Python reference impl</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">coagulation_gain_rate</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
-    <span class="o">...</span>
+<div class="highlight"><pre><span></span><code>@par.dispatchable        # decorates the Python reference impl
+def coagulation_gain_rate(...):
+    ...
 
-<span class="nd">@par</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">"coagulation_gain_rate"</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">"taichi"</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_fast_taichi_impl</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
-    <span class="o">...</span>
+@par.register("coagulation_gain_rate", backend="taichi")
+def _fast_taichi_impl(...):
+    ...
 </code></pre></div>
 <ul>
 <li>The wrapper looks up <code>par.get_backend()</code>.</li>
@@ -17177,17 +17185,17 @@ Give users a <em>single</em> statement—<code>par.use_backend("taichi")</code>,
 <p>Outcome: <strong>zero duplication, single source-of-truth docstring, plug-and-play backends.</strong></p>
 <h4 id="how-integration-feels-to-each-stakeholder">How integration feels to each stakeholder<a class="headerlink" href="#how-integration-feels-to-each-stakeholder" title="Permanent link">&para;</a></h4>
 <p><em>Users</em></p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">"taichi"</span><span class="p">)</span>      <span class="c1"># one line, opt-in</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">coagulation_gain_rate</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code>import particula as par
+par.use_backend("taichi")      # one line, opt-in
+result = par.coagulation_gain_rate(r, c, K)
 </code></pre></div>
 <p>If Taichi isn’t available—or if that particular kernel hasn’t been ported yet—the same call silently executes the pure-Python path.</p>
 <p><em>Backend Developer</em></p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="kn">import</span> <span class="n">register</span>
+<div class="highlight"><pre><span></span><code>from particula import register
 
-<span class="nd">@register</span><span class="p">(</span><span class="s2">"coagulation_gain_rate"</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">"warp"</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">gain_rate_warp</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
-    <span class="o">...</span>
+@register("coagulation_gain_rate", backend="warp")
+def gain_rate_warp(...):
+    ...
 </code></pre></div>
 <p>No changes to public modules, no touching docstrings, no conflicts with other backends.</p>
 <p><em>Core maintainers</em></p>
@@ -17208,11 +17216,11 @@ Give users a <em>single</em> statement—<code>par.use_backend("taichi")</code>,
 <h2 id="dispatch-decorator">Dispatch Decorator<a class="headerlink" href="#dispatch-decorator" title="Permanent link">&para;</a></h2>
 <p>Our goal is to have <strong>one line for users, zero friction for contributors.</strong>
 What changes is <em>how</em> we wire the backends. Instead of sprinkling <code>if par.backend.is_enabled(): …</code> inside every kernel, we wrap each public-API function in a <strong>single decorator that does automatic dispatch</strong>:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<div class="highlight"><pre><span></span><code>import particula as par
 
-<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">"taichi"</span><span class="p">)</span>        <span class="c1"># or "warp", "cpp", …</span>
-<span class="c1"># builder code stays identical ↓</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">coagulation_gain_rate</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">conc</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+par.use_backend("taichi")        # or "warp", "cpp", …
+# builder code stays identical ↓
+gain = par.coagulation_gain_rate(radius, conc, kernel)
 </code></pre></div>
 <p>Behind the scenes:</p>
 <ol>
@@ -17234,9 +17242,9 @@ What changes is <em>how</em> we wire the backends. Instead of sprinkling <code>i
 <p><strong>Accelerated versions live in separate modules</strong> and register themselves with:</p>
 </li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="nd">@par</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">"coagulation_gain_rate"</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">"taichi"</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">coagulation_gain_rate_taichi</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">conc</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
-    <span class="c1"># Taichi kernel here …</span>
+<div class="highlight"><pre><span></span><code>@par.register("coagulation_gain_rate", backend="taichi")
+def coagulation_gain_rate_taichi(radius, conc, kernel):
+    # Taichi kernel here …
 </code></pre></div>
 <ol>
 <li><strong>No accelerated version? No problem.</strong>
@@ -17270,63 +17278,63 @@ What changes is <em>how</em> we wire the backends. Instead of sprinkling <code>i
 </tbody>
 </table>
 <h3 id="example-skeleton">Example skeleton<a class="headerlink" href="#example-skeleton" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># -------- particula/_dispatch.py -----------------</span>
-<span class="n">_backend</span> <span class="o">=</span> <span class="s2">"python"</span>
-<span class="n">_registry</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">callable</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code># -------- particula/_dispatch.py -----------------
+_backend = "python"
+_registry: dict[str, dict[str, callable]] = defaultdict(dict)
 
-<span class="k">def</span><span class="w"> </span><span class="nf">use_backend</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># user API</span>
-    <span class="k">global</span> <span class="n">_backend</span>
-    <span class="n">_backend</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+def use_backend(name: str):  # user API
+    global _backend
+    _backend = name.lower()
 
-<span class="k">def</span><span class="w"> </span><span class="nf">get_backend</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">_backend</span>
+def get_backend() -&gt; str:
+    return _backend
 
-<span class="k">def</span><span class="w"> </span><span class="nf">dispatchable</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Decorator that enables backend dispatch with Python fallback."""</span>
-    <span class="n">func_name</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
+def dispatchable(func):
+    """Decorator that enables backend dispatch with Python fallback."""
+    func_name = func.__name__
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">impl</span> <span class="o">=</span> <span class="n">_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_backend</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">impl</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    def wrapper(*args, **kwargs):
+        impl = _registry.get(func_name, {}).get(_backend, func)
+        return impl(*args, **kwargs)
 
-    <span class="c1"># register default python implementation</span>
-    <span class="n">_registry</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="p">{})[</span><span class="s2">"python"</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
-    <span class="n">wrapper</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span>
-    <span class="k">return</span> <span class="n">wrapper</span>
+    # register default python implementation
+    _registry.setdefault(func_name, {})["python"] = func
+    wrapper.__doc__ = func.__doc__
+    return wrapper
 
-<span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Decorator factory for accelerated implementations."""</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">accel_func</span><span class="p">):</span>
-        <span class="n">_registry</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="p">{})[</span><span class="n">backend</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="o">=</span> <span class="n">accel_func</span>
-        <span class="k">return</span> <span class="n">accel_func</span>
-    <span class="k">return</span> <span class="n">decorator</span>
+def register(func_name: str, *, backend: str):
+    """Decorator factory for accelerated implementations."""
+    def decorator(accel_func):
+        _registry.setdefault(func_name, {})[backend.lower()] = accel_func
+        return accel_func
+    return decorator
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1"># -------- particula/public_api.py ----------------</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula._dispatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">dispatchable</span>
+<div class="highlight"><pre><span></span><code># -------- particula/public_api.py ----------------
+from particula._dispatch import dispatchable
 
-<span class="nd">@dispatchable</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">coagulation_gain_rate</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Compute gain rate by trapezoidal integration (pure Python)."""</span>
-    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span>
-        <span class="n">kernel</span> <span class="o">*</span> <span class="n">concentration</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">concentration</span><span class="p">,</span>
-        <span class="n">radius</span><span class="p">,</span>
-        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="p">)</span>
+@dispatchable
+def coagulation_gain_rate(radius, concentration, kernel):
+    """Compute gain rate by trapezoidal integration (pure Python)."""
+    return 0.5 * np.trapz(
+        kernel * concentration[:, None] * concentration,
+        radius,
+        axis=1,
+    )
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1"># -------- particula/_backend_taichi.py -----------</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula._dispatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">register</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">taichi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ti</span>
+<div class="highlight"><pre><span></span><code># -------- particula/_backend_taichi.py -----------
+from particula._dispatch import register
+import taichi as ti
 
-<span class="nd">@register</span><span class="p">(</span><span class="s2">"coagulation_gain_rate"</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">"taichi"</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">coagulation_gain_rate_taichi</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
-    <span class="c1"># Taichi implementation here …</span>
-    <span class="k">return</span> <span class="n">ti_kernel</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+@register("coagulation_gain_rate", backend="taichi")
+def coagulation_gain_rate_taichi(radius, concentration, kernel):
+    # Taichi implementation here …
+    return ti_kernel(radius, concentration, kernel)
 </code></pre></div>
 <h3 id="what-users-see">What users see<a class="headerlink" href="#what-users-see" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">"taichi"</span><span class="p">)</span>          <span class="c1"># one-liner switch</span>
+<div class="highlight"><pre><span></span><code>import particula as par
+par.use_backend("taichi")          # one-liner switch
 
-<span class="n">gain_rate</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">coagulation_gain_rate</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>  <span class="c1"># transparently fast</span>
+gain_rate = par.coagulation_gain_rate(r, c, K)  # transparently fast
 </code></pre></div>
 <p>If the Taichi module is unavailable or that particular kernel hasn’t been ported yet, <strong>the call runs the original Python version without any code change or error</strong>.</p>
 <hr />

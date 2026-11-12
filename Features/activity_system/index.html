@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14585,7 +14585,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14613,7 +14613,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14641,7 +14641,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14890,7 +14890,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17912,9 +17912,10 @@
 
 <span class="c1"># Select ideal molar strategy</span>
 <span class="n">ideal</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"ideal_molar"</span><span class="p">,</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"molar_ideal"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.015e-3</span><span class="p">,</span> <span class="mf">200.0e-3</span><span class="p">]),</span>
+        <span class="s2">"molar_mass_units"</span><span class="p">:</span> <span class="s2">"kg/mol"</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 
@@ -17932,7 +17933,10 @@
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="integration-with-equilibria">Integration with equilibria<a class="headerlink" href="#integration-with-equilibria" title="Permanent link">&para;</a></h3>
-<p>Activity strategies integrate with liquid-vapor partitioning calculations:</p>
+<p>Activity strategies integrate with liquid-vapor partitioning calculations.
+This equilibrium interface uses matching µg/m³ concentration inputs and g/mol
+molar masses; activity strategies above use kg/mol. Water supplied by the
+prescribed humidity reservoir is separate from the organic species balance:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
@@ -17943,7 +17947,7 @@
 
 <span class="c1"># Solve for equilibrium</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">partitioning</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span>
-    <span class="n">c_star_j_dry</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">]),</span>  <span class="c1"># saturation concentrations</span>
+    <span class="n">c_star_j_dry</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">]),</span>  <span class="c1"># ug/m³, matching organic inventory units</span>
     <span class="n">concentration_organic_matter</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]),</span>  <span class="c1"># ug/m^3</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">200.0</span><span class="p">,</span> <span class="mf">200.0</span><span class="p">,</span> <span class="mf">200.0</span><span class="p">]),</span>  <span class="c1"># g/mol</span>
     <span class="n">oxygen2carbon</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]),</span>
@@ -17954,6 +17958,9 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Partition coefficients: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">partition_coefficients</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Alpha phase water: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">alpha_phase</span><span class="o">.</span><span class="n">water_concentration</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
+<p>Run the Python snippets in page order so imports and example arrays are
+available to the later workflow snippets. These functional calculations do
+not construct or mutate an <code>Aerosol</code>.</p>
 <h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
 <h3 id="quick-start-ideal-activity-calculation">Quick start: ideal activity calculation<a class="headerlink" href="#quick-start-ideal-activity-calculation" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -18006,14 +18013,20 @@
 <h3 id="3-compute-activity-or-partial-pressure">3. Compute activity or partial pressure<a class="headerlink" href="#3-compute-activity-or-partial-pressure" title="Permanent link">&para;</a></h3>
 <p>Call the strategy methods with mass concentration arrays:</p>
 <div class="highlight"><pre><span></span><code><span class="n">activity</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">activity</span><span class="p">(</span><span class="n">mass_concentration</span><span class="o">=</span><span class="n">mass</span><span class="p">)</span>
-<span class="n">partial_p</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">partial_pressure</span><span class="p">(</span><span class="n">pure_vapor_pressure</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="o">=</span><span class="n">mass</span><span class="p">)</span>
+<span class="n">partial_p</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">partial_pressure</span><span class="p">(</span><span class="n">pure_pressure</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="o">=</span><span class="n">mass</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="4-integrate-with-equilibria">4. Integrate with equilibria<a class="headerlink" href="#4-integrate-with-equilibria" title="Permanent link">&para;</a></h3>
 <p>Combine with partitioning strategies for full thermodynamic calculations:</p>
 <div class="highlight"><pre><span></span><code><span class="n">partitioning</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">equilibria</span><span class="o">.</span><span class="n">LiquidVaporPartitioningStrategy</span><span class="p">(</span>
-    <span class="n">water_activity</span><span class="o">=</span><span class="n">target_rh</span><span class="p">,</span>
+    <span class="n">water_activity</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">partitioning</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">partitioning</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span>
+    <span class="n">c_star_j_dry</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">]),</span>  <span class="c1"># ug/m³</span>
+    <span class="n">concentration_organic_matter</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]),</span>  <span class="c1"># ug/m³</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">200.0</span><span class="p">,</span> <span class="mf">200.0</span><span class="p">,</span> <span class="mf">200.0</span><span class="p">]),</span>  <span class="c1"># g/mol</span>
+    <span class="n">oxygen2carbon</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]),</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1200.0</span><span class="p">,</span> <span class="mf">1200.0</span><span class="p">,</span> <span class="mf">1200.0</span><span class="p">]),</span>  <span class="c1"># kg/m³</span>
+<span class="p">)</span>
 </code></pre></div>
 <h2 id="use-cases">Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
 <h3 id="use-case-1-hygroscopic-growth-calculation">Use case 1: Hygroscopic growth calculation<a class="headerlink" href="#use-case-1-hygroscopic-growth-calculation" title="Permanent link">&para;</a></h3>
@@ -18124,7 +18137,7 @@
 <ol>
 <li><strong>Match model to system</strong>: Use ideal strategies for simple mixtures, kappa for inorganic hygroscopic aerosols, and BAT for organic-water systems</li>
 <li><strong>Use builder validation</strong>: Set parameters through builders to ensure unit conversion and validity checks</li>
-<li><strong>Check activity ranges</strong>: Activity values should be in [0, 1] for condensed phases</li>
+<li><strong>Check finite, nonnegative activities</strong>: Non-ideal activity can exceed one; do not clip it to a mole-fraction bound.</li>
 <li><strong>Consider temperature effects</strong>: The BAT model includes temperature-dependent parameters; ensure consistency</li>
 <li><strong>Validate with experiments</strong>: Compare model predictions against measured hygroscopic growth or partitioning data</li>
 <li><strong>Use consistent units</strong>: Mass concentrations are expected in kg/m^3; use builders for automatic conversion</li>

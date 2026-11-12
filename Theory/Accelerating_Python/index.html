@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14089,7 +14089,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14117,7 +14117,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14145,7 +14145,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14404,7 +14404,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -16858,10 +16858,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#cython-pypy" class="md-nav__link">
+  <a href="#cython" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cython (PyPy)
+        Cython
       
     </span>
   </a>
@@ -16885,10 +16885,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-we-envision-this-working" class="md-nav__link">
+  <a href="#historical-one-line-proposal" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How We Envision This Working
+        Historical one-line proposal
       
     </span>
   </a>
@@ -16955,7 +16955,7 @@
 <li>Cons: Niche use cases, less mature ecosystem than CUDA or Taichi.</li>
 <li>Example: <a href="../nvidia-warp/examples/gpu_benchmarks/">GPU Benchmarks</a> -- condensation &amp; coagulation scaling results.</li>
 </ul>
-<h3 id="cython-pypy"><strong>Cython (PyPy)</strong><a class="headerlink" href="#cython-pypy" title="Permanent link">&para;</a></h3>
+<h3 id="cython"><strong>Cython</strong><a class="headerlink" href="#cython" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A superset of Python that compiles to C, enabling static type declarations and direct C-API calls.  </li>
 <li>Pros: Incremental adoption via <code>*.pyx</code> files, excellent control over types and memory layout.  </li>
@@ -16970,18 +16970,21 @@
 <li>Example: This was explored (no example notebook) and found not to be a simple drop-in solution; due to incomplete <code>numpy</code> coverage. So if we needed to re-write the code anyway, we might as well use one of the other options.</li>
 </ul>
 <hr />
-<h2 id="how-we-envision-this-working">How We Envision This Working<a class="headerlink" href="#how-we-envision-this-working" title="Permanent link">&para;</a></h2>
-<p>Our vision is to have a simple enable statement for <code>particula</code> that allows users to choose the acceleration method. For example, a user could run the following command in their notebook:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<h2 id="historical-one-line-proposal">Historical one-line proposal<a class="headerlink" href="#historical-one-line-proposal" title="Permanent link">&para;</a></h2>
+<p><strong>This is an unimplemented historical proposal, not a supported API.</strong>
+Current workflows use <a href="../../Features/backend_selection/">explicit backend selection</a>
+and explicit data transfers; silent fallback is not promised.</p>
+<p>The earlier vision was to have a simple enable statement for <code>particula</code> that allows users to choose the acceleration method. For example, a user could run the following command in their notebook:</p>
+<div class="highlight"><pre><span></span><code>import particula as par
 
-<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">"taichi"</span><span class="p">)</span>  <span class="c1"># or "warp", "cpp", etc.</span>
+par.use_backend("taichi")  # or "warp", "cpp", etc.
 </code></pre></div>
 <p>The rest of the builder and other function calls would remain unchanged, and the user would be able to run their code as usual. The only difference would be that the kernels would be compiled to the selected backend (e.g., Taichi, Warp, etc.) and run there instead of in Python.</p>
 <p>See one option for how this could be done in the <a href="Details/One-Line_Vision/">One-Line Vision</a> document.</p>
 <hr />
 <h2 id="why-this-matters">Why This Matters<a class="headerlink" href="#why-this-matters" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Performance</strong>: Offloading compute-intensive work can yield <strong>10×–10,000×</strong> speedups.  </li>
+<li><strong>Performance</strong>: Measure each workload on its target device; this exploration establishes no speedup bound.</li>
 <li><strong>Maintainability</strong>: Choosing the right tool lets you keep most of your code in Python, while isolating optimized kernels.  </li>
 <li><strong>Portability</strong>: Leveraging standard libraries ensures compatibility across platforms (Linux, Windows, macOS).  </li>
 </ul>

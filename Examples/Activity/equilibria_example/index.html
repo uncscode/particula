@@ -12109,7 +12109,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -12137,7 +12137,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12575,7 +12575,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12603,7 +12603,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14267,7 +14267,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14295,7 +14295,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14323,7 +14323,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14572,7 +14572,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17292,7 +17292,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=46018756">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a6dbcafb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17311,12 +17311,12 @@ gas-particle equilibrium concentrations.</p>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3700c394">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b90a850b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -17340,7 +17340,7 @@ import particula as par</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b52410b8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cf8dcf12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17353,13 +17353,13 @@ particle phase.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ebd39820">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cf0d4e14">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -17399,9 +17399,25 @@ print(f"O:C ratios: {o2c_ratio}")</div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>=== Organic Species Properties ===
+C* (dry): [1.e-06 1.e-04 1.e-02]
+Total concentration: [ 1.  5. 10.] ug/m^3
+O:C ratios: [0.2 0.3 0.5]
+</pre>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b90ad448">
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2bf66b4d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17412,13 +17428,13 @@ print(f"O:C ratios: {o2c_ratio}")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a6490eb2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=51a57b1f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -17448,9 +17464,23 @@ print(f"Water activity (RH): {strategy.water_activity * 100:.0f}%")</div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Strategy: LiquidVaporPartitioningStrategy
+Water activity (RH): 75%
+</pre>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=015bccb9">
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7ab67197">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17461,13 +17491,13 @@ print(f"Water activity (RH): {strategy.water_activity * 100:.0f}%")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=40bba3e2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=11f18382">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -17503,9 +17533,22 @@ print("Equilibrium solved successfully!")</div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Equilibrium solved successfully!
+</pre>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=372a326b">
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6f9b28fa">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17517,13 +17560,13 @@ phase concentrations, and water content.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b5a84943">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1af68607">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -17549,7 +17592,9 @@ phase concentrations, and water content.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"  (fraction in condensed phase)"</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Alpha phase (water-rich):"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Species concentrations: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">alpha_phase</span><span class="o">.</span><span class="n">species_concentrations</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"  Species-associated organic + water: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">alpha_phase</span><span class="o">.</span><span class="n">species_concentrations</span><span class="si">}</span><span class="s2">"</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">"  Water concentration: "</span>
     <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">alpha_phase</span><span class="o">.</span><span class="n">water_concentration</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ug/m^3"</span>
@@ -17562,7 +17607,7 @@ phase concentrations, and water content.</p>
 <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">beta_phase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Beta phase (organic-rich):"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">"  Species concentrations: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">beta_phase</span><span class="o">.</span><span class="n">species_concentrations</span><span class="si">}</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"  Species-associated organic + water: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">beta_phase</span><span class="o">.</span><span class="n">species_concentrations</span><span class="si">}</span><span class="s2">"</span>
     <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span>
         <span class="s2">"  Water concentration: "</span>
@@ -17588,7 +17633,9 @@ print(f"Partition coefficients: {result.partition_coefficients}")
 print("  (fraction in condensed phase)")
 
 print("\nAlpha phase (water-rich):")
-print(f"  Species concentrations: {result.alpha_phase.species_concentrations}")
+print(
+    f"  Species-associated organic + water: {result.alpha_phase.species_concentrations}"
+)
 print(
     "  Water concentration: "
     f"{result.alpha_phase.water_concentration:.2f} ug/m^3"
@@ -17601,7 +17648,7 @@ print(
 if result.beta_phase is not None:
     print("\nBeta phase (organic-rich):")
     print(
-        f"  Species concentrations: {result.beta_phase.species_concentrations}"
+        f"  Species-associated organic + water: {result.beta_phase.species_concentrations}"
     )
     print(
         "  Water concentration: "
@@ -17617,9 +17664,44 @@ print(f"Optimization error: {result.error:.2e}")</div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>=== Liquid-Vapor Partitioning ===
+Water activity (RH): 75%
+
+Input organic species:
+  C* (dry): [1.e-06 1.e-04 1.e-02]
+  Total concentration: [ 1.  5. 10.] ug/m^3
+  O:C ratios: [0.2 0.3 0.5]
+
+=== Equilibrium Results ===
+Partition coefficients: [0.99999998 0.99999838 0.9998916 ]
+  (fraction in condensed phase)
+
+Alpha phase (water-rich):
+  Species-associated organic + water: [ 1.10751471  5.94511189 13.45712289]
+  Water concentration: 4.51 ug/m^3
+  Total concentration: 20.51 ug/m^3
+
+Beta phase (organic-rich):
+  Species-associated organic + water: [0. 0. 0.]
+  Water concentration: 0.00 ug/m^3
+
+Water content: alpha=4.51, beta=0.00 ug/m^3
+Optimization error: 5.57e-14
+</pre>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6c85c181">
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=052a8743">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17631,13 +17713,13 @@ changes.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a4ead35f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b7e892d4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -17668,6 +17750,23 @@ changes.</p>
         <span class="sa">f</span><span class="s2">"RH=</span><span class="si">{</span><span class="n">rh</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">%: mean partition coeff = </span><span class="si">{</span><span class="n">mean_partition</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, "</span>
         <span class="sa">f</span><span class="s2">"water = </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">alpha_phase</span><span class="o">.</span><span class="n">water_concentration</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ug/m^3"</span>
     <span class="p">)</span>
+
+<span class="c1"># The phase species entries include associated water. Subtract total water</span>
+<span class="c1"># before comparing with the organic-only partitioned inventory.</span>
+<span class="n">phases</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">alpha_phase</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">beta_phase</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">organic_condensed</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+    <span class="n">phase</span><span class="o">.</span><span class="n">total_concentration</span> <span class="o">-</span> <span class="n">phase</span><span class="o">.</span><span class="n">water_concentration</span> <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="n">phases</span>
+<span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span>
+    <span class="n">organic_condensed</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">partition_coefficients</span> <span class="o">*</span> <span class="n">concentration_organic</span><span class="p">),</span>
+    <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+    <span class="n">atol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">partition_coefficients</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">partition_coefficients</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">error</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">error</span> <span class="o">&lt;</span> <span class="mf">1e-8</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">print("=== Effect of RH on Partitioning ===\n")
 rh_values = [0.3, 0.5, 0.75, 0.9]
@@ -17686,7 +17785,42 @@ for rh in rh_values:
     print(
         f"RH={rh * 100:.0f}%: mean partition coeff = {mean_partition:.4f}, "
         f"water = {res.alpha_phase.water_concentration:.2f} ug/m^3"
-    )</div>
+    )
+
+# The phase species entries include associated water. Subtract total water
+# before comparing with the organic-only partitioned inventory.
+phases = [p for p in (result.alpha_phase, result.beta_phase) if p is not None]
+organic_condensed = sum(
+    phase.total_concentration - phase.water_concentration for phase in phases
+)
+np.testing.assert_allclose(
+    organic_condensed,
+    np.sum(result.partition_coefficients * concentration_organic),
+    rtol=1e-12,
+    atol=1e-12,
+)
+assert np.all(
+    (result.partition_coefficients &gt;= 0) &amp; (result.partition_coefficients &lt;= 1)
+)
+assert np.isfinite(result.error) and result.error &lt; 1e-8</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>=== Effect of RH on Partitioning ===
+
+RH=30%: mean partition coeff = 0.9999, water = 0.66 ug/m^3
+RH=50%: mean partition coeff = 0.9999, water = 1.52 ug/m^3
+RH=75%: mean partition coeff = 1.0000, water = 4.51 ug/m^3
+RH=90%: mean partition coeff = 1.0000, water = 13.42 ug/m^3
+</pre>
 </div>
 </div>
 </div>

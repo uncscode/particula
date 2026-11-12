@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -13717,6 +13717,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#native-population-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Native population boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cpu-planning-contract" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14241,7 +14252,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14269,7 +14280,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14297,7 +14308,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14546,7 +14557,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -16951,6 +16962,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#native-population-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Native population boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cpu-planning-contract" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -17064,6 +17086,18 @@ activation boundary. The shipped public, CPU-only one-box
 integration and broader policy orchestration remain deferred.</p>
 <p>For the supported one-box CPU consumer and its public construction boundary,
 see the <a href="../nucleation_strategy_system/">CPU Nucleation Strategy System</a>.</p>
+<h2 id="native-population-boundary">Native population boundary<a class="headerlink" href="#native-population-boundary" title="Permanent link">&para;</a></h2>
+<p>Native resampling and representative-volume scaling operate on explicitly
+tagged <code>particle_resolved</code> counts at a positive physical volume. PMF/PDF
+storage is not interchangeable with those counts. A selected scale multiplies
+existing counts, provisional source counts and volume together, preserving
+pre-existing number/mass density and gas concentration. This is distinct from
+physical volume evolution, which retains particle counts and dilutes gas.
+The native source consumer supplies explicit ordered species mapping; see
+<a href="../native_scientific_processes/#native-source-integration-m4">native source integration</a>.
+Legacy untagged compatibility remains separate and is not a native construction
+recipe. The two import snippets below require the selected E9 checkout, with
+Warp installed for the GPU imports.</p>
 <h2 id="cpu-planning-contract">CPU planning contract<a class="headerlink" href="#cpu-planning-contract" title="Permanent link">&para;</a></h2>
 <p>The CPU resolver exposes planning records only:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.exhaustion</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>

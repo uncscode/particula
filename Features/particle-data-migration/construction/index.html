@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14191,10 +14191,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#protected-boundaries-and-transition" class="md-nav__link">
+  <a href="#explicit-execution-boundaries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Protected boundaries and transition
+        Explicit execution boundaries
       
     </span>
   </a>
@@ -14227,7 +14227,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14255,7 +14255,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14283,7 +14283,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14532,7 +14532,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -16987,10 +16987,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#protected-boundaries-and-transition" class="md-nav__link">
+  <a href="#explicit-execution-boundaries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Protected boundaries and transition
+        Explicit execution boundaries
       
     </span>
   </a>
@@ -17021,11 +17021,12 @@
 
 
 <h1 id="native-aerosol-construction-and-replacement">Native aerosol construction and replacement<a class="headerlink" href="#native-aerosol-construction-and-replacement" title="Permanent link">&para;</a></h1>
-<p>This developer reference describes the E9-M2 construction API. Scientific
-process and runnable migration remains E9-M3/M4 work; native construction alone
-does not make an existing legacy runnable compatible with the new aggregate.
-The <a href="https://github.com/uncscode/particula/blob/main/.opencode/plans/sections/maintenance/E9-M1/appendix.md#p5-delivered-contract-reconciliation-2026-11-10-issue-1614">M1 delivered contract</a>
-owns representation semantics. See also <a href="../../data-containers-and-gpu-foundations/">container foundations</a>.</p>
+<p>This guide describes native construction used by the supported migrated
+examples. Native CPU processes and runnables consume these held containers;
+see <a href="../dynamics/">dynamics migration</a> for configuration and single-box limits.
+The <a href="../containers/">access walkthrough</a> demonstrates executable replacement and
+rejection checks. Use the selected E9-native checkout, not an assumed older
+published package. See also <a href="../../data-containers-and-gpu-foundations/">container foundations</a>.</p>
 <h2 id="assemble-three-containers">Assemble three containers<a class="headerlink" href="#assemble-three-containers" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
@@ -17197,19 +17198,20 @@ reduce only when every discarded value is identical to the retained value.
 Differing rows/lanes reject. Canonical <code>(B,N)</code> charge shape takes precedence;
 no values are discarded in that form. Radius helpers require a single material;
 use explicit species masses for mixtures. Inputs are never modified.</p>
-<h2 id="protected-boundaries-and-transition">Protected boundaries and transition<a class="headerlink" href="#protected-boundaries-and-transition" title="Permanent link">&para;</a></h2>
-<p>Tagged native particle data currently <strong>rejects</strong> upload through
-<code>to_warp_particle_data</code>: the existing Warp carrier cannot preserve distribution
-metadata/grid. Untagged legacy transfers remain explicit; never strip a native
-tag to bypass this boundary. No tagged GPU/PDF execution, checkpoint support,
-automatic synchronization, CPU fallback or device selection is added by M2.</p>
-<p>Old simulations use <code>particula._legacy_aerosol.Aerosol</code> and <code>AerosolBuilder</code>
-through explicit temporary imports. They preserve their historical reference and
-mutation behavior, with no native conversion or atmosphere-emulating property.
-M3 owns scientific migration, M4 orchestration/adapters, M5 full examples, and M6
-removes the remaining legacy APIs and tests after their consumers migrate.
-The new aggregate supports batched containers; it does not broaden CPU process
-execution beyond its existing supported box/weight combinations.</p>
+<h2 id="explicit-execution-boundaries">Explicit execution boundaries<a class="headerlink" href="#explicit-execution-boundaries" title="Permanent link">&para;</a></h2>
+<p>Native discrete and resolved particle uploads preserve their tag and raw
+concentration values. Radius-PDF upload is unsupported; never strip metadata to
+bypass validation. Gas names remain externally owned, and native condensation
+and nucleation require explicit exact-carrier species bindings. Direct and
+resident examples show their concrete preparation APIs and synchronization.</p>
+<p>A CPU aggregate replacement cannot rebind existing device arrays or a prepared
+resident request. Explicit restart uses a fresh same-device binding and schema-v5
+canonical checkpoint bytes; CPU inspection is not continuation authority.
+There is no implicit transfer, fallback, migration or recovery. Batched storage
+does not broaden CPU execution beyond supported single-box process contracts.</p>
+<p>Legacy facade and bridge removal belongs to M6 after the examples/documentation
+gate. These temporary implementations are not a supported construction path for
+native examples, and this guide does not authorize a release.</p>
 
 
 

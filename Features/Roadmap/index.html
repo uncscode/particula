@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14102,7 +14102,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14130,7 +14130,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14158,7 +14158,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14407,7 +14407,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17060,7 +17060,7 @@ plan closure separately from unavailable CUDA measurement evidence.</p>
   <a href="data-oriented-gpu/#epic-g-backend-selection-and-gpu-resident-simulation">Epic G</a>.</li>
 <li><strong>Graph capture and performance</strong>: Maintain shipped
   <a href="data-oriented-gpu/#epic-h-graph-capture-and-performance">Epic H</a>'s bounded
-  capture/replay and documentation tracks. Use the <a href="../../Examples/gpu_resident_graph_capture/">native-CUDA
+  capture/replay and documentation tracks. Use the <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py">native-CUDA
   example</a>, <a href="../gpu_graph_capture/">operator
   runbook</a>, and <a href="graph-capture-closeout/">closeout
   record</a>. E8-F7/T7 owns profiling and
@@ -17142,7 +17142,7 @@ meets its exit bar, the next pending epic in the sequence becomes active.</p>
   selector hardening, measured one-thread-per-box limits, documented direct
   kernel entry points, device-aware test policy, and the completed Epic B
   latent-heat example and integration baseline. Shipped artifacts:<ul>
-<li><a href="../../Examples/gpu_direct_kernels_quick_start/">Direct GPU kernels quick-start</a>
+<li><a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py">Direct GPU kernels quick-start</a>
   — explicit-transfer, two-call low-level condensation path with reused
   caller-owned fp64 sidecars; it does not invoke coagulation or configure
   RNG state</li>
@@ -17335,7 +17335,7 @@ document an explicit five-call sequence. Its <code>condensation_step_gpu</code>,
 <li>E5-F8's
   <a href="condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>
   and runnable
-  <a href="../../Examples/gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>.</li>
+  <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py">GPU condensation parity walkthrough</a>.</li>
 <li>E5-F9's
   <a href="../data-containers-and-gpu-foundations/#gpu-coagulation-configuration-and-sidecar-ownership">canonical GPU coagulation ownership contract</a>,
   <a href="../coagulation_strategy_system/#gpu-direct-kernel-foundations-and-limitations">direct-kernel support guide</a>,
@@ -17468,7 +17468,7 @@ document an explicit five-call sequence. Its <code>condensation_step_gpu</code>,
   2026-09-27. Reviewed CUDA measurements remain unavailable; plan closure
   does not establish a measured performance claim. E8-F8 owns the example,
   runbook, limitations, and closeout, with no
-  CPU or Warp-CPU fallback. The <a href="../../Examples/gpu_resident_graph_capture/">native-CUDA example</a>,
+  CPU or Warp-CPU fallback. The <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py">native-CUDA example</a>,
   <a href="../gpu_graph_capture/">operator runbook</a>, and <a href="graph-capture-closeout/">P3 closeout record</a>
   are the discoverable references; the closeout alone owns P3 status/evidence.</li>
 </ul>

@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14089,7 +14089,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14117,7 +14117,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14145,7 +14145,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14394,7 +14394,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17049,6 +17049,10 @@
 <p><strong>Analyze all function definitions provided, improve the docstrings, and ensure clarity, consistency, and adherence to best practices.</strong>  </p>
 </blockquote>
 <hr />
+<p>These are nonexecutable writing templates, not supported API snippets. Replace
+placeholders with verified imports, units and calculated outputs before
+publishing an executable example. Follow the repository Google-style <code>Args:</code>
+convention and 80-character line limit.</p>
 <h2 id="high-level-objective">High-Level Objective<a class="headerlink" href="#high-level-objective" title="Permanent link">&para;</a></h2>
 <ul>
 <li>
@@ -17078,46 +17082,46 @@
 <li><strong>Standardized Docstring Format:</strong><br />
   Use the following format:  </li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">function_name</span><span class="p">(</span><span class="n">param1</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">param2</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">return_type</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Brief description of what the function does.</span>
+<div class="highlight"><pre><span></span><code>def function_name(param1: type, param2: type) -&gt; return_type:
+    """
+    Brief description of what the function does.
 
-<span class="sd">    A description of the function, including the purpose</span>
-<span class="sd">    and methodology. Can be multiple lines. Where calculated as:</span>
+    A description of the function, including the purpose
+    and methodology. Can be multiple lines. Where calculated as:
 
-<span class="sd">    - φ = (γ × β) / c</span>
-<span class="sd">        - φ is Description of φ.</span>
-<span class="sd">        - γ is Description of γ.</span>
-<span class="sd">        - β is Description of β.</span>
-<span class="sd">        - c is Description of the constant.</span>
+    - φ = (γ × β) / c
+        - φ is Description of φ.
+        - γ is Description of γ.
+        - β is Description of β.
+        - c is Description of the constant.
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        - param1 : Description of param1.</span>
-<span class="sd">        - param2 : Description of param2.</span>
+    Arguments:
+        - param1 : Description of param1.
+        - param2 : Description of param2.
 
-<span class="sd">    Returns:</span>
-<span class="sd">        - Description of the return value.</span>
+    Returns:
+        - Description of the return value.
 
-<span class="sd">    Examples:</span>
-<span class="sd">        ``` py title="Example title"</span>
-<span class="sd">        import package_name as np</span>
-<span class="sd">        np.function_name(2, 3)</span>
-<span class="sd">        # Output: 1.5</span>
-<span class="sd">        ```</span>
+    Examples:
+        ``` py title="Example title"
+        import package_name as np
+        np.function_name(2, 3)
+        # Output: 1.5
+        ```
 
-<span class="sd">        ``` py title="Example Usage 2 array input"</span>
-<span class="sd">        import package_name as np</span>
-<span class="sd">        np.function_name(np.array([4,5,5]), np.array([2,3,4]))</span>
-<span class="sd">        # Output: array([4.0, 1.66666667, 1.25])</span>
-<span class="sd">        ```</span>
+        ``` py title="Example Usage 2 array input"
+        import package_name as np
+        np.function_name(np.array([4,5,5]), np.array([2,3,4]))
+        # Output: array([4.0, 1.66666667, 1.25])
+        ```
 
-<span class="sd">    References:</span>
-<span class="sd">        - Author Name, "Title of the Article," Journal Name, Volume, Issue, Year.</span>
-<span class="sd">            [DOI](url_link)</span>
-<span class="sd">        - "Article Title",</span>
-<span class="sd">          [Wikipedia](link)</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">param1</span> <span class="o">*</span> <span class="n">param2</span><span class="p">)</span> <span class="o">/</span> <span class="n">CONSTANT</span>
+    References:
+        - Author Name, "Title of the Article," Journal Name, Volume, Issue, Year.
+            [DOI](url_link)
+        - "Article Title",
+          [Wikipedia](link)
+    """
+    return (param1 * param2) / CONSTANT
 </code></pre></div>
 <ul>
 <li><strong>Mathematical Equation Representation:</strong>  </li>
@@ -17152,61 +17156,61 @@
 <li>ADD <strong>References</strong> for scientific accuracy.  </li>
 </ul>
 <p><strong>Example Before:</strong><br />
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calculate_concentration</span><span class="p">(</span><span class="n">partial_pressure</span><span class="p">,</span> <span class="n">molar_mass</span><span class="p">,</span> <span class="n">temperature</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Calculate the concentration of a gas from its partial pressure, molar mass, and temperature using the ideal gas law.</span>
+<div class="highlight"><pre><span></span><code>def calculate_concentration(partial_pressure, molar_mass, temperature):
+    """Calculate the concentration of a gas from its partial pressure, molar mass, and temperature using the ideal gas law.
 
-<span class="sd">    Parameters:</span>
-<span class="sd">    pressure (float or NDArray[np.float64]): Partial pressure of the gas</span>
-<span class="sd">    in Pascals (Pa).</span>
-<span class="sd">    molar_mass (float or NDArray[np.float64]): Molar mass of the gas in kg/mol</span>
-<span class="sd">    temperature (float or NDArray[np.float64]): Temperature in Kelvin.</span>
+    Parameters:
+    pressure (float or NDArray[np.float64]): Partial pressure of the gas
+    in Pascals (Pa).
+    molar_mass (float or NDArray[np.float64]): Molar mass of the gas in kg/mol
+    temperature (float or NDArray[np.float64]): Temperature in Kelvin.
 
-<span class="sd">    Returns:</span>
-<span class="sd">    - concentration (float or NDArray[np.float64]): Concentration of the gas</span>
-<span class="sd">    in kg/m^3.</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">partial_pressure</span> <span class="o">*</span> <span class="n">molar_mass</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">GAS_CONSTANT</span><span class="p">)</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">)</span>
+    Returns:
+    - concentration (float or NDArray[np.float64]): Concentration of the gas
+    in kg/m^3.
+    """
+    return (partial_pressure * molar_mass) / (float(GAS_CONSTANT) * temperature)
 </code></pre></div></p>
 <p><strong>Example After (With Reference):</strong><br />
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_calculate_concentration</span><span class="p">(</span>
-    <span class="n">partial_pressure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Calculate the concentration of a gas using the ideal gas law.</span>
+<div class="highlight"><pre><span></span><code>def get_calculate_concentration(
+    partial_pressure: Union[float, NDArray[np.float64]],
+    molar_mass: Union[float, NDArray[np.float64]],
+    temperature: Union[float, NDArray[np.float64]],
+) -&gt; Union[float, NDArray[np.float64]]:
+    """
+    Calculate the concentration of a gas using the ideal gas law.
 
-<span class="sd">    The concentration is determined using the equation:</span>
+    The concentration is determined using the equation:
 
-<span class="sd">    - C = (P × M) / (R × T)</span>
-<span class="sd">        - C is the concentration in kg/m³,</span>
-<span class="sd">        - P is the partial pressure in Pascals (Pa),</span>
-<span class="sd">        - M is the molar mass in kg/mol,</span>
-<span class="sd">        - R is the universal gas constant (J/(mol·K)),</span>
-<span class="sd">        - T is the temperature in Kelvin.</span>
+    - C = (P × M) / (R × T)
+        - C is the concentration in kg/m³,
+        - P is the partial pressure in Pascals (Pa),
+        - M is the molar mass in kg/mol,
+        - R is the universal gas constant (J/(mol·K)),
+        - T is the temperature in Kelvin.
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        - partial_pressure : Partial pressure of the gas in Pascals (Pa).</span>
-<span class="sd">        - molar_mass : Molar mass of the gas in kg/mol.</span>
-<span class="sd">        - temperature : Temperature in Kelvin.</span>
+    Arguments:
+        - partial_pressure : Partial pressure of the gas in Pascals (Pa).
+        - molar_mass : Molar mass of the gas in kg/mol.
+        - temperature : Temperature in Kelvin.
 
-<span class="sd">    Returns:</span>
-<span class="sd">        - Concentration of the gas in kg/m³.</span>
+    Returns:
+        - Concentration of the gas in kg/m³.
 
-<span class="sd">    Examples:</span>
-<span class="sd">        ``` py title="Example Usage"</span>
-<span class="sd">        import particula as par</span>
-<span class="sd">        par.gas.get_calculate_concentration(1.5, 0.02897, 298)</span>
-<span class="sd">        # Output: 1.6175</span>
-<span class="sd">        ```</span>
+    Examples:
+        ``` py title="Example Usage"
+        import particula as par
+        par.gas.get_calculate_concentration(1.5, 0.02897, 298)
+        # Output: 1.6175
+        ```
 
-<span class="sd">    References:</span>
-<span class="sd">        - "Ideal Gas Law,"</span>
-<span class="sd">          [Wikipedia](https://en.wikipedia.org/wiki/Ideal_gas_law)</span>
-<span class="sd">        - J. D. Lee, *Physical Chemistry*, 5th ed., Oxford University</span>
-<span class="sd">          Press, 2019.</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">partial_pressure</span> <span class="o">*</span> <span class="n">molar_mass</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">GAS_CONSTANT</span><span class="p">)</span> <span class="o">*</span> <span class="n">temperature</span><span class="p">)</span>
+    References:
+        - "Ideal Gas Law,"
+          [Wikipedia](https://en.wikipedia.org/wiki/Ideal_gas_law)
+        - J. D. Lee, *Physical Chemistry*, 5th ed., Oxford University
+          Press, 2019.
+    """
+    return (partial_pressure * molar_mass) / (float(GAS_CONSTANT) * temperature)
 </code></pre></div></p>
 <hr />
 <h3 id="3-apply-consistency-rules">3. Apply Consistency Rules<a class="headerlink" href="#3-apply-consistency-rules" title="Permanent link">&para;</a></h3>

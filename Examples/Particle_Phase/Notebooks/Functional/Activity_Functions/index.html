@@ -11969,7 +11969,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11997,7 +11997,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12439,7 +12439,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12467,7 +12467,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14293,7 +14293,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14321,7 +14321,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14349,7 +14349,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14598,7 +14598,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17340,39 +17340,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10ca8d5d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="activity-tutorial">Activity Tutorial<a class="anchor-link" href="#activity-tutorial">¶</a></h1><p>This Jupyter notebook is designed to deepen your understanding of mixing behaviors in solutions, focusing on both theoretical models and practical applications. We will explore ideal and non-ideal mixing rules, differentiate between mass-based and molar-based approaches, and introduce the kappa value parameterization for predicting water activity.</p>
-<h2 id="introduction-to-mixing-rules">Introduction to Mixing Rules<a class="anchor-link" href="#introduction-to-mixing-rules">¶</a></h2><p>Mixing rules are essential for predicting the properties of solutions, including their thermodynamic behavior and phase equilibria. In this notebook, we will:</p>
-<ul>
-<li><strong>Define and compare different mixing rules:</strong> Understand how various rules apply to different types of solutions.</li>
-<li><strong>Mass-Based vs. Molar-Based Mixing:</strong> Discuss the implications of choosing mass-based or molar-based calculations for different applications.</li>
-<li><strong>Kappa Value based Activity:</strong> Learn about the kappa value parameterization and its role in modeling water activity in non-ideal solutions.</li>
-</ul>
-<h2 id="structure-of-the-notebook">Structure of the Notebook<a class="anchor-link" href="#structure-of-the-notebook">¶</a></h2><ol>
-<li><p><strong>Mass-Based vs. Molar-Based vs. Volueme-Based</strong></p>
-<ul>
-<li>Definitions and when to use each method</li>
-<li>Examples and comparative analysis</li>
-</ul>
-</li>
-<li><p><strong>Kappa Value Parameterization</strong></p>
-<ul>
-<li>Theory behind kappa values</li>
-<li>Practical exercises on calculating water activity</li>
-</ul>
-</li>
-</ol>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8920f751">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6cd43a13">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17390,18 +17359,109 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># In Colab uncomment the following command to install particula:</span>
-<span class="c1">#!pip install particula[extra] --quiet</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="sd">"""Explore mixing rules and activity coefficient calculations.</span>
 
+<span class="sd">This notebook walks through mass-based, molar-based, and volume-based</span>
+<span class="sd">mixing rules, compares ideal activity coefficients, and demonstrates the</span>
+<span class="sd">kappa value parameterization to model non-ideal solution behavior. Each</span>
+<span class="sd">section builds the required data arrays, computes activities with the</span>
+<span class="sd">public ``par.particles`` helpers, and plots the results.</span>
+
+<span class="sd">Example:</span>
+<span class="sd">    Run this notebook to generate activity coefficient plots for two- and</span>
+<span class="sd">three-component systems under different mixing assumptions.</span>
+<span class="sd">"""</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-1">"""Explore mixing rules and activity coefficient calculations.
+
+This notebook walks through mass-based, molar-based, and volume-based
+mixing rules, compares ideal activity coefficients, and demonstrates the
+kappa value parameterization to model non-ideal solution behavior. Each
+section builds the required data arrays, computes activities with the
+public ``par.particles`` helpers, and plots the results.
+
+Example:
+    Run this notebook to generate activity coefficient plots for two- and
+three-component systems under different mixing assumptions.
+"""</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>'Explore mixing rules and activity coefficient calculations.\n\nThis notebook walks through mass-based, molar-based, and volume-based\nmixing rules, compares ideal activity coefficients, and demonstrates the\nkappa value parameterization to model non-ideal solution behavior. Each\nsection builds the required data arrays, computes activities with the\npublic ``par.particles`` helpers, and plots the results.\n\nExample:\n    Run this notebook to generate activity coefficient plots for two- and\nthree-component systems under different mixing assumptions.\n'</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=aad3e672">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h1 id="activity-tutorial">Activity Tutorial<a class="anchor-link" href="#activity-tutorial">¶</a></h1><p>This Jupyter notebook is designed to deepen your understanding of mixing behaviors in solutions, focusing on both theoretical models and practical applications. We will explore ideal and non-ideal mixing rules, differentiate between mass-based and molar-based approaches, and introduce the kappa value parameterization for predicting water activity.</p>
+<h2 id="introduction-to-mixing-rules">Introduction to Mixing Rules<a class="anchor-link" href="#introduction-to-mixing-rules">¶</a></h2><p>Mixing rules are essential for predicting the properties of solutions, including their thermodynamic behavior and phase equilibria. In this notebook, we will:</p>
+<ul>
+<li><strong>Define and compare different mixing rules:</strong> Understand how various rules apply to different types of solutions.</li>
+<li><strong>Mass-Based vs. Molar-Based Mixing:</strong> Discuss the implications of choosing mass-based or molar-based calculations for different applications.</li>
+<li><strong>Kappa Value based Activity:</strong> Learn about the kappa value parameterization and its role in modeling water activity in non-ideal solutions.</li>
+</ul>
+<h2 id="structure-of-the-notebook">Structure of the Notebook<a class="anchor-link" href="#structure-of-the-notebook">¶</a></h2><ol>
+<li><p><strong>Mass-Based vs. Molar-Based vs. Volume-Based</strong></p>
+<ul>
+<li>Definitions and when to use each method</li>
+<li>Examples and comparative analysis</li>
+</ul>
+</li>
+<li><p><strong>Kappa Value Parameterization</strong></p>
+<ul>
+<li>Theory behind kappa values</li>
+<li>Practical exercises on calculating water activity</li>
+</ul>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0adb5a59">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># In Colab uncomment the following command to install particula:</span>
+<span class="c1"># Use the selected E9 checkout: `python -m pip install -e ".[extra]"`</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1"># In Colab uncomment the following command to install particula:
-#!pip install particula[extra] --quiet
-import numpy as np
+<div class="clipboard-copy-txt" id="cell-2"># In Colab uncomment the following command to install particula:
+# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
 import matplotlib.pyplot as plt
-
+import numpy as np
 import particula as par</div>
 </div>
 </div>
@@ -17409,7 +17469,7 @@ import particula as par</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3f849aed">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2ffa5ac5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17422,15 +17482,15 @@ import particula as par</div>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=aff16ff4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=146a63fd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -17467,7 +17527,7 @@ import particula as par</div>
     <span class="n">molar_masses</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">molar_mass_1</span><span class="p">,</span> <span class="n">molar_mass_2</span><span class="p">,</span> <span class="n">molar_mass_3</span><span class="p">]),</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">masses_1 = np.linspace(0, 100, 1000)
+<div class="clipboard-copy-txt" id="cell-3">masses_1 = np.linspace(0, 100, 1000)
 masses_2 = np.full_like(masses_1, 30)
 masses_3 = np.linspace(150, 10, 1000)
 
@@ -17499,7 +17559,7 @@ mass_fractions_3component = par.particles.get_mole_fraction_from_mass(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d1d9e65e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a828b005">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17511,15 +17571,15 @@ mass_fractions_3component = par.particles.get_mole_fraction_from_mass(
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=02d2a26a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=eec2114e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -17590,7 +17650,7 @@ mass_fractions_3component = par.particles.get_mole_fraction_from_mass(
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">activity_2component_molar = par.particles.get_ideal_activity_molar(
+<div class="clipboard-copy-txt" id="cell-4">activity_2component_molar = par.particles.get_ideal_activity_molar(
     mass_concentration=mass_2component,
     molar_mass=np.array([molar_mass_1, molar_mass_2]),
 )
@@ -17668,7 +17728,7 @@ plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6426ebc1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7d5072c4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17680,15 +17740,15 @@ plt.show()</div>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=83addecc">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f0b54dd0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -17758,7 +17818,7 @@ plt.show()</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4"># Volume activity coefficient
+<div class="clipboard-copy-txt" id="cell-5"># Volume activity coefficient
 activity_2component_volume = par.particles.get_ideal_activity_volume(
     mass_concentration=mass_2component,
     density=density_2component,
@@ -17835,7 +17895,7 @@ plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d6b001c0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f6aa5a01">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17847,15 +17907,15 @@ plt.show()</div>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=73902be0">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d9a2adf6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -17927,7 +17987,7 @@ plt.show()</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5"># Mass activity coefficient
+<div class="clipboard-copy-txt" id="cell-6"># Mass activity coefficient
 activity_2component_mass = par.particles.get_ideal_activity_mass(
     mass_concentration=mass_2component,
 )
@@ -18006,7 +18066,7 @@ plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=738eefc7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e38ca4b9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -18018,15 +18078,15 @@ plt.show()</div>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=06a04cd8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=65009d16">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -18108,7 +18168,7 @@ plt.show()</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6"># kappa activity coefficient
+<div class="clipboard-copy-txt" id="cell-7"># kappa activity coefficient
 
 kappa_1 = 0.0  # kappa of water
 kappa_2 = 0.6  # kappa of component 2
@@ -18197,7 +18257,7 @@ plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f8805485">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=159070f0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

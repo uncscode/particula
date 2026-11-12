@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14089,7 +14089,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14117,7 +14117,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14145,7 +14145,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14402,7 +14402,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17397,11 +17397,15 @@
 <h3 id="objective-function">Objective Function<a class="headerlink" href="#objective-function" title="Permanent link">&para;</a></h3>
 <p>The equilibrium solver minimizes the difference between guessed and calculated partition coefficients:</p>
 <div class="arithmatex">\[\text{Error} = \sum_j (\varepsilon_j^{guess} - \varepsilon_j^{calc})^2 + (C_{liq}^{guess} - C_{liq}^{calc})^2\]</div>
-<p>Convergence is achieved when this error falls below a threshold (typically <span class="arithmatex">\(10^{-16}\)</span>).</p>
+<p>Inspect the returned optimizer success flag and residual for each solve.
+Optimizer termination does not imply a universal <span class="arithmatex">\(10^{-16}\)</span> residual or a
+validated thermodynamic accuracy bound.</p>
 <h3 id="mass-balance">Mass Balance<a class="headerlink" href="#mass-balance" title="Permanent link">&para;</a></h3>
 <p>At equilibrium, mass must be conserved:</p>
 <div class="arithmatex">\[C_j^{total} = C_j^{gas} + C_j^{\alpha} + C_j^{\beta}\]</div>
-<p>where the particle-phase concentrations include both organic mass and associated water.</p>
+<p>Here each species balance counts organic mass only. Associated water supplied
+by the prescribed humidity reservoir is reported separately; adding it to the
+organic species inventory would create a false mass imbalance.</p>
 <h2 id="implementation-in-particula">Implementation in Particula<a class="headerlink" href="#implementation-in-particula" title="Permanent link">&para;</a></h2>
 <p>The equilibria calculations are implemented in the <code>particula.equilibria</code> module:</p>
 <table>
@@ -17462,7 +17466,7 @@
     <span class="n">q_ab</span><span class="o">=</span><span class="n">q_ab</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total liquid concentration: </span><span class="si">{</span><span class="n">system</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> ug/m3"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total liquid organic concentration: </span><span class="si">{</span><span class="n">system</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> ug/m3"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Partition coefficients: </span><span class="si">{</span><span class="n">system</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="key-equations-summary">Key Equations Summary<a class="headerlink" href="#key-equations-summary" title="Permanent link">&para;</a></h2>

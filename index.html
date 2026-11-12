@@ -12268,7 +12268,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -12296,7 +12296,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12728,7 +12728,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12756,7 +12756,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14414,7 +14414,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14442,7 +14442,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14470,7 +14470,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14719,7 +14719,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17360,68 +17360,49 @@ The guide includes installation commands, examples, and compatibility limits.</p
 </code></pre></div></p>
 <p>If you are new to Python or plan on going through the Examples, head to <a href="Examples/Setup_Particula/">Setup Particula</a> for more comprehensive installation instructions.</p>
 <h3 id="quick-start-example">Quick Start Example<a class="headerlink" href="#quick-start-example" title="Permanent link">&para;</a></h3>
-<p>This “Quick Start Example” demonstrates a concise workflow for building an aerosol system in Particula and performing a single condensation step.</p>
+<p>This native single-box example initializes a lognormal PMF and performs one
+10-second condensation step. Use the selected E9 checkout (<code>pip install -e .</code>);
+older published wheels need not contain these migration APIs. The retained
+100 kg/m³ vapor concentration is an exaggerated illustration, not a calibrated
+atmospheric case or an accuracy/convergence claim.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula._legacy_aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">AerosolBuilder</span> <span class="k">as</span> <span class="n">LegacyAerosolBuilder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.condensation.species_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">CondensationSpeciesMap</span>
 
-<span class="c1"># 1. Build the GasSpecies for an organic vapor:</span>
-<span class="n">organic</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpeciesBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="s2">"organic"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">180e-3</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span>
-        <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">1e2</span><span class="p">)</span>  <span class="c1"># Pa</span>
-    <span class="p">)</span>
-    <span class="o">.</span><span class="n">set_partitioning</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e2</span><span class="p">]),</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
+    <span class="n">radius_bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">250</span><span class="p">),</span>
+    <span class="n">mode</span><span class="o">=</span><span class="p">[</span><span class="mf">100e-9</span><span class="p">],</span> <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="p">[</span><span class="mf">1.2</span><span class="p">],</span>
+    <span class="n">number_concentration</span><span class="o">=</span><span class="p">[</span><span class="mf">1e8</span><span class="p">],</span> <span class="n">density</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
 <span class="p">)</span>
-
-<span class="c1"># 2. Use AtmosphereBuilder to configure temperature, pressure, and species:</span>
-<span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mf">298.15</span><span class="p">,</span> <span class="s2">"K"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">101325</span><span class="p">,</span> <span class="s2">"Pa"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_more_partitioning_species</span><span class="p">(</span><span class="n">organic</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">gas</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasData</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s2">"organic"</span><span class="p">],</span> <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.180</span><span class="p">]),</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">100.0</span><span class="p">]]),</span>  <span class="c1"># kg/m³</span>
+    <span class="n">partitioning</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">]),</span>
 <span class="p">)</span>
-
-<span class="c1"># 3. Build the particle distribution:</span>
-<span class="c1">#    Using PresetParticleRadiusBuilder, we set mode radius, GSD, etc.</span>
-<span class="n">particle</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">100e-9</span><span class="p">]),</span> <span class="s2">"m"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_geometric_standard_deviation</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.2</span><span class="p">]))</span>
-    <span class="o">.</span><span class="n">set_number_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e8</span><span class="p">]),</span> <span class="s2">"1/m^3"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">1e3</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">environment</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">EnvironmentData</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="p">[</span><span class="mf">298.15</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="p">[</span><span class="mf">101325.0</span><span class="p">],</span> <span class="n">saturation_ratio</span><span class="o">=</span><span class="p">[[</span><span class="mf">1.0</span><span class="p">]],</span>
 <span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">(</span><span class="n">particles</span><span class="o">=</span><span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="o">=</span><span class="n">gas</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">)</span>
+<span class="n">initial_particle_mass</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">species_mass_inventory</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-<span class="c1"># 4. Create the Aerosol combining the atmosphere and particle distribution:</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">LegacyAerosolBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_particles</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+    <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span> <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">activity_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">(),</span>
+    <span class="n">surface_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyVolume</span><span class="p">(</span>
+        <span class="n">surface_tension</span><span class="o">=</span><span class="mf">0.072</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mf">1000.0</span>
+    <span class="p">),</span>
+    <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">100.0</span><span class="p">),</span>
+    <span class="n">species_map</span><span class="o">=</span><span class="n">CondensationSpeciesMap</span><span class="p">((</span><span class="s2">"organic"</span><span class="p">,),</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),)),</span>
 <span class="p">)</span>
-
-<span class="c1"># 5. Define the isothermal condensation strategy:</span>
-<span class="n">condensation_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
-    <span class="n">molar_mass</span><span class="o">=</span><span class="mf">180e-3</span><span class="p">,</span>  <span class="c1"># kg/mol</span>
-    <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
-    <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># 6. Build the MassCondensation process:</span>
-<span class="n">process</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span><span class="n">condensation_strategy</span><span class="p">)</span>
-
-<span class="c1"># 7. Execute the condensation process over 10 seconds:</span>
+<span class="n">process</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span><span class="n">strategy</span><span class="p">)</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
-
-<span class="c1">#   The result is an Aerosol instance with updated particle properties.</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">species_mass_density</span><span class="p">)</span>  <span class="c1"># kg/m³</span>
 </code></pre></div>
+<p>The PMF stores bin number densities and uses the canonical 1 m³ reference
+volume. See <a href="Features/particle-data-migration/construction/">native construction</a>
+and <a href="Features/particle-data-migration/containers/">access and replacement</a>.</p>
 <hr />
 <h3 id="feature-deep-dives">Feature deep-dives<a class="headerlink" href="#feature-deep-dives" title="Permanent link">&para;</a></h3>
 <ul>
@@ -17446,7 +17427,7 @@ The guide includes installation commands, examples, and compatibility limits.</p
   The step has no hidden transfer, CPU fallback, resize/compaction, GPU
   <code>Runnable</code>, scheduler/backend integration, or performance guarantee. See the
   <a href="Features/nucleation_strategy_system/#direct-warp-low-level-step">nucleation contract</a>
-  and <a href="Examples/Nucleation/gpu_direct_nucleation/">direct-Warp example</a>.</li>
+  and <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py">direct-Warp example</a>.</li>
 <li>GPU dilution P1–P4 is a direct, low-level operation imported with
    <code>from particula.gpu.kernels import dilution_step_gpu</code>. It applies
    <code>c_new = c * exp(-alpha * time_step)</code> in place to particle and gas
@@ -17574,7 +17555,7 @@ fallback. It makes no public adapter, <code>Runnable</code>, CUDA, or performanc
   are Shipped by maintainer decision; measured results remain unshipped
   pending reviewed evidence. E8-F7/T7 owns profiling and machine-bounded
   recommendations; E8-F8 owns the example, runbook, limitations, and closeout.
-  See the <a href="Examples/gpu_resident_graph_capture/">native-CUDA example</a>,
+  See the <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py">native-CUDA example</a>,
   <a href="Features/gpu_graph_capture/">operator runbook</a>, and <a href="Features/Roadmap/graph-capture-closeout/">roadmap closeout record</a>.</p>
 </li>
 </ul>

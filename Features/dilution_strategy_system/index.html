@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14197,7 +14197,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14225,7 +14225,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14253,7 +14253,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14502,7 +14502,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -16972,7 +16972,22 @@ downstream consumer of this CPU reference only; this guide does not deliver
 E6-F2 or CPU/GPU parity.</p>
 <h2 id="public-api-and-equation">Public API and equation<a class="headerlink" href="#public-api-and-equation" title="Permanent link">&para;</a></h2>
 <p>Construct the public strategy and runnable through <code>particula.dynamics</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+<span class="n">particles</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_resolved_particle_data</span><span class="p">(</span>
+    <span class="n">masses</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-18</span><span class="p">,</span> <span class="mf">2e-18</span><span class="p">],</span> <span class="n">density</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">],</span> <span class="n">volume</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">gas</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasData</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s2">"vapor"</span><span class="p">,</span> <span class="s2">"inert"</span><span class="p">],</span> <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">]),</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">3e-6</span><span class="p">,</span> <span class="mf">5e-6</span><span class="p">]]),</span>
+    <span class="n">partitioning</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]),</span>
+<span class="p">)</span>
+<span class="n">environment</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">EnvironmentData</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="p">[</span><span class="mf">298.15</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="p">[</span><span class="mf">101325.0</span><span class="p">],</span> <span class="n">saturation_ratio</span><span class="o">=</span><span class="p">[[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]],</span>
+<span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">(</span><span class="n">particles</span><span class="o">=</span><span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="o">=</span><span class="n">gas</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">)</span>
 
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">DilutionStrategy</span><span class="p">(</span><span class="n">coefficient</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 <span class="n">dilution</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Dilution</span><span class="p">(</span><span class="n">strategy</span><span class="p">)</span>
@@ -16984,11 +16999,12 @@ object. For chamber volume <code>V</code> [m³] and dilution flow <code>Q</code>
 coefficient is <code>alpha = Q / V</code> [s⁻¹]. Every supported concentration follows
 the exact exponential update</p>
 <p><code>c_new = c * exp(-alpha * time_step)</code>.</p>
-<p>Here <code>time_step</code> is in [s], particle number concentration is in [1/m³], and
-gas mass concentration is in [kg/m³]. The runnable operates on CPU scalar
-state: elementwise particle concentration, scalar partitioning gas
-concentration, and multi-species gas-only concentration are supported. This
-does not imply multi-box transport support.</p>
+<p>Here <code>time_step</code> is in s. Native resolved particle storage holds counts;
+PMF storage holds bin number density (m⁻³), and PDF storage holds <code>dn/dr</code>
+(m⁻⁴). All receive the same multiplicative decay at fixed volume. All lanes of
+the unified <code>GasData.concentration</code> (kg/m³) decay, regardless of partitioning.
+The native runnable supports one box; storage shapes do not imply multi-box
+transport support. Use the selected E9 checkout (<code>pip install -e .</code>).</p>
 <h2 id="execution-validation-and-recovery">Execution, validation, and recovery<a class="headerlink" href="#execution-validation-and-recovery" title="Permanent link">&para;</a></h2>
 <p><code>sub_steps</code> must be a positive, non-boolean Python or NumPy integer. For the
 concrete exact-exponential strategy, the runnable performs one total-duration
@@ -17000,14 +17016,15 @@ complex values are rejected, and booleans and non-scalars are rejected.</p>
 still preflighted even for a no-op. Concrete CPU dilution supports exactly one
 particle box and validates state
 before mutation. If validation fails, state is unchanged; if an unexpected
-setter failure occurs, already-written concentration state is rolled back.
+CPU write failure occurs, it restores attempted concentration writes from
+snapshots. Held containers and destination-array identities are retained.
 These atomicity and retry-safe failure guarantees let callers correct input and
 retry safely. Extreme finite decay may underflow to zero, but outputs remain
 finite and nonnegative.</p>
 <p>Dilution changes only particle number concentration and gas mass
 concentrations. It protects particle distribution/mass, charge, density,
 representation volume, gas names, molar masses, partitioning metadata, and
-atmospheric temperature and pressure.</p>
+environment temperature, pressure and saturation ratios.</p>
 <h2 id="boundaries-and-example">Boundaries and example<a class="headerlink" href="#boundaries-and-example" title="Permanent link">&para;</a></h2>
 <p>This CPU scalar contract excludes inlet composition or source terms, multi-box
 particle data and transport, GPU, Warp, CUDA, alternate-backend implementation or parity,

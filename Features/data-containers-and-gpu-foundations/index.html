@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -13521,15 +13521,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e9-m1-developer-contract-and-m2-handoff" class="md-nav__link">
+  <a href="#native-data-contract" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E9-M1 developer contract and M2 handoff
+        Native data contract
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="E9-M1 developer contract and M2 handoff">
+    <nav class="md-nav" aria-label="Native data contract">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -13577,10 +13577,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#m2-only-aggregate-replacement-specification" class="md-nav__link">
+  <a href="#aggregate-access-and-validated-replacement" class="md-nav__link">
     <span class="md-ellipsis">
       
-        M2-only aggregate replacement specification
+        Aggregate access and validated replacement
       
     </span>
   </a>
@@ -14680,7 +14680,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14708,7 +14708,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14736,7 +14736,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14985,7 +14985,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17418,15 +17418,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e9-m1-developer-contract-and-m2-handoff" class="md-nav__link">
+  <a href="#native-data-contract" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E9-M1 developer contract and M2 handoff
+        Native data contract
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="E9-M1 developer contract and M2 handoff">
+    <nav class="md-nav" aria-label="Native data contract">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -17474,10 +17474,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#m2-only-aggregate-replacement-specification" class="md-nav__link">
+  <a href="#aggregate-access-and-validated-replacement" class="md-nav__link">
     <span class="md-ellipsis">
       
-        M2-only aggregate replacement specification
+        Aggregate access and validated replacement
       
     </span>
   </a>
@@ -17929,17 +17929,17 @@
 
 
 <h1 id="data-containers-and-gpu-foundations">Data Containers and GPU Foundations<a class="headerlink" href="#data-containers-and-gpu-foundations" title="Permanent link">&para;</a></h1>
-<p>This page is the canonical reference for Particula's shipped data-container
+<p>This page is the canonical reference for the selected E9 checkout's data-container
 schemas, leading-axis shape conventions, explicit CPU↔GPU transfer helpers,
 the direct-kernel troubleshooting contract, and current CPU/GPU support
 boundaries.</p>
-<p>For a runnable walkthrough of the shipped single-box container construction and
+<p>For a runnable walkthrough of native single-box container construction and
 optional Warp CPU-backend round trips, see the
 <a href="../../Examples/Data_Containers/">Data Containers example</a> and run:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/data_containers_and_gpu_foundations.py
 </code></pre></div>
 <p>For the low-level direct-kernel path, use the canonical quick-start at
-<a href="../../Examples/gpu_direct_kernels_quick_start/"><code>docs/Examples/gpu_direct_kernels_quick_start.py</code></a>.
+<a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py"><code>docs/Examples/gpu_direct_kernels_quick_start.py</code></a>.
 That example keeps direct step imports explicit through <code>particula.gpu.kernels</code>
 while top-level <code>particula.gpu</code> stays focused on <code>WARP_AVAILABLE</code> and the
 <code>to_warp_*</code> / <code>from_warp_*</code> transfer helpers.</p>
@@ -17955,6 +17955,9 @@ while top-level <code>particula.gpu</code> stays focused on <code>WARP_AVAILABLE
 <a href="../particle-data-migration/">Particle &amp; Gas Data Migration</a>. For future work
 and planned expansions, see the
 <a href="../Roadmap/data-oriented-gpu/">Data-Oriented Design and GPU Roadmap</a>.</p>
+<p>The Python snippets below share imports and state in page order. Warp examples
+require Warp installed and select its CPU device explicitly; no CUDA evidence
+is implied. Native transfers and caller-owned scratch remain visible.</p>
 <h2 id="public-imports">Public imports<a class="headerlink" href="#public-imports" title="Permanent link">&para;</a></h2>
 <h3 id="concrete-cpu-structural-alignment-p4">Concrete CPU structural alignment (P4)<a class="headerlink" href="#concrete-cpu-structural-alignment-p4" title="Permanent link">&para;</a></h3>
 <p>Import <code>validate_aerosol_structure</code> directly from
@@ -17968,7 +17971,7 @@ allowed. Caller-managed full gas and ratio lane order remains unchanged.</p>
 <p>This structural check cannot certify a same-width permutation of ratio lanes.
 Expected ordered names and ratio-producer provenance, particle/gas mapping,
 mask eligibility, physical validity, and distribution/process admission belong
-to later M3/M4 process bindings, not to this P4 helper.</p>
+to process bindings, not to this structural helper.</p>
 <h3 id="cpu-particle-population-interpretation">CPU particle population interpretation<a class="headerlink" href="#cpu-particle-population-interpretation" title="Permanent link">&para;</a></h3>
 <p>For new builder-created <code>ParticleData</code>, explicitly call
 <code>set_distribution_type("discrete" | "continuous_pdf" | "particle_resolved")</code>
@@ -17986,13 +17989,12 @@ zero PDF and zero population mass.</p>
 <p>Call <code>validate_representation()</code> after directly constructing or mutating
 writable particle arrays; new population helpers call it on each read and
 reject invalid interpretation without repairing input. The caller owns
-representation-consistent changes. Tagged particle data is rejected before
-<code>to_warp_particle_data()</code> uploads it: the current Warp carrier cannot preserve
-its kind/grid metadata. <code>to_representation()</code> likewise rejects tagged data
-because the legacy facade cannot retain that provenance. Existing untagged
-explicit Warp transfers continue
-to support the older raw-array boundary; they do not provide PDF execution
-or tagged round trips.</p>
+representation-consistent changes. Native Warp transfers preserve the explicit
+<code>discrete</code> or <code>particle_resolved</code> kind and its volume interpretation. Continuous
+PDF upload is unsupported; do not clear a tag to bypass admission. Legacy
+untagged transfers remain compatibility storage, not native process admission.
+<code>to_representation()</code> rejects tagged data because the legacy facade cannot
+retain that provenance.</p>
 <p>Prefer the currently exported package-level imports. The low-level
 <code>particula.gpu</code> container, conversion-helper, explicit-transfer, and
 direct-kernel workflow is experimental, but these import paths and its
@@ -18008,11 +18010,12 @@ caller-owned transfer model are supported:</p>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParticleData</span>
 </code></pre></div>
-<h2 id="e9-m1-developer-contract-and-m2-handoff">E9-M1 developer contract and M2 handoff<a class="headerlink" href="#e9-m1-developer-contract-and-m2-handoff" title="Permanent link">&para;</a></h2>
-<p>M1 delivers CPU interpretation helpers and read-only structural validation.
-It does not migrate scientific consumers or implement the data-native
-<code>Aerosol</code> aggregate. Legacy untagged carriers remain available, but their raw
-arrays do not establish a distribution interpretation.</p>
+<h2 id="native-data-contract">Native data contract<a class="headerlink" href="#native-data-contract" title="Permanent link">&para;</a></h2>
+<p>Native <code>Aerosol</code> holds <code>ParticleData</code>, <code>GasData</code> and <code>EnvironmentData</code> by
+identity. Scientific processes own their physics and validate their supported
+single-box inputs. Legacy untagged carriers remain available, but their raw
+arrays do not establish a distribution interpretation. This guide describes
+the selected checkout; it does not announce a release or M6 facade removal.</p>
 <h3 id="stored-units-and-physical-inventories">Stored units and physical inventories<a class="headerlink" href="#stored-units-and-physical-inventories" title="Permanent link">&para;</a></h3>
 <p>Let <code>c[b,n]</code> be stored concentration, <code>m[b,n,s]</code> per-particle species mass
 in kg, and <code>V[b]</code> physical volume in m³. The declared kind is authoritative;
@@ -18057,7 +18060,7 @@ node per slot. Integrate the product of varying species mass and PDF on that
 interval, without extrapolation; summing PDF nodes or multiplying separate
 integrals is incorrect. Zero PDF and mass on a valid grid are allowed.
 Density-to-storage conversion would multiply by V only for resolved counts;
-M1 supplies no inverse-conversion helper or automatic rescaling.</p>
+Reading these properties performs no inverse conversion or automatic rescaling.</p>
 <p><code>species_mass_inventory</code> is species mass density times V, in kg per box.
 <code>total_mass</code> is instead mass per particle, summed over species. Gas
 <code>concentration</code> is always kg/m³, so extensive gas inventory is concentration
@@ -18131,11 +18134,11 @@ one full order. Environment saturation ratios use all <code>Sg</code> lanes in t
 order, including nonpartitioning species; a mask never compresses storage.
 The structural checker requires nonblank unique names and matching dimensions,
 but matching widths cannot prove the ratio producer used the right chemistry.</p>
-<p>A future process binding must compare expected full ordered gas names and
+<p>A process binding must compare expected full ordered gas names and
 ratio-producer provenance and supply explicit unique, in-range, one-to-one
 <code>(gas_index, particle_index)</code> pairs. It must check mapped mask eligibility,
 classify unmatched species, and admit physical values and distribution
-capabilities before mutation. These process gates remain M3/M4 work.
+capabilities before mutation. See the <a href="../native_scientific_processes/">native scientific process contract</a>.
 An all-false mask preserves all gas/ratio lanes and admits no partitioning
 transfer; it is not an empty gas container.</p>
 <p>The data-only integration regression uses particle order <code>[solute_a, solute_b]</code>
@@ -18157,35 +18160,38 @@ Callers own device placement and synchronization.</p>
 <p>Downloads are <code>from_warp_particle_data(gpu_data, sync=True)</code>,
 <code>from_warp_gas_data(gpu_data, name=None, sync=True)</code>, and
 <code>from_warp_environment_data(gpu_data, sync=True)</code>; <code>sync=False</code> requires
-caller synchronization before host access. Particle restore is untagged and
-must not be assumed detached from Warp CPU storage; explicitly copy when
+caller synchronization before host access. Native particle restore preserves
+its population kind and volume but must not be assumed detached from Warp CPU
+storage; explicitly copy when
 independent CPU ownership is needed. Preserve gas names externally and pass
 <code>name=</code> to restore their meaning; otherwise names are placeholders. GPU vapor
 pressure is omitted on CPU restore. Restored gas numeric storage can also
 share Warp CPU arrays; use <code>copy()</code> when isolation is required. Environment
 construction detaches its
 restored arrays. The detailed raw transfer tables below remain authoritative.</p>
-<p>Tagged particles are rejected by both Warp upload and legacy facade restore
-because neither carrier preserves kind/grid provenance. Do not clear the tag
-to bypass this check. M1 does not deliver tagged Warp round trips, GPU PDF
-execution, resident metadata migration, or performance evidence.</p>
-<h3 id="m2-only-aggregate-replacement-specification">M2-only aggregate replacement specification<a class="headerlink" href="#m2-only-aggregate-replacement-specification" title="Permanent link">&para;</a></h3>
-<p>The approved future interface is keyword-only
+<p>Native direct condensation and nucleation require explicit species bindings
+prepared against the transferred containers. Resident restart needs fresh
+bindings for the fresh containers; CPU object replacement does not rebind GPU
+state. See the <a href="../particle-data-migration/dynamics/">migration dynamics guide</a>
+and the runnable direct and resident examples. GPU PDF execution and
+cross-device continuation are unsupported; no performance evidence follows
+from successful transfers.</p>
+<h3 id="aggregate-access-and-validated-replacement">Aggregate access and validated replacement<a class="headerlink" href="#aggregate-access-and-validated-replacement" title="Permanent link">&para;</a></h3>
+<p>The native interface is keyword-only
 <code>Aerosol(particles=..., gas=..., environment=...)</code>, identity-returning properties
 with validated setters, and keyword-only
-<code>replace_data(particles=..., gas=..., environment=...)</code> requiring all three.
-These are <strong>specified for M2, not shipped M1 APIs</strong>.</p>
-<p>Validate the complete proposed triple before publishing any reference.
-Same-object assignment preserves identity; a compatible distinct candidate is
-retained by identity. An incompatible single setter rejects without changing
-held or candidate state. A compatible all-three layout change publishes the
-three supplied identities together; one invalid candidate rejects the entire
-operation. Do not implement this by chaining setters or by reconstructing
-containers for validation. Representation validation and structural alignment
-are separate checks; process mapping and physics admission remain later gates.
-Acceptance implies no hidden copy, transfer, GPU/resident rebinding or automatic
-interception of subsequent raw edits. M1's final validation and maintainer
-handoff approval are required before M2 starts.</p>
+<code>replace_data(particles=..., gas=..., environment=...)</code> requiring all three.</p>
+<p>The aggregate validates the complete proposed triple before publishing any
+reference. Same-object assignment preserves identity; a compatible distinct
+candidate is retained by identity. An incompatible single setter rejects
+without changing held or candidate state. A compatible all-three layout change
+publishes the three supplied identities together; one invalid candidate rejects
+the entire operation. Representation validation and structural alignment are
+separate checks; process mapping and physics admission remain process gates.
+Acceptance implies no hidden copy, transfer, GPU/resident rebinding, inventory
+conservation or automatic interception of subsequent raw edits. See
+<a href="../particle-data-migration/containers/">access and replacement</a> for executable
+examples and rejection checks.</p>
 <h2 id="execution-selection">Execution selection<a class="headerlink" href="#execution-selection" title="Permanent link">&para;</a></h2>
 <p>The package-level selection and policy values are stable and dependency-neutral.
 Their complete availability and explicit-fallback contract is in <a href="../backend_selection/">Backend
@@ -18291,12 +18297,14 @@ intentionally concrete-only at
 selected-condensation import, backend-registration recipe, or selected-step
 workflow. Availability and fallback mechanics, adapters, resident seams,
 registries, and GPU sidecars remain concrete-only.</p>
-<p>Selected CPU execution retains a caller-owned legacy <code>Aerosol</code> and calls a
+<p>Selected CPU execution retains a caller-owned native <code>Aerosol</code> and calls a
 caller-owned <code>MassCondensation</code>. Selected Warp execution retains supplied
 caller-owned resident <code>WarpParticleData</code>, <code>WarpGasData</code>, and
-<code>WarpEnvironmentData</code>, plus same-device fixed-shape sidecars. Profile selection
-is catalogue/capability metadata: it does not bind or validate a supplied CPU
-runnable or Warp sidecars against that profile. The result retains selected
+<code>WarpEnvironmentData</code>, plus same-device fixed-shape sidecars. The CPU profile is catalogue metadata and does not bind the supplied runnable
+to its declared semantics. The selected Warp adapter checks required latent-heat
+sidecars and activity/surface mode selectors against its profile before kernel
+resolution. Native tagged state additionally requires a species binding pinned
+to the exact particle/gas arrays; gas and particle species widths may differ. The result retains selected
 state and native payload identity; it does not convert or restore either state
 form.</p>
 <p>Before resident Warp execution, callers explicitly use
@@ -18322,7 +18330,7 @@ raw-proposal failure occurs before P2 commit in its failing substep, but
 completed earlier substeps remain committed and documented vapor-pressure/work
 sidecars may already be written. Callers needing retry semantics must use their
 own snapshot/restore.</p>
-<p>The <a href="../../Examples/gpu_direct_kernels_quick_start/">direct-kernel quick start</a>
+<p>The <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py">direct-kernel quick start</a>
 is the supported explicit-transfer path. It is separate from the bounded
 <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_session.py">GPU-resident session example</a>, which
 documents lifecycle ownership rather than process execution.</p>
@@ -18572,7 +18580,7 @@ guarantee. Checkpoint/finalize/restart remain the explicit exact-device boundary
 documented in <a href="../gpu_resident_checkpoints/">GPU resident checkpoints</a>.</p>
 <h3 id="e7-f9-resident-support-validation-matrix-2026-08-11">E7-F9 resident support validation matrix (2026-08-11)<a class="headerlink" href="#e7-f9-resident-support-validation-matrix-2026-08-11" title="Permanent link">&para;</a></h3>
 <p>The supported resident example is the repository-relative
-<a href="../../Examples/gpu_resident_multi_timestep/">multi-timestep resident source</a>.
+<a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py">multi-timestep resident source</a>.
 This closeout is scoped to <a href="https://github.com/Gorkowski/particula/issues/1451">issue #1451</a>.</p>
 <p><strong>Status: closeout validation pending.</strong> The historical four-module evidence
 passed, but shipment now requires the corrected five-module coverage command
@@ -18737,8 +18745,15 @@ post-writer rollback.</p>
 <h2 id="cpu-slot-diagnostics">CPU slot diagnostics<a class="headerlink" href="#cpu-slot-diagnostics" title="Permanent link">&para;</a></h2>
 <p><code>get_slot_diagnostics()</code> is the public CPU-only, read-only discovery API for
 fixed particle-resolved <code>ParticleData</code> storage:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_slot_diagnostics</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParticleData</span><span class="p">,</span> <span class="n">get_slot_diagnostics</span>
 
+<span class="n">particle_data</span> <span class="o">=</span> <span class="n">ParticleData</span><span class="p">(</span>
+    <span class="n">masses</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mf">1e-18</span><span class="p">,</span> <span class="mf">2e-18</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]]]),</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]]),</span> <span class="n">charge</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">1200.0</span><span class="p">]),</span> <span class="n">volume</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-6</span><span class="p">]),</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"particle_resolved"</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">free_indices</span><span class="p">,</span> <span class="n">active_counts</span><span class="p">,</span> <span class="n">free_counts</span> <span class="o">=</span> <span class="n">get_slot_diagnostics</span><span class="p">(</span><span class="n">particle_data</span><span class="p">)</span>
 </code></pre></div>
 <p>CPU and direct-Warp primitives classify slots identically before diagnostics or
@@ -18795,7 +18810,20 @@ preserved. It returns a fresh <code>np.int32</code> activated-count vector per b
 <p>Use the package-exported direct boundary when a caller-managed
 <code>WarpParticleData</code> must fill fixed-capacity free slots without moving state to
 the CPU:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">activate_slots_gpu</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">warp</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">wp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_warp_particle_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">activate_slots_gpu</span>
+
+<span class="c1"># Continue the fixed-capacity CPU example above with explicit Warp CPU storage.</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="n">to_warp_particle_data</span><span class="p">(</span><span class="n">particle_data</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">request_masses</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mf">2e-18</span><span class="p">,</span> <span class="mf">3e-18</span><span class="p">]]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">request_concentration</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">request_charge</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">requested_counts</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">activated_counts</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">free_indices</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">active_counts</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">free_counts</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
 
 <span class="n">activated_counts</span><span class="p">,</span> <span class="n">free_indices</span><span class="p">,</span> <span class="n">active_counts</span><span class="p">,</span> <span class="n">free_counts</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">activate_slots_gpu</span><span class="p">(</span>
@@ -19037,6 +19065,7 @@ saturation ratio belong to <code>EnvironmentData</code>.</p>
     <span class="n">charge</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">]]),</span>
     <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">1200.0</span><span class="p">]),</span>
     <span class="n">volume</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-6</span><span class="p">]),</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"particle_resolved"</span><span class="p">,</span>  <span class="c1"># raw concentration stores counts</span>
 <span class="p">)</span>
 
 <span class="n">gas_data</span> <span class="o">=</span> <span class="n">GasData</span><span class="p">(</span>
@@ -19107,6 +19136,9 @@ re-exported by <code>particula.gpu.kernels</code> or <code>particula.gpu</code>:
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">wall_loss_step_gpu</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.wall_loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeutralWallLossConfig</span>
 
+<span class="c1"># Use the native container construction immediately above; no hidden transfer.</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="n">to_warp_particle_data</span><span class="p">(</span><span class="n">particle_data</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">rng_states</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
 <span class="n">config</span> <span class="o">=</span> <span class="n">NeutralWallLossConfig</span><span class="p">(</span>
     <span class="n">geometry</span><span class="o">=</span><span class="s2">"spherical"</span><span class="p">,</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
@@ -19209,11 +19241,11 @@ consumes no draw. Exact CPU/Warp or per-seed RNG replay is not promised.</p>
 <p>Warp CPU is the baseline when Warp is installed; CUDA is optional and skips
 cleanly when unavailable. The evidence is not CPU-strategy parity or per-seed
 trajectory replay.</p>
-<p>GPU process orchestration, backend selection and scheduling, GPU-resident
-timestep integration, resizing, graph capture, autodiff, performance claims,
-and GPU nucleation remain deferred. The separate CPU-only, one-box
-<code>Nucleation</code> runnable is documented in the
-<a href="../nucleation_strategy_system/">CPU Nucleation Strategy System</a>.</p>
+<p>These direct wall-loss checks do not by themselves establish orchestration,
+capture, autodiff or performance evidence. Native resident integration has its
+own <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py">walkthrough</a>, and direct GPU
+nucleation has its own <a href="../nucleation_strategy_system/#direct-warp-low-level-step">source contract</a>.
+The CPU-only, one-box <code>Nucleation</code> runnable remains a separate high-level path.</p>
 <h3 id="particle-transfer-boundary">Particle transfer boundary<a class="headerlink" href="#particle-transfer-boundary" title="Permanent link">&para;</a></h3>
 <p><code>WarpParticleData</code> is the explicit Warp mirror for <code>ParticleData</code>. Use the
 helper boundary when particle-resident arrays must move between CPU-owned
@@ -19637,12 +19669,15 @@ caller-owned configuration sidecar for <code>condensation_step_gpu()</code>. Act
 all non-water species use unit activity. Static tension uses the current
 species' supplied value, while composition-weighted tension computes one
 particle-wide value from the per-species tensions.</p>
-<p><code>kappas</code> and <code>molar_mass_reference</code> must be same-device <code>wp.float64</code> arrays of
-shape <code>(n_species,)</code>. Kappas must be finite and nonnegative, and ordered molar
-masses must exactly match <code>gas.molar_mass</code>; this preserves the positional
-ordered-molar-mass compatibility contract. The frozen dataclass prevents field
-rebinding, not mutation of its arrays. Callers retain those arrays and must not
-mutate them concurrently with a launch.</p>
+<p>For native calls, let <code>Sp</code> be particle-material width and <code>Sg</code> full gas width.
+<code>kappas</code> and <code>molar_mass_reference</code> are same-device <code>wp.float64</code> arrays shaped
+<code>(Sp,)</code>. The water selector addresses a particle-material lane. Kappas are
+finite and nonnegative; reference molar masses are finite and positive.
+Every mapped particle reference must exactly equal its corresponding gas
+molar mass through the explicit species map; unmapped particle references
+remain particle-order data. Only the legacy equal-width path uses positional
+whole-array equality with <code>gas.molar_mass</code>. The frozen dataclass prevents
+rebinding, not array mutation; callers must not mutate storage during launch.</p>
 <p>Successful direct calls mutate particle masses and gas concentration in place,
 overwrite the derived GPU-only vapor-pressure buffer, and return the accumulated
 <strong>P2-finalized, inventory-limited</strong> transfer. A supplied total-transfer buffer
@@ -19668,24 +19703,61 @@ strategies are not silently copied or approximated; passing
 <code>activity_surface=None</code> retains legacy unit activity and static tension.</p>
 <p><code>CondensationScratchBuffers</code> is a concrete-module-only optional sidecar at
 <code>particula.gpu.kernels.condensation</code>; it is not another step entry point.
-Particle mass, transfer, and scratch transfer arrays are active-device
-<code>wp.float64</code> with shape <code>(n_boxes, n_particles, n_species)</code>; gas concentration
-and energy arrays are active-device <code>wp.float64</code> with shape
-<code>(n_boxes, n_species)</code>; scratch property arrays are active-device <code>wp.float64</code>
-with shape <code>(n_boxes,)</code>; and latent heat and thermal work arrays are
-active-device <code>wp.float64</code> with shape <code>(n_species,)</code>. Supplied
-transfer fields must be active-device, stable-shape <code>wp.float64</code> arrays with
-shape <code>(n_boxes, n_particles, n_species)</code>, and supplied property fields must be
-active-device, stable-shape <code>wp.float64</code> arrays with shape <code>(n_boxes,)</code>.
-The P2 demand, release, and scale sidecars must likewise be caller-owned,
-active-device, stable-shape <code>wp.float64</code> arrays with shape
-<code>(n_boxes, n_species)</code>. Every supplied field is metadata-validated for its
-applicable shape, dtype, and active device before launch; each may be omitted
-independently, in which case the step allocates only that field's fallback
-storage. Supplied fields preserve identity and remain caller-owned, but
-successful calls intentionally write their mutable work/output storage. No new
-container field, sidecar API, host conversion, synchronization, or transfer is
-implied by this ownership contract.</p>
+Native buffers use independent particle and gas widths:</p>
+<table>
+<thead>
+<tr>
+<th>Field family</th>
+<th>Shape</th>
+<th>Lane authority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Particle mass, accumulated transfer, raw/finalized scratch transfer</td>
+<td><code>(B, N, Sp)</code></td>
+<td>Particle-material order</td>
+</tr>
+<tr>
+<td>Gas concentration, vapor pressure, energy output</td>
+<td><code>(B, Sg)</code></td>
+<td>Full gas order</td>
+</tr>
+<tr>
+<td>P2 demand, release, scale and gas accumulator</td>
+<td><code>(B, Sg)</code></td>
+<td>Full gas order</td>
+</tr>
+<tr>
+<td>Latent heat and deferred thermal work</td>
+<td><code>(Sg,)</code></td>
+<td>Full gas order</td>
+</tr>
+<tr>
+<td>Thermodynamic model codes/reference masses</td>
+<td><code>(Sg,)</code></td>
+<td>Full gas order</td>
+</tr>
+<tr>
+<td>Activity kappas/reference masses</td>
+<td><code>(Sp,)</code></td>
+<td>Particle-material order</td>
+</tr>
+<tr>
+<td>Scratch environment properties</td>
+<td><code>(B,)</code></td>
+<td>Box order</td>
+</tr>
+</tbody>
+</table>
+<p>Numeric transfer/property/thermal storage is same-device <code>wp.float64</code>;
+thermodynamic model codes are <code>wp.int32</code>. <code>B</code> is box count and <code>N</code> is fixed
+particle capacity. Every supplied field is validated for its applicable shape,
+dtype and device. Independently omitted optional scratch fields use fallback
+allocations; supplied fields retain identity but mutable work/output storage is
+written on success. An explicit binding connects the two species orders; equal
+array widths alone do not establish chemical alignment. No implicit transfer,
+container replacement or automatic rebinding follows from these shapes.</p>
 <p>The direct condensation parity suite exercises all four activity/surface pairs
 (ideal/static, ideal/composition-weighted, kappa/static, and
 kappa/composition-weighted) against an independent NumPy <code>float64</code> reference.
@@ -19698,7 +19770,7 @@ particle transfer equals the opposing gas change. These checks remain a bounded
 direct-step contract, not a general CPU-strategy parity claim.</p>
 <h3 id="latent-rate-correction-and-energy-diagnostic">Latent-rate correction and energy diagnostic<a class="headerlink" href="#latent-rate-correction-and-energy-diagnostic" title="Permanent link">&para;</a></h3>
 <p>The direct step accepts optional keyword-only caller-owned active-device
-<code>wp.float64</code> <code>latent_heat</code> with shape <code>(n_species,)</code>. For species <code>i</code>, its
+<code>wp.float64</code> <code>latent_heat</code> with shape <code>(Sg,)</code> in full gas order. For species <code>i</code>, its
 shipped latent-rate correction is
 <code>dm_i/dt = isothermal_rate_i / correction_i</code>, where
 <code>isothermal_rate_i = k_i * Delta_p_i * M_i / (R * T)</code>,
@@ -19709,10 +19781,11 @@ factor is
 Here <code>p_surface_i</code> is the activity- and Kelvin-adjusted surface vapor pressure.
 An omitted sidecar, or exactly <code>L_i = 0</code>, follows the exact isothermal branch.</p>
 <p>Optional keyword-only <code>energy_transfer</code> is a caller-owned active-device
-<code>wp.float64</code>, <code>(n_boxes, n_species)</code>, write-only output. It requires valid
+<code>wp.float64</code>, <code>(B, Sg)</code>, write-only output in full gas order. It requires valid
 <code>latent_heat</code>, is overwritten only after successful preflight, and is not a
 third return value. Its signed whole-call diagnostic, shipped in issue #1272,
-is <code>Q[box, species] = sum_particles(Delta m_applied) * L[species]</code>: <code>Delta m</code>
+is <code>Q[b,g] = sum_slots(count[b,n] * Delta m_applied[b,n,p(g)]) * L[g]</code>
+for native resolved storage: <code>Delta m</code>
 is applied transfer in kg, <code>L</code> is latent heat in J/kg, and <code>Q</code> is J. Thus
 condensation is positive and evaporation is negative. The strict #1272
 energy-regression tolerance is <code>rtol=1e-12, atol=1e-18</code>.</p>
@@ -19790,9 +19863,9 @@ than storage support.</p>
 <td>Exact mask and rejection boundaries follow below. This path establishes no Runnable support, CPU parity, or performance claim.</td>
 </tr>
 <tr>
-<td>Fixed-shape GPU/runtime roadmap work</td>
-<td>Not current runtime behavior</td>
-<td>Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior.</td>
+<td>Resident execution and native CUDA capture</td>
+<td>Explicit bounded lifecycle</td>
+<td>See <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py">resident example</a> and <a href="../gpu_graph_capture/">capture limitations</a>; no implicit CPU fallback or measured performance claim.</td>
 </tr>
 </tbody>
 </table>
@@ -19865,7 +19938,7 @@ than storage support.</p>
 </ul>
 <h2 id="direct-kernel-troubleshooting">Direct-kernel troubleshooting<a class="headerlink" href="#direct-kernel-troubleshooting" title="Permanent link">&para;</a></h2>
 <p>Use
-<a href="../../Examples/gpu_direct_kernels_quick_start/"><code>docs/Examples/gpu_direct_kernels_quick_start.py</code></a>
+<a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py"><code>docs/Examples/gpu_direct_kernels_quick_start.py</code></a>
 as the canonical runnable reference when troubleshooting the low-level GPU
 path.</p>
 <ul>
@@ -19996,7 +20069,7 @@ pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic
 </code></pre></div>
 <p>This is additive to the required Warp <code>device="cpu"</code> baseline and skips
 cleanly when CUDA is unavailable.</p>
-<p>The <a href="../../Examples/gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>
+<p>The <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py">GPU condensation parity walkthrough</a>
 and its <a href="../Roadmap/condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>
 document bounded physics, conservation, and energy evidence only. They retain
 the fixed-four-substep low-level direct-kernel boundary: Warp CPU is the

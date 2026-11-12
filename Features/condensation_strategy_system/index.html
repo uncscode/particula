@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14674,7 +14674,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14702,7 +14702,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14730,7 +14730,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14979,7 +14979,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17927,7 +17927,7 @@ see <a href="../native_scientific_processes/">native scientific process calls</a
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>The condensation strategy system models mass transfer between gas and particle
 phases using the same object-oriented patterns as wall loss and coagulation.
-Strategies expose <code>rate</code> and <code>step</code>, work with <code>ParticleRepresentation</code> across
+Strategies expose <code>rate</code> and <code>step</code>, work with native <code>ParticleData</code> across
 "discrete", "continuous_pdf", and "particle_resolved" modes, and plug directly
 into runnable pipelines. You can choose simultaneous isothermal updates or
 staggered two-pass Gauss-Seidel sweeps with theta-controlled first-pass
@@ -17998,9 +17998,8 @@ failure does not promise rollback of already consumed random draws.
 Fully evaporated resolved particles leave subsequent staggered batches/sweeps.</p>
 <p>CPU native calls require one box and revalidate mutable state at each entry.
 They preserve carrier and destination-array identities and reject protected
-storage overlap before writes. Existing facade/untagged examples below retain
-their temporary compatibility behavior. Runnable, adapter and resident
-integration are owned by M4; broad tutorial migration is owned by M5.</p>
+storage overlap before writes. The examples below use native state and process-owned physics. Legacy facade
+execution remains available for compatibility until the separate M6 removal.</p>
 <h2 id="key-benefits">Key Benefits<a class="headerlink" href="#key-benefits" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Consistent dynamics workflow</strong>: Same strategy-based API (<code>rate</code>, <code>step</code>,
@@ -18030,6 +18029,16 @@ integration are owned by M4; broad tutorial migration is owned by M5.</p>
 <p>Concrete condensation implementations are exported alongside other dynamics
 components, while the abstract base interface remains available from the
 condensation subpackage:</p>
+<p>Run the following setup once before the other Python snippets on this page.
+Each recipe then creates fresh aligned state with the indicated molar masses;
+no recipe silently reuses a different species layout. These examples require
+the selected E9 checkout (<code>pip install -e .</code>). The shared illustrative PMF uses
+64 nodes over 50–500 nm, mode 100 nm, GSD 1.5 and 1e8 m⁻³; resolved examples
+use two unit-count slots in 1e-6 m³. The discrete quick start below retains the
+default two-mode, 250-bin initializer. Vapor pressures are prescribed at
+1e-3 Pa for this illustration, not calibrated species properties. No grid or
+timestep convergence is claimed. Composed wall-loss runs preserve their stated
+elapsed durations with 0.25-second substeps to avoid negative native proposals.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="c1"># Abstract interface</span>
@@ -18045,6 +18054,49 @@ condensation subpackage:</p>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggeredBuilder</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationLatentHeatBuilder</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationFactory</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.condensation.species_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">CondensationSpeciesMap</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_example</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">resolved</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Create illustrative state and explicit process-owned configuration."""</span>
+    <span class="n">molar_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"vapor_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">size</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">resolved</span> <span class="ow">or</span> <span class="n">molar_mass</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">particles</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_resolved_particle_data</span><span class="p">(</span>
+            <span class="n">masses</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">molar_mass</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="mf">1e-18</span><span class="p">),</span>
+            <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">),</span>
+            <span class="n">concentration</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">volume</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">particles</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+            <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
+            <span class="n">radius_bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mf">50e-9</span><span class="p">,</span> <span class="mf">500e-9</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+            <span class="n">mode</span><span class="o">=</span><span class="p">[</span><span class="mf">100e-9</span><span class="p">],</span> <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="p">[</span><span class="mf">1.5</span><span class="p">],</span>
+            <span class="n">number_concentration</span><span class="o">=</span><span class="p">[</span><span class="mf">1e8</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="n">gas</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasData</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">names</span><span class="p">,</span> <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
+        <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">molar_mass</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="mf">1e-6</span><span class="p">),</span>
+        <span class="n">partitioning</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">environment</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">EnvironmentData</span><span class="p">(</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="p">[</span><span class="mf">298.15</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="p">[</span><span class="mf">101325.0</span><span class="p">],</span>
+        <span class="n">saturation_ratio</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">molar_mass</span><span class="o">.</span><span class="n">size</span><span class="p">)),</span>
+    <span class="p">)</span>
+    <span class="n">aerosol</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">(</span><span class="n">particles</span><span class="o">=</span><span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="o">=</span><span class="n">gas</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">)</span>
+    <span class="n">physics</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">activity_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">(),</span>
+        <span class="n">surface_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyVolume</span><span class="p">(</span>
+            <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">),</span>
+        <span class="n">species_map</span><span class="o">=</span><span class="n">CondensationSpeciesMap</span><span class="p">(</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="n">names</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span>
 </code></pre></div>
 <p>All strategies share a common shape: initialize with physical parameters (molar
 mass, diffusion coefficient, accommodation coefficient) and coupling controls
@@ -18054,10 +18106,13 @@ instantaneous transfer; call <code>step(...)</code> to advance.</p>
 <p><code>MassCondensation</code> is a <code>RunnableABC</code> exported as <code>par.dynamics.MassCondensation</code>.
 It operates on an <code>Aerosol</code>, delegates to the configured strategy, splits
 <code>time_step</code> across <code>sub_steps</code>, and composes with other runnables.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.018</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="n">condensation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span>
     <span class="n">condensation_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+        <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
         <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
         <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -18071,7 +18126,7 @@ It operates on an <code>Aerosol</code>, delegates to the configured strategy, sp
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">workflow</span> <span class="o">=</span> <span class="n">condensation</span> <span class="o">|</span> <span class="n">wall_loss</span>
-<span class="n">updated</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">updated</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="condensationisothermal-simultaneous-update">CondensationIsothermal (simultaneous update)<a class="headerlink" href="#condensationisothermal-simultaneous-update" title="Permanent link">&para;</a></h3>
 <p><code>CondensationIsothermal</code> evaluates the mass-transfer equation in one shot for all
@@ -18082,7 +18137,10 @@ particles/bins:</p>
 <p>Radii are filled when zero, clipped to the minimum physical size (<code>1e-10 m</code>),
 pressure deltas (Δp) are sanitized (NaN/inf → 0) before computing rates, and gas
 mass is optionally depleted (<code>update_gases=True</code>).</p>
-<div class="highlight"><pre><span></span><code><span class="n">iso</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.18</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">iso</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.18</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
@@ -18107,7 +18165,10 @@ validated parameter loading or a strategy object. When both
 takes precedence. It records <code>last_latent_heat_energy</code> each step (positive for
 condensation, negative for evaporation) and accepts a <code>dynamic_viscosity</code>
 override for particle-resolved workflows.</p>
-<div class="highlight"><pre><span></span><code><span class="n">latent</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationLatentHeat</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.018</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">latent</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationLatentHeat</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -18126,10 +18187,12 @@ override for particle-resolved workflows.</p>
 <p>When neither a <code>latent_heat_strategy</code> nor a positive scalar <code>latent_heat</code>
 fallback is configured, the step follows the isothermal path and reports
 <code>last_latent_heat_energy = 0.0</code>.</p>
-<p><code>last_latent_heat_energy</code> records per-step latent-heat bookkeeping from the
-step mass-transfer quantity. For the current single-box public example path,
-that diagnostic aligns with the mass-concentration contract and should be
-reported as an energy density.</p>
+<p>For native state, <code>last_latent_heat_energy</code> is signed extensive energy in J:
+sum the applied per-particle material transfer times represented counts and
+latent heat. For PMF/PDF, integrate the population density over the canonical
+reference volume. Condensation is positive and evaporation negative. The
+example regression checks this against the actual particle inventory change;
+it is a per-call diagnostic, not a temperature-evolution model.</p>
 <p>For the current shipped support boundary, E3-F7 is the executable CPU
 integration baseline for future Epic D GPU parity work:
 <code>particula/integration_tests/condensation_latent_heat_conservation_test.py</code>.
@@ -18151,7 +18214,10 @@ not provide strategy/runnable-level latent-heat support; the separate
 controls the first-pass fraction; batches are clipped to the particle count and
 optionally shuffled each step. Gas concentration is updated after every batch to
 reduce lag. Radii are clamped and Δp is sanitized before computing dm/dt.</p>
-<div class="highlight"><pre><span></span><code><span class="n">staggered</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.018</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">staggered</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -18174,13 +18240,17 @@ reduce lag. Radii are clamped and Δp is sanitized before computing dm/dt.</p>
 <li><code>"random"</code>: θ ~ U[0,1] using the configured RNG (<code>random_state</code>).</li>
 <li><code>"batch"</code>: θ = 1.0; staggering comes from batch ordering instead of θ.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="n">half</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.018</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">half</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">theta_mode</span><span class="o">=</span><span class="s2">"half"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">batch</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">theta_mode</span><span class="o">=</span><span class="s2">"batch"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
@@ -18188,6 +18258,7 @@ reduce lag. Radii are clamped and Δp is sanitized before computing dm/dt.</p>
 <span class="p">)</span>
 
 <span class="n">rand</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">theta_mode</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
@@ -18205,7 +18276,9 @@ factory entry points are available from both import surfaces:</p>
 <li><code>particula.dynamics.condensation.CondensationFactory</code></li>
 </ul>
 <p>The shipped latent-heat factory key is <code>"latent_heat"</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.018</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.latent_heat_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantLatentHeat</span>
 
 <span class="n">iso</span> <span class="o">=</span> <span class="p">(</span>
@@ -18214,6 +18287,10 @@ factory entry points are available from both import surfaces:</p>
     <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">2.1e-5</span><span class="p">,</span> <span class="s2">"m^2/s"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_accommodation_coefficient</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"activity_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"surface_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"vapor_pressure_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_species_map</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"species_map"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -18227,6 +18304,10 @@ factory entry points are available from both import surfaces:</p>
     <span class="o">.</span><span class="n">set_shuffle_each_step</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_random_state</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"activity_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"surface_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"vapor_pressure_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_species_map</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"species_map"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -18239,6 +18320,10 @@ factory entry points are available from both import surfaces:</p>
     <span class="o">.</span><span class="n">set_accommodation_coefficient</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_latent_heat_strategy</span><span class="p">(</span><span class="n">latent_strategy</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"activity_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"surface_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"vapor_pressure_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_species_map</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"species_map"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -18246,31 +18331,37 @@ factory entry points are available from both import surfaces:</p>
 <span class="n">latent_factory_with_strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"latent_heat"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
+        <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
         <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="mf">0.018</span><span class="p">,</span>
+        <span class="s2">"molar_mass_units"</span><span class="p">:</span> <span class="s2">"kg/mol"</span><span class="p">,</span>
         <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="mf">2e-5</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient_units"</span><span class="p">:</span> <span class="s2">"m^2/s"</span><span class="p">,</span>
         <span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="s2">"latent_heat_strategy"</span><span class="p">:</span> <span class="n">latent_strategy</span><span class="p">,</span>
-        <span class="s2">"update_gases"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 
 <span class="n">iso_factory</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"isothermal"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
+        <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
         <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="mf">0.018</span><span class="p">,</span>
+        <span class="s2">"molar_mass_units"</span><span class="p">:</span> <span class="s2">"kg/mol"</span><span class="p">,</span>
         <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="mf">2e-5</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient_units"</span><span class="p">:</span> <span class="s2">"m^2/s"</span><span class="p">,</span>
         <span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-        <span class="s2">"update_gases"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 <span class="n">latent_factory</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"latent_heat"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
+        <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
         <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="mf">0.018</span><span class="p">,</span>
+        <span class="s2">"molar_mass_units"</span><span class="p">:</span> <span class="s2">"kg/mol"</span><span class="p">,</span>
         <span class="s2">"diffusion_coefficient"</span><span class="p">:</span> <span class="mf">2e-5</span><span class="p">,</span>
+        <span class="s2">"diffusion_coefficient_units"</span><span class="p">:</span> <span class="s2">"m^2/s"</span><span class="p">,</span>
         <span class="s2">"accommodation_coefficient"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="s2">"latent_heat"</span><span class="p">:</span> <span class="mf">2.4e6</span><span class="p">,</span>
-        <span class="s2">"update_gases"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -18289,7 +18380,10 @@ the scalar value is preserved only as constructor input metadata.</p>
 <h3 id="skip-partitioning-indices-and-gas-updates">Skip-partitioning indices and gas updates<a class="headerlink" href="#skip-partitioning-indices-and-gas-updates" title="Permanent link">&para;</a></h3>
 <p>Use <code>skip_partitioning_indices</code> to zero-out selected species during rate/step
 without touching others; combine with <code>update_gases</code> to control depletion.</p>
-<div class="highlight"><pre><span></span><code><span class="n">iso_skip</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">])</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">iso_skip</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="p">[</span><span class="mf">2e-5</span><span class="p">,</span> <span class="mf">1.5e-5</span><span class="p">],</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span>
@@ -18299,7 +18393,10 @@ without touching others; combine with <code>update_gases</code> to control deple
 <span class="n">rates</span> <span class="o">=</span> <span class="n">iso_skip</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">gas</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">298.0</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="multi-species-and-particle-resolved-batching">Multi-species and particle-resolved batching<a class="headerlink" href="#multi-species-and-particle-resolved-batching" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="n">multi</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">([</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.046</span><span class="p">])</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">multi</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="p">[</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.046</span><span class="p">],</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="p">[</span><span class="mf">2e-5</span><span class="p">,</span> <span class="mf">1.2e-5</span><span class="p">],</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span>
@@ -18319,14 +18416,22 @@ without touching others; combine with <code>update_gases</code> to control deple
 <p><code>MassCondensation.execute</code> splits <code>time_step</code> by <code>sub_steps</code>, calling the
 strategy <code>step</code> each sub-iteration. Use this to interleave condensation tightly
 with other processes.</p>
-<div class="highlight"><pre><span></span><code><span class="n">cond</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span><span class="n">condensation_strategy</span><span class="o">=</span><span class="n">iso</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.018</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">iso</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLoss</span><span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">"discrete"</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">cond</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span><span class="n">condensation_strategy</span><span class="o">=</span><span class="n">iso</span><span class="p">)</span>
 <span class="n">coag</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
     <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
         <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">workflow</span> <span class="o">=</span> <span class="n">cond</span> <span class="o">|</span> <span class="n">coag</span> <span class="o">|</span> <span class="n">wall_loss</span>
-<span class="n">updated</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">120.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">updated</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">120.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">480</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="mass-conservation-stability-and-sanitization">Mass conservation, stability, and sanitization<a class="headerlink" href="#mass-conservation-stability-and-sanitization" title="Permanent link">&para;</a></h3>
 <ul>
@@ -18345,11 +18450,15 @@ with other processes.</p>
 </ul>
 <h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
 <h3 id="quick-start-isothermal-condensation-on-a-discrete-distribution">Quick start: isothermal condensation on a discrete distribution<a class="headerlink" href="#quick-start-isothermal-condensation-on-a-discrete-distribution" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.018</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particle</span>
 
-<span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="n">gas</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpecies</span><span class="p">(</span><span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
 <span class="n">condensation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -18366,7 +18475,10 @@ with other processes.</p>
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="staggered-quick-start-with-theta-and-batches">Staggered quick start with theta and batches<a class="headerlink" href="#staggered-quick-start-with-theta-and-batches" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="n">staggered</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.018</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">staggered</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -18383,24 +18495,35 @@ with other processes.</p>
 </code></pre></div>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>particula</code> version 0.2.6 or later.</li>
-<li>A <code>ParticleRepresentation</code> (discrete, continuous PDF, or particle-resolved).</li>
-<li>Gas species configured via <code>par.gas.GasSpecies</code> with vapor properties.</li>
+<li>The selected E9 checkout installed with <code>pip install -e .</code>.</li>
+<li>Native <code>ParticleData</code> with an explicit population kind.</li>
+<li><code>GasData</code>, aligned <code>EnvironmentData</code>, and process-owned vapor properties and mapping.</li>
 <li>Familiarity with particula dynamics and examples.</li>
 </ul>
 <h2 id="typical-workflows">Typical Workflows<a class="headerlink" href="#typical-workflows" title="Permanent link">&para;</a></h2>
 <h3 id="1-configure-via-builder">1. Configure via builder<a class="headerlink" href="#1-configure-via-builder" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="n">condensation</span> <span class="o">=</span> <span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">condensation</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">1.5e-5</span><span class="p">,</span> <span class="s2">"m^2/s"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_accommodation_coefficient</span><span class="p">(</span><span class="mf">0.85</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"activity_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"surface_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"vapor_pressure_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_species_map</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"species_map"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="2-run-inside-a-runnable-pipeline">2. Run inside a runnable pipeline<a class="headerlink" href="#2-run-inside-a-runnable-pipeline" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="n">cond</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span><span class="n">condensation_strategy</span><span class="o">=</span><span class="n">condensation</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">condensation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cond</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span><span class="n">condensation_strategy</span><span class="o">=</span><span class="n">condensation</span><span class="p">)</span>
 <span class="n">wall</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLoss</span><span class="p">(</span>
     <span class="n">wall_loss_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
@@ -18409,17 +18532,23 @@ with other processes.</p>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">workflow</span> <span class="o">=</span> <span class="n">cond</span> <span class="o">|</span> <span class="n">wall</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="3-particle-resolved-batching-with-deterministic-ordering">3. Particle-resolved batching with deterministic ordering<a class="headerlink" href="#3-particle-resolved-batching-with-deterministic-ordering" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="n">staggered</span> <span class="o">=</span> <span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.018</span><span class="p">,</span> <span class="n">resolved</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">staggered</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggeredBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.018</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">2e-5</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.018</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">2e-5</span><span class="p">,</span> <span class="s2">"m^2/s"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_accommodation_coefficient</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_theta_mode</span><span class="p">(</span><span class="s2">"batch"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_num_batches</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_shuffle_each_step</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"activity_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"surface_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"vapor_pressure_strategy"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_species_map</span><span class="p">(</span><span class="n">physics</span><span class="p">[</span><span class="s2">"species_map"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span><span class="n">staggered</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
@@ -18434,8 +18563,14 @@ with other processes.</p>
 reducing gas phase mass.</p>
 <p><strong>Solution:</strong> Use <code>CondensationIsothermal</code> with <code>update_gases=True</code> and couple to
 wall loss in one pipeline.</p>
-<div class="highlight"><pre><span></span><code><span class="n">cond</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.15</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLoss</span><span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">"discrete"</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">cond</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span>
     <span class="n">condensation_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+        <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
         <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">1.8e-5</span><span class="p">,</span>
         <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
@@ -18443,14 +18578,17 @@ wall loss in one pipeline.</p>
     <span class="p">)</span>
 <span class="p">)</span>
 <span class="n">workflow</span> <span class="o">=</span> <span class="n">cond</span> <span class="o">|</span> <span class="n">wall_loss</span>
-<span class="n">updated</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">120.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">updated</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">120.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">480</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="use-case-2-particle-resolved-stability-with-batch-staggering">Use case 2: Particle-resolved stability with batch staggering<a class="headerlink" href="#use-case-2-particle-resolved-stability-with-batch-staggering" title="Permanent link">&para;</a></h3>
 <p><strong>Scenario:</strong> Particle-resolved simulation oscillates when large particles
 dominate.</p>
 <p><strong>Solution:</strong> Switch to <code>CondensationIsothermalStaggered</code> with <code>theta_mode</code>
 <code>"batch"</code> and multiple batches to spread updates and reduce lag.</p>
-<div class="highlight"><pre><span></span><code><span class="n">stable</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">(</span><span class="mf">0.018</span><span class="p">,</span> <span class="n">resolved</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">stable</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">theta_mode</span><span class="o">=</span><span class="s2">"batch"</span><span class="p">,</span>
     <span class="n">num_batches</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
@@ -18467,14 +18605,17 @@ dominate.</p>
 <p><strong>Solution:</strong> Provide vector properties and set <code>skip_partitioning_indices</code> for
 the species that should remain in gas; keep <code>update_gases</code> enabled for the
 condensing species.</p>
-<div class="highlight"><pre><span></span><code><span class="n">selective</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">aerosol</span><span class="p">,</span> <span class="n">physics</span> <span class="o">=</span> <span class="n">make_example</span><span class="p">([</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">])</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span>
+<span class="n">selective</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+    <span class="o">**</span><span class="n">physics</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="p">[</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">],</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="p">[</span><span class="mf">2e-5</span><span class="p">,</span> <span class="mf">1.6e-5</span><span class="p">],</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
     <span class="n">skip_partitioning_indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
     <span class="n">update_gases</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">aerosol</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">selective</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">selective</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
     <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
     <span class="n">gas_species</span><span class="o">=</span><span class="n">gas</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">300.0</span><span class="p">,</span>
@@ -18633,7 +18774,9 @@ synchronization or rebinding. No rollback is promised after a writer launches.
 The standalone private inventory-finalization test helper remains legacy-only;
 it is not a mapped native entry point. Untagged legacy direct/prepared callers
 retain the same-width contract described below. Native transfer does not
-establish resident/checkpoint support; that remains an M4 migration boundary.</p>
+establish resident/checkpoint support by itself. See the separately exercised
+<a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py">resident walkthrough</a> for explicit
+exact-device restart and fresh species bindings.</p>
 <p>Native scientific evidence is in
 <code>particula/gpu/kernels/tests/condensation_native_test.py</code>: independent scalar
 four-substep equations, separate particle/gas changes, V=.25/&frac14; conservation,
@@ -18701,7 +18844,7 @@ gas/full-system conservation. The direct step couples finalized particle and
 gas transfer through its stated P2-finalized direct coupling, but does not add strategy/
 <code>Runnable</code> integration, adaptive stepping, graph capture/replay, autodiff
 guarantees, or complete E4-F6 cross-device certification.</p>
-<p>The <a href="../../Examples/gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>
+<p>The <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py">GPU condensation parity walkthrough</a>
 separately reports physics, conservation, and energy evidence for this
 fixed-four-substep low-level direct-kernel comparison. Its
 <a href="../Roadmap/condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>
@@ -18764,7 +18907,7 @@ scoped CUDA strict expected failure document the public-step host-readback
 limitation rather than a successful capture replay.</p>
 <h2 id="backend-selected-condensation">Backend-selected condensation<a class="headerlink" href="#backend-selected-condensation" title="Permanent link">&para;</a></h2>
 <p>Selected condensation is a bounded concrete adapter layer over the existing
-legacy CPU <code>MassCondensation</code> runnable and the direct
+native CPU <code>MassCondensation</code> runnable and the direct
 <code>condensation_step_gpu</code> boundary. It is not new physics, a new public runnable,
 a scheduler, a resident session, or automatic backend selection. Ownership and
 selection boundaries are described in the
@@ -18788,7 +18931,7 @@ and its <a href="../data-containers-and-gpu-foundations/#gpu-thermodynamics-and-
 </tr>
 <tr>
 <td>Selected Warp execution</td>
-<td>Exactly 8 declared profiles: equal-step, latent heat enabled or disabled, ideal or kappa activity, and static or composition-weighted surface tension. Profiles are capability/catalogue selection and do not validate supplied sidecars against their semantics.</td>
+<td>Exactly 8 declared profiles: equal-step, latent heat enabled or disabled, ideal or kappa activity, and static or composition-weighted surface tension. Profile preflight requires enabled latent-heat storage, checks activity/surface mode selectors, and validates their particle-width arrays. Native species bindings validate exact carrier ownership separately.</td>
 </tr>
 <tr>
 <td>Unavailable selected Warp mapping</td>
@@ -18813,8 +18956,8 @@ installed-Warp baseline, and CUDA rows are optional guarded evidence. This does
 not claim general
 CPU-strategy parity, performance, adaptive stepping, graph capture/replay,
 autodiff, multi-GPU, resizing, or full scheduler support. The
-<a href="../Roadmap/data-oriented-gpu/#epic-g-backend-selection-and-gpu-resident-simulation">Epic G handoff</a>
-defers E7-F5 deterministic scheduling.</p>
+<a href="../Roadmap/data-oriented-gpu/#epic-g-backend-selection-and-gpu-resident-simulation">Epic G record</a>
+and resident guides define their separate scheduling and lifecycle scope.</p>
 <h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Staggered solver is Gauss-Seidel only; other solvers are not exposed.</li>
@@ -18823,8 +18966,8 @@ defers E7-F5 deterministic scheduling.</p>
 <li>Direct low-level GPU latent heat is a per-species rate correction only; it
   has no temperature feedback or strategy/<code>Runnable</code> integration. Its signed
   <code>energy_transfer</code> sidecar is finalized-transfer diagnostic bookkeeping only.</li>
-<li>Minimum-radius clamp (1e-10 m) enforces continuum validity; sub-continuum
-  physics is out of scope.</li>
+<li>The minimum-radius clamp (1e-10 m) is a numerical safeguard, not evidence
+  of physical validity at that scale; sub-continuum physics is out of scope.</li>
 </ul>
 <h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>
 <ul>

@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14089,7 +14089,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14117,7 +14117,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14145,7 +14145,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14402,7 +14402,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17386,42 +17386,47 @@ They offer three big advantages:</p>
 <h3 id="22-builder-piecing-together-valid-objects">2.2 Builder – piecing together valid objects<a class="headerlink" href="#22-builder-piecing-together-valid-objects" title="Permanent link">&para;</a></h3>
 <p>Problem solved: <em>“Creating the object requires many parameters and consistency checks.”</em></p>
 <p>General idea<br />
-<div class="highlight"><pre><span></span><code><span class="n">builder</span> <span class="o">=</span> <span class="n">FancyBuilder</span><span class="p">()</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">set_x</span><span class="p">(</span><span class="err">…</span><span class="p">)</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">set_y</span><span class="p">(</span><span class="err">…</span><span class="p">)</span>
-<span class="n">obj</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code>builder = FancyBuilder()
+builder.set_x(…)
+builder.set_y(…)
+obj = builder.build()
 </code></pre></div></p>
 <p>Particula examples<br />
-• <code>BrownianCoagulationBuilder</code> – validates distribution type, temperature, etc.<br />
+• <code>BrownianCoagulationBuilder</code> – validates the configured distribution type; execution validates state and environment.
 • <code>CombineCoagulationStrategyBuilder</code> – glues several strategies into one composite strategy.</p>
 <p>Tip for new users: the builder pattern reads almost like an English sentence; you can’t “forget” a required parameter because <code>build</code> would refuse to run.</p>
 <hr />
 <h3 id="23-factory-hiding-construction-complexity">2.3 Factory – hiding construction complexity<a class="headerlink" href="#23-factory-hiding-construction-complexity" title="Permanent link">&para;</a></h3>
 <p>Problem solved: <em>“I want one function that returns a ready‑to‑use object, but internally different builders/strategies decide what’s best.”</em></p>
-<p>General idea (but not implemented in Particula yet)
-<div class="highlight"><pre><span></span><code><span class="n">strategy</span> <span class="o">=</span> <span class="n">ActivityFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"water"</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">)</span>
+<p>Executable Particula example (selected E9 checkout):
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"mass_ideal"</span><span class="p">)</span>
 </code></pre></div></p>
 <p>Particula example<br />
-• <code>ActivityFactory</code> – selects the proper <code>ActivityStrategy</code> (Raoult | Pitzer | AI model …) based on user input.</p>
+• <code>ActivityFactory</code> selects a supported activity strategy from an explicit name;
+it does not infer a physical model from a species name.</p>
 <hr />
 <h3 id="24-decorator-adding-orthogonal-behavior">2.4 Decorator – adding orthogonal behavior<a class="headerlink" href="#24-decorator-adding-orthogonal-behavior" title="Permanent link">&para;</a></h3>
 <p>Problem solved: <em>“I need to add validation or logging without touching the original function.”</em></p>
 <p>Particula example<br />
-<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_brownian_kernel</span><span class="p">(</span><span class="err">…</span><span class="p">):</span>
-    <span class="err">…</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.validate_inputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_inputs</span>
+
+<span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">"radius"</span><span class="p">:</span> <span class="s2">"positive"</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sphere_volume</span><span class="p">(</span><span class="n">radius</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="mf">3.141592653589793</span> <span class="o">*</span> <span class="n">radius</span><span class="o">**</span><span class="mi">3</span>
 </code></pre></div>
 <code>@validate_inputs</code> throws a helpful error before the computation starts.</p>
 <hr />
 <h3 id="25-mixin-small-capability-boosters">2.5 Mixin – small capability boosters<a class="headerlink" href="#25-mixin-small-capability-boosters" title="Permanent link">&para;</a></h3>
 <p>Problem solved: <em>“Several unrelated classes need the same micro‑feature.”</em></p>
 <p>Example (conceptual)<br />
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ChargeMixin</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_charge_density</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="err">…</span>
+<div class="highlight"><pre><span></span><code>class ChargeMixin:
+    def get_charge_density(self): …
 
-<span class="k">class</span><span class="w"> </span><span class="nc">Particle</span><span class="p">(</span><span class="n">ChargeMixin</span><span class="p">,</span> <span class="n">BaseParticle</span><span class="p">):</span> <span class="err">…</span>
+class Particle(ChargeMixin, BaseParticle): …
 </code></pre></div></p>
-<p>Particula’s <code>DensityMixin</code>, <code>ChargeMixin</code>, etc. inject a single extra property without polluting the main class hierarchy.</p>
+<p>Builder mixins supply reusable setters, such as <code>BuilderMolarMassMixin</code>.
+The diagram above is conceptual pseudocode, not an importable particle API.</p>
 <hr />
 <h3 id="26-abstract-base-class-abc-enforcing-an-interface">2.6 Abstract Base Class (ABC) – enforcing an interface<a class="headerlink" href="#26-abstract-base-class-abc-enforcing-an-interface" title="Permanent link">&para;</a></h3>
 <p>Python code can be “duck‑typed”, but aerosols need guarantees!<br />
@@ -17429,7 +17434,7 @@ They offer three big advantages:</p>
 Concrete subclasses must implement them or Python raises a clear error.</p>
 <hr />
 <h3 id="27-template-method-fixed-skeleton-overridable-steps">2.7 Template Method – fixed skeleton, overridable steps<a class="headerlink" href="#27-template-method-fixed-skeleton-overridable-steps" title="Permanent link">&para;</a></h3>
-<p><code>RunnableSequence</code> keeps the loop logic (“for each process: run, pass aerosol to next”), while each individual <code>Runnable</code> supplies the physics in its <code>__execute__</code> method.</p>
+<p><code>RunnableSequence</code> keeps the loop logic (“for each process: run, pass aerosol to next”), while each individual <code>Runnable</code> supplies the physics in its <code>execute</code> method.</p>
 <hr />
 <h3 id="28-composition-inheritance">2.8 Composition &gt; Inheritance<a class="headerlink" href="#28-composition-inheritance" title="Permanent link">&para;</a></h3>
 <p>“Favor composition over inheritance” is the golden rule that keeps Particula’s
@@ -17441,17 +17446,19 @@ Instead of a deep hierarchy like</p>
         └── …
 </code></pre></div>
 <p>Particula builds objects out of <strong>smaller collaborating parts</strong>:</p>
-<div class="highlight"><pre><span></span><code><span class="n">representation</span> <span class="o">=</span> <span class="n">ParticleRepresentation</span><span class="p">(</span>
-    <span class="n">strategy</span><span class="o">=</span><span class="n">MassBasedMovingBin</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>     <span class="c1"># ⇦ behaviour plug‑in</span>
-    <span class="n">activity</span><span class="o">=</span><span class="n">RaoultActivityStrategy</span><span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="c1"># ⇦ second behaviour plug‑in</span>
-<span class="p">)</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="o">=</span><span class="n">atm</span><span class="p">,</span> <span class="n">particle_representation</span><span class="o">=</span><span class="n">representation</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">docs.Examples.native_state_access</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_aerosol</span><span class="p">,</span> <span class="n">build_condensation</span>
+
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">build_aerosol</span><span class="p">()</span>  <span class="c1"># native particle, full gas and environment containers</span>
+<span class="n">process</span> <span class="o">=</span> <span class="n">build_condensation</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span><span class="p">)</span>  <span class="c1"># explicit physics and species mapping</span>
+<span class="k">assert</span> <span class="n">process</span><span class="o">.</span><span class="n">condensation_strategy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 </code></pre></div>
-<p>• <code>Aerosol</code> <em>has an</em> <code>Atmosphere</code>; it does <strong>not</strong> <em>inherit from</em> it.<br />
-• <code>ParticleRepresentation</code> <em>has a</em> <code>DistributionStrategy</code>.  </p>
+<p>• Native <code>Aerosol</code> holds <code>ParticleData</code>, <code>GasData</code>, and <code>EnvironmentData</code> by identity.
+• A process owns its physical strategies and mapping; they are not injected into
+  a particle carrier. Run this example from the selected E9 checkout.</p>
 <p>Benefits<br />
 – no “diamond” problems,<br />
-– you can replace any sub‑component at run‑time,<br />
+– compatible container replacement is validated before publication; layout
+  changes require new process configuration,
 – unit tests target one responsibility at a time.</p>
 <hr />
 <h3 id="29-behavior-abstraction-naming-rules">2.9 Behavior, abstraction &amp; naming rules<a class="headerlink" href="#29-behavior-abstraction-naming-rules" title="Permanent link">&para;</a></h3>
@@ -17466,7 +17473,7 @@ Instead of a deep hierarchy like</p>
 <tbody>
 <tr>
 <td>Encapsulation</td>
-<td>State + behavior live together (<code>ParticleRepresentation.get_radius()</code> uses its own density).</td>
+<td>Native data stores arrays; <code>ParticleData.radii</code> derives radius from mass and density. Processes own physical behavior.</td>
 </tr>
 <tr>
 <td>Abstraction</td>
@@ -17478,7 +17485,7 @@ Instead of a deep hierarchy like</p>
 </tr>
 <tr>
 <td>Polymorphism</td>
-<td>Swap one <code>DistributionStrategy</code> for another without touching calling code.</td>
+<td>Choose a compatible process strategy with the same interface and admitted population kind.</td>
 </tr>
 </tbody>
 </table>
@@ -17486,7 +17493,7 @@ Instead of a deep hierarchy like</p>
 <ul>
 <li>Functions that <em>return a value</em> → <code>get_&lt;quantity&gt;()</code>  </li>
 <li>Classes that <em>encapsulate a pattern</em> → <code>&lt;Descriptor&gt;&lt;PatternName&gt;</code><br />
-  – <code>BrownianCoagulationBuilder</code>, <code>WaterBuckStrategy</code>, <code>RunnableSequence</code>  </li>
+  – <code>BrownianCoagulationBuilder</code>, <code>BuckVaporPressureStrategy</code>, <code>RunnableSequence</code></li>
 </ul>
 <p>Sticking to these names makes <strong>grep</strong>, IDE auto‑complete and LLM help far
 more effective for beginners.</p>
@@ -17539,7 +17546,7 @@ more effective for beginners.</p>
 </tr>
 <tr>
 <td>Mixin</td>
-<td><code>ChargeMixin</code>, <code>DensityMixin</code></td>
+<td><code>BuilderMolarMassMixin</code></td>
 <td>Supplies a single feature</td>
 </tr>
 <tr>
@@ -17557,72 +17564,52 @@ more effective for beginners.</p>
 <hr />
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
 <h3 id="builder-pattern-with-inline-comments">Builder Pattern with Inline Comments<a class="headerlink" href="#builder-pattern-with-inline-comments" title="Permanent link">&para;</a></h3>
-<p>In this example, we point out which parts are classes (blueprints), which parts are objects (instances created from these classes), and which are functions (methods) that you call to change the internal state or retrieve values from the final object. Notice in particular how properties and methods are “injected” into the builder and, ultimately, become part of the final particle representation object (<code>particle_rep_mass</code>). This example is based on the Particle Representation Tutorial.</p>
+<p>The builder below retains the tutorial's three radii, density and bin
+concentrations. A builder is an object with setter methods; <code>build()</code> returns
+a validated native data object. These methods configure values—they do not
+create new methods or inject physics into the result.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
-<span class="c1"># Define basic particle parameters.</span>
-<span class="c1"># Here, 'radius' and 'concentration' are objects from NumPy (created by the np.array() function)</span>
-<span class="c1"># and 'density' is just a numerical value.</span>
-<span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>  <span class="c1"># Object: NumPy ndarray holding radii values in nanometers.</span>
-<span class="n">density</span> <span class="o">=</span> <span class="mf">2.5</span>  <span class="c1"># A simple numeric value representing density.</span>
-<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e2</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e4</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>  <span class="c1"># NumPy array holding concentration values.</span>
+<span class="n">radius_nm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">concentration_cm3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e2</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e4</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">radius_m</span> <span class="o">=</span> <span class="n">radius_nm</span> <span class="o">*</span> <span class="mf">1e-9</span>
+<span class="n">density_kg_m3</span> <span class="o">=</span> <span class="mf">2.5</span> <span class="o">*</span> <span class="mf">1000.0</span>
+<span class="n">masses</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_m</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">density_kg_m3</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
 
-<span class="c1"># ----------------------------------------------------------------------------</span>
-<span class="c1"># The following section uses builder classes to set up the particle properties.</span>
-<span class="c1"># ----------------------------------------------------------------------------</span>
-
-<span class="c1"># 'SurfaceStrategyMassBuilder' is a class (a blueprint) that, when instantiated,</span>
-<span class="c1"># returns an object (builder instance) which provides methods to set up a surface strategy.</span>
-<span class="c1"># Here, we call its methods 'set_surface_tension' and 'set_density'.</span>
-<span class="c1"># Each of these methods is a function defined on the builder class that sets a property</span>
-<span class="c1"># into the builder's internal state. These properties are later used to construct the final surface strategy object.</span>
-<span class="n">surface_tension_strategy</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyMassBuilder</span><span class="p">()</span>  <span class="c1"># Class constructor: returns a builder object for surface strategy.</span>
-    <span class="o">.</span><span class="n">set_surface_tension</span><span class="p">(</span><span class="mf">0.072</span><span class="p">,</span> <span class="s2">"N/m"</span><span class="p">)</span>          <span class="c1"># Method: injects the surface tension value; function attached to the builder object.</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">"g/cm^3"</span><span class="p">)</span>                 <span class="c1"># Method: injects the density value; also a function on the builder.</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>                                    <span class="c1"># Method: finalizes the builder and returns the surface strategy object.</span>
+<span class="c1"># Class construction creates a builder; chained methods return that builder.</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleDataBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"discrete"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_masses</span><span class="p">(</span><span class="n">masses</span><span class="p">,</span> <span class="s2">"kg"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">concentration_cm3</span><span class="p">,</span> <span class="s2">"1/cm^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.5</span><span class="p">]),</span> <span class="s2">"g/cm^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">"m^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
-<span class="c1"># 'ParticleRadiusRepresentationBuilder' is another class used to create a particle representation object (how particles are represented in the simulation).</span>
-<span class="c1"># This builder gives you a fluent interface where each set_* method is a function that updates the builder instance.</span>
-<span class="c1"># They are not standalone functions but methods that belong to the builder object.</span>
-<span class="n">particle_rep_mass</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleRadiusRepresentationBuilder</span><span class="p">()</span>            <span class="c1"># Class call: creates a builder object for particle representation.</span>
-    <span class="o">.</span><span class="n">set_distribution_strategy</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">RadiiBasedMovingBin</span><span class="p">())</span>  <span class="c1"># Method call: sets the distribution strategy. Note: 'RadiiBasedMovingBin()' is itself a class constructor; its returned object is injected as a property.</span>
-    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">())</span>      <span class="c1"># Method call: sets the activity strategy. 'ActivityIdealMass()' is created by its class constructor and injected here.</span>
-    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">surface_tension_strategy</span><span class="p">)</span>                <span class="c1"># Method call: injects the previously built surface strategy object.</span>
-    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">concentration</span><span class="o">=</span><span class="n">concentration</span><span class="p">,</span> <span class="n">concentration_units</span><span class="o">=</span><span class="s2">"1/cm^3"</span><span class="p">)</span>  <span class="c1"># Method: sets the concentration property; the function here attaches the numerical array to the builder.</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span> <span class="n">density_units</span><span class="o">=</span><span class="s2">"g/cm^3"</span><span class="p">)</span>    <span class="c1"># Method: sets the density property.</span>
-    <span class="o">.</span><span class="n">set_radius</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">radius_units</span><span class="o">=</span><span class="s2">"nm"</span><span class="p">)</span>            <span class="c1"># Method: sets the radius property.</span>
-    <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">charge</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>                                    <span class="c1"># Method: sets the charge property (for example, neutral particles).</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>   <span class="c1"># Method: finalizes the builder and returns the final particle representation object.</span>
-               <span class="c1"># After 'build()' is called, all were "injected" into a newly created ParticleRepresentation instance.</span>
+<span class="c1"># Physical strategies belong to a process configuration, not ParticleData.</span>
+<span class="n">surface</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyMassBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_surface_tension</span><span class="p">(</span><span class="mf">0.072</span><span class="p">,</span> <span class="s2">"N/m"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">"g/cm^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
-<span class="c1"># ----------------------------------------------------------------------------</span>
-<span class="c1"># At this point, 'particle_rep_mass' is an object (an instance) of the ParticleRepresentation class.</span>
-<span class="c1"># The methods get_mass(), get_radius(), and get_mass_concentration() are functions defined on that object.</span>
-<span class="c1"># These functions are "injected" as part of the object's class definition – they allow you to retrieve calculated properties.</span>
-<span class="c1"># How the properties are calculated is different for each ParticleRepresentation class, but you see the same interface at the object level.</span>
-<span class="c1"># ----------------------------------------------------------------------------</span>
-
-<span class="c1"># Calling methods (functions attached to the object 'particle_rep_mass') to access computed properties:</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Mass of particles:"</span><span class="p">,</span> <span class="n">particle_rep_mass</span><span class="o">.</span><span class="n">get_mass</span><span class="p">())</span>  
-<span class="c1"># get_mass() is a method attached to the 'particle_rep_mass' object; it calculates and returns the mass.</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Radius of particles:"</span><span class="p">,</span> <span class="n">particle_rep_mass</span><span class="o">.</span><span class="n">get_radius</span><span class="p">())</span>  
-<span class="c1"># get_radius() is also an object method, returning the calculated radii.</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Total mass of the particle distribution:"</span><span class="p">,</span> <span class="n">particle_rep_mass</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">())</span>
-<span class="c1"># get_mass_concentration() is another method attached to the final object, computing the overall mass concentration.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Per-particle species mass [kg]:"</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Radius [m]:"</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">radii</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Species mass density [kg/m³]:"</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">species_mass_density</span><span class="p">)</span>
 </code></pre></div>
-<p>In this commented code:</p>
 <ul>
-<li>Classes like <code>SurfaceStrategyMassBuilder</code> and <code>ParticleRadiusRepresentationBuilder</code> use PascalCase as is typical for class names. However, snake_case is used for methods (functions) that are called on the instances of these classes.</li>
-<li>When we call a class (like <code>par.particles.SurfaceStrategyMassBuilder()</code>), it creates an object (a builder instance) that we then use to set properties.</li>
-<li>Methods like <code>set_surface_tension</code>, <code>set_density</code>, <code>set_concentration</code>, etc., are functions defined on those builder objects – they modify the internal state (i.e., inject properties) so that when you call <code>build()</code>, their values are used to create the final product.</li>
-<li>The final built object, <code>particle_rep_mass</code>, is an instance of a <code>ParticleRepresentation</code>. It has methods (like <code>get_mass()</code>) that are injected via the class definition and allow you to retrieve data computed from the properties previously injected via the builder pattern.</li>
+<li><code>ParticleDataBuilder</code> and <code>SurfaceStrategyMassBuilder</code> are classes.</li>
+<li>Calling either class constructs a builder instance; <code>set_*</code> methods configure
+  its values, and <code>build()</code> returns the corresponding data or strategy object.</li>
+<li><code>particles.masses</code> exposes writable stored data. <code>particles.radii</code> and
+  <code>particles.species_mass_density</code> return freshly derived arrays.</li>
+<li>For process construction and validated replacement, see the
+  <a href="../../../../Features/particle-data-migration/">native migration guide</a>.</li>
 </ul>
-<p>This clear separation of classes (blueprints), objects (instances created via constructors or build methods), and functions (methods attached to the objects) is a key principle in object-oriented programming and is leveraged by Particula for flexible aerosol simulations.</p>
 <hr />
 <h2 id="further-information">Further Information<a class="headerlink" href="#further-information" title="Permanent link">&para;</a></h2>
 <h3 id="youtube-videos">YouTube videos<a class="headerlink" href="#youtube-videos" title="Permanent link">&para;</a></h3>

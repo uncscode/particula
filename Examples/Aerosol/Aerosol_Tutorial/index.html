@@ -10384,10 +10384,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gas-atmosphere-and-particles" class="md-nav__link">
+  <a href="#glycerol-thermodynamics" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gas-&gt;Atmosphere and Particles
+        Glycerol thermodynamics
       
     </span>
   </a>
@@ -10395,10 +10395,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating-an-aerosol-object" class="md-nav__link">
+  <a href="#native-particle-initialization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Creating an Aerosol object
+        Native particle initialization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#assemble-and-inspect-the-held-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Assemble and inspect the held state
       
     </span>
   </a>
@@ -12065,7 +12076,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -12093,7 +12104,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12531,7 +12542,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12559,7 +12570,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14223,7 +14234,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14251,7 +14262,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14279,7 +14290,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14528,7 +14539,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -16922,10 +16933,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gas-atmosphere-and-particles" class="md-nav__link">
+  <a href="#glycerol-thermodynamics" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gas-&gt;Atmosphere and Particles
+        Glycerol thermodynamics
       
     </span>
   </a>
@@ -16933,10 +16944,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating-an-aerosol-object" class="md-nav__link">
+  <a href="#native-particle-initialization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Creating an Aerosol object
+        Native particle initialization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#assemble-and-inspect-the-held-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Assemble and inspect the held state
       
     </span>
   </a>
@@ -17204,20 +17226,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=83ac11a9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8e2e7ea0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="aerosol-tutorial">Aerosol Tutorial<a class="anchor-link" href="#aerosol-tutorial">¶</a></h1><p>Aerosols are complex systems comprising both gaseous components and particulate matter. To accurately model such systems, we introduce the <code>Aerosol</code> class, which serves as a collection the <code>Atmosphere</code> and <code>ParticleRepresentation</code> objects.</p>
-<p>In this quick tutorial, we will demonstrate how to create an <code>Aerosol</code> object, as this is the key object that will track the state of the aerosol system during dynamics.</p>
+<h1 id="aerosol-tutorial">Aerosol Tutorial<a class="anchor-link" href="#aerosol-tutorial">¶</a></h1><p>An aerosol holds three native containers: particle material and population,
+ordered gas species, and environment. Physics configuration stays separate.
+Here we initialize glycerol at half its saturation concentration and a
+lognormal particle population. Construction retains the supplied objects.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e873a027">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=67b0a7a6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17235,39 +17259,31 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># In Colab uncomment the following command to install particula:</span>
-<span class="c1">#!pip install particula[extra] --quiet</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula._legacy_aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aerosol</span> <span class="k">as</span> <span class="n">LegacyAerosol</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1"># In Colab uncomment the following command to install particula:
-#!pip install particula[extra] --quiet
-
-import numpy as np
-import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol</div>
+<div class="clipboard-copy-txt" id="cell-1">import numpy as np
+import particula as par</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e10aaacd">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0d686646">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="gas-atmosphere-and-particles">Gas-&gt;Atmosphere and Particles<a class="anchor-link" href="#gas-atmosphere-and-particles">¶</a></h2><p>First we'll create a simple <code>Atmosphere</code> object, which will represent the gas phase of the aerosol system. We'll also create a <code>ParticleRepresentation</code> object, which will represent the particulate phase of the aerosol system.</p>
-<p>For the chemical species, we will use a pure component glycerol system.</p>
+<h2 id="glycerol-thermodynamics">Glycerol thermodynamics<a class="anchor-link" href="#glycerol-thermodynamics">¶</a></h2><p>A vapor-pressure strategy computes the initial saturation concentration.
+It is not stored in gas data; a subsequent process owns its configuration.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5710a79e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=28d53e3f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17285,8 +17301,7 @@ from particula._legacy_aerosol import Aerosol as LegacyAerosol</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Glycerol gas</span>
-<span class="n">molar_mass_glycerol</span> <span class="o">=</span> <span class="mf">92.09382e-3</span>  <span class="c1"># kg/mol</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">molar_mass_glycerol</span> <span class="o">=</span> <span class="mf">92.09382e-3</span>  <span class="c1"># kg/mol</span>
 <span class="n">parameters_clausius</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">"latent_heat"</span><span class="p">:</span> <span class="mf">71.5</span> <span class="o">*</span> <span class="n">molar_mass_glycerol</span><span class="p">,</span>
     <span class="s2">"latent_heat_units"</span><span class="p">:</span> <span class="s2">"J/mol"</span><span class="p">,</span>
@@ -17304,39 +17319,22 @@ from particula._legacy_aerosol import Aerosol as LegacyAerosol</div>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Saturation concentration: </span><span class="si">{</span><span class="n">sat_concentration</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> kg/m^3"</span><span class="p">)</span>
 
-<span class="n">sat_factor</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># 50% of saturation concentration</span>
+<span class="n">sat_factor</span> <span class="o">=</span> <span class="mf">0.5</span>
 <span class="n">glycerol_gas</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpeciesBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">molar_mass_glycerol</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">vapor_pressure_strategy</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">sat_concentration</span> <span class="o">*</span> <span class="n">sat_factor</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="s2">"Glycerol"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_partitioning</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasDataBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_names</span><span class="p">([</span><span class="s2">"Glycerol"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">([</span><span class="n">molar_mass_glycerol</span><span class="p">],</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_concentration</span><span class="p">([</span><span class="n">sat_concentration</span> <span class="o">*</span> <span class="n">sat_factor</span><span class="p">],</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_partitioning</span><span class="p">([</span><span class="kc">True</span><span class="p">])</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">glycerol_gas</span><span class="p">)</span>
-
-<span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_more_partitioning_species</span><span class="p">(</span><span class="n">glycerol_gas</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">)</span>
-
-<span class="c1"># Glycerol particle distribution</span>
-<span class="n">lognormal_rep</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">]),</span> <span class="s2">"nm"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_geometric_standard_deviation</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">]))</span>
-    <span class="o">.</span><span class="n">set_number_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e4</span><span class="p">]),</span> <span class="s2">"1/cm^3"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">1.26</span><span class="p">,</span> <span class="s2">"g/cm^3"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">environment</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">EnvironmentData</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">298.15</span><span class="p">]),</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">101325.0</span><span class="p">]),</span>
+    <span class="n">saturation_ratio</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">sat_factor</span><span class="p">]]),</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2"># Glycerol gas
-molar_mass_glycerol = 92.09382e-3  # kg/mol
+<div class="clipboard-copy-txt" id="cell-2">molar_mass_glycerol = 92.09382e-3  # kg/mol
 parameters_clausius = {
     "latent_heat": 71.5 * molar_mass_glycerol,
     "latent_heat_units": "J/mol",
@@ -17354,35 +17352,19 @@ sat_concentration = vapor_pressure_strategy.saturation_concentration(
 )
 print(f"Saturation concentration: {sat_concentration:.2e} kg/m^3")
 
-sat_factor = 0.5  # 50% of saturation concentration
+sat_factor = 0.5
 glycerol_gas = (
-    par.gas.GasSpeciesBuilder()
-    .set_molar_mass(molar_mass_glycerol, "kg/mol")
-    .set_vapor_pressure_strategy(vapor_pressure_strategy)
-    .set_concentration(sat_concentration * sat_factor, "kg/m^3")
-    .set_name("Glycerol")
-    .set_partitioning(True)
+    par.gas.GasDataBuilder()
+    .set_names(["Glycerol"])
+    .set_molar_mass([molar_mass_glycerol], "kg/mol")
+    .set_concentration([sat_concentration * sat_factor], "kg/m^3")
+    .set_partitioning([True])
     .build()
 )
-print(glycerol_gas)
-
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_more_partitioning_species(glycerol_gas)
-    .set_temperature(25, temperature_units="degC")
-    .set_pressure(1, pressure_units="atm")
-    .build()
-)
-print(atmosphere)
-
-# Glycerol particle distribution
-lognormal_rep = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_mode(np.array([100]), "nm")
-    .set_geometric_standard_deviation(np.array([1.5]))
-    .set_number_concentration(np.array([1e4]), "1/cm^3")
-    .set_density(1.26, "g/cm^3")
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=np.array([298.15]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.array([[sat_factor]]),
 )</div>
 </div>
 </div>
@@ -17396,8 +17378,6 @@ lognormal_rep = (
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Saturation concentration: 4.95e-03 kg/m^3
-Glycerol
-Gas mixture at 298.15 K, 101325.0 Pa, partitioning=Glycerol, gas_only_species=None
 </pre>
 </div>
 </div>
@@ -17405,32 +17385,21 @@ Gas mixture at 298.15 K, 101325.0 Pa, partitioning=Glycerol, gas_only_species=No
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=765eea30">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c6ee871a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<blockquote>
-<p>Notice, that there are two different types of gas phase species possible. <code>partitioning</code> and <code>gas_only_spcies</code>. The <code>partitioning</code> species are the ones that will be partitioned between the gas and particle phase, while the <code>gas_only_species</code> are the ones that will only be in the gas phase.</p>
-</blockquote>
+<h2 id="native-particle-initialization">Native particle initialization<a class="anchor-link" href="#native-particle-initialization">¶</a></h2><p>Discrete bins store number density in m^-3 at reference volume 1 m^3.
+Each mass lane is per-particle mass in kg, not population mass. The preset
+retains the original 100 nm mode, geometric spread, and number density.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8d470e93">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="creating-an-aerosol-object">Creating an Aerosol object<a class="anchor-link" href="#creating-an-aerosol-object">¶</a></h2><p>With both the <code>Atmosphere</code> and <code>ParticleRepresentation</code> objects created, we can now create an <code>Aerosol</code> object. This object will contain both the gas and particle phase objects, and will be used to track the state of the aerosol system during dynamics.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=46dab12f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=eaed304c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17448,13 +17417,83 @@ Gas mixture at 298.15 K, 101325.0 Pa, partitioning=Glycerol, gas_only_species=No
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">aerosol</span> <span class="o">=</span> <span class="n">LegacyAerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="o">=</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="n">lognormal_rep</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">particles</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="p">[</span><span class="mf">100e-9</span><span class="p">],</span>
+    <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="p">[</span><span class="mf">1.5</span><span class="p">],</span>
+    <span class="n">number_concentration</span><span class="o">=</span><span class="p">[</span><span class="mf">1e10</span><span class="p">],</span>  <span class="c1"># 1e4 cm^-3</span>
+    <span class="n">density</span><span class="o">=</span><span class="mf">1260.0</span><span class="p">,</span>  <span class="c1"># 1.26 g/cm^3</span>
+<span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">aerosol = LegacyAerosol(atmosphere=atmosphere, particles=lognormal_rep)
-
-print(aerosol)</div>
+<div class="clipboard-copy-txt" id="cell-3">particles = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete",
+    mode=[100e-9],
+    geometric_standard_deviation=[1.5],
+    number_concentration=[1e10],  # 1e4 cm^-3
+    density=1260.0,  # 1.26 g/cm^3
+)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=23987918">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="assemble-and-inspect-the-held-state">Assemble and inspect the held state<a class="anchor-link" href="#assemble-and-inspect-the-held-state">¶</a></h2><p>Partitioning flags distinguish condensable species from inert gas lanes in
+one ordered gas container. No species list is filtered during construction.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2052169a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">aerosol</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">(</span>
+    <span class="n">particles</span><span class="o">=</span><span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="o">=</span><span class="n">glycerol_gas</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="n">environment</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span> <span class="ow">is</span> <span class="n">particles</span>
+<span class="k">assert</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span> <span class="ow">is</span> <span class="n">glycerol_gas</span>
+<span class="k">assert</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">environment</span> <span class="ow">is</span> <span class="n">environment</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Number density [m^-3]:"</span><span class="p">,</span> <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"Particle mass density [kg/m^3]:"</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">masses</span> <span class="o">*</span> <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-4">aerosol = par.Aerosol(
+    particles=particles, gas=glycerol_gas, environment=environment
+)
+assert aerosol.particles is particles
+assert aerosol.gas is glycerol_gas
+assert aerosol.environment is environment
+print(aerosol)
+print("Number density [m^-3]:", particles.concentration.sum(axis=1))
+print(
+    "Particle mass density [kg/m^3]:",
+    np.sum(particles.masses * particles.concentration[:, :, None], axis=1),
+)</div>
 </div>
 </div>
 </div>
@@ -17466,13 +17505,337 @@ print(aerosol)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Gas mixture at 298.15 K, 101325.0 Pa, partitioning=Glycerol, gas_only_species=None
-Particle Representation:
-	Strategy: RadiiBasedMovingBin
-	Activity: ActivityIdealMass
-	Surface: SurfaceStrategyVolume
-	Mass Concentration: 1.106e-07 [kg/m^3]
-	Number Concentration: 1.000e+10 [#/m^3]
+<pre>ParticleData(masses=array([[[5.27787566e-24],
+        [6.06317521e-24],
+        [6.96532014e-24],
+        [8.00169597e-24],
+        [9.19227503e-24],
+        [1.05600013e-23],
+        [1.21312328e-23],
+        [1.39362491e-23],
+        [1.60098353e-23],
+        [1.83919522e-23],
+        [2.11285062e-23],
+        [2.42722344e-23],
+        [2.78837205e-23],
+        [3.20325627e-23],
+        [3.67987146e-23],
+        [4.22740262e-23],
+        [4.85640141e-23],
+        [5.57898945e-23],
+        [6.40909197e-23],
+        [7.36270615e-23],
+        [8.45820938e-23],
+        [9.71671345e-23],
+        [1.11624714e-22],
+        [1.28233449e-22],
+        [1.47313411e-22],
+        [1.69232298e-22],
+        [1.94412513e-22],
+        [2.23339314e-22],
+        [2.56570158e-22],
+        [2.94745448e-22],
+        [3.38600870e-22],
+        [3.88981578e-22],
+        [4.46858474e-22],
+        [5.13346921e-22],
+        [5.89728241e-22],
+        [6.77474401e-22],
+        [7.78276385e-22],
+        [8.94076782e-22],
+        [1.02710722e-21],
+        [1.17993136e-21],
+        [1.35549434e-21],
+        [1.55717948e-21],
+        [1.78887352e-21],
+        [2.05504152e-21],
+        [2.36081287e-21],
+        [2.71208020e-21],
+        [3.11561289e-21],
+        [3.57918755e-21],
+        [4.11173787e-21],
+        [4.72352680e-21],
+        [5.42634431e-21],
+        [6.23373464e-21],
+        [7.16125725e-21],
+        [8.22678673e-21],
+        [9.45085723e-21],
+        [1.08570582e-20],
+        [1.24724890e-20],
+        [1.43282811e-20],
+        [1.64601981e-20],
+        [1.89093248e-20],
+        [2.17228591e-20],
+        [2.49550216e-20],
+        [2.86681002e-20],
+        [3.29336509e-20],
+        [3.78338764e-20],
+        [4.34632107e-20],
+        [4.99301383e-20],
+        [5.73592855e-20],
+        [6.58938217e-20],
+        [7.56982188e-20],
+        [8.69614203e-20],
+        [9.99004830e-20],
+        [1.14764760e-19],
+        [1.31840705e-19],
+        [1.51457394e-19],
+        [1.73992867e-19],
+        [1.99881411e-19],
+        [2.29621934e-19],
+        [2.63787575e-19],
+        [3.03036750e-19],
+        [3.48125842e-19],
+        [3.99923778e-19],
+        [4.59428773e-19],
+        [5.27787566e-19],
+        [6.06317521e-19],
+        [6.96532014e-19],
+        [8.00169597e-19],
+        [9.19227503e-19],
+        [1.05600013e-18],
+        [1.21312328e-18],
+        [1.39362491e-18],
+        [1.60098353e-18],
+        [1.83919522e-18],
+        [2.11285062e-18],
+        [2.42722344e-18],
+        [2.78837205e-18],
+        [3.20325627e-18],
+        [3.67987146e-18],
+        [4.22740262e-18],
+        [4.85640141e-18],
+        [5.57898945e-18],
+        [6.40909197e-18],
+        [7.36270615e-18],
+        [8.45820938e-18],
+        [9.71671345e-18],
+        [1.11624714e-17],
+        [1.28233449e-17],
+        [1.47313411e-17],
+        [1.69232298e-17],
+        [1.94412513e-17],
+        [2.23339314e-17],
+        [2.56570158e-17],
+        [2.94745448e-17],
+        [3.38600870e-17],
+        [3.88981578e-17],
+        [4.46858474e-17],
+        [5.13346921e-17],
+        [5.89728241e-17],
+        [6.77474401e-17],
+        [7.78276385e-17],
+        [8.94076782e-17],
+        [1.02710722e-16],
+        [1.17993136e-16],
+        [1.35549434e-16],
+        [1.55717948e-16],
+        [1.78887352e-16],
+        [2.05504152e-16],
+        [2.36081287e-16],
+        [2.71208020e-16],
+        [3.11561289e-16],
+        [3.57918755e-16],
+        [4.11173787e-16],
+        [4.72352680e-16],
+        [5.42634431e-16],
+        [6.23373464e-16],
+        [7.16125725e-16],
+        [8.22678673e-16],
+        [9.45085723e-16],
+        [1.08570582e-15],
+        [1.24724890e-15],
+        [1.43282811e-15],
+        [1.64601981e-15],
+        [1.89093248e-15],
+        [2.17228591e-15],
+        [2.49550216e-15],
+        [2.86681002e-15],
+        [3.29336509e-15],
+        [3.78338764e-15],
+        [4.34632107e-15],
+        [4.99301383e-15],
+        [5.73592855e-15],
+        [6.58938217e-15],
+        [7.56982188e-15],
+        [8.69614203e-15],
+        [9.99004830e-15],
+        [1.14764760e-14],
+        [1.31840705e-14],
+        [1.51457394e-14],
+        [1.73992867e-14],
+        [1.99881411e-14],
+        [2.29621934e-14],
+        [2.63787575e-14],
+        [3.03036750e-14],
+        [3.48125842e-14],
+        [3.99923778e-14],
+        [4.59428773e-14],
+        [5.27787566e-14],
+        [6.06317521e-14],
+        [6.96532014e-14],
+        [8.00169597e-14],
+        [9.19227503e-14],
+        [1.05600013e-13],
+        [1.21312328e-13],
+        [1.39362491e-13],
+        [1.60098353e-13],
+        [1.83919522e-13],
+        [2.11285062e-13],
+        [2.42722344e-13],
+        [2.78837205e-13],
+        [3.20325627e-13],
+        [3.67987146e-13],
+        [4.22740262e-13],
+        [4.85640141e-13],
+        [5.57898945e-13],
+        [6.40909197e-13],
+        [7.36270615e-13],
+        [8.45820938e-13],
+        [9.71671345e-13],
+        [1.11624714e-12],
+        [1.28233449e-12],
+        [1.47313411e-12],
+        [1.69232298e-12],
+        [1.94412513e-12],
+        [2.23339314e-12],
+        [2.56570158e-12],
+        [2.94745448e-12],
+        [3.38600870e-12],
+        [3.88981578e-12],
+        [4.46858474e-12],
+        [5.13346921e-12],
+        [5.89728241e-12],
+        [6.77474401e-12],
+        [7.78276385e-12],
+        [8.94076782e-12],
+        [1.02710722e-11],
+        [1.17993136e-11],
+        [1.35549434e-11],
+        [1.55717948e-11],
+        [1.78887352e-11],
+        [2.05504152e-11],
+        [2.36081287e-11],
+        [2.71208020e-11],
+        [3.11561289e-11],
+        [3.57918755e-11],
+        [4.11173787e-11],
+        [4.72352680e-11],
+        [5.42634431e-11],
+        [6.23373464e-11],
+        [7.16125725e-11],
+        [8.22678673e-11],
+        [9.45085723e-11],
+        [1.08570582e-10],
+        [1.24724890e-10],
+        [1.43282811e-10],
+        [1.64601981e-10],
+        [1.89093248e-10],
+        [2.17228591e-10],
+        [2.49550216e-10],
+        [2.86681002e-10],
+        [3.29336509e-10],
+        [3.78338764e-10],
+        [4.34632107e-10],
+        [4.99301383e-10],
+        [5.73592855e-10],
+        [6.58938217e-10],
+        [7.56982188e-10],
+        [8.69614203e-10],
+        [9.99004830e-10],
+        [1.14764760e-09],
+        [1.31840705e-09],
+        [1.51457394e-09],
+        [1.73992867e-09],
+        [1.99881411e-09],
+        [2.29621934e-09],
+        [2.63787575e-09],
+        [3.03036750e-09],
+        [3.48125842e-09],
+        [3.99923778e-09],
+        [4.59428773e-09],
+        [5.27787566e-09]]]), concentration=array([[4.42885787e-20, 1.60675992e-19, 5.75390670e-19, 2.03388888e-18,
+        7.09650006e-18, 2.44407079e-17, 8.30875455e-17, 2.78811485e-16,
+        9.23502278e-16, 3.01938062e-15, 9.74429304e-15, 3.10409775e-14,
+        9.76052153e-14, 3.02944616e-13, 9.28124067e-13, 2.80673501e-12,
+        8.37817386e-12, 2.46859535e-11, 7.17964590e-11, 2.06114585e-10,
+        5.84072832e-10, 1.63372091e-09, 4.51067263e-09, 1.22929844e-08,
+        3.30693711e-08, 8.78106353e-08, 2.30155249e-07, 5.95452647e-07,
+        1.52063911e-06, 3.83316633e-06, 9.53765815e-06, 2.34249364e-05,
+        5.67894511e-05, 1.35896885e-04, 3.20999172e-04, 7.48429512e-04,
+        1.72246528e-03, 3.91293497e-03, 8.77419668e-03, 1.94206911e-02,
+        4.24301509e-02, 9.15033623e-02, 1.94783475e-01, 4.09279270e-01,
+        8.48867618e-01, 1.73785191e+00, 3.51186770e+00, 7.00512853e+00,
+        1.37926162e+01, 2.68058617e+01, 5.14239551e+01, 9.73764103e+01,
+        1.82009738e+02, 3.35805706e+02, 6.11552996e+02, 1.09934171e+03,
+        1.95067040e+03, 3.41654907e+03, 5.90668773e+03, 1.00798238e+04,
+        1.69790917e+04, 2.82311484e+04, 4.63335118e+04, 7.50610217e+04,
+        1.20029033e+05, 1.89457028e+05, 2.95180536e+05, 4.53959693e+05,
+        6.89127293e+05, 1.03260492e+06, 1.52729000e+06, 2.22977688e+06,
+        3.21331934e+06, 4.57087083e+06, 6.41795386e+06, 8.89501763e+06,
+        1.21688522e+07, 1.64325515e+07, 2.19034722e+07, 2.88186420e+07,
+        3.74271397e+07, 4.79791275e+07, 6.07114540e+07, 7.58300780e+07,
+        9.34899553e+07, 1.13773464e+08, 1.36668867e+08, 1.62050653e+08,
+        1.89663848e+08, 2.19114396e+08, 2.49867543e+08, 2.81255718e+08,
+        3.12496715e+08, 3.42722118e+08, 3.71014934e+08, 3.96454388e+08,
+        4.18164969e+08, 4.35366138e+08, 4.47418799e+08, 4.53864682e+08,
+        4.54455256e+08, 4.49167633e+08, 4.38206038e+08, 4.21988719e+08,
+        4.01121468e+08, 3.76360080e+08, 3.48565001e+08, 3.18651954e+08,
+        2.87542453e+08, 2.56117906e+08, 2.25180351e+08, 1.95422076e+08,
+        1.67405350e+08, 1.41552527e+08, 1.18145857e+08, 9.73356541e+07,
+        7.91549331e+07, 6.35384478e+07, 5.03440091e+07, 3.93741846e+07,
+        3.03968045e+07, 2.31631100e+07, 1.74228175e+07, 1.29357760e+07,
+        9.48023641e+06, 6.85801497e+06, 4.89700188e+06, 3.45155417e+06,
+        2.40132917e+06, 1.64907832e+06, 1.11784978e+06, 7.47959688e+05,
+        4.93998373e+05, 3.22051574e+05, 2.07242066e+05, 1.31638517e+05,
+        8.25354706e+04, 5.10799969e+04, 3.12042446e+04, 1.88160763e+04,
+        1.11994588e+04, 6.57987421e+03, 3.81584500e+03, 2.18432090e+03,
+        1.23422613e+03, 6.88375830e+02, 3.78973699e+02, 2.05942086e+02,
+        1.10467297e+02, 5.84890984e+01, 3.05681184e+01, 1.57693963e+01,
+        8.02997161e+00, 4.03613359e+00, 2.00248668e+00, 9.80677746e-01,
+        4.74062481e-01, 2.26202516e-01, 1.06539795e-01, 4.95312017e-02,
+        2.27299486e-02, 1.02960495e-02, 4.60357657e-03, 2.03176138e-03,
+        8.85120934e-04, 3.80614303e-04, 1.61554916e-04, 6.76873997e-05,
+        2.79929111e-05, 1.14272277e-05, 4.60454027e-06, 1.83140439e-06,
+        7.19009799e-07, 2.78636462e-07, 1.06584405e-07, 4.02440765e-08,
+        1.49990187e-08, 5.51793153e-09, 2.00374453e-09, 7.18225750e-10,
+        2.54116096e-10, 8.87474655e-11, 3.05937226e-11, 1.04102527e-11,
+        3.49657458e-12, 1.15924946e-12, 3.79370530e-13, 1.22547050e-13,
+        3.90746152e-14, 1.22981317e-14, 3.82064029e-15, 1.17161721e-15,
+        3.54640161e-16, 1.05960176e-16, 3.12499987e-17, 9.09724557e-18,
+        2.61410131e-18, 7.41459596e-19, 2.07589388e-19, 5.73687498e-20,
+        1.56494185e-20, 4.21379695e-21, 1.11995761e-21, 2.93820535e-22,
+        7.60878456e-23, 1.94491672e-23, 4.90726276e-24, 1.22216600e-24,
+        3.00451006e-25, 7.29070806e-26, 1.74629791e-26, 4.12875908e-27,
+        9.63547946e-28, 2.21962546e-28, 5.04706210e-29, 1.13279201e-29,
+        2.50965654e-30, 5.48821329e-31, 1.18467781e-31, 2.52419038e-32,
+        5.30880217e-33, 1.10210648e-33, 2.25841189e-34, 4.56809712e-35,
+        9.12053020e-36, 1.79745251e-36, 3.49661119e-37, 6.71413149e-38,
+        1.27257950e-38, 2.38085301e-39, 4.39676066e-40, 8.01467005e-41,
+        1.44208564e-41, 2.56123269e-42, 4.49013709e-43, 7.77003090e-44,
+        1.32720642e-44, 2.23772534e-45, 3.72415431e-46, 6.11788257e-47,
+        9.92035437e-48, 1.58783663e-48, 2.50863240e-49, 3.91219793e-50,
+        6.02222797e-51, 9.15052781e-52, 1.37242203e-52, 2.03180392e-53,
+        2.96912506e-54, 4.28279973e-55]]), charge=array([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]]), density=array([1260.]), volume=array([1.]), distribution_type='discrete', radius_grid=None)
+GasData(name=['Glycerol'], molar_mass=array([0.09209382]), concentration=array([[0.00247482]]), partitioning=array([ True]))
+EnvironmentData(temperature=array([298.15]), pressure=array([101325.]), saturation_ratio=array([[0.5]]))
+Number density [m^-3]: [1.e+10]
+Particle mass density [kg/m^3]: [[1.10599721e-07]]
 </pre>
 </div>
 </div>
@@ -17480,13 +17843,15 @@ Particle Representation:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8153d8d2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e28260c2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="summary">Summary<a class="anchor-link" href="#summary">¶</a></h1><p>In this tutorial, we demonstrated how to create an <code>Aerosol</code> object, which is the key object that will track the state of the aerosol system during dynamics. It is pretty simple, as the <code>Aerosol</code> object is just a collection of the <code>Atmosphere</code> and <code>ParticleRepresentation</code> objects and only functions as a container for these objects. It can also iterate over the <code>Atmosphere</code> and <code>ParticleRepresentation</code> objects.</p>
+<p>The aggregate exposes its held containers through properties. Mutating their
+arrays changes the held state; use <code>copy()</code> for detached inspection. Processes
+validate their own scientific requirements before using this state.</p>
 </div>
 </div>
 </div>

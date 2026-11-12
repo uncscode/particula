@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -13957,10 +13957,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-build-a-particlerepresentation" class="md-nav__link">
+  <a href="#1-build-native-particledata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Build a ParticleRepresentation
+        1. Build native ParticleData
       
     </span>
   </a>
@@ -14547,7 +14547,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14575,7 +14575,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14603,7 +14603,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14852,7 +14852,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17469,10 +17469,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-build-a-particlerepresentation" class="md-nav__link">
+  <a href="#1-build-native-particledata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Build a ParticleRepresentation
+        1. Build native ParticleData
       
     </span>
   </a>
@@ -17669,7 +17669,7 @@
 <p>Strategy-based wall loss for chamber simulations that plugs directly into particula's dynamics workflow.</p>
 </blockquote>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The wall loss strategy system lets you model particle deposition onto chamber walls using the same object-oriented patterns as condensation and coagulation. Instead of calling standalone rate functions, you work with strategy objects that operate on <code>ParticleRepresentation</code>, support multiple distribution types, and expose a consistent <code>rate</code> / <code>step</code> interface.</p>
+<p>The wall loss strategy system lets you model particle deposition onto chamber walls using the same object-oriented patterns as condensation and coagulation. Instead of calling standalone rate functions, you work with strategy objects that operate on native <code>ParticleData</code>, support multiple distribution types, and expose a consistent <code>rate</code> / <code>step</code> interface.</p>
 <p>This feature is built around user-facing APIs exposed via <code>particula.dynamics</code>:</p>
 <ul>
 <li><code>WallLossStrategy</code> – abstract base class for wall loss models.</li>
@@ -17682,7 +17682,7 @@
 <li><code>WallLossFactory</code> – factory for selecting a wall loss geometry by name with
   builder defaults.</li>
 <li><code>WallLoss</code> runnable – delegates to a wall loss strategy on <code>Aerosol</code>, splits
-  <code>time_step</code> across <code>sub_steps</code>, and clamps concentrations non-negative.</li>
+  <code>time_step</code> across <code>sub_steps</code>, and delegates native positivity validation to the strategy.</li>
 </ul>
 <h2 id="native-cpu-strategy-contract-e9-m3">Native CPU strategy contract (E9-M3)<a class="headerlink" href="#native-cpu-strategy-contract-e9-m3" title="Permanent link">&para;</a></h2>
 <p>The neutral spherical/rectangular and charged spherical/rectangular strategies
@@ -17690,8 +17690,8 @@ accept explicitly tagged, single-box <code>ParticleData</code> directly. Configu
 remains on the strategy. Each coefficient, rate and step call revalidates the
 current representation, physical state, environment, geometry and field values.
 Native strategy and particle distribution types must agree. Legacy facade
-execution remains available for unmigrated consumers; runnable/adapter migration
-belongs to M4.</p>
+execution remains available for compatibility. Native runnables retain the
+held containers; see the composed examples below.</p>
 <table>
 <thead>
 <tr>
@@ -17735,16 +17735,16 @@ The existing neutral CPU helper draws for positive-radius slots, including
 unoccupied material carriers; charged CPU removal draws for occupied
 positive-radius slots. Native zero-time and wholly unoccupied calls perform
 validation but draw nothing. Rejections after a draw do not roll back RNG state.</p>
-<p>Removed occupied slots have their counts and species masses cleared. CPU charge
-storage is retained, including in removed slots, as in the existing CPU
-strategy. Surviving and previously unoccupied material remains unchanged.
-This is a CPU process contract, not a claim that removed charged slots satisfy
-the separate fixed-slot activation contract; M4 composition must respect that
-boundary. GPU removal has its own slot-clearing and RNG contract.</p>
+<p>Removed occupied slots have their counts, species masses and charge cleared,
+so removed slots satisfy the fixed-slot activation contract. Surviving and
+untouched inactive storage is preserved; the operation does not repair
+pre-existing inactive material. This native M4 behavior supersedes the earlier
+M3 charge-retention description without changing the CPU Bernoulli law.
+GPU removal also clears charge, with its own RNG lifecycle.</p>
 <p>Steps preserve the container and primary array identities. Preflight rejects
 unwritable destinations and aliases with protected state or array-backed
-geometry/field configuration. Density, volume, charge and the PDF radius grid
-remain protected; resolved masses are the additional writer. Independent tests
+geometry/field configuration. Density, volume and the PDF radius grid remain protected. Binned calls also
+protect masses and charge; resolved removal additionally writes both. Independent tests
 account for removed species and weighted charge, rather than requiring a sink
 process to conserve its remaining inventory.</p>
 <p>Both CPU strategy suites must be run explicitly, in separate invocations:</p>
@@ -17758,7 +17758,7 @@ the full package runner cannot substitute for its explicit check.</p>
 <ul>
 <li><strong>Consistent dynamics workflow</strong>: Use the same strategy-based API (<code>rate</code>, <code>step</code>, <code>distribution_type</code>) as for condensation and coagulation.</li>
 <li><strong>Builder/factory parity with validation</strong>: Configure wall loss using the same unit-aware builder and factory patterns as other dynamics modules, with built-in checks for geometry and distribution types.</li>
-<li><strong>Direct integration with ParticleRepresentation</strong>: Apply wall loss directly to particle distributions without writing glue code.</li>
+<li><strong>Direct integration with ParticleData</strong>: Apply wall loss directly to particle distributions without writing glue code.</li>
 <li><strong>Extensible wall loss models</strong>: Add new chamber geometries or wall loss models as additional <code>WallLossStrategy</code> implementations.</li>
 </ul>
 <h2 id="who-its-for">Who It's For<a class="headerlink" href="#who-its-for" title="Permanent link">&para;</a></h2>
@@ -17811,10 +17811,26 @@ optional electric-field drift effects. Configure it via
 <p><code>WallLoss</code> is a <code>RunnableABC</code> implementation exported as <code>par.dynamics.WallLoss</code>.
 It operates on an <code>Aerosol</code> in the runnable pipeline, delegates <code>rate</code> and
 <code>step</code> to the provided wall loss strategy, splits <code>time_step</code> across any
-<code>sub_steps</code>, clamps concentrations to be non-negative after each sub-step, and
+<code>sub_steps</code>, rejects negative native Euler proposals, and
 works with spherical or rectangular strategies across all supported
 distribution types.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+<span class="n">particles</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
+    <span class="n">radius_bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mf">50e-9</span><span class="p">,</span> <span class="mf">500e-9</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+    <span class="n">mode</span><span class="o">=</span><span class="p">[</span><span class="mf">100e-9</span><span class="p">],</span> <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="p">[</span><span class="mf">1.5</span><span class="p">],</span>
+    <span class="n">number_concentration</span><span class="o">=</span><span class="p">[</span><span class="mf">1e8</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">gas</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasData</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s2">"organic"</span><span class="p">],</span> <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.180</span><span class="p">]),</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1e-6</span><span class="p">]]),</span> <span class="n">partitioning</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">]),</span>
+<span class="p">)</span>
+<span class="n">environment</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">EnvironmentData</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="p">[</span><span class="mf">298.15</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="p">[</span><span class="mf">101325.0</span><span class="p">],</span> <span class="n">saturation_ratio</span><span class="o">=</span><span class="p">[[</span><span class="mf">1.0</span><span class="p">]],</span>
+<span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">(</span><span class="n">particles</span><span class="o">=</span><span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="o">=</span><span class="n">gas</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">)</span>
 
 <span class="n">wall_loss_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
@@ -17825,11 +17841,11 @@ distribution types.</p>
     <span class="n">wall_loss_strategy</span><span class="o">=</span><span class="n">wall_loss_strategy</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># Sub-steps split time_step and clamp concentrations after each sub-step</span>
+<span class="c1"># Sub-steps split time_step; native negative proposals reject.</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="n">aerosol</span><span class="p">,</span>
     <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span>
-    <span class="n">sub_steps</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">sub_steps</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># Chain with another runnable in a single pipeline</span>
@@ -17839,7 +17855,7 @@ distribution types.</p>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">combined</span> <span class="o">=</span> <span class="n">coagulation</span> <span class="o">|</span> <span class="n">wall_loss</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">combined</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">combined</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="direct-gpu-charged-wall-loss">Direct GPU charged wall loss<a class="headerlink" href="#direct-gpu-charged-wall-loss" title="Permanent link">&para;</a></h2>
 <p>The GPU boundary is a low-level, caller-managed fixed-capacity slot operation. It is
@@ -17895,8 +17911,10 @@ Its enqueue performs no host setup or transfer, but the frozen kernel's
 <code>initialize_rng=True</code> flag still requests a reset on each eligible launch.
 For persistent replay, supply initialized caller-owned RNG state and prepare
 with <code>initialize_rng=False</code>. Zero-time and wholly inactive calls do not advance
-or reset supplied words. Native selected-box/resident dispatch remains an M4
-integration task and rejects tagged inputs at its separate boundary.</p>
+or reset supplied words. Native resident dispatch uses explicit resolved
+metadata and session-owned continuation streams; see the
+<a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py">resident walkthrough</a>. Direct
+caller-owned RNG and resident lifecycle ownership are distinct boundaries.</p>
 <p>Warp CPU is the baseline when Warp is installed. CUDA is optional and the
 focused suites skip cleanly when it is unavailable:</p>
 <div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/dynamics/tests/wall_loss_funcs_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
@@ -17911,7 +17929,7 @@ replay, mandatory CUDA support, and performance claims remain deferred.</p>
 <p><code>SphericalWallLossStrategy</code> models deposition in a well-mixed spherical chamber. It:</p>
 <ul>
 <li>Reuses existing wall loss coefficient utilities for the underlying physics.</li>
-<li>Works with any <code>ParticleRepresentation</code> compatible with particula dynamics.</li>
+<li>Works with single-box native <code>ParticleData</code> whose declared kind matches the strategy.</li>
 <li>Computes size-dependent loss rates and updates particle concentration over time.</li>
 </ul>
 <p>Typical initialization:</p>
@@ -17952,16 +17970,26 @@ replay, mandatory CUDA support, and performance claims remain deferred.</p>
 <p>The strategy system operates on the same distribution types used elsewhere in particula:</p>
 <ul>
 <li>"discrete" – radius-binned distributions.</li>
-<li>"continuous_pdf" – continuous probability-density representations.</li>
+<li>"continuous_pdf" – radius number-density PDFs (<code>dn/dr</code> in m⁻⁴).</li>
 <li>"particle_resolved" – ensembles of individual particles.</li>
 </ul>
 <p>You select the appropriate mode at initialization (or via builder/factory parameters) with <code>distribution_type</code>, and the strategy adjusts its <code>step</code> behavior to match the representation.</p>
+<p>The snippets on this page use the selected E9 checkout. CPU snippets share
+imports and the native aerosol constructed in the runnable section above;
+optional GPU snippets only declare their separate low-level interfaces.
+That runnable fixture uses an explicitly truncated 50–500 nm, 64-bin PMF
+with a 100 nm mode, GSD 1.5 and 1e8 m⁻³ number density. Its finite interval is
+an illustration, not a converged distribution or atmospheric calibration.
+The 60/120-second runs use 0.25-second substeps to keep this fixture's native
+proposals admissible. This does not establish a general timestep bound.</p>
 <h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
 <h3 id="quick-start-wall-loss-on-a-discrete-distribution">Quick start: wall loss on a discrete distribution<a class="headerlink" href="#quick-start-wall-loss-on-a-discrete-distribution" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="c1"># 1. Build a radius-binned particle distribution</span>
-<span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># 2. Configure spherical wall loss</span>
 <span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
@@ -17975,30 +18003,33 @@ replay, mandatory CUDA support, and performance claims remain deferred.</p>
 <span class="n">P</span> <span class="o">=</span> <span class="mf">101325.0</span>  <span class="c1"># Pa</span>
 <span class="n">rate</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">)</span>
 
-<span class="c1"># 4. Advance the system by one time step</span>
-<span class="n">particle</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-    <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-    <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">,</span>
-    <span class="n">time_step</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>  <span class="c1"># s</span>
-<span class="p">)</span>
+<span class="c1"># 4. Advance 10 seconds with 40 equal steps (0.25 s each).</span>
+<span class="c1"># Native binned wall loss rejects a step that would make a bin negative.</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">):</span>
+    <span class="n">particle</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+        <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+    <span class="p">)</span>
 </code></pre></div>
 <h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>particula</code> version 0.2.6 or later installed.</li>
-<li>A <code>ParticleRepresentation</code> instance (e.g., from one of the preset builders).</li>
+<li>The selected E9 checkout installed with <code>pip install -e .</code>; no older-wheel compatibility is implied.</li>
+<li>A native <code>ParticleData</code> instance (with an explicit population kind).</li>
 <li>Basic familiarity with particula's dynamics and particle-phase examples.</li>
 </ul>
 <h2 id="typical-workflows">Typical Workflows<a class="headerlink" href="#typical-workflows" title="Permanent link">&para;</a></h2>
-<h3 id="1-build-a-particlerepresentation">1. Build a ParticleRepresentation<a class="headerlink" href="#1-build-a-particlerepresentation" title="Permanent link">&para;</a></h3>
+<h3 id="1-build-native-particledata">1. Build native ParticleData<a class="headerlink" href="#1-build-native-particledata" title="Permanent link">&para;</a></h3>
 <p>Start by constructing a particle distribution using existing builders:</p>
-<div class="highlight"><pre><span></span><code><span class="n">particle</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">"m^3"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_lognormal_binned_particle_data</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">radius_bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mf">50e-9</span><span class="p">,</span> <span class="mf">500e-9</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+    <span class="n">mode</span><span class="o">=</span><span class="p">[</span><span class="mf">100e-9</span><span class="p">],</span> <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="p">[</span><span class="mf">1.5</span><span class="p">],</span>
+    <span class="n">number_concentration</span><span class="o">=</span><span class="p">[</span><span class="mf">1e8</span><span class="p">],</span>
 <span class="p">)</span>
+<span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particle</span>
 </code></pre></div>
-<p>You can also use particle-resolved or continuous-PDF builders from the particle phase examples when you need finer control.</p>
+<p>Use the native resolved initializer for counts at a physical volume, or
+<code>distribution_type="continuous_pdf"</code> with a radius grid for a radius PDF.
+The strategy kind must match the stored kind; CPU execution is single-box.</p>
 <h3 id="2-configure-a-sphericalwalllossstrategy">2. Configure a SphericalWallLossStrategy<a class="headerlink" href="#2-configure-a-sphericalwalllossstrategy" title="Permanent link">&para;</a></h3>
 <p>Choose physical parameters for your chamber and distribution type:</p>
 <div class="highlight"><pre><span></span><code><span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
@@ -18014,35 +18045,29 @@ replay, mandatory CUDA support, and performance claims remain deferred.</p>
 </ul>
 <h3 id="3-combine-wall-loss-with-other-dynamics">3. Combine wall loss with other dynamics<a class="headerlink" href="#3-combine-wall-loss-with-other-dynamics" title="Permanent link">&para;</a></h3>
 <p>Wall loss strategies are designed to compose with other dynamics, such as condensation and coagulation, in a single time-stepping loop:</p>
-<div class="highlight"><pre><span></span><code><span class="n">condensation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
-    <span class="n">molar_mass</span><span class="o">=</span><span class="mf">180e-3</span><span class="p">,</span>
-    <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
-    <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.condensation.species_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">CondensationSpeciesMap</span>
+
+<span class="n">condensation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">MassCondensation</span><span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+        <span class="n">molar_mass</span><span class="o">=</span><span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+        <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
+        <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">activity_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">(),</span>
+        <span class="n">surface_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyVolume</span><span class="p">(</span><span class="n">density</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">),</span>
+        <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">),</span>
+        <span class="n">species_map</span><span class="o">=</span><span class="n">CondensationSpeciesMap</span><span class="p">((</span><span class="s2">"organic"</span><span class="p">,),</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),)),</span>
+    <span class="p">)</span>
 <span class="p">)</span>
-
-<span class="c1"># Time loop (pseudo-code)</span>
-<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_steps</span><span class="p">):</span>
-    <span class="c1"># Update particle size/composition</span>
-    <span class="n">particle</span> <span class="o">=</span> <span class="n">condensation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-        <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-        <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">,</span>
-        <span class="n">time_step</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="c1"># Apply wall loss to the updated distribution</span>
-    <span class="n">particle</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-        <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-        <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">,</span>
-        <span class="n">time_step</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
-    <span class="p">)</span>
+<span class="n">wall</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLoss</span><span class="p">(</span><span class="n">wall_loss_strategy</span><span class="o">=</span><span class="n">wall_loss</span><span class="p">)</span>
+<span class="n">workflow</span> <span class="o">=</span> <span class="n">condensation</span> <span class="o">|</span> <span class="n">wall</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">aerosol</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div>
 <p>This pattern matches how other dynamics strategies are combined in chamber simulations.</p>
 <h2 id="use-cases">Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
 <h3 id="use-case-1-standalone-chamber-wall-loss">Use case 1: Standalone chamber wall loss<a class="headerlink" href="#use-case-1-standalone-chamber-wall-loss" title="Permanent link">&para;</a></h3>
 <p><strong>Scenario:</strong> You want to understand how quickly particles are lost to the walls of a well-mixed spherical chamber.</p>
-<p><strong>Solution:</strong> Build a radius-binned <code>ParticleRepresentation</code>, configure <code>SphericalWallLossStrategy</code>, and integrate <code>step</code> over the experiment duration to track normalized concentration decay.</p>
+<p><strong>Solution:</strong> Build a radius-binned native <code>ParticleData</code>, configure <code>SphericalWallLossStrategy</code>, and integrate <code>step</code> over the experiment duration to track normalized concentration decay.</p>
 <h3 id="use-case-2-full-chamber-dynamics-with-wall-loss">Use case 2: Full chamber dynamics with wall loss<a class="headerlink" href="#use-case-2-full-chamber-dynamics-with-wall-loss" title="Permanent link">&para;</a></h3>
 <p><strong>Scenario:</strong> You are modeling a chamber experiment where condensation growth, coagulation, and wall loss all act simultaneously.</p>
 <p><strong>Solution:</strong> Combine <code>SphericalWallLossStrategy</code> with existing condensation or coagulation strategies in a shared time loop. This lets you track how wall loss interacts with growth and collisions without custom coupling code.</p>
@@ -18080,7 +18105,7 @@ replay, mandatory CUDA support, and performance claims remain deferred.</p>
 </table>
 <h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Match distribution type to your builder</strong>: Ensure <code>distribution_type</code> matches how your <code>ParticleRepresentation</code> was constructed to avoid unintended behavior.</li>
+<li><strong>Match distribution type to your builder</strong>: Ensure <code>distribution_type</code> matches how your native <code>ParticleData</code> was constructed to avoid unintended behavior.</li>
 <li><strong>Use builder/factory validation</strong>: Set parameters through the builders or factory to enforce positivity, 3D chamber dimensions, and allowed distribution types with automatic unit conversion.</li>
 <li><strong>Use physically reasonable parameters</strong>: Choose <code>wall_eddy_diffusivity</code>, <code>chamber_radius</code>, or <code>chamber_dimensions</code> consistent with your experimental setup.</li>
 <li><strong>Compose processes explicitly</strong>: When combining wall loss with other dynamics, keep a clear, ordered time loop so you can reason about which processes act first in each step.</li>
@@ -18096,11 +18121,11 @@ replay, mandatory CUDA support, and performance claims remain deferred.</p>
 <li><strong>Hands-on guide</strong>: <a href="../../Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial/">Wall loss tutorial</a></li>
 <li><strong>Notebooks</strong>: <a href="../../Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy/">Spherical wall loss strategy</a></li>
 <li><strong>Dynamics overview</strong>:
-  <a href="../../#feature-guides">Wall loss strategies</a></li>
+  <a href="../../#feature-deep-dives">Wall loss strategies</a></li>
 </ul>
 <h2 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h2>
 <h3 id="should-i-use-the-function-based-or-strategy-based-wall-loss-api">Should I use the function-based or strategy-based wall loss API?<a class="headerlink" href="#should-i-use-the-function-based-or-strategy-based-wall-loss-api" title="Permanent link">&para;</a></h3>
-<p>Use <code>SphericalWallLossStrategy</code> whenever you are already working with <code>ParticleRepresentation</code> and other dynamics strategies. The function-based API remains available for lower-level or legacy workflows.</p>
+<p>Use <code>SphericalWallLossStrategy</code> whenever you are already working with native <code>ParticleData</code> and other dynamics strategies. The function-based API remains available for lower-level or legacy workflows.</p>
 <h3 id="how-do-i-add-a-new-wall-loss-model-or-geometry">How do I add a new wall loss model or geometry?<a class="headerlink" href="#how-do-i-add-a-new-wall-loss-model-or-geometry" title="Permanent link">&para;</a></h3>
 <p>Subclass <code>WallLossStrategy</code> in your own code or contribute a new strategy to particula that implements <code>loss_coefficient</code> using the appropriate wall loss physics, then expose it through <code>particula.dynamics</code>.</p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>

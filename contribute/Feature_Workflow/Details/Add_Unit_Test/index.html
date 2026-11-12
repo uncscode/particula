@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14089,7 +14089,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14117,7 +14117,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14145,7 +14145,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14394,7 +14394,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -16992,46 +16992,52 @@
 <h2 id="philosophy">Philosophy<a class="headerlink" href="#philosophy" title="Permanent link">&para;</a></h2>
 <p>Every new public function or class must have at least one test for accuracy and one edge case or failure mode.</p>
 <h2 id="location">Location<a class="headerlink" href="#location" title="Permanent link">&para;</a></h2>
-<p>particula/<area>/tests/test_<symbol>.py  (mirror the package directory)</p>
+<p>particula/<area>/tests/<symbol>_test.py  (mirror the package directory)</p>
+<p>The following text templates contain placeholders and are not executable.
+Use native held state and independent physical expectations for process tests;
+see <a href="../Add_Example/">example maintenance</a>.</p>
 <h2 id="template-for-functions">Template for Functions<a class="headerlink" href="#template-for-functions" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="sd">"""Docstring for the test module."""</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>  <span class="c1"># if needed</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.</span><span class="o">&lt;</span><span class="n">area</span><span class="o">&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span>
+<div class="highlight"><pre><span></span><code>"""Docstring for the test module."""
+import numpy as np  # if needed
+import pytest
+from particula.&lt;area&gt; import &lt;symbol&gt;
 
-<span class="k">def</span><span class="w"> </span><span class="nf">test_</span><span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span><span class="n">_accuracy</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""Docstring for the test."""</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&lt;</span><span class="n">valid_args</span><span class="o">&gt;</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">expected</span><span class="o">&gt;</span><span class="p">)</span>
+def test_&lt;symbol&gt;_accuracy():
+    """Docstring for the test."""
+    result = &lt;symbol&gt;(&lt;valid_args&gt;)
+    assert np.isclose(result, &lt;expected&gt;)
 
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"bad_input"</span><span class="p">,</span> <span class="p">[</span><span class="o">...</span><span class="p">])</span>
+@pytest.mark.parametrize("bad_input", [...])
 
-<span class="k">def</span><span class="w"> </span><span class="nf">test_</span><span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span><span class="n">_bad_inputs</span><span class="p">(</span><span class="n">bad_input</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Docstring for the test."""</span>
-    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
-        <span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span><span class="p">(</span><span class="n">bad_input</span><span class="p">)</span>
+def test_&lt;symbol&gt;_bad_inputs(bad_input):
+    """Docstring for the test."""
+    with pytest.raises(ValueError):
+        &lt;symbol&gt;(bad_input)
 </code></pre></div>
 <h2 id="template-for-classes">Template for Classes<a class="headerlink" href="#template-for-classes" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="sd">"""Docstring for the test module."""</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>  <span class="c1"># if needed</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.</span><span class="o">&lt;</span><span class="n">area</span><span class="o">&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="o">&lt;</span><span class="n">ClassName</span><span class="o">&gt;</span>
+<div class="highlight"><pre><span></span><code>"""Docstring for the test module."""
+import numpy as np  # if needed
+import pytest
+from particula.&lt;area&gt; import &lt;ClassName&gt;
 
-<span class="k">def</span><span class="w"> </span><span class="nf">test_</span><span class="o">&lt;</span><span class="n">ClassName</span><span class="o">&gt;</span><span class="n">_accuracy</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""Docstring for the test."""</span>
-    <span class="n">obj</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">ClassName</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&lt;</span><span class="n">valid_args</span><span class="o">&gt;</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.&lt;</span><span class="n">method_name</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&lt;</span><span class="n">valid_args</span><span class="o">&gt;</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">expected</span><span class="o">&gt;</span><span class="p">)</span>
+def test_&lt;ClassName&gt;_accuracy():
+    """Docstring for the test."""
+    obj = &lt;ClassName&gt;(&lt;valid_args&gt;)
+    result = obj.&lt;method_name&gt;(&lt;valid_args&gt;)
+    assert np.isclose(result, &lt;expected&gt;)
 
 
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"bad_input"</span><span class="p">,</span> <span class="p">[</span><span class="o">...</span><span class="p">])</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_</span><span class="o">&lt;</span><span class="n">ClassName</span><span class="o">&gt;</span><span class="n">_bad_inputs</span><span class="p">(</span><span class="n">bad_input</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Docstring for the test."""</span>
-    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
-        <span class="o">&lt;</span><span class="n">ClassName</span><span class="o">&gt;</span><span class="p">(</span><span class="n">bad_input</span><span class="p">)</span>
+@pytest.mark.parametrize("bad_input", [...])
+def test_&lt;ClassName&gt;_bad_inputs(bad_input):
+    """Docstring for the test."""
+    with pytest.raises(ValueError):
+        &lt;ClassName&gt;(bad_input)
 </code></pre></div>
 <h2 id="run-locally">Run locally<a class="headerlink" href="#run-locally" title="Permanent link">&para;</a></h2>
-<p>Execute <code>pytest -q</code> before opening the pull request; all tests must be green.</p>
+<p>Run the package suite plus <code>pytest examples_tests -q -Werror</code> and
+<code>pytest scripts/tests -q -Werror</code> when maintaining examples or infrastructure.
+Focused assertions use <code>--no-cov</code>; obtain repository coverage only from the
+untargeted <code>.opencode/tools/run_pytest.py</code> gate.</p>
 
 
 

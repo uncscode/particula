@@ -25,7 +25,7 @@
     
     
       
-        <title>Dynamics Migration - Particula</title>
+        <title>Native dynamics migration - Particula</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#dynamics-migration" class="md-skip">
+        <a href="#native-dynamics-migration" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Dynamics Migration
+              Native dynamics migration
             
           </span>
         </div>
@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14102,7 +14102,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14139,7 +14139,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14157,7 +14157,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14186,10 +14186,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#using-particledata-and-gasdata-in-dynamics" class="md-nav__link">
+  <a href="#single-box-cpu-processes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Using ParticleData and GasData in dynamics
+        Single-box CPU processes
       
     </span>
   </a>
@@ -14197,10 +14197,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#condensation_step_gpu-environment-inputs" class="md-nav__link">
+  <a href="#direct-warp-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        condensation_step_gpu environment inputs
+        Direct Warp steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resident-and-capture-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resident and capture paths
       
     </span>
   </a>
@@ -14233,7 +14244,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14482,7 +14493,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -16876,10 +16887,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#using-particledata-and-gasdata-in-dynamics" class="md-nav__link">
+  <a href="#single-box-cpu-processes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Using ParticleData and GasData in dynamics
+        Single-box CPU processes
       
     </span>
   </a>
@@ -16887,10 +16898,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#condensation_step_gpu-environment-inputs" class="md-nav__link">
+  <a href="#direct-warp-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        condensation_step_gpu environment inputs
+        Direct Warp steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resident-and-capture-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resident and capture paths
       
     </span>
   </a>
@@ -16920,139 +16942,107 @@
   
 
 
-<h1 id="dynamics-migration">Dynamics Migration<a class="headerlink" href="#dynamics-migration" title="Permanent link">&para;</a></h1>
-<h2 id="using-particledata-and-gasdata-in-dynamics">Using ParticleData and GasData in dynamics<a class="headerlink" href="#using-particledata-and-gasdata-in-dynamics" title="Permanent link">&para;</a></h2>
-<p>For the canonical support-boundary summary, including the leading <code>n_boxes</code>
-axis and explicit particle, gas, and environment helper boundaries, see
-<a href="../../data-containers-and-gpu-foundations/">Data Containers and GPU Foundations</a>.</p>
-<p>Condensation and coagulation strategies accept both legacy facades and the new
-data containers. The return type matches the input type, but container
-compatibility does not mean every CPU dynamics path supports multi-box
-execution.</p>
+<h1 id="native-dynamics-migration">Native dynamics migration<a class="headerlink" href="#native-dynamics-migration" title="Permanent link">&para;</a></h1>
+<h2 id="single-box-cpu-processes">Single-box CPU processes<a class="headerlink" href="#single-box-cpu-processes" title="Permanent link">&para;</a></h2>
+<p>Native runnables consume the current <code>Aerosol.particles</code>, <code>.gas</code> and
+<code>.environment</code> objects. They preserve those identities during in-place process
+execution. Their schema may store several boxes, but the supported CPU runnable
+path is single-box; it does not silently process box zero of a multi-box input.</p>
+<p>Run this excerpt from the selected native checkout. Its maintained constructors
+are in <code>docs/Examples/native_state_access.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">docs.Examples.native_state_access</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_aerosol</span><span class="p">,</span> <span class="n">build_condensation</span>
+
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">build_aerosol</span><span class="p">()</span>
+<span class="n">condensation</span> <span class="o">=</span> <span class="n">build_condensation</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span><span class="p">)</span>
+<span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="p">,</span> <span class="n">environment</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">environment</span>
+<span class="k">assert</span> <span class="n">condensation</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">4e8</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="ow">is</span> <span class="n">aerosol</span>
+<span class="k">assert</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span> <span class="ow">is</span> <span class="n">particles</span> <span class="ow">and</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span> <span class="ow">is</span> <span class="n">gas</span>
+<span class="k">assert</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">environment</span> <span class="ow">is</span> <span class="n">environment</span>
+</code></pre></div>
+<p>The example explicitly maps water at gas lane 2 to particle material 0 and
+organic at gas lane 1 to material 1, retaining inert gas at lane 0. It supplies
+full gas-order molar masses and process-owned activity, surface and vapor-pressure
+strategies. Do not infer chemistry from equal array widths or discard inert gas.
+The runnable reads current environment and gas state during its substeps.</p>
 <table>
 <thead>
 <tr>
-<th>CPU dynamics path</th>
-<th>Containers accepted</th>
-<th>Current CPU execution support</th>
-<th>Multi-box CPU alternative</th>
+<th>Process</th>
+<th>Native guidance</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Condensation</td>
-<td>Legacy <code>ParticleRepresentation</code> and <code>GasSpecies</code>, or <code>ParticleData</code> and <code>GasData</code></td>
-<td><code>n_boxes == 1</code> only</td>
-<td>Run a caller-managed per-box loop and pass one box at a time.</td>
+<td><code>MassCondensation</code></td>
+<td>Explicit expected full gas order and material mapping; finite inventories; process-owned thermodynamics</td>
 </tr>
 <tr>
-<td>Coagulation</td>
-<td>Legacy <code>ParticleRepresentation</code>, or <code>ParticleData</code></td>
-<td><code>n_boxes == 1</code> only</td>
-<td>Run a caller-managed per-box loop and pass one box at a time.</td>
+<td><code>Coagulation</code></td>
+<td>Match <code>distribution_type</code>; resolved native coagulation requires equal positive active counts; retained binned methods have composition limitations</td>
+</tr>
+<tr>
+<td><code>Dilution</code></td>
+<td>Exponential finite-step decay of particle populations and every gas lane; masses per particle remain unchanged</td>
+</tr>
+<tr>
+<td><code>WallLoss</code></td>
+<td>Match the population kind and geometry; resolved removal retires lost slots; gas is not a wall sink</td>
+</tr>
+<tr>
+<td><code>Nucleation</code></td>
+<td>Explicit source/commit configuration and mapping; uses held environment and current gas; fixed capacity and exhaustion rules apply</td>
 </tr>
 </tbody>
 </table>
-<p>The storage schema is broader than the audited CPU support boundary.
-<code>ParticleData</code> and <code>GasData</code> can store multiple boxes, but current CPU
-condensation and coagulation execution remains single-box. Multi-box inputs
-fail fast instead of silently reading or mutating box <code>0</code>.</p>
-<p>Existing process entry points may continue to accept scalar <code>temperature</code> and
-<code>pressure</code>. Only migrated process code should read <code>EnvironmentData</code> directly,
-and environment fields should remain read-only unless the physical model owns
-the update and refreshes derived state such as <code>saturation_ratio</code>.</p>
-<p>Supported single-box CPU usage:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-
-<span class="n">activity_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">()</span>
-<span class="n">surface_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyMass</span><span class="p">()</span>
-<span class="n">vapor_pressure_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">2330.0</span><span class="p">)</span>
-
-<span class="n">condensation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
-    <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
-    <span class="n">activity_strategy</span><span class="o">=</span><span class="n">activity_strategy</span><span class="p">,</span>
-    <span class="n">surface_strategy</span><span class="o">=</span><span class="n">surface_strategy</span><span class="p">,</span>
-    <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">vapor_pressure_strategy</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">particle_out</span><span class="p">,</span> <span class="n">gas_out</span> <span class="o">=</span> <span class="n">condensation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-    <span class="n">particle</span><span class="o">=</span><span class="n">particle_data</span><span class="p">,</span>
-    <span class="n">gas_species</span><span class="o">=</span><span class="n">gas_data</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
-    <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
-    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">coagulation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span>
-<span class="p">)</span>
-<span class="n">particle_out</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-    <span class="n">particle</span><span class="o">=</span><span class="n">particle_out</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
-    <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
-    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div>
-<p>For multi-box CPU execution, manage the box loop in application code. This is
-pseudocode, not a built-in Particula helper:</p>
-<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">box_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">):</span>
-    <span class="n">single_box_particle</span> <span class="o">=</span> <span class="n">build_single_box_particle_data</span><span class="p">(</span>
-        <span class="n">particle_data</span><span class="p">,</span>
-        <span class="n">box_index</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">single_box_gas</span> <span class="o">=</span> <span class="n">build_single_box_gas_data</span><span class="p">(</span><span class="n">gas_data</span><span class="p">,</span> <span class="n">box_index</span><span class="p">)</span>
-
-    <span class="n">particle_box_out</span><span class="p">,</span> <span class="n">gas_box_out</span> <span class="o">=</span> <span class="n">condensation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-        <span class="n">particle</span><span class="o">=</span><span class="n">single_box_particle</span><span class="p">,</span>
-        <span class="n">gas_species</span><span class="o">=</span><span class="n">single_box_gas</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
-        <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
-        <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="n">particle_box_out</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-        <span class="n">particle</span><span class="o">=</span><span class="n">particle_box_out</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
-        <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
-        <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="c1"># Reassemble results in caller-owned storage.</span>
-</code></pre></div>
-<p>Use <code>EnvironmentData</code> for CPU-owned per-box <code>temperature</code>, <code>pressure</code>, and
-<code>saturation_ratio</code>. <code>GasData</code> does not own these fields. Keep scalar inputs
-where process APIs have not migrated, and use explicit conversion helpers for
-GPU round trips. Kernels and runnables do not move environment state for the
-caller.</p>
-<h2 id="condensation_step_gpu-environment-inputs"><code>condensation_step_gpu</code> environment inputs<a class="headerlink" href="#condensation_step_gpu-environment-inputs" title="Permanent link">&para;</a></h2>
-<p>The bounded direct GPU condensation path is imported with
-<code>from particula.gpu.kernels import condensation_step_gpu</code>. Explicitly convert
-with <code>to_warp_*</code> before the call and restore with <code>from_warp_*</code> afterward;
-preserve ordered species names outside GPU containers. Callers also own required
-synchronization and checkpoint/snapshot responsibility. See the authoritative
-<a href="../../data-containers-and-gpu-foundations/">Data Containers and GPU Foundations</a>
-page for its modes and schema matrix rather than duplicating that matrix here.</p>
-<p>The non-executable signature is
-<code>particles_out, mass_transfer = condensation_step_gpu(...,
-thermodynamics=thermodynamics)</code>. <code>thermodynamics=</code> is required and is
-caller-owned device-local configuration. Particle masses and
-<code>gas.concentration</code> mutate in place; there is no second gas return value.
-Caller-supplied GPU vapor pressure is derived, non-authoritative state that the
-step overwrites.</p>
-<p>Direct temperature and pressure inputs may be positive-finite scalars,
-same-device Warp arrays with shape <code>(n_boxes,)</code>, or hybrid scalar/Warp-array
-inputs. Alternatively, pass <code>environment=WarpEnvironmentData</code> with both direct
-inputs omitted; its <code>(n_boxes,)</code> values must be positive finite and on the same
-device. Temperature and pressure remain environment-owned state, not <code>GasData</code>
-fields.</p>
-<p>The step executes four fixed equal substeps, uses caller-owned reusable scratch
-and diagnostic buffers, P2 inventory finalization, and gas coupling for later
-proposals. Its transfer is a whole-call total; optional caller-owned energy
-output is not a third return value. This is not a high-level <code>Aerosol</code> or
-<code>Runnable</code> API, automatic fallback, or hidden simulation-state transfer.
-Callers synchronize before host observation or restoration; CUDA preflight
-validation-flag readbacks may synchronize without transferring simulation
-state. It also does not add adaptive stepping, new physics or container
-support, BAT, or staggered/Gauss-Seidel support.</p>
+<p>See the <a href="../../condensation_strategy_system/">condensation guide</a>,
+<a href="../../coagulation_strategy_system/">coagulation guide</a>, and
+<a href="../../nucleation_strategy_system/">nucleation guide</a>. The binned coagulation
+limitation is not a tolerance to relax: radius-varying composition can require a
+resolved model. A composed <code>first | second</code> sequence executes each full cycle
+with equal substep durations and reads the state left by preceding processes.</p>
+<p>Direct array mutation is caller-owned. Process validation still applies on the
+next invocation. Aggregate replacement validates shape/representation before
+publication, but it does not rewrite a process's expected gas order or physical
+configuration. Rebuild that configuration explicitly when its meaning changes.
+Validation rejection is distinct from rollback after a process writer runs;
+there is no blanket whole-sequence rollback guarantee.</p>
+<h2 id="direct-warp-steps">Direct Warp steps<a class="headerlink" href="#direct-warp-steps" title="Permanent link">&para;</a></h2>
+<p>Import steps from <code>particula.gpu.kernels</code>. Conversion helpers remain under
+<code>particula.gpu</code>; maps, scratch and resident configuration remain at their concrete
+modules. See the maintained
+<a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py">direct quick start</a>
+and <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py">five-process sequence</a>.</p>
+<p>Explicitly convert native discrete/resolved data; radius PDFs cannot be
+uploaded. Raw resolved concentration stays counts. Condensation couples gas
+through counts/volume, and extensive energy weights transfers by counts.
+Keep full ordered gas names externally. Prepare a condensation or nucleation
+species binding against the exact transferred carriers, with explicit lane
+pairs and full expected gas order. Replacing storage invalidates that binding;
+normal dispatch does not silently recreate it.</p>
+<p><code>condensation_step_gpu</code> requires <code>thermodynamics=</code> and native <code>species_binding=</code>.
+It returns the identical particle carrier and whole-call transfer accumulator;
+gas mutates in place and optional energy is a caller-owned output, not a third
+return. Four equal fixed substeps refresh derived vapor pressure and couple later
+proposals to updated gas. This is the bounded direct method, not general CPU
+strategy parity, adaptive stepping or a high-level runnable.</p>
+<p>Temperature and pressure may be positive finite scalars or same-device <code>(B,)</code>
+Warp arrays, including scalar/array hybrids. Alternatively supply
+<code>environment=WarpEnvironmentData</code> and omit both direct inputs. Never mix these
+forms. Synchronize explicitly before host observation/restoration. Validation
+may synchronize flags internally; simulation-state transfers remain explicit.</p>
+<h2 id="resident-and-capture-paths">Resident and capture paths<a class="headerlink" href="#resident-and-capture-paths" title="Permanent link">&para;</a></h2>
+<p>The <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py">resident multi-timestep example</a>
+prepares exact session/registry/guard ownership and process mappings, then runs
+the maintained twelve-node composition. After explicit same-device restart it
+prepares new mappings against fresh carriers. Its prescribed gas and wall loss
+make it an open system: zero-ledger residuals report net inventory change,
+not zero closed-system drift.</p>
+<p>Uncaptured examples use Warp CPU when installed. The
+<a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py">native capture example</a>
+requires CUDA and never substitutes CPU or Warp CPU. Optional CUDA absence is
+not performance evidence. See <a href="../../data-containers-and-gpu-foundations/">container foundations</a>
+for transfers and <a href="../../gpu_resident_checkpoints/">resident checkpoints</a> for
+canonical-byte continuation and lossy inspection boundaries.</p>
 
 
 

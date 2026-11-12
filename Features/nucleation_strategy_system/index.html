@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14219,7 +14219,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14247,7 +14247,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14275,7 +14275,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14524,7 +14524,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17018,7 +17018,7 @@ process. It combines immutable potential-rate construction (P4) with the public
 <code>Nucleation</code> runnable (P5). It is not a GPU process, scheduler, or general
 empirical new-particle-formation model.</p>
 <h2 id="public-api-equations-and-units">Public API, equations, and units<a class="headerlink" href="#public-api-equations-and-units" title="Permanent link">&para;</a></h2>
-<p>Use public imports only. <code>EnvironmentData</code> is the one-box thermodynamic input;
+<p>Use public process imports and the concrete species-map configuration. <code>EnvironmentData</code> is the one-box thermodynamic input;
 <code>ExhaustionControls</code> selects fixed-capacity recovery behavior.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -17028,7 +17028,10 @@ empirical new-particle-formation model.</p>
     <span class="n">NucleationCommitConfig</span><span class="p">,</span>
     <span class="n">NucleationSourceConfig</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvironmentData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aerosol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvironmentData</span><span class="p">,</span> <span class="n">GasData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParticleData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.nucleation.species_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">NucleationSpeciesMap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.exhaustion</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExhaustionControls</span>
 </code></pre></div>
 <p>Activation uses <span class="arithmatex">\(J=A C S\)</span> and kinetic nucleation uses <span class="arithmatex">\(J=K C^2 S\)</span>, where
@@ -17044,7 +17047,20 @@ and <code>finalize_particle_source</code>, <code>commit_particle_source</code>, 
 <code>nucleation.particle_source</code>, not supported package imports.</p>
 <p>Build an immutable potential-rate strategy through the public builder or
 factory, then select its precursor lane in <code>NucleationSourceConfig</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="n">strategy</span> <span class="o">=</span> <span class="n">ActivationNucleationBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">particles</span> <span class="o">=</span> <span class="n">ParticleData</span><span class="p">(</span>
+    <span class="n">masses</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
+    <span class="n">charge</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">]),</span>
+    <span class="n">volume</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.25</span><span class="p">]),</span> <span class="n">distribution_type</span><span class="o">=</span><span class="s2">"particle_resolved"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">gas</span> <span class="o">=</span> <span class="n">GasData</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s2">"precursor"</span><span class="p">,</span> <span class="s2">"inert"</span><span class="p">],</span> <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">]),</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1e-12</span><span class="p">,</span> <span class="mf">2e-6</span><span class="p">]]),</span> <span class="n">partitioning</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]),</span>
+<span class="p">)</span>
+<span class="n">environment</span> <span class="o">=</span> <span class="n">EnvironmentData</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="p">[</span><span class="mf">298.15</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="p">[</span><span class="mf">101325.0</span><span class="p">],</span> <span class="n">saturation_ratio</span><span class="o">=</span><span class="p">[[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]],</span>
+<span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">particles</span><span class="o">=</span><span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="o">=</span><span class="n">gas</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">)</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">ActivationNucleationBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">"coefficient"</span><span class="p">:</span> <span class="mf">1.0e-2</span><span class="p">,</span>
         <span class="s2">"coefficient_units"</span><span class="p">:</span> <span class="s2">"s^-1"</span><span class="p">,</span>
@@ -17057,28 +17073,43 @@ factory, then select its precursor lane in <code>NucleationSourceConfig</code>:<
         <span class="s2">"temperature_lower_units"</span><span class="p">:</span> <span class="s2">"K"</span><span class="p">,</span>
         <span class="s2">"temperature_upper"</span><span class="p">:</span> <span class="mf">400.0</span><span class="p">,</span>
         <span class="s2">"temperature_upper_units"</span><span class="p">:</span> <span class="s2">"K"</span><span class="p">,</span>
-        <span class="s2">"injection_composition"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">"injection_composition"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
         <span class="s2">"formation_diameter"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="s2">"formation_diameter_units"</span><span class="p">:</span> <span class="s2">"nm"</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="n">source</span> <span class="o">=</span> <span class="n">NucleationSourceConfig</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span> <span class="n">precursor_index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">NucleationSourceConfig</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span> <span class="n">precursor_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">species_map</span><span class="o">=</span><span class="n">NucleationSpeciesMap</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">gas</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),)),</span>
+<span class="p">)</span>
 </code></pre></div>
 <h2 id="getting-started">Getting started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
-<p>Use the <a href="../../Examples/Nucleation/cpu_nucleation/">supported CPU example</a> as
-the runnable starting point. It constructs the one-box legacy <code>Aerosol</code>, a
-partitioning <code>GasData</code> lane, fixed particle capacity, <code>EnvironmentData</code>, and
+<p>Use the <a href="https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/cpu_nucleation.py">supported CPU example</a> as
+the runnable starting point in the selected E9 checkout (<code>pip install -e .</code>).
+It constructs native <code>Aerosol</code>, unified <code>GasData</code> with precursor and inert lanes,
+fixed resolved particle capacity, aligned <code>EnvironmentData</code>, and
 the public <code>NucleationCommitConfig</code>. Its commit controls use
 <code>ExhaustionControls()</code> and one-element <code>float64</code> <code>requested_scale</code>,
 <code>minimum_scale</code>, and <code>minimum_volume</code> sidecars. Do not replace that setup with
 imports from <code>nucleation.particle_source</code>.</p>
 <h2 id="execution-fixed-capacity-and-accounting">Execution, fixed capacity, and accounting<a class="headerlink" href="#execution-fixed-capacity-and-accounting" title="Permanent link">&para;</a></h2>
-<p>The runnable adapts a legacy <code>Aerosol</code> backing <code>ParticleData</code> and partitioning
-<code>GasData</code> by identity. It supports exactly one box, fixed-capacity slots, and
-partitioning gas with matching particle/gas species widths. It does not resize
+<p>The runnable retains the native aggregate and its containers by identity.
+It supports exactly one resolved box and fixed-capacity slots. Full ordered
+gas names and explicit gas-to-particle pairs define the source mapping; gas
+and particle widths may differ. Every positive injection lane must be mapped
+and partitioning-enabled; other gas lanes remain unchanged. It does not resize
 or compact slots. It divides the duration into equal sequential substeps and
 re-reads current gas after each successful substep:</p>
-<div class="highlight"><pre><span></span><code><span class="n">result</span> <span class="o">=</span> <span class="n">nucleation</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">nucleation</span> <span class="o">=</span> <span class="n">Nucleation</span><span class="p">(</span>
+    <span class="n">source</span><span class="p">,</span>
+    <span class="n">NucleationCommitConfig</span><span class="p">(</span>
+        <span class="n">maximum_slot_weight</span><span class="o">=</span><span class="mf">1e20</span><span class="p">,</span> <span class="n">source_charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">exhaustion_controls</span><span class="o">=</span><span class="n">ExhaustionControls</span><span class="p">(),</span>
+        <span class="n">requested_scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]),</span> <span class="n">minimum_scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]),</span>
+        <span class="n">minimum_volume</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.01</span><span class="p">]),</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">nucleation</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="n">aerosol</span>
 </code></pre></div>
 <p>P2 planning is nonmutating. P3 rejects invalid preflight atomically. P5 makes
@@ -17096,10 +17127,11 @@ concentration-weighted. Per-box/per-species particle-plus-gas conservation uses
 is never silently truncated. On exhaustion, enabled resampling is considered
 first and representative-volume scaling is its fallback; if neither can
 represent the requested demand, the attempt raises rather than silently
-discarding it. Selected scaling scales pre-existing particle and gas state
-before source removal. Therefore an unscaled run conserves against its direct
-pre-step particle-plus-gas total, while a scaled row conserves against the
-selected scale times that pre-step total.</p>
+discarding it. Native representative-volume scaling scales counts and volume together,
+preserving pre-existing particle density and gas concentration. It differs from
+physical volume evolution. The added source is accounted against that scaled
+extensive inventory. CPU admitted event density is multiplied by current
+volume; <code>maximum_slot_weight</code> bounds represented counts per new slot.</p>
 <h2 id="scope-dependencies-and-example">Scope, dependencies, and example<a class="headerlink" href="#scope-dependencies-and-example" title="Permanent link">&para;</a></h2>
 <p>This contract does not claim universal empirical validity, implicit survival or
 growth correction, full Vehkamäki physics, GPU execution, dynamic slots,
@@ -17108,7 +17140,7 @@ The survival relation is an explicit caller factor, not an implicit
 Kerminen--Kulmala calculation.</p>
 <p>See <a href="../slot_exhaustion_policies/">Fixed-Capacity Slot Exhaustion Primitives</a>,
 the <a href="../../Theory/Technical/Dynamics/Nucleation_Equations/">equations</a>, and the
-<a href="../../Examples/Nucleation/cpu_nucleation/">supported CPU example</a>.</p>
+<a href="https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/cpu_nucleation.py">supported CPU example</a>.</p>
 <h2 id="direct-warp-low-level-step">Direct-Warp low-level step<a class="headerlink" href="#direct-warp-low-level-step" title="Permanent link">&para;</a></h2>
 <p>E6-F8 ships a bounded direct-Warp nucleation step. Import only its supported
 low-level entry point:</p>
@@ -17125,10 +17157,19 @@ remains the supported high-level CPU process; it is not a GPU fallback.</p>
 place arrays on one Warp device, and call <code>wp.synchronize()</code> before host
 inspection. Fixed schemas use <code>B</code> boxes, <code>N</code> particle slots, and <code>S</code> species:
 particle masses are <code>(B, N, S)</code>, particle concentration/charge are <code>(B, N)</code>,
-gas concentration/partitioning are <code>(B, S)</code>, and temperature is <code>(B,)</code>.
+gas concentration is <code>(B, Sg)</code>, partitioning is <code>(B, Sg)</code>, and temperature
+is <code>(B,)</code>. Native particle width <code>Sp</code> may differ from full gas width <code>Sg</code>.
+Tagged resolved inputs require a <code>NucleationSpeciesBinding</code> prepared with
+<code>prepare_nucleation_species_map</code> from
+<code>particula.gpu.nucleation_species_mapping</code>, using preserved full gas names and
+the explicit source map. Preparation binds the exact transferred arrays;
+replacement or restart needs fresh preparation. The direct GPU path uses
+integral int32 event counts and one unit-count slot per event; it does not
+implement the CPU weighted-slot packing scheme.
 Sidecars are caller-owned, same-device, contiguous <code>wp.float64</code> or <code>wp.int32</code>
 arrays with documented <code>(B,)</code>, <code>(B, N)</code>, <code>(B, S)</code>, and <code>(B, N, S)</code> schemas.
-P4 owns nested E6-F6 resampling/scaling sidecars; see
+Full-gas demand/transfer sidecars use gas width; resampling scratch uses
+particle width. P4 owns nested E6-F6 resampling/scaling sidecars; see
 <a href="../slot_exhaustion_policies/">fixed-slot exhaustion</a> for their fields.
 Preflight and phase handoffs may perform bounded aggregate device-status
 readbacks for validation; these are not CPU state transfers or a fallback.</p>
@@ -17148,7 +17189,7 @@ orchestration, expanded physics, graph capture, autodiff, and performance
 guarantees. E6-F5 fixed-slot activation, E6-F6 exhaustion primitives, and E6-F7
 CPU nucleation are dependencies; E6-F9 is only a downstream explicit-transfer
 integration consumer. See the <a href="../../Theory/Technical/Dynamics/Nucleation_Equations/">equations</a>,
-<a href="../../Examples/Nucleation/gpu_direct_nucleation/">direct example</a>, and
+<a href="https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py">direct example</a>, and
 <a href="../Roadmap/data-oriented-gpu/">GPU roadmap</a>.</p>
 <p>Focused validation:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/Nucleation/cpu_nucleation.py

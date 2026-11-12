@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14209,7 +14209,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14237,7 +14237,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14265,7 +14265,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14514,7 +14514,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17111,18 +17111,18 @@ snapshot and a separate explicit restoration to CPU-authoritative state plus a
 CPU-authority declaration before a distinct CPU request. Resident restart is
 an exact-device GPU lifecycle operation, not CPU restoration or fallback. No
 component restores, transfers, synchronizes, migrates, or retries silently.</p>
-<div class="highlight"><pre><span></span><code><span class="n">WARP_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+<div class="highlight"><pre><span></span><code>WARP_AVAILABLE = False
 
-<span class="k">if</span> <span class="n">WARP_AVAILABLE</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.checkpoint</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResidentCheckpointController</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.gpu_session</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResidentSession</span>
+if WARP_AVAILABLE:
+    from particula.execution.checkpoint import ResidentCheckpointController
+    from particula.execution.gpu_session import ResidentSession
 
-    <span class="n">controller</span> <span class="o">=</span> <span class="n">ResidentCheckpointController</span><span class="p">()</span>
-    <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">resident_session</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">guard</span><span class="p">)</span>
-    <span class="n">finalized</span> <span class="o">=</span> <span class="n">resident_session</span><span class="o">.</span><span class="n">finalize</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">guard</span><span class="p">)</span>
-    <span class="n">cpu_state</span> <span class="o">=</span> <span class="n">caller_restore_to_cpu_authoritative_state</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">)</span>
-    <span class="n">cpu_authority</span> <span class="o">=</span> <span class="s2">"caller declares CPU_AUTHORITATIVE after explicit restore"</span>
-    <span class="n">cpu_request</span> <span class="o">=</span> <span class="s2">"a distinct canonical CPU request"</span>
+    controller = ResidentCheckpointController()
+    checkpoint = resident_session.checkpoint(registry, guard)
+    finalized = resident_session.finalize(registry, guard)
+    cpu_state = caller_restore_to_cpu_authoritative_state(checkpoint)
+    cpu_authority = "caller declares CPU_AUTHORITATIVE after explicit restore"
+    cpu_request = "a distinct canonical CPU request"
 </code></pre></div>
 
 

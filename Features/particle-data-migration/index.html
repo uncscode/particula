@@ -25,7 +25,7 @@
     
     
       
-        <title>ParticleData and GasData Migration - Particula</title>
+        <title>Native aerosol migration - Particula</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#particledata-and-gasdata-migration-guide" class="md-skip">
+        <a href="#native-aerosol-migration" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ParticleData and GasData Migration
+              Native aerosol migration
             
           </span>
         </div>
@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14102,7 +14102,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14130,7 +14130,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14158,7 +14158,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14407,7 +14407,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -16812,10 +16812,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#state-and-behavior" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Overview
+        State and behavior
       
     </span>
   </a>
@@ -16823,32 +16823,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#why-migrate" class="md-nav__link">
+  <a href="#historical-release-context" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why migrate
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#deprecation-timeline" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Deprecation timeline
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related-references" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related references
+        Historical release context
       
     </span>
   </a>
@@ -16878,96 +16856,47 @@
   
 
 
-<h1 id="particledata-and-gasdata-migration-guide">ParticleData and GasData Migration Guide<a class="headerlink" href="#particledata-and-gasdata-migration-guide" title="Permanent link">&para;</a></h1>
-<p>Use this section to migrate from the legacy <code>ParticleRepresentation</code> and
-<code>GasSpecies</code> facades to the data-first <code>ParticleData</code> and <code>GasData</code> workflow.
-The facades remain available for backward compatibility, but they are
-deprecated and emit migration guidance in their logs.</p>
-<p>If you arrived from the legacy path <code>docs/migration/particle-data.md</code>, that
-page redirects here.</p>
+<h1 id="native-aerosol-migration">Native aerosol migration<a class="headerlink" href="#native-aerosol-migration" title="Permanent link">&para;</a></h1>
+<p>Migrate supported workflows to the flat native <code>Aerosol</code>, holding <code>ParticleData</code>,
+full ordered <code>GasData</code>, and <code>EnvironmentData</code>. Use the selected E9-native checkout
+for these examples; their presence here does not announce a published wheel or
+release. M6 owns remaining legacy deletion and release readiness after the M5
+validation handoff.</p>
 <h2 id="migration-topics">Migration topics<a class="headerlink" href="#migration-topics" title="Permanent link">&para;</a></h2>
 <ul>
-<li>
-<p><a href="construction/">Native construction and replacement</a>: three-container
-  Aerosol, builders, initializers, units, ownership and transition limits.</p>
-</li>
-<li>
-<p><a href="containers/">Container and facade migration</a>: before/after examples,
-  field mappings, gradual migration, and conversion helpers.</p>
-</li>
-<li><a href="dynamics/">Dynamics migration</a>: current CPU support boundaries,
-  single-box and multi-box guidance, and direct GPU condensation inputs.</li>
-<li><a href="troubleshooting/">Troubleshooting</a>: shape, environment-input, sidecar,
-  synchronization, and reproduction guidance.</li>
+<li><a href="construction/">Construction and replacement</a>: three-container assembly,
+  native initializers, distribution measures, units and ownership.</li>
+<li><a href="containers/">Container access</a>: raw arrays, detached properties, individual
+  and coordinated replacement, and historical API terminology.</li>
+<li><a href="dynamics/">Dynamics</a>: native single-box CPU processes, explicit species
+  maps, and direct/resident GPU boundaries.</li>
+<li><a href="troubleshooting/">Troubleshooting</a>: validation, gas order, normalization,
+  storage replacement and explicit transfer errors.</li>
 </ul>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>Before adding container fields or changing CPU-to-GPU conversion behavior,
-start with the canonical
-<a href="../data-containers-and-gpu-foundations/">Data Containers and GPU Foundations</a>
-guide for the shipped schema, shape, helper, and support-boundary contract.</p>
-<p>For roadmap policy and planned follow-on work, review the roadmap's
-<a href="../Roadmap/data-oriented-gpu/#authoritative-field-ownership-decisions">authoritative field ownership decisions</a>,
-<a href="../Roadmap/data-oriented-gpu/#canonical-shape-conventions-for-container-workflows">canonical shape conventions for container workflows</a>,
-and <a href="../Roadmap/data-oriented-gpu/#final-downstream-handoff-map-for-sibling-features">final downstream handoff map for sibling
-features</a>.
-Treat the <a href="../Roadmap/mass-precision-study/">Mass Precision Recommendation
-Report</a> as the canonical reference before
-changing particle mass dtype or schema behavior.</p>
-<p>The migration moves <strong>data</strong> into dedicated containers and leaves <strong>behavior</strong>
-in strategies and runnables:</p>
-<ul>
-<li><code>ParticleData</code> stores per-particle arrays with an explicit batch dimension.</li>
-<li><code>GasData</code> stores gas species arrays with an explicit box dimension; it does
-  not own per-box thermodynamic state.</li>
-<li><code>EnvironmentData</code> owns CPU-side per-box thermodynamic state with
-  <code>temperature -&gt; (n_boxes,)</code>, <code>pressure -&gt; (n_boxes,)</code>, and
-  <code>saturation_ratio -&gt; (n_boxes, n_species)</code>.</li>
-<li><code>ParticleData.volume</code> remains the authoritative per-box simulation-volume
-  owner.</li>
-<li><code>ParticleRepresentation</code> and <code>GasSpecies</code> remain as compatibility facades.</li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The explicit environment-state transfer boundary is
-<code>particula.gpu.WarpEnvironmentData</code>,
-<code>particula.gpu.to_warp_environment_data()</code>, and
-<code>particula.gpu.from_warp_environment_data()</code>. See
-<a href="../data-containers-and-gpu-foundations/">Data Containers and GPU Foundations</a>
-for the authoritative container and transfer contract.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>GPU-to-CPU gas restore is intentionally lossy unless ordered species
-metadata is preserved outside <code>WarpGasData</code>. GPU-only helper state such as
-<code>vapor_pressure</code> is also dropped on CPU restore.</p>
-</div>
-<h2 id="why-migrate">Why migrate<a class="headerlink" href="#why-migrate" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Clear data/behavior split</strong>: data containers keep state, strategies keep
-  physics.</li>
-<li><strong>Multi-box ready</strong>: batch dimensions make CFD and multi-box simulations
-  first-class.</li>
-<li><strong>Fewer implicit conversions</strong>: attributes are explicit arrays rather than
-  getter methods.</li>
-</ul>
-<h2 id="deprecation-timeline">Deprecation timeline<a class="headerlink" href="#deprecation-timeline" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>v0.2.13</strong> (planned after the E8 closeout merges): retain both the legacy
-  <code>ParticleRepresentation</code> and <code>GasSpecies</code> facades and the data containers.
-  Existing facade migration warnings remain applicable.</li>
-<li><strong>v0.3.0</strong> (planned breaking migration): remove the legacy facades, migrate
-  dependent workflows to the data containers, and update all affected
-  documentation, examples, imports, and tests.</li>
-</ul>
-<p>This 2026-09-27 maintainer decision supersedes the previous v1.0 removal
-target. The versions above are release plans, not announcements of publication.</p>
-<h2 id="related-references">Related references<a class="headerlink" href="#related-references" title="Permanent link">&para;</a></h2>
-<ul>
-<li><code>ParticleData</code> implementation: <code>particula/particles/particle_data.py</code></li>
-<li><code>GasData</code> implementation: <code>particula/gas/gas_data.py</code></li>
-<li>Legacy facades: <code>particula/particles/representation.py</code> and
-  <code>particula/gas/species.py</code></li>
-</ul>
+<p>The executable examples preserve useful initialization and scientific content.
+Historical facade names are reference material only; wrapping containers in a
+legacy facade is not a native migration technique.</p>
+<h2 id="state-and-behavior">State and behavior<a class="headerlink" href="#state-and-behavior" title="Permanent link">&para;</a></h2>
+<p><code>ParticleData.volume</code> owns represented volume. <code>GasData</code> retains all gas lanes,
+including nonpartitioning species. <code>EnvironmentData</code> owns per-box temperature
+and pressure and full gas-order saturation ratios. Activity, surface,
+vapor-pressure and other physical configuration belong to processes.</p>
+<p>Batched storage does not imply general multi-box CPU process support. The
+native CPU runnable path remains single-box. Direct Warp and resident execution
+use explicit preparation and transfer, with their documented process-specific
+limits. Warp CPU is the installed-Warp baseline for uncaptured examples;
+native graph capture requires CUDA and has no CPU fallback.</p>
+<p>Start with <a href="../data-containers-and-gpu-foundations/">container foundations</a>
+for the schema and <a href="containers/">native access</a> for units. GPU gas restore
+requires externally retained names for semantic fidelity and drops device-only
+vapor-pressure state. Checkpoint inspection carriers are lossy; canonical device
+bytes, not those inspection carriers, govern explicit compatible restart.</p>
+<h2 id="historical-release-context">Historical release context<a class="headerlink" href="#historical-release-context" title="Permanent link">&para;</a></h2>
+<p>The E8 closeout planned coexistence in 0.2.13 and a breaking native migration in
+0.3.0. These are release plans, not publication claims. This guide documents the
+native migration target; temporary legacy implementation still awaiting M6 is
+not endorsed for supported new examples. No performance qualification or
+cross-device continuation is implied.</p>
 
 
 

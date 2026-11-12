@@ -12089,7 +12089,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -12117,7 +12117,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12555,7 +12555,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12583,7 +12583,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14247,7 +14247,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14275,7 +14275,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14303,7 +14303,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14552,7 +14552,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -17250,26 +17250,26 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3af20593">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1f7738ba">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1 id="adding-particles-during-simulation">Adding Particles During Simulation<a class="anchor-link" href="#adding-particles-during-simulation">¶</a></h1><p>In this tutorial, we demonstrate how add particles to an aerosol object. This is useful when you want to modify a custom aerosol process during a simulation.</p>
-<p>The example is for a particle resolved simulation, the same approach can be used for the other types of particle representations (<em>but it has not been tested yet</em>).</p>
+<p>This particle-resolved example reserves fixed capacity for two additions. It does not resize storage or describe a binned insertion API.</p>
 <p><strong>Imports</strong></p>
 </div>
 </div>
 </div>
 </div>
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c6ab65c1">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6689c5d1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -17283,29 +17283,29 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># In Colab uncomment the following command to install particula:</span>
-<span class="c1">#!pip install particula[extra] --quiet</span>
+<span class="c1"># Use the selected E9 checkout: `python -m pip install -e ".[extra]"`</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># particula imports</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula._legacy_aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aerosol</span> <span class="k">as</span> <span class="n">LegacyAerosol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.slot_management</span><span class="w"> </span><span class="kn">import</span> <span class="n">activate_slots</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># In Colab uncomment the following command to install particula:
-#!pip install particula[extra] --quiet
+# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
 import matplotlib.pyplot as plt
 import numpy as np
 
 # particula imports
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol</div>
+from particula.particles.slot_management import activate_slots</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c6222f45">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=69866ea7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17316,13 +17316,13 @@ from particula._legacy_aerosol import Aerosol as LegacyAerosol</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=14b93645">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d3cdeb98">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -17335,20 +17335,24 @@ from particula._legacy_aerosol import Aerosol as LegacyAerosol</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Preset gas species that does not condense in the atmosphere</span>
-<span class="c1"># AtmosphereBuilder constructs the atmosphere with predefined species</span>
-<span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>  <span class="c1"># Set temperature to 25°C</span>
-    <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>  <span class="c1"># Set pressure to 1 atmosphere</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># Finalize the atmosphere object</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gas</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasData</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s2">"air"</span><span class="p">],</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.029</span><span class="p">]),</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.2</span><span class="p">]]),</span>
+    <span class="n">partitioning</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">False</span><span class="p">]),</span>
 <span class="p">)</span>
+<span class="n">environment</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">EnvironmentData</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">298.15</span><span class="p">]),</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">101325.0</span><span class="p">]),</span>
+    <span class="n">saturation_ratio</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+<span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 
 <span class="c1"># Generate a particle distribution using a lognormal sample distribution</span>
 <span class="c1"># This distribution has a mean particle diameter (mode) and geometric standard deviation (GSD)</span>
 <span class="n">particle_sample</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_sample_distribution</span><span class="p">(</span>
-    <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">100e-9</span><span class="p">]),</span>  <span class="c1"># Mean particle diameter of 100 nm</span>
-    <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.3</span><span class="p">]),</span>  <span class="c1"># GSD of 1.3</span>
+    <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">100e-9</span><span class="p">]),</span>  <span class="c1"># Mode radius of 100 nm</span>
+    <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.3</span><span class="p">]),</span>  <span class="c1"># GSD</span>
     <span class="n">number_of_particles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e4</span><span class="p">]),</span>  <span class="c1"># Total number of particles</span>
     <span class="n">number_of_samples</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span>  <span class="c1"># Number of samples for particle distribution</span>
 <span class="p">)</span>
@@ -17358,48 +17362,45 @@ from particula._legacy_aerosol import Aerosol as LegacyAerosol</div>
     <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particle_sample</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1500</span>
 <span class="p">)</span>  <span class="c1"># Particle mass in kg</span>
 
-<span class="c1"># Build a resolved mass representation for each particle</span>
-<span class="c1"># This defines how particle mass, activity, and surface are represented</span>
-<span class="n">resolved_masses</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ResolvedParticleMassRepresentationBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_distribution_strategy</span><span class="p">(</span>
-        <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleResolvedSpeciatedMass</span><span class="p">()</span>
-    <span class="p">)</span>  <span class="c1"># Use speciated mass distribution</span>
-    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span>
-        <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">()</span>
-    <span class="p">)</span>  <span class="c1"># Define activity based on ideal mass</span>
-    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span>
-        <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyVolume</span><span class="p">()</span>
-    <span class="p">)</span>  <span class="c1"># Define surface area based on particle volume</span>
-    <span class="o">.</span><span class="n">set_mass</span><span class="p">(</span><span class="n">particle_mass_sample</span><span class="p">,</span> <span class="s2">"kg"</span><span class="p">)</span>  <span class="c1"># Assign mass of particles (in kg)</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mi">1500</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>  <span class="c1"># Set particle density to 1500 kg/m^3</span>
-    <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particle_sample</span><span class="p">)</span>
-    <span class="p">)</span>  <span class="c1"># Neutral particles with per-particle charge array</span>
-    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"cm^3"</span><span class="p">)</span>  <span class="c1"># Set volume of particle distribution</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># Finalize the resolved mass representation</span>
+<span class="c1"># Reserve 20,000 free slots for two 10,000-particle additions. Free slots</span>
+<span class="c1"># have exactly zero mass, represented count, and charge.</span>
+<span class="n">initial_count</span> <span class="o">=</span> <span class="n">particle_mass_sample</span><span class="o">.</span><span class="n">size</span>
+<span class="n">capacity</span> <span class="o">=</span> <span class="n">initial_count</span> <span class="o">+</span> <span class="mi">20_000</span>
+<span class="n">masses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">capacity</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">capacity</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">masses</span><span class="p">[:</span><span class="n">initial_count</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle_mass_sample</span>
+<span class="n">counts</span><span class="p">[:</span><span class="n">initial_count</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">resolved_masses</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">create_resolved_particle_data</span><span class="p">(</span>
+    <span class="n">masses</span><span class="o">=</span><span class="n">masses</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">counts</span><span class="p">,</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1500.0</span><span class="p">]),</span>
+    <span class="n">volume</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>  <span class="c1"># 1 cm^3 in m^3</span>
 <span class="p">)</span>
-
-<span class="c1"># Create an aerosol object with the defined atmosphere and resolved particles</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">LegacyAerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="o">=</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="n">resolved_masses</span><span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">(</span>
+    <span class="n">particles</span><span class="o">=</span><span class="n">resolved_masses</span><span class="p">,</span> <span class="n">gas</span><span class="o">=</span><span class="n">gas</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="n">environment</span>
+<span class="p">)</span>
 
 <span class="c1"># Print the properties of the atmosphere</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2"># Preset gas species that does not condense in the atmosphere
-# AtmosphereBuilder constructs the atmosphere with predefined species
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(25, temperature_units="degC")  # Set temperature to 25°C
-    .set_pressure(1, pressure_units="atm")  # Set pressure to 1 atmosphere
-    .build()  # Finalize the atmosphere object
+<div class="clipboard-copy-txt" id="cell-2">gas = par.gas.GasData(
+    name=["air"],
+    molar_mass=np.array([0.029]),
+    concentration=np.array([[1.2]]),
+    partitioning=np.array([False]),
 )
+environment = par.gas.EnvironmentData(
+    temperature=np.array([298.15]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.zeros((1, 1)),
+)
+np.random.seed(42)
 
 # Generate a particle distribution using a lognormal sample distribution
 # This distribution has a mean particle diameter (mode) and geometric standard deviation (GSD)
 particle_sample = par.particles.get_lognormal_sample_distribution(
-    mode=np.array([100e-9]),  # Mean particle diameter of 100 nm
-    geometric_standard_deviation=np.array([1.3]),  # GSD of 1.3
+    mode=np.array([100e-9]),  # Mode radius of 100 nm
+    geometric_standard_deviation=np.array([1.3]),  # GSD
     number_of_particles=np.array([1e4]),  # Total number of particles
     number_of_samples=100_000,  # Number of samples for particle distribution
 )
@@ -17409,30 +17410,23 @@ particle_mass_sample = (
     4 / 3 * np.pi * particle_sample**3 * 1500
 )  # Particle mass in kg
 
-# Build a resolved mass representation for each particle
-# This defines how particle mass, activity, and surface are represented
-resolved_masses = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(
-        par.particles.ParticleResolvedSpeciatedMass()
-    )  # Use speciated mass distribution
-    .set_activity_strategy(
-        par.particles.ActivityIdealMass()
-    )  # Define activity based on ideal mass
-    .set_surface_strategy(
-        par.particles.SurfaceStrategyVolume()
-    )  # Define surface area based on particle volume
-    .set_mass(particle_mass_sample, "kg")  # Assign mass of particles (in kg)
-    .set_density(1500, "kg/m^3")  # Set particle density to 1500 kg/m^3
-    .set_charge(
-        np.zeros_like(particle_sample)
-    )  # Neutral particles with per-particle charge array
-    .set_volume(1, "cm^3")  # Set volume of particle distribution
-    .build()  # Finalize the resolved mass representation
+# Reserve 20,000 free slots for two 10,000-particle additions. Free slots
+# have exactly zero mass, represented count, and charge.
+initial_count = particle_mass_sample.size
+capacity = initial_count + 20_000
+masses = np.zeros((capacity, 1), dtype=np.float64)
+counts = np.zeros(capacity, dtype=np.float64)
+masses[:initial_count, 0] = particle_mass_sample
+counts[:initial_count] = 1.0
+resolved_masses = par.particles.create_resolved_particle_data(
+    masses=masses,
+    concentration=counts,
+    density=np.array([1500.0]),
+    volume=1e-6,  # 1 cm^3 in m^3
 )
-
-# Create an aerosol object with the defined atmosphere and resolved particles
-aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
+aerosol = par.Aerosol(
+    particles=resolved_masses, gas=gas, environment=environment
+)
 
 # Print the properties of the atmosphere
 print(aerosol)</div>
@@ -17440,28 +17434,51 @@ print(aerosol)</div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>ParticleData(masses=array([[[9.28905845e-18],
+        [5.63529914e-18],
+        [1.04611464e-17],
+        ...,
+        [0.00000000e+00],
+        [0.00000000e+00],
+        [0.00000000e+00]]], shape=(1, 120000, 1)), concentration=array([[1., 1., 1., ..., 0., 0., 0.]], shape=(1, 120000)), charge=array([[0., 0., 0., ..., 0., 0., 0.]], shape=(1, 120000)), density=array([1500.]), volume=array([1.e-06]), distribution_type='particle_resolved', radius_grid=None)
+GasData(name=['air'], molar_mass=array([0.029]), concentration=array([[1.2]]), partitioning=array([False]))
+EnvironmentData(temperature=array([298.15]), pressure=array([101325.]), saturation_ratio=array([[0.]]))
+</pre>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c0611a6f">
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=06d5222e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="particles-to-add">Particles to Add<a class="anchor-link" href="#particles-to-add">¶</a></h2><p>For the particle resolved representation, the particles to add must be the provide an array of new particle masses and the concentrations.</p>
-<p>Currently the concentrations should all be one, as this is the particle resolved representation.</p>
-<p>If you have multiple species, then the shape of the <code>added_distribution</code> should be <code>(number of particles, number of species)</code>. But <code>added_concentration</code> is still <code>(number of particles,)</code>.</p>
+<h2 id="particles-to-add">Particles to Add<a class="anchor-link" href="#particles-to-add">¶</a></h2><p>Requests carry masses <code>(boxes, requests, species)</code>, represented counts and
+charge <code>(boxes, requests)</code>, and a per-box integer prefix count. Each request
+here represents one particle. Activation fills ascending free slots and
+rejects insufficient capacity before mutation. This is an external particle
+source: gas is unchanged, and particle inventory increases by the injected mass.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=154b9832">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=aea0eb4f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -17479,8 +17496,8 @@ print(aerosol)</div>
 <span class="c1"># Generate a particle distribution using a lognormal sample distribution</span>
 <span class="c1"># This distribution has a mean particle diameter (mode) and geometric standard deviation (GSD)</span>
 <span class="n">particles_to_add</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_sample_distribution</span><span class="p">(</span>
-    <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-9</span><span class="p">]),</span>  <span class="c1"># Mean particle diameter of 100 nm</span>
-    <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">]),</span>  <span class="c1"># GSD of 1.3</span>
+    <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-9</span><span class="p">]),</span>  <span class="c1"># Mode radius of 1 nm</span>
+    <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">]),</span>  <span class="c1"># GSD</span>
     <span class="n">number_of_particles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e4</span><span class="p">]),</span>  <span class="c1"># Total number of particles</span>
     <span class="n">number_of_samples</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span>  <span class="c1"># Number of samples for particle distribution</span>
 <span class="p">)</span>
@@ -17500,8 +17517,8 @@ print(aerosol)</div>
 # Generate a particle distribution using a lognormal sample distribution
 # This distribution has a mean particle diameter (mode) and geometric standard deviation (GSD)
 particles_to_add = par.particles.get_lognormal_sample_distribution(
-    mode=np.array([1e-9]),  # Mean particle diameter of 100 nm
-    geometric_standard_deviation=np.array([1.1]),  # GSD of 1.3
+    mode=np.array([1e-9]),  # Mode radius of 1 nm
+    geometric_standard_deviation=np.array([1.1]),  # GSD
     number_of_particles=np.array([1e4]),  # Total number of particles
     number_of_samples=10_000,  # Number of samples for particle distribution
 )
@@ -17519,14 +17536,27 @@ print(f"Particles to add: {particle_mass_add.shape}")</div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=45f5e2e1">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Particles to add: (10000,)
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=dff574bd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -17539,68 +17569,116 @@ print(f"Particles to add: {particle_mass_add.shape}")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Get initial particle radii before adding particle</span>
-<span class="n">initial_radii</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Initial concentration: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Only active particles enter the radius histograms.</span>
+<span class="n">initial_radii</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">initial_count</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">initial_inventory</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">masses</span> <span class="o">*</span> <span class="n">counts</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">held_masses</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">masses</span>
+<span class="n">held_counts</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span>
+<span class="n">held_gas</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">request_masses</span> <span class="o">=</span> <span class="n">particle_mass_add</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">request_counts</span> <span class="o">=</span> <span class="n">concentration_add</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+<span class="n">request_charge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">request_counts</span><span class="p">)</span>
+<span class="n">requested_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">particle_mass_add</span><span class="o">.</span><span class="n">size</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
 
-<span class="c1"># Perform the add process</span>
-<span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>  <span class="c1"># select the particle representation and call add_concentration</span>
-    <span class="n">added_concentration</span><span class="o">=</span><span class="n">concentration_add</span><span class="p">,</span>
-    <span class="n">added_distribution</span><span class="o">=</span><span class="n">particle_mass_add</span><span class="p">,</span>
-    <span class="n">added_charge</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particle_mass_add</span><span class="p">),</span>
-<span class="p">)</span>
-<span class="n">radii_after_step_1</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s2">"Concentration after step 1: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
-<span class="p">)</span>
+<span class="n">radii_after_steps</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="n">activated</span> <span class="o">=</span> <span class="n">activate_slots</span><span class="p">(</span>
+        <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
+        <span class="n">request_masses</span><span class="o">=</span><span class="n">request_masses</span><span class="p">,</span>
+        <span class="n">request_concentration</span><span class="o">=</span><span class="n">request_counts</span><span class="p">,</span>
+        <span class="n">request_charge</span><span class="o">=</span><span class="n">request_charge</span><span class="p">,</span>
+        <span class="n">requested_counts</span><span class="o">=</span><span class="n">requested_counts</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">activated</span><span class="p">,</span> <span class="n">requested_counts</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">masses</span> <span class="ow">is</span> <span class="n">held_masses</span>
+    <span class="k">assert</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span> <span class="ow">is</span> <span class="n">held_counts</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span> <span class="n">held_gas</span><span class="p">)</span>
+    <span class="n">actual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+        <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="o">*</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span>
+        <span class="n">actual</span><span class="p">,</span>
+        <span class="n">initial_inventory</span> <span class="o">+</span> <span class="n">step</span> <span class="o">*</span> <span class="n">particle_mass_add</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+        <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+        <span class="n">atol</span><span class="o">=</span><span class="mf">1e-30</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">active</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">radii_after_steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">active</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+    <span class="n">number_density</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mf">1e-6</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Number density after step </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">number_density</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> m^-3"</span><span class="p">)</span>
 
-<span class="c1"># Perform the add process</span>
-<span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
-    <span class="n">added_concentration</span><span class="o">=</span><span class="n">concentration_add</span><span class="p">,</span>
-    <span class="n">added_distribution</span><span class="o">=</span><span class="n">particle_mass_add</span><span class="p">,</span>
-    <span class="n">added_charge</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particle_mass_add</span><span class="p">),</span>
+<span class="n">radii_after_step_1</span><span class="p">,</span> <span class="n">radii_after_step_2</span> <span class="o">=</span> <span class="n">radii_after_steps</span>
+<span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_slot_diagnostics</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">)[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="p">)</span>
-<span class="n">radii_after_step_2</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s2">"Concentration after step 2: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
-<span class="p">)</span>
-<span class="n">concentration_value</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4"># Get initial particle radii before adding particle
-initial_radii = aerosol.particles.get_radius(clone=True)
-print(f"Initial concentration: {aerosol.particles.get_total_concentration()}")
+<div class="clipboard-copy-txt" id="cell-4"># Only active particles enter the radius histograms.
+initial_radii = aerosol.particles.radii[0, :initial_count].copy()
+initial_inventory = np.sum(masses * counts[:, None], axis=0)
+held_masses = aerosol.particles.masses
+held_counts = aerosol.particles.concentration
+held_gas = aerosol.gas.concentration.copy()
+request_masses = particle_mass_add[None, :, None]
+request_counts = concentration_add[None, :]
+request_charge = np.zeros_like(request_counts)
+requested_counts = np.array([particle_mass_add.size], dtype=np.int32)
 
-# Perform the add process
-aerosol.particles.add_concentration(  # select the particle representation and call add_concentration
-    added_concentration=concentration_add,
-    added_distribution=particle_mass_add,
-    added_charge=np.zeros_like(particle_mass_add),
-)
-radii_after_step_1 = aerosol.particles.get_radius(clone=True)
-print(
-    f"Concentration after step 1: {aerosol.particles.get_total_concentration()}"
-)
+radii_after_steps = []
+for step in (1, 2):
+    activated = activate_slots(
+        aerosol.particles,
+        request_masses=request_masses,
+        request_concentration=request_counts,
+        request_charge=request_charge,
+        requested_counts=requested_counts,
+    )
+    np.testing.assert_array_equal(activated, requested_counts)
+    assert aerosol.particles.masses is held_masses
+    assert aerosol.particles.concentration is held_counts
+    np.testing.assert_array_equal(aerosol.gas.concentration, held_gas)
+    actual = np.sum(
+        aerosol.particles.masses[0]
+        * aerosol.particles.concentration[0, :, None],
+        axis=0,
+    )
+    np.testing.assert_allclose(
+        actual,
+        initial_inventory + step * particle_mass_add.sum(),
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    active = aerosol.particles.concentration[0] &gt; 0
+    radii_after_steps.append(aerosol.particles.radii[0, active].copy())
+    number_density = aerosol.particles.concentration.sum() / 1e-6
+    print(f"Number density after step {step}: {number_density:g} m^-3")
 
-# Perform the add process
-aerosol.particles.add_concentration(
-    added_concentration=concentration_add,
-    added_distribution=particle_mass_add,
-    added_charge=np.zeros_like(particle_mass_add),
-)
-radii_after_step_2 = aerosol.particles.get_radius(clone=True)
-
-print(
-    f"Concentration after step 2: {aerosol.particles.get_total_concentration()}"
-)
-concentration_value = aerosol.particles.concentration</div>
+radii_after_step_1, radii_after_step_2 = radii_after_steps
+np.testing.assert_array_equal(
+    par.particles.get_slot_diagnostics(aerosol.particles)[2], [0]
+)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Number density after step 1: 1.1e+11 m^-3
+Number density after step 2: 1.2e+11 m^-3
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6aeef080">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2b65e907">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17611,13 +17689,13 @@ concentration_value = aerosol.particles.concentration</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b67da6b7">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9030babe">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -17737,9 +17815,21 @@ plt.show()</div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
+<img alt="No description has been provided for this image" class="" src="data:image/png;base64,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5UodP35ckydPrlLYx44dq7y8vDMW24yMDOXn5+uyyy5TbGyszjvvPM2cOVPXXHON2rdvr+uuu04RERHatm2btm/frrlz5waU7YcffvAVSunHKROSlJaWVu1f/+/evVvPPfecRo4cqfT0dO3cuVPffPONbrvtNl/e038Qatu2rZo0aaKcnBz1799fo0aN0vz583XxxRfrwIEDWrVqlUaPHu2bMhEXF6cJEybo8ccfV2lpqe6++26NGzeOaQgAGg2n0ymHx6WUzk0Vl/DTEovHjzpU8ckxuT0eA9MBxjB8ua+BAwfK6/VWef18eapp06Zpz549Ki8v16ZNm9S3b1/jAjdweXl5ysnJqfYq9NixY/XZZ5/piy++qPZnFyxYoA8//FDt2rVTdna2JGno0KFauXKl1qxZo969e6tfv3564okn1KFDh4Czvffee8rOztbVV18tSbrhhhuUnZ2tJUuWVLt/QkKCvv76a40dO1YXX3yx7rjjDlmtVv3617/2fZ9hw4Zp0KBBatGihV577TVZLBb94x//0BVXXKFJkybp4osv1g033KA9e/b4/WHooosu0pgxY3TVVVdpyJAh6tatm/73f/834O8EAEaLS/hxhYLTr9h4w69ZAYbh7K+NWj4JrD78/e9/P+O2Pn36yOv1SpK6deume++912/7iBEjNGLEiCo/N3ToUA0dOvSMxz19zHOZOHFiQCtXtGrVyncDXHViY2P11ltvVRlv0qSJnnrqKT311FNnPf6dd96pO++8s8Z5AABAw2b4FVuj2Gw2ZWZmqnfv3kZHAQAAQBCEbbG1Wq0qKirS5s2bjY4CAACAIAjbYovwNXv2bBUWFhodAwAABBlzbAEAQJ24yl0qLi6uMh4XF6ekpCQDEiFcUWyBBmbG219WOz5vTNd6TgIA5+Yqd2vDquX6bmu+YmP8a0X2gOs15dYplFvUG4otAACoNXdFpdwRXqV0TlJyyk9PoXSWVajkVImcTifFFvUmbIutmR+pCwBAfYuN/3E9XcBIYXvzGKsiAAAAmEvYFlsAAACYS9hORagLu90up9NZb58X6rtKLRaL3nnnHY0aNeqM+0ycOFElJSVasWJFjY75/fff6/zzz9fnn3+u7t27ByUnAADA2VBsA2S32/XCX15QyamSevvMlPiUgO4qDbSEHjx4UOedd56kMxfSJ598ssaPzgUA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KuWO8Cqlc5LSejZTWs9mSuncVCWnSlhrP8wFfMX2n//8p95991316tVLERER6tChg6688ko1bdpU8+bN09VXXx2KnAAAAH5i46OVmBRrdAw0IAFfsXU4HGrZsqUk6bzzztPRo0clSV27dtXWrVuDmw4AAACooYCLbadOnbRz505JUlZWlp599lnt379fS5YsUevWrYMeEAAAAKiJgKci3HPPPTp48KAkadasWRo2bJheffVVxcTEaNmyZcHOBwAAANRIwMX2lltu8f26Z8+e2rNnj77++mu1b99ezZs3D2o4AAAAoKZqvY6t9ONjdOPj49WjR49g5QEAAABqJeA5tpKUl5enLl26KC4uTnFxcerSpYteeOGFYGcDAAAAaizgK7YzZ87UwoULddddd6l///6SpI0bN+q+++7T3r179cgjjwQ9JAAAAHAuARfbxYsX6/nnn9eNN97oGxs5cqS6deumu+66i2ILAAAAQwQ8FaGiokK9evWqMt6zZ0+53e6ghAIAAAACFXCxvfXWW7V48eIq488995xuvvnmoIQCAAAAAlWrVRHy8vK0Zs0a9evXT5K0adMm7d27V7fddptyc3N9+y1cuDA4KQEAAIBzCLjYbt++3be817fffitJat68uZo3b67t27f79rNYLEGKCAAAAJxbwMV27dq1ocgBIMgGH8qrZnRRfccAAKDe1GodWwAAAKChodgCAADAFCi2AAAAMAWKLQAAAEyhRsW2R48eOn78uCTpkUceUVlZWUhDAQAAAIGqUbHdsWOHHA6HJGnOnDmy2+0hDQUAQENmt9t17Ngxv1dxcbHc7kqjowFhrUbLfXXv3l2TJk3SgAED5PV69fjjjyspKanafWfOnBnUgAAANCR2u13T7xwhh8flN+50VmhP8XGlVaRKijUmHBDmalRsly1bplmzZmnlypWyWCx6//33FRVV9UctFgvFFgBgak6nUw6PSymdmyouIdo3fvyoQxWfHJPb4zEwHRDealRsO3XqpNdff12SFBERofz8fLVs2TKkwQAAaMjiEqKVmPTTldkye7mBaQBItVgVwePxNKhSu2/fPg0cOFCZmZnq1q2b3nzzTaMjAQAAwAABP1JXkr799lstWrRIO3bskCRlZmbqnnvu0YUXXhjUcDURFRWlRYsWqXv37jp06JB69uypq666SomJifWeBQAAAMYJ+IrtBx98oMzMTBUUFKhbt27q1q2bNm3apEsuuUQffvhhKDKeVevWrdW9e3dJUlpampo3b64ffvih3nMAAADAWAEX24ceekj33XefNm3apIULF2rhwoXatGmT7r33Xj344IMBB1i/fr1GjBih9PR0WSwWrVixoso+NptNGRkZiouLU9++fVVQUFDtsbZs2aLKykq1a9cu4BwAAABo3AIutjt27NDkyZOrjN9+++0qKioKOIDD4VBWVpZsNlu125cvX67c3FzNmjVLW7duVVZWloYOHaojR4747ffDDz/otttu03PPPRdwBgAAADR+ARfbFi1aqLCwsMp4YWFhrW4qGz58uObOnavRo0dXu33hwoWaOnWqJk2apMzMTC1ZskQJCQlaunSpb5/y8nKNGjVKDz30kC699NKzfl55eblKS0v9XgAAAGj8Ar55bOrUqbrjjjv03Xff+UrkJ598oscee0y5ublBDedyubRlyxbNmDHDNxYREaGcnBxt3LhRkuT1ejVx4kT96le/0q233nrOY86bN09z5swJak4AAAAYL+Bi+/vf/15NmjTRggULfIUzPT1ds2fP1t133x3UcMeOHVNlZaVatWrlN96qVSt9/fXXkn4s1cuXL1e3bt1883P/8pe/qGvXrtUec8aMGX4FvLS0lDm5AAAAJhBwsbVYLLrvvvt033336eTJk5KkJk2aBD1YTQ0YMECeAJ7yEhsbq9hYHnUIAABgNrVax/a0UBfa5s2bKzIyUocPH/YbP3z4sNLS0kL62QAAAGhcAr55rD7FxMSoZ8+eys/P9415PB7l5+erf//+dTq2zWZTZmamevfuXdeYAAAAaADqdMU2GOx2u3bt2uV7v3v3bhUWFio1NVXt27dXbm6uJkyYoF69eqlPnz5atGiRHA6HJk2aVKfPtVqtslqtKi0tVXJycl2/BgAAAAxmeLH97LPPNGjQIN/70zd2TZgwQcuWLdP48eN19OhRzZw5U4cOHVL37t21evXqKjeUAQAAILwFVGwrKio0bNgwLVmyRB07dgxKgIEDB8rr9Z51n2nTpmnatGlB+TwAAACYU0BzbKOjo/XFF1+EKgsAAABQawHfPHbLLbcoLy8vFFkAAACAWgt4jq3b7dbSpUv10UcfqWfPnkpMTPTbvnDhwqCFCyWbzSabzabKykqjowAAACAIAi6227dvV48e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kyRNnjxZM2bM0LfffqsLLrhAknTddddp7dq1evDBB30/k56eLpfLpUOHDqlDhw51+i4AcC4UWwAIgkGDBmnx4sVyOBx64oknFBUVpbFjx/q2V1ZW6o9//KPeeOMN7d+/Xy6XS+Xl5b75st9++61cLpf69u3r+5nU1FR16tSpTrnuvPNOjR07Vlu3btWQIUM0atQoXXrppWfc/9SpU4qLi6t2W7du3Xy/btWqlRISEnyl9vTYz69AS1J8fLwkVZmiAAChwFQEAAiCxMREXXTRRcrKytLSpUu1adMm5eXl+bb/+c9/1pNPPqkHH3xQa9euVWFhoYYOHSqXy1Xrz4yI+PF/4V6v1zdWUVHht8/w4cO1Z88e3XfffTpw4IAGDx7sd+X4vzVv3lzHjx+vdlt0dLTv16dXgPg5i8Uij8fjN/bDDz9I+vGmNwAINYotAARZRESE/t//+396+OGHderUKUnSJ598omuvvVa33HKLsrKydMEFF+g///mP72cuvPBCRUdHa9OmTb6x48eP++3z306XxYMHD/rGfn4j2c/3mzBhgl555RUtWrRIzz333BmPmZ2draKiohp/13PZvn272rZte9Z5vQAQLBRbAAiB66+/XpGRkbLZbJKkjh076sMPP9SGDRu0Y8cO/frXv9bhw4d9+yclJWny5Ml64IEH9M9//lPbt2/XxIkTfVdlqxMfH69+/frpT3/6k3bs2KF//etfevjhh/32mTlzpt59913t2rVLX331lVauXKnOnTuf8ZhDhw7VV199dcartoH6+OOPNWTIkKAcCwDOhWILACEQFRWladOmaf78+XI4HHr44YfVo0cPDR06VAMHDlRaWppGjRrl9zN//vOfdfnll2vEiBHKycnRgAEDzrhCwWlLly6V2+1Wz549de+992ru3Ll+22NiYjRjxgx169ZNV1xxhSIjI8+6/FbXrl3Vo0cPvfHGG7X+7qc5nU6tWLFCU6dOrfOxAKAmLN6fT84CAIS9VatW6YEHHtD27dvPesX4XBYvXqx33nlHa9asCWI6ADgzVkUAAPi5+uqr9c0332j//v1q165drY8THR1dZV1bAAglrtgCAADAFJhjCwAAAFOg2AIAAMAUKLYAAAAwBYotAAAATIFiCwAAAFOg2AIAAMAUKLYAAAAwBYotAAAATIFiCwAAAFP4/4CglXU3oACJAAAAAElFTkSuQmCC"/>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=148bc5a0">
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5abcaa7c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

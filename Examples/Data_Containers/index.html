@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11999,7 +11999,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12437,7 +12437,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12465,7 +12465,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14129,7 +14129,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14157,7 +14157,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14185,7 +14185,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14434,7 +14434,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -16849,7 +16849,14 @@ helpers.</p>
 supporting context only.</p>
 <p>The CPU container portion always runs. Warp-backed particle and gas round
 trips run only when Warp is available, and they use <code>device="cpu"</code> so CUDA is
-not required.</p>
+not required. Enabled transfer failures propagate; they are not reported as
+successful CPU-only runs. Set <code>PARTICULA_EXAMPLE_FORCE_NO_WARP=1</code> to deliberately
+inspect CPU construction without requesting transfers.</p>
+<p>The particle example declares <code>particle_resolved</code>: storage contains represented
+counts <code>[1, 0.25]</code> at physical volume <code>1e-6 m³</code>. Dividing once by that volume
+produces number densities <code>[1e6, 2.5e5] m⁻³</code>. Particle masses are per-particle
+material masses; multiply by counts and divide by volume for mass density.
+Explicit round trips preserve the population declaration and raw counts.</p>
 <p>For the low-level direct condensation path, use the separate canonical
 quick-start:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/gpu_direct_kernels_quick_start.py
@@ -16875,7 +16882,7 @@ API.</p>
 <li><a href="../../Features/data-containers-and-gpu-foundations/">Feature guide: Data Containers and GPU Foundations</a></li>
 <li><a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/data_containers_and_gpu_foundations.py">Runnable entrypoint source on GitHub</a></li>
 <li><a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py">Direct GPU kernels quick-start source on GitHub</a></li>
-<li><a href="../gpu_coagulation_direct/">Direct GPU coagulation source</a></li>
+<li><a href="https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_coagulation_direct.py">Direct GPU coagulation source</a></li>
 </ul>
 
 

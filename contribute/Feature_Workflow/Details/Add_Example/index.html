@@ -11943,7 +11943,7 @@
   <span class="md-ellipsis">
     
   
-    Atmosphere Tutorial
+    Gas Mixture and Environment Tutorial
   
 
     
@@ -11971,7 +11971,7 @@
   <span class="md-ellipsis">
     
   
-    Gas Species Tutorial
+    Native Gas Species Tutorial
   
 
     
@@ -12403,7 +12403,7 @@
   <span class="md-ellipsis">
     
   
-    Distribution Strategy Tutorial
+    Native Distribution Storage
   
 
     
@@ -12431,7 +12431,7 @@
   <span class="md-ellipsis">
     
   
-    Particle Representation
+    Native Particle Construction
   
 
     
@@ -14089,7 +14089,7 @@
   <span class="md-ellipsis">
     
   
-    Container and Facade Migration
+    Native container access and ownership
   
 
     
@@ -14117,7 +14117,7 @@
   <span class="md-ellipsis">
     
   
-    Dynamics Migration
+    Native dynamics migration
   
 
     
@@ -14145,7 +14145,7 @@
   <span class="md-ellipsis">
     
   
-    Migration Troubleshooting
+    Native migration troubleshooting
   
 
     
@@ -14394,7 +14394,7 @@
   <span class="md-ellipsis">
     
   
-    One-line Vision
+    One-line Vision — historical proposal
   
 
     
@@ -16589,10 +16589,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#goal" class="md-nav__link">
+  <a href="#native-construction-and-process-ownership" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Goal
+        Native construction and process ownership
       
     </span>
   </a>
@@ -16600,10 +16600,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rules" class="md-nav__link">
+  <a href="#source-and-notebook-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rules
+        Source and notebook workflow
       
     </span>
   </a>
@@ -16611,10 +16611,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#steps" class="md-nav__link">
+  <a href="#validation-and-evidence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Steps
+        Validation and evidence
       
     </span>
   </a>
@@ -16889,10 +16889,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#goal" class="md-nav__link">
+  <a href="#native-construction-and-process-ownership" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Goal
+        Native construction and process ownership
       
     </span>
   </a>
@@ -16900,10 +16900,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rules" class="md-nav__link">
+  <a href="#source-and-notebook-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rules
+        Source and notebook workflow
       
     </span>
   </a>
@@ -16911,10 +16911,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#steps" class="md-nav__link">
+  <a href="#validation-and-evidence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Steps
+        Validation and evidence
       
     </span>
   </a>
@@ -16945,29 +16945,56 @@
 
 
 <h1 id="add-examples">Add Examples<a class="headerlink" href="#add-examples" title="Permanent link">&para;</a></h1>
-<h2 id="goal">Goal<a class="headerlink" href="#goal" title="Permanent link">&para;</a></h2>
-<p>Provide a runnable demonstration in a Jupyter notebook.</p>
-<h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Runtime &lt;30 s on a typical laptop (in most cases).</li>
-<li>Use only the public API – no private helpers.</li>
-<li><code>import particula as par</code></li>
-<li>End with at least one plot or printed result.</li>
-<li>Contextualize the example with a short description of what it does and why it's useful.</li>
-</ul>
-<h2 id="steps">Steps<a class="headerlink" href="#steps" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Create a new issue on GitHub and assign it to yourself.</li>
-<li>Create a branch on your forked repo for this issue.</li>
-<li>Create <code>docs/examples/**/&lt;feature_name&gt;.ipynb</code>.</li>
-<li>Add a new folder if needed, but please keep it organized.</li>
-<li>These can also be under <code>docs/Theory/**/&lt;feature_name&gt;.ipynb</code> to validate the implementation of the theory.</li>
-<li>Interleave Markdown explanations with code cells.</li>
-<li>Verify it runs top‑to‑bottom.</li>
-<li>Commit the .ipynb file in your PR branch.</li>
-<li>The website builder will automatically convert it to markdown and HTML during PR.</li>
-<li>Create your pull‑request description.</li>
-</ol>
+<p>Provide a runnable demonstration with a clear physical purpose, units and
+observable outcomes. Keep small tutorials quick; preserve the published
+workload of scientific simulations and record their longer runtime explicitly.</p>
+<h2 id="native-construction-and-process-ownership">Native construction and process ownership<a class="headerlink" href="#native-construction-and-process-ownership" title="Permanent link">&para;</a></h2>
+<p>Use the selected E9 checkout (<code>python -m pip install -e ".[extra]"</code>), not an
+older released wheel. Construct native <code>Aerosol</code> from <code>ParticleData</code>, <code>GasData</code>
+and <code>EnvironmentData</code>; use process-owned physics and explicit species maps.
+Start with <a href="../../../../Features/particle-data-migration/">native state access and replacement</a>
+and <a href="../../../../Features/native_scientific_processes/">scientific process contracts</a>.</p>
+<p>Declare the distribution type and representative volume. Resolved concentration
+stores counts; discrete concentration stores number density; continuous PDFs
+are radius densities dN/dr. Label plotted units and compute inventory using the
+appropriate count/volume or quadrature conversion. Preserve ordered gas names,
+unmapped inert gases and particle-material versus full-gas widths.</p>
+<p>Use approved package exports. Required direct-GPU configuration and sidecars
+may come from documented concrete modules; keep those ownership boundaries
+explicit. Callers own transfers, synchronization and device selection. Optional
+CUDA skips do not establish capture, performance or cross-device equivalence.</p>
+<h2 id="source-and-notebook-workflow">Source and notebook workflow<a class="headerlink" href="#source-and-notebook-workflow" title="Permanent link">&para;</a></h2>
+<p>Create source files under <code>docs/Examples/</code> in the owning topic. Standalone
+scripts are supported; notebook examples use paired <code>.py</code> percent-format and
+<code>.ipynb</code> files. Edit the Python source first:</p>
+<div class="highlight"><pre><span></span><code>ruff<span class="w"> </span>check<span class="w"> </span>docs/Examples/path/example.py<span class="w"> </span>--fix
+ruff<span class="w"> </span>format<span class="w"> </span>docs/Examples/path/example.py
+python<span class="w"> </span>.opencode/tools/validate_notebook.py<span class="w"> </span>docs/Examples/path/example.ipynb<span class="w"> </span>--sync
+python<span class="w"> </span>.opencode/tools/run_notebook.py<span class="w"> </span>docs/Examples/path/example.ipynb
+</code></pre></div>
+<p>Execute the standalone source too, inspect plots and retained notebook outputs,
+and commit both files. Pure prose/formatting synchronization may retain prior
+outputs only after verifying every code cell has the same AST. A changed
+calculation requires execution of the complete published workload. Bounded test
+fixtures supplement that execution; they do not replace it.</p>
+<p>Add a topic-index link. Relative notebook links render in the full publication
+build. Python files are excluded from the site, so link their repository source
+when a reader needs the standalone entrypoint. <code>mkdocs-full.yml</code> renders saved
+notebook outputs and generates API pages; the faster base build does neither.</p>
+<h2 id="validation-and-evidence">Validation and evidence<a class="headerlink" href="#validation-and-evidence" title="Permanent link">&para;</a></h2>
+<p>Put example assertions in <code>examples_tests/*_test.py</code>. Check independent
+scientific outcomes, per-species inventory where valid, units, held-state
+identity and rejection behavior. Keep deterministic tolerances separate from
+stochastic aggregate bounds. Describe open reservoirs, sink processes and
+retained numerical defects honestly; execution alone is not scientific
+qualification. Never relax tolerances to hide a migration discrepancy.</p>
+<p>Run the explicit example and infrastructure suites as well as package tests;
+default pytest collection covers only <code>particula</code>. Follow the repository's
+coverage and lint gates. For a migration, record every source, notebook,
+public snippet and historical exception with literal dated execution evidence.
+Historical API sketches must be labeled before a nonexecutable text fence.
+Do not remove compatibility facades as part of an example migration; that
+requires the separately reviewed M6 removal milestone.</p>
 
 
 
