@@ -1920,3 +1920,263 @@ Standard strict docs after these edits passed in **1.55s**,
 `/tmp/m6-closeout-docs1.log`. Final full publication must follow completed
 notebook refresh and final documentation edits. No release readiness or PR
 creation is claimed yet.
+
+### Untargeted coverage rerun completed
+
+Session 43524 completed with exit 0. `/tmp/m6-full-runner2.log` reports:
+
+```text
+============================================================
+PYTEST SUMMARY
+============================================================
+Assertions: PASSED
+Coverage: PASSED
+
+Tests Run: 8333
+  Passed:  8333
+  Skipped: 684
+
+Duration: 164.10s
+Coverage: 92% (threshold: 80.0% PASSED)
+```
+
+The normal repository coverage threshold is unchanged. Source/notebook
+workload sessions 69495 and 2690 remain active; no rerun was started.
+
+## Final compatibility and documentation audit
+
+Reconciled all 95 baseline files in `removal_inventory.json` with current
+references and linked assertion ledgers. Remaining baseline names are removed-
+API guidance, explicitly historical releases, established tutorial filenames,
+scientific bibliography terms, or removal-safe test guards. Tightened the
+CPU dilution example import test to remove its obsolete allowance for
+`particula._legacy_aerosol`; final example regressions pass **225 tests,
+2 skips in 44.43s**, `/tmp/m6-examples-final1.log`.
+
+Updated GPU condensation/coagulation/wall-loss and adapter prose that incorrectly
+promised untagged execution. These edits were checked for identical executable
+ASTs before the subsequent dead-check cleanup. Concrete adapter short names
+and equal-width scratch validation remain supported independent contracts;
+they do not admit removed facades or infer population meaning. Removed two
+unreachable nullable-kind checks in the adapter/shared population validator,
+since the shared decoder now rejects untagged input itself. Focused admission
+suite passed **243 tests, 56 skips in 4.55s**,
+`/tmp/m6-final-admission1.log`; existing invalid-tag assertions remain intact.
+Full normal-coverage revalidation after this cleanup is active in session
+**21837**, `/tmp/m6-full-runner3.log`.
+
+Corrected three simulation prose blocks that still described Atmosphere or
+former object construction. Their Python ASTs are identical, pairs were synced
+with the repository tool before the source sweep reached them. Their full
+workloads remain required. The roadmap now separates historical release plans
+from current native-only behavior.
+
+### Notebook output correction
+
+The first corrected-import notebook sweep (session 2690) executed 40 notebooks
+but inherited MPLBACKEND=Agg from standalone script execution. It produced no
+PNG plots, so it does NOT satisfy notebook publication/plot-review evidence.
+The session was explicitly interrupted and confirmed terminal (exit 130)
+before retry. The replacement sweep uses
+`MPLBACKEND=module://matplotlib_inline.backend_inline`, retains the same complete
+workloads and existing M5 ADW/kernel setup, and is active in session **86138**.
+Progress: `/tmp/m6-notebook-inline-progress.log`; row records:
+`/tmp/m6-notebook-inline-execution/results.json`. The first activity notebook
+now retains five PNG outputs, matching its original output count. The original
+source sweep remains active in session **69495** on the full 10,000-step
+biomass cases. No workload reduction or numerical rebaseline is used.
+
+### Partial refreshed-output review
+
+The inline notebook sweep has restored output images. First completed batch:
+17 notebooks, 24 PNG plots, no error outputs, and PNG counts equal to the
+previous saved notebooks. Plots 0–23 were visually inspected on four contact
+sheets: activity, chamber/wall-loss, charge kernels and distribution comparisons
+have readable axes/legends and no blank or clipped plots. This is visual
+publication review, not a new numerical qualification. Review working records:
+`/tmp/m6-plot-review/audit.json`, `reviewed.json`, sheets 00–03. Later generated
+plots remain unreviewed. Preserve this index boundary when continuing review.
+
+The remaining source biomass workload is confirmed running its full 10,000-step
+cases. Source session 69495 and inline notebook session 86138 are live; normal
+coverage session 21837 is also live at the latest poll. No process was restarted
+because of delayed output. Final publication and commits await stable notebook
+outputs; avoid pre-commit's unstaged-file stash while a notebook writer is active.
+
+### Final production coverage and expanded output review
+
+Session 21837 completed with exit 0: **8,333 passed, 684 skipped in
+160.52s**, **92% coverage** against the unchanged normal 80% threshold.
+`/tmp/m6-full-runner3.log` reports VALIDATION: PASSED. This run includes the
+two unreachable nullable-kind check removals and current production docstrings.
+It supersedes the earlier pending-run status; intermediate failures remain
+recorded above.
+
+The corrected inline sweep has completed 40 notebooks with 70 PNG plots,
+no error outputs, and unchanged image counts compared with pre-refresh HEAD.
+Plots 24–69 were visually inspected on sheets 04–11, extending the reviewed
+boundary to 0–69. Axes/legends and plotted output are visible; this publication
+inspection does not qualify numerical models or remove existing limitations.
+Source session 69495 and notebook session 86138 remain confirmed live. Source
+execution has reached the organic partitioning/coagulation simulation; notebook
+execution has reached the complete biomass simulation. Final output evidence,
+publication reruns and commits still await their completion.
+
+### Final installed-wheel cache isolation
+
+The final fresh-wheel run `/tmp/m6-release-final.log` completed with 4,558
+passed, 1 failed, 25 skipped and 820 deselected. The failure was Warp 1.19.0
+initialization issuing a warning about previous-version cache artifacts in the
+shared `/tmp/particula-m6-warp` directory, promoted by release warning policy.
+It occurred before the resident population assertion ran. No warning filter,
+test assertion or production code was changed. A full fresh-wheel rerun uses
+its own `mktemp -d /tmp/particula-m6-release-warp-XXXXXX` cache, recorded in
+`/tmp/m6-release-final2.log`; its result remains pending.
+
+All 40 completed inline notebooks have AST-identical code to their paired
+Python sources. The three simulation prose edits also preserve source AST
+relative to HEAD. Partial output review with notebook content hashes is now
+tracked in `notebook_output_review.json`; remaining simulation rows must be
+added after execution and inspection.
+
+The isolated-cache fresh-wheel rerun completed with exit 0: **4,559 passed,
+25 skipped, 820 deselected in 41.74s** (`/tmp/m6-release-final2.log`). This
+validates the current production cleanup from an installed wheel outside the
+checkout with release warning policy unchanged. The previous shared-cache
+failure is environmental and remains documented above.
+
+### Assertion-ledger reference integrity
+
+Parsed all `*_assertions.json` ledgers and checked 1,606 unique native
+successor file/node references against current Python AST definitions: no
+missing paths or named functions/classes. This validates reference integrity,
+not scientific equivalence by itself; original assertion bodies, dispositions
+and the passing regression suites remain the substantive retention evidence.
+Working audit output: `/tmp/m6-retention-reference-audit.json`.
+
+### Execution ledger and example lint
+
+`example_execution.json` now records the authoritative source/inline-notebook
+attempts, exact commands, environment, content/log hashes and explicit pending
+rows. Current snapshot: 88 passed entries and 17 pending, with no accepted
+failed rows. It must be refreshed after the live sweeps terminate; missing-ADW
+and Agg notebook attempts are explicitly excluded. The completed biomass
+source workload took 605.01s; organic source execution took 223.69s.
+
+Final example source lint passed: `ruff check docs/Examples/` reports
+"All checks passed!" and `ruff format --check docs/Examples/` reports
+"59 files already formatted" (`/tmp/m6-example-lint-final.log`).
+Source session 69495 and inline notebook session 86138 remained live through
+a bounded 50-second poll. No restart or workload reduction was performed.
+
+### Simulation notebook output review
+
+The inline biomass, both cloud-chamber and cough notebooks completed with
+exit 0. The execution ledger now has 92 successful entries and 13 pending.
+All 44 completed notebooks have matching paired-source ASTs, unchanged PNG
+counts and no error outputs. Visual inspection now covers plots 0–87. New
+plots 70–87 show the biomass/cloud/cough illustrations; cloud dry-phase
+oscillations are visible and remain explicitly unqualified, as in M5. No
+scientific limitation, tolerance or workload is changed by this review.
+
+The source soot workload is progressing through all 500 steps (~2.7s/step).
+Its expected runtime exceeds the notebook driver's 1200-second limit. After
+the organic notebook completes, stop the notebook driver only while it is
+waiting for the source soot result (no notebook child running), then resume
+only its remaining soot row with a longer execution/outer timeout. Preserve
+completed records and do not interrupt or restart either active workload.
+
+### Final notebook execution window
+
+Organic notebook completed successfully in 229.68s. Its two plots (88–89)
+were visually reviewed: visible axes, legends and nonblank distributions.
+All 45 completed notebooks retain their expected PNG counts, have no error
+outputs and match paired-source code ASTs. Execution ledger: 93 passed,
+12 pending.
+
+After confirming END 47 and the notebook driver waiting in `time.sleep(1)`
+with no active notebook child, session 86138 was interrupted and confirmed
+terminal, exit 130. `/tmp/m6_resume_notebooks.py` preserves all 45 completed
+records and runs only the remaining soot notebook with `--timeout 3600` and
+outer timeout 3900. It is active in session **90927**. The source sweep
+remains active in session **69495**; its source execution is independent of
+notebook output. Its earlier notebook attempts fail dependency import before
+execution/output writes, so the two sweeps do not compete for notebook writes.
+No running scientific workload was stopped or shortened. Both now execute
+full soot workloads independently. Final commits/publication await stable
+outputs. No matching M6 PR exists in upstream at the latest connector check.
+
+### Full source sweep completed
+
+Source session 69495 completed with exit 0 after all 59 entrypoints. The full
+soot source workload passed in 1359.00s. There are 58 executed source successes
+and one explicitly optional hardware skip: `gpu_resident_graph_capture.py`
+reported native CUDA unavailable and confirmed no fixture/upload/capture and
+no CPU or Warp-CPU fallback. Exit 0 is not counted as executed capture evidence.
+The direct quick start reports device=cpu; resident examples retain explicit
+checkpoint/restart ownership. Logs are recorded per row in `example_execution.json`.
+
+Current ledger: 103 successful executions (58 sources, 45 notebooks), one
+optional native-CUDA skip, one pending soot notebook. Only session 90927 remains
+active. Its longer timeout preserves the complete original workload. Final
+publication, notebook review and commits remain pending its completion.
+
+### Completed source log inspection
+
+The completed source logs contain no Python traceback or unexplained execution
+failure. The `Vapor_Pressure.py` required-parameters error is the explicit
+caught missing-b/c builder demonstration at lines 152–160, not an unhandled
+failure. Warp CUDA initialization diagnostics match the unavailable CUDA device;
+CPU workflows execute on Warp CPU and the native-CUDA-only capture row skips
+without fallback. Standalone Agg plot-show and writable-cache warnings are
+separate from the inline notebooks whose saved plots were reviewed. These
+execution checks do not qualify the pre-existing scientific examples anew.
+
+### Full supported execution and plot review completed
+
+Final notebook session 90927 completed with exit 0. Soot notebook wall time
+was 1349.77s (runner execution 1348.89s), with all original 500 steps and
+100 condensation substeps retained. Both source and notebook sweeps are now
+terminal. All **46 notebooks** passed, retain expected PNG counts, contain
+no error outputs and match their paired Python code ASTs. All **98 PNG plots**
+were visually reviewed, including soot plots 90–97. Extreme extrapolated
+vapor pressures/property floors and cloud dry-phase oscillations remain
+illustrative limitations, not newly qualified behavior.
+
+The final execution ledger records **104 successful executions** (58 sources
+and 46 notebooks), **one optional native-CUDA-only skip**, and no pending or
+failed accepted rows. Initial failed/interrupted attempts remain documented
+separately. `notebook_output_review.json` identifies output hashes and the
+reviewed baseline. Final publication builds and commits are now unblocked.
+
+### Final implementation and publication evidence
+
+Final production cleanup committed as `1722460ba`; refreshed notebook outputs
+and AST-preserving simulation prose committed as `3cf7c6ae4`. Ruff fix, format
+and check hooks passed for both. All 105 recorded entrypoint content hashes
+and 46 reviewed notebook hashes match the committed tree after hooks.
+
+Both strict documentation builds completed with exit 0 after the final output
+refresh: standard **1.46s** (`/tmp/m6-standard-final.log`), full publication
+**47.69s** (`/tmp/m6-full-final.log`). Both logs contain zero WARNING/ERROR
+lines. The full build includes API and notebook pages without warning
+suppression. Final production removed-symbol search finds only intentional
+removal-safe `conftest.py` guards. Upstream main remains the M5 base
+`fb25078b6c0e8136ed06feeda59f0928b85c1b34`.
+
+Implementation requirement audit: particle/gas/aggregate and temporary GPU
+removals have co-located regressions and assertion ledgers; native integration,
+normal coverage, independent installed-wheel validation, both explicit wall-loss
+suites, source examples, infrastructure, plugin consistency and lint/type
+checks pass. Complete source/notebook execution and plot review pass with
+one qualified optional CUDA skip. No version or checkpoint schema bump, physics
+rebaseline, hidden fallback or new performance claim is introduced. Final
+maintainer scientific/release approval remains separate from delivering this
+implementation PR; no release is approved or published by these results.
+
+The final closeout-text publication rerun also passed: standard **1.49s** and
+full **47.53s**, with zero WARNING/ERROR lines (`/tmp/m6-closeout-final-standard.log`
+and `/tmp/m6-closeout-final-full.log`). Subsequent plan-only status reconciliation
+corrected historical draft/pending claims in open questions, success criteria,
+change log and reporting. It does not change production, examples or published
+API content. Final maintainer acceptance remains explicitly unchecked.

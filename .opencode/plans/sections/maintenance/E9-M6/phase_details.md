@@ -12,6 +12,10 @@ of definition deletion so that intermediate commits retain coherent imports.
 No standalone unit-testing phase: every removal/function change includes its
 tests. P5 is cross-layer integration, P6 final documentation/readiness.
 
+Checkboxes below represent final acceptance, not implementation progress.
+Implementation validation and publication are complete. They remain open
+for the named maintainer acceptance review. No separate child issues are required.
+
 ## Accepted single-PR implementation sequence
 
 The detailed maintainer-approved plan supersedes the earlier ten-commit scope.
@@ -49,7 +53,7 @@ revision separately from evidence-only edits. Both strict builds and the
 full published notebook workloads are mandatory, not optional follow-ups.
 
 - [ ] **E9-M6-P1: Audit final legacy consumers and temporary compatibility**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1607 | Size: S | Status: Audit reconciled after generated outputs; final review pending
   - Goal: Approve an exhaustive deletion and scientific-retention inventory.
   - Work: Reconcile M1–M5 ledgers with searches across production, tests, docs,
     Python/notebook sources, root snippets and API navigation. Seed names and
@@ -65,7 +69,7 @@ full published notebook workloads are mandatory, not optional follow-ups.
     upstream gates before any facade is deleted.
 
 - [ ] **E9-M6-P2: Remove particle facades and obsolete construction with boundary tests**
-  - Issue: #1607 | Size: S | Status: Implemented; final integration/readiness pending
+  - Issue: #1607 | Size: S | Status: Implemented and integration-tested; final review pending
   - Goal: Remove ParticleRepresentation without losing native initialization.
   - Work: Delete obsolete particle representation definitions/builders/factories
     and facade-specific conversions per P1. Update package/root imports,
@@ -80,7 +84,7 @@ full published notebook workloads are mandatory, not optional follow-ups.
     deleted scientific-looking assertion has a reviewed retained disposition.
 
 - [ ] **E9-M6-P3: Remove gas and atmosphere facades with boundary tests**
-  - Issue: #1607 | Size: S | Status: Implemented; final integration/readiness pending
+  - Issue: #1607 | Size: S | Status: Implemented and integration-tested; final review pending
   - Goal: Remove GasSpecies and Atmosphere without splitting gas authority.
   - Work: Delete obsolete species/atmosphere modules, builders/factories and
     bridges plus package/root exports and obsolete aggregate branches. Keep
@@ -94,7 +98,7 @@ full published notebook workloads are mandatory, not optional follow-ups.
     gas categories and environmental fields retain their scientific meaning.
 
 - [ ] **E9-M6-P4: Clear temporary compatibility branches and messages with regressions**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1607 | Size: S | Status: Compatibility removal implemented and regression-tested
   - Goal: Close the entire upstream temporary compatibility inventory.
   - Work: Remove residual adapters, type branches, alias lookups, warning/error
     text and facade-only tests in migrated strategies, runnable/aggregate and
@@ -108,7 +112,7 @@ full published notebook workloads are mandatory, not optional follow-ups.
     every remaining old-name match has an approved bounded disposition.
 
 - [ ] **E9-M6-P5: Validate native integration and retained CPU-Warp contracts**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1607 | Size: S | Status: Cross-layer package and complete example validation passed; final review pending
   - Goal: Demonstrate post-removal cross-layer scientific and ownership behavior.
   - Work: Extend native integration fixtures only where audit reveals a missing
     cross-layer scenario; no new physics or GPU interface. Exercise flat
@@ -122,7 +126,7 @@ full published notebook workloads are mandatory, not optional follow-ups.
     preserve literal outputs and record unavailable evidence as blocking.
 
 - [ ] **E9-M6-P6: Update development documentation**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1607 | Size: S | Status: Documentation, output review and both strict publication builds passed; maintainer review pending
   - Goal: Publish evidence-backed v0.3.0 migration/readiness guidance.
   - Work: Reconcile migration/API pages, roadmap, root/developer instructions
     and M5's full supported example ledger against deleted APIs. Proposed

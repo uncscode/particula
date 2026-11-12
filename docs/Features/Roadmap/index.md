@@ -7,7 +7,7 @@ schedule.
 ## Release and migration sequence
 
 Maintainer decision, 2026-09-27: E8 and E8-F1 through E8-F8 are Shipped.
-The next milestones are:
+The historical release sequence was:
 
 1. Merge the E8 closeout and roadmap update.
 2. Release **0.2.13**, retaining both the legacy `ParticleRepresentation` /
@@ -19,8 +19,10 @@ The next milestones are:
 4. Continue Epic I, differentiability and initial-state optimization, after
    the migration milestone.
 
-These are planned releases; this roadmap update does not publish a release.
-The [closeout record](graph-capture-closeout.md) records the maintainer's
+The current E9-M6 development tree has removed the facades and temporary
+untagged execution paths. Final validation and review are tracked in the
+[native migration closeout](data-native-v030-closeout.md). This roadmap does
+not publish a release. The [closeout record](graph-capture-closeout.md) records the maintainer's
 plan closure separately from unavailable CUDA measurement evidence.
 
 ## Current Focus
@@ -29,8 +31,8 @@ plan closure separately from unavailable CUDA measurement evidence.
   around strategy, builder, and factory APIs.
 - **Runnable workflows**: Make condensation, coagulation, wall loss, and related
   processes easier to compose in clear simulation pipelines.
-- **Particle and gas data containers**: Complete migration from legacy facades
-  toward explicit `ParticleData` and `GasData` containers.
+- **Particle and gas data containers**: Validate the native-only
+  `ParticleData`, `GasData` and `EnvironmentData` workflow after facade removal.
 - **GPU process completeness**: Maintain the shipped GPU dilution, wall loss,
   nucleation, and fixed-capacity slot-management contracts from
   [Epic F](data-oriented-gpu.md#epic-f-gpu-process-completeness).
@@ -64,11 +66,11 @@ plan closure separately from unavailable CUDA measurement evidence.
 
 ### Data Model Migration
 
-- Reduce reliance on legacy `ParticleRepresentation` and `GasSpecies` facade
-  patterns where newer data containers provide clearer state management.
-- Keep migration documentation up to date as APIs stabilize.
-- Identify remaining compatibility layers that can be simplified before a
-  stable major release.
+- Keep supported construction and execution on explicit native containers.
+- Keep migration documentation and removed-boundary tests aligned with the
+  native API; historical facade names are migration references only.
+- Complete the M6 scientific, installed-package and example validation before
+  final review and release approval.
 - Track details in the
   [data-oriented design and GPU roadmap](data-oriented-gpu.md).
 

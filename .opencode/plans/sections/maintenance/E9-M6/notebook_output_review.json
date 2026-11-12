@@ -1,0 +1,477 @@
+{
+  "status": "complete: all 46 notebooks executed and 98 PNG plots visually reviewed",
+  "baseline_revision": "1832b9a6e",
+  "notebooks": [
+    {
+      "notebook": "docs/Examples/Activity/activity_tutorial.ipynb",
+      "original_png": 5,
+      "current_png": 5,
+      "errors": [],
+      "sha256": "d6b418299a2f6d3b942cde1e5a018d71439df89ec1673e24e30eacfc54247dfe",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Activity/bat_activity_example.ipynb",
+      "original_png": 0,
+      "current_png": 0,
+      "errors": [],
+      "sha256": "489373c63c4e3c180f70082e79528c7512539ef0622f6cec582b50f36d4197c8",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Activity/equilibria_example.ipynb",
+      "original_png": 0,
+      "current_png": 0,
+      "errors": [],
+      "sha256": "1352495434e56d79674415458d959efbbc0bf5e3bc4dd13dce4efc80a922c57d",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Activity/ideal_activity_example.ipynb",
+      "original_png": 0,
+      "current_png": 0,
+      "errors": [],
+      "sha256": "8e1cc07aa204bbfdd9fa2e3f8491df0bb2d296d54698f625a5d359b31a81f38b",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Activity/kappa_activity_example.ipynb",
+      "original_png": 0,
+      "current_png": 0,
+      "errors": [],
+      "sha256": "11324869bfa095b36834e4bf0068510b1a4b7f308a95240227119f0fcaf58b4c",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Aerosol/Aerosol_Tutorial.ipynb",
+      "original_png": 0,
+      "current_png": 0,
+      "errors": [],
+      "sha256": "effb0afff1682cbb7a33c159d1c766d693a3b928c39e3f0622e32075acf37642",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.ipynb",
+      "original_png": 4,
+      "current_png": 4,
+      "errors": [],
+      "sha256": "71b508bc42b76a69ab58a47b97d8c3ce6e2346fcefd8e4a54c8919043b53edcb",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.ipynb",
+      "original_png": 0,
+      "current_png": 0,
+      "errors": [],
+      "sha256": "1bbe63e499e6003e1cb96517c6b9a3cbb62603cf32dd0aba17fac5a8075c2c99",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb",
+      "original_png": 2,
+      "current_png": 2,
+      "errors": [],
+      "sha256": "35e65edd313f7a9777815a73600dea3fefd5d5b0e0c39a037fbe4b5a5d26a6f2",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb",
+      "original_png": 4,
+      "current_png": 4,
+      "errors": [],
+      "sha256": "4bf00340592f17b6cb9299df0cb2fda65eeb8f60f90200743bd404b629bbde3f",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.ipynb",
+      "original_png": 0,
+      "current_png": 0,
+      "errors": [],
+      "sha256": "bbba2f883c497b8edcf959c77577e5172f2916cb8a706302cfba3f84ba3208c4",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.ipynb",
+      "original_png": 2,
+      "current_png": 2,
+      "errors": [],
+      "sha256": "92a3fc9446bada8eb29856d05ff61a851d78a810765de3e6dfc968ed2166595c",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.ipynb",
+      "original_png": 2,
+      "current_png": 2,
+      "errors": [],
+      "sha256": "11b1fd146f060a790907bf736c24319248a2858091a5a90954ae6df266d9a9bb",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "b15f4222fdb1c2cf0a7dcc371a883176a02afaa331249622317f87cb16fc2dc8",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "0760890a0486640f6f47cc7978a62900b2b5b2def1b80982552ae3ee2893489b",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "e466775faa725086f3d000549b2c80534dbb6e3e44de47777e5389ce450b76cf",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.ipynb",
+      "original_png": 2,
+      "current_png": 2,
+      "errors": [],
+      "sha256": "a5ac08382de84125f73f393b00c9b2e888e2e851cce54dd9530e67ff50e3d639",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.ipynb",
+      "original_png": 2,
+      "current_png": 2,
+      "errors": [],
+      "sha256": "112ba17e68bc273dca7c6d733e0330c4f96ca14b31425d11f811ce7a0d12534e",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "7dae05c6ef91e965504a553c27f1587ca4d3809366fdc7967d620e2e69774cd4",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "8f1b551ebb4aacf5d913be9ae3d46589e2ac1f01fc6e2ea3ec274b1d19eedee1",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.ipynb",
+      "original_png": 2,
+      "current_png": 2,
+      "errors": [],
+      "sha256": "17ee5f99e2dca070b8450bd8d449263749b4805f0818a69b5e20421d2fac6644",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "03f5acf9a871740a969a663892eb8dd0b35c361c4eecf97b031cb6740b589169",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "ef7df1e41cc8e68563ac9818029b502b8230d60ab642513841244400669016cf",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.ipynb",
+      "original_png": 2,
+      "current_png": 2,
+      "errors": [],
+      "sha256": "6c4fbf7d4b801f434bff79bf805757844b91293289bb3fee9061e3cda55ed682",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.ipynb",
+      "original_png": 3,
+      "current_png": 3,
+      "errors": [],
+      "sha256": "e1db456568e746610985a7f8194cc1f003c1d68acdd5e2d9611102ee78733711",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb",
+      "original_png": 0,
+      "current_png": 0,
+      "errors": [],
+      "sha256": "f32dcde33ea9487b5909099b69de3a85f56b8336a074741887dcf2cca705acea",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.ipynb",
+      "original_png": 3,
+      "current_png": 3,
+      "errors": [],
+      "sha256": "9dd17390994381626a91d49c0f280ccc99ac255bb7e3d340845607e971cd622b",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "3fa744d02d8880c072fdf5f30691cb189d50bc9ddc16cead9206a5fd3c2df542",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Equilibria/Notebooks/activity_part1.ipynb",
+      "original_png": 5,
+      "current_png": 5,
+      "errors": [],
+      "sha256": "1312ca150e21e4eb9e6f0de5070bca136153dd1fbddbf3eb6c8106b5b642907a",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Equilibria/Notebooks/equilibria_part1.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "9368c21d8554ad69a6d6ad21afe2691991d24ed076724dc722ac720c9de54169",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "6b4fb5368794bb357d4e14341cdf3c7c990c00424be6e51bb1d3c8eb5762dc8a",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Gas_Phase/Notebooks/Gas_Species.ipynb",
+      "original_png": 2,
+      "current_png": 2,
+      "errors": [],
+      "sha256": "5f05ad44bb59cc50480be9cbca8b8450683c73dc3492df75132a5261f3b0519d",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.ipynb",
+      "original_png": 5,
+      "current_png": 5,
+      "errors": [],
+      "sha256": "8c108ea818a7daefa7ebedabfa0907e2ab12c713d90772d64a4672602740d3fb",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb",
+      "original_png": 2,
+      "current_png": 2,
+      "errors": [],
+      "sha256": "a3f9a632ad42d2ec2bd53fe82b374ad52d4ee5b10be31ec1e789cc95fbd01d57",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "b6a3db02c1108e3932e68dfbe23b92423d963c237d91e5a2938974486b7f7b7c",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.ipynb",
+      "original_png": 2,
+      "current_png": 2,
+      "errors": [],
+      "sha256": "f19481dcee1ce66444aeca6cfb04e025de207e625543e086ad69c570e8222899",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.ipynb",
+      "original_png": 0,
+      "current_png": 0,
+      "errors": [],
+      "sha256": "22bec3aec8f640d268b8388657e0b123b347999fe7e48ccf8d09558ad7673891",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.ipynb",
+      "original_png": 4,
+      "current_png": 4,
+      "errors": [],
+      "sha256": "e5449eb5f8eac1a80060ea538950708325634462c99efc3a3b54a97372911d4b",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.ipynb",
+      "original_png": 3,
+      "current_png": 3,
+      "errors": [],
+      "sha256": "394cae066daabb6c3c6a4f732e162de88895e703dc01c612a640819e968a9567",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.ipynb",
+      "original_png": 3,
+      "current_png": 3,
+      "errors": [],
+      "sha256": "af813121942e5b9d80ce691c43914e6f3e209b3a6b692671991aa2328b1e1618",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb",
+      "original_png": 4,
+      "current_png": 4,
+      "errors": [],
+      "sha256": "8b5398fdfb31b6fbffb391dae273b5ba646d30bab875996f3044ed624e6abeb1",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb",
+      "original_png": 8,
+      "current_png": 8,
+      "errors": [],
+      "sha256": "dfd42ad21a909beada557ea862e2e8427081dd44b1221622214a697ae4f0789e",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.ipynb",
+      "original_png": 1,
+      "current_png": 1,
+      "errors": [],
+      "sha256": "c62bb1ca40238a766d4c0fc931c1f16e8272f3ccd1a8e539f55710654e016963",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb",
+      "original_png": 5,
+      "current_png": 5,
+      "errors": [],
+      "sha256": "58f58c3bd7fb83a536db9c4d0d3682edde37158a2de3f80e4cde347a8c15696e",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb",
+      "original_png": 2,
+      "current_png": 2,
+      "errors": [],
+      "sha256": "7aecf489b8963862d7e2dff8d34e6933b4d28fc22abe24ec51aa5b510db20946",
+      "paired_code_ast_matches": true
+    },
+    {
+      "notebook": "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb",
+      "original_png": 8,
+      "current_png": 8,
+      "errors": [],
+      "sha256": "d87dd47a175daf3371d103b328807b5f6b9c5af8a447790a86ec40b37bec5372",
+      "paired_code_ast_matches": true
+    }
+  ],
+  "reviewed_plot_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97
+  ],
+  "visual_findings": "Plots 0-23 visually reviewed on sheets 00-03: activity, chamber/wall-loss, charge kernels and PMF/PDF/resolved comparisons render with visible axes, legends and expected qualitative trends. No blank or clipped plots found. This visual check does not broaden the scientific qualification. Plots 24-69 reviewed on sheets 04-11: coagulation, condensation, activity/equilibria, gas, nucleation and particle property illustrations have visible axes, legends and nonblank output. Log axes, explicit viewport bounds and illustrative scientific limitations are retained; visual review does not establish new numerical accuracy. Plots 70-87 reviewed on sheets 11-14: biomass, cloud and cough outputs render with visible axes/legends. Cloud dry-phase oscillations remain visible and retain their documented unqualified limitation; these outputs are not evidence of newly qualified physical accuracy. Plots 88-89 visually reviewed: organic partitioning and coagulation distributions have visible axes, legends and nonblank curves. Plots 90-97 reviewed on sheets 15-16: soot property tables, temperature, growth and composition outputs render with visible labels and nonblank data. The extreme extrapolated vapor pressures and property floors retain the documented illustrative limitations; no new physical qualification is inferred.",
+  "scope": "Publication inspection only; existing scientific limitations remain.",
+  "output_revision": "3cf7c6ae43e90824c60984244080b850a8c3cf01"
+}

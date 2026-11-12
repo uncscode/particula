@@ -9,10 +9,12 @@ for this scope is that revision. Issue #1607 remains the tracking issue.
 Its original per-phase issue-generation workflow is superseded for this
 delivery by one implementation PR. No child issues are needed for this scope.
 
-Implementation is in progress on `codex/e9-m6-legacy-removal`. CPU consumer,
-legacy aggregate, particle and gas facade removals have revision-specific evidence
-in `implementation.md` and the assertion ledgers. GPU compatibility removal
-and final readiness gates remain pending. The serial review units are recorded
+Implementation is in progress on `codex/e9-m6-legacy-removal`. CPU consumers,
+legacy aggregate, particle/gas facades and untagged GPU compatibility paths
+have been removed, with revision-specific evidence in `implementation.md` and
+the assertion ledgers. Full package validation and the complete example output
+review and both strict publication builds pass. PR delivery is tracked by
+issue #1607; maintainer scientific and release approval remain separate. The serial review units are recorded
 in `phase_details.md`; P1–P6 remain acceptance milestones, not separate PRs.
 
 The post-M5 audit established these removal targets (consult the implementation
@@ -71,8 +73,8 @@ do not discard scientific binning or introduce a replacement facade.
 - Final guidance: `docs/Features/particle-data-migration/`,
   `docs/Features/data-containers-and-gpu-foundations.md`,
   `docs/Features/Roadmap/data-oriented-gpu.md`, supported `docs/Examples/`,
-  root/developer snippets and API navigation. Proposed readiness record:
-  `docs/Features/Roadmap/data-native-v030-closeout.md` (not yet created).
+  root/developer snippets and API navigation. Readiness record:
+  `docs/Features/Roadmap/data-native-v030-closeout.md`.
 
 ## Interfaces
 
@@ -93,6 +95,7 @@ permanent substitute facade, new public GPU API, hidden transfer/synchronization
 or fallback, automatic prepared-state rebind, resident/graph redesign, new
 performance claims, arbitrary coverage targets, Epic I or release publication.
 Do not remove unrelated warnings, functional science, useful native builders
-or CPU-Warp conversion helpers based on name matching alone. This scoping
-update edits only E9-M6 metadata and its existing section files. A version
+or CPU-Warp conversion helpers based on name matching alone. The original scoping
+update edited only E9-M6 metadata; implementation now follows the accepted
+serial review units. A version
 bump, release tag and publication are separate from this implementation scope.

@@ -1,0 +1,1814 @@
+{
+  "status": "complete: 58 source executions and 46 notebook executions passed; one optional native-CUDA-only source skipped cleanly",
+  "revision": "3cf7c6ae43e90824c60984244080b850a8c3cf01",
+  "revision_note": "Executed working-tree artifacts are now committed at this revision; every recorded content hash verified after commit hooks. Production cleanup is 1722460ba; notebook outputs are 3cf7c6ae4.",
+  "source_environment": {
+    "python": ".venv/bin/python",
+    "PYTHONPATH": "/home/kyle/Code/particula",
+    "MPLBACKEND": "Agg",
+    "WARP_CACHE_PATH": "/tmp/particula-m6-warp"
+  },
+  "notebook_environment": {
+    "python": ".venv/bin/python",
+    "PYTHONPATH": "/home/kyle/Code/particula:/home/kyle/Code/Agent",
+    "MPLBACKEND": "module://matplotlib_inline.backend_inline",
+    "WARP_CACHE_PATH": "/tmp/particula-m6-warp"
+  },
+  "excluded_attempts": "Initial notebook attempts missing ADW and interrupted Agg notebook sweep are not accepted evidence. Failures are retained in implementation.md.",
+  "visual_review": "notebook_output_review.json",
+  "rows": [
+    {
+      "path": "docs/Examples/Activity/activity_tutorial.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Activity/activity_tutorial.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.82,
+      "log_sha256": "a5f7d49ee894f727aae966204d4980d39972afa0b3c6db3d5b00db2db80c903d",
+      "local_log": "/tmp/m6-example-execution/00-source.log",
+      "content_sha256": "73e67165aed49d0caffd0ff6f5aaf5c2b5dbc7bfa5de2997a5ea5c1781afc486"
+    },
+    {
+      "path": "docs/Examples/Activity/activity_tutorial.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Activity/activity_tutorial.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.97,
+      "log_sha256": "a1b4f5d7ed08e574930e6b51a10d1912890e9b81cd0fa550736f29ae7502d158",
+      "local_log": "/tmp/m6-notebook-inline-execution/00-notebook.log",
+      "content_sha256": "d6b418299a2f6d3b942cde1e5a018d71439df89ec1673e24e30eacfc54247dfe",
+      "error_output_count": 0,
+      "png_count": 5,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Activity/bat_activity_example.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Activity/bat_activity_example.py"
+      ],
+      "returncode": 0,
+      "seconds": 1.87,
+      "log_sha256": "406bede86d855f11c4b632f245225ba7f6ba6e3d49bac932cb85b7b6de1b9419",
+      "local_log": "/tmp/m6-example-execution/01-source.log",
+      "content_sha256": "871b2f5857be6031406b8718e1136f762f5732065d4f404002e919978a9974af"
+    },
+    {
+      "path": "docs/Examples/Activity/bat_activity_example.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Activity/bat_activity_example.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 3.92,
+      "log_sha256": "3dd88b97d6b4557a63e39cf52f225bdf463d932291e5a0b7ae72000e495861f8",
+      "local_log": "/tmp/m6-notebook-inline-execution/01-notebook.log",
+      "content_sha256": "489373c63c4e3c180f70082e79528c7512539ef0622f6cec582b50f36d4197c8",
+      "error_output_count": 0,
+      "png_count": 0,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Activity/equilibria_example.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Activity/equilibria_example.py"
+      ],
+      "returncode": 0,
+      "seconds": 1.92,
+      "log_sha256": "31677fd9ef990b60225ff276a8bfeee088f5e93a2d61840c61f8d4e0ddab8977",
+      "local_log": "/tmp/m6-example-execution/02-source.log",
+      "content_sha256": "fb5c415cc44036982947ff74c89928277a6506f89cc7e11d6524a427ee0ed8db"
+    },
+    {
+      "path": "docs/Examples/Activity/equilibria_example.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Activity/equilibria_example.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 3.87,
+      "log_sha256": "18a0c354df863f99b01abf8a91b3ec81bd0e46f81cc8aa16e794052c2ec9be79",
+      "local_log": "/tmp/m6-notebook-inline-execution/02-notebook.log",
+      "content_sha256": "1352495434e56d79674415458d959efbbc0bf5e3bc4dd13dce4efc80a922c57d",
+      "error_output_count": 0,
+      "png_count": 0,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Activity/ideal_activity_example.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Activity/ideal_activity_example.py"
+      ],
+      "returncode": 0,
+      "seconds": 1.92,
+      "log_sha256": "0c8b71d3cd980a87017db8c214aafeadc37210815eb20846fdb7158e3a5dec79",
+      "local_log": "/tmp/m6-example-execution/03-source.log",
+      "content_sha256": "2f1ee106c5f0d4d6e233a8fd91b37641dadea4d46dec60b89c3a4a8ef570ec3b"
+    },
+    {
+      "path": "docs/Examples/Activity/ideal_activity_example.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Activity/ideal_activity_example.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 3.87,
+      "log_sha256": "3dd88b97d6b4557a63e39cf52f225bdf463d932291e5a0b7ae72000e495861f8",
+      "local_log": "/tmp/m6-notebook-inline-execution/03-notebook.log",
+      "content_sha256": "8e1cc07aa204bbfdd9fa2e3f8491df0bb2d296d54698f625a5d359b31a81f38b",
+      "error_output_count": 0,
+      "png_count": 0,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Activity/kappa_activity_example.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Activity/kappa_activity_example.py"
+      ],
+      "returncode": 0,
+      "seconds": 1.97,
+      "log_sha256": "3f9fe6efbfd64f0a5ab3967abad39f0389a078dfdf4a6ba6dd042f7b57ae3de0",
+      "local_log": "/tmp/m6-example-execution/04-source.log",
+      "content_sha256": "6721ff14d57a4a2b1fd7de9a79700f2f81f5377bf229823f894279754a74c931"
+    },
+    {
+      "path": "docs/Examples/Activity/kappa_activity_example.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Activity/kappa_activity_example.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 3.97,
+      "log_sha256": "0c1bb36027a51d13bfa5181741a01fe22e96e2f8cc1ca1ca53aeebfe88cd1414",
+      "local_log": "/tmp/m6-notebook-inline-execution/04-notebook.log",
+      "content_sha256": "11324869bfa095b36834e4bf0068510b1a4b7f308a95240227119f0fcaf58b4c",
+      "error_output_count": 0,
+      "png_count": 0,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Aerosol/Aerosol_Tutorial.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Aerosol/Aerosol_Tutorial.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.02,
+      "log_sha256": "6e3b2d2c7823cb424db40dcb7c2062910e392050c556ca525f92232f2a2d81f4",
+      "local_log": "/tmp/m6-example-execution/05-source.log",
+      "content_sha256": "879c172cca098a09f5e6824dfe13bfd6709598a43fcb0fa3e7deb8c6a8722dc2"
+    },
+    {
+      "path": "docs/Examples/Aerosol/Aerosol_Tutorial.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Aerosol/Aerosol_Tutorial.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.02,
+      "log_sha256": "16098c1533a984f594d784d9fa54a79f37e2359fff40c40ee1a5f1f751fd7d4f",
+      "local_log": "/tmp/m6-notebook-inline-execution/05-notebook.log",
+      "content_sha256": "effb0afff1682cbb7a33c159d1c766d693a3b928c39e3f0622e32075acf37642",
+      "error_output_count": 0,
+      "png_count": 0,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.py"
+      ],
+      "returncode": 0,
+      "seconds": 15.34,
+      "log_sha256": "e0b3032e88786b8c8ba8b4466d78da18bd9114c7832fe7485c95bf9bba68b384",
+      "local_log": "/tmp/m6-example-execution/06-source.log",
+      "content_sha256": "90e5dc6af4b34ead4c46e027c4588cd40091dc232eb75871cc79357d2129ca17"
+    },
+    {
+      "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 17.9,
+      "log_sha256": "eefa55bd4fff5e5e7d08be55e2fa88cdc4f1f3a7d21c9f375ff6da23e24c5fd4",
+      "local_log": "/tmp/m6-notebook-inline-execution/06-notebook.log",
+      "content_sha256": "71b508bc42b76a69ab58a47b97d8c3ce6e2346fcefd8e4a54c8919043b53edcb",
+      "error_output_count": 0,
+      "png_count": 4,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.72,
+      "log_sha256": "13d58e4334c2bf856688c940da398d4a4c630001f10cd338fb8864fa8b9cde6f",
+      "local_log": "/tmp/m6-example-execution/07-source.log",
+      "content_sha256": "3fe3d71fac5fc3ba84a6014e680480f7878a3e697ed846912929d3aefb9d48f7"
+    },
+    {
+      "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.57,
+      "log_sha256": "6e1f92dcfd1b593bc29a5ec485c2128cb3342992360ae347eceebc38bf951769",
+      "local_log": "/tmp/m6-notebook-inline-execution/07-notebook.log",
+      "content_sha256": "1bbe63e499e6003e1cb96517c6b9a3cbb62603cf32dd0aba17fac5a8075c2c99",
+      "error_output_count": 0,
+      "png_count": 0,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.py"
+      ],
+      "returncode": 0,
+      "seconds": 24.31,
+      "log_sha256": "0c6a0dda9c4782a18907ca76cdb3785b53f1b5b7a01941f0ac20f8c72dbe1507",
+      "local_log": "/tmp/m6-example-execution/08-source.log",
+      "content_sha256": "3d9f27301f4587646ee2bb0dad4d9e18b189c5cead50fce995850270647b1497"
+    },
+    {
+      "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 25.79,
+      "log_sha256": "24f17e9084b21d7c6c74c1bf033d0a55105e61bf9e8ea449cc14eafc632d46e4",
+      "local_log": "/tmp/m6-notebook-inline-execution/08-notebook.log",
+      "content_sha256": "35e65edd313f7a9777815a73600dea3fefd5d5b0e0c39a037fbe4b5a5d26a6f2",
+      "error_output_count": 0,
+      "png_count": 2,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.py"
+      ],
+      "returncode": 0,
+      "seconds": 4.18,
+      "log_sha256": "0d69dad57fd28a34fcb569c4b92427f5191b51563e2d4d18c5ea4810fac0915b",
+      "local_log": "/tmp/m6-example-execution/09-source.log",
+      "content_sha256": "a3ea86e76755ecf6f027b3a2cf6e6a6881b64be8c8bd8518acda23969358717f"
+    },
+    {
+      "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 5.97,
+      "log_sha256": "993455c2f07c49179b266c1e633eafcd7dc23eb7b43ca7e15d44c414ffc4361e",
+      "local_log": "/tmp/m6-notebook-inline-execution/09-notebook.log",
+      "content_sha256": "4bf00340592f17b6cb9299df0cb2fda65eeb8f60f90200743bd404b629bbde3f",
+      "error_output_count": 0,
+      "png_count": 4,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.17,
+      "log_sha256": "db0017bd268c43d4751fc41fb38668bc298f17837780904f6b4cfe46f35b6073",
+      "local_log": "/tmp/m6-example-execution/10-source.log",
+      "content_sha256": "fd73ec63b37332f947fffa2ec889a53f942670c09c3df4472306221d997e78a5"
+    },
+    {
+      "path": "docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.12,
+      "log_sha256": "e282fca87d85d49117d4758b329e0f283194f50b22799201bd507051c023b0cc",
+      "local_log": "/tmp/m6-notebook-inline-execution/10-notebook.log",
+      "content_sha256": "bbba2f883c497b8edcf959c77577e5172f2916cb8a706302cfba3f84ba3208c4",
+      "error_output_count": 0,
+      "png_count": 0,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.42,
+      "log_sha256": "acafe9d40e2276692e328a6ef877a9f88563358812ffee63f31faddf16c18807",
+      "local_log": "/tmp/m6-example-execution/11-source.log",
+      "content_sha256": "cc935dc8021793b4f9b977343a616845796e0d27c1f6d3a7bb9e19a8d96fa08c"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.87,
+      "log_sha256": "25182de6c5247e93af486fe1cc0b9b89777b56f748310b48adfc2ba2afbaded2",
+      "local_log": "/tmp/m6-example-execution/12-source.log",
+      "content_sha256": "b42da4c2c6d28c23b7d3c760cc363ee3d34095b017ebc5ede6d18ca7f6d4dacf"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.87,
+      "log_sha256": "09f7f8e262515e3792be0d759fecbeb3ad1a53575b50a7d236d3a9ec1994bade",
+      "local_log": "/tmp/m6-notebook-inline-execution/12-notebook.log",
+      "content_sha256": "92a3fc9446bada8eb29856d05ff61a851d78a810765de3e6dfc968ed2166595c",
+      "error_output_count": 0,
+      "png_count": 2,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.67,
+      "log_sha256": "45b8f5819249a8cbad93fa5aed069f4597d7a11b3250cefdfeb93a635250ffa4",
+      "local_log": "/tmp/m6-example-execution/13-source.log",
+      "content_sha256": "99d25c546562bf504d85402528f397a0d359e2df7a2982b76eb6781fef18d7d3"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.62,
+      "log_sha256": "bb51892fe0e96635dba4213efc948aa153dfdb5e7a79906dd53349632aa14cb5",
+      "local_log": "/tmp/m6-notebook-inline-execution/13-notebook.log",
+      "content_sha256": "11b1fd146f060a790907bf736c24319248a2858091a5a90954ae6df266d9a9bb",
+      "error_output_count": 0,
+      "png_count": 2,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.py"
+      ],
+      "returncode": 0,
+      "seconds": 3.67,
+      "log_sha256": "903be51bddf6ad2b559965947d84354a11179b0bb905d1b657efdd481a279a03",
+      "local_log": "/tmp/m6-example-execution/14-source.log",
+      "content_sha256": "34c2dbd408ae52dce422ba9894a807de29dafd3038f9b88213ee83983a525064"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 5.53,
+      "log_sha256": "22e793a1303f44519965a2e303f2d6b9cf4c95559337da75a5b233feb7fd8846",
+      "local_log": "/tmp/m6-notebook-inline-execution/14-notebook.log",
+      "content_sha256": "b15f4222fdb1c2cf0a7dcc371a883176a02afaa331249622317f87cb16fc2dc8",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.py"
+      ],
+      "returncode": 0,
+      "seconds": 3.82,
+      "log_sha256": "0d6426aa3093fbd2c006bed46772a23ab5619331cb6ddc0e96fa8a9a74eb9b43",
+      "local_log": "/tmp/m6-example-execution/15-source.log",
+      "content_sha256": "e65b047e2595f111b6f00399d1617ee8b8270cd3d456fe98cb0569a25abfbaa0"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 5.62,
+      "log_sha256": "26be316b153e569c1ceace7cdafa930cc1c97ed30192cddd2b1ce5621abbb478",
+      "local_log": "/tmp/m6-notebook-inline-execution/15-notebook.log",
+      "content_sha256": "0760890a0486640f6f47cc7978a62900b2b5b2def1b80982552ae3ee2893489b",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.py"
+      ],
+      "returncode": 0,
+      "seconds": 4.07,
+      "log_sha256": "96c17b7bfd46eb7a6116f00dbd399018cfcff245b0023936b4070e1bbced041b",
+      "local_log": "/tmp/m6-example-execution/16-source.log",
+      "content_sha256": "befa925f31d6b614f4fb35dea0a710f19169919cb070c127360e65abed459f96"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 8.24,
+      "log_sha256": "f252434086f2deb5333b20187544eab6bbca7d543a17d301349dd5708b91c02b",
+      "local_log": "/tmp/m6-notebook-inline-execution/16-notebook.log",
+      "content_sha256": "e466775faa725086f3d000549b2c80534dbb6e3e44de47777e5389ce450b76cf",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.py"
+      ],
+      "returncode": 0,
+      "seconds": 3.72,
+      "log_sha256": "8cd7a7b65749642237489d72b5e05577d96b389dfcc216c0dac08ccc1c5bed9f",
+      "local_log": "/tmp/m6-example-execution/17-source.log",
+      "content_sha256": "b22d084d3dcbba2756b3d4927d6c0385acbbb7069b30b1ebe54e4cd6480e5216"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 5.92,
+      "log_sha256": "4a2bc6d6e611bb40c9c5624af2bb7b09c3d581f1da1e7c415b6aa3ce15f87b45",
+      "local_log": "/tmp/m6-notebook-inline-execution/17-notebook.log",
+      "content_sha256": "a5ac08382de84125f73f393b00c9b2e888e2e851cce54dd9530e67ff50e3d639",
+      "error_output_count": 0,
+      "png_count": 2,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.py"
+      ],
+      "returncode": 0,
+      "seconds": 36.55,
+      "log_sha256": "4dade0cc7a21fb6709a8381b9588d6b2f515b43e5bdbd3464c317b2806232221",
+      "local_log": "/tmp/m6-example-execution/18-source.log",
+      "content_sha256": "1e0b436c4270b314571e8230fa62cea71bfb996eba2a6bb2e6b16da008b69f75"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 39.85,
+      "log_sha256": "2d13b551d5b79b8b717ee7db5916ba55e7c9fa603ed9acb7b7c4b1c539218d31",
+      "local_log": "/tmp/m6-notebook-inline-execution/18-notebook.log",
+      "content_sha256": "112ba17e68bc273dca7c6d733e0330c4f96ca14b31425d11f811ce7a0d12534e",
+      "error_output_count": 0,
+      "png_count": 2,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.72,
+      "log_sha256": "4ca367c658d9017ebfaddff2bc91e32498580954491936125e3845fdfbcf14eb",
+      "local_log": "/tmp/m6-example-execution/19-source.log",
+      "content_sha256": "07e6a5477446adb75461df2ad9ccf0b800b428e3c6bffd752f1e861768bbe538"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.88,
+      "log_sha256": "3577f8efc8910ef93fdc585009042e1d611e5ee6690f6f26303eb68a9c62ad7e",
+      "local_log": "/tmp/m6-notebook-inline-execution/19-notebook.log",
+      "content_sha256": "7dae05c6ef91e965504a553c27f1587ca4d3809366fdc7967d620e2e69774cd4",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.67,
+      "log_sha256": "711dbf858cd1f81fd65ec9187da297baf5294b6ece27c025c31df8b8748583f4",
+      "local_log": "/tmp/m6-example-execution/20-source.log",
+      "content_sha256": "69d6bf0882467fe1b10e12ba0ab2ce647e5a6dc8a544e9f0e68d6c98510f2c25"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.88,
+      "log_sha256": "3577f8efc8910ef93fdc585009042e1d611e5ee6690f6f26303eb68a9c62ad7e",
+      "local_log": "/tmp/m6-notebook-inline-execution/20-notebook.log",
+      "content_sha256": "8f1b551ebb4aacf5d913be9ae3d46589e2ac1f01fc6e2ea3ec274b1d19eedee1",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.82,
+      "log_sha256": "a339e2f67685450a2ebe9e988783f4513a404ed7a2c1ec904239602afcbd62b7",
+      "local_log": "/tmp/m6-example-execution/21-source.log",
+      "content_sha256": "98bf8bf5edd41b812a840429f99f0eb7aaa3a22ddb9f11c5ad6c8d1e9fe6336e"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.78,
+      "log_sha256": "a120d808203bca0e3e549f6ceef4fbf56e63dac44dfc02ab41e939d273755a1e",
+      "local_log": "/tmp/m6-notebook-inline-execution/21-notebook.log",
+      "content_sha256": "17ee5f99e2dca070b8450bd8d449263749b4805f0818a69b5e20421d2fac6644",
+      "error_output_count": 0,
+      "png_count": 2,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.92,
+      "log_sha256": "5762591986c7964d51fef107caa6d8d919124daff444254a0fbd8c59782c9cfe",
+      "local_log": "/tmp/m6-example-execution/22-source.log",
+      "content_sha256": "1392a8d85fe60fea505a8912f84fe2bcba23f3467db385c5042914605ee1d29d"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.53,
+      "log_sha256": "5a19c38f1f93d36691ff29b82f2804d8632d83ff711e868fb0464e9515d0a2d1",
+      "local_log": "/tmp/m6-notebook-inline-execution/22-notebook.log",
+      "content_sha256": "03f5acf9a871740a969a663892eb8dd0b35c361c4eecf97b031cb6740b589169",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.82,
+      "log_sha256": "1c2dd8732ce16bc5ba6a67619d8465ecca16b717dfc75aff07c08903f5d1fb2b",
+      "local_log": "/tmp/m6-example-execution/23-source.log",
+      "content_sha256": "17cd9fdbbbadc1c210e15a88df2fac25927a4b21492f9438ef0a5f043a54417b"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.83,
+      "log_sha256": "14b95843215fc697d72bafeafb380ea371b59a3f4f817a47fb6da892246a6e4c",
+      "local_log": "/tmp/m6-notebook-inline-execution/23-notebook.log",
+      "content_sha256": "ef7df1e41cc8e68563ac9818029b502b8230d60ab642513841244400669016cf",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.py"
+      ],
+      "returncode": 0,
+      "seconds": 16.91,
+      "log_sha256": "0cf20341910bb20701cb442fcdb7c71611cda906fdb32596a6a29be6efb985ce",
+      "local_log": "/tmp/m6-example-execution/24-source.log",
+      "content_sha256": "31857a4f1f07181ddb41a8edbc2b9ae8760d3d52409e12cd7a0fd9d81f197279"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 19.4,
+      "log_sha256": "92d4fe672d6aa9c4c2287c90545d9a9eb0c49ecb0c737efd208108fbff03f2e9",
+      "local_log": "/tmp/m6-notebook-inline-execution/24-notebook.log",
+      "content_sha256": "6c4fbf7d4b801f434bff79bf805757844b91293289bb3fee9061e3cda55ed682",
+      "error_output_count": 0,
+      "png_count": 2,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.py"
+      ],
+      "returncode": 0,
+      "seconds": 34.55,
+      "log_sha256": "222d4fcd652765f9d84aacfb00b07e933af4ba7df53bfea7db8bde07ffbdb428",
+      "local_log": "/tmp/m6-example-execution/25-source.log",
+      "content_sha256": "9cd03f1257c10e5ccf5965848dc6dcb16f4a9efed113cdc5a3f31f8513f4af53"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 36.38,
+      "log_sha256": "99867248016ac83e735a9210165d20e0bef12a7befc6411ecaf59e1816553b07",
+      "local_log": "/tmp/m6-notebook-inline-execution/25-notebook.log",
+      "content_sha256": "e1db456568e746610985a7f8194cc1f003c1d68acdd5e2d9611102ee78733711",
+      "error_output_count": 0,
+      "png_count": 3,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.12,
+      "log_sha256": "c4a5f4c34c62c7f49bb41758d7f594d898a43d0ca7dd3b1bdfa8f1573886dcaf",
+      "local_log": "/tmp/m6-example-execution/26-source.log",
+      "content_sha256": "444923489a228bea48f4bab08ca31da25371f43a85e36464a79ed41126aacfa0"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.03,
+      "log_sha256": "f1f5429fb97c38e2d9a7106574334d1d53ebe51d0e315f0dd5a400a3fe3c042f",
+      "local_log": "/tmp/m6-notebook-inline-execution/26-notebook.log",
+      "content_sha256": "f32dcde33ea9487b5909099b69de3a85f56b8336a074741887dcf2cca705acea",
+      "error_output_count": 0,
+      "png_count": 0,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.py"
+      ],
+      "returncode": 0,
+      "seconds": 6.63,
+      "log_sha256": "38349aa22c5b12a43eb36e2e0615a0b5e06acf99a875804a00ff8eb9598495e4",
+      "local_log": "/tmp/m6-example-execution/27-source.log",
+      "content_sha256": "66e7f14b6370495586310368881da24f12a48e0c29391d6da4578a714bc47896"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 8.05,
+      "log_sha256": "0ff67323fd995e7def393686f6e74e7799ea41eddff53cf2f31f64855870e3e6",
+      "local_log": "/tmp/m6-notebook-inline-execution/27-notebook.log",
+      "content_sha256": "9dd17390994381626a91d49c0f280ccc99ac255bb7e3d340845607e971cd622b",
+      "error_output_count": 0,
+      "png_count": 3,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.77,
+      "log_sha256": "ae64904395d9732e6254e752b122b3ddf3c54675447d794d61f43124379b252f",
+      "local_log": "/tmp/m6-example-execution/28-source.log",
+      "content_sha256": "16bab3f1cffaacb2d462509cd31f15ff118fcdd1e45ee8f69b58306fb7e69dca"
+    },
+    {
+      "path": "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.72,
+      "log_sha256": "318b098149a82d635b708201f9b91e0c1604abb783b4f189db4a4dc6d374be6b",
+      "local_log": "/tmp/m6-notebook-inline-execution/28-notebook.log",
+      "content_sha256": "3fa744d02d8880c072fdf5f30691cb189d50bc9ddc16cead9206a5fd3c2df542",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Equilibria/Notebooks/activity_part1.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Equilibria/Notebooks/activity_part1.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.82,
+      "log_sha256": "faa8ae97073cafad0ea672e8dd500798c874bb84588a026b8f4704dce63fc01e",
+      "local_log": "/tmp/m6-example-execution/29-source.log",
+      "content_sha256": "84008ab4de591d7a264798a99e17aeea0182f1238ff6d5bf264d9368e35557a2"
+    },
+    {
+      "path": "docs/Examples/Equilibria/Notebooks/activity_part1.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Equilibria/Notebooks/activity_part1.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 7.11,
+      "log_sha256": "0ab4c57e4d8948f0c0e3bc058ac3cb72d18f127f05e340dd7e3ad0c794f2262a",
+      "local_log": "/tmp/m6-notebook-inline-execution/29-notebook.log",
+      "content_sha256": "1312ca150e21e4eb9e6f0de5070bca136153dd1fbddbf3eb6c8106b5b642907a",
+      "error_output_count": 0,
+      "png_count": 5,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Equilibria/Notebooks/equilibria_part1.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Equilibria/Notebooks/equilibria_part1.py"
+      ],
+      "returncode": 0,
+      "seconds": 3.17,
+      "log_sha256": "a0cb3915dc55a5be4e6b408f16092156f2d41d1d0cc8e613468d4be4f6737ad0",
+      "local_log": "/tmp/m6-example-execution/30-source.log",
+      "content_sha256": "de8cc7961dd64c6571f97baa5b7b5b00165c0f4b41c566d092166d56bea56cac"
+    },
+    {
+      "path": "docs/Examples/Equilibria/Notebooks/equilibria_part1.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Equilibria/Notebooks/equilibria_part1.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.73,
+      "log_sha256": "95e5b243d79c1415982e177bd1a5d431a9cead15509596119c4038874881076a",
+      "local_log": "/tmp/m6-notebook-inline-execution/30-notebook.log",
+      "content_sha256": "9368c21d8554ad69a6d6ad21afe2691991d24ed076724dc722ac720c9de54169",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.67,
+      "log_sha256": "f5b5bde21dc9473b2f2cbba85aaa1be7c9ce9f3e3b308f2967c52acbefed3c2b",
+      "local_log": "/tmp/m6-example-execution/31-source.log",
+      "content_sha256": "2d38e3d5346956d7e7e9c373a39ff0ae8999ad02b373b4977dfdb2652af4f785"
+    },
+    {
+      "path": "docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.39,
+      "log_sha256": "734627be5d6006b0307a6cf9a5637e47c167ef3518398fc0f053eac640b97bc0",
+      "local_log": "/tmp/m6-notebook-inline-execution/31-notebook.log",
+      "content_sha256": "6b4fb5368794bb357d4e14341cdf3c7c990c00424be6e51bb1d3c8eb5762dc8a",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Gas_Phase/Notebooks/Gas_Species.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Gas_Phase/Notebooks/Gas_Species.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.72,
+      "log_sha256": "86f89359525b4ebd2ad840508d82312dcb552e8c5e44a6af7c6b40e05af4d7a8",
+      "local_log": "/tmp/m6-example-execution/32-source.log",
+      "content_sha256": "020ed648d005aa3a11e9063d6894748438733341f47e7ecfe924e55507a53b40"
+    },
+    {
+      "path": "docs/Examples/Gas_Phase/Notebooks/Gas_Species.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Gas_Phase/Notebooks/Gas_Species.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.58,
+      "log_sha256": "6e1f92dcfd1b593bc29a5ec485c2128cb3342992360ae347eceebc38bf951769",
+      "local_log": "/tmp/m6-notebook-inline-execution/32-notebook.log",
+      "content_sha256": "5f05ad44bb59cc50480be9cbca8b8450683c73dc3492df75132a5261f3b0519d",
+      "error_output_count": 0,
+      "png_count": 2,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.72,
+      "log_sha256": "2493de5df02fa3589b910d5ede71fe9b158f5375b907759a6fc985acb63c78c9",
+      "local_log": "/tmp/m6-example-execution/33-source.log",
+      "content_sha256": "f90c3e63ff00dfc7ede7d5385063dc071734e42c5cbb08d3dab6e28beabc5b43"
+    },
+    {
+      "path": "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.94,
+      "log_sha256": "3c0e238348c9706be8e13d65213cb8484e6bd6138d3a03dc7e8fe928256dbee5",
+      "local_log": "/tmp/m6-notebook-inline-execution/33-notebook.log",
+      "content_sha256": "8c108ea818a7daefa7ebedabfa0907e2ab12c713d90772d64a4672602740d3fb",
+      "error_output_count": 0,
+      "png_count": 5,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.py"
+      ],
+      "returncode": 0,
+      "seconds": 3.12,
+      "log_sha256": "8a2131ad0d9e72241cb427eb2b61569f71212c2d50cf672c986c4cfd0ff78699",
+      "local_log": "/tmp/m6-example-execution/34-source.log",
+      "content_sha256": "75075ca8db4a4ad975daddf84f03528b055ba33d61d044c1dab780f938e1c6b4"
+    },
+    {
+      "path": "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.83,
+      "log_sha256": "54955b5e23d3c8c6716a505671104254798047c8f46307f9976a132d7dc3ca6a",
+      "local_log": "/tmp/m6-notebook-inline-execution/34-notebook.log",
+      "content_sha256": "a3f9a632ad42d2ec2bd53fe82b374ad52d4ee5b10be31ec1e789cc95fbd01d57",
+      "error_output_count": 0,
+      "png_count": 2,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Nucleation/cpu_nucleation.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Nucleation/cpu_nucleation.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.02,
+      "log_sha256": "a614c3516cdee857ae74fd5bc17f9bee1b425dec844368afbf93ccf7949c4f45",
+      "local_log": "/tmp/m6-example-execution/35-source.log",
+      "content_sha256": "ab87f5e84875c6e247dc793cb2ae9d5b7968ca949b93a8a8594030e2b133449c"
+    },
+    {
+      "path": "docs/Examples/Nucleation/gpu_direct_nucleation.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Nucleation/gpu_direct_nucleation.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.62,
+      "log_sha256": "9a480a141e922bd318610b49be007d1df5f198f87d18f29ba2e5945f5895b722",
+      "local_log": "/tmp/m6-example-execution/36-source.log",
+      "content_sha256": "9ff37b19df5e56e2fdfc82472eb4c9a59ec80def63c745e45940d02530c75fc3"
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.72,
+      "log_sha256": "27091b0fb7a0a79bb7af1e5620d1ce66a737fc48761b6a1d469a30ea9754b8ca",
+      "local_log": "/tmp/m6-example-execution/37-source.log",
+      "content_sha256": "9dab779831aaf7c046ced161ed201fe352a07231b309830dc0788a9d633828f0"
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.27,
+      "log_sha256": "3cb55eae86b88f414b26bd5a98817a6c4ad96a5e547d88f6a8824b59789e05a7",
+      "local_log": "/tmp/m6-notebook-inline-execution/37-notebook.log",
+      "content_sha256": "b6a3db02c1108e3932e68dfbe23b92423d963c237d91e5a2938974486b7f7b7c",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.72,
+      "log_sha256": "1cc990ef7f11a3d449b0849c7eaf95dcb77962aa2fe3effa2f80ea1153e5a039",
+      "local_log": "/tmp/m6-example-execution/38-source.log",
+      "content_sha256": "a88ebce683f07630b9e1c676b2b95387d77317a4a833b4f9ec98bdc8c3ed068a"
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.52,
+      "log_sha256": "845156018ccc500e82712b013df6998f34cc4d216343a2dbebb400f8ebcb7514",
+      "local_log": "/tmp/m6-notebook-inline-execution/38-notebook.log",
+      "content_sha256": "f19481dcee1ce66444aeca6cfb04e025de207e625543e086ad69c570e8222899",
+      "error_output_count": 0,
+      "png_count": 2,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.12,
+      "log_sha256": "dc060a28cae770c6229040b2b64af8980e3cc9817a2f8bca4a34f2d1ea8c28ef",
+      "local_log": "/tmp/m6-example-execution/39-source.log",
+      "content_sha256": "1c55f6f3dbcf03955005224f4a5658dffe2ba1eabcc4e79e171391df2130ed73"
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 3.82,
+      "log_sha256": "112ba142373effd5ea3510e512bd4215ac4a79318439dee76cb0d83bb1a84f10",
+      "local_log": "/tmp/m6-notebook-inline-execution/39-notebook.log",
+      "content_sha256": "22bec3aec8f640d268b8388657e0b123b347999fe7e48ccf8d09558ad7673891",
+      "error_output_count": 0,
+      "png_count": 0,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.77,
+      "log_sha256": "17395311241f780cca3501b1fa695b39b004dc5142d805945f9b87fa45316b5f",
+      "local_log": "/tmp/m6-example-execution/40-source.log",
+      "content_sha256": "70a0732e4bd0c59c949218fd011304aa735426f7f9d8dd4abae54e931f95f091"
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.62,
+      "log_sha256": "68be7d6e0209a8b2639b151cdd57df8711cb993929890cfb5828f2458d120eee",
+      "local_log": "/tmp/m6-notebook-inline-execution/40-notebook.log",
+      "content_sha256": "e5449eb5f8eac1a80060ea538950708325634462c99efc3a3b54a97372911d4b",
+      "error_output_count": 0,
+      "png_count": 4,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.72,
+      "log_sha256": "70d9fddf2d69bf94632803fe1f453d8d48b6d17e7129c665a543d2d82b3f2d75",
+      "local_log": "/tmp/m6-example-execution/41-source.log",
+      "content_sha256": "952054b6075fab5294c626454e8c2db3e394f8059bf699d14c208fac1aaa7489"
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.92,
+      "log_sha256": "8519de860433d543ed08eb7ec63e851edbd6594195888b6ca35ac7aaed08f36c",
+      "local_log": "/tmp/m6-notebook-inline-execution/41-notebook.log",
+      "content_sha256": "394cae066daabb6c3c6a4f732e162de88895e703dc01c612a640819e968a9567",
+      "error_output_count": 0,
+      "png_count": 3,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.87,
+      "log_sha256": "135ac26dc7f3dfbfe0cd436686e890769742a572acf26cd404fcaa442d40c528",
+      "local_log": "/tmp/m6-example-execution/42-source.log",
+      "content_sha256": "93088da70127d1cc583c6dfacd50ce906dc8b115b619986c7f44aed0a7558ad9"
+    },
+    {
+      "path": "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 4.92,
+      "log_sha256": "f2d85391780ebc26d8597964f0bcd673da61b33177e1abe226618dd28ddd5964",
+      "local_log": "/tmp/m6-notebook-inline-execution/42-notebook.log",
+      "content_sha256": "af813121942e5b9d80ce691c43914e6f3e209b3a6b692671991aa2328b1e1618",
+      "error_output_count": 0,
+      "png_count": 3,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.py"
+      ],
+      "returncode": 0,
+      "seconds": 605.01,
+      "log_sha256": "9842eae85d1de26bcddeb71774a3cdff8e5cddf2f449514906bb322aefcb7397",
+      "local_log": "/tmp/m6-example-execution/43-source.log",
+      "content_sha256": "ed24cc3650332fcbea5c18d79e11b1710f84d920c29ef4b7f822f80b22a0c6b5"
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 622.22,
+      "log_sha256": "7d743522e83bc5c000ee793ac0560e5b673ef90fe7790721fa1e658c2788432e",
+      "local_log": "/tmp/m6-notebook-inline-execution/43-notebook.log",
+      "content_sha256": "8b5398fdfb31b6fbffb391dae273b5ba646d30bab875996f3044ed624e6abeb1",
+      "error_output_count": 0,
+      "png_count": 4,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.py"
+      ],
+      "returncode": 0,
+      "seconds": 7.18,
+      "log_sha256": "33a52fc81c06972c22bbaf3b8a7d592038ea4ea2fefc52d4667c47adc19fd7b6",
+      "local_log": "/tmp/m6-example-execution/44-source.log",
+      "content_sha256": "9fc349372215bcc1e4d880ea52974943714cc3d4dc836548a5225283dbb4d74a"
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 12.44,
+      "log_sha256": "2871134804a1412dbaca78bb11d1a79ddaff4a46b811744a08b1aedd1215b26f",
+      "local_log": "/tmp/m6-notebook-inline-execution/44-notebook.log",
+      "content_sha256": "dfd42ad21a909beada557ea862e2e8427081dd44b1221622214a697ae4f0789e",
+      "error_output_count": 0,
+      "png_count": 8,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.py"
+      ],
+      "returncode": 0,
+      "seconds": 7.28,
+      "log_sha256": "10aece152d025857850968b76358949f8a6c5204c0914d8625e3e12b183f258a",
+      "local_log": "/tmp/m6-example-execution/45-source.log",
+      "content_sha256": "b1f28ad4e9b7cf6269b1885f1038db978e2115e7d1707efd055d997d7839981c"
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 10.48,
+      "log_sha256": "228dd7d4c4ccf96052323616fbdb7c608ee846b1e28e7dc919bb150aa2bcaa74",
+      "local_log": "/tmp/m6-notebook-inline-execution/45-notebook.log",
+      "content_sha256": "c62bb1ca40238a766d4c0fc931c1f16e8272f3ccd1a8e539f55710654e016963",
+      "error_output_count": 0,
+      "png_count": 1,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.py"
+      ],
+      "returncode": 0,
+      "seconds": 16.89,
+      "log_sha256": "fa44cea56abbd6327dd94fbf17c3f1de8c3e7dd807fd917903ad0b72a050bdb9",
+      "local_log": "/tmp/m6-example-execution/46-source.log",
+      "content_sha256": "4e85504895f1c0dd591907a8e8a493aea788ee7cde8c097d251fd2e1ddafdc2c"
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 19.35,
+      "log_sha256": "48704b40b4856db020723dfa3f51cdad290d8bf0a7f767b99f2565e950037fea",
+      "local_log": "/tmp/m6-notebook-inline-execution/46-notebook.log",
+      "content_sha256": "58f58c3bd7fb83a536db9c4d0d3682edde37158a2de3f80e4cde347a8c15696e",
+      "error_output_count": 0,
+      "png_count": 5,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.py"
+      ],
+      "returncode": 0,
+      "seconds": 223.69,
+      "log_sha256": "ebcc4101dce57db9a3f9c4f000f1d2ad6438d421b218796c20928258ed3c38f7",
+      "local_log": "/tmp/m6-example-execution/47-source.log",
+      "content_sha256": "19e64f33df20fb5abad227889f02c2b8ea535b319bd5f0089fc2b8c0f5eae06f"
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb",
+        "--no-backup",
+        "--timeout",
+        "1200"
+      ],
+      "returncode": 0,
+      "seconds": 229.68,
+      "log_sha256": "bc762680cbac4205ae85e43e200e7bd262df5ab162122de54e39bb9d18c6456a",
+      "local_log": "/tmp/m6-notebook-inline-execution/47-notebook.log",
+      "content_sha256": "7aecf489b8963862d7e2dff8d34e6933b4d28fc22abe24ec51aa5b510db20946",
+      "error_output_count": 0,
+      "png_count": 2,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.py"
+      ],
+      "returncode": 0,
+      "seconds": 1359.0,
+      "log_sha256": "35320e16a0157a3dbe39f502917265521e215a0bc708b94967f002e56be97d79",
+      "local_log": "/tmp/m6-example-execution/48-source.log",
+      "content_sha256": "57f7e30d9899c8942243a3d903869faf3d065b5f31757541505588330f6bd393"
+    },
+    {
+      "path": "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb",
+      "kind": "notebook",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        ".opencode/tools/run_notebook.py",
+        "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb",
+        "--no-backup",
+        "--timeout",
+        "3600"
+      ],
+      "returncode": 0,
+      "seconds": 1349.77,
+      "log_sha256": "109e225ef0240b613774344ce099b6e3e8bae6cfc688a247193a7c8f8abdf802",
+      "local_log": "/tmp/m6-notebook-inline-execution/48-notebook.log",
+      "content_sha256": "d87dd47a175daf3371d103b328807b5f6b9c5af8a447790a86ec40b37bec5372",
+      "error_output_count": 0,
+      "png_count": 8,
+      "source_ast_matches": true
+    },
+    {
+      "path": "docs/Examples/cpu_dilution.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/cpu_dilution.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.07,
+      "log_sha256": "6ca6823932157f8102560e9dfd2c9472250e4c0209c28608d2bd579e411e1383",
+      "local_log": "/tmp/m6-example-execution/49-source.log",
+      "content_sha256": "b8b4e5e80dbe856e04f44c135a6b9eef0b25194322cd086a4a323d4d28cf4822"
+    },
+    {
+      "path": "docs/Examples/data_containers_and_gpu_foundations.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/data_containers_and_gpu_foundations.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.42,
+      "log_sha256": "acafe9d40e2276692e328a6ef877a9f88563358812ffee63f31faddf16c18807",
+      "local_log": "/tmp/m6-example-execution/50-source.log",
+      "content_sha256": "db9a546c91dd0739ed7cd3028f84b6f9f95278a6c7acd05c38df08067532aa20"
+    },
+    {
+      "path": "docs/Examples/gpu_coagulation_direct.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/gpu_coagulation_direct.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.52,
+      "log_sha256": "81211d61b6ef432f6aedfcc566308c1113099c85af2fe2504c3793527c8cdba0",
+      "local_log": "/tmp/m6-example-execution/51-source.log",
+      "content_sha256": "486e2e9d2cd796922ba38dadd5659ebc502904fed3ce0764cf6e063c0dde76d7"
+    },
+    {
+      "path": "docs/Examples/gpu_complete_process_sequence.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/gpu_complete_process_sequence.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.97,
+      "log_sha256": "108f73b0bdff8f9eed8c77eb6cea2379075b1ad8b3eaa79e49a4d4b09cccaddd",
+      "local_log": "/tmp/m6-example-execution/52-source.log",
+      "content_sha256": "ccedb3fd2a3397124e5c5b2bc3ead1e768d547ae39459168e6b0c9b2de75fcec"
+    },
+    {
+      "path": "docs/Examples/gpu_condensation_parity_walkthrough.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/gpu_condensation_parity_walkthrough.py"
+      ],
+      "returncode": 0,
+      "seconds": 11.88,
+      "log_sha256": "6306950dfb0586b0744cbdce71882528b3035009e4c66a290e9f5729bebf8373",
+      "local_log": "/tmp/m6-example-execution/53-source.log",
+      "content_sha256": "6dfe4623b1b1f2a4bff0345fa7267c886319698158d96a54d8bac9eda20d6241"
+    },
+    {
+      "path": "docs/Examples/gpu_direct_kernels_quick_start.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/gpu_direct_kernels_quick_start.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.57,
+      "log_sha256": "0794b0e4a3d2d5b74c1c3a8267f429aebb11d8fb8a7226b86ea41a014b8c4acc",
+      "local_log": "/tmp/m6-example-execution/54-source.log",
+      "content_sha256": "42c8d9da6fb5191405fea6bcf4084310201fcc295530c0a6f2a80132b809ed17"
+    },
+    {
+      "path": "docs/Examples/gpu_resident_graph_capture.py",
+      "kind": "source",
+      "status": "optional_hardware_skip",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/gpu_resident_graph_capture.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.42,
+      "log_sha256": "a5ae19cc0bb42ba15f1214530d07165114dbaa3c6abc6d5339d52c8fc1dad37e",
+      "local_log": "/tmp/m6-example-execution/55-source.log",
+      "reason": "Native CUDA unavailable; entrypoint exited cleanly without fixture/upload/capture or CPU fallback.",
+      "content_sha256": "559ce1d2449d9c7415061b604be69fddce59bd000c8a3fe91de0f37ca6b65ef4"
+    },
+    {
+      "path": "docs/Examples/gpu_resident_multi_timestep.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/gpu_resident_multi_timestep.py"
+      ],
+      "returncode": 0,
+      "seconds": 3.17,
+      "log_sha256": "49ec7d7eb43037f2a726f9093def9a026775c8e09600e374136e5a190ae875a5",
+      "local_log": "/tmp/m6-example-execution/56-source.log",
+      "content_sha256": "831f05089365c478339ccd4979f37f9e85c5f3cc8ca385fbf0441cad2cbb5ffc"
+    },
+    {
+      "path": "docs/Examples/gpu_resident_session.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/gpu_resident_session.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.87,
+      "log_sha256": "ddfe0af4cb7b38ad602db5e9846287c679d2f21df577efeb47a97c847ea8e41b",
+      "local_log": "/tmp/m6-example-execution/57-source.log",
+      "content_sha256": "76a59ee39692b958e1c590676eea20ea786e57d2c1046d7be2225646e3e27f66"
+    },
+    {
+      "path": "docs/Examples/native_state_access.py",
+      "kind": "source",
+      "status": "passed",
+      "command": [
+        "/home/kyle/Code/particula/.venv/bin/python",
+        "docs/Examples/native_state_access.py"
+      ],
+      "returncode": 0,
+      "seconds": 2.02,
+      "log_sha256": "f5ae081d9ee1c2cc43a748b434373ed4794c74e17c55f9782bd84f3f79494fba",
+      "local_log": "/tmp/m6-example-execution/58-source.log",
+      "content_sha256": "90cbcc43459032b7373572f7b69bde248df9ff2ef5796ad634361214f407d12f"
+    }
+  ]
+}

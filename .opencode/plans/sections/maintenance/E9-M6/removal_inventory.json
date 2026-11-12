@@ -1,6 +1,6 @@
 {
   "base_revision": "fb25078b6c0e8136ed06feeda59f0928b85c1b34",
-  "status": "initial lexical inventory; not an approved deletion or assertion-retention map",
+  "status": "Removal inventory reconciled after all example/notebook executions; production search retains only intentional removal-safe conftest guards. Final maintainer review is separate from implementation evidence.",
   "files": [
     {
       "path": "AGENTS.md",
@@ -13,8 +13,18 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Retained explicitly historical release context, removed-API comparison or removal guidance; not supported executable facade construction.",
+      "test_nodes": [],
+      "current_references": [
+        {
+          "line": 94,
+          "symbols": [
+            "GasSpecies",
+            "ParticleRepresentation"
+          ]
+        }
+      ],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Examples/Gas_Phase/index.md",
@@ -26,8 +36,17 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Retained established tutorial filename only; its executable construction is native. Renaming the linked notebook is not needed for facade removal.",
+      "test_nodes": [],
+      "current_references": [
+        {
+          "line": 7,
+          "symbols": [
+            "Atmosphere"
+          ]
+        }
+      ],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb",
@@ -39,8 +58,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.py",
@@ -52,8 +73,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb",
@@ -65,8 +88,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.py",
@@ -78,8 +103,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb",
@@ -91,8 +118,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.py",
@@ -104,8 +133,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Features/Roadmap/data-oriented-gpu.md",
@@ -137,8 +168,25 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Retained explicitly historical release context, removed-API comparison or removal guidance; not supported executable facade construction.",
+      "test_nodes": [],
+      "current_references": [
+        {
+          "line": 142,
+          "symbols": [
+            "GasSpecies",
+            "ParticleRepresentation"
+          ]
+        },
+        {
+          "line": 329,
+          "symbols": [
+            "GasSpecies",
+            "ParticleRepresentation"
+          ]
+        }
+      ],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Features/Roadmap/index.md",
@@ -163,8 +211,23 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Retained explicitly historical release context, removed-API comparison or removal guidance; not supported executable facade construction.",
+      "test_nodes": [],
+      "current_references": [
+        {
+          "line": 13,
+          "symbols": [
+            "ParticleRepresentation"
+          ]
+        },
+        {
+          "line": 14,
+          "symbols": [
+            "GasSpecies"
+          ]
+        }
+      ],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Features/data-containers-and-gpu-foundations.md",
@@ -176,8 +239,17 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Retained explicitly historical release context, removed-API comparison or removal guidance; not supported executable facade construction.",
+      "test_nodes": [],
+      "current_references": [
+        {
+          "line": 84,
+          "symbols": [
+            "to_representation"
+          ]
+        }
+      ],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Features/native_scientific_processes.md",
@@ -189,8 +261,17 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Retained explicitly historical release context, removed-API comparison or removal guidance; not supported executable facade construction.",
+      "test_nodes": [],
+      "current_references": [
+        {
+          "line": 164,
+          "symbols": [
+            "LegacyNucleation"
+          ]
+        }
+      ],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Features/particle-data-migration/containers.md",
@@ -228,8 +309,56 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Retained explicitly historical release context, removed-API comparison or removal guidance; not supported executable facade construction.",
+      "test_nodes": [],
+      "current_references": [
+        {
+          "line": 101,
+          "symbols": [
+            "from_representation"
+          ]
+        },
+        {
+          "line": 102,
+          "symbols": [
+            "from_species",
+            "to_representation",
+            "to_species"
+          ]
+        },
+        {
+          "line": 107,
+          "symbols": [
+            "from_species",
+            "to_species"
+          ]
+        },
+        {
+          "line": 110,
+          "symbols": [
+            "Atmosphere"
+          ]
+        },
+        {
+          "line": 116,
+          "symbols": [
+            "ParticleRepresentation"
+          ]
+        },
+        {
+          "line": 120,
+          "symbols": [
+            "GasSpecies"
+          ]
+        },
+        {
+          "line": 121,
+          "symbols": [
+            "Atmosphere"
+          ]
+        }
+      ],
+      "retention_ledgers": []
     },
     {
       "path": "docs/Theory/Technical/Dynamics/Nucleation_Equations.md",
@@ -241,8 +370,17 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Retained scientific bibliographic terminology (Atmospheres), not an API or executable compatibility path.",
+      "test_nodes": [],
+      "current_references": [
+        {
+          "line": 503,
+          "symbols": [
+            "Atmosphere"
+          ]
+        }
+      ],
+      "retention_ledgers": []
     },
     {
       "path": "examples_tests/dilution_example_test.py",
@@ -254,7 +392,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
       "test_nodes": [
         {
           "name": "test_cpu_dilution_example_executes_exact_public_api_decay",
@@ -286,7 +424,9 @@
           "line": 116,
           "assertion_disposition": "pending"
         }
-      ]
+      ],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "examples_tests/native_foundations_example_test.py",
@@ -298,7 +438,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Retained established tutorial filename only; its executable construction is native. Renaming the linked notebook is not needed for facade removal.",
       "test_nodes": [
         {
           "name": "test_aerosol_tutorial_population_and_held_state",
@@ -330,7 +470,16 @@
           "line": 194,
           "assertion_disposition": "pending"
         }
-      ]
+      ],
+      "current_references": [
+        {
+          "line": 56,
+          "symbols": [
+            "Atmosphere"
+          ]
+        }
+      ],
+      "retention_ledgers": []
     },
     {
       "path": "particula/_legacy_aerosol.py",
@@ -505,7 +654,9 @@
         }
       ],
       "disposition": "Removed obsolete aggregate; all nine test assertions reviewed in aggregate_assertions.json with native successors.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/dynamics/coagulation/coagulation_strategy/brownian_coagulation_strategy.py",
@@ -517,8 +668,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/dynamics/coagulation/coagulation_strategy/charged_coagulation_strategy.py",
@@ -530,8 +683,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py",
@@ -622,7 +777,9 @@
         }
       ],
       "disposition": "Complete: facade union, getters, unwrapping, legacy binning, rate and step dispatch removed; native material/property science and count-weighted binning retained.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy.py",
@@ -634,8 +791,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/dynamics/coagulation/coagulation_strategy/tests/charged_coagulation_strategy_test.py",
@@ -665,7 +824,7 @@
           ]
         }
       ],
-      "disposition": "Migrated mechanism tests to native lognormal initialization and explicit PMF/PDF/resolved metadata; every original test is mapped in coagulation_mechanism_assertions.json. Oversized legacy updates now have separate rejection assertions. Shared strategy dispatch removal remains pending.",
+      "disposition": "Migrated mechanism tests to native lognormal initialization and explicit PMF/PDF/resolved metadata; every original test is mapped in coagulation_mechanism_assertions.json. Oversized legacy updates now have separate rejection assertions. Shared strategy facade dispatch has subsequently been removed; native dispatch is covered by the full suite.",
       "test_nodes": [
         {
           "name": "test_direct_kernel_flag_default_false",
@@ -717,6 +876,10 @@
           "line": 230,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "coagulation_mechanism_assertions.json"
       ]
     },
     {
@@ -916,6 +1079,11 @@
           "line": 1010,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "coagulation_step_assertions.json",
+        "coagulation_helpers_assertions.json"
       ]
     },
     {
@@ -928,8 +1096,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/dynamics/condensation/condensation_strategies.py",
@@ -1362,7 +1532,9 @@
         }
       ],
       "disposition": "Removed all facade imports/unions/overloads, unwrapping, fallback physics, untagged execution and compatibility-only stepping/normalization helpers. Native math/control helper ASTs preserved. Public pressure/rate/step require tagged ParticleData, GasData and explicit process configuration.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/dynamics/condensation/tests/condensation_strategies_test.py",
@@ -2343,6 +2515,10 @@
           "line": 3450,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "condensation_assertions.json"
       ]
     },
     {
@@ -2426,6 +2602,10 @@
           "line": 448,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "staggered_conservation_assertions.json"
       ]
     },
     {
@@ -2497,6 +2677,10 @@
           "line": 432,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "staggered_performance_assertions.json"
       ]
     },
     {
@@ -2547,6 +2731,10 @@
           "line": 314,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "staggered_stability_assertions.json"
       ]
     },
     {
@@ -2560,7 +2748,9 @@
         }
       ],
       "disposition": "Legacy aggregate import, admission, setter commit and facade backing-state rollback removed. Native numeric helpers, array rollback, concentration preflight and public strategy retained; dilution_assertions.json records test migration.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/dynamics/particle_process.py",
@@ -2651,7 +2841,9 @@
         }
       ],
       "disposition": "Complete: native-only Nucleation, Dilution, WallLoss, Coagulation and MassCondensation; legacy aggregate imports/unions and facade mutation paths removed. Per-process science retained with assertion mappings and native boundary tests.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/dynamics/tests/dilution_runnable_test.py",
@@ -2782,6 +2974,10 @@
           "line": 384,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "dilution_assertions.json"
       ]
     },
     {
@@ -3038,6 +3234,10 @@
           "line": 1186,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "dilution_assertions.json"
       ]
     },
     {
@@ -3086,7 +3286,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
       "test_nodes": [
         {
           "name": "test_commit_converts_density_to_counts_and_maps_species",
@@ -3133,7 +3333,9 @@
           "line": 336,
           "assertion_disposition": "pending"
         }
-      ]
+      ],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/dynamics/tests/native_runnable_test.py",
@@ -3196,7 +3398,9 @@
           "line": 198,
           "assertion_disposition": "pending"
         }
-      ]
+      ],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/dynamics/tests/nucleation_runnable_test.py",
@@ -3393,6 +3597,17 @@
           "line": 853,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [
+        {
+          "line": 115,
+          "symbols": [
+            "LegacyNucleation"
+          ]
+        }
+      ],
+      "retention_ledgers": [
+        "nucleation_assertions.json"
       ]
     },
     {
@@ -3492,6 +3707,10 @@
           "line": 227,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "wall_loss_runnable_assertions.json"
       ]
     },
     {
@@ -3541,7 +3760,9 @@
         }
       ],
       "disposition": "Removed all facade imports/unions/overloads and coefficient/rate/step branches, plus implicit charge-cache reader. Population entry points delegate to existing native implementations. Neutral/charged laws and stochastic array helper retained. Both strategy suites were already native (M3 commit 3ca096650) and remain unchanged; added native boundary/cache regressions.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/equilibria/equilibria.py",
@@ -3553,8 +3774,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/execution/adapters/coagulation.py",
@@ -3566,8 +3789,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/execution/adapters/condensation.py",
@@ -3579,8 +3804,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/execution/checkpoint.py",
@@ -3628,8 +3855,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/execution/tests/coagulation_adapter_test.py",
@@ -3647,7 +3876,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
       "test_nodes": [
         {
           "name": "test_cpu_carriers_retain_identity_and_are_frozen",
@@ -3869,6 +4098,10 @@
           "line": 1686,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "gpu_boundary_assertions.json"
       ]
     },
     {
@@ -3887,7 +4120,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
       "test_nodes": [
         {
           "name": "test_cpu_adapter_matches_local_brownian_kernel_reference_and_preserves_identity",
@@ -3944,6 +4177,10 @@
           "line": 575,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "gpu_coagulation_assertions.json"
       ]
     },
     {
@@ -3968,7 +4205,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
       "test_nodes": [
         {
           "name": "test_cpu_carriers_retain_resources_by_identity_and_freeze",
@@ -4170,6 +4407,10 @@
           "line": 1727,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "gpu_condensation_assertions.json"
       ]
     },
     {
@@ -4207,7 +4448,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
       "test_nodes": [
         {
           "name": "test_cpu_adapter_executes_native_cases_and_conserves_inventory",
@@ -4239,6 +4480,10 @@
           "line": 883,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "gpu_condensation_assertions.json"
       ]
     },
     {
@@ -4270,7 +4515,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
       "test_nodes": [
         {
           "name": "test_native_selected_adapter_dispatches_once_and_conserves",
@@ -4292,7 +4537,9 @@
           "line": 171,
           "assertion_disposition": "pending"
         }
-      ]
+      ],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/execution/tests/native_full_loop_test.py",
@@ -4323,7 +4570,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
       "test_nodes": [
         {
           "name": "test_native_complete_prepared_loop_and_restart",
@@ -4335,7 +4582,9 @@
           "line": 487,
           "assertion_disposition": "pending"
         }
-      ]
+      ],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gas/__init__.py",
@@ -4432,8 +4681,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gas/atmosphere.py",
@@ -4524,7 +4775,9 @@
         }
       ],
       "disposition": "Removed obsolete atmosphere aggregate/builder. Six original assertions mapped in atmosphere_assertions.json to explicit native gas/environment construction and coordinated replacement.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gas/atmosphere_builders.py",
@@ -4735,7 +4988,9 @@
         }
       ],
       "disposition": "Removed obsolete atmosphere aggregate/builder. Six original assertions mapped in atmosphere_assertions.json to explicit native gas/environment construction and coordinated replacement.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gas/gas_data.py",
@@ -4863,7 +5118,9 @@
         }
       ],
       "disposition": "Removed species conversion bridges and facade-only tests; native GasData unchanged. Fourteen original test bodies mapped in gas_bridge_assertions.json.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gas/species.py",
@@ -5068,7 +5325,9 @@
         }
       ],
       "disposition": "Removed after assertion-level review; see gas_facade_assertions.json for all 37 preserved test bodies and native successors.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gas/species_builders.py",
@@ -5261,7 +5520,9 @@
         }
       ],
       "disposition": "Removed obsolete gas constructors; fourteen original assertions mapped in gas_constructor_assertions.json to native builder and removed-import successors.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gas/species_factories.py",
@@ -5388,7 +5649,9 @@
         }
       ],
       "disposition": "Removed obsolete gas constructors; fourteen original assertions mapped in gas_constructor_assertions.json to native builder and removed-import successors.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gas/tests/atmosphere_builder_test.py",
@@ -5448,6 +5711,10 @@
           "line": 50,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "atmosphere_assertions.json"
       ]
     },
     {
@@ -5543,6 +5810,10 @@
           "line": 85,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "atmosphere_assertions.json"
       ]
     },
     {
@@ -5937,6 +6208,11 @@
           "line": 523,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "gas_bridge_assertions.json",
+        "gas_facade_assertions.json"
       ]
     },
     {
@@ -6085,6 +6361,10 @@
           "line": 131,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "gas_constructor_assertions.json"
       ]
     },
     {
@@ -6266,6 +6546,10 @@
           "line": 219,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "gas_facade_assertions.json"
       ]
     },
     {
@@ -6366,6 +6650,10 @@
           "line": 69,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "gas_constructor_assertions.json"
       ]
     },
     {
@@ -6460,6 +6748,10 @@
           "line": 161,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "gas_facade_assertions.json"
       ]
     },
     {
@@ -6682,6 +6974,10 @@
           "line": 288,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "gas_facade_assertions.json"
       ]
     },
     {
@@ -6700,8 +6996,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gpu/kernels/condensation.py",
@@ -6725,8 +7023,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gpu/kernels/exhaustion.py",
@@ -6750,8 +7050,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gpu/kernels/nucleation.py",
@@ -6769,8 +7071,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gpu/kernels/wall_loss.py",
@@ -6800,8 +7104,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/gpu/population_metadata.py",
@@ -6837,8 +7143,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/integration_tests/charged_coagulation_comparison_test.py",
@@ -6873,6 +7181,10 @@
           "line": 216,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "charged_integration_assertions.json"
       ]
     },
     {
@@ -6928,6 +7240,10 @@
           "line": 255,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "coagulation_integration_assertions.json"
       ]
     },
     {
@@ -6979,6 +7295,10 @@
           "line": 232,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "condensation_integration_assertions.json"
       ]
     },
     {
@@ -7016,6 +7336,10 @@
           "line": 123,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "condensation_integration_assertions.json"
       ]
     },
     {
@@ -7070,7 +7394,9 @@
           "line": 132,
           "assertion_disposition": "pending"
         }
-      ]
+      ],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/integration_tests/native_runnable_sequence_test.py",
@@ -7108,7 +7434,9 @@
           "line": 33,
           "assertion_disposition": "pending"
         }
-      ]
+      ],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/integration_tests/native_scientific_processes_test.py",
@@ -7139,7 +7467,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
       "test_nodes": [
         {
           "name": "test_resolved_native_aggregate_through_three_processes",
@@ -7156,7 +7484,9 @@
           "line": 299,
           "assertion_disposition": "pending"
         }
-      ]
+      ],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/particles/__init__.py",
@@ -7186,8 +7516,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/particles/change_particle_representation.py",
@@ -7236,7 +7568,9 @@
         }
       ],
       "disposition": "Removed obsolete facade binning wrapper; three original tests mapped in representation_binning_assertions.json to native one/two-material grid, positivity and weighted inventory checks.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/particles/particle_data.py",
@@ -7309,7 +7643,9 @@
         }
       ],
       "disposition": "Removed both facade bridges and facade/strategy imports; native storage/property algorithms unchanged. See particle_bridge_assertions.json.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/particles/properties/mixing_state_index.py",
@@ -7321,8 +7657,17 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Retained scientific bibliographic terminology (Atmospheres), not an API or executable compatibility path.",
+      "test_nodes": [],
+      "current_references": [
+        {
+          "line": 64,
+          "symbols": [
+            "Atmosphere"
+          ]
+        }
+      ],
+      "retention_ledgers": []
     },
     {
       "path": "particula/particles/representation.py",
@@ -7353,7 +7698,9 @@
         }
       ],
       "disposition": "Facade removed after assertion review in particle_facade_assertions.json; previously removed converter case remains in particle_bridge_assertions.json. Native fields/properties/initialization and direct scientific utilities retain enduring assertions.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/particles/representation_builders.py",
@@ -7444,7 +7791,9 @@
         }
       ],
       "disposition": "Removed obsolete builders and normalization helpers; ten assertions reviewed in particle_builder_assertions.json with explicit native successors and lossless shape requirements.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/particles/representation_factories.py",
@@ -7499,7 +7848,9 @@
         }
       ],
       "disposition": "Removed legacy factory and export; six old tests mapped to native construction and removed-boundary successors in particle_factory_assertions.json.",
-      "test_nodes": []
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/particles/tests/change_particle_representation_test.py",
@@ -7558,6 +7909,10 @@
           "line": 53,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "representation_binning_assertions.json"
       ]
     },
     {
@@ -7926,6 +8281,11 @@
           "line": 812,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "particle_bridge_assertions.json",
+        "particle_facade_assertions.json"
       ]
     },
     {
@@ -8006,6 +8366,10 @@
           "line": 221,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "particle_bridge_assertions.json"
       ]
     },
     {
@@ -8137,6 +8501,10 @@
           "line": 161,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "particle_builder_assertions.json"
       ]
     },
     {
@@ -8286,6 +8654,11 @@
           "line": 310,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "particle_bridge_assertions.json",
+        "particle_facade_assertions.json"
       ]
     },
     {
@@ -8444,6 +8817,10 @@
           "line": 149,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "particle_factory_assertions.json"
       ]
     },
     {
@@ -8657,6 +9034,10 @@
           "line": 439,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "particle_facade_assertions.json"
       ]
     },
     {
@@ -8669,8 +9050,10 @@
           ]
         }
       ],
-      "disposition": "pending review",
-      "test_nodes": []
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
+      "test_nodes": [],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/tests/execution_test.py",
@@ -9046,7 +9429,9 @@
           "line": 2006,
           "assertion_disposition": "pending"
         }
-      ]
+      ],
+      "current_references": [],
+      "retention_ledgers": []
     },
     {
       "path": "particula/tests/legacy_aerosol_builder_test.py",
@@ -9120,6 +9505,10 @@
           "line": 148,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "aggregate_assertions.json"
       ]
     },
     {
@@ -9185,6 +9574,10 @@
           "line": 85,
           "assertion_disposition": "pending"
         }
+      ],
+      "current_references": [],
+      "retention_ledgers": [
+        "aggregate_assertions.json"
       ]
     },
     {
@@ -9197,14 +9590,22 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Baseline legacy references removed; native implementation or assertions retained. Full repository suite passes after native integration fixture migration.",
       "test_nodes": [
         {
           "name": "test_runnable_sequence_execute",
           "line": 33,
           "assertion_disposition": "pending"
         }
-      ]
+      ],
+      "current_references": [],
+      "retention_ledgers": []
     }
-  ]
+  ],
+  "audit_revision": "3cf7c6ae43e90824c60984244080b850a8c3cf01",
+  "audit_evidence": {
+    "package_suite": "8333 passed, 684 skipped; 92% normal full-package coverage",
+    "installed_package_suite": "4559 passed, 25 skipped, 820 deselected; includes removed imports and native aggregate construction",
+    "production_removed_symbol_search": "Only intentional removal-safe test guard names in particula/conftest.py remain for ParticleRepresentation/GasSpecies; no production facade imports or definitions."
+  }
 }

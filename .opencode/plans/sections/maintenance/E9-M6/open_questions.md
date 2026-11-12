@@ -17,11 +17,19 @@ Authority: [E9 review decisions](../../epics/E9/appendix.md#review-decisions-202
 - [x] **Q5 execution policy:** require a declared installed-Warp CPU environment
   and all supported CPU/notebook dependencies. Record execution operator/device
   availability before P5/P6. Optional CUDA may skip cleanly; unavailable required
-  runs block readiness. No environment is represented as provisioned here.
+  runs block readiness. Execution used the repository Python environment with Warp 1.11.1 CPU;
+  native CUDA was unavailable. The final fresh-wheel run independently resolved
+  Warp 1.19.0 and passed with an isolated cache.
 
-## Evidence still required in M6
+## Implementation evidence and remaining review
 
-Close the legacy/seam inventory, validate distribution metadata propagation and
-CPU/GPU non-unit-volume scientific corrections after removal, and publish actual
-test/lint/docs/example results. Old ambiguous checkpoint handling must be
-documented and tested. No API removal or release readiness is claimed complete.
+The removal inventory, assertion-retention ledgers, complete example execution
+and notebook output review are recorded beside this file. Full package coverage,
+installed-wheel tests, native/GPU boundaries, lint/type checks and both strict
+publication builds pass. Tagged v5 checkpoints remain supported; untagged
+records reject before setup/upload. See `implementation.md` and the published
+`docs/Features/Roadmap/data-native-v030-closeout.md`.
+
+The implementation evidence is complete. Kyle/Gorkowski's explicit scientific
+and release readiness approval remains a separate review; no release is
+published by this PR.

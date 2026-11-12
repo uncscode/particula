@@ -1,39 +1,47 @@
 # Success Criteria
 
-All implementation gates are pending. Draft completion is not v0.3.0 readiness.
+Implementation validation is complete. Final maintainer scientific/release
+acceptance remains pending and is not inferred from passing tests or PR creation.
+The authoritative result details are in `implementation.md`, the assertion
+ledgers, `example_execution.json`, `notebook_output_review.json`, and
+`docs/Features/Roadmap/data-native-v030-closeout.md`.
 
-- [ ] M1–M5 completed-and-validated handoffs accepted in strict order.
-- [ ] Final consumer audit has no supported executable legacy dependencies;
-  temporary compatibility inventory is empty with per-row removal proof.
-- [ ] ParticleRepresentation, GasSpecies, Atmosphere and obsolete builders,
-  bridges, exports, branches, messages and facade-only tests are removed.
-- [ ] Removed API import/attribute boundaries fail as intended, while retained
-  native construction, access/replacement and composition work without facades.
-- [ ] Every enduring legacy-fixture scientific assertion maps to native tests;
-  normalization, species alignment, conservation, identity, rejection, CPU
-  single-box admission and documented failure behavior remain protected.
-- [ ] BOTH CPU wall-loss strategy suites pass independently after removal.
-- [ ] CPU-Warp transfers, exports, ownership, direct kernels and resident
-  contracts pass applicable checks; optional CUDA skips are clearly recorded.
-- [ ] Every supported M5 example is revalidated against removal; affected pairs
-  are Python-first synchronized and executed, retaining both source files.
-- [ ] Strict docs, required lint/type checks and untargeted full-suite runner
-  pass at the final revision with repository coverage defaults unchanged.
-- [ ] v0.3.0 removals, replacements, historical exceptions and evidence gaps are
-  documented; maintainer accepts readiness explicitly without inferring release.
+- [x] Enter M6 from maintainer-reported completed M5 and merged base
+  `fb25078b6c0e8136ed06feeda59f0928b85c1b34`.
+- [x] Final audit identifies no supported executable legacy consumers; remaining
+  removed names are intentional negative guards, migration history or filenames.
+- [x] ParticleRepresentation, GasSpecies, Atmosphere, obsolete construction,
+  bridges and temporary CPU/GPU compatibility paths are removed.
+- [x] Removed root/package/concrete-module imports reject intentionally;
+  native construction, replacement and composition pass, including installed wheel.
+- [x] Enduring scientific assertions have native successors or explicit justified
+  dispositions; 1,606 successor references resolve and regression suites pass.
+- [x] Both CPU wall-loss strategy suites pass independently (16 and 43 tests).
+- [x] Required CPU-Warp transfer, ownership, direct-kernel and resident checks
+  pass; unavailable native CUDA is explicitly distinguished from Warp CPU.
+- [x] All supported M5 examples plus native state access are accounted for:
+  58 source successes, one optional native-CUDA skip, and 46 executed notebooks.
+  All 98 PNG outputs are reviewed and source/notebook ASTs match.
+- [x] Untargeted normal coverage passes at 92% without lowering the 80% threshold;
+  required lint/type, source-example, infrastructure, plugin and publication
+  checks pass against final production/example content.
+- [x] Removals, native replacements, explicit ownership and retained scientific
+  limitations are documented; no version/schema bump or release is introduced.
+- [ ] Kyle/Gorkowski explicitly accepts final scientific and release readiness.
 
-| Metric | Draft baseline | Target | Evidence source |
-|---|---|---|---|
-| Supported legacy consumers | Final audit pending | Zero | P1/P4 final-revision ledger |
-| Temporary compatibility seams | Upstream inventories pending acceptance | Zero open rows | M1–M5 handoffs and deletion diff |
-| Removed API surfaces | Facades still exist | All inventoried imports/aliases absent | Co-located negative API tests |
-| Enduring scientific assertions | Mapping pending | Every row migrated, none silently dropped | Reviewed test-retention map |
-| CPU wall-loss suites | Not run by drafting | Both pass | Two separate literal outputs |
-| Supported examples/pairs | M5 inventory required | Every supported row accounted for | Final execution/sync ledger |
-| Retained GPU/resident contracts | Not run by drafting | Required checks pass | Device-qualified assertion records |
-| Full coverage/lint/docs | Not run by drafting | Normal gates pass | Untargeted runner, lint/type, strict build |
-| Readiness | BLOCKED pending implementation/evidence | Explicit accepted gate | P6 closeout review |
+| Metric | Final implementation evidence |
+| --- | --- |
+| Supported legacy consumers and temporary seams | Zero supported remaining paths; reconciled removal inventory |
+| Removed API surfaces | Negative source and installed-wheel tests plus positive native execution |
+| Scientific assertion retention | Original bodies/dispositions and native successors in adjacent ledgers |
+| CPU wall loss | Both explicit suites pass |
+| Examples and notebooks | Complete execution and hash-qualified plot review records |
+| GPU/resident contracts | Warp CPU evidence and separately qualified optional CUDA skips |
+| Full coverage | 8,333 passed, 684 skipped; 92% at unchanged threshold |
+| Installed wheel | 4,559 passed, 25 skipped, 820 deselected; separate examples 20 passed |
+| Documentation | Standard and full strict publication pass without warning suppression |
+| Release readiness | Awaiting explicit maintainer review; no release publication |
 
-Optional skips are not measured success. Any required fail/unavailable/pending
-row keeps readiness BLOCKED; a full-suite pass alone cannot close a missing
-adjacent wall-loss or notebook-execution row.
+Optional hardware skips are not measured success. Historical failed attempts
+remain in the implementation record; final successful reruns supersede them
+only for the same validated scope.
