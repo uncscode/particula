@@ -1,73 +1,91 @@
 ---
-title: Migration Troubleshooting
+title: Native migration troubleshooting
 ---
 
-# Migration Troubleshooting
+# Native migration troubleshooting
 
-## Shape mismatches when creating data containers
+## Explicit population kind is required
 
-`ParticleData` expects `(n_boxes, n_particles, n_species)` for masses and
-`(n_boxes, n_particles)` for concentration and charge. Use `np.newaxis` or
-`np.tile` to add the batch dimension.
+Set `distribution_type` through a native initializer/builder or explicit
+`ParticleData` construction. Choose the physical measure deliberately:
 
-## Deprecation logs
+- `discrete`: bin number density, m⁻³, at exactly unit volume.
+- `continuous_pdf`: radius `dN/dr`, m⁻⁴, with a positive increasing radius grid
+  and exactly unit volume. Integrate over radius; do not sum nodes.
+- `particle_resolved`: represented counts at positive physical volume.
+  Density input must be multiplied by volume once; density output divides once.
 
-The facades log at INFO level to avoid `-Werror` failures. To reduce noise,
-prefer `ParticleData` and `GasData` directly or wrap with `from_data` methods.
+An untagged legacy carrier is not native. Facade wrapping or stripping a tag is
+not a workaround. For initializers, `concentration_units="count"` preserves
+weights; explicit density units convert to counts using represented volume.
 
-## Single-box vs multi-box data
+## Replacement rejects a shape or layout
 
-Legacy facades assume a single box. The audited CPU baseline is:
+Particle masses use `(B,N,P)`, counts/weights and charge `(B,N)`, density `(P,)`
+and volume `(B,)`. Full gas concentration and environment saturation ratios use
+`(B,G)`. Temperature and pressure use `(B,)`; molar mass and gas flags use `(G,)`.
+Particle and gas species widths may differ. Keep every gas lane, including inert
+species.
 
-- Condensation public `ParticleData` and `GasData` paths accept only
-  `n_boxes == 1` and reject `n_boxes != 1`.
-- CPU coagulation `ParticleData` paths accept only `n_boxes == 1`; multi-box
-  inputs raise a clear `ValueError` instead of falling back to box `0`.
+Individual assignments validate against held peers. To change a gas width and
+its matching environment width together, use `aerosol.replace_data` with all
+three candidate containers. Rejection preserves held identities and candidate
+state. Construction/replacement validates structure and representation, not all
+later physical requirements or an unnamed permutation of chemistry. See the
+[executable replacement checks](containers.md#executable-access-and-replacement-walkthrough).
 
-For the support contract and caller-managed per-box loop guidance, see
-[Dynamics migration](dynamics.md#using-particledata-and-gasdata-in-dynamics).
+## A process rejects state after successful construction
 
-When legacy-shaped arrays are needed, index the first box explicitly:
+Raw arrays are writable; direct edits may introduce negative/nonfinite values.
+Processes revalidate their own physical domain and full expected gas order.
+Reordering or replacing gas does not update old process configuration. Recreate
+its explicit mapping only when the new order is intentional. Do not catch the
+error and retry with a facade.
 
-```python
-radii_single_box = particle_data.radii[0]
-concentration_single_box = gas_data.concentration[0]
-```
+Resolved coagulation requires equal positive active counts. Fractional counts
+are valid storage but that does not imply every process supports arbitrary
+weights. Binned coagulation also retains method-specific composition limits.
+Consult the process documentation instead of changing conservation tolerances.
 
-## `condensation_step_gpu` rejects my environment inputs
+## Multi-box storage is not general CPU execution
 
-`condensation_step_gpu(...)` validates environment inputs before Warp launch.
-Check the following first:
+Native CPU runnables remain single-box. Multi-box arrays must not be passed to a
+single-box process expecting implicit iteration. Application-owned per-box
+execution requires explicit independent state/configuration and result handling;
+there is no undocumented helper that slices/reassembles a complete simulation.
+See [dynamics migration](dynamics.md).
 
-- Do not mix direct `temperature` and `pressure` arguments with `environment=`
-  in the same call.
-- If `environment` is omitted, supply both direct thermodynamic inputs as
-  scalars, `(n_boxes,)` Warp arrays, or a supported hybrid.
-- Ensure direct or environment-owned `temperature` and `pressure` values are
-  positive and finite.
-- Ensure direct arrays match the particle and gas box count and live on the
-  same Warp device.
+## A GPU binding rejects state
 
-For a CPU-owned source of truth, keep using `EnvironmentData` and convert it
-only at the explicit `to_warp_environment_data()` boundary.
+Native condensation and nucleation bindings pin the exact carriers, arrays,
+devices, population metadata and complete gas-name provenance. Prepare them
+explicitly after conversion. Replacing CPU containers does not change existing
+device state; replacing Warp storage or restarting a resident session needs fresh
+explicit preparation. Radius-PDF particle upload is unsupported.
 
-## Direct-condensation troubleshooting and reproduction
+Direct condensation requires `thermodynamics=`. Supply either `environment=` or
+both direct temperature/pressure inputs, never both forms. Direct arrays must
+have shape `(B,)`, positive finite values and the active device. Configuration,
+scratch and diagnostic arrays must match their documented per-material,
+full-gas or per-box shapes and dtypes; equal widths are not a species map.
 
-Keep restored ordered gas names and thermodynamics-sidecar species order aligned
-with `gas.molar_mass`, including a valid water-species index. Particle and gas
-layouts retain their leading `(n_boxes, ...)` dimension, but sidecars have
-field-appropriate shapes: species configuration uses `(n_species,)`, scratch
-property fields use `(n_boxes,)`, and transfer fields use their required
-per-particle or per-species transfer shapes. Scalar indices, including the
-water-species index, remain scalar. Supplied scratch, latent-heat, and energy
-sidecars must be active-device `wp.float64`.
+## Restore lost names or derived state
 
-Use either `environment=` or both direct positive finite temperature/pressure
-inputs, with direct arrays on the active device. P2 inventory limiting bounds
-applied transfers rather than proving parity. Synchronize explicitly before host
-observation of caller-owned energy output. Warp `device="cpu"` is the baseline
-when installed; CUDA is optional/local and skips cleanly when CUDA is
-unavailable.
+`WarpGasData` does not own gas names. Pass the saved full ordered names to
+`from_warp_gas_data`; otherwise placeholders are produced. CPU `GasData` has no
+vapor-pressure field, so this device-only derived state is dropped on restore.
+Normal condensation refreshes it from current temperature and thermodynamics.
+Synchronize before host observation, or use the conversion helper's documented
+synchronization mode.
 
-For the single canonical command matrix, see the
-[GPU condensation command matrix](../data-containers-and-gpu-foundations.md#focused-reproduction-commands).
+Checkpoint CPU inspection carriers are also lossy. Explicit restart consumes
+canonical schema-v5 bytes on an exactly compatible device; it does not rebuild
+continuation from inspection data or silently migrate an old schema.
+
+## Reproduce the supported path
+
+Run the published scripts and their owning `examples_tests` suites from the
+selected E9-native checkout. Warp CPU is the installed-Warp baseline for
+uncaptured examples. Optional CUDA tests skip when unavailable; native capture
+has no CPU fallback. A no-Warp result must report that no kernel ran, not claim
+physics parity. See [focused reproduction commands](../data-containers-and-gpu-foundations.md#focused-reproduction-commands).

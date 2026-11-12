@@ -379,3 +379,37 @@ reported unavailable as above). Scoped Ruff checks/format and git diff --check
 passed. `.venv/bin/mkdocs build --strict` exited 0, built in 1.58s; informational
 link messages remain for P6/P7 reconciliation (`/tmp/m5-p5-mkdocs.log`).
 P5 is complete. P6, P7, full final-revision gates and the PR remain outstanding.
+
+
+### P6 native access and migration guide checkpoint (2026-11-11)
+
+Added docs/Examples/native_state_access.py with single-box resolved counts at
+0.25 m³, two material lanes and complete inert/organic/water gas provenance.
+It demonstrates held raw-array identity, detached density properties, individual
+container replacement, coordinated gas/environment width expansion, explicit
+new process configuration and independent mapped condensation conservation.
+Eight behavioral regressions check numerical units, copy isolation, derived
+property detachment, unchanged old/candidate data on individual/coordinated
+rejection, old process rejection after layout change, direct mutation validation,
+and real material uptake without inert-gas changes. Three more tests execute
+the exact Python snippets in construction, containers and dynamics Markdown.
+
+Rewrote all five particle-data-migration pages around the native target. Removed
+executable facade wrapping/bridge guidance, kept historical names in a clearly
+nonexecutable terminology table, corrected raw count versus density mappings,
+and replaced stale claims that tagged GPU uploads are rejected. Current native
+transfer/species-binding/schema-v5 restart boundaries and open-system resident
+diagnostics are stated explicitly. Construction retains its useful initializer,
+unit and sampling details. This does not remove legacy production APIs or claim
+a published release.
+
+Validation: `.venv/bin/python docs/Examples/native_state_access.py` exited 0;
+`.venv/bin/pytest examples_tests/native_state_access_example_test.py -q --no-cov`
+reported 11 passed in 1.53s. Scoped Ruff and format checks passed. Initial strict
+rendering caught two nonexistent example-index links; replaced with existing
+process guides. `.venv/bin/mkdocs build --strict` then exited 0, built in 1.58s
+(`/tmp/m5-p6-mkdocs.log`). Existing informational link audit remains for P6/P7.
+
+P6 remains in progress: broader foundations/process/API snippets, public
+quick-start integration fixture, navigation and inventory reconciliation are
+still pending. P7 and final full-repository gates remain outstanding.

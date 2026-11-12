@@ -1565,6 +1565,13 @@
       "phase": "P6",
       "disposition": "migrate with public quick starts",
       "execution": "pending"
+    },
+    {
+      "source": "docs/Examples/native_state_access.py",
+      "phase": "P6",
+      "disposition": "new native access/replacement and mapped condensation walkthrough",
+      "regression": "examples_tests/native_state_access_example_test.py",
+      "execution": "standalone passed; 11 example and exact Markdown snippet tests passed on 2026-11-11"
     }
   ],
   "navigation_audit": {

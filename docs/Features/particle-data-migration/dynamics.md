@@ -1,135 +1,99 @@
 ---
-title: Dynamics Migration
+title: Native dynamics migration
 ---
 
-# Dynamics Migration
+# Native dynamics migration
 
-## Using ParticleData and GasData in dynamics
+## Single-box CPU processes
 
-For the canonical support-boundary summary, including the leading `n_boxes`
-axis and explicit particle, gas, and environment helper boundaries, see
-[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md).
+Native runnables consume the current `Aerosol.particles`, `.gas` and
+`.environment` objects. They preserve those identities during in-place process
+execution. Their schema may store several boxes, but the supported CPU runnable
+path is single-box; it does not silently process box zero of a multi-box input.
 
-Condensation and coagulation strategies accept both legacy facades and the new
-data containers. The return type matches the input type, but container
-compatibility does not mean every CPU dynamics path supports multi-box
-execution.
-
-| CPU dynamics path | Containers accepted | Current CPU execution support | Multi-box CPU alternative |
-| --- | --- | --- | --- |
-| Condensation | Legacy `ParticleRepresentation` and `GasSpecies`, or `ParticleData` and `GasData` | `n_boxes == 1` only | Run a caller-managed per-box loop and pass one box at a time. |
-| Coagulation | Legacy `ParticleRepresentation`, or `ParticleData` | `n_boxes == 1` only | Run a caller-managed per-box loop and pass one box at a time. |
-
-The storage schema is broader than the audited CPU support boundary.
-`ParticleData` and `GasData` can store multiple boxes, but current CPU
-condensation and coagulation execution remains single-box. Multi-box inputs
-fail fast instead of silently reading or mutating box `0`.
-
-Existing process entry points may continue to accept scalar `temperature` and
-`pressure`. Only migrated process code should read `EnvironmentData` directly,
-and environment fields should remain read-only unless the physical model owns
-the update and refreshes derived state such as `saturation_ratio`.
-
-Supported single-box CPU usage:
+Run this excerpt from the selected native checkout. Its maintained constructors
+are in `docs/Examples/native_state_access.py`:
 
 ```python
-import particula as par
+from docs.Examples.native_state_access import build_aerosol, build_condensation
 
-activity_strategy = par.particles.ActivityIdealMass()
-surface_strategy = par.particles.SurfaceStrategyMass()
-vapor_pressure_strategy = par.gas.ConstantVaporPressureStrategy(2330.0)
-
-condensation = par.dynamics.CondensationIsothermal(
-    molar_mass=0.018,
-    activity_strategy=activity_strategy,
-    surface_strategy=surface_strategy,
-    vapor_pressure_strategy=vapor_pressure_strategy,
-)
-particle_out, gas_out = condensation.step(
-    particle=particle_data,
-    gas_species=gas_data,
-    temperature=298.15,
-    pressure=101325.0,
-    time_step=1.0,
-)
-
-coagulation = par.dynamics.BrownianCoagulationStrategy(
-    distribution_type="discrete"
-)
-particle_out = coagulation.step(
-    particle=particle_out,
-    temperature=298.15,
-    pressure=101325.0,
-    time_step=1.0,
-)
+aerosol = build_aerosol()
+condensation = build_condensation(aerosol.gas)
+particles, gas, environment = aerosol.particles, aerosol.gas, aerosol.environment
+assert condensation.execute(aerosol, time_step=4e8, sub_steps=4) is aerosol
+assert aerosol.particles is particles and aerosol.gas is gas
+assert aerosol.environment is environment
 ```
 
-For multi-box CPU execution, manage the box loop in application code. This is
-pseudocode, not a built-in Particula helper:
+The example explicitly maps water at gas lane 2 to particle material 0 and
+organic at gas lane 1 to material 1, retaining inert gas at lane 0. It supplies
+full gas-order molar masses and process-owned activity, surface and vapor-pressure
+strategies. Do not infer chemistry from equal array widths or discard inert gas.
+The runnable reads current environment and gas state during its substeps.
 
-```python
-for box_index in range(particle_data.n_boxes):
-    single_box_particle = build_single_box_particle_data(
-        particle_data,
-        box_index,
-    )
-    single_box_gas = build_single_box_gas_data(gas_data, box_index)
+| Process | Native guidance |
+|---|---|
+| `MassCondensation` | Explicit expected full gas order and material mapping; finite inventories; process-owned thermodynamics |
+| `Coagulation` | Match `distribution_type`; resolved native coagulation requires equal positive active counts; retained binned methods have composition limitations |
+| `Dilution` | Exponential finite-step decay of particle populations and every gas lane; masses per particle remain unchanged |
+| `WallLoss` | Match the population kind and geometry; resolved removal retires lost slots; gas is not a wall sink |
+| `Nucleation` | Explicit source/commit configuration and mapping; uses held environment and current gas; fixed capacity and exhaustion rules apply |
 
-    particle_box_out, gas_box_out = condensation.step(
-        particle=single_box_particle,
-        gas_species=single_box_gas,
-        temperature=298.15,
-        pressure=101325.0,
-        time_step=1.0,
-    )
+See the [condensation guide](../condensation_strategy_system.md),
+[coagulation guide](../coagulation_strategy_system.md), and
+[nucleation guide](../nucleation_strategy_system.md). The binned coagulation
+limitation is not a tolerance to relax: radius-varying composition can require a
+resolved model. A composed `first | second` sequence executes each full cycle
+with equal substep durations and reads the state left by preceding processes.
 
-    particle_box_out = coagulation.step(
-        particle=particle_box_out,
-        temperature=298.15,
-        pressure=101325.0,
-        time_step=1.0,
-    )
+Direct array mutation is caller-owned. Process validation still applies on the
+next invocation. Aggregate replacement validates shape/representation before
+publication, but it does not rewrite a process's expected gas order or physical
+configuration. Rebuild that configuration explicitly when its meaning changes.
+Validation rejection is distinct from rollback after a process writer runs;
+there is no blanket whole-sequence rollback guarantee.
 
-    # Reassemble results in caller-owned storage.
-```
+## Direct Warp steps
 
-Use `EnvironmentData` for CPU-owned per-box `temperature`, `pressure`, and
-`saturation_ratio`. `GasData` does not own these fields. Keep scalar inputs
-where process APIs have not migrated, and use explicit conversion helpers for
-GPU round trips. Kernels and runnables do not move environment state for the
-caller.
+Import steps from `particula.gpu.kernels`. Conversion helpers remain under
+`particula.gpu`; maps, scratch and resident configuration remain at their concrete
+modules. See the maintained
+[direct quick start](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
+and [five-process sequence](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py).
 
-## `condensation_step_gpu` environment inputs
+Explicitly convert native discrete/resolved data; radius PDFs cannot be
+uploaded. Raw resolved concentration stays counts. Condensation couples gas
+through counts/volume, and extensive energy weights transfers by counts.
+Keep full ordered gas names externally. Prepare a condensation or nucleation
+species binding against the exact transferred carriers, with explicit lane
+pairs and full expected gas order. Replacing storage invalidates that binding;
+normal dispatch does not silently recreate it.
 
-The bounded direct GPU condensation path is imported with
-`from particula.gpu.kernels import condensation_step_gpu`. Explicitly convert
-with `to_warp_*` before the call and restore with `from_warp_*` afterward;
-preserve ordered species names outside GPU containers. Callers also own required
-synchronization and checkpoint/snapshot responsibility. See the authoritative
-[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
-page for its modes and schema matrix rather than duplicating that matrix here.
+`condensation_step_gpu` requires `thermodynamics=` and native `species_binding=`.
+It returns the identical particle carrier and whole-call transfer accumulator;
+gas mutates in place and optional energy is a caller-owned output, not a third
+return. Four equal fixed substeps refresh derived vapor pressure and couple later
+proposals to updated gas. This is the bounded direct method, not general CPU
+strategy parity, adaptive stepping or a high-level runnable.
 
-The non-executable signature is
-`particles_out, mass_transfer = condensation_step_gpu(...,
-thermodynamics=thermodynamics)`. `thermodynamics=` is required and is
-caller-owned device-local configuration. Particle masses and
-`gas.concentration` mutate in place; there is no second gas return value.
-Caller-supplied GPU vapor pressure is derived, non-authoritative state that the
-step overwrites.
+Temperature and pressure may be positive finite scalars or same-device `(B,)`
+Warp arrays, including scalar/array hybrids. Alternatively supply
+`environment=WarpEnvironmentData` and omit both direct inputs. Never mix these
+forms. Synchronize explicitly before host observation/restoration. Validation
+may synchronize flags internally; simulation-state transfers remain explicit.
 
-Direct temperature and pressure inputs may be positive-finite scalars,
-same-device Warp arrays with shape `(n_boxes,)`, or hybrid scalar/Warp-array
-inputs. Alternatively, pass `environment=WarpEnvironmentData` with both direct
-inputs omitted; its `(n_boxes,)` values must be positive finite and on the same
-device. Temperature and pressure remain environment-owned state, not `GasData`
-fields.
+## Resident and capture paths
 
-The step executes four fixed equal substeps, uses caller-owned reusable scratch
-and diagnostic buffers, P2 inventory finalization, and gas coupling for later
-proposals. Its transfer is a whole-call total; optional caller-owned energy
-output is not a third return value. This is not a high-level `Aerosol` or
-`Runnable` API, automatic fallback, or hidden simulation-state transfer.
-Callers synchronize before host observation or restoration; CUDA preflight
-validation-flag readbacks may synchronize without transferring simulation
-state. It also does not add adaptive stepping, new physics or container
-support, BAT, or staggered/Gauss-Seidel support.
+The [resident multi-timestep example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py)
+prepares exact session/registry/guard ownership and process mappings, then runs
+the maintained twelve-node composition. After explicit same-device restart it
+prepares new mappings against fresh carriers. Its prescribed gas and wall loss
+make it an open system: zero-ledger residuals report net inventory change,
+not zero closed-system drift.
+
+Uncaptured examples use Warp CPU when installed. The
+[native capture example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py)
+requires CUDA and never substitutes CPU or Warp CPU. Optional CUDA absence is
+not performance evidence. See [container foundations](../data-containers-and-gpu-foundations.md)
+for transfers and [resident checkpoints](../gpu_resident_checkpoints.md) for
+canonical-byte continuation and lossy inspection boundaries.

@@ -1,10 +1,11 @@
 # Native aerosol construction and replacement
 
-This developer reference describes the E9-M2 construction API. Scientific
-process and runnable migration remains E9-M3/M4 work; native construction alone
-does not make an existing legacy runnable compatible with the new aggregate.
-The [M1 delivered contract](https://github.com/uncscode/particula/blob/main/.opencode/plans/sections/maintenance/E9-M1/appendix.md#p5-delivered-contract-reconciliation-2026-11-10-issue-1614)
-owns representation semantics. See also [container foundations](../data-containers-and-gpu-foundations.md).
+This guide describes native construction used by the supported migrated
+examples. Native CPU processes and runnables consume these held containers;
+see [dynamics migration](dynamics.md) for configuration and single-box limits.
+The [access walkthrough](containers.md) demonstrates executable replacement and
+rejection checks. Use the selected E9-native checkout, not an assumed older
+published package. See also [container foundations](../data-containers-and-gpu-foundations.md).
 
 ## Assemble three containers
 
@@ -154,18 +155,20 @@ Differing rows/lanes reject. Canonical `(B,N)` charge shape takes precedence;
 no values are discarded in that form. Radius helpers require a single material;
 use explicit species masses for mixtures. Inputs are never modified.
 
-## Protected boundaries and transition
+## Explicit execution boundaries
 
-Tagged native particle data currently **rejects** upload through
-`to_warp_particle_data`: the existing Warp carrier cannot preserve distribution
-metadata/grid. Untagged legacy transfers remain explicit; never strip a native
-tag to bypass this boundary. No tagged GPU/PDF execution, checkpoint support,
-automatic synchronization, CPU fallback or device selection is added by M2.
+Native discrete and resolved particle uploads preserve their tag and raw
+concentration values. Radius-PDF upload is unsupported; never strip metadata to
+bypass validation. Gas names remain externally owned, and native condensation
+and nucleation require explicit exact-carrier species bindings. Direct and
+resident examples show their concrete preparation APIs and synchronization.
 
-Old simulations use `particula._legacy_aerosol.Aerosol` and `AerosolBuilder`
-through explicit temporary imports. They preserve their historical reference and
-mutation behavior, with no native conversion or atmosphere-emulating property.
-M3 owns scientific migration, M4 orchestration/adapters, M5 full examples, and M6
-removes the remaining legacy APIs and tests after their consumers migrate.
-The new aggregate supports batched containers; it does not broaden CPU process
-execution beyond its existing supported box/weight combinations.
+A CPU aggregate replacement cannot rebind existing device arrays or a prepared
+resident request. Explicit restart uses a fresh same-device binding and schema-v5
+canonical checkpoint bytes; CPU inspection is not continuation authority.
+There is no implicit transfer, fallback, migration or recovery. Batched storage
+does not broaden CPU execution beyond supported single-box process contracts.
+
+Legacy facade and bridge removal belongs to M6 after the examples/documentation
+gate. These temporary implementations are not a supported construction path for
+native examples, and this guide does not authorize a release.

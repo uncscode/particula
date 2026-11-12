@@ -1,205 +1,126 @@
 ---
-title: Container and Facade Migration
+title: Native container access and ownership
 ---
 
-# Container and Facade Migration
+# Native container access and ownership
 
-This page maps legacy particle and gas facades to their data-container
-equivalents. See the [migration overview](index.md) for ownership and support
-boundaries.
+Use the native `Aerosol(particles=..., gas=..., environment=...)` aggregate
+from the selected E9 checkout. It retains three supplied containers by identity.
+The [construction guide](construction.md) covers initializers and builders;
+[the executable access example](https://github.com/uncscode/particula/blob/main/docs/Examples/native_state_access.py)
+covers access, replacement and a subsequent mapped process.
 
-## Quick migration
+## Raw fields and derived quantities
 
-### Particle data (before to after)
+Let `B` be boxes, `N` slots, `P` particle materials and `G` full gas species.
+Particle and gas widths may differ. Gas order includes inert species; matching
+array widths alone never establishes chemical correspondence.
 
-```python
-import numpy as np
-import particula as par
+| Native field or property | Shape | Meaning and ownership |
+|---|---|---|
+| `aerosol.particles` / `.gas` / `.environment` | Container | Actual held object, not a copy |
+| `particles.masses` | `(B,N,P)` | Writable kg per represented particle/material |
+| `particles.concentration` | `(B,N)` | Writable counts, PMF density or radius-PDF density according to the explicit kind |
+| `particles.charge` | `(B,N)` | Writable elementary-charge units |
+| `particles.density` | `(P,)` | Material density, kg/m³ |
+| `particles.volume` | `(B,)` | Authoritative represented volume, m³ |
+| `particles.radii` | `(B,N)` | Fresh radii in m, derived from mass/material density |
+| `particles.total_mass` | `(B,N)` | Fresh total kg per particle; not bulk inventory |
+| `particles.effective_density` | `(B,N)` | Fresh retained mass-weighted material-density diagnostic |
+| `particles.mass_fractions` | `(B,N,P)` | Fresh per-particle mass fractions |
+| `particles.slot_concentration_density` | `(B,N)` | Fresh m⁻³ for discrete/resolved, m⁻⁴ for radius PDFs |
+| `particles.number_density` | `(B,)` | Fresh integrated/summed number density, m⁻³ |
+| `particles.species_mass_density` | `(B,P)` | Fresh particle mass density, kg/m³ |
+| `particles.species_mass_inventory` | `(B,P)` | Fresh extensive particle mass, kg |
+| `gas.name` | `G` names | Full ordered CPU-owned provenance |
+| `gas.concentration` | `(B,G)` | Writable gas mass density, kg/m³ |
+| `gas.molar_mass` / `.partitioning` | `(G,)` | kg/mol and Boolean gas flags |
+| `environment.temperature` / `.pressure` | `(B,)` | Writable K and Pa |
+| `environment.saturation_ratio` | `(B,G)` | Full gas-order dimensionless state |
 
-# Legacy facade
-rep = par.particles.ParticleRepresentation(
-    strategy=par.particles.MassBasedMovingBin(),
-    activity=par.particles.ActivityIdealMass(),
-    surface=par.particles.SurfaceStrategyMass(),
-    distribution=np.array([1e-18, 2e-18, 3e-18]),
-    density=np.array([1200.0]),
-    concentration=np.array([1e5, 1e5, 1e5]),
-    charge=np.zeros(3),
-    volume=1e-6,
-)
+Raw array access aliases storage. Derived particle properties compute detached
+arrays; modifying a derived radius or number-density result does not update
+masses or counts. `copy()` explicitly detaches a container. Population-derived
+properties validate the current representation on each read; raw mutation
+itself does not enforce process-specific physics.
 
-# New data container
-from particula.particles import ParticleData
+For resolved data, `concentration` is **counts**, and per-slot number density is
+`concentration / volume[:, None]`. For PMFs, sum densities. For radius PDFs,
+integrate `dN/dr` and mass times `dN/dr` over the explicit radius grid; do not
+sum PDF nodes. Discrete/PDF volume is exactly 1 m³. See
+[distribution rules](construction.md#distribution-and-volume-rules).
 
-data = ParticleData(
-    # (n_boxes, n_particles, n_species)
-    masses=rep.get_species_mass()[None, ...],
-    concentration=rep.get_concentration()[None, ...],
-    charge=rep.get_charge()[None, ...],
-    density=rep.get_density(),
-    volume=np.array([rep.get_volume()]),
-)
+## Executable access and replacement walkthrough
+
+Run from the selected native checkout:
+
+```bash
+python docs/Examples/native_state_access.py
+pytest examples_tests/native_state_access_example_test.py -q --no-cov
 ```
 
-### Gas data (before to after)
+The following excerpt uses that maintained example's native constructors:
 
 ```python
-import numpy as np
-import particula as par
+from docs.Examples.native_state_access import build_aerosol, replacement_layout
 
-# Legacy facade
-species = par.gas.GasSpecies(
-    name="Water",
-    molar_mass=0.018,
-    vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(2330.0),
-    concentration=1e-6,
-)
+aerosol = build_aerosol()
+held = aerosol.particles
+assert held is aerosol.particles
+counts = held.concentration
+assert counts is held.concentration
 
-# New data container
-from particula.gas import GasData
+# Compatible individual replacement retains the supplied identity.
+candidate = held.copy()
+aerosol.particles = candidate
+assert aerosol.particles is candidate
 
-gas_data = GasData(
-    name=["Water"],
-    molar_mass=np.array([0.018]),
-    concentration=np.array([[1e-6]]),  # (n_boxes, n_species)
-    partitioning=np.array([True]),
-)
+# Adding a gas requires a matching environment width. Publish both together.
+particles, gas, environment = replacement_layout(aerosol)
+aerosol.replace_data(particles=particles, gas=gas, environment=environment)
+assert aerosol.gas is gas and aerosol.environment is environment
 ```
 
-## ParticleRepresentation to ParticleData
+All three arguments to `replace_data` are required. Each setter and coordinated
+replacement validates the whole candidate triple before publishing references.
+A rejection preserves old and candidate state. Same-object assignments also
+revalidate. This is validation atomicity, not thread safety or rollback of an
+already launched process.
 
-### Constructor mapping
+Replacement selects new state; it does not conserve, rescale or merge the old
+inventory. Shape compatibility does not validate an unchanged process's gas
+order. Rebuild process-owned mappings when the intended chemistry/order changes.
+Direct mutation can invalidate physical values even when shapes stay unchanged;
+the next process call must reject invalid current inputs before its documented
+write boundary. Prepared GPU/resident resources still refer to their original
+carriers and require explicit new preparation after replacement or restart.
 
-| Legacy input | ParticleData field | Notes |
-| --- | --- | --- |
-| `distribution` | `masses` | Convert to per-species masses. |
-| `density` | `density` | 1D array of species densities. |
-| `concentration` | `concentration` | Shape `(n_boxes, n_particles)`. |
-| `charge` | `charge` | Shape `(n_boxes, n_particles)`. |
-| `volume` | `volume` | Shape `(n_boxes,)`. |
-| `strategy` | _behavior_ | Keep strategy separate from data. |
-| `activity` | _behavior_ | Remains in activity strategies. |
-| `surface` | _behavior_ | Remains in surface strategies. |
+## Historical terminology — unsupported before-state
 
-### Property and method mapping
+This table is migration history, not executable instructions. Legacy facade
+constructors, `.data` wrapping, `from_data`, `from_representation`,
+`to_representation`, `from_species` and `to_species` are not supported native
+construction or migration steps. Do not strip a native tag to cross a bridge.
 
-| Legacy API | ParticleData equivalent | Notes |
-| --- | --- | --- |
-| `get_radius()` | `data.radii` | Computed from mass and density. |
-| `get_mass()` | `data.total_mass` | Total per particle. |
-| `get_species_mass()` | `data.masses` | Per-species masses. |
-| `get_density()` | `data.density` | Density per species. |
-| `get_concentration()` | `data.concentration` | 2D array by box. |
-| `get_charge()` | `data.charge` | 2D array by box. |
-| `get_volume()` | `data.volume` | Per-box volume. |
-| `get_effective_density()` | `data.effective_density` | Mass-weighted density. |
-| `get_total_concentration()` | `data.concentration.sum(axis=1)` | Per box. |
+| Historical API | Native replacement |
+|---|---|
+| `ParticleRepresentation.get_species_mass()` | `particles.masses` |
+| `get_radius()` / `get_mass()` | `particles.radii` / `particles.total_mass` |
+| `get_concentration()` | Choose raw counts or `slot_concentration_density` explicitly |
+| `get_total_concentration()` | `particles.number_density` |
+| `GasSpecies.get_concentration()` | `gas.concentration`, retaining the box axis |
+| `Atmosphere` nested inside an aerosol | Separate `GasData` and `EnvironmentData` |
+| Facade-owned activity, surface and vapor-pressure strategies | Process-owned scientific configuration |
 
-!!! note
-    `ParticleData` keeps the batch dimension. If you used a single-box facade,
-    index `data.concentration[0]` or `data.radii[0]` for the legacy shape.
+Old numerical normalization errors are not parity targets. Determine the
+original physical measure before initializing native storage.
 
-## GasSpecies to GasData
+## Explicit Warp boundary
 
-### Constructor mapping
-
-| Legacy input | GasData field | Notes |
-| --- | --- | --- |
-| `name` | `name` | List of species names. |
-| `molar_mass` | `molar_mass` | 1D array of molar masses. |
-| `concentration` | `concentration` | Shape `(n_boxes, n_species)`. |
-| `partitioning` | `partitioning` | 1D boolean array. |
-| `vapor_pressure_strategy` | _behavior_ | Remains on the facade. |
-
-### Property and method mapping
-
-| Legacy API | GasData equivalent | Notes |
-| --- | --- | --- |
-| `get_name()` | `data.name` | List of names. |
-| `get_molar_mass()` | `data.molar_mass` | 1D array. |
-| `get_concentration()` | `data.concentration[box_index]` | Select a box. |
-| `get_partitioning()` | `data.partitioning` | Boolean mask by species. |
-
-!!! note
-    Vapor pressure calculations remain on `GasSpecies`. Use the facade when
-    strategy-driven behavior is required, and pass `GasData` where only data
-    is required.
-
-### GasData and WarpGasData migration summary
-
-For the canonical transfer boundary and support limits, see
-[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md).
-
-Migration-focused rules of thumb:
-
-- Keep the leading box axis explicit. Single-box gas arrays still use
-  `(1, n_species)`.
-- Treat `name` as caller-owned metadata at the restore boundary. Supplying the
-  original ordered names gives a semantic round trip; omitting `name` or
-  passing `name=None` produces placeholders only.
-- Treat `partitioning` as a CPU boolean API and a GPU numeric mask.
-- Treat `vapor_pressure` as GPU sidecar process state that must be preserved
-  or recomputed outside `GasData` after restore.
-
-Example CPU-to-GPU-to-CPU handoff:
-
-```python
-import numpy as np
-
-from particula.gpu import from_warp_gas_data, to_warp_gas_data
-
-vapor_pressure = np.array([[2330.0, 120.0]])  # (1, n_species)
-gpu_gas = to_warp_gas_data(
-    gas_data,
-    device="cpu",
-    vapor_pressure=vapor_pressure,
-)
-restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
-
-# Preserve ordered names outside WarpGasData and keep any vapor-pressure
-# sidecar separately (or recompute it) on the CPU side.
-```
-
-## Gradual migration with `.data`
-
-Both legacy facades expose their underlying data containers:
-
-```python
-particle_data = rep.data
-gas_data = species.data
-```
-
-To wrap data without emitting deprecation logs, use each facade's class
-method:
-
-```python
-rep = par.particles.ParticleRepresentation.from_data(
-    data=particle_data,
-    strategy=par.particles.MassBasedMovingBin(),
-    activity=par.particles.ActivityIdealMass(),
-    surface=par.particles.SurfaceStrategyMass(),
-    distribution=particle_data.total_mass[0],
-)
-
-species = par.gas.GasSpecies.from_data(
-    data=gas_data,
-    vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(2330.0),
-)
-```
-
-## Conversion helpers
-
-Use conversion helpers when bridging old and new APIs:
-
-- `from_representation` and `to_representation` for particle data. They are
-  exported from `particula.particles`.
-- `from_species` and `to_species` for gas data. They are exported from
-  `particula.gas`.
-
-```python
-from particula.gas import from_species
-from particula.particles import from_representation
-
-particle_data = from_representation(rep, n_boxes=1)
-gas_data = from_species(species, n_boxes=1)
-```
+Native discrete and resolved particle transfers retain population metadata and
+raw concentration values. Radius-PDF upload is unsupported. Preserve the full
+ordered gas names externally; `WarpGasData` has no names. A gas restore without
+names produces placeholders, and always drops GPU-only vapor-pressure storage.
+Native condensation/nucleation require explicit process species bindings for the
+exact transferred carriers. See [dynamics migration](dynamics.md) and
+[container foundations](../data-containers-and-gpu-foundations.md).
