@@ -586,3 +586,39 @@ Validation:
 - Scoped Ruff/format and whitespace checks passed.
 No production stepping changed. Remaining shared condensation compatibility
 and all final release/publication gates remain pending.
+
+## Native resolved latent-heat condensation regressions
+
+Migrated all 44 remaining latent-heat methods into
+`native_latent_condensation_test.py`, guarded against facade construction.
+Fixtures now directly create resolved ParticleData and full ordered GasData;
+physics and species maps are explicit process inputs. Preserved material
+properties, gas saturation/loading, representative volume, latent/transport
+settings and numerical tolerances. Updated every original node's successor.
+
+Native shape assertions retain both particle/species axes, including the
+single-species case. Former facade-type checks now assert native types and
+input identity. Native admission intentionally rejects the old -1e-13 count
+instead of the obsolete norm-concentration helper's tolerance clamp; a mapped
+replacement verifies rejection without mutation. Error expectations follow
+existing native validation rather than compatibility helper messages.
+
+Moved nonfinite-pressure, gas exhaustion and viscosity probes to the active
+native calculation boundary. Nonfinite pressure injection is asserted consumed
+and produces exact zero lanes. Surface-pressure checks now inspect the mapped
+native calculation, including rejection of nonfinite Kelvin values. Gas-update
+oracle derives representable per-particle increments from the independent
+proposal calculation before count/volume scaling, retaining rtol=1e-15/atol=0.
+Energy oracles convert mass-density transfer into extensive mass using volume;
+latent energy continues to mean J, not J/m^3. No production math changed.
+
+Validation:
+- Focused native latent suite: **44 passed in 0.07s** after correcting native
+  shape/error/seam expectations, `/tmp/m6-native-latent-third.log`.
+- Final full condensation tree plus integration: **729 passed, 1 skipped
+  in 9.21s**, `/tmp/m6-native-latent-broad.log`.
+- Full-package mypy: **555 files passed**, `/tmp/m6-native-latent-mypy.log`;
+  final changed-file annotation check passed,
+  `/tmp/m6-native-latent-types-final.log`.
+- Scoped Ruff/format and whitespace checks passed.
+Isothermal/staggered fixture migration and shared strategy removal remain.

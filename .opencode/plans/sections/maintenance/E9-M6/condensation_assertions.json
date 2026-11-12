@@ -809,8 +809,8 @@
       "assertions": [
         "self.assertIs(cond._latent_heat_strategy, strategy)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_instantiation_with_strategy"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_instantiation_with_constant_fallback",
@@ -819,24 +819,24 @@
         "self.assertIsInstance(cond._latent_heat_strategy, ConstantLatentHeat)",
         "self.assertEqual(cond._latent_heat_strategy.latent_heat_ref, 2.26e6)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_instantiation_with_constant_fallback"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_instantiation_isothermal_fallback",
       "assertions": [
         "self.assertIsNone(cond._latent_heat_strategy)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_instantiation_isothermal_fallback"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_resolution_priority_strategy_over_constant",
       "assertions": [
         "self.assertIs(cond._latent_heat_strategy, strategy)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_resolution_priority_strategy_over_constant"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_resolution_with_array_latent_heat_logs_and_falls_back",
@@ -845,8 +845,8 @@
         "self.assertTrue(\n            any(\n                \"Array-like latent_heat\" in record.getMessage()\n                for record in cm.records\n            )\n        )",
         "self.assertLogs(\"particula\", level=\"WARNING\")"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_resolution_with_array_latent_heat_logs_and_falls_back"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_resolution_with_negative_latent_heat_logs_and_falls_back",
@@ -855,16 +855,16 @@
         "self.assertTrue(\n            any(\n                \"Negative latent_heat\" in record.getMessage()\n                for record in cm.records\n            )\n        )",
         "self.assertLogs(\"particula\", level=\"WARNING\")"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_resolution_with_negative_latent_heat_logs_and_falls_back"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_last_latent_heat_energy_initialized",
       "assertions": [
         "self.assertEqual(cond.last_latent_heat_energy, 0.0)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_last_latent_heat_energy_initialized"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_base_class_params_forwarded",
@@ -874,40 +874,40 @@
         "self.assertEqual(cond.accommodation_coefficient, 0.7)",
         "self.assertFalse(cond.update_gases)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_base_class_params_forwarded"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_isothermal_parity",
       "assertions": [
         "np.testing.assert_allclose(latent_rate, iso_rate, rtol=1e-15)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_isothermal_parity"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_rate_isothermal_parity",
       "assertions": [
         "np.testing.assert_allclose(latent_rate, iso_rate, rtol=1e-15)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_rate_isothermal_parity"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_reduced_with_latent_heat",
       "assertions": [
         "self.assertTrue(np.all(np.abs(latent_rate) <= np.abs(iso_rate) + 1e-30))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_reduced_with_latent_heat"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_single_species",
       "assertions": [
         "self.assertEqual(rate.shape, (1,))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_single_species"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_get_vapor_pressure_surface_single_species",
@@ -915,16 +915,16 @@
         "self.assertEqual(vapor_pressure_surface.shape, (3,))",
         "self.assertTrue(np.all(np.isfinite(vapor_pressure_surface)))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_get_vapor_pressure_surface_single_species"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_multi_species",
       "assertions": [
         "self.assertEqual(rate.shape, (1, 2))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_multi_species"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_get_vapor_pressure_surface_multi_species",
@@ -932,32 +932,32 @@
         "self.assertEqual(vapor_pressure_surface.shape, (1, 2))",
         "self.assertTrue(np.all(np.isfinite(vapor_pressure_surface)))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_get_vapor_pressure_surface_multi_species"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_rate_scales_by_concentration",
       "assertions": [
         "np.testing.assert_allclose(double_rate, base_rate * 2.0, rtol=1e-15)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_rate_scales_by_concentration"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_rate_respects_skip_partitioning",
       "assertions": [
         "self.assertTrue(np.all(rates[:, 1] == 0.0))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_rate_respects_skip_partitioning"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_rate_skip_partitioning_out_of_bounds_raises",
       "assertions": [
         "self.assertRaises(IndexError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_rate_skip_partitioning_out_of_bounds_raises"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_nonfinite_pressure_delta_sanitized",
@@ -965,40 +965,40 @@
         "self.assertTrue(np.all(np.isfinite(rates)))",
         "self.assertTrue(np.allclose(rates, 0.0))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_nonfinite_pressure_delta_sanitized"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_nonfinite_pressure_delta_matches_isothermal",
       "assertions": [
         "np.testing.assert_allclose(latent_rates, iso_rates, rtol=1e-14)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_nonfinite_pressure_delta_matches_isothermal"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_nonfinite_latent_heat_raises",
       "assertions": [
         "self.assertRaises(ValueError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_nonfinite_latent_heat_raises"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_nonfinite_thermal_conductivity_raises",
       "assertions": [
         "self.assertRaises(ValueError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_nonfinite_thermal_conductivity_raises"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_nonfinite_vapor_pressure_surface_raises",
       "assertions": [
         "self.assertRaises(ValueError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_nonfinite_vapor_pressure_surface_raises"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_inherited_methods_work",
@@ -1006,32 +1006,32 @@
         "self.assertGreater(mean_free_path, 0.0)",
         "self.assertGreater(knudsen_number, 0.0)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_inherited_methods_work"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_mass_conservation_single_species",
       "assertions": [
         "self.assertLess(relative_error, 1e-12)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_mass_conservation_single_species"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_mass_conservation_multi_species",
       "assertions": [
         "self.assertLess(relative_error, 1e-12)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_mass_conservation_multi_species"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_mass_conservation_data_only",
       "assertions": [
         "self.assertLess(relative_error, 1e-12)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_mass_conservation_data_only"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_10_bins_mass_conservation",
@@ -1136,24 +1136,24 @@
       "assertions": [
         "self.assertRaisesRegex(ValueError, \"volume must be finite\")"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_rejects_nonpositive_volume"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_rejects_invalid_concentration_for_norm_conc",
       "assertions": [
         "self.assertRaisesRegex(\n                    ValueError, \"concentration must be finite\"\n                )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_rejects_invalid_concentration_for_norm_conc"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_energy_tracking_matches_dm_times_l",
       "assertions": [
         "np.testing.assert_allclose(\n            cond.last_latent_heat_energy,\n            np.sum(mass_transfer * latent_heat),\n            rtol=1e-14,\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_energy_tracking_matches_dm_times_l"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_energy_tracking_update_gases_false",
@@ -1161,24 +1161,24 @@
         "np.testing.assert_allclose(\n            gas_species.get_concentration(), initial_conc, rtol=1e-15\n        )",
         "np.testing.assert_allclose(\n            cond.last_latent_heat_energy,\n            np.sum(mass_transfer * latent_heat),\n            rtol=1e-14,\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_energy_tracking_update_gases_false"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_energy_tracking_data_inputs",
       "assertions": [
         "np.testing.assert_allclose(\n            cond.last_latent_heat_energy,\n            np.sum(mass_transfer * latent_heat),\n            rtol=1e-14,\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_energy_tracking_data_inputs"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_energy_tracking_skip_partitioning",
       "assertions": [
         "np.testing.assert_allclose(\n            cond.last_latent_heat_energy,\n            np.sum(mass_transfer * latent_heat),\n            rtol=1e-14,\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_energy_tracking_skip_partitioning"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_energy_sign_convention",
@@ -1186,8 +1186,8 @@
         "self.assertGreater(cond.last_latent_heat_energy, 0.0)",
         "self.assertLess(cond.last_latent_heat_energy, 0.0)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_energy_sign_convention"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_isothermal_parity",
@@ -1196,8 +1196,8 @@
         "np.testing.assert_allclose(\n            gas_out.get_concentration(),\n            gas_iso_out.get_concentration(),\n            rtol=1e-15,\n        )",
         "self.assertEqual(latent_cond.last_latent_heat_energy, 0.0)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_isothermal_parity"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_returns_correct_types_legacy",
@@ -1205,8 +1205,8 @@
         "self.assertIsInstance(particle_new, ParticleRepresentation)",
         "self.assertIsInstance(gas_new, GasSpecies)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths. Legacy return types intentionally removed; native types and exact input identity now asserted.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_retains_native_objects"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_returns_correct_types_data",
@@ -1214,24 +1214,24 @@
         "self.assertIsInstance(particle_new, ParticleData)",
         "self.assertIsInstance(gas_new, GasData)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_returns_correct_types_data"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_updates_gas_when_enabled",
       "assertions": [
         "np.testing.assert_allclose(\n            gas_new.get_concentration(), expected_gas, rtol=1e-15\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths. Gas oracle accounts for representable per-particle mass increments before count/volume scaling; rtol=1e-15 and atol=0 remain unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_updates_gas_when_enabled"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_clamps_gas_concentration_nonnegative",
       "assertions": [
         "np.testing.assert_allclose(gas_new.concentration[0], 0.0, rtol=1e-15)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_clamps_gas_concentration_nonnegative"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_calculate_norm_conc_clamps_small_negative",
@@ -1239,32 +1239,32 @@
         "self.assertTrue(np.all(norm_conc >= 0.0))",
         "self.assertEqual(norm_conc[1], 0.0)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths. Legacy tolerance-clamping helper is obsolete: native admission rejects every negative count, including original -1e-13, without mutation; replacement test explicitly asserts that strengthened boundary.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_small_negative_concentration_rejects_without_mutation"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_rejects_invalid_time_step",
       "assertions": [
         "self.assertRaisesRegex(ValueError, \"time_step must be finite\")"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_rejects_invalid_time_step"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_get_vapor_pressure_surface_rejects_nonfinite_kelvin",
       "assertions": [
         "self.assertRaisesRegex(\n                ValueError, \"kelvin_term must be finite\"\n            )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_get_vapor_pressure_surface_rejects_nonfinite_kelvin"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_dynamic_viscosity_pass_through",
       "assertions": [
         "self.assertEqual(spy.call_args.kwargs[\"dynamic_viscosity\"], override)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_dynamic_viscosity_pass_through"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_mass_condensation_runnable_compatibility",
@@ -1274,8 +1274,8 @@
         "self.assertIsInstance(aerosol_iso_out.particles, ParticleRepresentation)",
         "self.assertIsInstance(\n            aerosol_iso_out.atmosphere.partitioning_species, GasSpecies\n        )"
       ],
-      "disposition": "Migrated both latent-enabled and disabled runnable cases to native data with explicit full gas physics and mapping; original facade-type assertions replaced by native-type plus exact held-object identity checks.",
-      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_mass_condensation_runnable_compatibility"
+      "disposition": "Migrated native resolved fixture with explicit process physics, full ordered gas molar masses and map. Retained physical inputs, numerical thresholds, latent/isothermal comparisons, gas-update and failure assertions; energy oracle converts density transfer to extensive mass using physical volume. Native single-species arrays retain both particle/species axes. Mocks target active native calculation paths.",
+      "native_successor": "particula/dynamics/condensation/tests/native_latent_condensation_test.py::TestCondensationLatentHeat::test_step_mass_condensation_runnable_compatibility"
     }
   ]
 }
