@@ -13,7 +13,7 @@ The direct condensation call begins the illustrative [explicit-transfer sequence
 
 The condensation strategy system models mass transfer between gas and particle
 phases using the same object-oriented patterns as wall loss and coagulation.
-Strategies expose `rate` and `step`, work with `ParticleRepresentation` across
+Strategies expose `rate` and `step`, work with native `ParticleData` across
 "discrete", "continuous_pdf", and "particle_resolved" modes, and plug directly
 into runnable pipelines. You can choose simultaneous isothermal updates or
 staggered two-pass Gauss-Seidel sweeps with theta-controlled first-pass
@@ -92,9 +92,8 @@ Fully evaporated resolved particles leave subsequent staggered batches/sweeps.
 
 CPU native calls require one box and revalidate mutable state at each entry.
 They preserve carrier and destination-array identities and reject protected
-storage overlap before writes. Existing facade/untagged examples below retain
-their temporary compatibility behavior. Runnable, adapter and resident
-integration are owned by M4; broad tutorial migration is owned by M5.
+storage overlap before writes. The examples below use native state and process-owned physics. Legacy facade
+execution remains available for compatibility until the separate M6 removal.
 
 ## Key Benefits
 
@@ -129,6 +128,17 @@ Concrete condensation implementations are exported alongside other dynamics
 components, while the abstract base interface remains available from the
 condensation subpackage:
 
+Run the following setup once before the other Python snippets on this page.
+Each recipe then creates fresh aligned state with the indicated molar masses;
+no recipe silently reuses a different species layout. These examples require
+the selected E9 checkout (`pip install -e .`). The shared illustrative PMF uses
+64 nodes over 50–500 nm, mode 100 nm, GSD 1.5 and 1e8 m⁻³; resolved examples
+use two unit-count slots in 1e-6 m³. The discrete quick start below retains the
+default two-mode, 250-bin initializer. Vapor pressures are prescribed at
+1e-3 Pa for this illustration, not calibrated species properties. No grid or
+timestep convergence is claimed. Composed wall-loss runs preserve their stated
+elapsed durations with 0.25-second substeps to avoid negative native proposals.
+
 ```python
 import particula as par
 
@@ -145,6 +155,50 @@ par.dynamics.CondensationIsothermalBuilder
 par.dynamics.CondensationIsothermalStaggeredBuilder
 par.dynamics.CondensationLatentHeatBuilder
 par.dynamics.CondensationFactory
+
+import numpy as np
+from particula.dynamics.condensation.species_mapping import CondensationSpeciesMap
+
+
+def make_example(molar_mass, *, resolved=False):
+    """Create illustrative state and explicit process-owned configuration."""
+    molar_mass = np.atleast_1d(molar_mass).astype(float)
+    names = [f"vapor_{i}" for i in range(molar_mass.size)]
+    if resolved or molar_mass.size > 1:
+        particles = par.particles.create_resolved_particle_data(
+            masses=np.full((2, molar_mass.size), 1e-18),
+            density=np.full(molar_mass.size, 1000.0),
+            concentration=[1.0, 1.0], volume=1e-6,
+        )
+    else:
+        particles = par.particles.create_lognormal_binned_particle_data(
+            distribution_type="discrete",
+            radius_bins=np.geomspace(50e-9, 500e-9, 64),
+            mode=[100e-9], geometric_standard_deviation=[1.5],
+            number_concentration=[1e8],
+        )
+    gas = par.gas.GasData(
+        name=names, molar_mass=molar_mass,
+        concentration=np.full((1, molar_mass.size), 1e-6),
+        partitioning=np.ones(molar_mass.size, dtype=bool),
+    )
+    environment = par.gas.EnvironmentData(
+        temperature=[298.15], pressure=[101325.0],
+        saturation_ratio=np.ones((1, molar_mass.size)),
+    )
+    aerosol = par.Aerosol(particles=particles, gas=gas, environment=environment)
+    physics = dict(
+        activity_strategy=par.particles.ActivityIdealMass(),
+        surface_strategy=par.particles.SurfaceStrategyVolume(
+            density=np.full(molar_mass.size, 1000.0)
+        ),
+        vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(1e-3),
+        species_map=CondensationSpeciesMap(
+            tuple(names), tuple((i, i) for i in range(molar_mass.size))
+        ),
+    )
+    return aerosol, physics
+
 ```
 
 All strategies share a common shape: initialize with physical parameters (molar
@@ -159,10 +213,13 @@ It operates on an `Aerosol`, delegates to the configured strategy, splits
 `time_step` across `sub_steps`, and composes with other runnables.
 
 ```python
+aerosol, physics = make_example(0.018)
+particle, gas = aerosol.particles, aerosol.gas
 import particula as par
 
 condensation = par.dynamics.MassCondensation(
     condensation_strategy=par.dynamics.CondensationIsothermal(
+        **physics,
         molar_mass=0.018,
         diffusion_coefficient=2e-5,
         accommodation_coefficient=1.0,
@@ -176,7 +233,7 @@ wall_loss = par.dynamics.WallLoss(
     ),
 )
 workflow = condensation | wall_loss
-updated = workflow.execute(aerosol, time_step=60.0, sub_steps=4)
+updated = workflow.execute(aerosol, time_step=60.0, sub_steps=240)
 ```
 
 ### CondensationIsothermal (simultaneous update)
@@ -191,7 +248,10 @@ pressure deltas (Δp) are sanitized (NaN/inf → 0) before computing rates, and 
 mass is optionally depleted (`update_gases=True`).
 
 ```python
+aerosol, physics = make_example(0.18)
+particle, gas = aerosol.particles, aerosol.gas
 iso = par.dynamics.CondensationIsothermal(
+    **physics,
     molar_mass=0.18,
     diffusion_coefficient=2e-5,
     accommodation_coefficient=0.9,
@@ -220,7 +280,10 @@ condensation, negative for evaporation) and accepts a `dynamic_viscosity`
 override for particle-resolved workflows.
 
 ```python
+aerosol, physics = make_example(0.018)
+particle, gas = aerosol.particles, aerosol.gas
 latent = par.dynamics.CondensationLatentHeat(
+    **physics,
     molar_mass=0.018,
     diffusion_coefficient=2e-5,
     accommodation_coefficient=1.0,
@@ -241,10 +304,12 @@ When neither a `latent_heat_strategy` nor a positive scalar `latent_heat`
 fallback is configured, the step follows the isothermal path and reports
 `last_latent_heat_energy = 0.0`.
 
-`last_latent_heat_energy` records per-step latent-heat bookkeeping from the
-step mass-transfer quantity. For the current single-box public example path,
-that diagnostic aligns with the mass-concentration contract and should be
-reported as an energy density.
+For native state, `last_latent_heat_energy` is signed extensive energy in J:
+sum the applied per-particle material transfer times represented counts and
+latent heat. For PMF/PDF, integrate the population density over the canonical
+reference volume. Condensation is positive and evaporation negative. The
+example regression checks this against the actual particle inventory change;
+it is a per-call diagnostic, not a temperature-evolution model.
 
 For the current shipped support boundary, E3-F7 is the executable CPU
 integration baseline for future Epic D GPU parity work:
@@ -272,7 +337,10 @@ optionally shuffled each step. Gas concentration is updated after every batch to
 reduce lag. Radii are clamped and Δp is sanitized before computing dm/dt.
 
 ```python
+aerosol, physics = make_example(0.018)
+particle, gas = aerosol.particles, aerosol.gas
 staggered = par.dynamics.CondensationIsothermalStaggered(
+    **physics,
     molar_mass=0.018,
     diffusion_coefficient=2e-5,
     accommodation_coefficient=1.0,
@@ -297,13 +365,17 @@ particle, gas = staggered.step(
 - `"batch"`: θ = 1.0; staggering comes from batch ordering instead of θ.
 
 ```python
+aerosol, physics = make_example(0.018)
+particle, gas = aerosol.particles, aerosol.gas
 half = par.dynamics.CondensationIsothermalStaggered(
+    **physics,
     molar_mass=0.018,
     theta_mode="half",
     num_batches=1,
 )
 
 batch = par.dynamics.CondensationIsothermalStaggered(
+    **physics,
     molar_mass=0.018,
     theta_mode="batch",
     num_batches=16,
@@ -311,6 +383,7 @@ batch = par.dynamics.CondensationIsothermalStaggered(
 )
 
 rand = par.dynamics.CondensationIsothermalStaggered(
+    **physics,
     molar_mass=0.018,
     theta_mode="random",
     num_batches=4,
@@ -332,6 +405,8 @@ factory entry points are available from both import surfaces:
 The shipped latent-heat factory key is `"latent_heat"`.
 
 ```python
+aerosol, physics = make_example(0.018)
+particle, gas = aerosol.particles, aerosol.gas
 import particula as par
 from particula.gas.latent_heat_strategies import ConstantLatentHeat
 
@@ -341,6 +416,10 @@ iso = (
     .set_diffusion_coefficient(2.1e-5, "m^2/s")
     .set_accommodation_coefficient(1.0)
     .set_update_gases(True)
+    .set_activity_strategy(physics["activity_strategy"])
+    .set_surface_strategy(physics["surface_strategy"])
+    .set_vapor_pressure_strategy(physics["vapor_pressure_strategy"])
+    .set_species_map(physics["species_map"])
     .build()
 )
 
@@ -354,6 +433,10 @@ staggered = (
     .set_shuffle_each_step(True)
     .set_random_state(7)
     .set_update_gases(False)
+    .set_activity_strategy(physics["activity_strategy"])
+    .set_surface_strategy(physics["surface_strategy"])
+    .set_vapor_pressure_strategy(physics["vapor_pressure_strategy"])
+    .set_species_map(physics["species_map"])
     .build()
 )
 
@@ -366,6 +449,10 @@ latent = (
     .set_accommodation_coefficient(1.0)
     .set_latent_heat_strategy(latent_strategy)
     .set_update_gases(True)
+    .set_activity_strategy(physics["activity_strategy"])
+    .set_surface_strategy(physics["surface_strategy"])
+    .set_vapor_pressure_strategy(physics["vapor_pressure_strategy"])
+    .set_species_map(physics["species_map"])
     .build()
 )
 
@@ -373,31 +460,37 @@ factory = par.dynamics.CondensationFactory()
 latent_factory_with_strategy = factory.get_strategy(
     strategy_type="latent_heat",
     parameters={
+        **physics,
         "molar_mass": 0.018,
+        "molar_mass_units": "kg/mol",
         "diffusion_coefficient": 2e-5,
+        "diffusion_coefficient_units": "m^2/s",
         "accommodation_coefficient": 1.0,
         "latent_heat_strategy": latent_strategy,
-        "update_gases": True,
     },
 )
 
 iso_factory = factory.get_strategy(
     strategy_type="isothermal",
     parameters={
+        **physics,
         "molar_mass": 0.018,
+        "molar_mass_units": "kg/mol",
         "diffusion_coefficient": 2e-5,
+        "diffusion_coefficient_units": "m^2/s",
         "accommodation_coefficient": 1.0,
-        "update_gases": True,
     },
 )
 latent_factory = factory.get_strategy(
     strategy_type="latent_heat",
     parameters={
+        **physics,
         "molar_mass": 0.018,
+        "molar_mass_units": "kg/mol",
         "diffusion_coefficient": 2e-5,
+        "diffusion_coefficient_units": "m^2/s",
         "accommodation_coefficient": 1.0,
         "latent_heat": 2.4e6,
-        "update_gases": True,
     },
 )
 ```
@@ -421,7 +514,10 @@ Use `skip_partitioning_indices` to zero-out selected species during rate/step
 without touching others; combine with `update_gases` to control depletion.
 
 ```python
+aerosol, physics = make_example([0.1, 0.2])
+particle, gas = aerosol.particles, aerosol.gas
 iso_skip = par.dynamics.CondensationIsothermal(
+    **physics,
     molar_mass=[0.1, 0.2],
     diffusion_coefficient=[2e-5, 1.5e-5],
     accommodation_coefficient=[1.0, 0.8],
@@ -434,7 +530,10 @@ rates = iso_skip.rate(particle, gas, temperature=298.0, pressure=101325.0)
 ### Multi-species and particle-resolved batching
 
 ```python
+aerosol, physics = make_example([0.018, 0.046])
+particle, gas = aerosol.particles, aerosol.gas
 multi = par.dynamics.CondensationIsothermalStaggered(
+    **physics,
     molar_mass=[0.018, 0.046],
     diffusion_coefficient=[2e-5, 1.2e-5],
     accommodation_coefficient=[1.0, 0.7],
@@ -458,6 +557,14 @@ strategy `step` each sub-iteration. Use this to interleave condensation tightly
 with other processes.
 
 ```python
+aerosol, physics = make_example(0.018)
+particle, gas = aerosol.particles, aerosol.gas
+iso = par.dynamics.CondensationIsothermal(
+    molar_mass=gas.molar_mass.copy(), **physics,
+)
+wall_loss = par.dynamics.WallLoss(
+    par.dynamics.SphericalWallLossStrategy(1e-3, 0.5, "discrete")
+)
 cond = par.dynamics.MassCondensation(condensation_strategy=iso)
 coag = par.dynamics.Coagulation(
     coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
@@ -465,7 +572,7 @@ coag = par.dynamics.Coagulation(
     ),
 )
 workflow = cond | coag | wall_loss
-updated = workflow.execute(aerosol, time_step=120.0, sub_steps=6)
+updated = workflow.execute(aerosol, time_step=120.0, sub_steps=480)
 ```
 
 ### Mass conservation, stability, and sanitization
@@ -488,11 +595,15 @@ updated = workflow.execute(aerosol, time_step=120.0, sub_steps=6)
 ### Quick start: isothermal condensation on a discrete distribution
 
 ```python
-import particula as par
+aerosol, physics = make_example(0.018)
+particle, gas = aerosol.particles, aerosol.gas
+particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete",
+)
+aerosol.particles = particle
 
-particle = par.particles.PresetParticleRadiusBuilder().build()
-gas = par.gas.GasSpecies(molar_mass=0.018, concentration=1e-6)
 condensation = par.dynamics.CondensationIsothermal(
+    **physics,
     molar_mass=0.018,
     diffusion_coefficient=2e-5,
     accommodation_coefficient=1.0,
@@ -512,7 +623,10 @@ particle, gas = condensation.step(
 ### Staggered quick start with theta and batches
 
 ```python
+aerosol, physics = make_example(0.018)
+particle, gas = aerosol.particles, aerosol.gas
 staggered = par.dynamics.CondensationIsothermalStaggered(
+    **physics,
     molar_mass=0.018,
     diffusion_coefficient=2e-5,
     accommodation_coefficient=1.0,
@@ -530,9 +644,9 @@ particle, gas = staggered.step(
 
 ## Prerequisites
 
-- `particula` version 0.2.6 or later.
-- A `ParticleRepresentation` (discrete, continuous PDF, or particle-resolved).
-- Gas species configured via `par.gas.GasSpecies` with vapor properties.
+- The selected E9 checkout installed with `pip install -e .`.
+- Native `ParticleData` with an explicit population kind.
+- `GasData`, aligned `EnvironmentData`, and process-owned vapor properties and mapping.
 - Familiarity with particula dynamics and examples.
 
 ## Typical Workflows
@@ -540,12 +654,18 @@ particle, gas = staggered.step(
 ### 1. Configure via builder
 
 ```python
+aerosol, physics = make_example(0.05)
+particle, gas = aerosol.particles, aerosol.gas
 condensation = (
     par.dynamics.CondensationIsothermalBuilder()
     .set_molar_mass(0.05, "kg/mol")
     .set_diffusion_coefficient(1.5e-5, "m^2/s")
     .set_accommodation_coefficient(0.85)
     .set_update_gases(True)
+    .set_activity_strategy(physics["activity_strategy"])
+    .set_surface_strategy(physics["surface_strategy"])
+    .set_vapor_pressure_strategy(physics["vapor_pressure_strategy"])
+    .set_species_map(physics["species_map"])
     .build()
 )
 ```
@@ -553,6 +673,11 @@ condensation = (
 ### 2. Run inside a runnable pipeline
 
 ```python
+aerosol, physics = make_example(0.05)
+particle, gas = aerosol.particles, aerosol.gas
+condensation = par.dynamics.CondensationIsothermal(
+    molar_mass=gas.molar_mass.copy(), **physics,
+)
 cond = par.dynamics.MassCondensation(condensation_strategy=condensation)
 wall = par.dynamics.WallLoss(
     wall_loss_strategy=par.dynamics.SphericalWallLossStrategy(
@@ -562,20 +687,26 @@ wall = par.dynamics.WallLoss(
     ),
 )
 workflow = cond | wall
-aerosol = workflow.execute(aerosol, time_step=30.0, sub_steps=3)
+aerosol = workflow.execute(aerosol, time_step=30.0, sub_steps=120)
 ```
 
 ### 3. Particle-resolved batching with deterministic ordering
 
 ```python
+aerosol, physics = make_example(0.018, resolved=True)
+particle, gas = aerosol.particles, aerosol.gas
 staggered = (
     par.dynamics.CondensationIsothermalStaggeredBuilder()
-    .set_molar_mass(0.018)
-    .set_diffusion_coefficient(2e-5)
+    .set_molar_mass(0.018, "kg/mol")
+    .set_diffusion_coefficient(2e-5, "m^2/s")
     .set_accommodation_coefficient(1.0)
     .set_theta_mode("batch")
     .set_num_batches(32)
     .set_shuffle_each_step(False)
+    .set_activity_strategy(physics["activity_strategy"])
+    .set_surface_strategy(physics["surface_strategy"])
+    .set_vapor_pressure_strategy(physics["vapor_pressure_strategy"])
+    .set_species_map(physics["species_map"])
     .build()
 )
 aerosol = par.dynamics.MassCondensation(staggered).execute(
@@ -596,8 +727,14 @@ reducing gas phase mass.
 wall loss in one pipeline.
 
 ```python
+aerosol, physics = make_example(0.15)
+particle, gas = aerosol.particles, aerosol.gas
+wall_loss = par.dynamics.WallLoss(
+    par.dynamics.SphericalWallLossStrategy(1e-3, 0.5, "discrete")
+)
 cond = par.dynamics.MassCondensation(
     condensation_strategy=par.dynamics.CondensationIsothermal(
+        **physics,
         molar_mass=0.15,
         diffusion_coefficient=1.8e-5,
         accommodation_coefficient=0.95,
@@ -605,7 +742,7 @@ cond = par.dynamics.MassCondensation(
     )
 )
 workflow = cond | wall_loss
-updated = workflow.execute(aerosol, time_step=120.0, sub_steps=4)
+updated = workflow.execute(aerosol, time_step=120.0, sub_steps=480)
 ```
 
 ### Use case 2: Particle-resolved stability with batch staggering
@@ -617,7 +754,10 @@ dominate.
 `"batch"` and multiple batches to spread updates and reduce lag.
 
 ```python
+aerosol, physics = make_example(0.018, resolved=True)
+particle, gas = aerosol.particles, aerosol.gas
 stable = par.dynamics.CondensationIsothermalStaggered(
+    **physics,
     molar_mass=0.018,
     theta_mode="batch",
     num_batches=24,
@@ -639,14 +779,17 @@ the species that should remain in gas; keep `update_gases` enabled for the
 condensing species.
 
 ```python
+aerosol, physics = make_example([0.018, 0.05])
+particle, gas = aerosol.particles, aerosol.gas
 selective = par.dynamics.CondensationIsothermal(
+    **physics,
     molar_mass=[0.018, 0.05],
     diffusion_coefficient=[2e-5, 1.6e-5],
     accommodation_coefficient=[1.0, 0.5],
     skip_partitioning_indices=[1],
     update_gases=True,
 )
-aerosol, gas = selective.step(
+particle, gas = selective.step(
     particle=particle,
     gas_species=gas,
     temperature=300.0,
@@ -731,7 +874,9 @@ synchronization or rebinding. No rollback is promised after a writer launches.
 The standalone private inventory-finalization test helper remains legacy-only;
 it is not a mapped native entry point. Untagged legacy direct/prepared callers
 retain the same-width contract described below. Native transfer does not
-establish resident/checkpoint support; that remains an M4 migration boundary.
+establish resident/checkpoint support by itself. See the separately exercised
+[resident walkthrough](../Examples/gpu_resident_multi_timestep.py) for explicit
+exact-device restart and fresh species bindings.
 
 Native scientific evidence is in
 `particula/gpu/kernels/tests/condensation_native_test.py`: independent scalar
@@ -858,7 +1003,7 @@ limitation rather than a successful capture replay.
 ## Backend-selected condensation
 
 Selected condensation is a bounded concrete adapter layer over the existing
-legacy CPU `MassCondensation` runnable and the direct
+native CPU `MassCondensation` runnable and the direct
 `condensation_step_gpu` boundary. It is not new physics, a new public runnable,
 a scheduler, a resident session, or automatic backend selection. Ownership and
 selection boundaries are described in the
@@ -901,8 +1046,8 @@ defers E7-F5 deterministic scheduling.
 - Direct low-level GPU latent heat is a per-species rate correction only; it
   has no temperature feedback or strategy/`Runnable` integration. Its signed
   `energy_transfer` sidecar is finalized-transfer diagnostic bookkeeping only.
-- Minimum-radius clamp (1e-10 m) enforces continuum validity; sub-continuum
-  physics is out of scope.
+- The minimum-radius clamp (1e-10 m) is a numerical safeguard, not evidence
+  of physical validity at that scale; sub-continuum physics is out of scope.
 
 ## Related Documentation
 

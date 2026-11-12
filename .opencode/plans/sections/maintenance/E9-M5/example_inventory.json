@@ -1024,310 +1024,354 @@
     {
       "path": "docs/.assets/temp/docs/Examples/Aerosol/Aerosol_Tutorial.md",
       "python_fences": 3,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.md",
       "python_fences": 6,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.md",
       "python_fences": 10,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.md",
       "python_fences": 14,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.md",
       "python_fences": 4,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.md",
       "python_fences": 4,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.md",
       "python_fences": 12,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.md",
       "python_fences": 15,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.md",
       "python_fences": 8,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.md",
       "python_fences": 15,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.md",
       "python_fences": 10,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Condensation/Condensation_1_Bin.md",
       "python_fences": 3,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.md",
       "python_fences": 5,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.md",
       "python_fences": 8,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.md",
       "python_fences": 5,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Equilibria/Notebooks/activity_part1.md",
       "python_fences": 6,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Equilibria/Notebooks/equilibria_part1.md",
       "python_fences": 5,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.md",
       "python_fences": 4,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Gas_Phase/Notebooks/Gas_Species.md",
       "python_fences": 6,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.md",
       "python_fences": 8,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.md",
       "python_fences": 9,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.md",
       "python_fences": 5,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.md",
       "python_fences": 9,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.md",
       "python_fences": 4,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.md",
       "python_fences": 6,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.md",
       "python_fences": 4,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.md",
       "python_fences": 5,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.md",
       "python_fences": 7,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.md",
       "python_fences": 14,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.md",
       "python_fences": 12,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.md",
       "python_fences": 12,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Accelerating_Python/Details/One-Line_Vision.md",
       "python_fences": 8,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Accelerating_Python/Details/Taichi_Exploration.md",
       "python_fences": 9,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Accelerating_Python/index.md",
       "python_fences": 1,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Code_Concepts/Details/Design_Patterns.md",
       "python_fences": 2,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Code_Concepts/Details/Object_Oriented_Patterns.md",
       "python_fences": 6,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Fluid_and_Particle_Properties_Comparison.md",
       "python_fences": 10,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Horizontal_Velocity_Comparison.md",
       "python_fences": 5,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Kernel_Comparison.md",
       "python_fences": 7,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Distribution_Comparison.md",
       "python_fences": 5,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Relative_Velocity_Comparison.md",
       "python_fences": 8,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Dynamics/ionparticle_coagulation.md",
       "python_fences": 4,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Properties/dynamic_viscosity.md",
       "python_fences": 1,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/.assets/temp/docs/Theory/Technical/Properties/mean_free_path.md",
       "python_fences": 1,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "excluded generated temporary copy; untracked and ignored, not a published source",
+      "execution": "not applicable",
+      "phase": "P6",
+      "evidence": ".gitignore:14 and mkdocs.yml exclude_docs .assets/; git ls-files and check-ignore verified 2026-11-11"
     },
     {
       "path": "docs/Examples/Activity/index.md",
@@ -1375,9 +1419,10 @@
     {
       "path": "docs/Features/condensation_strategy_system.md",
       "python_fences": 19,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "native CPU snippets migrated; selected-backend prose reconciliation remains pending",
+      "execution": "all 19 Python fences execute; 18 process-guide tests passed including 10 condensation inventory cases",
+      "phase": "P6",
+      "evidence": "examples_tests/native_process_guides_test.py"
     },
     {
       "path": "docs/Features/data-containers-and-gpu-foundations.md",
