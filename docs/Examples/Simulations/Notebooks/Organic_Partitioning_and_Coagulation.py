@@ -201,10 +201,10 @@ for i in range(len(name)):
     vapor_pressure_strategies.append(vapor_pressure_organic)
 
 # %% [markdown]
-#  ## Compose the atmosphere
+#  ## Compose gas and environment state
 #
-#  Combine temperature, pressure and the list of partitioning species
-#  into a single `Atmosphere` container.
+#  Keep the ordered gas mixture in `GasData` and temperature and pressure
+#  in `EnvironmentData`; the native aerosol holds both containers.
 #
 #
 #  > **EnvironmentData:** central thermodynamic context (temperature &
