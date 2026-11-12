@@ -9,7 +9,7 @@ latent heat energy, and conservation residual. Matrix operations use ``(B, S)``
 ``wp.float64`` arrays; particle number uses a ``(B,)`` ``wp.float64`` array.
 
 For native resolved counts, total mass adds ``Σp(m * N)`` to ``V * gas``
-using an explicit complete material-to-gas map. PMF and legacy particle density
+using an explicit complete material-to-gas map. PMF particle density
 use ``V * Σp(m * c)``. Native mass diagnostics reject unmapped particle-only
 lanes instead of dropping their inventory. Matrix lanes follow full gas order.
 Resolved number concentration is ``Σp(N) / V``; density carriers use ``Σp(c)``.
@@ -79,7 +79,7 @@ class ResidentDiagnosticRegistration:
         sink_ledger: Required nonnegative extensive sink ledger for residual in
             kg; forbidden otherwise.
         species_map: Native total-mass gas-to-particle map covering all material
-            lanes; forbidden for other operations and legacy populations.
+            lanes; forbidden for other operations.
     """
 
     operation: ResidentDiagnosticOperation
@@ -206,7 +206,6 @@ class PreparedResidentDiagnostics:
         sink_ledgers: Residual sink ledgers aligned with registrations.
         total_mass_output: Bound total-mass output used by the residual writer.
         resolved_counts: Whether particle population stores raw counts.
-        native_population: Whether explicit population semantics apply.
         particle_mass_pairs: Validated gas-to-particle inventory lane pairs.
     """
 
@@ -226,7 +225,6 @@ class PreparedResidentDiagnostics:
     sink_ledgers: tuple[object | None, ...]
     total_mass_output: object | None
     resolved_counts: bool = False
-    native_population: bool = False
     particle_mass_pairs: tuple[tuple[int, int], ...] = ()
 
 
@@ -244,25 +242,6 @@ def _initialize_total_species_mass(
     """Initialize each extensive-mass lane from resident gas."""
     box, species = wp.tid()  # type: ignore[misc]
     output[box, species] = volume[box] * gas_concentration[box, species]
-
-
-@wp.kernel
-def _accumulate_particle_species_mass(
-    masses: Any,
-    concentration: Any,
-    volume: Any,
-    output: Any,
-) -> None:
-    """Accumulate one concentration-weighted particle lane in parallel."""
-    box, particle, species = wp.tid()  # type: ignore[misc]
-    wp.atomic_add(
-        output,
-        box,
-        species,
-        volume[box]
-        * masses[box, particle, species]
-        * concentration[box, particle],
-    )
 
 
 @wp.kernel
@@ -342,8 +321,7 @@ def _mass_pairs(plan: ResidentDiagnosticsPlan) -> tuple[tuple[int, int], ...]:
             registration.operation
             is ResidentDiagnosticOperation.TOTAL_SPECIES_MASS
         )
-        native = plan.session.metadata.distribution_type is not None
-        if not is_total or not native:
+        if not is_total:
             if mapping is not None:
                 raise ValueError(
                     "species_map is only for native total species mass"
@@ -578,10 +556,7 @@ class ResidentDiagnosticsExecutor:
                         ],
                         device=particles.masses.device,
                     )
-                    if (
-                        dimensions.n_particles
-                        and plan.session.metadata.distribution_type is not None
-                    ):
+                    if dimensions.n_particles:
                         for gas_lane, particle_lane in _mass_pairs(plan):
                             wp.launch(
                                 _accumulate_mapped_particle_mass,
@@ -603,22 +578,6 @@ class ResidentDiagnosticsExecutor:
                                 ],
                                 device=particles.masses.device,
                             )
-                    elif dimensions.n_particles:
-                        wp.launch(
-                            _accumulate_particle_species_mass,
-                            dim=(
-                                dimensions.n_boxes,
-                                dimensions.n_particles,
-                                dimensions.n_species,
-                            ),
-                            inputs=[
-                                particles.masses,
-                                particles.concentration,
-                                particles.volume,
-                                registration.output,
-                            ],
-                            device=particles.masses.device,
-                        )
                 elif (
                     operation is ResidentDiagnosticOperation.LATENT_HEAT_ENERGY
                 ):
@@ -737,7 +696,6 @@ def setup_prepared_resident_diagnostics(
         tuple(item.sink_ledger for item in typed.registrations),
         total_mass_output,
         typed.session.metadata.distribution_type == "particle_resolved",
-        typed.session.metadata.distribution_type is not None,
         _mass_pairs(typed),
     )
 
@@ -824,7 +782,7 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
                     ],
                     device=device,
                 )
-                if dimensions.n_particles and prepared.native_population:
+                if dimensions.n_particles:
                     for gas_lane, particle_lane in prepared.particle_mass_pairs:
                         wp.launch(
                             _accumulate_mapped_particle_mass,
@@ -840,22 +798,6 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
                             ],
                             device=device,
                         )
-                elif dimensions.n_particles:
-                    wp.launch(
-                        _accumulate_particle_species_mass,
-                        dim=(
-                            dimensions.n_boxes,
-                            dimensions.n_particles,
-                            dimensions.n_species,
-                        ),
-                        inputs=[
-                            prepared.particle_masses,
-                            prepared.particle_concentration,
-                            prepared.particle_volume,
-                            output,
-                        ],
-                        device=device,
-                    )
             elif operation is ResidentDiagnosticOperation.LATENT_HEAT_ENERGY:
                 wp.launch(
                     _copy_snapshot,

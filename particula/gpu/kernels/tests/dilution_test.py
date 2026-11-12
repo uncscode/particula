@@ -42,6 +42,12 @@ def _warp():
     return pytest.importorskip("warp")
 
 
+class _ResolvedParticleState(SimpleNamespace):
+    """Declare count semantics without adding fields to array snapshots."""
+
+    distribution_kind = 3
+
+
 def _containers(
     n_boxes: int = 2,
     n_particles: int = 2,
@@ -53,6 +59,7 @@ def _containers(
     from particula.gpu import WarpGasData, WarpParticleData
 
     particles = WarpParticleData()
+    particles.distribution_kind = wp.int32(3)
     particles.masses = wp.ones(
         (n_boxes, n_particles, n_species), dtype=wp.float64, device=device
     )
@@ -207,11 +214,13 @@ def _forbid_preflight_side_effects(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(dilution_module.wp, "full", unexpected_side_effect)
     monkeypatch.setattr(dilution_module.wp, "empty", unexpected_side_effect)
     original_launch = dilution_module.wp.launch
+    from particula.gpu.kernels._population_validation import _scan_population
 
     def reject_dilution_launch(kernel: Any, *args: Any, **kwargs: Any) -> None:
         assert kernel in (
             dilution_module._scan_nonnegative_finite_1d,
             dilution_module._scan_nonnegative_finite_2d,
+            _scan_population,
         )
         original_launch(kernel, *args, **kwargs)
 
@@ -733,7 +742,7 @@ def test_zero_scalar_and_zero_time_validate_container_metadata() -> None:
     """Scalar zero and zero time still require complete preflight."""
     from particula.gpu.kernels import dilution_step_gpu
 
-    particles = SimpleNamespace(concentration="not a Warp array")
+    particles = _ResolvedParticleState(concentration="not a Warp array")
     gas = SimpleNamespace(concentration="not a Warp array")
     with pytest.raises(
         ValueError, match="particles.masses must be a Warp array"
@@ -767,7 +776,9 @@ def test_per_box_zero_time_validates_coefficient_and_containers() -> None:
         gas.concentration.numpy(), snapshots["gas_concentration"]
     )
 
-    malformed_particles = SimpleNamespace(concentration="not a Warp array")
+    malformed_particles = _ResolvedParticleState(
+        concentration="not a Warp array"
+    )
     malformed_gas = SimpleNamespace(concentration="not a Warp array")
     with pytest.raises(
         ValueError, match=r"particles\.masses must be a Warp array"
@@ -870,7 +881,7 @@ def test_non_warp_concentrations_reject_before_writes(
     particles, gas = _containers()
     snapshots = _state_snapshots(particles, gas)
     if field == "particle":
-        particles = SimpleNamespace(
+        particles = _ResolvedParticleState(
             masses=particles.masses,
             concentration=value,
         )
@@ -911,7 +922,7 @@ def test_concentration_shape_errors_reject_before_writes(
     particles, gas = _containers()
     snapshots = _state_snapshots(particles, gas)
     if field == "particle":
-        particles = SimpleNamespace(
+        particles = _ResolvedParticleState(
             masses=particles.masses,
             concentration=wp.ones(shape, dtype=wp.float64, device="cpu"),
         )
@@ -949,7 +960,7 @@ def test_float32_concentrations_reject_before_any_write(field, message) -> None:
     particle_values = particles.concentration.numpy().copy()
     gas_values = gas.concentration.numpy().copy()
     if field == "particle":
-        particles = SimpleNamespace(
+        particles = _ResolvedParticleState(
             masses=particles.masses,
             concentration=wp.array(
                 particle_values, dtype=wp.float32, device="cpu"
@@ -983,7 +994,7 @@ def test_device_mismatch_rejects_before_any_write(mismatch) -> None:
     if mismatch == "coefficient":
         coefficient = wp.ones(2, dtype=wp.float64, device="cuda:0")
     elif mismatch == "particle":
-        particles = SimpleNamespace(
+        particles = _ResolvedParticleState(
             masses=particles.masses,
             concentration=wp.array(
                 particle_values, dtype=wp.float64, device="cuda:0"
@@ -1044,7 +1055,12 @@ def test_per_box_coefficient_rank_error_precedes_time_and_state_access() -> (
 
     coefficient = wp.ones((2, 1), dtype=wp.float64, device="cpu")
     with pytest.raises(ValueError, match="coefficient must have rank 1"):
-        dilution_step_gpu(object(), object(), coefficient, cast(Any, "invalid"))
+        dilution_step_gpu(
+            _ResolvedParticleState(),
+            object(),
+            coefficient,
+            cast(Any, "invalid"),
+        )
 
 
 @pytest.mark.parametrize("value", [-1.0, np.nan, np.inf, -np.inf])
@@ -1055,7 +1071,9 @@ def test_invalid_scalar_domains_raise_before_time_or_state_access(
     from particula.gpu.kernels import dilution_step_gpu
 
     with pytest.raises(ValueError, match="coefficient.*finite and nonnegative"):
-        dilution_step_gpu(None, None, value, cast(Any, "invalid"))
+        dilution_step_gpu(
+            _ResolvedParticleState(), None, value, cast(Any, "invalid")
+        )
 
 
 @pytest.mark.parametrize(
@@ -1068,7 +1086,9 @@ def test_unsupported_scalar_coefficient_raises_before_time_or_state_access(
     from particula.gpu.kernels import dilution_step_gpu
 
     with pytest.raises(TypeError, match="coefficient.*real scalar"):
-        dilution_step_gpu(None, None, value, cast(Any, "invalid"))
+        dilution_step_gpu(
+            _ResolvedParticleState(), None, value, cast(Any, "invalid")
+        )
 
 
 @pytest.mark.parametrize("value", [True, "one", None, [1.0], np.array([1.0])])
@@ -1077,7 +1097,7 @@ def test_invalid_time_step_raises_before_container_access(value) -> None:
     from particula.gpu.kernels import dilution_step_gpu
 
     with pytest.raises((TypeError, ValueError), match="time_step"):
-        dilution_step_gpu(None, None, 1.0, value)
+        dilution_step_gpu(_ResolvedParticleState(), None, 1.0, value)
 
 
 @pytest.mark.parametrize("value", [-1.0, np.nan, np.inf, -np.inf])
@@ -1088,7 +1108,7 @@ def test_invalid_time_step_domain_raises_before_container_access(value) -> None:
     with pytest.raises(
         ValueError, match="time_step must be finite and nonnegative"
     ):
-        dilution_step_gpu(None, None, 1.0, value)
+        dilution_step_gpu(_ResolvedParticleState(), None, 1.0, value)
 
 
 @pytest.mark.parametrize(
@@ -1108,14 +1128,16 @@ def test_mass_schema_rejections_are_atomic_and_side_effect_free(
 
     particles, gas = _containers()
     if mass_kind == "missing":
-        particles = SimpleNamespace(concentration=particles.concentration)
+        particles = _ResolvedParticleState(
+            concentration=particles.concentration
+        )
     elif mass_kind == "dtype":
-        particles = SimpleNamespace(
+        particles = _ResolvedParticleState(
             masses=wp.ones((2, 2, 2), dtype=wp.float32, device="cpu"),
             concentration=particles.concentration,
         )
     else:
-        particles = SimpleNamespace(
+        particles = _ResolvedParticleState(
             masses=wp.ones((2, 2), dtype=wp.float64, device="cpu"),
             concentration=particles.concentration,
         )
@@ -1143,7 +1165,7 @@ def test_missing_concentration_fields_are_atomic_and_side_effect_free(
 
     particles, gas = _containers()
     if container_name == "particles":
-        particles = SimpleNamespace(masses=particles.masses)
+        particles = _ResolvedParticleState(masses=particles.masses)
     else:
         gas = SimpleNamespace()
     snapshot = _full_state_snapshot(particles, gas, 1.0)
@@ -1164,7 +1186,12 @@ def test_invalid_coefficient_metadata_precedes_time_and_particle_access() -> (
 
     coefficient = wp.ones(2, dtype=wp.float32, device="cpu")
     with pytest.raises(ValueError, match="coefficient must use dtype float64"):
-        dilution_step_gpu(object(), object(), coefficient, cast(Any, "invalid"))
+        dilution_step_gpu(
+            _ResolvedParticleState(),
+            object(),
+            coefficient,
+            cast(Any, "invalid"),
+        )
 
 
 @pytest.mark.parametrize(
@@ -1196,7 +1223,7 @@ def test_preflight_rejections_are_atomic_and_side_effect_free(
     elif failure == "time":
         time_step = cast(Any, "invalid")
     elif failure == "masses":
-        particles = SimpleNamespace(
+        particles = _ResolvedParticleState(
             masses="invalid",
             concentration=particles.concentration,
             charge=particles.charge,
@@ -1374,6 +1401,9 @@ def test_gas_concentration_width_is_independent_of_particle_species() -> None:
     gas.concentration = wp.array(
         [[2.0, 3.0], [4.0, 5.0]], dtype=wp.float64, device="cpu"
     )
+    gas.molar_mass = wp.ones(2, dtype=wp.float64, device="cpu")
+    gas.vapor_pressure = wp.ones((2, 2), dtype=wp.float64, device="cpu")
+    gas.partitioning = wp.ones((2, 2), dtype=wp.int32, device="cpu")
     particle_before = particles.concentration.numpy().copy()
     gas_before = gas.concentration.numpy().copy()
 
@@ -1438,7 +1468,7 @@ def test_preflight_validation_order_at_remaining_boundaries() -> None:
     from particula.gpu.kernels import dilution_step_gpu
 
     particles, gas = _containers()
-    particles = SimpleNamespace(
+    particles = _ResolvedParticleState(
         masses="invalid",
         concentration=particles.concentration,
         charge=particles.charge,
@@ -1452,7 +1482,7 @@ def test_preflight_validation_order_at_remaining_boundaries() -> None:
         dilution_step_gpu(particles, gas, invalid_coefficient, 1.0)
 
     particles, gas = _containers()
-    particles = SimpleNamespace(
+    particles = _ResolvedParticleState(
         masses=particles.masses,
         concentration="invalid",
         charge=particles.charge,
@@ -1480,3 +1510,21 @@ def test_preflight_validation_order_at_remaining_boundaries() -> None:
         match="particles.concentration must be finite and nonnegative",
     ):
         dilution_step_gpu(particles, gas, 1.0, 1.0)
+
+
+@pytest.mark.parametrize("code", [None, 0, 2])
+@pytest.mark.parametrize("prepared", [False, True])
+def test_dilution_requires_supported_metadata_before_payload(code, prepared):
+    """No-op dilution cannot admit unset or unsupported population meaning."""
+    from particula.gpu.kernels import dilution as module
+
+    particles = SimpleNamespace()
+    if code is not None:
+        particles.distribution_kind = code
+    entry = (
+        module._prepare_dilution_step_gpu
+        if prepared
+        else module.dilution_step_gpu
+    )
+    with pytest.raises(ValueError, match="metadata|continuous_pdf"):
+        entry(particles, None, 0.0, 0.0)

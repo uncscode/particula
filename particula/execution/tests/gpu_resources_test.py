@@ -61,8 +61,6 @@ def _session(
     boxes: int = 1,
     particle_count: int = 2,
     species: int = 1,
-    *,
-    resolved: bool = False,
 ) -> ResidentSession:
     """Build a small valid active Warp CPU resident session lazily."""
     wp = pytest.importorskip("warp")
@@ -73,7 +71,7 @@ def _session(
     )
 
     particles = WarpParticleData()
-    particles.distribution_kind = wp.int32(3 if resolved else 0)
+    particles.distribution_kind = wp.int32(3)
     particles.masses = wp.ones(
         (boxes, particle_count, species), dtype=wp.float64, device="cpu"
     )
@@ -104,13 +102,11 @@ def _session(
         particles,
         gas,
         environment,
-        ResidentDimensions(
-            boxes, particle_count, species, species if resolved else None
-        ),
+        ResidentDimensions(boxes, particle_count, species, species),
         ResidentMetadata(
             Device(Backend.WARP, "cpu"),
             tuple(str(index) for index in range(species)),
-            distribution_type="particle_resolved" if resolved else None,
+            distribution_type="particle_resolved",
         ),
         ResidentLifecycle.ACTIVE,
     )
@@ -166,6 +162,14 @@ def _diagnostics_plan(
             device=device,
         )
 
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+
+    mapping = CondensationSpeciesMap(
+        session.metadata.gas_names,
+        tuple((index, index) for index in range(dimensions.n_species)),
+    )
     return ResidentDiagnosticsPlan(
         session,
         registry,
@@ -184,6 +188,7 @@ def _diagnostics_plan(
             ResidentDiagnosticRegistration(
                 ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
                 matrix(),
+                species_map=mapping,
             ),
             ResidentDiagnosticRegistration(
                 ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
@@ -402,6 +407,7 @@ def test_coagulation_acquisition_initializes_one_persistent_stream() -> None:
             session.metadata.stream.__class__(
                 2, 41, ("north", "south"), (1, 0)
             ),
+            distribution_type=session.metadata.distribution_type,
         ),
     )
     registry = GPUResourceRegistry(session)
@@ -687,6 +693,7 @@ def test_published_stream_default_reset_uses_nondefault_root_seed() -> None:
             session.metadata.stream.__class__(
                 2, 73, ("north", "south"), (1, 0)
             ),
+            distribution_type=session.metadata.distribution_type,
         ),
     )
     registry = GPUResourceRegistry(session)
@@ -965,7 +972,7 @@ def test_registry_rejects_invalid_sidecar_schema_and_session_signature() -> (
 
     with pytest.raises(ValueError, match="incompatible schema"):
         registry.acquire_wall_loss(rng_states=wrong_dtype)
-    object.__setattr__(session, "dimensions", ResidentDimensions(1, 3, 1))
+    object.__setattr__(session, "dimensions", ResidentDimensions(1, 3, 1, 1))
     with pytest.raises(ValueError, match="signature changed"):
         registry.acquire_wall_loss()
 
@@ -999,6 +1006,9 @@ def test_registry_rejects_replaced_container_before_allocation() -> None:
     registry = GPUResourceRegistry(session)
     original_particles = cast(Any, session.particles)
     replacement_particles = WarpParticleData()
+    replacement_particles.distribution_kind = (
+        original_particles.distribution_kind
+    )
     for name in ("masses", "concentration", "charge", "density", "volume"):
         setattr(replacement_particles, name, getattr(original_particles, name))
     object.__setattr__(session, "particles", replacement_particles)
@@ -2163,6 +2173,7 @@ def test_validate_pinned_session_rejects_primary_and_container_drift() -> None:
     object.__setattr__(particles, "masses", original_masses)
 
     replacement = WarpParticleData()
+    replacement.distribution_kind = wp.int32(3)
     for name in ("masses", "concentration", "charge", "density", "volume"):
         setattr(replacement, name, getattr(particles, name))
     object.__setattr__(session, "particles", replacement)

@@ -242,6 +242,7 @@ def test_mass_precision_cases_construct_particle_data(
         charge=case.charge,
         density=case.density_kg_m3,
         volume=case.volume,
+        distribution_type="particle_resolved",
     )
 
     assert particle_data.masses.shape == case.masses.shape
@@ -264,6 +265,7 @@ def test_mass_precision_case_radii_match_expected_scale_order(
             charge=case.charge,
             density=case.density_kg_m3,
             volume=case.volume,
+            distribution_type="particle_resolved",
         )
         derived_radii = particle_data.radii
         assert np.all(np.isfinite(derived_radii))
@@ -291,6 +293,7 @@ def test_mass_precision_case_rejects_malformed_particle_data_shape() -> None:
             charge=case.charge,
             density=case.density_kg_m3,
             volume=case.volume,
+            distribution_type="particle_resolved",
         )
 
     with pytest.raises(
@@ -303,6 +306,7 @@ def test_mass_precision_case_rejects_malformed_particle_data_shape() -> None:
             charge=case.charge,
             density=case.density_kg_m3,
             volume=case.volume,
+            distribution_type="particle_resolved",
         )
 
 
@@ -365,6 +369,7 @@ def test_mass_precision_baseline_policy_preserves_fp64_on_cpu_and_warp(
         charge=case.charge,
         density=case.density_kg_m3,
         volume=case.volume,
+        distribution_type="particle_resolved",
     )
     assert case.masses.dtype == np.float64
     assert particle_data.masses.dtype == np.float64
@@ -401,6 +406,7 @@ def test_mass_precision_case_warp_round_trip_preserves_values_exactly(
         charge=case.charge,
         density=case.density_kg_m3,
         volume=case.volume,
+        distribution_type="particle_resolved",
     )
 
     restored = from_warp_particle_data(

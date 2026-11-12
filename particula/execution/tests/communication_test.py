@@ -80,7 +80,7 @@ def _configuration(
     )
     from particula.execution.gpu_session import ResidentDimensions
 
-    return configuration, ResidentDimensions(3, 2, 1)
+    return configuration, ResidentDimensions(3, 2, 1, 1)
 
 
 @pytest.mark.warp
@@ -470,7 +470,7 @@ def test_sparse_duplicate_allocation_scales_with_edges_not_boxes() -> None:
         enabled=wp.array([1, 1, 1, 1], dtype=wp.int32, device="cpu"),
         rates=wp.array([1.0, 1.0, 1.0, 1.0], dtype=wp.float64, device="cpu"),
     )
-    dimensions = ResidentDimensions(4, 2, 1)
+    dimensions = ResidentDimensions(4, 2, 1, 1)
     table_sizes: list[int] = []
     original_full = communication.wp.full
 
@@ -522,7 +522,7 @@ def test_schema_alias_and_empty_preflight() -> None:
 
     assert (
         communication.validate_communication_configuration(
-            empty, ResidentDimensions(0, 0, 0), wp.get_device("cpu")
+            empty, ResidentDimensions(0, 0, 0, 0), wp.get_device("cpu")
         )
         is empty
     )
@@ -590,7 +590,7 @@ def test_all_disabled_and_empty_maps_validate_full_rate_volume_domains() -> (
 
     with pytest.raises(ValueError, match="final_volumes values"):
         communication.validate_communication_configuration(
-            empty, ResidentDimensions(1, 0, 0), wp.get_device("cpu")
+            empty, ResidentDimensions(1, 0, 0, 0), wp.get_device("cpu")
         )
 
 
@@ -656,7 +656,9 @@ def test_duplicate_sort_uses_enabled_edges_not_disabled_capacity() -> None:
     try:
         assert (
             communication.validate_communication_configuration(
-                configuration, ResidentDimensions(9, 0, 0), wp.get_device("cpu")
+                configuration,
+                ResidentDimensions(9, 0, 0, 0),
+                wp.get_device("cpu"),
             )
             is configuration
         )

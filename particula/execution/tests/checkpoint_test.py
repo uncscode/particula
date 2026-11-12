@@ -36,8 +36,6 @@ if TYPE_CHECKING:
 
 def _resident_binding(
     n_boxes: int = 1,
-    *,
-    resolved: bool = False,
 ) -> tuple[
     ResidentSession,
     "GPUResourceRegistry",
@@ -53,7 +51,7 @@ def _resident_binding(
     )
 
     particles = WarpParticleData()
-    particles.distribution_kind = wp.int32(3 if resolved else 0)
+    particles.distribution_kind = wp.int32(3)
     particles.masses = wp.array(
         np.ones((n_boxes, 1, 1)), dtype=wp.float64, device="cpu"
     )
@@ -90,11 +88,11 @@ def _resident_binding(
         particles,
         gas,
         environment,
-        ResidentDimensions(n_boxes, 1, 1, 1 if resolved else None),
+        ResidentDimensions(n_boxes, 1, 1, 1),
         ResidentMetadata(
             Device(Backend.WARP, "cpu"),
             ("water",),
-            distribution_type="particle_resolved" if resolved else None,
+            distribution_type="particle_resolved",
         ),
         ResidentLifecycle.ACTIVE,
     )
@@ -314,7 +312,7 @@ def test_checkpoint_is_detached_and_preserves_active_session() -> None:
     assert checkpoint.rng_continuation is not None
     assert checkpoint.rng_continuation.payloads == ()
     assert session.lifecycle is ResidentLifecycle.ACTIVE
-    assert checkpoint.dimensions == ResidentDimensions(1, 1, 1)
+    assert checkpoint.dimensions == ResidentDimensions(1, 1, 1, 1)
     assert checkpoint.gas_names == ("water",)
     assert checkpoint.particles is not session.particles
     assert checkpoint.gas is not session.gas
@@ -1260,3 +1258,25 @@ def test_checkpoint_cleanup_failure_is_chained_to_synchronization_error(
 
     assert caught.value is primary
     assert caught.value.__cause__ is cleanup
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("kind", ["legacy_untagged", "", None])
+def test_v5_untagged_restart_rejects_before_setup(kind, monkeypatch):
+    """Schema v5 cannot infer missing population semantics from raw bytes."""
+    import particula.execution.checkpoint as module
+
+    session, registry, guard = _resident_binding()
+    snapshot = session.checkpoint(registry, guard)
+    assert snapshot.schema_version == 5
+    assert snapshot.distribution_type == "particle_resolved"
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("untagged checkpoint reached setup or upload")
+
+    monkeypatch.setattr(module, "setup_resident_session", forbidden)
+    with pytest.raises(ValueError, match="population semantics"):
+        restart_resident_session(
+            replace(snapshot, distribution_type=kind), snapshot.device
+        )
+    assert session.lifecycle is ResidentLifecycle.ACTIVE

@@ -509,6 +509,7 @@ def _warp_particles() -> Any:
     from particula.gpu.warp_types import WarpParticleData
 
     particles = WarpParticleData()
+    particles.distribution_kind = wp.int32(3)
     particles.masses = wp.ones((1, 2, 1), dtype=wp.float64, device="cpu")
     particles.concentration = wp.ones((1, 2), dtype=wp.float64, device="cpu")
     particles.charge = wp.zeros((1, 2), dtype=wp.float64, device="cpu")

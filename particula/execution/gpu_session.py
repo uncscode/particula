@@ -95,16 +95,22 @@ def _validate_cpu_shape(
         raise ValueError(f"{name} must have shape {expected_shape}.")
 
 
-def _validate_native_cpu_population(particles: "ParticleData") -> None:
-    """Check explicit population admission before upload."""
+def _require_native_population_kind(particles: "ParticleData") -> None:
+    """Reject ambiguous or unsupported population tags before payload access."""
+    if particles.distribution_type is None:
+        raise ValueError("resident population requires explicit metadata")
     if particles.distribution_type == "continuous_pdf":
         raise ValueError("GPU continuous_pdf populations are unsupported")
-    if particles.distribution_type is not None:
-        particles.validate_representation()
-        with np.errstate(over="ignore", invalid="ignore"):
-            density = particles.concentration / particles.volume[:, None]
-        if not np.all(np.isfinite(density)):
-            raise ValueError("resident population density must be finite")
+
+
+def _validate_native_cpu_population(particles: "ParticleData") -> None:
+    """Check explicit population admission before upload."""
+    _require_native_population_kind(particles)
+    particles.validate_representation()
+    with np.errstate(over="ignore", invalid="ignore"):
+        density = particles.concentration / particles.volume[:, None]
+    if not np.all(np.isfinite(density)):
+        raise ValueError("resident population density must be finite")
 
 
 def _gas_shape(gas: "GasData") -> tuple[int, int]:
@@ -143,7 +149,7 @@ def _preflight_cpu_session(
 
     if not isinstance(particles, ParticleData):
         raise TypeError("particles must be a ParticleData.")
-    _validate_native_cpu_population(particles)
+    _require_native_population_kind(particles)
     if not isinstance(gas, GasData):
         raise TypeError("gas must be a GasData.")
     if not isinstance(environment, EnvironmentData):
@@ -155,7 +161,7 @@ def _preflight_cpu_session(
     gas_shape = _gas_shape(gas)
     dimensions = ResidentDimensions(
         *masses_shape,
-        gas_shape[1] if particles.distribution_type is not None else None,
+        gas_shape[1],
     )
     boxes = dimensions.n_boxes
     if boxes == 0:
@@ -209,6 +215,7 @@ def _preflight_cpu_session(
     )
     gas_names = tuple(gas.name)
     _validate_gas_names(gas_names)
+    _validate_native_cpu_population(particles)
     return particles, gas, environment, dimensions, gas_names
 
 
@@ -220,20 +227,18 @@ class ResidentDimensions:
         n_boxes: Nonnegative number of resident boxes.
         n_particles: Nonnegative fixed particle capacity per box.
         n_species: Nonnegative number of particle material species.
-        n_gas_species: Explicit gas width; None retains legacy equal widths.
+        n_gas_species: Explicit independent nonnegative gas width.
     """
 
     n_boxes: int
     n_particles: int
     n_species: int
-    n_gas_species: int | None = None
+    n_gas_species: int
 
     @property
     def gas_species(self) -> int:
-        """Return explicit gas width or the legacy shared width."""
-        return (
-            self.n_species if self.n_gas_species is None else self.n_gas_species
-        )
+        """Return the explicitly declared independent gas width."""
+        return self.n_gas_species
 
     def __post_init__(self) -> None:
         """Validate the immutable resident dimensions.
@@ -245,10 +250,7 @@ class ResidentDimensions:
         _validate_dimension(self.n_boxes, "n_boxes", positive=False)
         _validate_dimension(self.n_particles, "n_particles", positive=False)
         _validate_dimension(self.n_species, "n_species", positive=False)
-        if self.n_gas_species is not None:
-            _validate_dimension(
-                self.n_gas_species, "n_gas_species", positive=False
-            )
+        _validate_dimension(self.n_gas_species, "n_gas_species", positive=False)
 
 
 @dataclass(frozen=True)
@@ -365,7 +367,7 @@ class ResidentMetadata:
     device: Device
     gas_names: tuple[str, ...]
     stream: ResidentStreamMetadata = ResidentStreamMetadata(0, 0, (), ())
-    distribution_type: str | None = None
+    distribution_type: str = ""
 
     def __post_init__(self) -> None:
         """Validate fixed-cost metadata declarations without normalizing names.
@@ -380,7 +382,6 @@ class ResidentMetadata:
             raise ValueError("device.backend must be Backend.WARP.")
         _validate_gas_names(self.gas_names)
         if self.distribution_type not in (
-            None,
             "discrete",
             "particle_resolved",
         ):
@@ -1596,7 +1597,10 @@ def setup_resident_session(
         device=device.native,
     )
     metadata = ResidentMetadata(
-        device, gas_names, stream, validated_particles.distribution_type
+        device,
+        gas_names,
+        stream,
+        cast(str, validated_particles.distribution_type),
     )
     return ResidentSession(
         warp_particles,

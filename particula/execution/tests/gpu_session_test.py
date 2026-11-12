@@ -36,6 +36,7 @@ def _metadata(species: int = 1) -> ResidentMetadata:
     return ResidentMetadata(
         Device(Backend.WARP, "cpu"),
         tuple(f"species_{index}" for index in range(species)),
+        distribution_type="particle_resolved",
     )
 
 
@@ -63,11 +64,11 @@ def test_resident_revalidation_rejects_new_population_tag():
         particles=particles,
         gas=gas,
         environment=environment,
-        dimensions=ResidentDimensions(1, 2, 1),
+        dimensions=ResidentDimensions(1, 2, 1, 1),
         metadata=_metadata(),
         lifecycle=ResidentLifecycle.ACTIVE,
     )
-    particles.distribution_kind = 3
+    particles.distribution_kind = 1
     with pytest.raises(
         ValueError, match="population metadata does not match session"
     ):
@@ -109,6 +110,7 @@ def _warp_resources(
     )
 
     particles = WarpParticleData()
+    particles.distribution_kind = wp.int32(3)
     particles.masses = wp.ones(
         (boxes, particles_count, species), dtype=wp.float64, device="cpu"
     )
@@ -147,7 +149,7 @@ def _guard() -> ResidentStepGuard:
         particles,
         gas,
         environment,
-        ResidentDimensions(1, 2, 1),
+        ResidentDimensions(1, 2, 1, 1),
         _metadata(),
         ResidentLifecycle.ACTIVE,
     )
@@ -211,10 +213,12 @@ def _snapshot_resources(
 
 def test_carriers_validate_and_remain_immutable() -> None:
     """Test CPU-only dimensions, metadata, and lifecycle vocabulary."""
-    dimensions = ResidentDimensions(1, 0, 0)
-    metadata = ResidentMetadata(Device(Backend.WARP, "cpu"), ())
+    dimensions = ResidentDimensions(1, 0, 0, 0)
+    metadata = ResidentMetadata(
+        Device(Backend.WARP, "cpu"), (), distribution_type="particle_resolved"
+    )
 
-    assert dimensions == ResidentDimensions(1, 0, 0)
+    assert dimensions == ResidentDimensions(1, 0, 0, 0)
     assert metadata.gas_names is metadata.gas_names
     assert set(ResidentLifecycle) == {
         ResidentLifecycle.ACTIVE,
@@ -249,6 +253,7 @@ def test_dimensions_reject_invalid_values(
         "n_boxes": 1,
         "n_particles": 0,
         "n_species": 0,
+        "n_gas_species": 0,
     }
     values[name] = value
     with pytest.raises(error, match=message):
@@ -268,14 +273,18 @@ def test_metadata_rejects_invalid_values(
 ) -> None:
     """Test metadata does not normalize invalid device or name declarations."""
     with pytest.raises(error, match=message):
-        ResidentMetadata(device, names)  # type: ignore[arg-type]
+        ResidentMetadata(device, names, distribution_type="particle_resolved")  # type: ignore[arg-type]
 
 
 def test_metadata_preserves_valid_names_by_identity() -> None:
     """Test metadata retains valid tuple and string names by identity."""
     names = ("ok", "still_ok")
 
-    metadata = ResidentMetadata(Device(Backend.WARP, "cpu"), names)
+    metadata = ResidentMetadata(
+        Device(Backend.WARP, "cpu"),
+        names,
+        distribution_type="particle_resolved",
+    )
 
     assert metadata.gas_names is names
 
@@ -285,7 +294,12 @@ def test_resident_stream_metadata_validates_and_is_retained_by_metadata() -> (
 ):
     """Test stream metadata preserves an explicit nontrivial lane manifest."""
     stream = ResidentStreamMetadata(2, 41, ("north", "south"), (1, 0))
-    metadata = ResidentMetadata(Device(Backend.WARP, "cpu"), (), stream)
+    metadata = ResidentMetadata(
+        Device(Backend.WARP, "cpu"),
+        (),
+        stream,
+        distribution_type="particle_resolved",
+    )
 
     assert metadata.stream is stream
     assert stream.root_seed == 41
@@ -301,7 +315,11 @@ def test_resident_stream_metadata_validates_and_is_retained_by_metadata() -> (
 def test_metadata_rejects_non_string_names(names: tuple[object, ...]) -> None:
     """Test metadata requires exact string gas-name entries."""
     with pytest.raises(TypeError, match="exact str instances"):
-        ResidentMetadata(Device(Backend.WARP, "cpu"), names)  # type: ignore[arg-type]
+        ResidentMetadata(
+            Device(Backend.WARP, "cpu"),
+            names,  # type: ignore[arg-type]
+            distribution_type="particle_resolved",
+        )
 
 
 def test_module_import_does_not_load_warp_or_gpu() -> None:
@@ -312,8 +330,8 @@ def test_module_import_does_not_load_warp_or_gpu() -> None:
 import sys
 from particula.execution import Backend, Device
 from particula.execution.gpu_session import ResidentDimensions, ResidentLifecycle, ResidentMetadata
-ResidentDimensions(1, 0, 0)
-ResidentMetadata(Device(Backend.WARP, 'cpu'), ())
+ResidentDimensions(1, 0, 0, 0)
+ResidentMetadata(Device(Backend.WARP, 'cpu'), (), distribution_type='particle_resolved')
 assert ResidentLifecycle.ACTIVE.value == 'active'
 assert not any(name == 'warp' or name.startswith('particula.gpu') for name in sys.modules)
 """
@@ -344,7 +362,7 @@ def test_session_retains_valid_resources_by_identity(
     particles, gas, environment = _warp_resources(
         boxes, particle_count, species
     )
-    dimensions = ResidentDimensions(*shape)
+    dimensions = ResidentDimensions(*shape, n_gas_species=shape[2])
     metadata = _metadata(species)
     before = _snapshot_resources(particles, gas, environment)
     for lifecycle in ResidentLifecycle:
@@ -375,13 +393,17 @@ def test_session_preserves_gas_name_identity() -> None:
     """Test valid session construction preserves valid gas-name tuples."""
     particles, gas, environment = _warp_resources(species=2)
     names = ("species_0", "species_1")
-    metadata = ResidentMetadata(Device(Backend.WARP, "cpu"), names)
+    metadata = ResidentMetadata(
+        Device(Backend.WARP, "cpu"),
+        names,
+        distribution_type="particle_resolved",
+    )
 
     session = ResidentSession(
         particles,
         gas,
         environment,
-        ResidentDimensions(1, 2, 2),
+        ResidentDimensions(1, 2, 2, 2),
         metadata,
         ResidentLifecycle.ACTIVE,
     )
@@ -394,7 +416,7 @@ def test_session_preserves_gas_name_identity() -> None:
 def test_session_rejects_schema_and_metadata_mismatches() -> None:
     """Test isolated schema failures are deterministic and read-only."""
     particles, gas, environment = _warp_resources()
-    dimensions = ResidentDimensions(1, 2, 1)
+    dimensions = ResidentDimensions(1, 2, 1, 1)
 
     with pytest.raises(ValueError, match="gas_names length"):
         ResidentSession(
@@ -402,7 +424,11 @@ def test_session_rejects_schema_and_metadata_mismatches() -> None:
             gas,
             environment,
             dimensions,
-            ResidentMetadata(Device(Backend.WARP, "cpu"), ("a", "b")),
+            ResidentMetadata(
+                Device(Backend.WARP, "cpu"),
+                ("a", "b"),
+                distribution_type="particle_resolved",
+            ),
             ResidentLifecycle.ACTIVE,
         )
     with pytest.raises(ValueError, match="metadata.device.native"):
@@ -411,7 +437,11 @@ def test_session_rejects_schema_and_metadata_mismatches() -> None:
             gas,
             environment,
             dimensions,
-            ResidentMetadata(Device(Backend.WARP, "cuda:0"), ("a",)),
+            ResidentMetadata(
+                Device(Backend.WARP, "cuda:0"),
+                ("a",),
+                distribution_type="particle_resolved",
+            ),
             ResidentLifecycle.ACTIVE,
         )
     with pytest.raises(ValueError, match="masses shape must match"):
@@ -419,7 +449,7 @@ def test_session_rejects_schema_and_metadata_mismatches() -> None:
             particles,
             gas,
             environment,
-            ResidentDimensions(1, 1, 1),
+            ResidentDimensions(1, 1, 1, 1),
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
@@ -459,7 +489,7 @@ def test_session_rejects_overlapping_primary_arrays(
             particles,
             gas,
             environment,
-            ResidentDimensions(1, 2, 1),
+            ResidentDimensions(1, 2, 1, 1),
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
@@ -467,8 +497,10 @@ def test_session_rejects_overlapping_primary_arrays(
 
 def test_preflight_rejects_cpu_carriers_before_warp_import() -> None:
     """Test carrier and identity failures precede optional Warp import."""
-    dimensions = ResidentDimensions(1, 0, 0)
-    metadata = ResidentMetadata(Device(Backend.WARP, "cpu"), ())
+    dimensions = ResidentDimensions(1, 0, 0, 0)
+    metadata = ResidentMetadata(
+        Device(Backend.WARP, "cpu"), (), distribution_type="particle_resolved"
+    )
     with pytest.raises(TypeError, match="exact ResidentDimensions"):
         ResidentSession(
             object(),
@@ -518,7 +550,7 @@ def blocked_import(name, *args, **kwargs):
         raise ModuleNotFoundError("No module named 'warp'", name='warp')
     return original_import(name, *args, **kwargs)
 builtins.__import__ = blocked_import
-metadata = ResidentMetadata(Device(Backend.WARP, 'cpu'), ())
+metadata = ResidentMetadata(Device(Backend.WARP, 'cpu'), (), distribution_type='particle_resolved')
 try:
     ResidentSession(object(), object(), object(), object(), metadata, ResidentLifecycle.ACTIVE)
 except TypeError as error:
@@ -527,13 +559,13 @@ else:
     raise AssertionError('carrier error did not precede Warp import')
 shared = object()
 try:
-    ResidentSession(shared, shared, object(), ResidentDimensions(1, 0, 0), metadata, ResidentLifecycle.ACTIVE)
+    ResidentSession(shared, shared, object(), ResidentDimensions(1, 0, 0, 0), metadata, ResidentLifecycle.ACTIVE)
 except ValueError as error:
     assert str(error) == 'particles and gas must not be identical.'
 else:
     raise AssertionError('identity error did not precede Warp import')
 try:
-    ResidentSession(object(), object(), object(), ResidentDimensions(1, 0, 0), metadata, ResidentLifecycle.ACTIVE)
+    ResidentSession(object(), object(), object(), ResidentDimensions(1, 0, 0, 0), metadata, ResidentLifecycle.ACTIVE)
 except RuntimeError as error:
     assert str(error) == 'ResidentSession requires the optional Warp runtime.'
 else:
@@ -573,7 +605,7 @@ def test_missing_warp_runtime_is_covered_without_loading_generated_types(
             object(),
             object(),
             object(),
-            ResidentDimensions(1, 0, 0),
+            ResidentDimensions(1, 0, 0, 0),
             _metadata(0),
             ResidentLifecycle.ACTIVE,
         )
@@ -663,7 +695,7 @@ def test_step_guards_share_one_open_token_per_registry_binding() -> None:
         particles,
         gas,
         environment,
-        ResidentDimensions(1, 2, 1),
+        ResidentDimensions(1, 2, 1, 1),
         _metadata(),
         ResidentLifecycle.ACTIVE,
     )
@@ -695,7 +727,7 @@ def test_step_guard_rejects_nonfinite_completed_time_atomically() -> None:
         particles,
         gas,
         environment,
-        ResidentDimensions(1, 2, 1),
+        ResidentDimensions(1, 2, 1, 1),
         _metadata(),
         ResidentLifecycle.ACTIVE,
     )
@@ -742,7 +774,7 @@ def test_step_guard_completion_time_failure_is_atomic() -> None:
         particles,
         gas,
         environment,
-        ResidentDimensions(1, 2, 1),
+        ResidentDimensions(1, 2, 1, 1),
         _metadata(),
         ResidentLifecycle.ACTIVE,
     )
@@ -908,7 +940,7 @@ def test_session_revalidates_fabricated_cpu_carriers_before_warp_import() -> (
             object(),
             object(),
             object(),
-            ResidentDimensions(1, 0, 0),
+            ResidentDimensions(1, 0, 0, 0),
             invalid_metadata,
             ResidentLifecycle.ACTIVE,
         )
@@ -921,7 +953,7 @@ def test_session_revalidates_fabricated_cpu_carriers_before_warp_import() -> (
             object(),
             object(),
             object(),
-            ResidentDimensions(1, 0, 0),
+            ResidentDimensions(1, 0, 0, 0),
             invalid_names,
             ResidentLifecycle.ACTIVE,
         )
@@ -931,7 +963,7 @@ def test_session_revalidates_fabricated_cpu_carriers_before_warp_import() -> (
             object(),
             object(),
             object(),
-            ResidentDimensions(1, 0, 0),
+            ResidentDimensions(1, 0, 0, 0),
             _metadata(0),
             "active",  # type: ignore[arg-type]
         )
@@ -958,7 +990,7 @@ def test_session_rejects_each_invalid_generated_container(
             resources["particles"],
             resources["gas"],
             resources["environment"],
-            ResidentDimensions(1, 2, 1),
+            ResidentDimensions(1, 2, 1, 1),
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
@@ -992,7 +1024,7 @@ def test_session_rejects_each_primary_array_wrong_shape_read_only(
             particles,
             gas,
             environment,
-            ResidentDimensions(1, 2, 1),
+            ResidentDimensions(1, 2, 1, 1),
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
@@ -1023,7 +1055,7 @@ def test_session_rejects_each_primary_array_wrong_dtype_read_only(
             particles,
             gas,
             environment,
-            ResidentDimensions(1, 2, 1),
+            ResidentDimensions(1, 2, 1, 1),
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
@@ -1059,7 +1091,7 @@ def test_session_rejects_each_primary_array_wrong_device_read_only(
             particles,
             gas,
             environment,
-            ResidentDimensions(1, 2, 1),
+            ResidentDimensions(1, 2, 1, 1),
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
@@ -1082,7 +1114,7 @@ def test_session_rejects_masses_metadata_and_native_device_read_only() -> None:
             particles,
             gas,
             environment,
-            ResidentDimensions(1, 2, 1),
+            ResidentDimensions(1, 2, 1, 1),
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
@@ -1096,7 +1128,7 @@ def test_session_rejects_masses_metadata_and_native_device_read_only() -> None:
             particles,
             gas,
             environment,
-            ResidentDimensions(1, 2, 1),
+            ResidentDimensions(1, 2, 1, 1),
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
@@ -1110,7 +1142,7 @@ def test_session_rejects_masses_metadata_and_native_device_read_only() -> None:
             particles,
             gas,
             environment,
-            ResidentDimensions(1, 2, 1),
+            ResidentDimensions(1, 2, 1, 1),
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
@@ -1120,8 +1152,12 @@ def test_session_rejects_masses_metadata_and_native_device_read_only() -> None:
             particles,
             gas,
             environment,
-            ResidentDimensions(1, 2, 1),
-            ResidentMetadata(Device(Backend.WARP, "not-cpu"), ("species_0",)),
+            ResidentDimensions(1, 2, 1, 1),
+            ResidentMetadata(
+                Device(Backend.WARP, "not-cpu"),
+                ("species_0",),
+                distribution_type="particle_resolved",
+            ),
             ResidentLifecycle.ACTIVE,
         )
     assert _snapshot_resources(particles, gas, environment) == before
@@ -1141,7 +1177,7 @@ def test_session_rejects_primary_array_without_metadata_read_only() -> None:
             particles,
             gas,
             environment,
-            ResidentDimensions(1, 2, 1),
+            ResidentDimensions(1, 2, 1, 1),
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
@@ -1180,7 +1216,7 @@ def test_session_schema_validation_never_performs_runtime_work(
         particles,
         gas,
         environment,
-        ResidentDimensions(1, 2, 1),
+        ResidentDimensions(1, 2, 1, 1),
         _metadata(),
         ResidentLifecycle.ACTIVE,
     )
@@ -1198,7 +1234,7 @@ def test_session_schema_validation_never_performs_runtime_work(
             particles,
             gas,
             environment,
-            ResidentDimensions(1, 2, 1),
+            ResidentDimensions(1, 2, 1, 1),
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
@@ -1216,6 +1252,7 @@ def _cpu_resources(
         charge=np.zeros((boxes, particle_count), dtype=np.float64),
         density=np.ones(species, dtype=np.float64),
         volume=np.ones(boxes, dtype=np.float64),
+        distribution_type="particle_resolved",
     )
     gas = GasData(
         name=[f"species_{index}" for index in range(species)],
@@ -1300,7 +1337,7 @@ def test_setup_resident_session_converts_once_and_retains_identity(
     assert session.particles is warp_particles
     assert session.gas is warp_gas
     assert session.environment is warp_environment
-    assert session.dimensions == ResidentDimensions(2, 2, 2)
+    assert session.dimensions == ResidentDimensions(2, 2, 2, 2)
     assert session.metadata.gas_names == tuple(gas.name)
     assert session.lifecycle is ResidentLifecycle.ACTIVE
     assert not hasattr(warp_gas, "name")
@@ -1568,6 +1605,7 @@ from particula.particles import ParticleData
 particles = ParticleData(
     masses=np.ones((1, 2, 1)), concentration=np.ones((1, 2)),
     charge=np.zeros((1, 2)), density=np.ones((1,)), volume=np.ones((1,)),
+    distribution_type="particle_resolved",
 )
 gas = GasData(
     name=['species_0'], molar_mass=np.ones((1,)),
@@ -2204,7 +2242,7 @@ def test_session_stream_lifecycle_requires_closed_active_binding() -> None:
         particles,
         gas,
         environment,
-        ResidentDimensions(1, 2, 1),
+        ResidentDimensions(1, 2, 1, 1),
         _metadata(),
         ResidentLifecycle.ACTIVE,
     )
@@ -2297,3 +2335,43 @@ def test_stream_lifecycle_binding_rejection_precedes_registry_delegation(
         session.reset_streams(registry, other_guard)
 
     assert calls == []
+
+
+@pytest.mark.parametrize("kind", [None, "", "legacy_untagged"])
+def test_resident_metadata_requires_explicit_population_kind(kind):
+    """Omitted or historical population meaning is not resident metadata."""
+    with pytest.raises(ValueError, match="distribution_type"):
+        ResidentMetadata(
+            Device(Backend.WARP, "cpu"), (), distribution_type=kind
+        )
+
+
+def test_resident_dimensions_require_independent_gas_width():
+    """Particle-material width cannot supply an omitted gas dimension."""
+    with pytest.raises(TypeError, match="n_gas_species"):
+        ResidentDimensions(1, 2, 3)  # type: ignore[call-arg]
+    with pytest.raises(TypeError, match="n_gas_species"):
+        ResidentDimensions(1, 2, 3, None)  # type: ignore[arg-type]
+    assert ResidentDimensions(1, 2, 3, 0).gas_species == 0
+
+
+def test_untagged_cpu_session_rejects_before_optional_import(monkeypatch):
+    """CPU scratch without interpretation cannot reach session upload."""
+    import builtins
+
+    particles, gas, environment = _cpu_resources()
+    particles.distribution_type = None
+    before = particles.concentration.copy()
+    original_import = builtins.__import__
+
+    def guarded_import(name, *args, **kwargs):
+        if name == "warp" or name.startswith("particula.gpu"):
+            pytest.fail("untagged session reached optional backend import")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", guarded_import)
+    with pytest.raises(ValueError, match="explicit metadata"):
+        setup_resident_session(
+            particles, gas, environment, Device(Backend.WARP, "cpu")
+        )
+    np.testing.assert_array_equal(particles.concentration, before)

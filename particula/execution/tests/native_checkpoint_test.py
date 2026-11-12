@@ -96,13 +96,14 @@ def test_native_checkpoint_rejects_semantic_drift_before_setup(
             distribution_type=None if failure == "kind" else "continuous_pdf",
         )
     elif failure in ("gas_width", "missing_width"):
-        checkpoint = replace(
-            checkpoint,
-            dimensions=replace(
-                checkpoint.dimensions,
-                n_gas_species=4 if failure == "gas_width" else None,
-            ),
+        dimensions = replace(checkpoint.dimensions)
+        # Bypass constructor validation to exercise corrupted restart metadata.
+        object.__setattr__(
+            dimensions,
+            "n_gas_species",
+            4 if failure == "gas_width" else None,
         )
+        checkpoint = replace(checkpoint, dimensions=dimensions)
     else:
         target = Device(Backend.WARP, "cuda:0" if device == "cpu" else "cpu")
     monkeypatch.setattr(

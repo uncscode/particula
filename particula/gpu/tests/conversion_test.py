@@ -57,10 +57,10 @@ def _available_warp_devices() -> list[str]:
 def test_p1_raw_particle_transfer_characterization(
     device: str, volume: float, kind: str
 ) -> None:
-    """Transfers have no distribution metadata and never normalize weights."""
+    """Transfers preserve explicit PMF/count tags; PDF remains unsupported."""
     from particula.particles.particle_data import ParticleData
 
-    # PDF is transfer-only; no GPU PDF physics is asserted.
+    # Original raw PDF fixture is retained as an unsupported-transfer case.
     weights = [1e9, 2e9, 1e9] if kind == "pdf_transfer_only" else [8, 0.5, 0]
     source = ParticleData(
         masses=np.array([[[0.5e-18, 1.5e-18], [2e-18, 3e-18], [0.0, 0.0]]]),
@@ -68,7 +68,19 @@ def test_p1_raw_particle_transfer_characterization(
         charge=np.array([[1.0, -1.0, 0.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([volume]),
+        distribution_type="discrete"
+        if kind == "discrete"
+        else "particle_resolved",
     )
+    if kind == "pdf_transfer_only":
+        source.distribution_type = "continuous_pdf"
+        with pytest.raises(ValueError, match="continuous_pdf"):
+            to_warp_particle_data(source, device=device, copy=True)
+        return
+    if kind == "discrete" and volume != 1.0:
+        with pytest.raises(ValueError, match="PMF/PDF volume"):
+            to_warp_particle_data(source, device=device, copy=True)
+        return
     mirror = to_warp_particle_data(source, device=device, copy=True)
     restored = from_warp_particle_data(mirror)
     for field in ("masses", "concentration", "charge", "density", "volume"):
@@ -271,6 +283,7 @@ def sample_particle_data():
         charge=np.zeros((n_boxes, n_particles)),
         density=np.array([1000.0, 1200.0, 1500.0]),
         volume=np.array([1e-3, 1e-3]),
+        distribution_type="particle_resolved",
     )
 
 
@@ -884,6 +897,7 @@ class TestMultiBoxScenarios:
             charge=np.zeros((n_boxes, n_particles)),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1e-3] * n_boxes),
+            distribution_type="particle_resolved",
         )
 
         gpu_data = to_warp_particle_data(data, device="cpu")
@@ -928,6 +942,7 @@ class TestMultiBoxScenarios:
             charge=np.zeros((n_boxes, n_particles)),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.array([1e-6]),
+            distribution_type="particle_resolved",
         )
 
         gpu_data = to_warp_particle_data(data, device="cpu")
@@ -970,6 +985,7 @@ class TestMultiBoxScenarios:
             charge=np.zeros((n_boxes, n_particles)),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1e-3] * n_boxes),
+            distribution_type="particle_resolved",
         )
 
         gpu_data = to_warp_particle_data(data, device="cpu")
@@ -1020,6 +1036,7 @@ class TestMultiBoxScenarios:
             charge=np.zeros((1, 10)),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1e-3]),
+            distribution_type="particle_resolved",
         )
 
         gpu_data = to_warp_particle_data(data, device="cpu")
@@ -1038,6 +1055,7 @@ class TestMultiBoxScenarios:
             charge=np.array([[0.0]]),  # (1, 1)
             density=np.array([1000.0]),  # (1,)
             volume=np.array([1e-3]),  # (1,)
+            distribution_type="particle_resolved",
         )
 
         gpu_data = to_warp_particle_data(data, device="cpu")

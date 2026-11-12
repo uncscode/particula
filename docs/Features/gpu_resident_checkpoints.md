@@ -3,9 +3,11 @@
 Current controllers create schema-v5 checkpoints with explicit population type
 and independent particle-material and gas widths. Schemas v1–v4 reject before
 setup or upload; there is no inferred migration. Supported population semantics
-are native PMF, native resolved counts, and explicitly marked transitional
-untagged carriers. PDF remains unsupported on Warp. Native inspection carriers
-retain their population tag; canonical bytes remain restart authority.
+are explicit PMF and resolved counts, with independently declared gas width.
+Schema-v5 `legacy_untagged` records and missing population meaning reject before
+setup or upload without inferred migration or a schema-version change. PDF
+remains unsupported on Warp. Native inspection carriers retain their population
+tag; canonical bytes remain restart authority.
 
 Resident communication is a concrete-only closed-map barrier. Communication
 runs before optional physical volume evolution; both invalidate saturation
