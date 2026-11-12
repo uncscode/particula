@@ -1851,3 +1851,23 @@ leaves Python/ipynb notebook eligibility unchanged. No Markdown notebooks were
 found in the supported docs. The routing regression passed (1 test, 0.02s).
 Full strict publication rerun is active in session 84473, log
 `/tmp/m6-full-publication-routing1.log`; poll this handle before retrying.
+
+### Warning-free publication routing closure
+
+Full strict publication passed with exit 0 in **49.06 seconds** and **zero
+warning/error lines**, `/tmp/m6-full-publication-routing1.log`. Generated
+Aerosol and ParticleData API HTML contains rendered API content rather than
+literal directives; the activity tutorial notebook HTML remains rendered.
+The ordinary strict build also passed in **1.56 seconds**,
+`/tmp/m6-standard-routing1.log`. The infrastructure suite including the routing
+regression passed **132 tests in 25.74s**, `/tmp/m6-scripts-routing1.log`.
+The hook corrects notebook eligibility before parsing; it suppresses no warning
+and removes no supported API or Python/ipynb notebook from publication.
+All three runs are terminal. Later documentation edits require renewed final
+publication validation; these results do not execute notebook workloads.
+
+Untargeted normal-coverage repository runner started at benchmark commit
+`48771293c` with the routing-only docs changes present:
+`PATH="$PWD/.venv/bin:$PATH" WARP_CACHE_PATH=/tmp/particula-m6-warp
+.opencode/tools/run_pytest.py`. Session 88972 remains confirmed live; buffered
+output is `/tmp/m6-full-runner1.log`. Poll this session before restarting.
