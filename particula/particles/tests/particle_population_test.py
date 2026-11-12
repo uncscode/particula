@@ -8,11 +8,8 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 from particula.gpu import conversion
-from particula.particles.activity_strategies import ActivityIdealMass
-from particula.particles.distribution_strategies import MassBasedMovingBin
-from particula.particles.particle_data import ParticleData, to_representation
+from particula.particles.particle_data import ParticleData
 from particula.particles.particle_data_builder import ParticleDataBuilder
-from particula.particles.surface_strategies import SurfaceStrategyMass
 
 
 def _particles(kind: str, volume: float = 1.0) -> ParticleData:
@@ -184,17 +181,6 @@ def test_pdf_transfer_rejects_before_warp_probe(
     for copy in (True, False):
         with pytest.raises(ValueError, match="continuous_pdf.*unsupported"):
             conversion.to_warp_particle_data(data, device="cpu", copy=copy)
-
-
-def test_tagged_facade_restore_rejects_lost_provenance() -> None:
-    """A legacy facade cannot retain an explicit PMF/PDF kind or radius grid."""
-    with pytest.raises(ValueError, match="untagged facade"):
-        to_representation(
-            _particles("discrete"),
-            MassBasedMovingBin(),
-            ActivityIdealMass(),
-            SurfaceStrategyMass(),
-        )
 
 
 @pytest.mark.parametrize(
