@@ -29,10 +29,6 @@
          <lastmod>2026-11-12</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/API/particula/_legacy_aerosol/</loc>
-         <lastmod>2026-11-12</lastmod>
-    </url>
-    <url>
          <loc>https://uncscode.github.io/particula/API/particula/abc_builder/</loc>
          <lastmod>2026-11-12</lastmod>
     </url>
@@ -521,14 +517,6 @@
          <lastmod>2026-11-12</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/API/particula/gas/atmosphere/</loc>
-         <lastmod>2026-11-12</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/API/particula/gas/atmosphere_builders/</loc>
-         <lastmod>2026-11-12</lastmod>
-    </url>
-    <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/environment_data/</loc>
          <lastmod>2026-11-12</lastmod>
     </url>
@@ -554,18 +542,6 @@
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/</loc>
-         <lastmod>2026-11-12</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/API/particula/gas/species/</loc>
-         <lastmod>2026-11-12</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/API/particula/gas/species_builders/</loc>
-         <lastmod>2026-11-12</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/API/particula/gas/species_factories/</loc>
          <lastmod>2026-11-12</lastmod>
     </url>
     <url>
@@ -753,10 +729,6 @@
          <lastmod>2026-11-12</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/API/particula/particles/change_particle_representation/</loc>
-         <lastmod>2026-11-12</lastmod>
-    </url>
-    <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/distribution_builders/</loc>
          <lastmod>2026-11-12</lastmod>
     </url>
@@ -786,18 +758,6 @@
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/</loc>
-         <lastmod>2026-11-12</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/API/particula/particles/representation/</loc>
-         <lastmod>2026-11-12</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/API/particula/particles/representation_builders/</loc>
-         <lastmod>2026-11-12</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/API/particula/particles/representation_factories/</loc>
          <lastmod>2026-11-12</lastmod>
     </url>
     <url>
@@ -1338,6 +1298,10 @@
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Features/Roadmap/condensation-stiffness-study/</loc>
+         <lastmod>2026-11-12</lastmod>
+    </url>
+    <url>
+         <loc>https://uncscode.github.io/particula/Features/Roadmap/data-native-v030-closeout/</loc>
          <lastmod>2026-11-12</lastmod>
     </url>
     <url>
