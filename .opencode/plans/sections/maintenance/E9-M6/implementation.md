@@ -288,3 +288,37 @@ Validation:
 - Scoped Ruff and whitespace checks passed. Initial focused run found the
   obsolete aggressive-step clipping expectation; its two native successor
   checks pass in the broader run. No physics or tolerances changed.
+
+## Native-only wall-loss strategies
+
+Removed facade unions/overloads/imports and legacy coefficient, rate and step
+implementations from all CPU wall-loss strategies. Their existing native
+implementations remain authoritative and now explicitly reject non-ParticleData
+inputs before physical coefficient work. Removed the implicit charged-particle
+cache reader: charge-free array calls assume zero charge; charged array calls
+continue to take explicit charges through `compute_coefficient_from_arrays`.
+The neutral/charged coefficient laws and standalone stochastic helper remain.
+
+Both strategy suites had already migrated to native fixtures in M3 commit
+`3ca096650`; their original 16 + 43 scientific tests are unchanged by this
+removal. Added 16 population-boundary cases across four geometries/families and
+four entry points, plus two independent charge-free helper checks. Existing
+native independent coefficient, conservation/sink and stochastic checks remain.
+Updated strategy/API prose and corrected the adjacent-suite collection note:
+that suite is maintained native coverage and must still run explicitly.
+
+Validation:
+- Focused native + top-level strategy + runnable group: **437 passed**,
+  `/tmp/m6-wall-strategies.log`.
+- Separate adjacent wall-loss strategy suite: **43 passed**,
+  `/tmp/m6-wall-strategies-adjacent.log`.
+- All dynamics runnable tests plus native scientific/sequence integration:
+  **825 passed**, `/tmp/m6-wall-strategies-broad.log`.
+- Native process-guide examples with `-Werror --no-cov`: **23 passed**,
+  `/tmp/m6-wall-strategies-examples.log`.
+- Full-package mypy clean, 552 files, `/tmp/m6-wall-strategies-mypy.log`.
+- Scoped Ruff/format and whitespace checks passed; base strict docs passed
+  in 1.46 seconds, `/tmp/m6-wall-strategies-docs.log`.
+
+CPU condensation/coagulation, facade definitions, untagged GPU/lifecycle
+admission, complete inventories and final publication/readiness remain pending.

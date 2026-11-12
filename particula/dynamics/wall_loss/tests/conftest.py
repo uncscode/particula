@@ -1,13 +1,9 @@
-"""Pytest configuration for wall loss tests.
+"""Keep the adjacent wall-loss contract suite out of recursive collection.
 
-This module prevents ``pytest`` from collecting the legacy
-``wall_loss_strategies_test.py`` file under this package.
-
-The tests have been moved to
-``particula/dynamics/tests/wall_loss_strategies_test.py``
-to avoid rare import edge cases when running ``pytest particula``
-via ADW tooling.
+The top-level dynamics suite covers the shared strategy behavior. This adjacent
+suite also covers charged models and stochastic array helpers and must run
+explicitly by path. Separate invocations avoid same-basename import collisions;
+see AGENTS.md. These are maintained native tests, not obsolete facade tests.
 """
 
-# Ignore the legacy test module in this package; see module docstring.
 collect_ignore_glob = ["wall_loss_strategies_test.py"]

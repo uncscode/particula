@@ -64,6 +64,8 @@ def validate(
     strategy: Any, particle: ParticleData, temperature: float, pressure: float
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Check current native storage, physics, representation and controls."""
+    if not isinstance(particle, ParticleData):
+        raise TypeError("wall loss requires native ParticleData")
     particle.validate_representation()
     if particle.distribution_type not in (
         "discrete",
