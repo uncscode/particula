@@ -1,12 +1,12 @@
 {
-  "status": "All 144 original tests have reviewed native successors or explicit facade-only dispositions; shared production compatibility removal still pending.",
+  "status": "All 144 original test nodes mapped; CPU condensation legacy dispatch removed; affected suites, native boundaries and examples validated. Final repository readiness remains pending.",
   "tests": [
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_validate_time_step_allows_zero_and_rejects_invalid",
       "assertions": [
         "self.assertRaisesRegex(ValueError, \"time_step must be finite\")"
       ],
-      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates. Calls the shared native validator directly after removal of the obsolete wrapper; native message expectation updated.",
       "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_validate_time_step_allows_zero_and_rejects_invalid"
     },
     {
@@ -54,8 +54,8 @@
       "assertions": [
         "self.assertRaises(ValueError)"
       ],
-      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
-      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_require_single_box_raises_for_multi_box"
+      "disposition": "Obsolete private compatibility helper removed. Native public evaluation now tests the enduring single-box, particle/species shape or skip-index invariant directly. Native rate masking preserves input state instead of mutating an intermediate array. Native invalid skip indices raise ValueError consistently with species-map admission.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_native_pressure_rejects_multi_box"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_vapor_pressure_helpers_handle_sequence_and_single",
@@ -130,8 +130,8 @@
       "assertions": [
         "self.assertEqual(normalized.shape, (3, 1))"
       ],
-      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
-      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_normalize_first_order_mass_transport_2d"
+      "disposition": "Obsolete private compatibility helper removed. Native public evaluation now tests the enduring single-box, particle/species shape or skip-index invariant directly. Native rate masking preserves input state instead of mutating an intermediate array. Native invalid skip indices raise ValueError consistently with species-map admission.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_native_transport_preserves_particle_species_axes"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_step_rejects_invalid_time_step",
@@ -186,24 +186,24 @@
         "self.assertIs(returned_2d, array_2d)",
         "np.testing.assert_array_equal(array_2d, expected_2d)"
       ],
-      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
-      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_direct"
+      "disposition": "Obsolete private compatibility helper removed. Native public evaluation now tests the enduring single-box, particle/species shape or skip-index invariant directly. Native rate masking preserves input state instead of mutating an intermediate array. Native invalid skip indices raise ValueError consistently with species-map admission.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_skip_partitioning_masks_native_rates_without_mutating_inputs"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_rejects_non_integer_indices",
       "assertions": [
         "self.assertRaises(TypeError)"
       ],
-      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
-      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_rejects_non_integer_indices"
+      "disposition": "Obsolete private compatibility helper removed. Native public evaluation now tests the enduring single-box, particle/species shape or skip-index invariant directly. Native rate masking preserves input state instead of mutating an intermediate array. Native invalid skip indices raise ValueError consistently with species-map admission.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_native_skip_rejects_non_integer_indices"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_out_of_bounds_raises",
       "assertions": [
         "self.assertRaises(IndexError)"
       ],
-      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
-      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_out_of_bounds_raises"
+      "disposition": "Obsolete private compatibility helper removed. Native public evaluation now tests the enduring single-box, particle/species shape or skip-index invariant directly. Native rate masking preserves input state instead of mutating an intermediate array. Native invalid skip indices raise ValueError consistently with species-map admission.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_native_skip_out_of_bounds_raises"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_step_with_particle_data_gas_data",

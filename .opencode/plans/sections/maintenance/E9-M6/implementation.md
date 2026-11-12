@@ -664,3 +664,53 @@ Validation:
 The now-unneeded production legacy condensation dispatch can be removed next.
 Final coverage, examples/notebooks, publication and installed-wheel gates remain
 pending; none are inferred from these focused runs.
+
+## Native-only shared CPU condensation strategies
+
+Removed facade imports, type unions, overloads, unwrapping/matching flags,
+untagged dispatch, implicit carrier-owned physics, and legacy isothermal,
+staggered and latent stepping from condensation_strategies.py. Removed obsolete
+per-particle/batch transfer, shape-normalization, radius-fill, raw-concentration
+mask and legacy latent bookkeeping helpers. Scientific mass-transfer utilities
+remain in their owning modules. Pressure, mass-rate, density-rate and step entry
+points now admit only tagged ParticleData/GasData with explicit process maps
+and physics. Internal material-only batch scratch remains private and does not
+interpret population semantics.
+
+Nine native scientific/control helpers are executable-AST identical to the
+preceding commit: native parameters, single step, staggered step, rate from
+parameters, latent values, Kelvin lane, theta draws, batch construction and
+staggered control validation. Strategy resolution now reads only process-owned
+configuration. All 144 original test successor references were checked against
+actual source symbols. The remaining private-helper assertions now exercise
+native pressure admission, three-particle/two-species shapes and real skip-map
+rate masking. Existing latent numerical oracles consume already-masked native
+rates instead of calling a deleted compatibility helper.
+
+Added 36 boundary cases across all three strategies and all four public
+entrypoints: untagged, wrong particle type and wrong gas type reject without
+particle/gas array mutation. Updated native time-step error expectations after
+removing the old wrapper. Rewrote public method docstrings and corrected class
+examples to require native state and process-owned physics; the user-facing
+CPU condensation guide now records completed compatibility removal. GPU
+untagged documentation remains pending its separate implementation phase.
+
+Validation:
+- Before new boundary cases: **1590 passed, 4 skipped in 13.74s**,
+  `/tmp/m6-cond-removal-second.log`; the first run found only three obsolete
+  time-step message expectations, corrected without changing rejection behavior.
+- Expanded group run concurrently with examples hit the existing theta-mode
+  timing ratio limit (3.06x versus 2.6x), with **1625 passed, 4 skipped**. No
+  threshold or workload changed. After examples finished, serial rerun of the
+  same full affected group passed: **1626 passed, 4 skipped in 13.35s**,
+  `/tmp/m6-cond-removal-serial.log`.
+- Entire source-example suite with `-Werror --no-cov`: **225 passed,
+  2 skipped in 44.20s**, `/tmp/m6-cond-removal-examples.log`.
+- Full-package mypy: **555 files passed**,
+  `/tmp/m6-cond-removal-final-mypy.log`.
+- Base strict documentation passed in **1.68s**,
+  `/tmp/m6-cond-removal-docs.log`; scoped Ruff/format and whitespace passed.
+- No obsolete helper names or legacy facade imports/unions remain in the CPU
+  condensation strategy module or condensation test tree.
+Final untargeted coverage, supported notebook execution, full publication and
+installed-wheel checks remain pending; no overall readiness claim is made.

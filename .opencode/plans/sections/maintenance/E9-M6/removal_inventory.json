@@ -1361,7 +1361,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed all facade imports/unions/overloads, unwrapping, fallback physics, untagged execution and compatibility-only stepping/normalization helpers. Native math/control helper ASTs preserved. Public pressure/rate/step require tagged ParticleData, GasData and explicit process configuration.",
       "test_nodes": []
     },
     {
