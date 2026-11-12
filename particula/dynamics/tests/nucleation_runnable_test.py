@@ -854,7 +854,9 @@ def test_runnable_sequence_preserves_process_order(
     monkeypatch: pytest.MonkeyPatch,
 ):
     """Nucleation composes through ``|`` with one inner substep per cycle."""
-    aerosol, _, _, _ = _aerosol()
+    from particula.dynamics.tests.native_nucleation_test import fixture
+
+    aerosol, _ = fixture()
     runnable = _runnable()
     calls: list[tuple[str, int]] = []
 

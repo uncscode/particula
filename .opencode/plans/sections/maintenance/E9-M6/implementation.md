@@ -130,3 +130,28 @@ Publication diagnostic session **12505** remains to be polled.
 - Equilibria suites plus native CPU adapter suite: **69 passed in 0.10s**;
   log `/tmp/m6-equilibria-removal2.log`. Scoped mypy log:
   `/tmp/m6-equilibria-mypy.log`. Ruff and whitespace checks passed.
+
+Scoped mypy did NOT pass: two override errors expose the still-native/legacy
+`RunnableABC` contract in `runnable.py`. Do not suppress these errors or restore
+the legacy equilibrium union. Next consumer cleanup must migrate the base
+runnable and dependent annotations coherently; preserve existing run/sequence
+behavior. Equilibrium assertions pass, but its type gate remains pending.
+
+## Runnable base contract cleanup
+
+Removed the legacy aggregate import/union from `runnable.py`; public native
+nucleation annotations and dilution protocol now use native Aerosol. The still
+pending LegacyNucleation deletion retains its original runtime behavior, with
+an input-preserving generic return annotation so it cannot widen the native
+base return contract. No type-error suppression was introduced.
+
+Migrated runnable mock specification and the order-only nucleation sequence
+fixture to native state, preserving dispatch-order/substep assertions. Updated
+an adapter replacement sentinel cast to its declared native contract.
+
+- Full package mypy: **clean across 552 files**; log
+  `/tmp/m6-native-runnable-mypy2.log`.
+- Runnable/execution/legacy-and-native nucleation/equilibria/native adapter
+  group: **279 passed in 6.55s**; `/tmp/m6-runnable-native.log`.
+- Scoped Ruff check/format passed.
+- Full test session 67715 and full publication session 57066 remain pending.

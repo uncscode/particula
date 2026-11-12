@@ -1978,7 +1978,7 @@ def test_cpu_adapter_rejects_replacement_aerosol_after_one_dispatch() -> None:
         ) -> AerosolLike:
             """Record the call and deliberately return another object."""
             self.calls.append((aerosol, time_step, sub_steps))
-            return cast(Aerosol, object())
+            return cast(AerosolLike, object())
 
     runnable = ReplacingRunnable()
     state = CPUExecutionState(object(), 1.0, 1)  # type: ignore[arg-type]
