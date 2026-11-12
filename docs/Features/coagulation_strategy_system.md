@@ -60,13 +60,16 @@ rates remain zero. Supplied pair kernels must be real, finite, nonnegative
 square matrices matching the population width.
 
 Gain/loss/net-rate APIs remain discrete/PDF operations. Native resolved kernel
-support does not introduce deterministic resolved rate APIs. The examples below use native state. Legacy untagged/facade
-execution remains available for compatibility until the separate M6 removal. Independent native fixtures are in
+support does not introduce deterministic resolved rate APIs. The examples below
+use native state. Independent native fixtures are in
 `particula/dynamics/coagulation/coagulation_strategy/tests/native_rates_test.py`.
 
 ### Native CPU stepping and conservation
 
-Native `step` preserves the input container and its arrays. It validates
+`step` requires explicitly tagged `ParticleData`, including on zero-duration
+calls. Non-native objects and untagged populations reject before numerical
+dispatch; the method never infers a distribution type. It preserves the input
+container and its arrays. It validates
 representation, writable/nonoverlapping destinations, environment and current
 process controls before publishing a staged update. Rejected numerical
 proposals leave caller arrays unchanged. Density, volume and the explicit PDF

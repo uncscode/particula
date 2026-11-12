@@ -13,14 +13,8 @@ from numpy.typing import NDArray
 
 from particula import gas, particles
 from particula.dynamics.coagulation import (
-    charged_dimensional_kernel,
-    charged_kernel_strategy,
     coagulation_rate,
 )
-from particula.dynamics.coagulation.particle_resolved_step import (
-    particle_resolved_method,
-)
-from particula.particles import change_particle_representation
 from particula.particles.particle_data import ParticleData
 from particula.particles.representation import ParticleRepresentation
 
@@ -680,18 +674,18 @@ class CoagulationStrategyABC(ABC):
         gain_rate = self.gain_rate(particle=particle, kernel=kernel_arr)
         return gain_rate - loss_rate
 
-    def step(  # noqa: C901
+    def step(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
         time_step: float,
-    ) -> ParticleLike:
+    ) -> ParticleData:
         """Perform a single coagulation step over a specified time interval.
 
-        Updates the particle distribution or representation based on the
-        net_rate calculated for the given time_step. CPU ``ParticleData``
-        inputs are supported only for ``n_boxes == 1``.
+        Update density populations from their net rate or merge selected
+        resolved collisions. Explicit distribution metadata and a single box
+        are required, including on zero-duration calls.
 
         Args:
             particle: The particle data to update.
@@ -700,11 +694,11 @@ class CoagulationStrategyABC(ABC):
             time_step: The timestep over which to integrate [s].
 
         Returns:
-            ParticleRepresentation or ParticleData : Updated after
-            this step.
+            ParticleData: The identical updated native container.
 
         Raises:
-            ValueError: If the distribution type is invalid or unsupported,
+            TypeError: If particle is not ParticleData.
+            ValueError: If distribution metadata is absent or unsupported,
                 or if a CPU ParticleData input has ``n_boxes != 1``.
 
         Examples:
@@ -712,272 +706,13 @@ class CoagulationStrategyABC(ABC):
             updated_particle = strategy.step(particle, 298.15, 101325, 1.0)
             ```
         """
-        particle = _unwrap_particle(particle)
-        if is_native(particle):
-            return step_native(
-                self,
-                cast(ParticleData, particle),
-                temperature,
-                pressure,
-                time_step,
+        if not isinstance(particle, ParticleData):
+            raise TypeError("coagulation step requires ParticleData")
+        if particle.distribution_type is None:
+            raise ValueError(
+                "coagulation step requires explicit distribution_type"
             )
-        if isinstance(particle, ParticleData):
-            particle = _require_single_box_particle_data(particle)
-        if self.distribution_type in ["discrete", "continuous_pdf"]:
-            net_rate_value = self.net_rate(
-                particle=particle,
-                temperature=temperature,
-                pressure=pressure,
-            )
-            # Type narrowing: cast to NDArray for add_concentration
-            concentration_change = cast(
-                NDArray[np.float64], np.atleast_1d(net_rate_value * time_step)
-            )
-            if isinstance(particle, ParticleData):
-                particle.concentration[0] += concentration_change
-                return particle
-            particle.add_concentration(concentration_change)
-            return particle
-
-        if self.distribution_type == "particle_resolved":
-            kernel_func: Optional[
-                Callable[
-                    [NDArray[np.float64], NDArray[np.float64]],
-                    NDArray[np.float64],
-                ]
-            ] = None
-            kernel_index_func: Optional[
-                Callable[
-                    [NDArray[np.int64], NDArray[np.int64]],
-                    NDArray[np.float64],
-                ]
-            ] = None
-            if isinstance(particle, ParticleData):
-                if (
-                    particle.concentration[0].size == 0
-                    or np.sum(particle.concentration[0]) == 0
-                ):
-                    return particle
-                kernel_radius = _get_particle_resolved_kernel_radius_data(
-                    data=particle,
-                    bin_radius=self.particle_resolved_radius,
-                    total_bins=self.particle_resolved_bins_number,
-                    bins_per_radius_decade=self.particle_resolved_bins_per_decade,
-                )
-                kernel_data = _get_binned_kernel_data_from_particle_data(
-                    data=particle, kernel_radius=kernel_radius
-                )
-                kernel_radius = _get_radius(kernel_data)
-                if not np.any(kernel_radius):
-                    raise ValueError(
-                        "The kernel radius cannot be zero. "
-                        "Check the particle representation."
-                    )
-                kernel = self.kernel(
-                    particle=kernel_data,
-                    temperature=temperature,
-                    pressure=pressure,
-                )
-                kernel_arr = cast(NDArray[np.float64], np.atleast_1d(kernel))
-                sort_indices = np.argsort(kernel_radius)
-                kernel_radius = kernel_radius[sort_indices]
-                if kernel_arr.ndim == 2:
-                    kernel_arr = kernel_arr[sort_indices][:, sort_indices]
-                step_func = particle_resolved_method.get_particle_resolved_coagulation_step  # noqa: E501
-                if self.use_direct_kernel:
-                    kernel_strategy = getattr(self, "kernel_strategy", None)
-                    kernel_mapping = {
-                        charged_kernel_strategy.HardSphereKernelStrategy: (
-                            charged_dimensional_kernel.get_hard_sphere_kernel_via_system_state
-                        ),
-                        (
-                            charged_kernel_strategy.CoulombDyachkov2007KernelStrategy
-                        ): (
-                            charged_dimensional_kernel.get_coulomb_kernel_dyachkov2007_via_system_state
-                        ),
-                        (
-                            charged_kernel_strategy.CoulombGatti2008KernelStrategy
-                        ): (
-                            charged_dimensional_kernel.get_coulomb_kernel_gatti2008_via_system_state
-                        ),
-                        (
-                            charged_kernel_strategy.CoulombGopalakrishnan2012KernelStrategy
-                        ): (
-                            charged_dimensional_kernel.get_coulomb_kernel_gopalakrishnan2012_via_system_state
-                        ),
-                        (
-                            charged_kernel_strategy.CoulumbChahl2019KernelStrategy
-                        ): (
-                            charged_dimensional_kernel.get_coulomb_kernel_chahl2019_via_system_state
-                        ),
-                    }
-                    kernel_builder = None
-                    if kernel_strategy is not None:
-                        kernel_builder = kernel_mapping.get(
-                            type(kernel_strategy)
-                        )
-                    if kernel_builder is None:
-                        logger.warning(
-                            "Direct kernel disabled for unsupported kernel "
-                            "strategy."
-                        )
-                    else:
-                        particle_radius = np.asarray(
-                            _get_radius(particle), dtype=np.float64
-                        )
-                        particle_mass = np.asarray(
-                            _get_mass(particle), dtype=np.float64
-                        )
-                        particle_charge = _get_charge(particle)
-                        if particle_charge is None:
-                            particle_charge = np.zeros_like(
-                                particle_radius, dtype=np.float64
-                            )
-                        charge_array = np.asarray(
-                            particle_charge, dtype=np.float64
-                        )
-                        kernel_index_func = _build_direct_kernel_index_func(
-                            particle_radius=particle_radius,
-                            particle_mass=particle_mass,
-                            particle_charge=charge_array,
-                            kernel_builder=kernel_builder,
-                            temperature=temperature,
-                            pressure=pressure,
-                        )
-                loss_gain_indices = step_func(
-                    particle_radius=_get_radius(particle),
-                    kernel=kernel_arr,
-                    kernel_radius=kernel_radius,
-                    volume=_get_volume(particle),
-                    time_step=time_step,
-                    random_generator=self.random_generator,
-                    kernel_func=kernel_func,
-                    kernel_index_func=kernel_index_func,
-                )
-                if loss_gain_indices.size == 0:
-                    return particle
-                small_index = loss_gain_indices[:, 0]
-                large_index = loss_gain_indices[:, 1]
-                small_mass = particle.masses[0][small_index].copy()
-                particle.masses[0][small_index] = 0
-                np.add.at(particle.masses[0], large_index, small_mass)
-                particle.concentration[0][small_index] = 0
-                small_charge = particle.charge[0][small_index].copy()
-                particle.charge[0][small_index] = 0
-                np.add.at(particle.charge[0], large_index, small_charge)
-                return particle
-            # get the kernel radius
-            func = (  # noqa: E501
-                change_particle_representation.get_particle_resolved_binned_radius
-            )
-            kernel_radius = func(
-                particle=cast(ParticleRepresentation, particle),
-                bin_radius=self.particle_resolved_radius,
-                total_bins=self.particle_resolved_bins_number,
-                bins_per_radius_decade=self.particle_resolved_bins_per_decade,  # noqa: E501
-            )
-            # convert particle representation to calculate kernel
-            func2 = change_particle_representation.get_speciated_mass_representation_from_particle_resolved  # noqa: E501
-            kernel_particle = func2(
-                particle=cast(ParticleRepresentation, particle),
-                bin_radius=kernel_radius,
-            )
-            kernel_radius = kernel_particle.get_radius()
-            if not np.any(kernel_radius):
-                raise ValueError(
-                    "The kernel radius cannot be zero. "
-                    "Check the particle representation."
-                )
-            kernel = self.kernel(
-                particle=kernel_particle,
-                temperature=temperature,
-                pressure=pressure,
-            )
-            # Type narrowing: cast to NDArray for step function
-            kernel_arr = cast(NDArray[np.float64], np.atleast_1d(kernel))
-            # Ensure kernel_radius is monotonically increasing for binning
-            # and reorder kernel matrix accordingly
-            sort_indices = np.argsort(kernel_radius)
-            kernel_radius = kernel_radius[sort_indices]
-            if kernel_arr.ndim == 2:
-                kernel_arr = kernel_arr[sort_indices][:, sort_indices]
-            # calculate step
-            step_func = (
-                particle_resolved_method.get_particle_resolved_coagulation_step
-            )
-            if self.use_direct_kernel:
-                kernel_strategy = getattr(self, "kernel_strategy", None)
-                kernel_mapping = {
-                    charged_kernel_strategy.HardSphereKernelStrategy: (
-                        charged_dimensional_kernel.get_hard_sphere_kernel_via_system_state
-                    ),
-                    (
-                        charged_kernel_strategy.CoulombDyachkov2007KernelStrategy
-                    ): (
-                        charged_dimensional_kernel.get_coulomb_kernel_dyachkov2007_via_system_state
-                    ),
-                    (charged_kernel_strategy.CoulombGatti2008KernelStrategy): (
-                        charged_dimensional_kernel.get_coulomb_kernel_gatti2008_via_system_state
-                    ),
-                    (
-                        charged_kernel_strategy.CoulombGopalakrishnan2012KernelStrategy
-                    ): (
-                        charged_dimensional_kernel.get_coulomb_kernel_gopalakrishnan2012_via_system_state
-                    ),
-                    (charged_kernel_strategy.CoulumbChahl2019KernelStrategy): (
-                        charged_dimensional_kernel.get_coulomb_kernel_chahl2019_via_system_state
-                    ),
-                }
-                kernel_builder = None
-                if kernel_strategy is not None:
-                    kernel_builder = kernel_mapping.get(type(kernel_strategy))
-                if kernel_builder is None:
-                    logger.warning(
-                        "Direct kernel disabled for unsupported kernel "
-                        "strategy."
-                    )
-                else:
-                    particle_radius = np.asarray(
-                        _get_radius(particle), dtype=np.float64
-                    )
-                    particle_mass = np.asarray(
-                        _get_mass(particle), dtype=np.float64
-                    )
-                    particle_charge = _get_charge(particle)
-                    if particle_charge is None:
-                        particle_charge = np.zeros_like(
-                            particle_radius, dtype=np.float64
-                        )
-                    charge_array = np.asarray(particle_charge, dtype=np.float64)
-                    kernel_index_func = _build_direct_kernel_index_func(
-                        particle_radius=particle_radius,
-                        particle_mass=particle_mass,
-                        particle_charge=charge_array,
-                        kernel_builder=kernel_builder,
-                        temperature=temperature,
-                        pressure=pressure,
-                    )
-
-            loss_gain_indices = step_func(
-                particle_radius=_get_radius(particle),
-                kernel=kernel_arr,
-                kernel_radius=kernel_radius,
-                volume=_get_volume(particle),
-                time_step=time_step,
-                random_generator=self.random_generator,
-                kernel_func=kernel_func,
-                kernel_index_func=kernel_index_func,
-            )
-            cast(ParticleRepresentation, particle).collide_pairs(
-                loss_gain_indices
-            )
-            return particle
-
-        raise ValueError(
-            "Invalid distribution type. "
-            "Must be either 'discrete', 'continuous_pdf', or"
-            " 'particle_resolved'."
-        )
+        return step_native(self, particle, temperature, pressure, time_step)
 
     def diffusive_knudsen(
         self,
