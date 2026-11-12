@@ -107,6 +107,9 @@ initializers or `ParticleDataBuilder` directly from `particula.particles`.
 The `from_species()` and `to_species()` gas bridges have also been removed.
 Construct `GasData` or use `GasDataBuilder`, preserving full ordered species
 and mixed partitioning masks; use `copy()` for detached native storage.
+`Atmosphere` and `AtmosphereBuilder` are removed as well: hold `GasData` and
+`EnvironmentData` in the native `Aerosol`, and replace them together when
+changing the full gas-species layout.
 
 | Historical API | Native replacement |
 |---|---|
