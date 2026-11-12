@@ -174,3 +174,36 @@ def test_explicit_radius_storage(kind):
         assert data.radius_grid is None
         expected = raw.sum()
     npt.assert_allclose(data.number_density, [expected], rtol=1e-12, atol=0)
+
+
+def test_native_bulk_property_successors():
+    """Native discrete totals retain the original number and mass slot sums."""
+    data = create_particle_data_from_radii(
+        radii=[1.0, 2.0, 3.0],
+        concentration=[10.0, 20.0, 30.0],
+        density=1.0,
+        charge=1.0,
+        distribution_type="discrete",
+    )
+    copied = data.copy()
+    expected_mass = np.sum(data.total_mass[0] * data.concentration[0])
+    for candidate in (data, copied):
+        npt.assert_array_equal(candidate.number_density, [60.0])
+        npt.assert_array_equal(
+            candidate.species_mass_density, [[expected_mass]]
+        )
+
+
+@pytest.mark.parametrize("species", [1, 3])
+def test_native_effective_density_successors(species):
+    """Retain mass-weighted density and the original multispecies mean oracle."""
+    masses = np.arange(1, 13, dtype=np.float64).reshape(4, 3)[:, :species]
+    density = np.arange(1, species + 1, dtype=np.float64)
+    data = create_resolved_particle_data(masses=masses, density=density)
+    expected = np.sum(masses * density, axis=1) / np.sum(masses, axis=1)
+    npt.assert_allclose(data.effective_density[0], expected, rtol=1e-7)
+    values = data.effective_density[0]
+    mean = float(np.mean(values[values != 0]))
+    assert np.isclose(
+        mean, 1.0 if species == 1 else 2.1526515151515153, rtol=1e-7
+    )

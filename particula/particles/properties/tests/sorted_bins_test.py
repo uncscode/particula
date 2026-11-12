@@ -1,4 +1,4 @@
-"""Unit tests for particula.particles.representation.get_sorted_bins_by_radius.
+"""Unit tests for the standalone particle bin-sorting utility.
 
 The tests cover:
 • Already-sorted 1-D inputs (function must return inputs unchanged).
@@ -9,7 +9,7 @@ The tests cover:
 """
 
 import numpy as np
-from particula.particles.representation import get_sorted_bins_by_radius
+from particula.particles.properties.sort_bins import get_sorted_bins_by_radius
 
 
 def test_sorted_vector():

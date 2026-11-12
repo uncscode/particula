@@ -358,7 +358,7 @@ class TestParticleDataProperties:
             density=density,
             volume=np.array([1e-6]),
         )
-        # Effective density is total mass divided by summed species volume:
+        # Effective density uses mass-weighted species densities:
         # sum(mass_i * density_i) / sum(mass_i)
         mass_weighted_density = np.sum(masses * density, axis=-1)
         total_mass = np.sum(masses, axis=-1)

@@ -863,3 +863,41 @@ Validation:
 - All ten native successors resolve; scoped Ruff/format and whitespace passed.
 The particle facade itself and a scientific sorted-bin helper still require
 review before removal. Gas/GPU and final publication gates remain pending.
+
+## Remove ParticleRepresentation after native scientific assertion audit
+
+Deleted representation.py and its export after auditing all 43 remaining test
+bodies in particle_facade_assertions.json. Native storage/copy and initialization
+retain raw fields, shape checks, explicit count/volume interpretation and
+species provenance. Added the original discrete bulk number/mass sums and
+single/multispecies mass-weighted effective density, including the original
+2.1526515151515153 mean baseline at unchanged rtol=1e-7. Corrected a recently
+introduced explanatory comment to match that retained mass-weighted formula;
+no density algorithm or numerical oracle changed.
+
+Retained the direct distribution-strategy scientific tests, including identical
+charged append input/output checks and mass/radius update oracles. Facade-only
+strategy getters, cached .data wrapping, clone flags, warning logs and disabled
+charge sentinels are retired explicitly. Native lossless charge forms and
+rejection of missing charge lanes have successor checks. Empty population
+material density remains explicit; no zero-density inference survives.
+The standalone properties/sort_bins.py implementation is unchanged; all four
+existing sorting tests retain their bodies and now import its owning module
+instead of relying on the facade module's incidental import.
+
+Added concrete-module and root/package symbol absence checks. Updated migration
+and roadmap guidance to reflect actual particle API removal and identify
+remaining gas/readiness work. Updated local scope/phase metadata to distinguish
+implemented particle removal from final acceptance; review units can contain
+multiple coherent prerequisite commits within the single PR.
+
+Validation:
+- Particle tree, root package tests and integration: **1072 passed, 1 skipped
+  in 11.98s**, `/tmp/m6-particle-facade-tests.log`.
+- Complete source examples with warnings as errors: **225 passed, 2 skipped
+  in 42.13s**, `/tmp/m6-particle-facade-examples.log`.
+- Full-package mypy: **544 files passed**, `/tmp/m6-particle-facade-mypy.log`.
+- Base strict docs passed in **1.46s**, `/tmp/m6-particle-facade-docs.log`.
+- All 43 successor symbols resolve; scoped Ruff/format and whitespace passed.
+Final installed-wheel absence, full coverage and full publication evidence
+remain pending alongside gas/GPU compatibility removal.

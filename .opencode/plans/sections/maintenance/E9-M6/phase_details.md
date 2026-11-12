@@ -15,7 +15,9 @@ tests. P5 is cross-layer integration, P6 final documentation/readiness.
 ## Accepted single-PR implementation sequence
 
 The detailed maintainer-approved plan supersedes the earlier ten-commit scope.
-One PR, fifteen serial commits, each with affected fixtures and regressions:
+One PR, fifteen logical review units, each with affected fixtures and
+regressions. Implementation splits larger units into serial prerequisite commits
+to preserve scientific assertion provenance and coherent imports:
 
 1. Finalize removal/assertion-retention inventories and baseline evidence.
 2. Remove CPU condensation facade dispatch.
@@ -63,7 +65,7 @@ full published notebook workloads are mandatory, not optional follow-ups.
     upstream gates before any facade is deleted.
 
 - [ ] **E9-M6-P2: Remove particle facades and obsolete construction with boundary tests**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1607 | Size: S | Status: Implemented; final integration/readiness pending
   - Goal: Remove ParticleRepresentation without losing native initialization.
   - Work: Delete obsolete particle representation definitions/builders/factories
     and facade-specific conversions per P1. Update package/root imports,

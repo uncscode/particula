@@ -15,6 +15,7 @@ from particula.tests.aerosol_test import native_triple
         "particula.particles.change_particle_representation",
         "particula.particles.representation_factories",
         "particula.particles.representation_builders",
+        "particula.particles.representation",
     ],
 )
 def test_removed_concrete_module(module_name):
@@ -86,4 +87,14 @@ def test_removed_particle_builder(module_name, name):
     assert not hasattr(module, name)
     with pytest.raises(ImportError) as caught:
         exec(f"from {module_name} import {name}", {})  # noqa: S102
+    assert caught.value.name == module_name
+
+
+@pytest.mark.parametrize("module_name", ["particula", "particula.particles"])
+def test_removed_particle_facade(module_name):
+    """Native particle APIs remain importable without the representation facade."""
+    module = importlib.import_module(module_name)
+    assert not hasattr(module, "ParticleRepresentation")
+    with pytest.raises(ImportError) as caught:
+        exec(f"from {module_name} import ParticleRepresentation", {})  # noqa: S102
     assert caught.value.name == module_name

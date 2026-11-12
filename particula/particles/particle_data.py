@@ -345,7 +345,7 @@ class ParticleData:
         Returns:
             Effective density in kg/m^3 with shape (n_boxes, n_particles).
         """
-        # Match ParticleRepresentation.get_effective_density():
+        # Preserve the mass-weighted effective-density convention:
         # sum_i(m_i * rho_i) / sum_i(m_i)
         mass_weighted_density_sum = np.sum(self.masses * self.density, axis=-1)
         total_mass = self.total_mass
