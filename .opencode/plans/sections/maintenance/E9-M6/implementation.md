@@ -506,3 +506,37 @@ Validation:
 - Scoped Ruff/format and whitespace checks passed; base strict documentation
   passed in 1.52 seconds, `/tmp/m6-cond-runnable-docs.log`.
 Full final coverage, notebook execution and full publication remain pending.
+
+## Native staggered conservation, performance and stability fixtures
+
+Migrated all three ancillary staggered suites to tagged resolved ParticleData,
+GasDataBuilder and explicit process-owned activity/surface/vapor-pressure laws
+and water species maps. Removal-safe guards prohibit compatibility constructors.
+Original particle counts, seeds, timesteps, theta/batch matrices, numerical
+thresholds and timing bounds are retained. Separate staggered assertion ledgers
+preserve the original test bodies and identify native successors.
+
+The conservation helper now explicitly sums count-weighted particle inventory
+and gas concentration times representative volume. Original volume-one cases
+retain their numeric meaning. Fixed an ineffective mass-change assertion that
+previously compared aliases after in-place mutation: it now uses a pre-step
+owned snapshot and the unchanged 1e-15 bound. Renamed two conservation cases
+whose gas loadings did not establish the supersaturation/equilibrium claimed
+by their names; preserved fixture values and scientific assertions.
+
+Updated test prose and AGENTS.md to describe native vectorized batches with
+sequential gas coupling. Removed unsupported claims of per-particle Python
+loops, universal overhead/complexity and a tenfold stable-timestep advantage.
+No production scientific code or algorithm was changed in this commit.
+
+Validation:
+- Condensation tree plus integration suites: **729 passed, 1 skipped in 9.29s**,
+  `/tmp/m6-staggered-migrations-broad.log`.
+- Final three migrated suites after test-name/prose corrections: **54 passed
+  in 5.91s**, `/tmp/m6-staggered-final.log` (32 conservation, 9 performance,
+  13 stability cases; no marker exclusions).
+- Full-package mypy: **552 files passed**,
+  `/tmp/m6-staggered-migrations-mypy.log`.
+- Scoped Ruff/format and whitespace checks passed after formatting.
+Shared condensation strategy legacy dispatch and its main test suite remain
+pending; these focused passes are not final M6 coverage or readiness evidence.

@@ -1,0 +1,44 @@
+[
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_stability_test.py",
+    "test": "test_stability_large_time_step",
+    "original": "def test_stability_large_time_step(self, time_step: float) -> None:\n        \"\"\"Staggered stays stable at large dt; simultaneous may diverge.\"\"\"\n        seed = 11\n        particle_sim, gas_sim = create_test_system(220, seed)\n        particle_stag, gas_stag = create_test_system(220, seed)\n\n        simultaneous = CondensationIsothermal(molar_mass=DEFAULT_MOLAR_MASS)\n        staggered = CondensationIsothermalStaggered(\n            molar_mass=DEFAULT_MOLAR_MASS,\n            theta_mode=\"half\",\n            num_batches=6,\n            shuffle_each_step=False,\n            random_state=seed,\n        )\n\n        particle_sim, gas_sim = run_simulation(\n            simultaneous,\n            particle_sim,\n            gas_sim,\n            time_step=time_step,\n            steps=6,\n        )\n        particle_stag, gas_stag = run_simulation(\n            staggered,\n            particle_stag,\n            gas_stag,\n            time_step=time_step,\n            steps=6,\n        )\n\n        mass_stag = np.asarray(particle_stag.get_mass())\n        var_stag = float(np.var(mass_stag))\n        assert is_numerically_stable(particle_stag)\n        assert var_stag <= VARIANCE_LIMIT\n        if time_step < 10.0:\n            mass_sim = np.asarray(particle_sim.get_mass())\n            var_sim = float(np.var(mass_sim))\n            assert is_numerically_stable(particle_sim)\n            assert var_sim <= VARIANCE_LIMIT",
+    "successor": "test_stability_large_time_step",
+    "disposition": "Native tagged resolved fixtures and explicit process physics; original finite/nonnegative/variance checks, seeds, timesteps and thresholds retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_stability_test.py",
+    "test": "test_stability_variance_comparison",
+    "original": "def test_stability_variance_comparison(self) -> None:\n        \"\"\"Variance growth is lower or equal for staggered at moderate dt.\"\"\"\n        seed = 7\n        particle_sim, gas_sim = create_test_system(200, seed)\n        particle_stag, gas_stag = create_test_system(200, seed)\n\n        simultaneous = CondensationIsothermal(molar_mass=DEFAULT_MOLAR_MASS)\n        staggered = CondensationIsothermalStaggered(\n            molar_mass=DEFAULT_MOLAR_MASS,\n            theta_mode=\"half\",\n            num_batches=4,\n            shuffle_each_step=False,\n            random_state=seed,\n        )\n\n        particle_sim, gas_sim = run_simulation(\n            simultaneous,\n            particle_sim,\n            gas_sim,\n            time_step=1.0,\n            steps=5,\n        )\n        particle_stag, gas_stag = run_simulation(\n            staggered,\n            particle_stag,\n            gas_stag,\n            time_step=1.0,\n            steps=5,\n        )\n\n        mass_sim = np.asarray(particle_sim.get_mass())\n        mass_stag = np.asarray(particle_stag.get_mass())\n        var_sim = float(np.var(mass_sim))\n        var_stag = float(np.var(mass_stag))\n        assert is_numerically_stable(particle_sim)\n        assert is_numerically_stable(particle_stag)\n        assert var_sim <= VARIANCE_LIMIT\n        assert var_stag <= VARIANCE_LIMIT",
+    "successor": "test_stability_variance_comparison",
+    "disposition": "Native tagged resolved fixtures and explicit process physics; original finite/nonnegative/variance checks, seeds, timesteps and thresholds retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_stability_test.py",
+    "test": "test_stability_mode_comparison",
+    "original": "def test_stability_mode_comparison(self, theta_mode: str) -> None:\n        \"\"\"All theta modes stay stable at challenging dt with fixed seed.\"\"\"\n        seed = 21\n        particle, gas_species = create_test_system(180, seed)\n        staggered = CondensationIsothermalStaggered(\n            molar_mass=DEFAULT_MOLAR_MASS,\n            theta_mode=theta_mode,\n            num_batches=6,\n            shuffle_each_step=False,\n            random_state=seed,\n        )\n\n        particle_out, gas_out = run_simulation(\n            staggered,\n            particle,\n            gas_species,\n            time_step=10.0,\n            steps=6,\n        )\n\n        assert is_numerically_stable(particle_out)\n        variance = float(np.var(particle_out.get_mass()))\n        assert variance < MAX_VARIANCE",
+    "successor": "test_stability_mode_comparison",
+    "disposition": "Native tagged resolved fixtures and explicit process physics; original finite/nonnegative/variance checks, seeds, timesteps and thresholds retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_stability_test.py",
+    "test": "test_stability_batch_count_effect",
+    "original": "def test_stability_batch_count_effect(self, num_batches: int) -> None:\n        \"\"\"Batch counts stay stable; variance remains bounded and comparable.\"\"\"\n        seed = 33\n        n_particles = max(DEFAULT_PARTICLE_COUNT, num_batches * 20)\n        particle, gas_species = create_test_system(n_particles, seed)\n        staggered = CondensationIsothermalStaggered(\n            molar_mass=DEFAULT_MOLAR_MASS,\n            theta_mode=\"batch\",\n            num_batches=num_batches,\n            shuffle_each_step=False,\n            random_state=seed,\n        )\n\n        particle_out, gas_out = run_simulation(\n            staggered,\n            particle,\n            gas_species,\n            time_step=10.0,\n            steps=5,\n        )\n\n        assert is_numerically_stable(particle_out)\n        variance = float(np.var(particle_out.get_mass()))\n        assert variance < MAX_VARIANCE",
+    "successor": "test_stability_batch_count_effect",
+    "disposition": "Native tagged resolved fixtures and explicit process physics; original finite/nonnegative/variance checks, seeds, timesteps and thresholds retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_stability_test.py",
+    "test": "test_stability_zero_time_step_noop",
+    "original": "def test_stability_zero_time_step_noop(self) -> None:\n        \"\"\"Zero time step returns early without mutation and stays stable.\"\"\"\n        particle, gas_species = create_test_system(10, seed=19)\n        initial_masses = np.array(particle.get_mass(), copy=True)\n\n        staggered = CondensationIsothermalStaggered(\n            molar_mass=DEFAULT_MOLAR_MASS,\n            theta_mode=\"half\",\n            num_batches=2,\n            shuffle_each_step=False,\n            random_state=19,\n        )\n\n        particle_out, gas_out = run_simulation(\n            staggered,\n            particle,\n            gas_species,\n            time_step=0.0,\n            steps=5,\n        )\n\n        assert np.array_equal(initial_masses, particle_out.get_mass())\n        assert is_numerically_stable(particle_out)\n        assert (\n            np.asarray(gas_out.get_concentration()).shape\n            == np.asarray(gas_species.get_concentration()).shape\n        )",
+    "successor": "test_stability_zero_time_step_noop",
+    "disposition": "Native tagged resolved fixtures and explicit process physics; original finite/nonnegative/variance checks, seeds, timesteps and thresholds retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_stability_test.py",
+    "test": "test_stability_zero_particles_safe",
+    "original": "def test_stability_zero_particles_safe(self) -> None:\n        \"\"\"Zero-particle systems exit cleanly and are reported stable.\"\"\"\n        particle, gas_species = create_test_system(0, seed=5)\n        staggered = CondensationIsothermalStaggered(\n            molar_mass=DEFAULT_MOLAR_MASS,\n            theta_mode=\"half\",\n            num_batches=1,\n            shuffle_each_step=False,\n            random_state=5,\n        )\n\n        particle_out, gas_out = run_simulation(\n            staggered,\n            particle,\n            gas_species,\n            time_step=10.0,\n            steps=5,\n        )\n\n        assert is_numerically_stable(particle_out)\n        assert particle_out.get_mass().size == 0\n        assert (\n            np.asarray(gas_out.get_concentration()).shape\n            == np.asarray(gas_species.get_concentration()).shape\n        )",
+    "successor": "test_stability_zero_particles_safe",
+    "disposition": "Native tagged resolved fixtures and explicit process physics; original finite/nonnegative/variance checks, seeds, timesteps and thresholds retained."
+  }
+]

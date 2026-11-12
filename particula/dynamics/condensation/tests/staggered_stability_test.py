@@ -1,10 +1,9 @@
 """Stability benchmarks for staggered condensation stepping.
 
-This module measures stability improvements of staggered condensation relative
-to simultaneous updates. Benchmarks evaluate bounded variance, maximum stable
-time step, and robustness across theta modes and batch counts. Target: the
-staggered strategy sustains ~10x larger stable time steps while keeping masses
-finite and non-negative.
+These native fixtures check finite nonnegative masses and bounded variance
+at specified timesteps, theta modes and batch counts. They do not establish
+accuracy, a maximum stable timestep, or a timestep advantage over simultaneous
+stepping. Both processes retain their own inventory-limited update contracts.
 
 Run with:
     pytest particula/dynamics/condensation/tests/staggered_stability_test.py \
@@ -23,12 +22,14 @@ from particula.dynamics.condensation import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,
 )
-from particula.gas import GasSpeciesBuilder, VaporPressureFactory
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
+from particula.gas import GasDataBuilder, VaporPressureFactory
 from particula.particles import (
     ActivityIdealMass,
-    ParticleResolvedSpeciatedMassBuilder,
-    ResolvedParticleMassRepresentationBuilder,
     SurfaceStrategyVolume,
+    create_resolved_particle_data,
 )
 
 pytestmark = pytest.mark.slow
@@ -50,6 +51,23 @@ _VAPOR_STRATEGY = VaporPressureFactory().get_strategy(
 )
 
 
+@pytest.fixture(autouse=True)
+def forbid_facades(forbid_legacy_facades):
+    """Check stability on supported native execution only."""
+
+
+def _physics():
+    """Keep the original material and gas laws on the process."""
+    return dict(
+        activity_strategy=ActivityIdealMass(),
+        surface_strategy=SurfaceStrategyVolume(
+            surface_tension=0.072, density=1000.0
+        ),
+        vapor_pressure_strategy=_VAPOR_STRATEGY,
+        species_map=CondensationSpeciesMap(("water",), ((0, 0),)),
+    )
+
+
 @lru_cache(maxsize=None)
 def _cached_masses(n_particles: int, seed: int) -> NDArray[np.float64]:
     """Create deterministic lognormal masses for reuse across tests."""
@@ -65,28 +83,16 @@ def create_test_system(
     masses: NDArray[np.float64] = np.array(
         _cached_masses(n_particles, seed), copy=True
     )
-    distribution_strategy = ParticleResolvedSpeciatedMassBuilder().build()
-    particle = (
-        ResolvedParticleMassRepresentationBuilder()
-        .set_distribution_strategy(distribution_strategy)
-        .set_activity_strategy(ActivityIdealMass())
-        .set_surface_strategy(
-            SurfaceStrategyVolume(surface_tension=0.072, density=1000.0)
-        )
-        .set_mass(masses, "kg")
-        .set_density(np.full_like(masses, 1000.0), "kg/m^3")
-        .set_charge(np.zeros_like(masses))
-        .set_volume(1.0, "m^3")
-        .build()
+    particle = create_resolved_particle_data(
+        masses=masses, density=1000.0, volume=1.0
     )
 
     gas_species = (
-        GasSpeciesBuilder()
-        .set_name("water")
-        .set_molar_mass(DEFAULT_MOLAR_MASS, "kg/mol")
-        .set_vapor_pressure_strategy(_VAPOR_STRATEGY)
-        .set_partitioning(True)
-        .set_concentration(0.01, "kg/m^3")
+        GasDataBuilder()
+        .set_names(["water"])
+        .set_molar_mass([DEFAULT_MOLAR_MASS])
+        .set_partitioning([True])
+        .set_concentration([0.01])
         .build()
     )
     return particle, gas_species
@@ -94,7 +100,7 @@ def create_test_system(
 
 def is_numerically_stable(particle) -> bool:
     """Check that masses stay finite, non-negative, and variance bounded."""
-    masses = np.asarray(particle.get_mass())
+    masses = np.asarray(particle.total_mass[0])
     if masses.size == 0:
         return True
     variance = float(np.var(masses))
@@ -115,7 +121,7 @@ def run_simulation(
     pressure: float = DEFAULT_PRESSURE,
 ):
     """Run multiple steps, guarding zero-length or zero-dt cases."""
-    if time_step <= 0.0 or particle.get_mass().size == 0 or steps <= 0:
+    if time_step <= 0.0 or particle.total_mass[0].size == 0 or steps <= 0:
         return particle, gas_species
     particle_current = particle
     gas_current = gas_species
@@ -134,18 +140,18 @@ def run_simulation(
 class TestStabilityBenchmarks:
     """Stability benchmarks contrasting simultaneous and staggered updates."""
 
-    @pytest.mark.filterwarnings(
-        "ignore:All radius values are zero:RuntimeWarning"
-    )
     @pytest.mark.parametrize("time_step", [1.0, 10.0, 100.0])
     def test_stability_large_time_step(self, time_step: float) -> None:
-        """Staggered stays stable at large dt; simultaneous may diverge."""
+        """Retain bounded-variance checks at the specified large timesteps."""
         seed = 11
         particle_sim, gas_sim = create_test_system(220, seed)
         particle_stag, gas_stag = create_test_system(220, seed)
 
-        simultaneous = CondensationIsothermal(molar_mass=DEFAULT_MOLAR_MASS)
+        simultaneous = CondensationIsothermal(
+            **_physics(), molar_mass=DEFAULT_MOLAR_MASS
+        )
         staggered = CondensationIsothermalStaggered(
+            **_physics(),
             molar_mass=DEFAULT_MOLAR_MASS,
             theta_mode="half",
             num_batches=6,
@@ -168,27 +174,27 @@ class TestStabilityBenchmarks:
             steps=6,
         )
 
-        mass_stag = np.asarray(particle_stag.get_mass())
+        mass_stag = np.asarray(particle_stag.total_mass[0])
         var_stag = float(np.var(mass_stag))
         assert is_numerically_stable(particle_stag)
         assert var_stag <= VARIANCE_LIMIT
         if time_step < 10.0:
-            mass_sim = np.asarray(particle_sim.get_mass())
+            mass_sim = np.asarray(particle_sim.total_mass[0])
             var_sim = float(np.var(mass_sim))
             assert is_numerically_stable(particle_sim)
             assert var_sim <= VARIANCE_LIMIT
 
-    @pytest.mark.filterwarnings(
-        "ignore:All radius values are zero:RuntimeWarning"
-    )
     def test_stability_variance_comparison(self) -> None:
-        """Variance growth is lower or equal for staggered at moderate dt."""
+        """Both native strategies retain bounded variance at moderate dt."""
         seed = 7
         particle_sim, gas_sim = create_test_system(200, seed)
         particle_stag, gas_stag = create_test_system(200, seed)
 
-        simultaneous = CondensationIsothermal(molar_mass=DEFAULT_MOLAR_MASS)
+        simultaneous = CondensationIsothermal(
+            **_physics(), molar_mass=DEFAULT_MOLAR_MASS
+        )
         staggered = CondensationIsothermalStaggered(
+            **_physics(),
             molar_mass=DEFAULT_MOLAR_MASS,
             theta_mode="half",
             num_batches=4,
@@ -211,8 +217,8 @@ class TestStabilityBenchmarks:
             steps=5,
         )
 
-        mass_sim = np.asarray(particle_sim.get_mass())
-        mass_stag = np.asarray(particle_stag.get_mass())
+        mass_sim = np.asarray(particle_sim.total_mass[0])
+        mass_stag = np.asarray(particle_stag.total_mass[0])
         var_sim = float(np.var(mass_sim))
         var_stag = float(np.var(mass_stag))
         assert is_numerically_stable(particle_sim)
@@ -220,15 +226,13 @@ class TestStabilityBenchmarks:
         assert var_sim <= VARIANCE_LIMIT
         assert var_stag <= VARIANCE_LIMIT
 
-    @pytest.mark.filterwarnings(
-        "ignore:All radius values are zero:RuntimeWarning"
-    )
     @pytest.mark.parametrize("theta_mode", ["half", "random", "batch"])
     def test_stability_mode_comparison(self, theta_mode: str) -> None:
         """All theta modes stay stable at challenging dt with fixed seed."""
         seed = 21
         particle, gas_species = create_test_system(180, seed)
         staggered = CondensationIsothermalStaggered(
+            **_physics(),
             molar_mass=DEFAULT_MOLAR_MASS,
             theta_mode=theta_mode,
             num_batches=6,
@@ -245,12 +249,9 @@ class TestStabilityBenchmarks:
         )
 
         assert is_numerically_stable(particle_out)
-        variance = float(np.var(particle_out.get_mass()))
+        variance = float(np.var(particle_out.total_mass[0]))
         assert variance < MAX_VARIANCE
 
-    @pytest.mark.filterwarnings(
-        "ignore:All radius values are zero:RuntimeWarning"
-    )
     @pytest.mark.parametrize("num_batches", [1, 2, 5, 10])
     def test_stability_batch_count_effect(self, num_batches: int) -> None:
         """Batch counts stay stable; variance remains bounded and comparable."""
@@ -258,6 +259,7 @@ class TestStabilityBenchmarks:
         n_particles = max(DEFAULT_PARTICLE_COUNT, num_batches * 20)
         particle, gas_species = create_test_system(n_particles, seed)
         staggered = CondensationIsothermalStaggered(
+            **_physics(),
             molar_mass=DEFAULT_MOLAR_MASS,
             theta_mode="batch",
             num_batches=num_batches,
@@ -274,18 +276,16 @@ class TestStabilityBenchmarks:
         )
 
         assert is_numerically_stable(particle_out)
-        variance = float(np.var(particle_out.get_mass()))
+        variance = float(np.var(particle_out.total_mass[0]))
         assert variance < MAX_VARIANCE
 
-    @pytest.mark.filterwarnings(
-        "ignore:All radius values are zero:RuntimeWarning"
-    )
     def test_stability_zero_time_step_noop(self) -> None:
         """Zero time step returns early without mutation and stays stable."""
         particle, gas_species = create_test_system(10, seed=19)
-        initial_masses = np.array(particle.get_mass(), copy=True)
+        initial_masses = np.array(particle.total_mass[0], copy=True)
 
         staggered = CondensationIsothermalStaggered(
+            **_physics(),
             molar_mass=DEFAULT_MOLAR_MASS,
             theta_mode="half",
             num_batches=2,
@@ -301,20 +301,18 @@ class TestStabilityBenchmarks:
             steps=5,
         )
 
-        assert np.array_equal(initial_masses, particle_out.get_mass())
+        assert np.array_equal(initial_masses, particle_out.total_mass[0])
         assert is_numerically_stable(particle_out)
         assert (
-            np.asarray(gas_out.get_concentration()).shape
-            == np.asarray(gas_species.get_concentration()).shape
+            np.asarray(gas_out.concentration).shape
+            == np.asarray(gas_species.concentration).shape
         )
 
-    @pytest.mark.filterwarnings(
-        "ignore:All radius values are zero:RuntimeWarning"
-    )
     def test_stability_zero_particles_safe(self) -> None:
         """Zero-particle systems exit cleanly and are reported stable."""
         particle, gas_species = create_test_system(0, seed=5)
         staggered = CondensationIsothermalStaggered(
+            **_physics(),
             molar_mass=DEFAULT_MOLAR_MASS,
             theta_mode="half",
             num_batches=1,
@@ -331,8 +329,8 @@ class TestStabilityBenchmarks:
         )
 
         assert is_numerically_stable(particle_out)
-        assert particle_out.get_mass().size == 0
+        assert particle_out.total_mass[0].size == 0
         assert (
-            np.asarray(gas_out.get_concentration()).shape
-            == np.asarray(gas_species.get_concentration()).shape
+            np.asarray(gas_out.concentration).shape
+            == np.asarray(gas_species.concentration).shape
         )

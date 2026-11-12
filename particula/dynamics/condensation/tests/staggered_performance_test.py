@@ -1,11 +1,11 @@
 """Performance benchmarks for staggered condensation stepping.
 
-These slow+performance tests measure CondensationIsothermalStaggered scaling
-characteristics, validate O(n) linear scaling with particle count, and compare
-theta-mode trade-offs. The staggered algorithm uses Gauss-Seidel style per-
-particle updates which are inherently sequential and cannot be vectorized like
-the simultaneous baseline. Therefore, staggered vs simultaneous overhead ratios
-are expected to be high (O(n) per-particle loops vs O(1) vectorized ops).
+These slow+performance tests measure native CondensationIsothermalStaggered
+scaling at fixed particle counts and compare theta modes. Native staggered
+stepping evaluates arrays within each batch while successive batches read
+updated gas inventory. Simultaneous stepping evaluates the whole population.
+The measured overhead ratio is informational; neither universal speed nor
+asymptotic complexity follows from these finite workload measurements.
 
 Run with:
     pytest particula/dynamics/condensation/tests/staggered_performance_test.py
@@ -34,13 +34,33 @@ from particula.dynamics.condensation import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,
 )
-from particula.gas import GasSpeciesBuilder, VaporPressureFactory
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
+from particula.gas import GasDataBuilder, VaporPressureFactory
 from particula.particles import (
     ActivityIdealMass,
-    ParticleResolvedSpeciatedMassBuilder,
-    ResolvedParticleMassRepresentationBuilder,
     SurfaceStrategyVolume,
+    create_resolved_particle_data,
 )
+
+
+@pytest.fixture(autouse=True)
+def forbid_facades(forbid_legacy_facades):
+    """Benchmark supported native execution, never compatibility dispatch."""
+
+
+def _physics(vapor_strategy):
+    """Bind the original material and gas laws explicitly to each process."""
+    return dict(
+        activity_strategy=ActivityIdealMass(),
+        surface_strategy=SurfaceStrategyVolume(
+            surface_tension=0.072, density=1000.0
+        ),
+        vapor_pressure_strategy=vapor_strategy,
+        species_map=CondensationSpeciesMap(("water",), ((0, 0),)),
+    )
+
 
 # =============================================================================
 # SMOKE TEST (Fast, runs in CI/CD)
@@ -74,33 +94,22 @@ def test_staggered_condensation_smoke():
         {"vapor_pressure": pressure_pa, "vapor_pressure_units": "Pa"},
     )
 
-    distribution_strategy = ParticleResolvedSpeciatedMassBuilder().build()
-    particle = (
-        ResolvedParticleMassRepresentationBuilder()
-        .set_distribution_strategy(distribution_strategy)
-        .set_activity_strategy(ActivityIdealMass())
-        .set_surface_strategy(
-            SurfaceStrategyVolume(surface_tension=0.072, density=1000.0)
-        )
-        .set_mass(masses, "kg")
-        .set_density(np.full_like(masses, 1000.0), "kg/m^3")
-        .set_charge(np.zeros_like(masses))
-        .set_volume(1.0, "m^3")
-        .build()
+    particle = create_resolved_particle_data(
+        masses=masses, density=1000.0, volume=1.0
     )
 
     gas_species = (
-        GasSpeciesBuilder()
-        .set_name("water")
-        .set_molar_mass(molar_mass, "kg/mol")
-        .set_vapor_pressure_strategy(vapor_strategy)
-        .set_partitioning(True)
-        .set_concentration(0.01, "kg/m^3")
+        GasDataBuilder()
+        .set_names(["water"])
+        .set_molar_mass([molar_mass])
+        .set_partitioning([True])
+        .set_concentration([0.01])
         .build()
     )
 
     # Create staggered condensation strategy
     staggered = CondensationIsothermalStaggered(
+        **_physics(vapor_strategy),
         molar_mass=molar_mass,
         theta_mode="random",
         num_batches=2,
@@ -120,7 +129,7 @@ def test_staggered_condensation_smoke():
     # Verify outputs are valid
     assert updated_particle is not None, "Particle should not be None"
     assert updated_gas is not None, "Gas should not be None"
-    assert updated_particle.get_mass().shape[0] == n_particles, (
+    assert updated_particle.total_mass[0].shape[0] == n_particles, (
         "Particle count should be preserved"
     )
 
@@ -163,28 +172,16 @@ def create_test_system(n_particles: int, seed: int = SEED):
         size=(n_particles, 1),
     )
 
-    distribution_strategy = ParticleResolvedSpeciatedMassBuilder().build()
-    particle = (
-        ResolvedParticleMassRepresentationBuilder()
-        .set_distribution_strategy(distribution_strategy)
-        .set_activity_strategy(ActivityIdealMass())
-        .set_surface_strategy(
-            SurfaceStrategyVolume(surface_tension=0.072, density=1000.0)
-        )
-        .set_mass(masses, "kg")
-        .set_density(np.full_like(masses, 1000.0), "kg/m^3")
-        .set_charge(np.zeros_like(masses))
-        .set_volume(1.0, "m^3")
-        .build()
+    particle = create_resolved_particle_data(
+        masses=masses, density=1000.0, volume=1.0
     )
 
     gas_species = (
-        GasSpeciesBuilder()
-        .set_name("water")
-        .set_molar_mass(DEFAULT_MOLAR_MASS, "kg/mol")
-        .set_vapor_pressure_strategy(_VAPOR_STRATEGY)
-        .set_partitioning(True)
-        .set_concentration(0.01, "kg/m^3")
+        GasDataBuilder()
+        .set_names(["water"])
+        .set_molar_mass([DEFAULT_MOLAR_MASS])
+        .set_partitioning([True])
+        .set_concentration([0.01])
         .build()
     )
 
@@ -214,6 +211,7 @@ def _time_strategy(strategy, particle, gas_species, iterations: int) -> float:
 
 def _new_staggered_strategy(theta_mode: str, shuffle_each_step: bool):
     return CondensationIsothermalStaggered(
+        **_physics(_VAPOR_STRATEGY),
         molar_mass=DEFAULT_MOLAR_MASS,
         theta_mode=theta_mode,
         num_batches=_validate_num_batches(DEFAULT_NUM_BATCHES),
@@ -237,9 +235,8 @@ def _run_timing_report(n_particles: int) -> tuple[float, float, float]:
     """Run both strategies and report timings (informational only).
 
     This function measures both simultaneous and staggered timing but does NOT
-    enforce any overhead target. The overhead ratio is expected to be high
-    because staggered uses per-particle Python loops while simultaneous uses
-    vectorized NumPy operations.
+    enforce any overhead target. Native staggered stepping uses vectorized
+    batch calculations with sequential gas coupling between batches.
 
     Returns:
         Tuple of (baseline_time, staggered_time, overhead_ratio)
@@ -247,7 +244,9 @@ def _run_timing_report(n_particles: int) -> tuple[float, float, float]:
     iterations = ITERATIONS[n_particles]
     base_particle, base_gas = create_test_system(n_particles, seed=SEED)
 
-    baseline = CondensationIsothermal(molar_mass=DEFAULT_MOLAR_MASS)
+    baseline = CondensationIsothermal(
+        **_physics(_VAPOR_STRATEGY), molar_mass=DEFAULT_MOLAR_MASS
+    )
     staggered = _new_staggered_strategy(
         theta_mode="random",
         shuffle_each_step=True,
@@ -281,7 +280,7 @@ def _run_timing_report(n_particles: int) -> tuple[float, float, float]:
     )
 
     # No assertion on overhead - this is informational only
-    # The staggered algorithm is inherently slower due to per-particle loops
+    # The relative timing depends on workload, batching and machine.
 
     return baseline_time, staggered_time, overhead
 
@@ -395,17 +394,17 @@ def test_performance_vs_simultaneous() -> None:
     """Report overhead comparison between staggered and simultaneous.
 
     This test reports the overhead ratio but does NOT enforce a target.
-    The staggered algorithm uses Gauss-Seidel style per-particle updates
-    which are inherently slower than the vectorized simultaneous approach.
-    High overhead ratios (100x-1000x+) are expected and acceptable.
+    Native staggered stepping couples sequential batches through gas state;
+    both strategies use array calculations. The ratio is specific to this
+    workload and machine.
     """
     baseline_time, staggered_time, overhead = _run_timing_report(10000)
 
     # Report only - no assertion on overhead target
     # The algorithms are fundamentally different
     print(
-        f"Note: Overhead {overhead:.1f}x is expected - staggered uses "
-        "sequential per-particle updates while simultaneous is vectorized."
+        f"Measured overhead: {overhead:.1f}x for this workload; "
+        "native staggered batches retain sequential gas coupling."
     )
 
     # Basic sanity: both should complete in reasonable time
@@ -420,10 +419,10 @@ def test_create_test_system_is_deterministic() -> None:
     particle_a, gas_a = create_test_system(1000, seed=SEED)
     particle_b, gas_b = create_test_system(1000, seed=SEED)
 
-    assert np.array_equal(particle_a.get_mass(), particle_b.get_mass())
+    assert np.array_equal(particle_a.total_mass[0], particle_b.total_mass[0])
     assert np.array_equal(
-        np.asarray(gas_a.get_concentration()),
-        np.asarray(gas_b.get_concentration()),
+        np.asarray(gas_a.concentration),
+        np.asarray(gas_b.concentration),
     )
 
 

@@ -18,13 +18,35 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 from particula.dynamics.condensation import CondensationIsothermalStaggered
-from particula.gas import GasSpeciesBuilder, VaporPressureFactory
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
+from particula.gas import GasDataBuilder, VaporPressureFactory
 from particula.particles import (
     ActivityIdealMass,
-    ParticleResolvedSpeciatedMassBuilder,
-    ResolvedParticleMassRepresentationBuilder,
     SurfaceStrategyVolume,
+    create_resolved_particle_data,
 )
+
+
+@pytest.fixture(autouse=True)
+def forbid_facades(forbid_legacy_facades):
+    """Run all scientific cases without compatibility construction."""
+
+
+def _physics():
+    """Return explicit process-owned physics matching the original fixtures."""
+    return dict(
+        activity_strategy=ActivityIdealMass(),
+        surface_strategy=SurfaceStrategyVolume(
+            surface_tension=0.072, density=1000.0
+        ),
+        vapor_pressure_strategy=VaporPressureFactory().get_strategy(
+            "constant",
+            {"vapor_pressure": 101325.0, "vapor_pressure_units": "Pa"},
+        ),
+        species_map=CondensationSpeciesMap(("water",), ((0, 0),)),
+    )
 
 
 def calculate_total_mass(
@@ -34,14 +56,18 @@ def calculate_total_mass(
     """Return total system mass (particle + gas) in kilograms.
 
     Args:
-        particle: ParticleRepresentation with resolved mass distribution.
-        gas_species: GasSpecies carrying condensing species concentration.
+        particle: Native resolved count-weighted particle population.
+        gas_species: Native gas data carrying water concentration.
 
     Returns:
         Total mass in kilograms for conservation checks.
     """
-    particle_mass = float(np.sum(particle.get_mass()))
-    gas_mass = float(np.sum(gas_species.get_concentration()))
+    particle_mass = float(
+        np.sum(particle.masses * particle.concentration[..., None])
+    )
+    gas_mass = float(
+        np.sum(gas_species.concentration * particle.volume[:, None])
+    )
     return particle_mass + gas_mass
 
 
@@ -54,13 +80,6 @@ def create_test_system():
         particle count and RNG seed. Mass arrays are shaped (n, 1) to match
         a single condensing species.
     """
-    vp_strategy = VaporPressureFactory().get_strategy(
-        "constant",
-        {
-            "vapor_pressure": 101325.0,
-            "vapor_pressure_units": "Pa",
-        },
-    )
 
     def _create(n_particles: int, seed: int = 42):
         rng = np.random.default_rng(seed)
@@ -68,28 +87,15 @@ def create_test_system():
             mean=-20.0, sigma=0.5, size=(n_particles, 1)
         )
 
-        distribution_strategy = ParticleResolvedSpeciatedMassBuilder().build()
-        particle = (
-            ResolvedParticleMassRepresentationBuilder()
-            .set_distribution_strategy(distribution_strategy)
-            .set_activity_strategy(ActivityIdealMass())
-            .set_surface_strategy(
-                SurfaceStrategyVolume(surface_tension=0.072, density=1000.0)
-            )
-            .set_mass(masses, "kg")
-            .set_density(np.full_like(masses, 1000.0), "kg/m^3")
-            .set_charge(np.zeros_like(masses))
-            .set_volume(1.0, "m^3")
-            .build()
+        particle = create_resolved_particle_data(
+            masses=masses, density=1000.0, volume=1.0
         )
-
         gas_species = (
-            GasSpeciesBuilder()
-            .set_name("water")
-            .set_molar_mass(0.018, "kg/mol")
-            .set_vapor_pressure_strategy(vp_strategy)
-            .set_partitioning(True)
-            .set_concentration(0.01, "kg/m^3")
+            GasDataBuilder()
+            .set_names(["water"])
+            .set_molar_mass([0.018])
+            .set_partitioning([True])
+            .set_concentration([0.01])
             .build()
         )
 
@@ -102,7 +108,7 @@ def create_test_system():
 def small_particles():
     """Create sub-10 nm particles to stress Kelvin curvature effects.
 
-    Note: Tests mutate the returned gas_species via set_concentration().
+    Note: Tests mutate the returned gas_species through native concentration arrays.
     The fixture uses default function scope, so each test receives a fresh
     instance to ensure isolation.
     """
@@ -111,36 +117,15 @@ def small_particles():
     volumes = (4.0 / 3.0) * np.pi * (diameters / 2.0) ** 3
     masses = (volumes * density).reshape(-1, 1)
 
-    distribution_strategy = ParticleResolvedSpeciatedMassBuilder().build()
-    particle = (
-        ResolvedParticleMassRepresentationBuilder()
-        .set_distribution_strategy(distribution_strategy)
-        .set_activity_strategy(ActivityIdealMass())
-        .set_surface_strategy(
-            SurfaceStrategyVolume(surface_tension=0.072, density=density)
-        )
-        .set_mass(masses, "kg")
-        .set_density(np.full_like(masses, density), "kg/m^3")
-        .set_charge(np.zeros_like(masses))
-        .set_volume(1.0, "m^3")
-        .build()
+    particle = create_resolved_particle_data(
+        masses=masses, density=density, volume=1.0
     )
-
     gas_species = (
-        GasSpeciesBuilder()
-        .set_name("water")
-        .set_molar_mass(0.018, "kg/mol")
-        .set_vapor_pressure_strategy(
-            VaporPressureFactory().get_strategy(
-                "constant",
-                {
-                    "vapor_pressure": 101325.0,
-                    "vapor_pressure_units": "Pa",
-                },
-            )
-        )
-        .set_partitioning(True)
-        .set_concentration(0.01, "kg/m^3")
+        GasDataBuilder()
+        .set_names(["water"])
+        .set_molar_mass([0.018])
+        .set_partitioning([True])
+        .set_concentration([0.01])
         .build()
     )
 
@@ -181,6 +166,7 @@ class TestMassConservation:
         initial_mass = calculate_total_mass(particle, gas_species)
 
         strategy = CondensationIsothermalStaggered(
+            **_physics(),
             molar_mass=0.018,
             theta_mode=theta_mode,
             num_batches=10,
@@ -228,6 +214,7 @@ class TestMassConservation:
         initial_mass = calculate_total_mass(particle, gas_species)
 
         strategy = CondensationIsothermalStaggered(
+            **_physics(),
             molar_mass=0.018,
             theta_mode=theta_mode,
             num_batches=10,
@@ -266,6 +253,7 @@ class TestMassConservation:
         initial_mass = calculate_total_mass(particle, gas_species)
 
         strategy = CondensationIsothermalStaggered(
+            **_physics(),
             molar_mass=0.018,
             theta_mode="half",
             num_batches=10,
@@ -303,6 +291,7 @@ class TestMassConservation:
         initial_mass = calculate_total_mass(particle, gas_species)
 
         strategy = CondensationIsothermalStaggered(
+            **_physics(),
             molar_mass=0.018,
             theta_mode=theta_mode,
             num_batches=10,
@@ -327,18 +316,20 @@ class TestKelvinEffectConservation:
     """Stress Kelvin curvature cases while conserving total mass.
 
     These scenarios use sub-10 nm particles where curvature raises equilibrium
-    vapor pressure (Kelvin effect). Each test configures explicit super- or
-    subsaturation to drive condensation or evaporation and asserts total
-    particle + gas mass is conserved to 1e-12 relative tolerance.
+    vapor pressure (Kelvin effect). The cases check conservation at specified
+    gas loadings to 1e-12 relative tolerance. The mixed case additionally
+    asserts both growth and shrinkage; conservation alone does not establish
+    the direction of transfer.
     """
 
     RELATIVE_TOLERANCE = 1e-12
     DEFAULT_TIME_STEP = 0.001
-    EQUILIBRIUM_MASS_DRIFT_THRESHOLD = 1e-15
+    ABSOLUTE_MASS_CHANGE_THRESHOLD = 1e-15
 
     @staticmethod
     def _strategy(theta_mode: str = "half", num_batches: int = 3):
         return CondensationIsothermalStaggered(
+            **_physics(),
             molar_mass=0.018,
             theta_mode=theta_mode,
             num_batches=num_batches,
@@ -350,7 +341,7 @@ class TestKelvinEffectConservation:
         """Strong subsaturation drives Kelvin-enhanced evaporation."""
         particle, gas_species = small_particles
         # Push the vapor well below equilibrium to force evaporation.
-        gas_species.set_concentration(1e-4)
+        gas_species.concentration[:] = 1e-4
 
         initial_mass = calculate_total_mass(particle, gas_species)
         strategy = self._strategy(theta_mode="half")
@@ -369,11 +360,13 @@ class TestKelvinEffectConservation:
             f"relative error={relative_error:.2e}"
         )
 
-    def test_kelvin_supersaturation_condensation(self, small_particles) -> None:
-        """Supersaturation forces condensation while conserving mass."""
+    def test_kelvin_higher_gas_loading_conservation(
+        self, small_particles
+    ) -> None:
+        """Higher gas loading preserves total particle-plus-gas mass."""
         particle, gas_species = small_particles
-        # Five times the baseline concentration yields clear supersaturation.
-        gas_species.set_concentration(5e-2)
+        # Five times the baseline remains below planar saturation.
+        gas_species.concentration[:] = 5e-2
 
         initial_mass = calculate_total_mass(particle, gas_species)
         strategy = self._strategy(theta_mode="half")
@@ -388,7 +381,7 @@ class TestKelvinEffectConservation:
         final_mass = calculate_total_mass(particle_new, gas_new)
         relative_error = abs(final_mass - initial_mass) / initial_mass
         assert relative_error < self.RELATIVE_TOLERANCE, (
-            "Supersaturation condensation violated mass conservation; "
+            "Higher gas loading violated mass conservation; "
             f"relative error={relative_error:.2e}"
         )
 
@@ -396,7 +389,7 @@ class TestKelvinEffectConservation:
         """Mild subsaturation evaporates mass without loss of total mass."""
         particle, gas_species = small_particles
         # Lower concentration (20x below baseline) for moderate evaporation.
-        gas_species.set_concentration(5e-4)
+        gas_species.concentration[:] = 5e-4
 
         initial_mass = calculate_total_mass(particle, gas_species)
         strategy = self._strategy(theta_mode="half")
@@ -421,9 +414,9 @@ class TestKelvinEffectConservation:
         """Mixed conditions shrink smallest particles and grow largest."""
         particle, gas_species = small_particles
         # Mid-range vapor lets Kelvin curvature split growth vs evaporation.
-        gas_species.set_concentration(1.0)
+        gas_species.concentration[:] = 1.0
         initial_mass = calculate_total_mass(particle, gas_species)
-        initial_particle_mass = np.array(particle.get_mass(), copy=True)
+        initial_particle_mass = np.array(particle.total_mass[0], copy=True)
 
         strategy = self._strategy(theta_mode="batch", num_batches=3)
         particle_new, gas_new = strategy.step(
@@ -436,7 +429,7 @@ class TestKelvinEffectConservation:
 
         final_mass = calculate_total_mass(particle_new, gas_new)
         relative_error = abs(final_mass - initial_mass) / initial_mass
-        masses_new = np.array(particle_new.get_mass())
+        masses_new = np.array(particle_new.total_mass[0])
         mass_change = masses_new - initial_particle_mass
         assert np.any(mass_change < 0.0)
         assert np.any(mass_change > 0.0)
@@ -445,12 +438,13 @@ class TestKelvinEffectConservation:
             f"relative error={relative_error:.2e}"
         )
 
-    def test_kelvin_critical_diameter_behavior(self, small_particles) -> None:
-        """Near-equilibrium vapor keeps mass conserved with minimal drift."""
+    def test_kelvin_baseline_loading_mass_change(self, small_particles) -> None:
+        """Baseline gas loading conserves mass with bounded absolute change."""
         particle, gas_species = small_particles
-        gas_species.set_concentration(0.01)
+        gas_species.concentration[:] = 0.01
 
         initial_mass = calculate_total_mass(particle, gas_species)
+        initial_particle_mass = particle.total_mass[0].copy()
         strategy = self._strategy(theta_mode="half")
         particle_new, gas_new = strategy.step(
             particle,
@@ -462,12 +456,12 @@ class TestKelvinEffectConservation:
 
         final_mass = calculate_total_mass(particle_new, gas_new)
         relative_error = abs(final_mass - initial_mass) / initial_mass
-        # Stay close to equilibrium: per-particle mass drift is tiny.
+        # Bound absolute change; this does not establish equilibrium.
         mass_delta = np.linalg.norm(
-            particle_new.get_mass() - particle.get_mass()
+            particle_new.total_mass[0] - initial_particle_mass
         )
-        assert mass_delta < self.EQUILIBRIUM_MASS_DRIFT_THRESHOLD
+        assert mass_delta < self.ABSOLUTE_MASS_CHANGE_THRESHOLD
         assert relative_error < self.RELATIVE_TOLERANCE, (
-            "Critical diameter case drifted mass; "
+            "Baseline loading case drifted mass; "
             f"relative error={relative_error:.2e}"
         )
