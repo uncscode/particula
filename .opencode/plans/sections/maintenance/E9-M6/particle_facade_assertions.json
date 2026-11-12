@@ -1,0 +1,303 @@
+[
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_mass",
+    "original": "def test_get_mass():\n    \"\"\"Test get_mass method.\"\"\"\n    particle = setup_particle()\n    mass = particle.get_mass()\n    mass_clone = particle.get_mass(clone=True)\n\n    assert isinstance(mass, np.ndarray)\n    assert isinstance(mass_clone, np.ndarray)\n    np.testing.assert_array_equal(mass, mass_clone)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Native storage/copy, derived mass, raw counts, count/volume density, charge and material fields retain the numerical and copy assertions. Facade caches, cloned physics and deprecated wrapping are removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_radius",
+    "original": "def test_get_radius():\n    \"\"\"Test get_radius method.\"\"\"\n    particle = setup_particle()\n    radius = particle.get_radius()\n    radius_clone = particle.get_radius(clone=True)\n\n    assert isinstance(radius, np.ndarray)\n    assert isinstance(radius_clone, np.ndarray)\n    np.testing.assert_array_equal(radius, radius_clone)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_radius_storage",
+    "disposition": "Native explicit radius initialization retains independent sphere mass/radius checks; native copy/property tests replace clone getter flags."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_mass_concentration",
+    "original": "def test_get_mass_concentration():\n    \"\"\"Test get_mass_concentration method.\"\"\"\n    particle = setup_particle()\n    mass = particle.get_mass()\n    expected_mass_concentration = np.sum(mass * particle.get_concentration())\n    total_mass = particle.get_mass_concentration()\n    total_mass_clone = particle.get_mass_concentration(clone=True)\n\n    assert isinstance(total_mass, np.float64)\n    assert isinstance(total_mass_clone, np.float64)\n    assert total_mass == total_mass_clone\n    assert total_mass == expected_mass_concentration",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_native_bulk_property_successors",
+    "disposition": "Native number and per-species mass density retain independent slot-sum checks at explicit discrete semantics; scalar facade getter and clone-return types are obsolete."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_strategy",
+    "original": "def test_get_strategy():\n    \"\"\"Test get_strategy method.\"\"\"\n    particle = setup_particle()\n    strategy = particle.get_strategy()\n    strategy_clone = particle.get_strategy(clone=True)\n\n    assert isinstance(strategy, RadiiBasedMovingBin)\n    assert isinstance(strategy_clone, RadiiBasedMovingBin)",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_facade",
+    "disposition": "Facade-owned strategy access and clone getters are removed. Native process-owned physics remains covered by scientific strategy suites; no substitute strategy-owning container is introduced."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_activity",
+    "original": "def test_get_activity():\n    \"\"\"Test get_activity method.\"\"\"\n    particle = setup_particle()\n    activity = particle.get_activity()\n    activity_clone = particle.get_activity(clone=True)\n\n    assert isinstance(activity, ActivityIdealMass)\n    assert isinstance(activity_clone, ActivityIdealMass)",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_facade",
+    "disposition": "Facade-owned strategy access and clone getters are removed. Native process-owned physics remains covered by scientific strategy suites; no substitute strategy-owning container is introduced."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_surface",
+    "original": "def test_get_surface():\n    \"\"\"Test get_surface method.\"\"\"\n    particle = setup_particle()\n    surface = particle.get_surface()\n    surface_clone = particle.get_surface(clone=True)\n\n    assert isinstance(surface, SurfaceStrategyVolume)\n    assert isinstance(surface_clone, SurfaceStrategyVolume)",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_facade",
+    "disposition": "Facade-owned strategy access and clone getters are removed. Native process-owned physics remains covered by scientific strategy suites; no substitute strategy-owning container is introduced."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_distribution",
+    "original": "def test_get_distribution():\n    \"\"\"Test get_distribution method.\"\"\"\n    particle = setup_particle()\n    distribution = particle.get_distribution()\n    distribution_clone = particle.get_distribution(clone=True)\n\n    np.testing.assert_array_equal(distribution, distribution_clone)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Native storage/copy, derived mass, raw counts, count/volume density, charge and material fields retain the numerical and copy assertions. Facade caches, cloned physics and deprecated wrapping are removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_density",
+    "original": "def test_get_density():\n    \"\"\"Test get_density method.\"\"\"\n    particle = setup_particle()\n    density = particle.get_density()\n    density_clone = particle.get_density(clone=True)\n\n    np.testing.assert_array_equal(density, density_clone)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Native storage/copy, derived mass, raw counts, count/volume density, charge and material fields retain the numerical and copy assertions. Facade caches, cloned physics and deprecated wrapping are removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_concentration",
+    "original": "def test_get_concentration():\n    \"\"\"Test get_concentration method.\"\"\"\n    particle = setup_particle()\n    concentration = particle.get_concentration()\n    concentration_clone = particle.get_concentration(clone=True)\n\n    np.testing.assert_array_equal(concentration, concentration_clone)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Native storage/copy, derived mass, raw counts, count/volume density, charge and material fields retain the numerical and copy assertions. Facade caches, cloned physics and deprecated wrapping are removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_charge",
+    "original": "def test_get_charge():\n    \"\"\"Test get_charge method.\"\"\"\n    particle = setup_particle()\n    charge = particle.get_charge()\n    charge_clone = particle.get_charge(clone=True)\n\n    np.testing.assert_array_equal(charge, charge_clone)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Native storage/copy, derived mass, raw counts, count/volume density, charge and material fields retain the numerical and copy assertions. Facade caches, cloned physics and deprecated wrapping are removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_volume",
+    "original": "def test_get_volume():\n    \"\"\"Test get_volume method.\"\"\"\n    particle = setup_particle()\n    volume = particle.get_volume()\n    volume_clone = particle.get_volume(clone=True)\n\n    assert volume == volume_clone",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Native storage/copy, derived mass, raw counts, count/volume density, charge and material fields retain the numerical and copy assertions. Facade caches, cloned physics and deprecated wrapping are removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_species_mass",
+    "original": "def test_get_species_mass():\n    \"\"\"Test get_species_mass method.\"\"\"\n    particle = setup_particle()\n    species_mass = particle.get_species_mass()\n    species_mass_clone = particle.get_species_mass(clone=True)\n\n    np.testing.assert_array_equal(species_mass, species_mass_clone)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Native storage/copy, derived mass, raw counts, count/volume density, charge and material fields retain the numerical and copy assertions. Facade caches, cloned physics and deprecated wrapping are removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_total_concentration",
+    "original": "def test_get_total_concentration():\n    \"\"\"Test get_total_concentration method.\"\"\"\n    particle = setup_particle()\n    conc = particle.get_concentration()\n    expected_total_concentration = np.sum(conc)\n    total_concentration = particle.get_total_concentration()\n    total_concentration_clone = particle.get_total_concentration(clone=True)\n\n    assert total_concentration == total_concentration_clone\n    assert total_concentration == expected_total_concentration",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_native_bulk_property_successors",
+    "disposition": "Native number and per-species mass density retain independent slot-sum checks at explicit discrete semantics; scalar facade getter and clone-return types are obsolete."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_effective_density",
+    "original": "def test_get_effective_density():\n    \"\"\"Test get_effective_density method.\"\"\"\n    particle = setup_particle()\n    effective_density = particle.get_effective_density()\n\n    assert isinstance(effective_density, np.ndarray)\n\n    distribution = particle.get_distribution()\n    expected_density = np.ones_like(distribution) * particle.get_density()\n    np.testing.assert_allclose(effective_density, expected_density, rtol=1e-7)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_native_effective_density_successors",
+    "disposition": "Retain original mass-weighted density law, filtered mean and exact 2.1526515151515153 multispecies baseline with original rtol=1e-7. No numerical density model change."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_mean_effective_density",
+    "original": "def test_get_mean_effective_density():\n    \"\"\"Test get_mean_effective_density for single-species.\"\"\"\n    particle = setup_particle()\n    med = particle.get_mean_effective_density()\n    effective_density = particle.get_effective_density()\n    # Filter out any zero entries before computing mean\n    effective_density_nonzero = effective_density[effective_density != 0]\n    expected_mean = np.mean(effective_density_nonzero)\n\n    assert isinstance(med, float)\n    assert np.isclose(med, expected_mean, rtol=1e-7)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_native_effective_density_successors",
+    "disposition": "Retain original mass-weighted density law, filtered mean and exact 2.1526515151515153 multispecies baseline with original rtol=1e-7. No numerical density model change."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_mean_effective_density_particle_resolved",
+    "original": "def test_get_mean_effective_density_particle_resolved():\n    \"\"\"Test get_mean_effective_density for multi-species (particle-resolved).\"\"\"\n    particle = setup_particle_resolved()\n    med = particle.get_mean_effective_density()\n    expected_mean = np.float64(2.1526515151515153)\n    assert isinstance(med, float)\n    assert np.isclose(med, expected_mean, rtol=1e-7)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_native_effective_density_successors",
+    "disposition": "Retain original mass-weighted density law, filtered mean and exact 2.1526515151515153 multispecies baseline with original rtol=1e-7. No numerical density model change."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_get_effective_density_particle_resolved",
+    "original": "def test_get_effective_density_particle_resolved():\n    \"\"\"Test get_effective_density method for particle resolved.\"\"\"\n    particle = setup_particle_resolved()\n    effective_density = particle.get_effective_density()\n\n    assert isinstance(effective_density, np.ndarray)\n\n    total_mass = particle.get_mass()\n    density = particle.get_density()\n    # Weighted-average density for each particle (row)\n    expected_density = (\n        np.sum(particle.get_species_mass() * density, axis=1) / total_mass\n    )\n    np.testing.assert_allclose(effective_density, expected_density, rtol=1e-7)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_native_effective_density_successors",
+    "disposition": "Retain original mass-weighted density law, filtered mean and exact 2.1526515151515153 multispecies baseline with original rtol=1e-7. No numerical density model change."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_zero_particle_resolved_density_preserves_species_shape",
+    "original": "def test_zero_particle_resolved_density_preserves_species_shape() -> None:\n    \"\"\"Zero-particle resolved densities should preserve species count.\"\"\"\n    particle = setup_particle(\n        strategy=ParticleResolvedSpeciatedMass(),\n        distribution=np.zeros((0, 2), dtype=np.float64),\n        density=np.zeros((0, 2), dtype=np.float64),\n        concentration=np.zeros(0, dtype=np.float64),\n        charge=np.zeros(0, dtype=np.float64),\n    )\n\n    assert particle.get_species_mass().shape == (0, 2)\n    assert particle.get_density().shape == (2,)",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_redundant_density_charge_and_empty_population",
+    "disposition": "Native empty population retains species shape with explicit positive density. Inferring zero material density from an empty matrix is retired and rejected."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_bin_order_after_add_mass",
+    "original": "def test_bin_order_after_add_mass():\n    \"\"\"Bins should be ordered after mass addition.\"\"\"\n    particle = setup_particle(\n        distribution=np.array([2.0, 1.0, 3.0]),\n        concentration=np.array([20, 10, 30]),\n        charge=np.array([2, 1, 3]),\n    )\n\n    particle.add_mass(np.zeros_like(particle.get_distribution()))\n\n    np.testing.assert_allclose(\n        particle.get_distribution(), np.array([1.0, 2.0, 3.0]), rtol=1e-12\n    )\n    np.testing.assert_array_equal(\n        particle.get_concentration(), np.array([10, 20, 30])\n    )\n    np.testing.assert_array_equal(particle.get_charge(), np.array([1, 2, 3]))",
+    "successor": "particula/particles/properties/tests/sorted_bins_test.py::test_unsorted_vector",
+    "disposition": "Preserve the existing scientific sorting helper and exact co-reordering assertions through its owning module. Implicit facade mutation/sorting is removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_add_concentration_charge_passthrough_updates_representation",
+    "original": "def test_add_concentration_charge_passthrough_updates_representation():\n    \"\"\"add_concentration should wire charge through the strategy.\"\"\"\n    particle = setup_particle(\n        strategy=ParticleResolvedSpeciatedMass(),\n        distribution=np.array([[1.0, 2.0]], dtype=np.float64),\n        density=np.array([1.0, 1.0], dtype=np.float64),\n        concentration=np.array([1.0], dtype=np.float64),\n        charge=0.5,\n    )\n\n    particle.add_concentration(\n        added_concentration=np.array([1.0], dtype=np.float64),\n        added_distribution=np.array([[3.0, 4.0]], dtype=np.float64),\n        added_charge=np.array([2.0], dtype=np.float64),\n    )\n\n    np.testing.assert_array_equal(\n        particle.get_charge(), np.array([0.5, 2.0], dtype=np.float64)\n    )",
+    "successor": "particula/particles/distribution_strategies/tests/particle_resolved_speciated_mass_test.py::test_add_concentration_with_charge_append",
+    "disposition": "Identical original charged append input/output assertions already live in the retained distribution strategy suite; facade forwarding is obsolete."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_add_concentration_charge_none_returns_none",
+    "original": "def test_add_concentration_charge_none_returns_none():\n    \"\"\"When charge is None, add_concentration should preserve None.\"\"\"\n    particle = ParticleRepresentation(\n        strategy=ParticleResolvedSpeciatedMass(),\n        activity=ActivityIdealMass(),\n        surface=SurfaceStrategyVolume(),\n        distribution=np.array([[1.0, 2.0]], dtype=np.float64),\n        density=np.array([1.0, 1.0], dtype=np.float64),\n        concentration=np.array([1.0], dtype=np.float64),\n        charge=None,  # type: ignore[arg-type]\n    )\n\n    particle.add_concentration(\n        added_concentration=np.array([1.0], dtype=np.float64),\n        added_distribution=np.array([[3.0, 4.0]], dtype=np.float64),\n    )\n\n    assert particle.get_charge() is None",
+    "successor": "particula/particles/distribution_strategies/tests/particle_resolved_speciated_mass_test.py::test_add_concentration_charge_none_passthrough",
+    "disposition": "Underlying distribution utility retains optional-charge semantics. Native population storage always has numeric charge; None initialization maps to zeros rather than retaining a facade-only disabled flag."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_particle_representation_rejects_multidimensional_density",
+    "original": "def test_particle_representation_rejects_multidimensional_density() -> None:\n    \"\"\"Density inputs must be scalar or 1D arrays.\"\"\"\n    with pytest.raises(\n        ValueError,\n        match=(\n            r\"density must be a scalar or 1D array, got array with \"\n            r\"shape \\(2, 2\\)\"\n        ),\n    ):\n        setup_particle(density=np.array([[1000.0, 1000.0], [900.0, 900.0]]))",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_invalid_inputs_are_read_only",
+    "disposition": "Retain rejection of inconsistent population density with unchanged inputs. Native initialization additionally accepts lossless redundant density rows."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_particle_representation_accepts_scalar_and_1d_density",
+    "original": "def test_particle_representation_accepts_scalar_and_1d_density() -> None:\n    \"\"\"Supported density forms should preserve existing normalization.\"\"\"\n    scalar_particle = setup_particle(density=1000.0)\n    array_particle = setup_particle(density=np.array([1000.0]))\n\n    np.testing.assert_array_equal(\n        scalar_particle.get_density(), np.array([1000.0])\n    )\n    np.testing.assert_array_equal(\n        array_particle.get_density(), np.array([1000.0])\n    )",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_native_density_forms_and_empty_charge_rejection",
+    "disposition": "Retain scalar and species-vector density normalization. Empty population-shaped density cannot establish material metadata and rejects separately; no zero-density inference survives."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_particle_representation_rejects_incompatible_charge_shapes",
+    "original": "def test_particle_representation_rejects_incompatible_charge_shapes() -> None:\n    \"\"\"Charge arrays must be scalar, empty, or match concentration shape.\"\"\"\n    with pytest.raises(\n        ValueError,\n        match=(\n            r\"charge must be a scalar, empty array, or array matching \"\n            r\"concentration shape \\(3,\\); got shape \\(1, 3\\)\"\n        ),\n    ):\n        setup_particle(charge=np.array([[1.0, 2.0, 3.0]]))",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_native_density_forms_and_empty_charge_rejection",
+    "disposition": "Retain scalar and matched charge normalization. Lossless singleton row/column input is now supported; an empty charge vector for nonempty slots rejects instead of silently zero-filling. Existing native invalid-shape tests retain rejection coverage."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_normalize_density_array_handles_scalar_1d_and_empty_2d",
+    "original": "def test_normalize_density_array_handles_scalar_1d_and_empty_2d() -> None:\n    \"\"\"Density normalization should support expected legacy input shapes.\"\"\"\n    np.testing.assert_array_equal(\n        _normalize_density_array(1000.0),\n        np.array([1000.0]),\n    )\n    np.testing.assert_array_equal(\n        _normalize_density_array(np.array([900.0, 1000.0])),\n        np.array([900.0, 1000.0]),\n    )\n    np.testing.assert_array_equal(\n        _normalize_density_array(np.zeros((0, 2), dtype=np.float64)),\n        np.zeros(2, dtype=np.float64),\n    )",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_native_density_forms_and_empty_charge_rejection",
+    "disposition": "Retain scalar and species-vector density normalization. Empty population-shaped density cannot establish material metadata and rejects separately; no zero-density inference survives."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_normalize_charge_array_handles_scalar_empty_and_matching_shape",
+    "original": "def test_normalize_charge_array_handles_scalar_empty_and_matching_shape() -> (\n    None\n):\n    \"\"\"Charge normalization should match the concentration template shape.\"\"\"\n    template = np.array([1.0, 2.0, 3.0], dtype=np.float64)\n\n    np.testing.assert_array_equal(\n        _normalize_charge_array(2.0, template),\n        np.array([2.0, 2.0, 2.0]),\n    )\n    np.testing.assert_array_equal(\n        _normalize_charge_array(np.array([], dtype=np.float64), template),\n        np.zeros_like(template),\n    )\n    np.testing.assert_array_equal(\n        _normalize_charge_array(np.array([1.0, 2.0, 3.0]), template),\n        np.array([1.0, 2.0, 3.0]),\n    )",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_native_density_forms_and_empty_charge_rejection",
+    "disposition": "Retain scalar and matched charge normalization. Lossless singleton row/column input is now supported; an empty charge vector for nonempty slots rejects instead of silently zero-filling. Existing native invalid-shape tests retain rejection coverage."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_warn_deprecated_logs_message",
+    "original": "def test_warn_deprecated_logs_message(monkeypatch: pytest.MonkeyPatch) -> None:\n    \"\"\"Deprecation helper should log instead of emitting warnings.\"\"\"\n    messages: list[str] = []\n\n    monkeypatch.setattr(\n        \"particula.particles.representation.logger.info\",\n        messages.append,\n    )\n\n    _warn_deprecated()\n\n    assert messages\n    assert \"ParticleRepresentation is deprecated\" in messages[0]",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_facade",
+    "disposition": "Obsolete facade deprecation logger, cached setter and forwarding methods removed; explicit absent concrete-module/export checks replace compatibility warnings."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_particle_representation_from_data_preserves_charge_without_warning",
+    "original": "def test_particle_representation_from_data_preserves_charge_without_warning() -> (\n    None\n):\n    \"\"\"from_data should wrap ParticleData without logging deprecation.\"\"\"\n    particle = setup_particle(charge=np.array([1.0, 2.0, 3.0]))\n\n    wrapped = ParticleRepresentation.from_data(\n        particle.data,\n        strategy=particle.get_strategy(),\n        activity=particle.get_activity(),\n        surface=particle.get_surface(),\n        distribution=particle.get_distribution(),\n        charge=particle.get_charge(),\n    )\n\n    np.testing.assert_array_equal(\n        wrapped.get_distribution(), particle.get_distribution()\n    )\n    np.testing.assert_array_equal(wrapped.get_charge(), particle.get_charge())",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Native storage/copy, derived mass, raw counts, count/volume density, charge and material fields retain the numerical and copy assertions. Facade caches, cloned physics and deprecated wrapping are removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_test.py",
+    "test": "test_particle_representation_accepts_matching_and_scalar_charge",
+    "original": "def test_particle_representation_accepts_matching_and_scalar_charge() -> None:\n    \"\"\"Valid charge inputs should continue to work.\"\"\"\n    array_particle = setup_particle(charge=np.array([1.0, 2.0, 3.0]))\n    scalar_particle = setup_particle(charge=2.0)\n\n    np.testing.assert_array_equal(\n        array_particle.get_charge(),\n        np.array([1.0, 2.0, 3.0]),\n    )\n    np.testing.assert_array_equal(\n        scalar_particle.get_charge(),\n        np.array([2.0, 2.0, 2.0]),\n    )",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_native_density_forms_and_empty_charge_rejection",
+    "disposition": "Retain scalar and matched charge normalization. Lossless singleton row/column input is now supported; an empty charge vector for nonempty slots rejects instead of silently zero-filling. Existing native invalid-shape tests retain rejection coverage."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_init_deprecation_log",
+    "original": "def test_init_deprecation_log(_enable_particula_log_capture):\n    \"\"\"Constructor logs a deprecation info message.\"\"\"\n    caplog = _enable_particula_log_capture\n    _make_representation(\n        strategy=RadiiBasedMovingBin(),\n        distribution=np.array([1.0, 2.0]),\n        density=np.array([1000.0]),\n        concentration=np.array([1.0, 2.0]),\n        charge=np.array([0.0, 0.0]),\n    )\n    assert _DEPRECATION_MESSAGE in caplog.text",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_facade",
+    "disposition": "Obsolete facade deprecation logger, cached setter and forwarding methods removed; explicit absent concrete-module/export checks replace compatibility warnings."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_warn_deprecated_logs_message",
+    "original": "def test_warn_deprecated_logs_message(_enable_particula_log_capture):\n    \"\"\"_warn_deprecated emits an info log message.\"\"\"\n    caplog = _enable_particula_log_capture\n    _warn_deprecated(stacklevel=1)\n    assert _DEPRECATION_MESSAGE in caplog.text",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_facade",
+    "disposition": "Obsolete facade deprecation logger, cached setter and forwarding methods removed; explicit absent concrete-module/export checks replace compatibility warnings."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_init_deprecation_log_message",
+    "original": "def test_init_deprecation_log_message(_enable_particula_log_capture):\n    \"\"\"Deprecation log includes migration guidance.\"\"\"\n    caplog = _enable_particula_log_capture\n    _make_representation(\n        strategy=RadiiBasedMovingBin(),\n        distribution=np.array([1.0, 2.0]),\n        density=np.array([1000.0]),\n        concentration=np.array([1.0, 2.0]),\n        charge=np.array([0.0, 0.0]),\n    )\n    assert \"ParticleData\" in caplog.text\n    assert \"deprecated\" in caplog.text.lower()",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_facade",
+    "disposition": "Obsolete facade deprecation logger, cached setter and forwarding methods removed; explicit absent concrete-module/export checks replace compatibility warnings."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_distribution_setter_deprecation_log",
+    "original": "def test_distribution_setter_deprecation_log(\n    _enable_particula_log_capture,\n):\n    \"\"\"Distribution setter logs a deprecation message.\"\"\"\n    caplog = _enable_particula_log_capture\n    rep = _make_representation(\n        strategy=RadiiBasedMovingBin(),\n        distribution=np.array([1.0, 2.0]),\n        density=np.array([1000.0]),\n        concentration=np.array([1.0, 2.0]),\n        charge=np.array([0.0, 0.0]),\n    )\n    caplog.clear()\n    rep.distribution = np.array([2.0, 3.0])\n    assert _DEPRECATION_MESSAGE in caplog.text",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_facade",
+    "disposition": "Obsolete facade deprecation logger, cached setter and forwarding methods removed; explicit absent concrete-module/export checks replace compatibility warnings."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_mutation_deprecation_logs",
+    "original": "def test_mutation_deprecation_logs(method_name, _enable_particula_log_capture):\n    \"\"\"Mutation helpers log deprecation messages.\"\"\"\n    caplog = _enable_particula_log_capture\n    if method_name == \"collide_pairs\":\n        rep = _make_representation(\n            strategy=ParticleResolvedSpeciatedMass(),\n            distribution=np.array([[1.0, 2.0]]),\n            density=np.array([1000.0, 1200.0]),\n            concentration=np.array([1.0]),\n            charge=np.array([0.0]),\n        )\n    else:\n        rep = _make_representation(\n            strategy=SpeciatedMassMovingBin(),\n            distribution=np.array([[1.0, 2.0]]),\n            density=np.array([1000.0, 1200.0]),\n            concentration=np.array([1.0]),\n            charge=np.array([0.0]),\n        )\n    caplog.clear()\n    if method_name == \"add_mass\":\n        rep.add_mass(np.array([[0.1, 0.2]]))\n    elif method_name == \"add_concentration\":\n        rep.add_concentration(\n            added_concentration=np.array([1.0]),\n            added_distribution=np.array([[1.0, 2.0]]),\n            added_charge=np.array([0.0]),\n        )\n    else:\n        rep.collide_pairs(np.array([[0, 0]], dtype=np.int64))\n    assert _DEPRECATION_MESSAGE in caplog.text",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_facade",
+    "disposition": "Obsolete facade deprecation logger, cached setter and forwarding methods removed; explicit absent concrete-module/export checks replace compatibility warnings."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_data_property_returns_particle_data",
+    "original": "def test_data_property_returns_particle_data():\n    \"\"\"Data property exposes ParticleData.\"\"\"\n    rep = _make_representation(\n        strategy=RadiiBasedMovingBin(),\n        distribution=np.array([1.0, 2.0]),\n        density=np.array([1000.0]),\n        concentration=np.array([1.0, 2.0]),\n        charge=np.array([0.0, 0.0]),\n    )\n    assert isinstance(rep.data, ParticleData)\n    assert rep.data.masses.shape[0] == 1",
+    "successor": "particula/tests/aerosol_test.py::test_native_identity_current_values",
+    "disposition": "Direct native storage and aggregate getters retain container identity/current values. Facade .data wrapping and deprecation logging are obsolete."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_from_data_no_deprecation_log",
+    "original": "def test_from_data_no_deprecation_log(_enable_particula_log_capture):\n    \"\"\"from_data constructs facade without deprecation log.\"\"\"\n    caplog = _enable_particula_log_capture\n    data = ParticleData(\n        masses=np.array([[[1.0], [2.0]]]),\n        concentration=np.array([[1.0, 2.0]]),\n        charge=np.array([[0.0, 0.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    caplog.clear()\n    rep = ParticleRepresentation.from_data(\n        data,\n        strategy=RadiiBasedMovingBin(),\n        activity=ActivityIdealMass(),\n        surface=SurfaceStrategyVolume(),\n        distribution=np.array([1.0, 2.0]),\n        charge=np.array([0.0, 0.0]),\n    )\n    assert _DEPRECATION_MESSAGE not in caplog.text\n    assert rep.data is data\n    assert rep.get_charge() is not None",
+    "successor": "particula/tests/aerosol_test.py::test_native_identity_current_values",
+    "disposition": "Direct native storage and aggregate getters retain container identity/current values. Facade .data wrapping and deprecation logging are obsolete."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_from_data_sets_charge_none",
+    "original": "def test_from_data_sets_charge_none():\n    \"\"\"from_data preserves charge=None behavior.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1.0], [2.0]]]),\n        concentration=np.array([[1.0, 2.0]]),\n        charge=np.array([[0.0, 0.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    rep = ParticleRepresentation.from_data(\n        data,\n        strategy=RadiiBasedMovingBin(),\n        activity=ActivityIdealMass(),\n        surface=SurfaceStrategyVolume(),\n        distribution=np.array([1.0, 2.0]),\n        charge=None,\n    )\n    assert rep.get_charge() is None",
+    "successor": "particula/particles/tests/resolved_initialization_test.py::test_native_builder_successor_charge_shapes",
+    "disposition": "Native None initialization creates numeric zeros; the facade-only charge-disabled sentinel is retired."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_facade_delegation_getters",
+    "original": "def test_facade_delegation_getters():\n    \"\"\"Facade getters align with ParticleData values.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1.0], [2.0]]]),\n        concentration=np.array([[2.0, 4.0]]),\n        charge=np.array([[0.5, 1.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([2.0]),\n    )\n    rep = ParticleRepresentation.from_data(\n        data,\n        strategy=MassBasedMovingBin(),\n        activity=ActivityIdealMass(),\n        surface=SurfaceStrategyVolume(),\n        distribution=np.array([1.0, 2.0]),\n        charge=np.array([0.5, 1.0]),\n    )\n    np.testing.assert_allclose(rep.get_radius(), data.radii[0])\n    np.testing.assert_allclose(rep.get_mass(), data.total_mass[0])\n    np.testing.assert_allclose(rep.get_species_mass(), data.masses[0][:, 0])\n    np.testing.assert_allclose(\n        rep.get_concentration(),\n        data.concentration[0] / data.volume[0],\n    )\n    charge = rep.get_charge()\n    assert charge is not None\n    charge_array = np.asarray(charge, dtype=np.float64)\n    np.testing.assert_allclose(charge_array, data.charge[0])\n    np.testing.assert_allclose(\n        rep.get_effective_density(), data.effective_density[0]\n    )",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Native storage/copy, derived mass, raw counts, count/volume density, charge and material fields retain the numerical and copy assertions. Facade caches, cloned physics and deprecated wrapping are removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_facade_concentration_volume_scaling",
+    "original": "def test_facade_concentration_volume_scaling():\n    \"\"\"Concentration scales by volume for facade getter.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1.0], [2.0]]]),\n        concentration=np.array([[2.0, 4.0]]),\n        charge=np.array([[0.0, 0.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([0.5]),\n    )\n    rep = ParticleRepresentation.from_data(\n        data,\n        strategy=MassBasedMovingBin(),\n        activity=ActivityIdealMass(),\n        surface=SurfaceStrategyVolume(),\n        distribution=np.array([1.0, 2.0]),\n        charge=np.array([0.0, 0.0]),\n    )\n    np.testing.assert_allclose(rep.get_concentration(), np.array([4.0, 8.0]))",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Native storage/copy, derived mass, raw counts, count/volume density, charge and material fields retain the numerical and copy assertions. Facade caches, cloned physics and deprecated wrapping are removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_add_mass_updates_internal_data",
+    "original": "def test_add_mass_updates_internal_data():\n    \"\"\"add_mass updates ParticleData masses.\"\"\"\n    rep = _make_representation(\n        strategy=RadiiBasedMovingBin(),\n        distribution=np.array([1.0, 2.0]),\n        density=np.array([1000.0]),\n        concentration=np.array([1.0, 1.0]),\n        charge=np.array([0.0, 0.0]),\n    )\n    before = rep.data.masses.copy()\n    rep.add_mass(np.array([0.1, 0.2]))\n    assert not np.array_equal(before, rep.data.masses)",
+    "successor": "particula/particles/distribution_strategies/tests/radii_based_moving_bin_test.py::test_add_mass",
+    "disposition": "Retain existing direct distribution-strategy mass/radius update and independent analytic oracle. Facade caching/mutation forwarding removed."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_add_concentration_updates_internal_data",
+    "original": "def test_add_concentration_updates_internal_data():\n    \"\"\"add_concentration updates ParticleData concentration.\"\"\"\n    rep = _make_representation(\n        strategy=RadiiBasedMovingBin(),\n        distribution=np.array([1.0, 2.0]),\n        density=np.array([1000.0]),\n        concentration=np.array([1.0, 1.0]),\n        charge=np.array([0.0, 0.0]),\n    )\n    rep.add_concentration(\n        added_concentration=np.array([1.0, 1.0]),\n        added_distribution=np.array([1.0, 2.0]),\n    )\n    np.testing.assert_allclose(rep.data.concentration[0], np.array([2.0, 2.0]))",
+    "successor": "particula/particles/distribution_strategies/tests/radii_based_moving_bin_test.py::test_add_concentration_missing_added_charge_preserves_charge",
+    "disposition": "Retain underlying concentration-addition and charge preservation assertions. No implicit native resize or facade forwarding is introduced."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_init_shape_mismatch_raises_value_error",
+    "original": "def test_init_shape_mismatch_raises_value_error():\n    \"\"\"Invalid shapes raise ValueError mirroring ParticleData.\"\"\"\n    with pytest.raises(ValueError, match=\"concentration shape\"):\n        _make_representation(\n            strategy=RadiiBasedMovingBin(),\n            distribution=np.array([1.0, 2.0]),\n            density=np.array([1000.0]),\n            concentration=np.array([1.0, 2.0, 3.0]),\n            charge=np.array([0.0, 0.0]),\n        )",
+    "successor": "particula/particles/tests/particle_data_test.py::TestParticleDataValidation.test_concentration_shape_wrong_n_particles",
+    "disposition": "Native container still rejects mismatched concentration width; removed facade constructor no longer needs duplicate forwarding coverage."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_charge_none_preserved",
+    "original": "def test_charge_none_preserved():\n    \"\"\"Charge None stays None through mutation.\"\"\"\n    rep = _make_representation(\n        strategy=ParticleResolvedSpeciatedMass(),\n        distribution=np.array([[1.0, 2.0]]),\n        density=np.array([1000.0, 1200.0]),\n        concentration=np.array([1.0]),\n        charge=None,\n    )\n    rep.add_concentration(\n        added_concentration=np.array([1.0]),\n        added_distribution=np.array([[1.0, 2.0]]),\n    )\n    assert rep.get_charge() is None",
+    "successor": "particula/particles/distribution_strategies/tests/particle_resolved_speciated_mass_test.py::test_add_concentration_charge_none_passthrough",
+    "disposition": "Underlying distribution utility retains optional-charge semantics. Native population storage always has numeric charge; None initialization maps to zeros rather than retaining a facade-only disabled flag."
+  }
+]

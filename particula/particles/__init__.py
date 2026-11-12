@@ -36,9 +36,6 @@ from particula.particles.activity_builders import (
 from particula.particles.activity_factories import (
     ActivityFactory,
 )
-from particula.particles.representation import (
-    ParticleRepresentation,
-)
 from particula.particles.particle_data import (
     ParticleData,
 )

@@ -139,8 +139,11 @@ Use
 [ParticleData and GasData Migration](../particle-data-migration/index.md)
 as the implementation walkthrough companion.
 
-The work is still a migration, not a full replacement. `ParticleRepresentation`
-and `GasSpecies` remain available for compatibility.
+The E9 v0.3.0 migration removes the compatibility facades. In the current
+development tree, `ParticleRepresentation`, its builders/factory, and its
+conversion bridges have been removed. Use explicit native initialization;
+remaining gas compatibility removal and final readiness validation belong to
+E9-M6. The historical 0.2.x compatibility policy is not the current API contract.
 
 Data-model support and remaining boundaries:
 

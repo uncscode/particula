@@ -7352,7 +7352,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Facade removed after assertion review in particle_facade_assertions.json; previously removed converter case remains in particle_bridge_assertions.json. Native fields/properties/initialization and direct scientific utilities retain enduring assertions.",
       "test_nodes": []
     },
     {
@@ -8209,7 +8209,7 @@
           ]
         }
       ],
-      "disposition": "Bridge round-trip test audited/removed in particle_bridge_assertions.json; remaining facade tests pending review.",
+      "disposition": "Facade removed after assertion review in particle_facade_assertions.json; previously removed converter case remains in particle_bridge_assertions.json. Native fields/properties/initialization and direct scientific utilities retain enduring assertions.",
       "test_nodes": [
         {
           "name": "test_init_deprecation_log",
@@ -8510,7 +8510,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Facade removed after assertion review in particle_facade_assertions.json; previously removed converter case remains in particle_bridge_assertions.json. Native fields/properties/initialization and direct scientific utilities retain enduring assertions.",
       "test_nodes": [
         {
           "name": "test_get_mass",

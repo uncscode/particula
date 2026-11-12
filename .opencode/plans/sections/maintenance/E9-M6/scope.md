@@ -9,13 +9,14 @@ for this scope is that revision. Issue #1607 remains the tracking issue.
 Its original per-phase issue-generation workflow is superseded for this
 delivery by one implementation PR. No child issues are needed for this scope.
 
-Implementation is authorized. P1 audit and baseline validation are in progress;
-no deletion or readiness gate is claimed complete.
-Use branch `codex/e9-m6-legacy-removal` when implementation starts, checking
-the upstream base again then. The proposed serial commit sequence is recorded
+Implementation is in progress on `codex/e9-m6-legacy-removal`. CPU consumer,
+legacy aggregate and particle facade removals have revision-specific evidence
+in `implementation.md` and the assertion ledgers. Gas/GPU compatibility removal
+and final readiness gates remain pending. The serial review units are recorded
 in `phase_details.md`; P1–P6 remain acceptance milestones, not separate PRs.
 
-The current source confirms additional explicit removal targets:
+The post-M5 audit established these removal targets (consult the implementation
+record for completed items):
 
 - `particula/_legacy_aerosol.py`, including its aggregate and builder.
 - `LegacyNucleation`, legacy dilution preflight and aggregate dispatch in

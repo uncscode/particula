@@ -157,6 +157,27 @@ def test_empty_population_requires_material_density():
     assert density.shape == (0, 2)
 
 
+@pytest.mark.parametrize("density", [1000.0, [1000.0], [900.0, 1000.0]])
+@pytest.mark.parametrize("charge", [2.0, [1.0, 2.0, 3.0]])
+def test_native_density_forms_and_empty_charge_rejection(density, charge):
+    """Normalize explicit material/charge lanes without inventing missing data."""
+    expected_density = np.atleast_1d(density)
+    masses = np.ones((3, expected_density.size))
+    data = create_resolved_particle_data(
+        masses=masses,
+        density=density,
+        charge=charge,
+    )
+    np.testing.assert_array_equal(data.density, expected_density)
+    np.testing.assert_array_equal(data.charge[0], np.broadcast_to(charge, (3,)))
+    with pytest.raises(ValueError, match="charge"):
+        create_resolved_particle_data(
+            masses=masses,
+            density=density,
+            charge=np.array([]),
+        )
+
+
 @pytest.mark.parametrize(
     "kwargs",
     [
