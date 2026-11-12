@@ -1,0 +1,198 @@
+[
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_resolve_radius_indices_unique_match",
+    "original": "def test_resolve_radius_indices_unique_match() -> None:\n    \"\"\"Unique radius lookup should resolve indices deterministically.\"\"\"\n    particle_radius = np.array([1.0, 2.0, 3.0], dtype=np.float64)\n    lookup_values = np.array([1.0, 3.0], dtype=np.float64)\n\n    indices = coagulation_strategy_abc._resolve_radius_indices(\n        particle_radius=particle_radius,\n        lookup_values=lookup_values,\n    )\n\n    np.testing.assert_array_equal(indices, np.array([0, 2], dtype=np.int64))",
+    "successor": "test_resolve_radius_indices_unique_match",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_resolve_radius_indices_missing_match",
+    "original": "def test_resolve_radius_indices_missing_match() -> None:\n    \"\"\"Missing radius values should raise a clear error.\"\"\"\n    particle_radius = np.array([1.0, 2.0], dtype=np.float64)\n    lookup_values = np.array([4.0], dtype=np.float64)\n\n    with pytest.raises(ValueError, match=\"Direct kernel lookup failed\"):\n        coagulation_strategy_abc._resolve_radius_indices(\n            particle_radius=particle_radius,\n            lookup_values=lookup_values,\n        )",
+    "successor": "test_resolve_radius_indices_missing_match",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_resolve_radius_indices_ambiguous_match",
+    "original": "def test_resolve_radius_indices_ambiguous_match() -> None:\n    \"\"\"Duplicate radii should raise an ambiguity error.\"\"\"\n    particle_radius = np.array([1.0, 2.0, 2.0], dtype=np.float64)\n    lookup_values = np.array([2.0], dtype=np.float64)\n\n    with pytest.raises(ValueError, match=\"Direct kernel lookup ambiguous\"):\n        coagulation_strategy_abc._resolve_radius_indices(\n            particle_radius=particle_radius,\n            lookup_values=lookup_values,\n        )",
+    "successor": "test_resolve_radius_indices_ambiguous_match",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_build_direct_kernel_index_func_uses_indexed_values",
+    "original": "def test_build_direct_kernel_index_func_uses_indexed_values() -> None:\n    \"\"\"Direct kernel should use indices for deterministic values.\"\"\"\n    particle_radius = np.array([1.0, 2.0, 3.0], dtype=np.float64)\n    particle_mass = np.array([10.0, 20.0, 30.0], dtype=np.float64)\n    particle_charge = np.array([0.0, 1.0, 2.0], dtype=np.float64)\n\n    def _kernel_builder(\n        particle_radius: np.ndarray,\n        particle_mass: np.ndarray,\n        particle_charge: np.ndarray,\n        temperature: float,\n        pressure: float,\n    ) -> np.ndarray:\n        _ = temperature, pressure\n        value = particle_radius[0] * 10 + particle_mass[1] + particle_charge[1]\n        return np.array([[0.0, value], [value, 0.0]], dtype=np.float64)\n\n    kernel_func = coagulation_strategy_abc._build_direct_kernel_index_func(\n        particle_radius=particle_radius,\n        particle_mass=particle_mass,\n        particle_charge=particle_charge,\n        kernel_builder=_kernel_builder,\n        temperature=298.15,\n        pressure=101325.0,\n    )\n\n    result = kernel_func(\n        np.array([0], dtype=np.int64),\n        np.array([1], dtype=np.int64),\n    )\n    assert result.shape == (1,)\n    assert result[0] == pytest.approx(31.0)",
+    "successor": "test_build_direct_kernel_index_func_uses_indexed_values",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_get_mean_effective_density_particle_data_filters_zeros",
+    "original": "def test_get_mean_effective_density_particle_data_filters_zeros() -> None:\n    \"\"\"Mean effective density should ignore zero-mass particles.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[0.0], [1e-18], [2e-18]]]),\n        concentration=np.array([[0.0, 1.0, 1.0]]),\n        charge=np.zeros((1, 3)),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    expected = 1000.0\n    result = coagulation_strategy_abc._get_mean_effective_density(data)\n    assert result == pytest.approx(expected)",
+    "successor": "test_get_mean_effective_density_particle_data_filters_zeros",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_get_mean_effective_density_particle_data_all_zero_returns_zero",
+    "original": "def test_get_mean_effective_density_particle_data_all_zero_returns_zero() -> (\n    None\n):\n    \"\"\"Mean effective density should be zero when no positive mass exists.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[0.0], [0.0]]]),\n        concentration=np.array([[0.0, 0.0]]),\n        charge=np.zeros((1, 2)),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n\n    assert coagulation_strategy_abc._get_mean_effective_density(data) == 0.0",
+    "successor": "test_get_mean_effective_density_particle_data_all_zero_returns_zero",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_is_particle_data_type_guard",
+    "original": "def test_is_particle_data_type_guard() -> None:\n    \"\"\"Type guard should discriminate ParticleData from representations.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18]]]),\n        concentration=np.array([[1.0]]),\n        charge=np.array([[0.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    representation = PresetParticleRadiusBuilder().build()\n\n    assert coagulation_strategy_abc._is_particle_data(data) is True\n    assert coagulation_strategy_abc._is_particle_data(representation) is False",
+    "successor": "test_material_getters_reject_non_native_input",
+    "disposition": "Deleted dispatch/typeguard semantics; native rejection boundary replaces facade type discrimination."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_unwrap_particle_returns_same_instance",
+    "original": "def test_unwrap_particle_returns_same_instance() -> None:\n    \"\"\"Unwrap helper should return the original particle instance.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18]]]),\n        concentration=np.array([[1.0]]),\n        charge=np.array([[0.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    representation = PresetParticleRadiusBuilder().build()\n\n    assert coagulation_strategy_abc._unwrap_particle(data) is data\n    assert (\n        coagulation_strategy_abc._unwrap_particle(representation)\n        is representation\n    )",
+    "successor": "test_material_admission_retains_same_instance",
+    "disposition": "Retain native identity assertion at real material admission; no-op facade unwrapping is obsolete."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_require_single_box_particle_data_accepts_single_box",
+    "original": "def test_require_single_box_particle_data_accepts_single_box() -> None:\n    \"\"\"Single-box ParticleData should pass the shared validation helper.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18]]]),\n        concentration=np.array([[1.0]]),\n        charge=np.array([[0.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n\n    result = coagulation_strategy_abc._require_single_box_particle_data(data)\n\n    assert result is data",
+    "successor": "test_require_single_box_particle_data_accepts_single_box",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_require_single_box_particle_data_rejects_multi_box",
+    "original": "def test_require_single_box_particle_data_rejects_multi_box() -> None:\n    \"\"\"Multi-box ParticleData should raise a clear validation error.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18]], [[2e-18]]]),\n        concentration=np.array([[1.0], [2.0]]),\n        charge=np.array([[0.0], [1.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0, 2.0]),\n    )\n\n    with pytest.raises(ValueError, match=r\"n_boxes=1.*n_boxes=2\"):\n        coagulation_strategy_abc._require_single_box_particle_data(data)",
+    "successor": "test_require_single_box_particle_data_rejects_multi_box",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_getters_particle_data_match_arrays",
+    "original": "def test_getters_particle_data_match_arrays() -> None:\n    \"\"\"Adapter helpers should mirror ParticleData arrays.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18, 2e-18], [2e-18, 3e-18]]]),\n        concentration=np.array([[1.0, 2.0]]),\n        charge=np.array([[0.0, 1.0]]),\n        density=np.array([1000.0, 1200.0]),\n        volume=np.array([1.0]),\n    )\n\n    np.testing.assert_allclose(\n        coagulation_strategy_abc._get_radius(data),\n        data.radii[0],\n    )\n    np.testing.assert_allclose(\n        coagulation_strategy_abc._get_mass(data),\n        data.total_mass[0],\n    )\n    np.testing.assert_allclose(\n        coagulation_strategy_abc._get_concentration(data),\n        data.concentration[0],\n    )\n    charge_array = coagulation_strategy_abc._get_charge(data)\n    assert charge_array is not None\n    assert charge_array.shape == data.charge[0].shape\n    assert charge_array.tolist() == data.charge[0].tolist()\n    np.testing.assert_allclose(\n        coagulation_strategy_abc._get_effective_density(data),\n        data.effective_density[0],\n    )\n    assert coagulation_strategy_abc._get_volume(data) == pytest.approx(\n        float(data.volume[0])\n    )",
+    "successor": "test_getters_particle_data_match_arrays",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_getters_particle_data_reject_multi_box_inputs",
+    "original": "def test_getters_particle_data_reject_multi_box_inputs() -> None:\n    \"\"\"Adapter helpers should reject unsupported multi-box ParticleData.\"\"\"\n    data = ParticleData(\n        masses=np.array(\n            [\n                [[1e-18, 2e-18], [2e-18, 3e-18]],\n                [[9e-18, 8e-18], [7e-18, 6e-18]],\n            ]\n        ),\n        concentration=np.array([[1.0, 2.0], [10.0, 20.0]]),\n        charge=np.array([[0.0, 1.0], [4.0, 5.0]]),\n        density=np.array([1000.0, 1200.0]),\n        volume=np.array([1.0, 9.0]),\n    )\n\n    getters = (\n        coagulation_strategy_abc._get_radius,\n        coagulation_strategy_abc._get_mass,\n        coagulation_strategy_abc._get_concentration,\n        coagulation_strategy_abc._get_charge,\n        coagulation_strategy_abc._get_volume,\n        coagulation_strategy_abc._get_effective_density,\n        coagulation_strategy_abc._get_mean_effective_density,\n    )\n\n    for getter in getters:\n        with pytest.raises(ValueError, match=r\"n_boxes=1.*n_boxes=2\"):\n            getter(data)",
+    "successor": "test_getters_particle_data_reject_multi_box_inputs",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_getters_particle_representation_match_methods",
+    "original": "def test_getters_particle_representation_match_methods() -> None:\n    \"\"\"Adapter helpers should mirror ParticleRepresentation accessors.\"\"\"\n    representation = PresetParticleRadiusBuilder().build()\n\n    np.testing.assert_allclose(\n        coagulation_strategy_abc._get_radius(representation),\n        representation.get_radius(),\n    )\n    np.testing.assert_allclose(\n        coagulation_strategy_abc._get_mass(representation),\n        representation.get_mass(),\n    )\n    np.testing.assert_allclose(\n        coagulation_strategy_abc._get_concentration(representation),\n        representation.concentration,\n    )\n    np.testing.assert_allclose(\n        coagulation_strategy_abc._get_effective_density(representation),\n        representation.get_effective_density(),\n    )\n    assert coagulation_strategy_abc._get_volume(\n        representation\n    ) == pytest.approx(representation.get_volume())",
+    "successor": "test_getters_native_initializer_match_arrays",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_get_charge_representation_none_when_unset",
+    "original": "def test_get_charge_representation_none_when_unset() -> None:\n    \"\"\"Charge helper should mirror representation-provided charge values.\"\"\"\n    representation = PresetParticleRadiusBuilder().build()\n\n    charge = representation.get_charge()\n    result = coagulation_strategy_abc._get_charge(representation)\n    if charge is None:\n        assert result is None\n    else:\n        np.testing.assert_array_equal(result, charge)",
+    "successor": "test_get_charge_native_initializer_defaults_to_zero",
+    "disposition": "Native zero-charge initialization/array identity replaces legacy optional None representation; numerical neutral behavior retained."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_get_particle_resolved_kernel_radius_data_uses_bin_radius",
+    "original": "def test_get_particle_resolved_kernel_radius_data_uses_bin_radius() -> None:\n    \"\"\"Helper should return provided bin radius unchanged.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18], [2e-18]]]),\n        concentration=np.array([[1.0, 1.0]]),\n        charge=np.zeros((1, 2)),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    bin_radius = np.array([1e-8, 2e-8], dtype=np.float64)\n    result = coagulation_strategy_abc._get_particle_resolved_kernel_radius_data(\n        data=data,\n        bin_radius=bin_radius,\n    )\n    np.testing.assert_array_equal(result, bin_radius)",
+    "successor": "test_get_particle_resolved_kernel_radius_data_uses_bin_radius",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_get_particle_resolved_kernel_radius_data_raises_on_all_zero",
+    "original": "def test_get_particle_resolved_kernel_radius_data_raises_on_all_zero() -> None:\n    \"\"\"All-zero radii should raise a ValueError.\"\"\"\n    data = ParticleData(\n        masses=np.zeros((1, 2, 1)),\n        concentration=np.zeros((1, 2)),\n        charge=np.zeros((1, 2)),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    with pytest.raises(ValueError, match=\"Particle radius must be finite\"):\n        coagulation_strategy_abc._get_particle_resolved_kernel_radius_data(\n            data=data,\n        )",
+    "successor": "test_get_particle_resolved_kernel_radius_data_raises_on_all_zero",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_get_particle_resolved_kernel_radius_data_raises_on_nonfinite",
+    "original": "def test_get_particle_resolved_kernel_radius_data_raises_on_nonfinite() -> None:\n    \"\"\"Non-finite radii should raise a ValueError.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[np.inf]]]),\n        concentration=np.array([[1.0]]),\n        charge=np.array([[0.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    with pytest.raises(ValueError, match=\"Particle radius must be finite\"):\n        coagulation_strategy_abc._get_particle_resolved_kernel_radius_data(\n            data=data,\n        )",
+    "successor": "test_get_particle_resolved_kernel_radius_data_raises_on_nonfinite",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_get_particle_resolved_kernel_radius_data_generates_requested_bins",
+    "original": "def test_get_particle_resolved_kernel_radius_data_generates_requested_bins() -> (\n    None\n):\n    \"\"\"Radius helper should generate explicit or inferred logarithmic bins.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18], [8e-18], [27e-18]]]),\n        concentration=np.array([[1.0, 1.0, 1.0]]),\n        charge=np.array([[0.0, 0.0, 0.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n\n    fixed_bins = (\n        coagulation_strategy_abc._get_particle_resolved_kernel_radius_data(\n            data=data,\n            total_bins=4,\n        )\n    )\n    inferred_bins = (\n        coagulation_strategy_abc._get_particle_resolved_kernel_radius_data(\n            data=data,\n            bins_per_radius_decade=5,\n        )\n    )\n\n    assert fixed_bins.shape == (4,)\n    assert inferred_bins.ndim == 1\n    assert inferred_bins.size >= 1\n    assert np.all(np.diff(fixed_bins) > 0)\n    assert np.all(np.diff(inferred_bins) >= 0)",
+    "successor": "test_get_particle_resolved_kernel_radius_data_generates_requested_bins",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_get_particle_resolved_kernel_radius_data_rejects_multi_box_inputs",
+    "original": "def test_get_particle_resolved_kernel_radius_data_rejects_multi_box_inputs() -> (\n    None\n):\n    \"\"\"Radius helper should reject unsupported multi-box ParticleData.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18]], [[2e-18]]]),\n        concentration=np.array([[1.0], [2.0]]),\n        charge=np.array([[0.0], [1.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0, 2.0]),\n    )\n\n    with pytest.raises(ValueError, match=r\"n_boxes=1.*n_boxes=2\"):\n        coagulation_strategy_abc._get_particle_resolved_kernel_radius_data(\n            data=data,\n        )",
+    "successor": "test_get_particle_resolved_kernel_radius_data_rejects_multi_box_inputs",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_get_binned_kernel_data_from_particle_data_aggregates_bins",
+    "original": "def test_get_binned_kernel_data_from_particle_data_aggregates_bins() -> None:\n    \"\"\"Binning helper should aggregate mass and concentration by bins.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18], [2e-18], [3e-18]]]),\n        concentration=np.array([[1.0, 2.0, 3.0]]),\n        charge=np.array([[0.0, 1.0, 2.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    radii = data.radii[0]\n    kernel_radius = np.array(\n        [radii.min() * 0.8, radii.mean(), radii.max() * 1.2], dtype=np.float64\n    )\n    binned = (\n        coagulation_strategy_abc._get_binned_kernel_data_from_particle_data(\n            data=data,\n            kernel_radius=kernel_radius,\n        )\n    )\n    bin_indexes = np.digitize(radii, kernel_radius)\n    num_bins = kernel_radius.size\n    valid_mask = bin_indexes < num_bins\n    bin_indexes = bin_indexes[valid_mask]\n    masses = data.masses[0][valid_mask]\n    concentration = data.concentration[0][valid_mask]\n    charge = data.charge[0][valid_mask]\n    counts = np.bincount(bin_indexes, minlength=num_bins)\n    concentration_sum = np.bincount(\n        bin_indexes, weights=concentration, minlength=num_bins\n    )\n    new_masses = np.zeros((num_bins, data.n_species), dtype=np.float64)\n    summed = np.bincount(bin_indexes, weights=masses[:, 0], minlength=num_bins)\n    with np.errstate(divide=\"ignore\", invalid=\"ignore\"):\n        mean_mass = summed / counts\n    mean_mass[counts == 0] = np.nan\n    new_masses[:, 0] = mean_mass\n    new_charge = np.full(num_bins, np.nan, dtype=np.float64)\n    for bin_index in np.flatnonzero(counts):\n        mask = bin_indexes == bin_index\n        new_charge[bin_index] = np.median(charge[mask])\n    new_charge = np.where(np.isnan(new_charge), 0, new_charge)\n    new_concentration = np.where(\n        np.isnan(concentration_sum), 0, concentration_sum\n    )\n    mask_nan_zeros = np.isnan(new_masses) | (new_masses == 0)\n    mask_nan_zeros = ~np.any(mask_nan_zeros, axis=1)\n    np.testing.assert_allclose(\n        binned.masses[0], new_masses[mask_nan_zeros], rtol=1e-12\n    )\n    np.testing.assert_allclose(\n        binned.concentration[0], new_concentration[mask_nan_zeros], rtol=1e-12\n    )\n    np.testing.assert_allclose(\n        binned.charge[0], new_charge[mask_nan_zeros], rtol=1e-12\n    )",
+    "successor": "test_get_binned_kernel_data_from_particle_data_aggregates_bins",
+    "disposition": "Retain mass/count/median-charge bin assertions with M3 count-weighted mass oracle; old arithmetic mass mean discarded because unequal counts require weighted material representatives."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_get_binned_kernel_data_from_particle_data_rejects_multi_box_inputs",
+    "original": "def test_get_binned_kernel_data_from_particle_data_rejects_multi_box_inputs() -> (\n    None\n):\n    \"\"\"Binning helper should reject unsupported multi-box ParticleData.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18]], [[2e-18]]]),\n        concentration=np.array([[1.0], [2.0]]),\n        charge=np.array([[0.0], [1.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0, 2.0]),\n    )\n\n    with pytest.raises(ValueError, match=r\"n_boxes=1.*n_boxes=2\"):\n        coagulation_strategy_abc._get_binned_kernel_data_from_particle_data(\n            data=data,\n            kernel_radius=np.array([1e-9, 2e-9], dtype=np.float64),\n        )",
+    "successor": "test_get_binned_kernel_data_from_particle_data_rejects_multi_box_inputs",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_get_binned_kernel_data_from_particle_data_returns_empty_when_all_outside",
+    "original": "def test_get_binned_kernel_data_from_particle_data_returns_empty_when_all_outside() -> (\n    None\n):\n    \"\"\"Binning helper should return an empty single-box container if needed.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18], [2e-18]]]),\n        concentration=np.array([[1.0, 2.0]]),\n        charge=np.array([[0.0, 1.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    kernel_radius = np.array([1e-12], dtype=np.float64)\n\n    binned = (\n        coagulation_strategy_abc._get_binned_kernel_data_from_particle_data(\n            data=data,\n            kernel_radius=kernel_radius,\n        )\n    )\n\n    assert binned.masses.shape == (1, 0, 1)\n    assert binned.concentration.shape == (1, 0)\n    assert binned.charge.shape == (1, 0)\n    np.testing.assert_allclose(binned.volume, np.array([1.0]))",
+    "successor": "test_get_binned_kernel_data_rejects_uncovered_active_radii",
+    "disposition": "Native rejection with exact state preservation replaces lossy exclusion of all active particles. Separate empty-population test retains zero-width output/volume contract."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_strategy_init_rejects_invalid_distribution_type",
+    "original": "def test_strategy_init_rejects_invalid_distribution_type() -> None:\n    \"\"\"Invalid distribution types should raise a clear ValueError.\"\"\"\n    with pytest.raises(ValueError, match=\"Invalid distribution type\"):\n        DummyCoagulationStrategy(distribution_type=\"invalid\")",
+    "successor": "test_strategy_init_rejects_invalid_distribution_type",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_loss_gain_and_net_rate_particle_data_paths",
+    "original": "def test_loss_gain_and_net_rate_particle_data_paths(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Discrete and continuous ParticleData paths should use shared helpers.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18], [2e-18]]]),\n        concentration=np.array([[3.0, 4.0]]),\n        charge=np.array([[0.0, 1.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    kernel = np.array([[1.0, 0.5], [0.5, 2.0]], dtype=np.float64)\n\n    discrete = DummyCoagulationStrategy(distribution_type=\"discrete\")\n    continuous = DummyCoagulationStrategy(distribution_type=\"continuous_pdf\")\n    monkeypatch.setattr(\n        coagulation_strategy_abc.coagulation_rate,\n        \"get_coagulation_loss_rate_discrete\",\n        lambda concentration, kernel: np.array([10.0, 11.0]),\n    )\n    monkeypatch.setattr(\n        coagulation_strategy_abc.coagulation_rate,\n        \"get_coagulation_gain_rate_discrete\",\n        lambda radius, concentration, kernel: np.array([12.0, 13.0]),\n    )\n    monkeypatch.setattr(\n        coagulation_strategy_abc.coagulation_rate,\n        \"get_coagulation_loss_rate_continuous\",\n        lambda radius, concentration, kernel: np.array([14.0, 15.0]),\n    )\n    monkeypatch.setattr(\n        coagulation_strategy_abc.coagulation_rate,\n        \"get_coagulation_gain_rate_continuous\",\n        lambda radius, concentration, kernel: np.array([16.0, 17.0]),\n    )\n\n    np.testing.assert_allclose(discrete.loss_rate(data, kernel), [10.0, 11.0])\n    np.testing.assert_allclose(discrete.gain_rate(data, kernel), [12.0, 13.0])\n    np.testing.assert_allclose(continuous.loss_rate(data, kernel), [14.0, 15.0])\n    np.testing.assert_allclose(continuous.gain_rate(data, kernel), [16.0, 17.0])\n\n    net_strategy = DummyCoagulationStrategy(distribution_type=\"discrete\")\n    expected_net = np.array([2.0, 2.0])\n    np.testing.assert_allclose(\n        net_strategy.net_rate(data, temperature=298.15, pressure=101325.0),\n        expected_net,\n    )",
+    "successor": "test_loss_gain_and_net_rate_particle_data_paths",
+    "disposition": "All loss/gain/net delegation assertions retained, extended to four nodes required by native gain interpolation; separate tagged PDF fixture preserves declared coordinate."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_public_particle_data_api_rejects_multi_box_inputs",
+    "original": "def test_public_particle_data_api_rejects_multi_box_inputs(\n    method_name: str,\n    args: tuple[object, ...],\n    kwargs: dict[str, float],\n) -> None:\n    \"\"\"Public ParticleData APIs should reject unsupported multi-box input.\"\"\"\n    strategy = DummyCoagulationStrategy(distribution_type=\"discrete\")\n    data = _build_multi_box_particle_data()\n\n    if method_name == \"step\":\n        data.distribution_type = \"discrete\"\n        data.volume[:] = 1.0\n\n    method = getattr(strategy, method_name)\n\n    with pytest.raises(ValueError, match=\"n_boxes=1\"):\n        method(data, *args, **kwargs)",
+    "successor": "test_public_particle_data_api_rejects_multi_box_inputs",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_loss_gain_rate_reject_invalid_distribution_type",
+    "original": "def test_loss_gain_rate_reject_invalid_distribution_type() -> None:\n    \"\"\"Invalid distribution types should still fail in loss/gain helpers.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18]]]),\n        concentration=np.array([[1.0]]),\n        charge=np.array([[0.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    kernel = np.ones((1, 1), dtype=np.float64)\n    strategy = DummyCoagulationStrategy(distribution_type=\"discrete\")\n    strategy.distribution_type = \"invalid\"\n\n    with pytest.raises(ValueError, match=\"Invalid distribution type\"):\n        strategy.loss_rate(data, kernel)\n    with pytest.raises(ValueError, match=\"Invalid distribution type\"):\n        strategy.gain_rate(data, kernel)",
+    "successor": "test_loss_gain_rate_reject_invalid_distribution_type",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_diffusive_knudsen_and_friction_factor_particle_data",
+    "original": "def test_diffusive_knudsen_and_friction_factor_particle_data(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Diffusive Knudsen path should compose friction-factor helpers.\"\"\"\n    data = ParticleData(\n        masses=np.array([[[1e-18], [2e-18]]]),\n        concentration=np.array([[1.0, 2.0]]),\n        charge=np.array([[0.0, 1.0]]),\n        density=np.array([1000.0]),\n        volume=np.array([1.0]),\n    )\n    strategy = DummyCoagulationStrategy(distribution_type=\"discrete\")\n\n    monkeypatch.setattr(\n        coagulation_strategy_abc.gas,\n        \"get_dynamic_viscosity\",\n        lambda temperature: 1.8e-5,\n    )\n    monkeypatch.setattr(\n        coagulation_strategy_abc.gas,\n        \"get_molecule_mean_free_path\",\n        lambda temperature, pressure, dynamic_viscosity: 6.5e-8,\n    )\n    monkeypatch.setattr(\n        coagulation_strategy_abc.particles,\n        \"get_knudsen_number\",\n        lambda mean_free_path, particle_radius: np.full_like(\n            particle_radius, 2.0\n        ),\n    )\n    monkeypatch.setattr(\n        coagulation_strategy_abc.particles,\n        \"get_cunningham_slip_correction\",\n        lambda knudsen_number: np.full_like(knudsen_number, 3.0),\n    )\n    monkeypatch.setattr(\n        coagulation_strategy_abc.particles,\n        \"get_friction_factor\",\n        lambda particle_radius,\n        dynamic_viscosity,\n        slip_correction: np.full_like(particle_radius, 4.0),\n    )\n    monkeypatch.setattr(\n        coagulation_strategy_abc.particles,\n        \"get_diffusive_knudsen_number\",\n        lambda particle_radius,\n        particle_mass,\n        friction_factor,\n        coulomb_potential_ratio,\n        temperature: np.full_like(particle_radius, 5.0),\n    )\n    monkeypatch.setattr(\n        coagulation_strategy_abc.particles,\n        \"get_coulomb_enhancement_ratio\",\n        lambda particle_radius, charge, temperature: np.full_like(\n            particle_radius, 6.0\n        ),\n    )\n\n    np.testing.assert_allclose(\n        strategy.friction_factor(data, temperature=298.15, pressure=101325.0),\n        np.array([4.0, 4.0]),\n    )\n    np.testing.assert_allclose(\n        strategy.diffusive_knudsen(data, temperature=298.15, pressure=101325.0),\n        np.array([5.0, 5.0]),\n    )",
+    "successor": "test_diffusive_knudsen_and_friction_factor_particle_data",
+    "disposition": "Assertions retained with explicit native fixtures; numerical tolerance unchanged."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py",
+    "test": "test_coulomb_potential_ratio_uses_zero_charge_when_unset",
+    "original": "def test_coulomb_potential_ratio_uses_zero_charge_when_unset(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Legacy representations with no charge should use zeros.\"\"\"\n    representation = PresetParticleRadiusBuilder().build()\n    monkeypatch.setattr(representation, \"get_charge\", lambda: None)\n    strategy = DummyCoagulationStrategy(distribution_type=\"discrete\")\n\n    def _fake_coulomb(\n        particle_radius: NDArray[np.float64],\n        charge: NDArray[np.float64],\n        temperature: float,\n    ) -> NDArray[np.float64]:\n        _ = temperature\n        np.testing.assert_allclose(charge, np.zeros_like(particle_radius))\n        return np.full_like(particle_radius, 7.0)\n\n    monkeypatch.setattr(\n        coagulation_strategy_abc.particles,\n        \"get_coulomb_enhancement_ratio\",\n        _fake_coulomb,\n    )\n\n    np.testing.assert_allclose(\n        strategy.coulomb_potential_ratio(representation, temperature=298.15),\n        np.full_like(representation.get_radius(), 7.0),\n    )",
+    "successor": "test_coulomb_potential_ratio_uses_native_zero_charge",
+    "disposition": "Neutral-law zero-charge assertion retained with explicit native charge array; removed legacy None getter fallback."
+  }
+]

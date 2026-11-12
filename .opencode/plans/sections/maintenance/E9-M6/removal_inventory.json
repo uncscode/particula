@@ -621,7 +621,7 @@
           ]
         }
       ],
-      "disposition": "Shared step legacy/untagged dispatch removed; native step retained. Kernel/rate/material helper legacy branches remain pending.",
+      "disposition": "Complete: facade union, getters, unwrapping, legacy binning, rate and step dispatch removed; native material/property science and count-weighted binning retained.",
       "test_nodes": []
     },
     {
@@ -729,7 +729,7 @@
           ]
         }
       ],
-      "disposition": "Step assertions migrated and recorded in coagulation_step_assertions.json; helper/rate fixture migration remains pending.",
+      "disposition": "Complete: original step assertions mapped in coagulation_step_assertions.json; remaining helper/rate assertions mapped in coagulation_helpers_assertions.json, with native admission and scientific successors.",
       "test_nodes": [
         {
           "name": "test_resolve_radius_indices_unique_match",

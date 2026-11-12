@@ -18,11 +18,11 @@ from numpy.typing import NDArray
 from particula.dynamics.coagulation.turbulent_shear_kernel import (
     get_turbulent_shear_kernel_st1956_via_system_state,
 )
+from particula.particles.particle_data import ParticleData
 
 from ._native_validation import native_kernel
 from .coagulation_strategy_abc import (
     CoagulationStrategyABC,
-    ParticleLike,
     _get_radius,
 )
 
@@ -155,7 +155,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
     @native_kernel
     def kernel(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -177,12 +177,12 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         Examples:
             ```py title="Example usage of kernel method"
             kernel_value = strategy.kernel(
-                particle=ParticleRepresentation(...),
+                particle=particle_data,
                 temperature=298.15,
                 pressure=101325
             )
             # kernel_value could be a float or array depending on the
-            # particle representation
+            # native particle population
             ```
 
         References:

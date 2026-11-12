@@ -12,13 +12,14 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.particles.particle_data import ParticleData
+
 from ..turbulent_dns_kernel.turbulent_dns_kernel_ao2008 import (
     get_turbulent_dns_kernel_ao2008_via_system_state,
 )
 from ._native_validation import native_kernel
 from .coagulation_strategy_abc import (
     CoagulationStrategyABC,
-    ParticleLike,
     _get_mean_effective_density,
     _get_radius,
 )
@@ -194,7 +195,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
     @native_kernel
     def kernel(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:

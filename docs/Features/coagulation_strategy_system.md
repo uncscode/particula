@@ -29,11 +29,17 @@ population measure. Non-native aggregates reject before strategy dispatch.
 ## Native kernel and rate contract (E9-M3)
 
 The six concrete CPU strategy families accept explicitly tagged `ParticleData`
-for native kernel evaluation: Brownian, charged, sedimentation, turbulent shear,
+for kernel evaluation: Brownian, charged, sedimentation, turbulent shear,
 turbulent DNS and compatible combinations. Configuration stays on strategies.
 Every native entry revalidates representation and physical state, requires one
 box and matching `distribution_type`, and checks scalar temperature/pressure.
 Mutated mechanism controls and combined child distributions are checked again.
+Non-native objects and untagged populations reject at kernel, gain/loss/net-rate
+and step boundaries; distribution meaning is never inferred. Combined kernels
+validate the full population once, evaluate child material laws internally,
+and restore zero interaction rows and columns for empty slots. This also
+applies to nested combinations; private material storage is not a supported
+population-execution input.
 
 Kernel values have units m³/s and use per-particle material mass, geometry and
 charge. They do not multiply physical mass by population count. Zero-mass,

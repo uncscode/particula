@@ -1,6 +1,6 @@
 """Read-only admission for explicitly tagged native coagulation state.
 
-Legacy untagged/facade inputs keep their existing behavior. Kernel evaluation
+Public kernels require explicit population metadata. Kernel evaluation
 uses a private material-only view for positive-mass lanes, then restores the
 full slot matrix with zero rows/columns for zero-mass lanes. This does not
 select collisions, mutate a population, or assign it a different representation.
@@ -16,14 +16,6 @@ from numpy.typing import NDArray
 from particula.particles.particle_data import ParticleData
 
 _KernelMethod = TypeVar("_KernelMethod", bound=Callable[..., Any])
-
-
-def is_native(particle: Any) -> bool:
-    """Identify explicit metadata without inferring legacy meaning."""
-    return (
-        isinstance(particle, ParticleData)
-        and particle.distribution_type is not None
-    )
 
 
 def positive_scalar(
@@ -42,10 +34,15 @@ def positive_scalar(
 
 def validate_particle(particle: ParticleData, distribution_type: str) -> None:
     """Check current representation, layout, physics and strategy agreement."""
+    if not isinstance(particle, ParticleData):
+        raise TypeError("coagulation requires ParticleData")
+    if particle.distribution_type is None:
+        raise ValueError("coagulation requires explicit distribution_type")
     particle.validate_representation()
     if particle.n_boxes != 1:
         raise ValueError(
-            "ParticleData must have n_boxes=1 for CPU coagulation strategies"
+            "ParticleData must have n_boxes=1 for CPU coagulation strategies; "
+            f"got n_boxes={particle.n_boxes}"
         )
     if distribution_type != particle.distribution_type:
         raise ValueError(
@@ -125,8 +122,6 @@ def native_kernel(method: _KernelMethod) -> _KernelMethod:
     def evaluate(
         self: Any, particle: Any, temperature: float, pressure: float
     ) -> Any:
-        if not is_native(particle):
-            return method(self, particle, temperature, pressure)
         validate_particle(particle, self.distribution_type)
         positive_scalar(temperature, "temperature")
         positive_scalar(pressure, "pressure")
@@ -162,6 +157,9 @@ def native_kernel(method: _KernelMethod) -> _KernelMethod:
         matrix[np.ix_(indices, indices)] = values
         return matrix
 
+    # Private composition hook: outer admission has already validated the
+    # population and all child controls. This evaluates material laws only.
+    evaluate._coagulation_material_kernel = method  # type: ignore[attr-defined]
     return cast(_KernelMethod, evaluate)
 
 
@@ -192,3 +190,19 @@ def rate_radius(particle: ParticleData) -> NDArray[np.float64]:
             raise ValueError("native PDF requires radius_grid")
         return particle.radius_grid
     return particle.radii[0]
+
+
+def _evaluate_material_kernel(
+    strategy: Any, material: ParticleData, temperature: float, pressure: float
+) -> Any:
+    """Evaluate an admitted combination's child without public re-admission.
+
+    Decorated built-ins expose their material law privately. Custom kernels
+    retain their existing direct material-input contract. This helper is used
+    only inside a combined kernel after the outer population/control checks.
+    """
+    method = strategy.kernel
+    law = getattr(method, "_coagulation_material_kernel", None)
+    if law is not None:
+        return law(strategy, material, temperature, pressure)
+    return method(particle=material, temperature=temperature, pressure=pressure)

@@ -11,13 +11,14 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.particles.particle_data import ParticleData
+
 from ..sedimentation_kernel import (
     get_sedimentation_kernel_sp2016_via_system_state as get_kernel_sp2016,
 )
 from ._native_validation import native_kernel
 from .coagulation_strategy_abc import (
     CoagulationStrategyABC,
-    ParticleLike,
     _get_mean_effective_density,
     _get_radius,
 )
@@ -99,7 +100,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
     @native_kernel
     def kernel(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -120,7 +121,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         Examples:
             ```py
             k_values = strategy.kernel(
-                ParticleRepresentation, temperature=298.15, pressure=101325
+                particle_data, temperature=298.15, pressure=101325
             )
             # k_values may be a single float or an array
             ```

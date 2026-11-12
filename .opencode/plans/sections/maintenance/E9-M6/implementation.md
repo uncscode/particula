@@ -420,3 +420,48 @@ Validation:
   passed in 1.62 seconds, `/tmp/m6-step-removal-docs.log`.
 These checks do not replace final full coverage, notebook execution or full
 publication validation after all M6 removals.
+
+## Complete native coagulation kernel/rate/helper boundary
+
+Removed ParticleLike and all ParticleRepresentation imports, facade getters,
+no-op unwrapping/type dispatch, untagged kernel/rate admission and duplicate
+legacy kernel-binning implementations from the coagulation strategy tree.
+Concrete kernels and gain/loss/net rates require explicitly tagged ParticleData.
+Single-box material-property helpers retain raw internal material storage;
+they neither infer a population measure nor provide population execution.
+Shared step remains the previously validated native-only implementation.
+
+Combined kernels now use a private material-law hook after outer population
+and recursive control validation. Nested combinations retain zero-slot expansion
+and physical laws without calling public kernels on untagged scratch. Custom
+material laws retain keyword invocation, including keyword-only callables.
+No numerical formulas or native tolerances changed.
+
+`coagulation_helpers_assertions.json` records all original non-step helper/rate
+test bodies and successors. Facade-only type/unwrap/None-charge contracts were
+replaced with native admission, identity and explicit zero-charge checks.
+The binning oracle uses the existing native count-weighted material average;
+uncovered active particles reject with exact preservation rather than silently
+vanishing. A separate empty-population test retains empty shapes and volume.
+Mocked gain/rate fixtures now use four increasing nodes and a distinct PDF
+coordinate as required by native admission. Added 80 concrete-family boundary
+cases, three nested-combination cases, one keyword-only custom-law case and
+one empty-bin case. Updated all obsolete strategy docstring examples and the
+user-facing coagulation contract.
+
+Validation:
+- Initial run identified 19 obsolete fixture/helper failures; after migration,
+  all **621** existing strategy cases passed before new boundary additions.
+- Full coagulation, dynamics runnable and integration group: **1716 passed,
+  1 skipped in 6.39s**, `/tmp/m6-coag-native-boundaries.log`.
+- Entire source-example suite plus CPU coagulation adapter/integration suites,
+  with `-Werror --no-cov`: **312 passed, 4 skipped in 45.86s**,
+  `/tmp/m6-coag-native-boundaries-examples.log`.
+- Full-package mypy passed, **552 files**,
+  `/tmp/m6-coag-native-boundaries-mypy2.log`; the first run found an intentional
+  wrong-type boundary call needing its explicit test-only type suppression.
+- Scoped Ruff/format and whitespace checks passed. Base strict documentation
+  passed in 1.60 seconds, `/tmp/m6-coag-native-boundaries-docs.log`.
+- No remaining ParticleRepresentation, ParticleLike, is_native, or obsolete
+  unwrapping/typeguard references in the coagulation tree. Remaining similarly
+  named condensation helpers belong to the still-pending condensation removal.
