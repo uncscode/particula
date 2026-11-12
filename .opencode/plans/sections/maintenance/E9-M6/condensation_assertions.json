@@ -1,0 +1,1281 @@
+{
+  "status": "baseline assertions preserved; successor mapping pending source-level review",
+  "tests": [
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_validate_time_step_allows_zero_and_rejects_invalid",
+      "assertions": [
+        "self.assertRaisesRegex(ValueError, \"time_step must be finite\")"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_mean_free_path",
+      "assertions": [
+        "self.assertIsNotNone(result)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_unwrap_helpers_accept_legacy_and_data",
+      "assertions": [
+        "self.assertIsInstance(particle_unwrapped, ParticleData)",
+        "self.assertIsInstance(gas_unwrapped, GasData)",
+        "self.assertTrue(particle_is_legacy)",
+        "self.assertTrue(gas_is_legacy)",
+        "self.assertIsInstance(particle_unwrapped, ParticleData)",
+        "self.assertIsInstance(gas_unwrapped, GasData)",
+        "self.assertFalse(particle_is_legacy)",
+        "self.assertFalse(gas_is_legacy)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_unwrap_helpers_invalid_type_raises",
+      "assertions": [
+        "self.assertRaises(TypeError)",
+        "self.assertRaises(TypeError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_require_matching_types_raises_on_mismatch",
+      "assertions": [
+        "self.assertRaises(TypeError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_require_single_box_raises_for_multi_box",
+      "assertions": [
+        "self.assertRaises(ValueError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_vapor_pressure_helpers_handle_sequence_and_single",
+      "assertions": [
+        "self.assertEqual(pure_sequence.shape[0], len(strategy_sequence))",
+        "self.assertEqual(pure_single.shape, ())",
+        "self.assertEqual(partial_sequence.shape[0], len(strategy_sequence))",
+        "self.assertIsInstance(partial_single, np.ndarray)",
+        "self.assertEqual(partial_single.shape, ())"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_data_only_requires_strategy_configuration",
+      "assertions": [
+        "self.assertRaises(TypeError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_data_only_missing_vapor_pressure_strategy_raises",
+      "assertions": [
+        "self.assertRaises(TypeError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_rate_rejects_mixed_legacy_and_data_inputs",
+      "assertions": [
+        "self.assertRaises(TypeError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_mass_transfer_rate_rejects_multi_box_data_inputs",
+      "assertions": [
+        "self.assertRaisesRegex(\n            ValueError,\n            \"ParticleData must have n_boxes=1 for condensation strategies, \"\n            \"got n_boxes=2.\",\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_step_rejects_multi_box_data_inputs",
+      "assertions": [
+        "self.assertRaisesRegex(\n            ValueError,\n            \"ParticleData must have n_boxes=1 for condensation strategies, \"\n            \"got n_boxes=2.\",\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_knudsen_number",
+      "assertions": [
+        "self.assertIsNotNone(result)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_first_order_mass_transport",
+      "assertions": [
+        "self.assertIsNotNone(result)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_normalize_first_order_mass_transport_2d",
+      "assertions": [
+        "self.assertEqual(normalized.shape, (3, 1))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_step_rejects_invalid_time_step",
+      "assertions": [
+        "self.assertRaisesRegex(ValueError, \"time_step must be finite\")"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_fill_zero_radius",
+      "assertions": [
+        "self.assertTrue(np.all(filled != 0.0))",
+        "self.assertEqual(filled[0], np.max(radii))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_fill_zero_radius_all_zeros_warns",
+      "assertions": [
+        "self.assertWarns(RuntimeWarning)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_rate_respects_skip_indices",
+      "assertions": [
+        "self.assertTrue(np.allclose(rates_skip[..., 0], 0.0))",
+        "self.assertTrue(np.any(rates_noskip[..., 0] != 0.0))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_step_skip_preserves_skipped_species",
+      "assertions": [
+        "self.assertGreater(\n            final_particle_mass[..., 0].sum(),\n            initial_particle_mass[..., 0].sum(),\n        )",
+        "self.assertLess(final_gas_conc[0], initial_gas_conc[0])",
+        "np.testing.assert_allclose(\n            final_particle_mass[..., skip_idx],\n            initial_particle_mass[..., skip_idx],\n        )",
+        "self.assertAlmostEqual(\n            final_gas_conc[skip_idx], initial_gas_conc[skip_idx]\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_direct",
+      "assertions": [
+        "self.assertIs(returned_1d, array_1d)",
+        "np.testing.assert_array_equal(array_1d, np.array([0.0, 1.0, 0.0, 3.0]))",
+        "self.assertIs(returned_2d, array_2d)",
+        "np.testing.assert_array_equal(array_2d, expected_2d)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_rejects_non_integer_indices",
+      "assertions": [
+        "self.assertRaises(TypeError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_out_of_bounds_raises",
+      "assertions": [
+        "self.assertRaises(IndexError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_step_with_particle_data_gas_data",
+      "assertions": [
+        "self.assertIsInstance(particle_new, ParticleData)",
+        "self.assertIsInstance(gas_new, GasData)",
+        "self.assertEqual(particle_new.masses.shape, particle_data.masses.shape)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_step_returns_matching_types",
+      "assertions": [
+        "self.assertIsInstance(\n            particle_legacy, par.particles.ParticleRepresentation\n        )",
+        "self.assertIsInstance(gas_legacy, par.gas.GasSpecies)",
+        "self.assertIsInstance(particle_new, ParticleData)",
+        "self.assertIsInstance(gas_new, GasData)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_step_numerical_parity",
+      "assertions": [
+        "np.testing.assert_allclose(\n            data_mass,\n            legacy_mass,\n            rtol=1e-10,\n            err_msg=\"Particle mass diverges between legacy and data paths\",\n        )",
+        "np.testing.assert_allclose(\n            data_gas,\n            legacy_gas,\n            rtol=1e-10,\n            err_msg=\"Gas concentration diverges between legacy and data paths\",\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_rate_numerical_parity",
+      "assertions": [
+        "np.testing.assert_allclose(\n            data_rate,\n            legacy_rate,\n            rtol=1e-10,\n            err_msg=\"rate() diverges between legacy and data paths\",\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_rate_with_particle_data",
+      "assertions": [
+        "self.assertIsInstance(rate, np.ndarray)",
+        "self.assertEqual(rate.shape, particle_data.masses[0].shape)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_mass_transfer_rate_with_particle_data",
+      "assertions": [
+        "self.assertIsInstance(mass_rate, np.ndarray)",
+        "self.assertEqual(mass_rate.shape, particle_data.masses[0].shape)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_calculate_pressure_delta_with_particle_data",
+      "assertions": [
+        "self.assertIsInstance(pressure_delta, np.ndarray)",
+        "self.assertEqual(pressure_delta.shape[0], radius.shape[0])",
+        "self.assertTrue(np.all(np.isfinite(pressure_delta)))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_defaults",
+      "assertions": [
+        "self.assertEqual(strategy.theta_mode, \"half\")",
+        "self.assertEqual(strategy.num_batches, 1)",
+        "self.assertTrue(strategy.shuffle_each_step)",
+        "self.assertIsNone(strategy.random_state)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_theta_mode_random_stores_seed",
+      "assertions": [
+        "self.assertEqual(strategy.theta_mode, \"random\")",
+        "self.assertEqual(strategy.random_state, 42)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_theta_mode_batch_stores_batches",
+      "assertions": [
+        "self.assertEqual(strategy.theta_mode, \"batch\")",
+        "self.assertEqual(strategy.num_batches, 4)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_invalid_theta_mode_raises",
+      "assertions": [
+        "self.assertRaises(ValueError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_num_batches_less_than_one_raises",
+      "assertions": [
+        "self.assertRaises(ValueError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_mass_transfer_rate_returns_array",
+      "assertions": [
+        "self.assertIsInstance(mass_rate, np.ndarray)",
+        "self.assertEqual(\n            mass_rate.shape, self.particle.get_species_mass().shape\n        )",
+        "self.assertTrue(np.all(np.isfinite(mass_rate)))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_rate_returns_array_and_respects_skip",
+      "assertions": [
+        "self.assertIsInstance(rate, np.ndarray)",
+        "self.assertEqual(rate.shape, self.particle.get_species_mass().shape)",
+        "np.testing.assert_array_equal(rate[..., 0], np.zeros_like(rate[..., 0]))",
+        "self.assertTrue(np.all(np.isfinite(rate)))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_rate_api_accepts_positional_arguments",
+      "assertions": [
+        "self.assertIsInstance(rate_positional, np.ndarray)",
+        "self.assertEqual(\n            rate_positional.shape, self.particle.get_species_mass().shape\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_half_mode_returns_half",
+      "assertions": [
+        "np.testing.assert_array_equal(theta, np.full(5, 0.5))",
+        "self.assertEqual(theta.shape, (5,))",
+        "self.assertEqual(theta.dtype, np.float64)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_random_mode_range_and_shape",
+      "assertions": [
+        "self.assertTrue(np.all(theta >= 0.0))",
+        "self.assertTrue(np.all(theta <= 1.0))",
+        "self.assertEqual(theta.shape, (100,))",
+        "self.assertEqual(theta.dtype, np.float64)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_random_mode_reproducible",
+      "assertions": [
+        "np.testing.assert_array_equal(theta_a, theta_b)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_random_mode_different_seed",
+      "assertions": [
+        "self.assertFalse(np.allclose(theta_a, theta_b))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_random_mode_accepts_random_state",
+      "assertions": [
+        "np.testing.assert_array_equal(theta_a, theta_b)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_random_mode_accepts_generator",
+      "assertions": [
+        "np.testing.assert_array_equal(theta_a, theta_b)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_batch_mode_returns_ones",
+      "assertions": [
+        "np.testing.assert_array_equal(theta, np.ones(8))",
+        "self.assertEqual(theta.shape, (8,))",
+        "self.assertEqual(theta.dtype, np.float64)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_single_particle_all_modes",
+      "assertions": [
+        "np.testing.assert_array_equal(theta_half, np.array([0.5]))",
+        "self.assertEqual(theta_half.shape, (1,))",
+        "self.assertTrue(0.0 <= theta_random[0] <= 1.0)",
+        "self.assertEqual(theta_random.shape, (1,))",
+        "np.testing.assert_array_equal(theta_batch, np.array([1.0]))",
+        "self.assertEqual(theta_batch.shape, (1,))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_zero_particles_returns_empty",
+      "assertions": [
+        "self.assertEqual(theta.shape, (0,))",
+        "self.assertEqual(theta.dtype, np.float64)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_invalid_theta_mode_raises_value_error",
+      "assertions": [
+        "self.assertRaises(ValueError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_correct_count",
+      "assertions": [
+        "self.assertEqual(len(batches), 4)",
+        "self.assertEqual(sum(len(batch) for batch in batches), 100)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_no_shuffle_when_disabled",
+      "assertions": [
+        "np.testing.assert_array_equal(batches[0], np.arange(10))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_shuffles_when_enabled",
+      "assertions": [
+        "self.assertFalse(np.array_equal(batches[0], np.arange(20)))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_preserves_all_indices",
+      "assertions": [
+        "np.testing.assert_array_equal(np.sort(all_indices), np.arange(57))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_reproducible",
+      "assertions": [
+        "np.testing.assert_array_equal(batch_a, batch_b)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_single_batch",
+      "assertions": [
+        "self.assertEqual(len(batches), 1)",
+        "self.assertEqual(len(batches[0]), 7)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_validate_num_batches_zero_raises_value_error",
+      "assertions": [
+        "self.assertRaisesRegex(\n            ValueError, r\"num_batches.*(>=|at least)\\s*1\"\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_validate_num_batches_negative_raises_value_error",
+      "assertions": [
+        "self.assertRaisesRegex(\n            ValueError, r\"num_batches.*(>=|at least)\\s*1\"\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_more_batches_than_particles",
+      "assertions": [
+        "self.assertEqual(len(batches), 3)",
+        "np.testing.assert_array_equal(np.concatenate(batches), np.arange(3))",
+        "self.assertTrue(all(len(batch) == 1 for batch in batches))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_single_particle",
+      "assertions": [
+        "self.assertEqual(len(batches), 1)",
+        "np.testing.assert_array_equal(batches[0], np.array([0], dtype=np.intp))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_zero_particles_returns_empty",
+      "assertions": [
+        "self.assertEqual(batches, [])"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_random_state_shuffle_path",
+      "assertions": [
+        "self.assertFalse(\n            np.array_equal(np.concatenate(batches_a), np.arange(6))\n        )",
+        "np.testing.assert_array_equal(batch_a, batch_b)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_generator_shuffle_path",
+      "assertions": [
+        "self.assertFalse(\n            np.array_equal(np.concatenate(batches_a), np.arange(6))\n        )",
+        "np.testing.assert_array_equal(batch_a, batch_b)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_calculate_single_particle_transfer_default_transport",
+      "assertions": [
+        "self.assertEqual(mass_change.shape, (species_count,))",
+        "self.assertTrue(np.all(np.isfinite(mass_change)))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_calculate_single_particle_transfer_scalar_transport",
+      "assertions": [
+        "self.assertEqual(mass_change.shape, (species_count,))",
+        "self.assertTrue(np.all(np.isfinite(mass_change)))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_half_mode_produces_valid_output",
+      "assertions": [
+        "self.assertIsNotNone(particle_new)",
+        "self.assertIsNotNone(gas_new)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_step_with_particle_data_gas_data",
+      "assertions": [
+        "self.assertIsInstance(particle_new, ParticleData)",
+        "self.assertIsInstance(gas_new, GasData)",
+        "self.assertEqual(particle_new.masses.shape, particle_data.masses.shape)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_step_rejects_multi_box_data_inputs",
+      "assertions": [
+        "self.assertRaisesRegex(\n            ValueError,\n            \"ParticleData must have n_boxes=1 for condensation strategies, \"\n            \"got n_boxes=2.\",\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_step_returns_matching_types",
+      "assertions": [
+        "self.assertIsInstance(\n            particle_legacy, par.particles.ParticleRepresentation\n        )",
+        "self.assertIsInstance(gas_legacy, par.gas.GasSpecies)",
+        "self.assertIsInstance(particle_new, ParticleData)",
+        "self.assertIsInstance(gas_new, GasData)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_step_numerical_parity",
+      "assertions": [
+        "np.testing.assert_allclose(\n            data_mass,\n            legacy_mass,\n            rtol=1e-10,\n            err_msg=(\n                \"Staggered particle mass diverges between legacy and data paths\"\n            ),\n        )",
+        "np.testing.assert_allclose(\n            data_gas,\n            legacy_gas,\n            rtol=1e-10,\n            err_msg=(\n                \"Staggered gas concentration diverges between legacy \"\n                \"and data paths\"\n            ),\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_rate_numerical_parity",
+      "assertions": [
+        "np.testing.assert_allclose(\n            data_rate,\n            legacy_rate,\n            rtol=1e-10,\n            err_msg=\"Staggered rate() diverges between legacy and data paths\",\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_rate_with_particle_data",
+      "assertions": [
+        "self.assertIsInstance(rate, np.ndarray)",
+        "self.assertEqual(rate.shape, particle_data.masses[0].shape)",
+        "self.assertTrue(np.all(np.isfinite(rate)))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_mass_transfer_rate_with_particle_data",
+      "assertions": [
+        "self.assertIsInstance(mass_rate, np.ndarray)",
+        "self.assertEqual(mass_rate.shape, particle_data.masses[0].shape)",
+        "self.assertTrue(np.all(np.isfinite(mass_rate)))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_random_mode_produces_valid_output",
+      "assertions": [
+        "self.assertIsNotNone(particle_new)",
+        "self.assertIsNotNone(gas_new)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_batch_mode_produces_valid_output",
+      "assertions": [
+        "self.assertIsNotNone(particle_new)",
+        "self.assertIsNotNone(gas_new)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_non_negative_masses_and_gas",
+      "assertions": [
+        "self.assertTrue(np.all(particle_new.get_species_mass() >= 0.0))",
+        "self.assertTrue(np.all(gas_new.get_concentration() >= 0.0))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_basic_mass_conservation",
+      "assertions": [
+        "np.testing.assert_allclose(initial_total, final_total, rtol=1e-10)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_respects_skip_partitioning_indices",
+      "assertions": [
+        "np.testing.assert_allclose(\n            particle_new.get_species_mass()[..., skip_idx],\n            initial_mass[..., skip_idx],\n        )",
+        "np.testing.assert_allclose(\n            gas_new.get_concentration()[skip_idx], initial_gas[skip_idx]\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_positional_api_matches_signature",
+      "assertions": [
+        "self.assertIsNotNone(particle_new)",
+        "self.assertIsNotNone(gas_new)",
+        "self.assertEqual(\n            particle_new.get_species_mass().shape,\n            self.particle.get_species_mass().shape,\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_zero_time_step_returns_inputs",
+      "assertions": [
+        "np.testing.assert_allclose(\n            particle_new.get_species_mass(), initial_mass\n        )",
+        "np.testing.assert_allclose(gas_new.get_concentration(), initial_gas)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_empty_particles_noop",
+      "assertions": [
+        "self.assertEqual(particle_new.get_species_mass().shape[0], 0)",
+        "np.testing.assert_allclose(\n            gas_new.get_concentration(), self.gas_species.get_concentration()\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_updates_gas_between_batches",
+      "assertions": [
+        "self.assertGreater(len(gas_inputs), 2)",
+        "self.assertLess(gas_inputs[2][0], gas_inputs[0][0])",
+        "self.assertTrue(np.all(np.isfinite(gas_inputs[-1])))",
+        "self.assertTrue(np.all(gas_inputs[-1] >= 0.0))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_num_batches_changes_outcome",
+      "assertions": [
+        "self.assertGreater(gas_delta, 0.0)",
+        "self.assertGreater(particle_delta, 0.0)",
+        "self.assertTrue(np.all(np.isfinite(particle_many.get_species_mass())))",
+        "self.assertTrue(np.all(particle_many.get_species_mass() >= 0.0))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_batch_order_affects_result",
+      "assertions": [
+        "self.assertGreater(gas_delta, 0.0)",
+        "self.assertGreater(particle_delta, 0.0)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_num_batches_exceeds_particle_count_clips",
+      "assertions": [
+        "np.testing.assert_allclose(\n            gas_high.get_concentration(), gas_exact.get_concentration()\n        )",
+        "np.testing.assert_allclose(\n            particle_high.get_species_mass(), particle_exact.get_species_mass()\n        )",
+        "self.assertTrue(np.all(gas_high.get_concentration() >= 0.0))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_batch_with_theta_modes",
+      "assertions": [
+        "np.testing.assert_allclose(\n            gas_a.get_concentration(), gas_b.get_concentration()\n        )",
+        "np.testing.assert_allclose(\n            particle_a.get_species_mass(), particle_b.get_species_mass()\n        )",
+        "self.assertTrue(np.all(particle_new.get_species_mass() >= 0.0))",
+        "self.assertTrue(np.all(np.isfinite(gas_new.get_concentration())))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_num_batches_exceeds_particles_clips_and_logs_info",
+      "assertions": [
+        "self.assertEqual(len(batches), 5)",
+        "np.testing.assert_array_equal(np.concatenate(batches), np.arange(5))",
+        "self.assertTrue(\n            any(\n                \"Clipping num_batches\" in record.message\n                for record in cm.records\n            )\n        )",
+        "self.assertLogs(\"particula\", level=logging.INFO)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_num_batches_equals_particles_no_log",
+      "assertions": [
+        "self.assertEqual(len(batches), 5)",
+        "np.testing.assert_array_equal(np.concatenate(batches), np.arange(5))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_num_batches_one_creates_single_batch",
+      "assertions": [
+        "self.assertEqual(len(batches), 1)",
+        "np.testing.assert_array_equal(batches[0], np.arange(12))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_zero_particles_returns_empty_batches_no_log",
+      "assertions": [
+        "self.assertEqual(batches, [])"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_instantiation_with_strategy",
+      "assertions": [
+        "self.assertIs(cond._latent_heat_strategy, strategy)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_instantiation_with_constant_fallback",
+      "assertions": [
+        "assert cond._latent_heat_strategy is not None",
+        "self.assertIsInstance(cond._latent_heat_strategy, ConstantLatentHeat)",
+        "self.assertEqual(cond._latent_heat_strategy.latent_heat_ref, 2.26e6)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_instantiation_isothermal_fallback",
+      "assertions": [
+        "self.assertIsNone(cond._latent_heat_strategy)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_resolution_priority_strategy_over_constant",
+      "assertions": [
+        "self.assertIs(cond._latent_heat_strategy, strategy)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_resolution_with_array_latent_heat_logs_and_falls_back",
+      "assertions": [
+        "self.assertIsNone(cond._latent_heat_strategy)",
+        "self.assertTrue(\n            any(\n                \"Array-like latent_heat\" in record.getMessage()\n                for record in cm.records\n            )\n        )",
+        "self.assertLogs(\"particula\", level=\"WARNING\")"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_resolution_with_negative_latent_heat_logs_and_falls_back",
+      "assertions": [
+        "self.assertIsNone(cond._latent_heat_strategy)",
+        "self.assertTrue(\n            any(\n                \"Negative latent_heat\" in record.getMessage()\n                for record in cm.records\n            )\n        )",
+        "self.assertLogs(\"particula\", level=\"WARNING\")"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_last_latent_heat_energy_initialized",
+      "assertions": [
+        "self.assertEqual(cond.last_latent_heat_energy, 0.0)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_base_class_params_forwarded",
+      "assertions": [
+        "self.assertEqual(cond.molar_mass, 0.02)",
+        "self.assertEqual(cond.diffusion_coefficient, 1.5e-5)",
+        "self.assertEqual(cond.accommodation_coefficient, 0.7)",
+        "self.assertFalse(cond.update_gases)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_isothermal_parity",
+      "assertions": [
+        "np.testing.assert_allclose(latent_rate, iso_rate, rtol=1e-15)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_rate_isothermal_parity",
+      "assertions": [
+        "np.testing.assert_allclose(latent_rate, iso_rate, rtol=1e-15)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_reduced_with_latent_heat",
+      "assertions": [
+        "self.assertTrue(np.all(np.abs(latent_rate) <= np.abs(iso_rate) + 1e-30))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_single_species",
+      "assertions": [
+        "self.assertEqual(rate.shape, (1,))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_get_vapor_pressure_surface_single_species",
+      "assertions": [
+        "self.assertEqual(vapor_pressure_surface.shape, (3,))",
+        "self.assertTrue(np.all(np.isfinite(vapor_pressure_surface)))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_multi_species",
+      "assertions": [
+        "self.assertEqual(rate.shape, (1, 2))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_get_vapor_pressure_surface_multi_species",
+      "assertions": [
+        "self.assertEqual(vapor_pressure_surface.shape, (1, 2))",
+        "self.assertTrue(np.all(np.isfinite(vapor_pressure_surface)))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_rate_scales_by_concentration",
+      "assertions": [
+        "np.testing.assert_allclose(double_rate, base_rate * 2.0, rtol=1e-15)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_rate_respects_skip_partitioning",
+      "assertions": [
+        "self.assertTrue(np.all(rates[:, 1] == 0.0))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_rate_skip_partitioning_out_of_bounds_raises",
+      "assertions": [
+        "self.assertRaises(IndexError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_nonfinite_pressure_delta_sanitized",
+      "assertions": [
+        "self.assertTrue(np.all(np.isfinite(rates)))",
+        "self.assertTrue(np.allclose(rates, 0.0))"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_nonfinite_pressure_delta_matches_isothermal",
+      "assertions": [
+        "np.testing.assert_allclose(latent_rates, iso_rates, rtol=1e-14)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_nonfinite_latent_heat_raises",
+      "assertions": [
+        "self.assertRaises(ValueError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_nonfinite_thermal_conductivity_raises",
+      "assertions": [
+        "self.assertRaises(ValueError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_nonfinite_vapor_pressure_surface_raises",
+      "assertions": [
+        "self.assertRaises(ValueError)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_inherited_methods_work",
+      "assertions": [
+        "self.assertGreater(mean_free_path, 0.0)",
+        "self.assertGreater(knudsen_number, 0.0)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_mass_conservation_single_species",
+      "assertions": [
+        "self.assertLess(relative_error, 1e-12)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_mass_conservation_multi_species",
+      "assertions": [
+        "self.assertLess(relative_error, 1e-12)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_mass_conservation_data_only",
+      "assertions": [
+        "self.assertLess(relative_error, 1e-12)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_10_bins_mass_conservation",
+      "assertions": [
+        "np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_50_bins_mass_conservation",
+      "assertions": [
+        "np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_100_bins_mass_conservation",
+      "assertions": [
+        "np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_continuous_distribution_mass_conservation",
+      "assertions": [
+        "np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_isothermal_parity",
+      "assertions": [
+        "np.testing.assert_allclose(\n            latent_particle.masses[0], iso_particle.masses[0], rtol=1e-15\n        )",
+        "np.testing.assert_allclose(\n            latent_gas.concentration[0], iso_gas.concentration[0], rtol=1e-15\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_continuous_isothermal_parity",
+      "assertions": [
+        "np.testing.assert_allclose(\n            latent_particle.masses[0],\n            iso_particle.masses[0],\n            rtol=1e-15,\n            atol=1e-17,\n        )",
+        "np.testing.assert_allclose(\n            latent_gas.concentration[0],\n            iso_gas.concentration[0],\n            rtol=1e-15,\n            atol=1e-17,\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_energy_tracking",
+      "assertions": [
+        "np.testing.assert_allclose(\n            cond.last_latent_heat_energy, expected_energy, rtol=1e-14\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_2d_mass_shapes",
+      "assertions": [
+        "self.assertEqual(\n            particle_new.masses[0].shape,\n            (\n                particle_data.masses[0].shape[0],\n                particle_data.masses[0].shape[1],\n            ),\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_rate_discrete_shape",
+      "assertions": [
+        "self.assertEqual(rate.shape, particle_data.masses[0].shape)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_discrete_shape",
+      "assertions": [
+        "self.assertEqual(mass_rate.shape, particle_data.masses[0].shape)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_rejects_nonfinite_latent_heat",
+      "assertions": [
+        "self.assertRaisesRegex(ValueError, \"latent_heat\")"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_rejects_negative_concentration",
+      "assertions": [
+        "self.assertRaisesRegex(ValueError, \"concentration must be finite\")"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_rejects_nonpositive_volume",
+      "assertions": [
+        "self.assertRaisesRegex(ValueError, \"volume must be finite\")"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_rejects_invalid_concentration_for_norm_conc",
+      "assertions": [
+        "self.assertRaisesRegex(\n                    ValueError, \"concentration must be finite\"\n                )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_energy_tracking_matches_dm_times_l",
+      "assertions": [
+        "np.testing.assert_allclose(\n            cond.last_latent_heat_energy,\n            np.sum(mass_transfer * latent_heat),\n            rtol=1e-14,\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_energy_tracking_update_gases_false",
+      "assertions": [
+        "np.testing.assert_allclose(\n            gas_species.get_concentration(), initial_conc, rtol=1e-15\n        )",
+        "np.testing.assert_allclose(\n            cond.last_latent_heat_energy,\n            np.sum(mass_transfer * latent_heat),\n            rtol=1e-14,\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_energy_tracking_data_inputs",
+      "assertions": [
+        "np.testing.assert_allclose(\n            cond.last_latent_heat_energy,\n            np.sum(mass_transfer * latent_heat),\n            rtol=1e-14,\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_energy_tracking_skip_partitioning",
+      "assertions": [
+        "np.testing.assert_allclose(\n            cond.last_latent_heat_energy,\n            np.sum(mass_transfer * latent_heat),\n            rtol=1e-14,\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_energy_sign_convention",
+      "assertions": [
+        "self.assertGreater(cond.last_latent_heat_energy, 0.0)",
+        "self.assertLess(cond.last_latent_heat_energy, 0.0)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_isothermal_parity",
+      "assertions": [
+        "np.testing.assert_allclose(\n            particle_out.get_mass(), particle_iso_out.get_mass(), rtol=1e-15\n        )",
+        "np.testing.assert_allclose(\n            gas_out.get_concentration(),\n            gas_iso_out.get_concentration(),\n            rtol=1e-15,\n        )",
+        "self.assertEqual(latent_cond.last_latent_heat_energy, 0.0)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_returns_correct_types_legacy",
+      "assertions": [
+        "self.assertIsInstance(particle_new, ParticleRepresentation)",
+        "self.assertIsInstance(gas_new, GasSpecies)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_returns_correct_types_data",
+      "assertions": [
+        "self.assertIsInstance(particle_new, ParticleData)",
+        "self.assertIsInstance(gas_new, GasData)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_updates_gas_when_enabled",
+      "assertions": [
+        "np.testing.assert_allclose(\n            gas_new.get_concentration(), expected_gas, rtol=1e-15\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_clamps_gas_concentration_nonnegative",
+      "assertions": [
+        "np.testing.assert_allclose(gas_new.concentration[0], 0.0, rtol=1e-15)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_calculate_norm_conc_clamps_small_negative",
+      "assertions": [
+        "self.assertTrue(np.all(norm_conc >= 0.0))",
+        "self.assertEqual(norm_conc[1], 0.0)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_rejects_invalid_time_step",
+      "assertions": [
+        "self.assertRaisesRegex(ValueError, \"time_step must be finite\")"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_get_vapor_pressure_surface_rejects_nonfinite_kelvin",
+      "assertions": [
+        "self.assertRaisesRegex(\n                ValueError, \"kelvin_term must be finite\"\n            )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_dynamic_viscosity_pass_through",
+      "assertions": [
+        "self.assertEqual(spy.call_args.kwargs[\"dynamic_viscosity\"], override)"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    },
+    {
+      "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_mass_condensation_runnable_compatibility",
+      "assertions": [
+        "self.assertIsInstance(aerosol_out.particles, ParticleRepresentation)",
+        "self.assertIsInstance(\n            aerosol_out.atmosphere.partitioning_species, GasSpecies\n        )",
+        "self.assertIsInstance(aerosol_iso_out.particles, ParticleRepresentation)",
+        "self.assertIsInstance(\n            aerosol_iso_out.atmosphere.partitioning_species, GasSpecies\n        )"
+      ],
+      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
+      "native_successor": null
+    }
+  ]
+}

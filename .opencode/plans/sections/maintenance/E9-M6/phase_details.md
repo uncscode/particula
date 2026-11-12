@@ -6,9 +6,45 @@ CPU/direct/prepared/resident number and per-species mass conservation at
 V=0.25/1/4. Legacy ambiguous checkpoints must not silently acquire new semantics.
 
 Entry: E9-M5 and all its predecessors are completed and validated, not merely
-drafted. P1 -> P2 -> P3 -> P4 -> P5 -> P6, each gated by reviewed evidence.
+drafted. P1 -> P2 -> P3 -> P4 -> P5 -> P6 acceptance gates remain ordered.
+The post-M5 commit sequence below moves consumer cleanup prerequisites ahead
+of definition deletion so that intermediate commits retain coherent imports.
 No standalone unit-testing phase: every removal/function change includes its
 tests. P5 is cross-layer integration, P6 final documentation/readiness.
+
+## Accepted single-PR implementation sequence
+
+The detailed maintainer-approved plan supersedes the earlier ten-commit scope.
+One PR, fifteen serial commits, each with affected fixtures and regressions:
+
+1. Finalize removal/assertion-retention inventories and baseline evidence.
+2. Remove CPU condensation facade dispatch.
+3. Remove CPU coagulation and wall-loss facade dispatch.
+4. Retire legacy aggregate, runnable, dilution/nucleation and CPU adapter paths.
+5. Remove particle representation APIs, bridges and obsolete construction.
+6. Remove gas/atmosphere APIs, bridges and obsolete construction.
+7. Remove untagged GPU condensation execution.
+8. Remove untagged GPU coagulation and wall-loss execution.
+9. Remove remaining untagged GPU source/exhaustion/communication paths.
+10. Require explicit metadata at transfers/resident lifecycle; reject untagged
+    v5 checkpoints before setup/upload while retaining tagged v5 restart.
+11. Close remaining API seams and validate native/installed-wheel integration.
+12. Finalize migration guidance and execute all supported M5 example workloads.
+13. Repair scientific API docstrings without executable AST changes.
+14. Repair remaining publication/rendering warnings; pass both strict builds.
+15. Record final validation/readiness evidence and create the single PR.
+
+Consumers and their tests migrate before definition deletion. Keep coherent
+imports and collection at each commit. No new compatibility shim, numerical
+rebaseline, inferred population meaning, schema bump or release publication.
+Raw CPU scratch material may remain incompletely tagged; supported execution
+and population interpretation may not. Scientific algorithms, explicit
+transfers, native metadata, RNG continuation and device ownership are retained.
+
+Every enduring old test assertion must have an explicit native successor or
+justified facade-only disposition before deletion. Record final executable
+revision separately from evidence-only edits. Both strict builds and the
+full published notebook workloads are mandatory, not optional follow-ups.
 
 - [ ] **E9-M6-P1: Audit final legacy consumers and temporary compatibility**
   - Issue: TBD | Size: S | Status: Not Started

@@ -2,6 +2,7 @@
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-11-11 | Scoped one M6 PR with ten serial review commits from merged M5 `fb25078b6`; added concrete bridge/aggregate removals, consumer-first sequencing, native-test guard migration, protected low-level legacy contracts, installed-wheel evidence and the M5 full-publication limitation. Planning only; phase completion and readiness unchanged. | Codex |
 | 2026-09-27 | Drafted all twelve E9-M6 sections and six serial phases for issue #1602 T6; set E9-M5 metadata prerequisite; made final audits, scientific-test preservation, both CPU wall-loss suites and truthful v0.3.0 readiness explicit | plan-maintenance-drafter |
 
 Initial status: Draft; P1–P6 Not Started. This change is planning only. No

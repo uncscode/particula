@@ -1,5 +1,11 @@
 # Communication and Reporting
 
+Delivery update (2026-11-11): the maintainer requests one PR with serial
+commits for #1607. Use the commit plan in `phase_details.md`, with phase
+evidence collected in that PR; do not generate or require separate phase
+issues/PRs. This replaces the issue body's original generation workflow for
+the requested delivery. No GitHub issue or PR was modified during scoping.
+
 - Report to the E9 orchestrator and issue #1602 maintainers at phase entry,
   each removal PR and phase closeout; named implementation/review owners remain
   to be assigned. No calendar deadline has been imposed.
