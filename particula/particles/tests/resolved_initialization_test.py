@@ -112,6 +112,52 @@ def test_redundant_density_charge_and_empty_population():
 
 
 @pytest.mark.parametrize(
+    ("charge", "expected"),
+    [
+        (None, [0, 0, 0]),
+        (np.zeros((3, 1)), [0, 0, 0]),
+        (np.array([[1, 2, 3]]), [1, 2, 3]),
+        (np.array([[1], [2], [3]]), [1, 2, 3]),
+    ],
+)
+def test_native_builder_successor_charge_shapes(charge, expected):
+    """Lossless singleton charge forms preserve every particle lane."""
+    data = create_resolved_particle_data(
+        masses=np.array([[1.0], [2.0], [3.0]]),
+        density=np.full((3, 1), 1000.0),
+        charge=charge,
+        volume=1.0,
+    )
+    np.testing.assert_array_equal(data.density, [1000.0])
+    np.testing.assert_array_equal(data.charge, [expected])
+    np.testing.assert_array_equal(data.concentration, [[1.0, 1.0, 1.0]])
+
+
+def test_native_empty_population_with_array_charge():
+    """Empty resolved slots retain empty charge and explicit material density."""
+    data = create_resolved_particle_data(
+        masses=np.zeros((0, 1)),
+        density=[1000.0],
+        charge=np.zeros((0, 1)),
+        volume=1.0,
+    )
+    assert data.masses.shape == (1, 0, 1)
+    assert data.total_mass.size == 0
+    assert data.charge.shape == (1, 0)
+    np.testing.assert_array_equal(data.density, [1000.0])
+
+
+def test_empty_population_requires_material_density():
+    """An empty population cannot establish positive species density metadata."""
+    masses = np.zeros((0, 2))
+    density = np.zeros((0, 2))
+    with pytest.raises(ValueError, match="density"):
+        create_resolved_particle_data(masses=masses, density=density)
+    assert masses.shape == (0, 2)
+    assert density.shape == (0, 2)
+
+
+@pytest.mark.parametrize(
     "kwargs",
     [
         {"density": [[1000.0, 1200.0], [900.0, 1200.0], [1000.0, 1200.0]]},

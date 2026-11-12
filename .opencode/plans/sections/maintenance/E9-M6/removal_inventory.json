@@ -7443,7 +7443,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete builders and normalization helpers; ten assertions reviewed in particle_builder_assertions.json with explicit native successors and lossless shape requirements.",
       "test_nodes": []
     },
     {
@@ -8090,7 +8090,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete builders and normalization helpers; ten assertions reviewed in particle_builder_assertions.json with explicit native successors and lossless shape requirements.",
       "test_nodes": [
         {
           "name": "test_mass_particle_representation_builder",
