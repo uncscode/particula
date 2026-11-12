@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+from particula import Aerosol
 from particula.equilibria.equilibria import Equilibria
 from particula.equilibria.equilibria_strategies import (
     EquilibriaStrategy,
@@ -14,6 +15,8 @@ from particula.equilibria.equilibria_strategies import (
     LiquidVaporPartitioningStrategy,
     PhaseConcentrations,
 )
+from particula.gas import EnvironmentData, GasData
+from particula.particles import ParticleData
 from particula.runnable import RunnableABC, RunnableSequence
 
 
@@ -63,13 +66,42 @@ def test_rate_returns_strategy_name():
 
 
 def test_execute_returns_aerosol_instance():
-    """Strategy results that are aerosols are returned directly."""
-    aerosol = _AerosolStub()
+    """A distinct native strategy result replaces the input by identity."""
+
+    def native():
+        return Aerosol(
+            particles=ParticleData(
+                masses=np.ones((1, 1, 1)) * 1e-18,
+                concentration=np.ones((1, 1)),
+                charge=np.zeros((1, 1)),
+                density=np.array([1000.0]),
+                volume=np.ones(1),
+                distribution_type="discrete",
+            ),
+            gas=GasData(
+                name=["water"],
+                molar_mass=np.array([0.018]),
+                concentration=np.ones((1, 1)),
+                partitioning=np.array([True]),
+            ),
+            environment=EnvironmentData(
+                temperature=np.array([298.15]),
+                pressure=np.array([101325.0]),
+                saturation_ratio=np.ones((1, 1)),
+            ),
+        )
+
+    aerosol = native()
+    replacement = native()
+    aerosol.partitioning_inputs = (  # type: ignore[attr-defined]
+        _AerosolStub().partitioning_inputs
+    )
     strategy = MagicMock(spec=EquilibriaStrategy)
-    strategy.solve.return_value = aerosol
+    strategy.solve.return_value = replacement
     runnable = Equilibria(strategy)
-    result = runnable.execute(aerosol, time_step=1.0)  # type: ignore[arg-type]
-    assert result is aerosol
+    result = runnable.execute(aerosol, time_step=1.0)
+    assert result is replacement
+    assert result is not aerosol
 
 
 def test_execute_applies_mapping_result():
