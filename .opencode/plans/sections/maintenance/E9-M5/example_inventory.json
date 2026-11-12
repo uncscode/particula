@@ -1384,15 +1384,15 @@
     {
       "path": "docs/Features/Roadmap/data-oriented-gpu.md",
       "python_fences": 1,
-      "disposition": "pending audit",
-      "execution": "pending",
+      "disposition": "Native construction/nucleation ownership reconciled; historical milestones and measurement boundaries retained; partial wall-loss sketch explicitly text",
+      "execution": "Package import fences checked; supported executable workflows covered by P5",
       "phase": "P6"
     },
     {
       "path": "docs/Features/Roadmap/warp-autodiff-limitations.md",
       "python_fences": 7,
-      "disposition": "pending audit",
-      "execution": "pending",
+      "disposition": "Standalone Warp teaching patterns; no legacy carrier dependency or production-gradient claim; undefined gradcheck recipe explicitly text",
+      "execution": "File-backed quadratic Tape snippet gradient [5,7,9] checked on Warp CPU; other teaching definitions retained, not claimed as aerosol runtime evidence",
       "phase": "P6"
     },
     {
@@ -1430,15 +1430,15 @@
     {
       "path": "docs/Features/data-containers-and-gpu-foundations.md",
       "python_fences": 16,
-      "disposition": "all native snippets executable; remaining long-form shape and boundary prose audit pending",
-      "execution": "all 16 Python fences execute on Warp CPU; activation and round-trip outcome assertions pass in 23-test process-guide suite",
+      "disposition": "Native construction, independent particle/gas widths, selected adapters, explicit transfer and exhaustion boundaries reconciled",
+      "execution": "All 16 Python fences execute on Warp CPU; 51-test final snippet gate passed with 1 optional CUDA skip",
       "phase": "P6",
       "evidence": "examples_tests/native_process_guides_test.py and examples_tests/native_state_access_example_test.py"
     },
     {
       "path": "docs/Features/dilution_strategy_system.md",
       "python_fences": 1,
-      "disposition": "native CPU snippets and state ownership reconciled; navigation and remaining cross-guide boundary audit pending",
+      "disposition": "Native state ownership, exact CPU snippets, shape boundaries and navigation reconciled",
       "execution": "exact CPU snippets execute; 21 process-guide tests passed",
       "phase": "P6",
       "evidence": "examples_tests/native_process_guides_test.py"
@@ -1446,7 +1446,7 @@
     {
       "path": "docs/Features/native_scientific_processes.md",
       "python_fences": 1,
-      "disposition": "native CPU snippets and state ownership reconciled; navigation and remaining cross-guide boundary audit pending",
+      "disposition": "Native state ownership, exact CPU snippets, shape boundaries and navigation reconciled",
       "execution": "exact CPU snippets execute; 21 process-guide tests passed",
       "phase": "P6",
       "evidence": "examples_tests/native_process_guides_test.py"
@@ -1454,7 +1454,7 @@
     {
       "path": "docs/Features/nucleation_strategy_system.md",
       "python_fences": 4,
-      "disposition": "native CPU snippets and state ownership reconciled; navigation and remaining cross-guide boundary audit pending",
+      "disposition": "Native state ownership, exact CPU snippets, shape boundaries and navigation reconciled",
       "execution": "exact CPU snippets execute; 21 process-guide tests passed",
       "phase": "P6",
       "evidence": "examples_tests/native_process_guides_test.py"
@@ -1494,8 +1494,8 @@
     {
       "path": "docs/Features/slot_exhaustion_policies.md",
       "python_fences": 2,
-      "disposition": "pending audit",
-      "execution": "pending",
+      "disposition": "Concrete import-only snippets retained; native resolved count/volume semantics and legacy compatibility separated",
+      "execution": "Imports execute; condensation-native plus CPU/GPU exhaustion suite: 252 passed, 136 optional device/benchmark skips",
       "phase": "P6"
     },
     {
@@ -1634,15 +1634,15 @@
     {
       "source": "particula/integration_tests/quick_start_test.py",
       "phase": "P6",
-      "disposition": "migrate with public quick starts",
-      "execution": "pending"
+      "disposition": "Exact README and home-page native quick starts migrated",
+      "execution": "Both quick starts passed in final 51-test snippet gate"
     },
     {
       "source": "docs/Examples/native_state_access.py",
       "phase": "P6",
       "disposition": "new native access/replacement and mapped condensation walkthrough",
       "regression": "examples_tests/native_state_access_example_test.py",
-      "execution": "standalone passed; 11 example and exact Markdown snippet tests passed on 2026-11-11"
+      "execution": "Standalone passed; 12 example and exact Markdown snippet tests pass in final 51-test snippet gate"
     }
   ],
   "navigation_audit": {

@@ -182,7 +182,7 @@ Jump in by selecting any card below and follow along in your browser or local en
     - [GPU coagulation strategy guide](../Features/coagulation_strategy_system.md) — supported direct-kernel mechanisms, validation boundaries, and release evidence.
     - [Canonical low-level direct-condensation contract](../Features/data-containers-and-gpu-foundations.md)
       — supported low-level scope and boundaries
-    - [GPU condensation parity walkthrough](gpu_condensation_parity_walkthrough.py)
+    - [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py)
       — explicit-transfer, fixed-four-substep low-level direct-kernel evidence
         with separately reported physics, conservation, and energy results
     - [condensation parity walkthrough ownership record](../Features/Roadmap/condensation-parity-walkthrough.md)

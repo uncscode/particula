@@ -6,13 +6,13 @@ using fixed-capacity slots and partitioning gas. It preserves the supplied
 
 ## Supported CPU runnable
 
-- [Source/download: CPU nucleation](cpu_nucleation.py)
+- [Source/download: CPU nucleation](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/cpu_nucleation.py)
 - Run: `python docs/Examples/Nucleation/cpu_nucleation.py`
 - [Feature contract](../../Features/nucleation_strategy_system.md)
 
 ## Direct-Warp low-level example
 
-The [direct-Warp source/download](gpu_direct_nucleation.py) demonstrates the
+The [direct-Warp source/download](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py) demonstrates the
 package-exported `nucleation_step_gpu` with caller-owned transfers, sidecars,
 and synchronization. It requires Warp and defaults to Warp CPU; it is not a
 replacement for the supported CPU runnable or a CPU fallback.

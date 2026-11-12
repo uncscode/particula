@@ -131,7 +131,7 @@ Native runnable composition, execution adapters, dilution/nucleation and
 resident/checkpoint integration are available under their bounded contracts.
 See the source, communication and resident sections below, the
 [migration guide](particle-data-migration/index.md), and the
-[complete direct sequence](../Examples/gpu_complete_process_sequence.py).
+[complete direct sequence](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py).
 Temporary facades and untagged compatibility dispatch remain until M6; these
 examples do not authorize deletion, a release, or GPU performance claims.
 

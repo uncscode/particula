@@ -27,7 +27,7 @@
 #
 # To run locally:
 # ```bash
-# pip install particula
+# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
 # ```
 
 # %% [markdown]

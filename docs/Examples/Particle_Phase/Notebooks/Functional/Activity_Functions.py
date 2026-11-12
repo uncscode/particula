@@ -51,7 +51,7 @@ three-component systems under different mixing assumptions.
 
 # %%
 # In Colab uncomment the following command to install particula:
-# #!pip install particula[extra] --quiet
+# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par

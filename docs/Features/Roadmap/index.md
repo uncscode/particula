@@ -41,7 +41,7 @@ plan closure separately from unavailable CUDA measurement evidence.
 - **Graph capture and performance**: Maintain shipped
   [Epic H](data-oriented-gpu.md#epic-h-graph-capture-and-performance)'s bounded
   capture/replay and documentation tracks. Use the [native-CUDA
-  example](../../Examples/gpu_resident_graph_capture.py), [operator
+  example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py), [operator
   runbook](../gpu_graph_capture.md), and [closeout
   record](graph-capture-closeout.md). E8-F7/T7 owns profiling and
   machine-bounded recommendations; E8-F8 owns the example, runbook,
@@ -123,7 +123,7 @@ meets its exit bar, the next pending epic in the sequence becomes active.
   selector hardening, measured one-thread-per-box limits, documented direct
   kernel entry points, device-aware test policy, and the completed Epic B
   latent-heat example and integration baseline. Shipped artifacts:
-    - [Direct GPU kernels quick-start](../../Examples/gpu_direct_kernels_quick_start.py)
+    - [Direct GPU kernels quick-start](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
       — explicit-transfer, two-call low-level condensation path with reused
       caller-owned fp64 sidecars; it does not invoke coagulation or configure
       RNG state
@@ -219,7 +219,7 @@ All E5 features are shipped. The public E5 cross-links are:
 - E5-F8's
   [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md)
   and runnable
-  [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py).
+  [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py).
 - E5-F9's
   [canonical GPU coagulation ownership contract](../data-containers-and-gpu-foundations.md#gpu-coagulation-configuration-and-sidecar-ownership),
   [direct-kernel support guide](../coagulation_strategy_system.md#gpu-direct-kernel-foundations-and-limitations),
@@ -262,7 +262,7 @@ E5, E6, E7, E8, and all of their feature plans are shipped.
   2026-09-27. Reviewed CUDA measurements remain unavailable; plan closure
   does not establish a measured performance claim. E8-F8 owns the example,
   runbook, limitations, and closeout, with no
-  CPU or Warp-CPU fallback. The [native-CUDA example](../../Examples/gpu_resident_graph_capture.py),
+  CPU or Warp-CPU fallback. The [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py),
   [operator runbook](../gpu_graph_capture.md), and [P3 closeout record](graph-capture-closeout.md)
   are the discoverable references; the closeout alone owns P3 status/evidence.
 
