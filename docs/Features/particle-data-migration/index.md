@@ -1,95 +1,53 @@
 ---
-title: ParticleData and GasData Migration
+title: Native aerosol migration
 ---
 
-# ParticleData and GasData Migration Guide
+# Native aerosol migration
 
-Use this section to migrate from the legacy `ParticleRepresentation` and
-`GasSpecies` facades to the data-first `ParticleData` and `GasData` workflow.
-The facades remain available for backward compatibility, but they are
-deprecated and emit migration guidance in their logs.
-
-If you arrived from the legacy path `docs/migration/particle-data.md`, that
-page redirects here.
+Migrate supported workflows to the flat native `Aerosol`, holding `ParticleData`,
+full ordered `GasData`, and `EnvironmentData`. Use the selected E9-native checkout
+for these examples; their presence here does not announce a published wheel or
+release. M6 owns remaining legacy deletion and release readiness after the M5
+validation handoff.
 
 ## Migration topics
 
-- [Native construction and replacement](construction.md): three-container
-  Aerosol, builders, initializers, units, ownership and transition limits.
+- [Construction and replacement](construction.md): three-container assembly,
+  native initializers, distribution measures, units and ownership.
+- [Container access](containers.md): raw arrays, detached properties, individual
+  and coordinated replacement, and historical API terminology.
+- [Dynamics](dynamics.md): native single-box CPU processes, explicit species
+  maps, and direct/resident GPU boundaries.
+- [Troubleshooting](troubleshooting.md): validation, gas order, normalization,
+  storage replacement and explicit transfer errors.
 
-- [Container and facade migration](containers.md): before/after examples,
-  field mappings, gradual migration, and conversion helpers.
-- [Dynamics migration](dynamics.md): current CPU support boundaries,
-  single-box and multi-box guidance, and direct GPU condensation inputs.
-- [Troubleshooting](troubleshooting.md): shape, environment-input, sidecar,
-  synchronization, and reproduction guidance.
+The executable examples preserve useful initialization and scientific content.
+Historical facade names are reference material only; wrapping containers in a
+legacy facade is not a native migration technique.
 
-## Overview
+## State and behavior
 
-Before adding container fields or changing CPU-to-GPU conversion behavior,
-start with the canonical
-[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
-guide for the shipped schema, shape, helper, and support-boundary contract.
+`ParticleData.volume` owns represented volume. `GasData` retains all gas lanes,
+including nonpartitioning species. `EnvironmentData` owns per-box temperature
+and pressure and full gas-order saturation ratios. Activity, surface,
+vapor-pressure and other physical configuration belong to processes.
 
-For roadmap policy and planned follow-on work, review the roadmap's
-[authoritative field ownership decisions](../Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),
-[canonical shape conventions for container workflows](../Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows),
-and [final downstream handoff map for sibling
-features](../Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features).
-Treat the [Mass Precision Recommendation
-Report](../Roadmap/mass-precision-study.md) as the canonical reference before
-changing particle mass dtype or schema behavior.
+Batched storage does not imply general multi-box CPU process support. The
+native CPU runnable path remains single-box. Direct Warp and resident execution
+use explicit preparation and transfer, with their documented process-specific
+limits. Warp CPU is the installed-Warp baseline for uncaptured examples;
+native graph capture requires CUDA and has no CPU fallback.
 
-The migration moves **data** into dedicated containers and leaves **behavior**
-in strategies and runnables:
+Start with [container foundations](../data-containers-and-gpu-foundations.md)
+for the schema and [native access](containers.md) for units. GPU gas restore
+requires externally retained names for semantic fidelity and drops device-only
+vapor-pressure state. Checkpoint inspection carriers are lossy; canonical device
+bytes, not those inspection carriers, govern explicit compatible restart.
 
-- `ParticleData` stores per-particle arrays with an explicit batch dimension.
-- `GasData` stores gas species arrays with an explicit box dimension; it does
-  not own per-box thermodynamic state.
-- `EnvironmentData` owns CPU-side per-box thermodynamic state with
-  `temperature -> (n_boxes,)`, `pressure -> (n_boxes,)`, and
-  `saturation_ratio -> (n_boxes, n_species)`.
-- `ParticleData.volume` remains the authoritative per-box simulation-volume
-  owner.
-- `ParticleRepresentation` and `GasSpecies` remain as compatibility facades.
+## Historical release context
 
-!!! note
-    The explicit environment-state transfer boundary is
-    `particula.gpu.WarpEnvironmentData`,
-    `particula.gpu.to_warp_environment_data()`, and
-    `particula.gpu.from_warp_environment_data()`. See
-    [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
-    for the authoritative container and transfer contract.
-
-!!! warning
-    GPU-to-CPU gas restore is intentionally lossy unless ordered species
-    metadata is preserved outside `WarpGasData`. GPU-only helper state such as
-    `vapor_pressure` is also dropped on CPU restore.
-
-## Why migrate
-
-- **Clear data/behavior split**: data containers keep state, strategies keep
-  physics.
-- **Multi-box ready**: batch dimensions make CFD and multi-box simulations
-  first-class.
-- **Fewer implicit conversions**: attributes are explicit arrays rather than
-  getter methods.
-
-## Deprecation timeline
-
-- **v0.2.13** (planned after the E8 closeout merges): retain both the legacy
-  `ParticleRepresentation` and `GasSpecies` facades and the data containers.
-  Existing facade migration warnings remain applicable.
-- **v0.3.0** (planned breaking migration): remove the legacy facades, migrate
-  dependent workflows to the data containers, and update all affected
-  documentation, examples, imports, and tests.
-
-This 2026-09-27 maintainer decision supersedes the previous v1.0 removal
-target. The versions above are release plans, not announcements of publication.
-
-## Related references
-
-- `ParticleData` implementation: `particula/particles/particle_data.py`
-- `GasData` implementation: `particula/gas/gas_data.py`
-- Legacy facades: `particula/particles/representation.py` and
-  `particula/gas/species.py`
+The E8 closeout planned coexistence in 0.2.13 and a breaking native migration in
+0.3.0. These are release plans, not publication claims. This guide documents the
+native migration target; temporary legacy implementation still awaiting M6 is
+not endorsed for supported new examples. No performance qualification or
+cross-device continuation is implied.

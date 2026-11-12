@@ -76,7 +76,7 @@ Notebook sync/execution occurs in the owning phase, not deferred to P7.
     unavailable profiling/performance evidence remains unavailable.
 
 - [ ] **E9-M5-P6: Publish native API migration and advanced replacement guidance with executable fixtures**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: TBD | Size: S | Status: In Progress
   - Work: Rewrite particle-data-migration coexistence guidance for final native
     workflows, update affected API-reference inputs and topic links. Provide
     advanced field/derived access, individual and coordinated container
