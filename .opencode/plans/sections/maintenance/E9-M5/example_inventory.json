@@ -1376,9 +1376,10 @@
     {
       "path": "docs/Examples/Activity/index.md",
       "python_fences": 1,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "unchanged functional activity example; no aggregate migration needed",
+      "execution": "exact Python fences execute; 3 theory-guide tests passed",
+      "phase": "P6",
+      "evidence": "examples_tests/native_theory_guides_test.py"
     },
     {
       "path": "docs/Features/Roadmap/data-oriented-gpu.md",
@@ -1534,16 +1535,18 @@
     {
       "path": "docs/Theory/Code_Concepts/Details/Design_Patterns.md",
       "python_fences": 2,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "native design examples migrated; conceptual pseudocode explicitly textual",
+      "execution": "exact Python fences execute; 3 theory-guide tests passed",
+      "phase": "P6",
+      "evidence": "examples_tests/native_theory_guides_test.py"
     },
     {
       "path": "docs/Theory/Code_Concepts/Details/Object_Oriented_Patterns.md",
-      "python_fences": 6,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "python_fences": 4,
+      "disposition": "native design examples migrated; conceptual pseudocode explicitly textual",
+      "execution": "exact Python fences execute; 3 theory-guide tests passed",
+      "phase": "P6",
+      "evidence": "examples_tests/native_theory_guides_test.py"
     },
     {
       "path": "docs/Theory/nvidia-warp/datastructures.md",
