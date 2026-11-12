@@ -6856,7 +6856,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Native fixture migration complete; all original scenario and conservation assertions retained in charged_integration_assertions.json; added per-material conservation and facade guard.",
       "test_nodes": [
         {
           "name": "test_same_sign_ions_no_mergers",

@@ -1,0 +1,30 @@
+[
+  {
+    "file": "particula/integration_tests/charged_coagulation_comparison_test.py",
+    "test": "_assert_conservation",
+    "original": "def _assert_conservation(results: dict) -> None:\n    \"\"\"Assert mass and charge conservation for a scenario.\"\"\"\n    npt.assert_allclose(\n        results[\"total_mass_after\"],\n        results[\"total_mass_before\"],\n        rtol=1e-10,\n        err_msg=\"Mass not conserved in charged coagulation scenario.\",\n    )\n    npt.assert_allclose(\n        results[\"total_charge_after\"],\n        results[\"total_charge_before\"],\n        rtol=1e-10,\n        err_msg=\"Charge not conserved in charged coagulation scenario.\",\n    )",
+    "successor": "_assert_conservation",
+    "disposition": "All scenario and conservation assertions retained with native resolved counts, explicit environment, and inert gas. Strategy RNG explicitly seeded."
+  },
+  {
+    "file": "particula/integration_tests/charged_coagulation_comparison_test.py",
+    "test": "test_same_sign_ions_no_mergers",
+    "original": "def test_same_sign_ions_no_mergers():\n    \"\"\"Same-sign ions repel: no ion-calcite or calcite-calcite mergers.\"\"\"\n    results = _run_coagulation(\n        ion_charge=-6.0,\n        use_direct_kernel=False,\n        n_steps=1,\n        calcite_count=100,\n        ion_count=20,\n        calcite_charge=-6.0,\n        total_time=1.0,\n        seed=7,\n    )\n\n    _assert_conservation(results)\n    assert results[\"ion_calcite_mergers\"] == 0\n    assert results[\"calcite_calcite_mergers\"] == 0",
+    "successor": "test_same_sign_ions_no_mergers",
+    "disposition": "All scenario and conservation assertions retained with native resolved counts, explicit environment, and inert gas. Strategy RNG explicitly seeded."
+  },
+  {
+    "file": "particula/integration_tests/charged_coagulation_comparison_test.py",
+    "test": "test_neutral_ions_brownian_baseline",
+    "original": "def test_neutral_ions_brownian_baseline():\n    \"\"\"Neutral ions and charged calcite follow Brownian baseline.\"\"\"\n    results = _run_coagulation(\n        ion_charge=0.0,\n        use_direct_kernel=False,\n        n_steps=5,\n        calcite_count=120,\n        ion_count=40,\n        calcite_charge=-6.0,\n        seed=42,\n    )\n\n    _assert_conservation(results)\n    assert results[\"ion_calcite_mergers\"] > 0\n    assert results[\"calcite_calcite_mergers\"] > 0",
+    "successor": "test_neutral_ions_brownian_baseline",
+    "disposition": "All scenario and conservation assertions retained with native resolved counts, explicit environment, and inert gas. Strategy RNG explicitly seeded."
+  },
+  {
+    "file": "particula/integration_tests/charged_coagulation_comparison_test.py",
+    "test": "test_opposite_sign_ions_direct_kernel",
+    "original": "def test_opposite_sign_ions_direct_kernel():\n    \"\"\"Opposite-sign ions attract; direct kernel avoids spurious mergers.\"\"\"\n    results = _run_coagulation(\n        ion_charge=6.0,\n        use_direct_kernel=True,\n        n_steps=2,\n        calcite_count=1,\n        ion_count=40,\n        calcite_charge=-6.0,\n        total_time=10.0,\n        seed=42,\n    )\n\n    _assert_conservation(results)\n    assert results[\"ion_calcite_mergers\"] > 0\n    assert results[\"calcite_calcite_mergers\"] == 0",
+    "successor": "test_opposite_sign_ions_direct_kernel",
+    "disposition": "All scenario and conservation assertions retained with native resolved counts, explicit environment, and inert gas. Strategy RNG explicitly seeded."
+  }
+]
