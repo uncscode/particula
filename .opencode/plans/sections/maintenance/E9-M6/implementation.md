@@ -956,3 +956,23 @@ Validation:
 - Base strict docs: **1.50s**, `/tmp/m6-atmosphere-removal-docs.log`.
 - All six native successors resolve; scoped Ruff/format and whitespace passed.
 GasSpecies/builders/factory, GPU compatibility and final readiness remain pending.
+
+## Remove obsolete gas species constructors
+
+Deleted species_builders.py and species_factories.py and their package exports.
+All fourteen original constructor tests are preserved with native successors or
+explicit facade-only dispositions in gas_constructor_assertions.json. Native
+GasDataBuilder tests retain Oxygen and Preset100 field values, fluent setters,
+required-field admission and rejection of invalid molar mass/concentration
+without input mutation. Vapor-pressure strategy ownership remains on processes;
+the obsolete generic factory dispatch and gas-owned strategy setter are removed.
+Removed-module and root/package symbol tests cover all three constructors.
+
+Validation:
+- Gas tree, removed APIs and integration: **488 passed, 1 skipped in 2.60s**,
+  `/tmp/m6-gas-constructor-tests.log`.
+- Full-package mypy: **538 files passed**,
+  `/tmp/m6-gas-constructor-mypy.log`.
+- All fourteen successor symbols resolve. Scoped Ruff check passed; package
+  import whitespace was formatted after the test run, without behavior changes.
+GasSpecies itself, GPU admission and final readiness remain pending.

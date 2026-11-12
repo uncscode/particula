@@ -63,21 +63,12 @@ from particula.gas.gas_data import GasData
 from particula.gas.gas_data_builder import GasDataBuilder
 from particula.gas.species import GasSpecies
 
-from particula.gas.species_builders import (
-    GasSpeciesBuilder,
-    PresetGasSpeciesBuilder,
-)
-from particula.gas.species_factories import GasSpeciesFactory
-
 
 __all__ = [
     "GasData",
     "EnvironmentData",
     "GasDataBuilder",
     "GasSpecies",
-    "GasSpeciesBuilder",
-    "PresetGasSpeciesBuilder",
-    "GasSpeciesFactory",
     "ConstantVaporPressureStrategy",
     "AntoineVaporPressureStrategy",
     "ClausiusClapeyronStrategy",

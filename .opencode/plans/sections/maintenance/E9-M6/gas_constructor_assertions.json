@@ -1,0 +1,100 @@
+[
+  {
+    "file": "particula/gas/tests/species_builder_test.py",
+    "test": "test_set_name",
+    "original": "def test_set_name():\n    \"\"\"Test setting the name of the gas species.\"\"\"\n    builder = GasSpeciesBuilder()\n    builder.set_name(\"Oxygen\")\n    assert builder.name == \"Oxygen\"",
+    "successor": "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_retains_explicit_values",
+    "disposition": "Retain ordered name, molar mass, concentration and true/false partitioning through GasDataBuilder. Vapor-pressure strategy ownership belongs to processes, not gas storage; native construction needs no facade factory."
+  },
+  {
+    "file": "particula/gas/tests/species_builder_test.py",
+    "test": "test_set_molar_mass",
+    "original": "def test_set_molar_mass():\n    \"\"\"Test setting the molar mass of the gas species.\"\"\"\n    builder = GasSpeciesBuilder()\n    builder.set_molar_mass(0.032, \"kg/mol\")\n    assert builder.molar_mass == 0.032\n\n    with pytest.raises(ValueError):\n        builder.set_molar_mass(-0.032, \"kg/mol\")",
+    "successor": "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_rejects_invalid_fields",
+    "disposition": "Retain ordered name, molar mass, concentration and true/false partitioning through GasDataBuilder. Vapor-pressure strategy ownership belongs to processes, not gas storage; native construction needs no facade factory. Original positive setter values are covered by the explicit-values test; negative inputs remain rejected."
+  },
+  {
+    "file": "particula/gas/tests/species_builder_test.py",
+    "test": "test_set_vapor_pressure_strategy",
+    "original": "def test_set_vapor_pressure_strategy():\n    \"\"\"Test setting the vapor pressure strategy of the gas species.\"\"\"\n    builder = GasSpeciesBuilder()\n    strategy = ConstantVaporPressureStrategy(0.0)\n    builder.set_vapor_pressure_strategy(strategy)\n    assert builder.vapor_pressure_strategy == strategy",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_gas_constructor",
+    "disposition": "Facade-only factory mapping, generic parameter dispatch and gas-owned vapor-pressure setter removed. Negative constructor imports replace obsolete dispatch tests; scientific vapor-pressure strategies remain unchanged."
+  },
+  {
+    "file": "particula/gas/tests/species_builder_test.py",
+    "test": "test_set_partitioning",
+    "original": "def test_set_partitioning():\n    \"\"\"Test setting the partitioning bool of the gas species.\"\"\"\n    builder = GasSpeciesBuilder()\n    builder.set_partitioning(True)\n    assert builder.partitioning is True\n\n    builder.set_partitioning(False)\n    assert builder.partitioning is False",
+    "successor": "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_retains_explicit_values",
+    "disposition": "Retain ordered name, molar mass, concentration and true/false partitioning through GasDataBuilder. Vapor-pressure strategy ownership belongs to processes, not gas storage; native construction needs no facade factory."
+  },
+  {
+    "file": "particula/gas/tests/species_builder_test.py",
+    "test": "test_set_concentration",
+    "original": "def test_set_concentration():\n    \"\"\"Test setting the concentration of the gas species.\"\"\"\n    builder = GasSpeciesBuilder()\n    builder.set_concentration(1.0, \"kg/m^3\")\n    assert builder.concentration == 1.0\n\n    with pytest.raises(ValueError):\n        builder.set_concentration(-1.0, \"kg/m^3\")\n\n    builder.set_concentration(1e-3, concentration_units=\"kg/m^3\")\n    assert builder.concentration == 1.0e-3",
+    "successor": "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_rejects_invalid_fields",
+    "disposition": "Retain ordered name, molar mass, concentration and true/false partitioning through GasDataBuilder. Vapor-pressure strategy ownership belongs to processes, not gas storage; native construction needs no facade factory. Original positive setter values are covered by the explicit-values test; negative inputs remain rejected."
+  },
+  {
+    "file": "particula/gas/tests/species_builder_test.py",
+    "test": "test_set_parameters",
+    "original": "def test_set_parameters():\n    \"\"\"Test setting all parameters at once.\"\"\"\n    builder = GasSpeciesBuilder()\n    vapor_obj = ConstantVaporPressureStrategy(0.0)\n    parameters = {\n        \"name\": \"Oxygen\",\n        \"molar_mass\": 0.032,\n        \"molar_mass_units\": \"kg/mol\",\n        \"vapor_pressure_strategy\": vapor_obj,\n        \"partitioning\": True,\n        \"concentration\": 1.0,\n        \"concentration_units\": \"kg/m^3\",\n    }\n    builder.set_parameters(parameters)\n    assert builder.name == \"Oxygen\"\n    assert builder.molar_mass == 0.032\n    assert builder.vapor_pressure_strategy == vapor_obj\n    assert builder.partitioning is True\n    assert builder.concentration == 1.0",
+    "successor": "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_retains_explicit_values",
+    "disposition": "Retain ordered name, molar mass, concentration and true/false partitioning through GasDataBuilder. Vapor-pressure strategy ownership belongs to processes, not gas storage; native construction needs no facade factory."
+  },
+  {
+    "file": "particula/gas/tests/species_builder_test.py",
+    "test": "test_missing_required_parameter",
+    "original": "def test_missing_required_parameter():\n    \"\"\"Test missing a required parameter in the parameters dict.\"\"\"\n    builder = GasSpeciesBuilder()\n    parameters = {\n        \"name\": \"Oxygen\",\n        \"molar_mass\": 0.032,\n        \"vapor_pressure_strategy\": ConstantVaporPressureStrategy(0.0),\n        \"partitioning\": True,\n    }\n    with pytest.raises(ValueError):\n        builder.set_parameters(parameters)",
+    "successor": "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_requires_each_field",
+    "disposition": "Retain required-field admission through explicit native builder setters/build; old generic parameter-dictionary dispatch is removed."
+  },
+  {
+    "file": "particula/gas/tests/species_builder_test.py",
+    "test": "test_invalid_parameter",
+    "original": "def test_invalid_parameter():\n    \"\"\"Test an invalid parameter in the parameters dict.\"\"\"\n    builder = GasSpeciesBuilder()\n    parameters = {\n        \"name\": \"Oxygen\",\n        \"molar_mass\": 0.032,\n        \"vapor_pressure_strategy\": ConstantVaporPressureStrategy(0.0),\n        \"partitioning\": True,\n        \"concentration\": 1.0,\n        \"invalid_param\": 123,\n    }\n    with pytest.raises(ValueError):\n        builder.set_parameters(parameters)",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_gas_constructor",
+    "disposition": "Facade-only factory mapping, generic parameter dispatch and gas-owned vapor-pressure setter removed. Negative constructor imports replace obsolete dispatch tests; scientific vapor-pressure strategies remain unchanged."
+  },
+  {
+    "file": "particula/gas/tests/species_builder_test.py",
+    "test": "test_build",
+    "original": "def test_build():\n    \"\"\"Test building the gas species object.\"\"\"\n    builder = GasSpeciesBuilder()\n    parameters = {\n        \"name\": \"Oxygen\",\n        \"molar_mass\": 0.032,\n        \"molar_mass_units\": \"kg/mol\",\n        \"vapor_pressure_strategy\": ConstantVaporPressureStrategy(0.0),\n        \"partitioning\": True,\n        \"concentration\": 1.0,\n        \"concentration_units\": \"kg/m^3\",\n    }\n    builder.set_parameters(parameters)\n    gas_species = builder.build()\n    assert isinstance(gas_species, GasSpecies)\n    assert gas_species.get_name() == \"Oxygen\"",
+    "successor": "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_retains_explicit_values",
+    "disposition": "Retain ordered name, molar mass, concentration and true/false partitioning through GasDataBuilder. Vapor-pressure strategy ownership belongs to processes, not gas storage; native construction needs no facade factory."
+  },
+  {
+    "file": "particula/gas/tests/species_builder_test.py",
+    "test": "test_preset_builder",
+    "original": "def test_preset_builder():\n    \"\"\"Test the preset gas species builder.\"\"\"\n    builder = PresetGasSpeciesBuilder()\n    gas_species = builder.build()\n    assert isinstance(gas_species, GasSpecies)\n    assert gas_species.get_name() == \"Preset100\"\n    assert gas_species.get_molar_mass() == 0.100\n    assert gas_species.get_partitioning() is False\n    assert gas_species.get_concentration() == 1.0",
+    "successor": "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_retains_explicit_values",
+    "disposition": "Retain all Preset100 data values through explicit native construction. The arbitrary facade preset and bundled constant-vapor-pressure behavior are not recreated as a second native factory."
+  },
+  {
+    "file": "particula/gas/tests/species_factory_test.py",
+    "test": "test_get_builders",
+    "original": "def test_get_builders(self):\n        \"\"\"Test getting the builders.\"\"\"\n        builders = self.factory.get_builders()\n        self.assertIsInstance(builders[\"gas_species\"], GasSpeciesBuilder)\n        self.assertIsInstance(\n            builders[\"preset_gas_species\"], PresetGasSpeciesBuilder\n        )",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_gas_constructor",
+    "disposition": "Facade-only factory mapping, generic parameter dispatch and gas-owned vapor-pressure setter removed. Negative constructor imports replace obsolete dispatch tests; scientific vapor-pressure strategies remain unchanged."
+  },
+  {
+    "file": "particula/gas/tests/species_factory_test.py",
+    "test": "test_get_strategy_gas_species",
+    "original": "def test_get_strategy_gas_species(self):\n        \"\"\"Test getting a gas species strategy.\"\"\"\n        parameters = {\n            \"name\": \"Oxygen\",\n            \"molar_mass\": 0.032,\n            \"molar_mass_units\": \"kg/mol\",\n            \"vapor_pressure_strategy\": ConstantVaporPressureStrategy(50),\n            \"partitioning\": False,\n            \"concentration\": 1.2,\n            \"concentration_units\": \"kg/m^3\",\n        }\n        gas_species = self.factory.get_strategy(\"gas_species\", parameters)\n        self.assertIsInstance(gas_species, GasSpecies)\n        self.assertEqual(gas_species.name, parameters[\"name\"])\n        self.assertEqual(gas_species.molar_mass, parameters[\"molar_mass\"])\n        self.assertEqual(\n            gas_species.pure_vapor_pressure_strategy,\n            parameters[\"vapor_pressure_strategy\"],\n        )\n        self.assertEqual(gas_species.partitioning, parameters[\"partitioning\"])\n        self.assertEqual(gas_species.concentration, parameters[\"concentration\"])\n        self.assertIsInstance(gas_species, GasSpecies)",
+    "successor": "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_retains_explicit_values",
+    "disposition": "Retain ordered name, molar mass, concentration and true/false partitioning through GasDataBuilder. Vapor-pressure strategy ownership belongs to processes, not gas storage; native construction needs no facade factory."
+  },
+  {
+    "file": "particula/gas/tests/species_factory_test.py",
+    "test": "test_get_strategy_preset_gas_species",
+    "original": "def test_get_strategy_preset_gas_species(self):\n        \"\"\"Test getting a preset gas species strategy.\"\"\"\n        parameters = {}\n        preset_gas_species = self.factory.get_strategy(\n            \"preset_gas_species\", parameters\n        )\n        self.assertIsInstance(preset_gas_species, GasSpecies)\n        self.assertEqual(preset_gas_species.molar_mass, 0.1)\n        self.assertIsInstance(\n            preset_gas_species.pure_vapor_pressure_strategy,\n            ConstantVaporPressureStrategy,\n        )\n        self.assertEqual(preset_gas_species.partitioning, False)\n        self.assertEqual(preset_gas_species.concentration, 1.0)",
+    "successor": "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_retains_explicit_values",
+    "disposition": "Retain all Preset100 data values through explicit native construction. The arbitrary facade preset and bundled constant-vapor-pressure behavior are not recreated as a second native factory."
+  },
+  {
+    "file": "particula/gas/tests/species_factory_test.py",
+    "test": "test_get_strategy_invalid",
+    "original": "def test_get_strategy_invalid(self):\n        \"\"\"Test getting an invalid strategy.\"\"\"\n        with self.assertRaises(ValueError):\n            self.factory.get_strategy(\"invalid_type\", {})",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_gas_constructor",
+    "disposition": "Facade-only factory mapping, generic parameter dispatch and gas-owned vapor-pressure setter removed. Negative constructor imports replace obsolete dispatch tests; scientific vapor-pressure strategies remain unchanged."
+  }
+]
