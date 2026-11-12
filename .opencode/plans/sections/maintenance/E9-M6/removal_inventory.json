@@ -2650,7 +2650,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Complete: native-only Nucleation, Dilution, WallLoss, Coagulation and MassCondensation; legacy aggregate imports/unions and facade mutation paths removed. Per-process science retained with assertion mappings and native boundary tests.",
       "test_nodes": []
     },
     {
@@ -6952,7 +6952,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Complete: native fixtures with process-owned physics/species maps; scientific successors recorded in condensation_integration_assertions.json.",
       "test_nodes": [
         {
           "name": "test_condensation_latent_heat_fixture_starts_supersaturated",
@@ -7009,7 +7009,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Complete: native fixtures with process-owned physics/species maps; scientific successors recorded in condensation_integration_assertions.json.",
       "test_nodes": [
         {
           "name": "test_condensation_transfers_mass",
@@ -7058,7 +7058,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Complete: use shared removal-safe facade guard; all native construction/replacement/sequence scientific assertions retained.",
       "test_nodes": [
         {
           "name": "test_native_construction_replacement_and_accounting",
@@ -7101,7 +7101,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Complete: use shared removal-safe facade guard; all native construction/replacement/sequence scientific assertions retained.",
       "test_nodes": [
         {
           "name": "test_complete_native_cpu_sequence_conserves_each_stage",

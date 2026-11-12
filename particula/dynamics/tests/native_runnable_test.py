@@ -198,17 +198,20 @@ def test_current_invalid_environment_rejects_before_dispatch(family):
         family(SimpleNamespace(step=forbidden)).execute(aerosol, 0.0)
 
 
+@pytest.mark.parametrize("family", [Coagulation, MassCondensation])
 @pytest.mark.parametrize("operation", ["rate", "execute"])
 @pytest.mark.parametrize("candidate", [None, object(), SimpleNamespace()])
-def test_coagulation_rejects_non_native_aggregate(operation, candidate):
+def test_process_rejects_non_native_aggregate(family, operation, candidate):
     """Reject obsolete/duck-typed aggregates before strategy access."""
 
     def forbidden(**kwargs):
         pytest.fail("non-native aggregate reached strategy")
 
-    process = Coagulation(SimpleNamespace(step=forbidden, net_rate=forbidden))
+    process = family(
+        SimpleNamespace(step=forbidden, rate=forbidden, net_rate=forbidden)
+    )
     with pytest.raises(
-        TypeError, match="Coagulation requires a native Aerosol"
+        TypeError, match=f"{family.__name__} requires a native Aerosol"
     ):
         if operation == "rate":
             process.rate(candidate)
@@ -226,3 +229,25 @@ def test_coagulation_rejects_replacement_particle_result():
         process.execute(aerosol, 0.1)
     assert aerosol.particles is held
     np.testing.assert_array_equal(held.masses, before)
+
+
+@pytest.mark.parametrize("replacement", ["particle", "gas"])
+def test_condensation_rejects_replacement_container_result(replacement):
+    """Neither returned container may replace the held native state."""
+    aerosol = state()
+    particle, gas = aerosol.particles, aerosol.gas
+    before_particle, before_gas = (
+        particle.masses.copy(),
+        gas.concentration.copy(),
+    )
+    result = (
+        (particle.copy(), gas)
+        if replacement == "particle"
+        else (particle, gas.copy())
+    )
+    process = MassCondensation(SimpleNamespace(step=lambda **kwargs: result))
+    with pytest.raises(ValueError, match="retain its containers"):
+        process.execute(aerosol, 0.1)
+    assert aerosol.particles is particle and aerosol.gas is gas
+    np.testing.assert_array_equal(particle.masses, before_particle)
+    np.testing.assert_array_equal(gas.concentration, before_gas)

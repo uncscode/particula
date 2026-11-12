@@ -465,3 +465,44 @@ Validation:
 - No remaining ParticleRepresentation, ParticleLike, is_native, or obsolete
   unwrapping/typeguard references in the coagulation tree. Remaining similarly
   named condensation helpers belong to the still-pending condensation removal.
+
+## Native-only mass-condensation runnable and integration fixtures
+
+Removed the final legacy aggregate dispatch from `MassCondensation.rate` and
+`execute`. The whole particle_process module now has no legacy aggregate,
+GasSpecies, ParticleRepresentation, atmosphere access or aggregate type union.
+All five CPU runnables use the established native ownership path. Added
+non-native admission and particle/gas replacement-result rejection coverage;
+updated the public runnable contract and fixed its docstring import typo.
+
+Migrated the isothermal resolved and latent-heat conservation integration
+fixtures to native particle/full gas/environment data with explicit process
+physics and species maps. Six original test functions (seven parametrized
+cases) are recorded in `condensation_integration_assertions.json`; all original
+scientific tolerances and finite/nonzero/conservation assertions remain. Gas
+and particle inventories remain densities for comparison; native latent energy
+is extensive joules, so its expectation multiplies the particle density gain
+by the explicit physical parcel volume. Accepted scalar-material input shapes
+are exercised through native initialization, and a real two-material container
+replaces the removed getter monkeypatch for helper rejection.
+
+The broader run found one additional latent-enabled/disabled runnable test
+still building a legacy aerosol. Migrated both cases and recorded its native
+successor in `condensation_assertions.json`; native type and exact held-object
+identity assertions replace obsolete facade type assertions. Remaining shared
+condensation strategy fixtures and dispatch still require migration/removal.
+Two existing native integration guards now use the removal-safe shared fixture,
+retaining every scientific/construction/replacement/transfer assertion.
+
+Validation:
+- Migrated condensation integration cases: **7 passed in 0.03s**.
+- Condensation tree, all dynamics runnable/integration tests, CPU condensation
+  adapter and integration suites: **1591 passed, 4 skipped in 12.67s**,
+  `/tmp/m6-cond-runnable-broad2.log`. The initial run's single obsolete runnable
+  fixture failure was resolved, without weakening numerical checks.
+- Entire source-example suite with `-Werror --no-cov`: **225 passed,
+  2 skipped in 42.98s**, `/tmp/m6-cond-runnable-examples.log`.
+- Full-package mypy: **552 files passed**, `/tmp/m6-cond-runnable-mypy2.log`.
+- Scoped Ruff/format and whitespace checks passed; base strict documentation
+  passed in 1.52 seconds, `/tmp/m6-cond-runnable-docs.log`.
+Full final coverage, notebook execution and full publication remain pending.

@@ -11,7 +11,6 @@ from unittest.mock import patch
 
 import numpy as np
 import particula as par  # new – we will build real objects
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,
@@ -3448,48 +3447,51 @@ class TestCondensationLatentHeat(unittest.TestCase):
         self.assertEqual(spy.call_args.kwargs["dynamic_viscosity"], override)
 
     def test_step_mass_condensation_runnable_compatibility(self):
-        """MassCondensation executes with latent heat strategies."""
-        particle = copy.deepcopy(self.particle)
-        gas_species = copy.deepcopy(self.gas_species)
-        atmosphere = par.gas.Atmosphere(
-            temperature=self.temperature,
-            total_pressure=self.pressure,
-            partitioning_species=gas_species,
-            gas_only_species=[],
-        )
-        aerosol = LegacyAerosol(atmosphere=atmosphere, particles=particle)
-
-        cond_latent = CondensationLatentHeat(
-            molar_mass=self.molar_mass,
-            diffusion_coefficient=self.diffusion_coefficient,
-            accommodation_coefficient=self.accommodation_coefficient,
-            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
-        )
-        condensation = par.dynamics.MassCondensation(
-            condensation_strategy=cond_latent
-        )
-        aerosol_out = condensation.execute(aerosol, time_step=1.0)
-
-        self.assertIsInstance(aerosol_out.particles, ParticleRepresentation)
-        self.assertIsInstance(
-            aerosol_out.atmosphere.partitioning_species, GasSpecies
+        """MassCondensation retains native containers with/without latent heat."""
+        from particula.dynamics.condensation.species_mapping import (
+            CondensationSpeciesMap,
         )
 
-        aerosol_iso = LegacyAerosol(
-            atmosphere=copy.deepcopy(atmosphere),
-            particles=copy.deepcopy(self.particle),
-        )
-        cond_iso = CondensationLatentHeat(
-            molar_mass=self.molar_mass,
-            diffusion_coefficient=self.diffusion_coefficient,
-            accommodation_coefficient=self.accommodation_coefficient,
-        )
-        condensation_iso = par.dynamics.MassCondensation(
-            condensation_strategy=cond_iso
-        )
-        aerosol_iso_out = condensation_iso.execute(aerosol_iso, time_step=1.0)
-
-        self.assertIsInstance(aerosol_iso_out.particles, ParticleRepresentation)
-        self.assertIsInstance(
-            aerosol_iso_out.atmosphere.partitioning_species, GasSpecies
-        )
+        core_mass = 4 / 3 * np.pi * (100e-9) ** 3 * 1770.0
+        for latent_heat in (ConstantLatentHeat(2.26e6), None):
+            particle = par.particles.create_resolved_particle_data(
+                masses=[[0.0, core_mass]], density=[1000.0, 1770.0], volume=1e-6
+            )
+            saturation = self.vapor_pressure_strategy[
+                0
+            ].saturation_concentration(18.015e-3, self.temperature)
+            gas = (
+                par.gas.GasDataBuilder()
+                .set_names(["H2O", "NH4HSO4"])
+                .set_molar_mass([18.015e-3, 132.14e-3])
+                .set_concentration([float(saturation) * 1.02, 1e-30])
+                .set_partitioning([True, True])
+                .build()
+            )
+            aerosol = par.Aerosol(
+                particles=particle,
+                gas=gas,
+                environment=par.gas.EnvironmentData(
+                    [self.temperature], [self.pressure], [[1.02, 0.0]]
+                ),
+            )
+            strategy = CondensationLatentHeat(
+                molar_mass=gas.molar_mass.copy(),
+                diffusion_coefficient=self.diffusion_coefficient,
+                accommodation_coefficient=self.accommodation_coefficient,
+                latent_heat_strategy=latent_heat,
+                activity_strategy=self.activity_strategy,
+                surface_strategy=self.surface_strategy,
+                vapor_pressure_strategy=self.vapor_pressure_strategy,
+                species_map=CondensationSpeciesMap(
+                    ("H2O", "NH4HSO4"), ((0, 0), (1, 1))
+                ),
+            )
+            result = par.dynamics.MassCondensation(strategy).execute(
+                aerosol, 1.0
+            )
+            self.assertIsInstance(result.particles, ParticleData)
+            self.assertIsInstance(result.gas, GasData)
+            self.assertIs(result, aerosol)
+            self.assertIs(result.particles, particle)
+            self.assertIs(result.gas, gas)

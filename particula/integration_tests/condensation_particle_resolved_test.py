@@ -5,7 +5,16 @@ import unittest
 import numpy as np
 import numpy.testing as npt
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+import pytest
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
+from particula.gas import EnvironmentData, GasDataBuilder
+
+
+@pytest.fixture(autouse=True)
+def forbid_facades(forbid_legacy_facades):
+    """Require native execution without temporary facade construction."""
 
 
 class TestCondensationParticleResolved(unittest.TestCase):
@@ -30,35 +39,16 @@ class TestCondensationParticleResolved(unittest.TestCase):
         # 2 % supersaturation
         water_conc = water_sat * 1.02
 
-        self.gas_partitioning = (
-            par.gas.GasSpeciesBuilder()
-            .set_name(["H2O", "NH4HSO4"])
-            .set_molar_mass(
-                np.array([molar_mass_water, molar_mass_am_sulf]), "kg/mol"
-            )
-            .set_vapor_pressure_strategy([self.vp_water, self.vp_constant])
-            .set_concentration(np.array([water_conc, 1e-30]), "kg/m^3")
-            .set_partitioning(True)
+        self.gas = (
+            GasDataBuilder()
+            .set_names(["H2O", "NH4HSO4", "N2"])
+            .set_molar_mass([molar_mass_water, molar_mass_am_sulf, 0.028])
+            .set_concentration([water_conc, 1e-30, 0.79])
+            .set_partitioning([True, True, False])
             .build()
         )
-
-        self.gas_inert = (
-            par.gas.GasSpeciesBuilder()
-            .set_name("N2")
-            .set_molar_mass(0.028, "kg/mol")
-            .set_vapor_pressure_strategy(self.vp_constant)
-            .set_concentration(0.79, "kg/m^3")
-            .set_partitioning(False)
-            .build()
-        )
-        # ---------- atmosphere ----------
-        self.atmosphere = (
-            par.gas.AtmosphereBuilder()
-            .set_temperature(298.15, "K")
-            .set_pressure(101325, "Pa")
-            .set_more_partitioning_species(self.gas_partitioning)
-            .set_more_gas_only_species(self.gas_inert)
-            .build()
+        self.environment = EnvironmentData(
+            [298.15], [101325.0], [[1.02, 0.0, 0.0]]
         )
 
         # ---------- particle distribution ----------
@@ -89,27 +79,30 @@ class TestCondensationParticleResolved(unittest.TestCase):
             .set_surface_tension(np.array([0.072, 0.092]), "N/m")
             .build()
         )
-        self.aerosol = LegacyAerosol(
-            atmosphere=self.atmosphere,
-            particles=(
-                par.particles.ResolvedParticleMassRepresentationBuilder()
-                .set_distribution_strategy(
-                    par.particles.ParticleResolvedSpeciatedMass()
-                )
-                .set_activity_strategy(activity)
-                .set_surface_strategy(surface)
-                .set_mass(mass_speciation, "kg")
-                .set_density(densities, "kg/m^3")
-                .set_charge(0)
-                .set_volume(1e-6, "m^3")  # 1 cm³ air parcel
-                .build()
+        self.aerosol = par.Aerosol(
+            gas=self.gas,
+            environment=self.environment,
+            particles=par.particles.create_resolved_particle_data(
+                masses=mass_speciation,
+                density=densities,
+                volume=1e-6,
             ),
         )
 
         # ---------- condensation process ----------
         self.condensation = par.dynamics.MassCondensation(
             condensation_strategy=par.dynamics.CondensationIsothermal(
-                molar_mass=np.array([molar_mass_water, molar_mass_am_sulf]),
+                molar_mass=self.gas.molar_mass.copy(),
+                activity_strategy=activity,
+                surface_strategy=surface,
+                vapor_pressure_strategy=[
+                    self.vp_water,
+                    self.vp_constant,
+                    self.vp_constant,
+                ],
+                species_map=CondensationSpeciesMap(
+                    ("H2O", "NH4HSO4", "N2"), ((0, 0), (1, 1))
+                ),
                 diffusion_coefficient=2e-5,
                 accommodation_coefficient=1,
                 update_gases=True,
@@ -122,33 +115,28 @@ class TestCondensationParticleResolved(unittest.TestCase):
 
     def test_condensation_transfers_mass(self):
         """Particle mass should increase while gas-phase water decreases."""
-        initial_species_mass = self.aerosol.particles.get_species_mass(
-            clone=True
-        )
-        particle_concentration = self.aerosol.particles.get_concentration(
-            clone=True
-        )
+        initial_species_mass = self.aerosol.particles.masses[0].copy()
+        particle_concentration = (
+            self.aerosol.particles.concentration[0]
+            / self.aerosol.particles.volume[0]
+        ).copy()
         initial_particle_inventory = np.sum(
             initial_species_mass * particle_concentration[:, None], axis=0
         )
-        initial_partitioning_gas = self.aerosol.atmosphere.partitioning_species.get_concentration().copy()
-        initial_nitrogen = (
-            self.aerosol.atmosphere.gas_only_species.get_concentration()
-        )
+        initial_partitioning_gas = self.aerosol.gas.concentration[0, :2].copy()
+        initial_nitrogen = self.aerosol.gas.concentration[0, 2]
         initial_gas_water = initial_partitioning_gas[0]
 
         aerosol = self.aerosol
         for _ in range(5):
             aerosol = self.condensation.execute(aerosol, 0.1, 1)
 
-        final_species_mass = aerosol.particles.get_species_mass(clone=True)
+        final_species_mass = aerosol.particles.masses[0].copy()
         final_particle_inventory = np.sum(
             final_species_mass * particle_concentration[:, None], axis=0
         )
-        final_partitioning_gas = (
-            aerosol.atmosphere.partitioning_species.get_concentration()
-        )
-        final_nitrogen = aerosol.atmosphere.gas_only_species.get_concentration()
+        final_partitioning_gas = aerosol.gas.concentration[0, :2]
+        final_nitrogen = aerosol.gas.concentration[0, 2]
         final_gas_water = final_partitioning_gas[0]
 
         self.assertGreater(

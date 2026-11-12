@@ -30,17 +30,10 @@ from particula.particles.activity_strategies import ActivityIdealMass
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 
 
-def test_complete_native_cpu_sequence_conserves_each_stage(monkeypatch):
+def test_complete_native_cpu_sequence_conserves_each_stage(
+    monkeypatch, forbid_legacy_facades
+):
     """Real five-process composition accounts for dilution and wall sinks."""
-    from particula._legacy_aerosol import Aerosol as LegacyAerosol
-    from particula.gas.species import GasSpecies
-    from particula.particles.representation import ParticleRepresentation
-
-    def forbidden(*args, **kwargs):
-        raise AssertionError("native sequence constructed a facade")
-
-    for carrier in (LegacyAerosol, GasSpecies, ParticleRepresentation):
-        monkeypatch.setattr(carrier, "__init__", forbidden)
     aerosol, config = fixture(capacity=8)
     particles, gas, environment = (
         aerosol.particles,
