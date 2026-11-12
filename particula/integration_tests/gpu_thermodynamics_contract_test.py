@@ -40,10 +40,14 @@ def _make_gpu_data() -> tuple[Any, Any]:
             ],
             dtype=np.float64,
         ),
-        concentration=np.ones((_N_BOXES, n_particles), dtype=np.float64),
+        # Preserve the former unit number density at the declared volume.
+        concentration=np.full(
+            (_N_BOXES, n_particles), 1.0e-6, dtype=np.float64
+        ),
         charge=np.zeros((_N_BOXES, n_particles), dtype=np.float64),
         density=np.array([1000.0, 1200.0], dtype=np.float64),
         volume=np.full(_N_BOXES, 1.0e-6, dtype=np.float64),
+        distribution_type="particle_resolved",
     )
     gas = GasData(
         name=["constant", "buck"],
@@ -143,8 +147,12 @@ def _call_step(
     mass_transfer: Any,
     thermodynamics: Any | None = None,
 ) -> tuple[Any, Any]:
-    """Call the public condensation API through its legacy positional layout."""
+    """Exercise supported positional arguments with explicit native mapping."""
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
     from particula.gpu.kernels import condensation_step_gpu
+    from particula.gpu.species_mapping import prepare_condensation_species_map
 
     kwargs = (
         {} if thermodynamics is None else {"thermodynamics": thermodynamics}
@@ -159,6 +167,14 @@ def _call_step(
         None,
         None,
         mass_transfer,
+        species_binding=prepare_condensation_species_map(
+            gpu_particles,
+            gpu_gas,
+            gas_names=("constant", "buck"),
+            species_map=CondensationSpeciesMap(
+                ("constant", "buck"), ((0, 0), (1, 1))
+            ),
+        ),
         **kwargs,
     )
 

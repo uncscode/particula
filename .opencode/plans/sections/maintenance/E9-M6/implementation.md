@@ -1871,3 +1871,52 @@ Untargeted normal-coverage repository runner started at benchmark commit
 `PATH="$PWD/.venv/bin:$PATH" WARP_CACHE_PATH=/tmp/particula-m6-warp
 .opencode/tools/run_pytest.py`. Session 88972 remains confirmed live; buffered
 output is `/tmp/m6-full-runner1.log`. Poll this session before restarting.
+
+## Installed integration and full workload validation
+
+The first untargeted repository runner finished with **8331 passed, 2 failed,
+684 skipped in 152.84s**, coverage **92%**, normal **80% threshold passed**.
+Its assertion failures were the two Warp CPU thermodynamics integration tests:
+the fixture still uploaded untagged ParticleData. The fixture now stores
+resolved counts equal to its former density times volume and supplies an
+explicit identity species map. All three original test function bodies and
+numerical tolerances are retained in `gpu_integration_assertions.json`.
+Focused rerun passed **2 tests, 1 optional CUDA skip in 0.46s**,
+`/tmp/m6-thermodynamics-integration1.log`. The full runner rerun uses the normal
+policy and `--timeout 1200`; session **43524**, log `/tmp/m6-full-runner2.log`,
+was last confirmed live. Initial runner session 88972 is terminal.
+
+Fresh-wheel package validation passed **4559 passed, 25 skipped, 820
+deselected in 39.41s**, `/tmp/m6-release-package2.log`. The first attempt failed
+because isolated build dependencies could not be downloaded under restricted
+networking; the corrected run had network access. Removed-module/import tests
+and positive native construction were included in this installed suite, with
+installed provenance checked outside the checkout. Separate fresh-wheel example
+suite passed **20 tests in 0.81s**, `/tmp/m6-release-examples1.log`.
+Both wall-loss suites passed separately (**16 in 0.03s**, **43 in 0.06s**),
+and plugin consistency validated six skills and host packages. Logs:
+`/tmp/m6-wallloss-public1.log`, `/tmp/m6-wallloss-adjacent1.log`,
+`/tmp/m6-plugin-check1.log`.
+
+Full M5 workload execution is active, without reduced problem sizes:
+- Source sweep: session **69495**, `/tmp/m6-inventory-progress.log`, per-row
+  records `/tmp/m6-example-execution/results.json`. It includes all 58 original
+  inventory sources plus `docs/Examples/native_state_access.py` (59 total).
+- Its initial notebook attempts fail on missing ADW import and are NOT evidence.
+  M5 records the existing utility path `/home/kyle/Code/Agent`; no dependency
+  package or repository runner was changed.
+- Corrected notebook sweep: session **2690**, `/tmp/m6-notebook-progress.log`,
+  per-row records `/tmp/m6-notebook-execution/results.json`. Uses existing ADW
+  utilities, repository interpreter and local kernel access, retains refreshed
+  output in all 46 maintained notebook files, and waits for each source's
+  earlier attempt to finish before writing that notebook. Original code and
+  scientific workloads are unchanged. Output/plot review remains pending.
+
+Created `docs/Features/Roadmap/data-native-v030-closeout.md` with explicit
+incomplete readiness status, replacements, retained contracts and current gate
+results. Updated migration and roadmap prose that still promised future facade
+or GPU compatibility removal; retained historical release context separately.
+Standard strict docs after these edits passed in **1.55s**,
+`/tmp/m6-closeout-docs1.log`. Final full publication must follow completed
+notebook refresh and final documentation edits. No release readiness or PR
+creation is claimed yet.
