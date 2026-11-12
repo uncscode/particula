@@ -571,14 +571,21 @@ def test_wall_loss_partial_binding_does_no_setup_work_at_enqueue(
 def test_wall_loss_selected_lanes_preserve_disabled_and_no_work_rng() -> None:
     """Only a selected lane with eligible work may advance its RNG word."""
     wp = pytest.importorskip("warp")
+    from particula.execution import Backend, Device
+    from particula.execution.gpu_session import setup_resident_session
+    from particula.execution.tests.gpu_session_test import _cpu_resources
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
 
-    session = _session(boxes=3)
+    cpu_particles, gas, environment = _cpu_resources(3, 2, 1)
+    cpu_particles.distribution_type = "particle_resolved"
+    session = setup_resident_session(
+        cpu_particles, gas, environment, Device(Backend.WARP, "cpu")
+    )
     registry = _registry(session)
     resources = registry.acquire_wall_loss()
     particles = cast(Any, session.particles)
     particles.concentration.assign(
-        np.array([[1.0, 1.0], [0.0, 0.0], [1.0, 1.0]])
+        np.array([[1.0, 1.0], [0.0, 0.0], [0.0, 0.0]])
     )
     particles.masses.assign(
         np.array([[[1.0], [1.0]], [[1.0], [1.0]], [[0.0], [0.0]]])

@@ -256,8 +256,9 @@ concentration is that inventory divided by box volume. No volume factor is
 introduced into the per-particle wall-loss coefficient. Native preflight
 rejects occupied zero-mass slots, unrepresentable derived geometry/count
 density, noncontiguous storage, and overlapping writers or protected inputs.
-Tagged PMF/PDF inputs reject before payload access. The temporary untagged
-legacy path remains separately supported.
+Explicit resolved population metadata is required at direct, prepared, and
+selected-box boundaries. Untagged and PMF/PDF inputs reject before payload
+access, including zero-duration calls.
 
 The private prepared boundary freezes array references and scalar arguments.
 Its enqueue performs no host setup or transfer, but the frozen kernel's

@@ -156,11 +156,20 @@ def _resident_sequence_fixture(fixture: ProcessFixture) -> ProcessFixture:
     # first box. Keep later boxes at zero precursor so their count is exactly
     # zero rather than a nonintegral fixed-slot request.
     gas_concentration[1:, 0] = 0.0
+    # Native coagulation supports equal positive counts within each box.
+    # Keep the original unequal-weight fixtures for their standalone tests;
+    # this sequence derivative preserves species mass and signed charge.
+    active = fixture.particle_concentration > 0.0
+    mean_density = fixture.particle_concentration.sum(axis=1) / active.sum(
+        axis=1
+    )
+    concentrations = active * mean_density[:, None]
+    weight_ratio = fixture.particle_concentration / mean_density[:, None]
     return replace(
         fixture,
-        masses=fixture.masses.copy(),
-        particle_concentration=fixture.particle_concentration.copy(),
-        charge=fixture.charge.copy(),
+        masses=fixture.masses * weight_ratio[:, :, None],
+        particle_concentration=concentrations,
+        charge=fixture.charge * weight_ratio,
         density=fixture.density.copy(),
         volume=fixture.volume.copy(),
         gas_concentration=gas_concentration,
@@ -191,9 +200,12 @@ def _resident_state(fixture: ProcessFixture, device: str) -> SimpleNamespace:
 
     boxes, particles_count, species = fixture.masses.shape
     particles = WarpParticleData()
+    particles.distribution_kind = wp.int32(3)
     particles.masses = wp.array(fixture.masses, dtype=wp.float64, device=device)
     particles.concentration = wp.array(
-        fixture.particle_concentration, dtype=wp.float64, device=device
+        fixture.particle_concentration * fixture.volume[:, None],
+        dtype=wp.float64,
+        device=device,
     )
     particles.charge = wp.array(fixture.charge, dtype=wp.float64, device=device)
     particles.density = wp.array(
@@ -343,6 +355,39 @@ def _resident_state(fixture: ProcessFixture, device: str) -> SimpleNamespace:
             wp.zeros(boxes, dtype=wp.int32, device=device),
         ),
         exhaustion=exhaustion,
+    )
+
+
+def _process_species_binding(state: SimpleNamespace, *, nucleation=False):
+    """Prepare an explicit fixture map after any deliberate storage replacement."""
+    names = tuple(
+        f"species-{i}" for i in range(state.gas.concentration.shape[1])
+    )
+    pairs = tuple((i, i) for i in range(state.particles.masses.shape[2]))
+    if nucleation:
+        from particula.dynamics.nucleation.species_mapping import (
+            NucleationSpeciesMap,
+        )
+        from particula.gpu.nucleation_species_mapping import (
+            prepare_nucleation_species_map,
+        )
+
+        return prepare_nucleation_species_map(
+            state.particles,
+            state.gas,
+            gas_names=names,
+            species_map=NucleationSpeciesMap(names, pairs),
+        )
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+    from particula.gpu.species_mapping import prepare_condensation_species_map
+
+    return prepare_condensation_species_map(
+        state.particles,
+        state.gas,
+        gas_names=names,
+        species_map=CondensationSpeciesMap(names, pairs),
     )
 
 
@@ -1360,7 +1405,8 @@ def _run_resident_sequence_on_device(
     wp.synchronize()
     initial_inventory = _particle_plus_gas_inventory(
         state.particles.masses.numpy(),
-        state.particles.concentration.numpy(),
+        state.particles.concentration.numpy()
+        / state.particles.volume.numpy()[:, None],
         state.gas.concentration.numpy(),
     )
 
@@ -1374,13 +1420,15 @@ def _run_resident_sequence_on_device(
         environment=state.environment,
         thermodynamics=state.thermodynamics,
         scratch_buffers=state.scratch,
+        species_binding=_process_species_binding(state),
     )
     assert condensed_particles is state.particles
     assert transfer is state.mass_transfer
     wp.synchronize()
     condensed_inventory = _particle_plus_gas_inventory(
         state.particles.masses.numpy(),
-        state.particles.concentration.numpy(),
+        state.particles.concentration.numpy()
+        / state.particles.volume.numpy()[:, None],
         state.gas.concentration.numpy(),
     )
     npt.assert_allclose(
@@ -1402,7 +1450,7 @@ def _run_resident_sequence_on_device(
         state.particles,
         None,
         None,
-        1.0e12,
+        1.0e30,
         max_collisions=state.collision_pairs.shape[1],
         collision_pairs=state.collision_pairs,
         n_collisions=state.collision_counts,
@@ -1540,17 +1588,18 @@ def _run_resident_sequence_on_device(
     wp.synchronize()
     inventory_before_nucleation = _particle_plus_gas_inventory(
         state.particles.masses.numpy(),
-        state.particles.concentration.numpy(),
+        state.particles.concentration.numpy()
+        / state.particles.volume.numpy()[:, None],
         state.gas.concentration.numpy(),
     )
     config = NucleationConfig(
         rate_law="activation",
         coefficient=(
-            fixture.molar_mass[0]
+            (1.0 / fixture.volume[0])
             / (
-                AVOGADRO_NUMBER
-                * fixture.volume[0]
-                * state.gas.concentration.numpy()[0, 0]
+                state.gas.concentration.numpy()[0, 0]
+                / fixture.molar_mass[0]
+                * AVOGADRO_NUMBER
             )
         ),
         survival_factor=1.0,
@@ -1573,6 +1622,7 @@ def _run_resident_sequence_on_device(
         exhaustion_controls=NucleationExhaustionControls(True, True),
         exhaustion_buffers=state.exhaustion,
         environment=state.environment,
+        species_binding=_process_species_binding(state, nucleation=True),
     )
     assert result_particles is state.particles
     assert result_gas is state.gas
@@ -1580,7 +1630,8 @@ def _run_resident_sequence_on_device(
     npt.assert_allclose(
         _particle_plus_gas_inventory(
             state.particles.masses.numpy(),
-            state.particles.concentration.numpy(),
+            state.particles.concentration.numpy()
+            / state.particles.volume.numpy()[:, None],
             state.gas.concentration.numpy(),
         ),
         inventory_before_nucleation,
@@ -1706,6 +1757,7 @@ def test_condensation_preserves_disabled_original_fixture_lanes(
         environment=state.environment,
         thermodynamics=state.thermodynamics,
         scratch_buffers=state.scratch,
+        species_binding=_process_species_binding(state),
     )
     wp.synchronize()
     for box in range(fixture.masses.shape[0]):
@@ -1773,6 +1825,7 @@ def test_zero_time_direct_calls_are_byte_exact_no_op(
         environment=state.environment,
         thermodynamics=state.thermodynamics,
         scratch_buffers=state.scratch,
+        species_binding=_process_species_binding(state),
     )
     npt.assert_allclose(
         state.gas.vapor_pressure.numpy(),
@@ -1830,6 +1883,7 @@ def test_zero_time_direct_calls_are_byte_exact_no_op(
         exhaustion_controls=NucleationExhaustionControls(True, True),
         exhaustion_buffers=state.exhaustion,
         environment=state.environment,
+        species_binding=_process_species_binding(state, nucleation=True),
     )
 
     npt.assert_array_equal(
@@ -1905,7 +1959,8 @@ def test_positive_time_nucleation_admits_slots_removes_gas_and_conserves() -> (
     )
     inventory_before = _particle_plus_gas_inventory(
         state.particles.masses.numpy(),
-        state.particles.concentration.numpy(),
+        state.particles.concentration.numpy()
+        / state.particles.volume.numpy()[:, None],
         state.gas.concentration.numpy(),
     )
     gas_before = state.gas.concentration.numpy().copy()
@@ -1936,6 +1991,7 @@ def test_positive_time_nucleation_admits_slots_removes_gas_and_conserves() -> (
         exhaustion_controls=NucleationExhaustionControls(False, False),
         exhaustion_buffers=state.exhaustion,
         environment=state.environment,
+        species_binding=_process_species_binding(state, nucleation=True),
     )
 
     assert particles is state.particles
@@ -1950,7 +2006,8 @@ def test_positive_time_nucleation_admits_slots_removes_gas_and_conserves() -> (
     npt.assert_allclose(
         _particle_plus_gas_inventory(
             state.particles.masses.numpy(),
-            state.particles.concentration.numpy(),
+            state.particles.concentration.numpy()
+            / state.particles.volume.numpy()[:, None],
             state.gas.concentration.numpy(),
         ),
         inventory_before,
@@ -2038,6 +2095,7 @@ def test_condensation_preflight_rejects_invalid_metadata_without_mutation(
             None,
             0.0,
             **kwargs,
+            species_binding=_process_species_binding(state),
         )
     _assert_snapshot_unchanged(
         before,
@@ -2311,6 +2369,7 @@ def test_nucleation_preflight_rejects_invalid_inputs_without_mutation(
             ),
             0.0,
             **kwargs,
+            species_binding=_process_species_binding(state, nucleation=True),
         )
     _assert_snapshot_unchanged(
         before,
@@ -2371,6 +2430,7 @@ def test_neutral_wall_loss_aggregate_removal_stays_within_binomial_band() -> (
         mode="neutral",
     )
     particles = SimpleNamespace(
+        distribution_kind=3,
         masses=wp.full(
             (trials, 1, 1),
             4.0 * np.pi * particle_radius**3 * particle_density / 3.0,
@@ -2397,3 +2457,61 @@ def test_neutral_wall_loss_aggregate_removal_stays_within_binomial_band() -> (
     removed = int(np.sum(particles.concentration.numpy() == 0.0))
 
     assert abs(removed - expected_mean) <= bound
+
+
+@pytest.mark.parametrize(
+    "fixture", _build_process_fixtures(), ids=lambda item: item.name
+)
+def test_sequence_equal_weight_derivative_preserves_particle_inventories(
+    fixture,
+):
+    """Native coagulation fixtures preserve number, species mass, and charge."""
+    sequence = _resident_sequence_fixture(fixture)
+    npt.assert_allclose(
+        sequence.particle_concentration.sum(axis=1),
+        fixture.particle_concentration.sum(axis=1),
+        rtol=1e-15,
+        atol=0,
+    )
+    npt.assert_allclose(
+        _particle_inventory(sequence.masses, sequence.particle_concentration),
+        _particle_inventory(fixture.masses, fixture.particle_concentration),
+        rtol=1e-15,
+        atol=1e-30,
+    )
+    npt.assert_allclose(
+        np.sum(sequence.charge * sequence.particle_concentration, axis=1),
+        np.sum(fixture.charge * fixture.particle_concentration, axis=1),
+        rtol=1e-15,
+        atol=0,
+    )
+    for row in sequence.particle_concentration:
+        positive = row[row > 0]
+        npt.assert_array_equal(positive, np.full_like(positive, positive[0]))
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "fixture", _build_process_fixtures(), ids=lambda item: item.name
+)
+def test_original_unequal_weights_reject_coagulation_without_mutation(fixture):
+    """The original density fixture is not silently admitted as equal counts."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels import coagulation_step_gpu
+
+    state = _resident_state(fixture, "cpu")
+    before = _snapshot_owners(
+        particles=state.particles, rng=state.coagulation_rng
+    )
+    with pytest.raises(ValueError, match="equal positive active counts"):
+        coagulation_step_gpu(
+            state.particles,
+            None,
+            None,
+            0.0,
+            environment=state.environment,
+            rng_states=state.coagulation_rng,
+        )
+    _assert_snapshot_unchanged(
+        before, particles=state.particles, rng=state.coagulation_rng
+    )

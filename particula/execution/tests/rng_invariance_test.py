@@ -73,6 +73,7 @@ def _make_session(
         charge=charge,
         density=np.array([1000.0], dtype=np.float64),
         volume=np.ones(boxes, dtype=np.float64),
+        distribution_type="particle_resolved",
     )
     gas = GasData(
         name=["species"],
@@ -101,6 +102,7 @@ def _make_session(
             session.metadata.__class__(
                 session.metadata.device,
                 session.metadata.gas_names,
+                distribution_type="particle_resolved",
             ),
         )
     registry = GPUResourceRegistry(session)
