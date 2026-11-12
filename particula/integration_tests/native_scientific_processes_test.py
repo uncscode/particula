@@ -35,17 +35,8 @@ CONDENSATION = [
 
 
 @pytest.fixture(autouse=True)
-def forbid_facade_construction(monkeypatch):
-    """Native integration must never fall back to temporary facade setup."""
-    from particula._legacy_aerosol import Aerosol as LegacyAerosol
-    from particula.gas.species import GasSpecies
-    from particula.particles.representation import ParticleRepresentation
-
-    def forbidden(*args, **kwargs):
-        pytest.fail("native scientific integration constructed a facade")
-
-    for cls in (LegacyAerosol, GasSpecies, ParticleRepresentation):
-        monkeypatch.setattr(cls, "__init__", forbidden)
+def forbid_facades(forbid_legacy_facades):
+    """Apply the removal-safe native execution boundary guard."""
 
 
 def _aggregate(particles):

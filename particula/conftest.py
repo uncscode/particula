@@ -7,6 +7,8 @@ only collection-affecting pytest option.
 
 from __future__ import annotations
 
+import sys
+
 import pytest
 
 from particula._pytest_support import (
@@ -60,3 +62,29 @@ def pytest_collection_modifyitems(
     for item in items:
         if "benchmark" in item.keywords:
             item.add_marker(skip_benchmark)
+
+
+@pytest.fixture
+def forbid_legacy_facades(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Reject cached facade construction and fresh imports in native tests.
+
+    Inspect already-loaded modules instead of importing obsolete APIs. This
+    guard remains effective while removal proceeds and after modules disappear.
+    """
+    modules = {
+        "particula._legacy_aerosol": ("Aerosol", "AerosolBuilder"),
+        "particula.gas.species": ("GasSpecies",),
+        "particula.gas.atmosphere": ("Atmosphere",),
+        "particula.particles.representation": ("ParticleRepresentation",),
+    }
+
+    def forbidden(*args: object, **kwargs: object) -> None:
+        pytest.fail("native execution constructed a legacy facade")
+
+    for module_name, names in modules.items():
+        module = sys.modules.get(module_name)
+        for name in names:
+            carrier = getattr(module, name, None)
+            if isinstance(carrier, type):
+                monkeypatch.setattr(carrier, "__init__", forbidden)
+        monkeypatch.setitem(sys.modules, module_name, None)

@@ -39,17 +39,8 @@ from particula.execution.tests.condensation_adapter_test import _configuration
 
 
 @pytest.fixture(autouse=True)
-def forbid_facades(monkeypatch):
-    """No adapter may reconstruct native input through a legacy facade."""
-    from particula._legacy_aerosol import Aerosol as LegacyAerosol
-    from particula.gas.species import GasSpecies
-    from particula.particles.representation import ParticleRepresentation
-
-    def forbidden(*args, **kwargs):
-        pytest.fail("native adapter constructed a legacy facade")
-
-    for cls in (LegacyAerosol, GasSpecies, ParticleRepresentation):
-        monkeypatch.setattr(cls, "__init__", forbidden)
+def forbid_facades(forbid_legacy_facades):
+    """Apply the removal-safe native execution boundary guard."""
 
 
 def selected(family, aerosol):
