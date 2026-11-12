@@ -1,4 +1,12 @@
-# One-line Vision
+# One-line Vision — historical proposal
+
+> **Historical, unimplemented design sketch.** The `par.use_backend`,
+> `par.get_backend`, `par.dispatchable` and `par.register` names below are not
+> current Particula APIs. All code blocks on this page are nonexecutable proposal
+> text. Silent fallback was a proposed design, not the current execution
+> contract. Use [explicit backend selection](../../../Features/backend_selection.md)
+> and the [native migration guide](../../../Features/particle-data-migration/index.md).
+
 
 **Objective**
 Give users a *single* statement—`par.use_backend("taichi")`, `par.use_backend("warp")`, or nothing at all—to decide whether each heavy-duty kernel runs as plain-Python/NumPy or on an accelerated backend.  All builders, simulators, and analysis notebooks continue to call the same public functions (`par.coagulation_gain_rate`, `par.foo`, …).  In other words: “flip a switch, get speed, keep code.”
@@ -30,7 +38,7 @@ See the [Dispatch Decorator](#dispatch-decorator) section below for a full code 
 
 **Dispatch layer** centralizes the decision in *one* lightweight wrapper:
 
-```python
+```text
 @par.dispatchable        # decorates the Python reference impl
 def coagulation_gain_rate(...):
     ...
@@ -50,7 +58,7 @@ Outcome: **zero duplication, single source-of-truth docstring, plug-and-play bac
 
 *Users*
 
-```python
+```text
 import particula as par
 par.use_backend("taichi")      # one line, opt-in
 result = par.coagulation_gain_rate(r, c, K)
@@ -60,7 +68,7 @@ If Taichi isn’t available—or if that particular kernel hasn’t been ported 
 
 *Backend Developer*
 
-```python
+```text
 from particula import register
 
 @register("coagulation_gain_rate", backend="warp")
@@ -92,7 +100,7 @@ No changes to public modules, no touching docstrings, no conflicts with other ba
 Our goal is to have **one line for users, zero friction for contributors.**
 What changes is *how* we wire the backends. Instead of sprinkling `if par.backend.is_enabled(): …` inside every kernel, we wrap each public-API function in a **single decorator that does automatic dispatch**:
 
-```python
+```text
 import particula as par
 
 par.use_backend("taichi")        # or "warp", "cpp", …
@@ -113,7 +121,7 @@ Behind the scenes:
 
 3. **Accelerated versions live in separate modules** and register themselves with:
 
-   ```python
+   ```text
    @par.register("coagulation_gain_rate", backend="taichi")
    def coagulation_gain_rate_taichi(radius, conc, kernel):
        # Taichi kernel here …
@@ -133,7 +141,7 @@ Behind the scenes:
 
 ### Example skeleton
 
-```python
+```text
 # -------- particula/_dispatch.py -----------------
 _backend = "python"
 _registry: dict[str, dict[str, callable]] = defaultdict(dict)
@@ -166,7 +174,7 @@ def register(func_name: str, *, backend: str):
     return decorator
 ```
 
-```python
+```text
 # -------- particula/public_api.py ----------------
 from particula._dispatch import dispatchable
 
@@ -180,7 +188,7 @@ def coagulation_gain_rate(radius, concentration, kernel):
     )
 ```
 
-```python
+```text
 # -------- particula/_backend_taichi.py -----------
 from particula._dispatch import register
 import taichi as ti
@@ -193,7 +201,7 @@ def coagulation_gain_rate_taichi(radius, concentration, kernel):
 
 ### What users see
 
-```python
+```text
 import particula as par
 par.use_backend("taichi")          # one-liner switch
 

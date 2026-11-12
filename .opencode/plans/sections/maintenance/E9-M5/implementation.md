@@ -591,3 +591,33 @@ scoped Ruff check/format, git diff --check and strict MkDocs pass (log
 `/tmp/m5-p6-activity-reference-mkdocs.log`). The inventory records these three
 functional dispositions. P6 still has remaining backend/foundations, GPU theory,
 roadmap, API-target and navigation audits; P7 and final gates are outstanding.
+
+### P6 acceleration and Warp teaching boundary checkpoint (2026-11-11)
+
+The One-Line Vision and accelerating-Python overview describe an unimplemented
+historical dispatch proposal. Verified current package exports do not include
+use_backend/get_backend/dispatchable/register. Preserved that design as clearly
+labeled nonexecutable text with current backend/native guidance pointers;
+removed an unsupported numerical speedup promise and separated Cython from
+PyPy naming. This does not remove a working API or supported simulation.
+
+Warp theory pages use standalone teaching definitions rather than native
+ParticleData/GasData construction (except the existing explicit EnvironmentData
+round trip). Added scope boundaries and links to supported native workflows,
+without promoting toy loops to coupled-physics/conservation/autodiff evidence.
+Their explicitly CUDA-selected teaching loops were not executed on this host;
+that is recorded, not replaced with a passing-runtime claim. The primer now
+selects Warp CPU explicitly for portable execution and documents file-backed
+compilation; CUDA remains an explicit user choice, not automatic fallback.
+Its 10000-particle workload and timestep remain unchanged. Removed its dead
+examples-directory link while retaining individual example links.
+
+Two exact-snippet regressions run the file-backed primer plus independent
+nonzero advection and the native two-box/three-gas-lane environment round trip.
+Final theory suite: **8 passed in 1.61s** on Warp CPU. Scoped Ruff check/format,
+git diff --check and strict MkDocs pass (1.50s build,
+`/tmp/m5-p6-warp-theory-mkdocs.log`). Changed-line Markdown whitespace was fixed
+after the initial diff check. Inventory now distinguishes historical proposals,
+standalone teaching patterns and the verified native helper. P6 remains open
+for foundations/backend/roadmap/API/navigation reconciliation; P7 and full
+final gates remain outstanding, and no PR has been opened.
