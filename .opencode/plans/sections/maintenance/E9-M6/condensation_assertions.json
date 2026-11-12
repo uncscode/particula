@@ -279,8 +279,8 @@
         "self.assertTrue(strategy.shuffle_each_step)",
         "self.assertIsNone(strategy.random_state)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_defaults"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_theta_mode_random_stores_seed",
@@ -288,8 +288,8 @@
         "self.assertEqual(strategy.theta_mode, \"random\")",
         "self.assertEqual(strategy.random_state, 42)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_theta_mode_random_stores_seed"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_theta_mode_batch_stores_batches",
@@ -297,24 +297,24 @@
         "self.assertEqual(strategy.theta_mode, \"batch\")",
         "self.assertEqual(strategy.num_batches, 4)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_theta_mode_batch_stores_batches"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_invalid_theta_mode_raises",
       "assertions": [
         "self.assertRaises(ValueError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_invalid_theta_mode_raises"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_num_batches_less_than_one_raises",
       "assertions": [
         "self.assertRaises(ValueError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_num_batches_less_than_one_raises"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_mass_transfer_rate_returns_array",
@@ -353,8 +353,8 @@
         "self.assertEqual(theta.shape, (5,))",
         "self.assertEqual(theta.dtype, np.float64)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_get_theta_values_half_mode_returns_half"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_random_mode_range_and_shape",
@@ -364,40 +364,40 @@
         "self.assertEqual(theta.shape, (100,))",
         "self.assertEqual(theta.dtype, np.float64)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_get_theta_values_random_mode_range_and_shape"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_random_mode_reproducible",
       "assertions": [
         "np.testing.assert_array_equal(theta_a, theta_b)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_get_theta_values_random_mode_reproducible"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_random_mode_different_seed",
       "assertions": [
         "self.assertFalse(np.allclose(theta_a, theta_b))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_get_theta_values_random_mode_different_seed"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_random_mode_accepts_random_state",
       "assertions": [
         "np.testing.assert_array_equal(theta_a, theta_b)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_get_theta_values_random_mode_accepts_random_state"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_random_mode_accepts_generator",
       "assertions": [
         "np.testing.assert_array_equal(theta_a, theta_b)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_get_theta_values_random_mode_accepts_generator"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_batch_mode_returns_ones",
@@ -406,8 +406,8 @@
         "self.assertEqual(theta.shape, (8,))",
         "self.assertEqual(theta.dtype, np.float64)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_get_theta_values_batch_mode_returns_ones"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_single_particle_all_modes",
@@ -419,8 +419,8 @@
         "np.testing.assert_array_equal(theta_batch, np.array([1.0]))",
         "self.assertEqual(theta_batch.shape, (1,))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_get_theta_values_single_particle_all_modes"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_zero_particles_returns_empty",
@@ -428,16 +428,16 @@
         "self.assertEqual(theta.shape, (0,))",
         "self.assertEqual(theta.dtype, np.float64)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_get_theta_values_zero_particles_returns_empty"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_invalid_theta_mode_raises_value_error",
       "assertions": [
         "self.assertRaises(ValueError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_get_theta_values_invalid_theta_mode_raises_value_error"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_correct_count",
@@ -445,40 +445,40 @@
         "self.assertEqual(len(batches), 4)",
         "self.assertEqual(sum(len(batch) for batch in batches), 100)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_make_batches_correct_count"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_no_shuffle_when_disabled",
       "assertions": [
         "np.testing.assert_array_equal(batches[0], np.arange(10))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_make_batches_no_shuffle_when_disabled"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_shuffles_when_enabled",
       "assertions": [
         "self.assertFalse(np.array_equal(batches[0], np.arange(20)))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_make_batches_shuffles_when_enabled"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_preserves_all_indices",
       "assertions": [
         "np.testing.assert_array_equal(np.sort(all_indices), np.arange(57))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_make_batches_preserves_all_indices"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_reproducible",
       "assertions": [
         "np.testing.assert_array_equal(batch_a, batch_b)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_make_batches_reproducible"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_single_batch",
@@ -486,24 +486,24 @@
         "self.assertEqual(len(batches), 1)",
         "self.assertEqual(len(batches[0]), 7)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_make_batches_single_batch"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_validate_num_batches_zero_raises_value_error",
       "assertions": [
         "self.assertRaisesRegex(\n            ValueError, r\"num_batches.*(>=|at least)\\s*1\"\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_validate_num_batches_zero_raises_value_error"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_validate_num_batches_negative_raises_value_error",
       "assertions": [
         "self.assertRaisesRegex(\n            ValueError, r\"num_batches.*(>=|at least)\\s*1\"\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_validate_num_batches_negative_raises_value_error"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_more_batches_than_particles",
@@ -512,8 +512,8 @@
         "np.testing.assert_array_equal(np.concatenate(batches), np.arange(3))",
         "self.assertTrue(all(len(batch) == 1 for batch in batches))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_make_batches_more_batches_than_particles"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_single_particle",
@@ -521,16 +521,16 @@
         "self.assertEqual(len(batches), 1)",
         "np.testing.assert_array_equal(batches[0], np.array([0], dtype=np.intp))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_make_batches_single_particle"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_zero_particles_returns_empty",
       "assertions": [
         "self.assertEqual(batches, [])"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_make_batches_zero_particles_returns_empty"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_random_state_shuffle_path",
@@ -538,8 +538,8 @@
         "self.assertFalse(\n            np.array_equal(np.concatenate(batches_a), np.arange(6))\n        )",
         "np.testing.assert_array_equal(batch_a, batch_b)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_make_batches_random_state_shuffle_path"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_make_batches_generator_shuffle_path",
@@ -547,8 +547,8 @@
         "self.assertFalse(\n            np.array_equal(np.concatenate(batches_a), np.arange(6))\n        )",
         "np.testing.assert_array_equal(batch_a, batch_b)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_make_batches_generator_shuffle_path"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_calculate_single_particle_transfer_default_transport",
@@ -775,8 +775,8 @@
         "self.assertTrue(\n            any(\n                \"Clipping num_batches\" in record.message\n                for record in cm.records\n            )\n        )",
         "self.assertLogs(\"particula\", level=logging.INFO)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_num_batches_exceeds_particles_clips_and_logs_info"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_num_batches_equals_particles_no_log",
@@ -784,8 +784,8 @@
         "self.assertEqual(len(batches), 5)",
         "np.testing.assert_array_equal(np.concatenate(batches), np.arange(5))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_num_batches_equals_particles_no_log"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_num_batches_one_creates_single_batch",
@@ -793,16 +793,16 @@
         "self.assertEqual(len(batches), 1)",
         "np.testing.assert_array_equal(batches[0], np.arange(12))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_num_batches_one_creates_single_batch"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_zero_particles_returns_empty_batches_no_log",
       "assertions": [
         "self.assertEqual(batches, [])"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Retained method body verbatim in facade-independent controls suite; removal-safe guard proves no legacy fixture construction. Original RNG, theta, batching and logging assertions unchanged.",
+      "native_successor": "particula/dynamics/condensation/tests/staggered_controls_test.py::TestStaggeredControls::test_zero_particles_returns_empty_batches_no_log"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_instantiation_with_strategy",
