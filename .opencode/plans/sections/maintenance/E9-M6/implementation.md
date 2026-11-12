@@ -258,3 +258,33 @@ Validation:
 
 The common aggregate still has legacy condensation/coagulation/wall-loss paths;
 those consumers and their strategies must migrate before facade deletion.
+
+## Native-only wall-loss runnable
+
+Removed WallLoss's legacy aggregate execution/rate and facade concentration
+clipping branches. Native strategy invocation, equal durations, held-container
+validation and in-place clamp remain unchanged; non-native aggregate objects
+reject before strategy calls. Strategy-level facade branches are still pending.
+
+Migrated all **11 original wall-loss runnable tests**, recorded with original
+source and disposition in `wall_loss_runnable_assertions.json`. Explicit native
+size lanes replace obsolete preset facades. Preserved reduction, no-op, rate
+shape/sign, geometry/resolved smoke, equal substeps and composition assertions.
+Native strategies already reject oversized steps before writing. The original
+clamp assertion now uses successful custom-strategy output; a separate test
+asserts oversized native rejection and exact unchanged storage. AGENTS and the
+runnable docstring now distinguish those behaviors rather than promising native
+clipping for arbitrary aggressive steps.
+
+Validation:
+- All dynamics runnable tests and native scientific/sequence integration:
+  **807 passed in 2.08s**, `/tmp/m6-wall-runnable-broad.log`.
+- Both required wall-loss strategy suites executed separately: **16 passed**
+  and **43 passed**, `/tmp/m6-wall-top.log`, `/tmp/m6-wall-adjacent.log`.
+- Full mypy clean (552 files), `/tmp/m6-wall-runnable-mypy.log`.
+- Base strict documentation build passed in 1.59 seconds,
+  `/tmp/m6-native-runnable-docs.log`. Full publication warning cleanup is still
+  pending; this base build is not evidence for that separate gate.
+- Scoped Ruff and whitespace checks passed. Initial focused run found the
+  obsolete aggressive-step clipping expectation; its two native successor
+  checks pass in the broader run. No physics or tolerances changed.

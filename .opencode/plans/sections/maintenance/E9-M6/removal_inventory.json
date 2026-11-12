@@ -3435,7 +3435,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "All 11 original runnable tests migrated to native tagged arrays; exact original nodes and successor rationale in wall_loss_runnable_assertions.json. Native oversized-step rejection and successful custom-output clamping are separate assertions.",
       "test_nodes": [
         {
           "name": "test_init_with_spherical_strategy",

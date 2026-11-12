@@ -626,8 +626,8 @@ class WallLoss(RunnableABC):
 
     Supports discrete, continuous PDF, and particle-resolved distributions via
     the configured wall loss strategy. The total ``time_step`` is split across
-    ``sub_steps`` and concentrations are clamped to non-negative values after
-    each sub-step to avoid negative counts from aggressive steps.
+    ``sub_steps``. Native strategies reject oversized steps before writing;
+    the runnable clamps concentrations after successful strategy delegation.
 
     Example:
         >>> import particula as par
@@ -652,28 +652,20 @@ class WallLoss(RunnableABC):
         """
         self.wall_loss_strategy = wall_loss_strategy
 
-    def _clamp_non_negative(self, particle: Any) -> None:
+    def _clamp_non_negative(self, particle: ParticleData) -> None:
         """Clamp particle concentrations to non-negative values.
 
         Args:
             particle: Particle object whose concentration is clipped in place.
         """
-        if isinstance(particle, ParticleData):
-            np.maximum(particle.concentration, 0.0, out=particle.concentration)
-            return
-        concentration = particle.get_concentration()
-        clipped_concentration = np.clip(concentration, 0.0, None)
-        if not np.array_equal(clipped_concentration, concentration):
-            particle.concentration = (
-                clipped_concentration * particle.get_volume()
-            )
+        np.maximum(particle.concentration, 0.0, out=particle.concentration)
 
     def execute(
         self,
-        aerosol: _AerosolT,
+        aerosol: Aerosol,
         time_step: float,
         sub_steps: int = 1,
-    ) -> _AerosolT:
+    ) -> Aerosol:
         """Apply wall loss over the provided time step.
 
         Concentrations are clamped to remain non-negative after each
@@ -687,35 +679,23 @@ class WallLoss(RunnableABC):
         Returns:
             Aerosol with updated particle concentrations.
         """
-        if isinstance(aerosol, Aerosol):
-            duration = _native_duration(time_step, sub_steps)
-            for _ in range(sub_steps):
-                particles, _, temperature, pressure = _native_process_state(
-                    aerosol
-                )
-                result = self.wall_loss_strategy.step(
-                    particle=particles,
-                    temperature=temperature,
-                    pressure=pressure,
-                    time_step=duration,
-                )
-                if result is not particles:
-                    raise ValueError(
-                        "Native wall loss must retain its container."
-                    )
-                self._clamp_non_negative(particles)
-            return aerosol
+        if not isinstance(aerosol, Aerosol):
+            raise TypeError("WallLoss requires a native Aerosol")
+        duration = _native_duration(time_step, sub_steps)
         for _ in range(sub_steps):
-            aerosol.particles = self.wall_loss_strategy.step(
-                particle=aerosol.particles,
-                temperature=aerosol.atmosphere.temperature,
-                pressure=aerosol.atmosphere.total_pressure,
-                time_step=time_step / sub_steps,
+            particles, _, temperature, pressure = _native_process_state(aerosol)
+            result = self.wall_loss_strategy.step(
+                particle=particles,
+                temperature=temperature,
+                pressure=pressure,
+                time_step=duration,
             )
-            self._clamp_non_negative(aerosol.particles)
+            if result is not particles:
+                raise ValueError("Native wall loss must retain its container.")
+            self._clamp_non_negative(particles)
         return aerosol
 
-    def rate(self, aerosol: Aerosol | LegacyAerosol) -> Any:
+    def rate(self, aerosol: Aerosol) -> Any:
         """Return the wall loss rate for the aerosol particles.
 
         Args:
@@ -724,17 +704,13 @@ class WallLoss(RunnableABC):
         Returns:
             Array of wall loss rates matching the particle representation.
         """
-        if isinstance(aerosol, Aerosol):
-            particles, _, temperature, pressure = _native_process_state(aerosol)
-            return self.wall_loss_strategy.rate(
-                particle=particles,
-                temperature=temperature,
-                pressure=pressure,
-            )
+        if not isinstance(aerosol, Aerosol):
+            raise TypeError("WallLoss requires a native Aerosol")
+        particles, _, temperature, pressure = _native_process_state(aerosol)
         return self.wall_loss_strategy.rate(
-            particle=aerosol.particles,
-            temperature=aerosol.atmosphere.temperature,
-            pressure=aerosol.atmosphere.total_pressure,
+            particle=particles,
+            temperature=temperature,
+            pressure=pressure,
         )
 
 
