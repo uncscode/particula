@@ -12,7 +12,7 @@ from typing import assert_type, cast
 import numpy as np
 import numpy.testing as npt
 import pytest
-from particula._legacy_aerosol import Aerosol
+from particula.aerosol import Aerosol
 from particula.dynamics.dilution import DilutionStrategy
 from particula.dynamics.particle_process import Dilution
 from particula.execution import (
@@ -57,12 +57,8 @@ from particula.execution import (
     require_condensation_profile,
     validate_execution_result,
 )
-from particula.gas.atmosphere import Atmosphere
-from particula.gas.species import GasSpecies
-from particula.particles.activity_strategies import ActivityIdealMass
-from particula.particles.distribution_strategies import MassBasedMovingBin
-from particula.particles.representation import ParticleRepresentation
-from particula.particles.surface_strategies import SurfaceStrategyVolume
+from particula.gas import EnvironmentData, GasData
+from particula.particles import ParticleData
 from particula.runnable import Aerosol as AerosolLike
 from particula.runnable import RunnableABC
 
@@ -1751,51 +1747,41 @@ class _RecordingRunnable(RunnableABC):
 
 def _make_cpu_adapter_aerosol() -> Aerosol:
     """Build deterministic particle and gas concentration state."""
-    particles = ParticleRepresentation(
-        strategy=MassBasedMovingBin(),
-        activity=ActivityIdealMass(),
-        surface=SurfaceStrategyVolume(),
-        distribution=np.array([1e-18, 2e-18], dtype=np.float64),
+    particles = ParticleData(
+        masses=np.array([[[1e-18], [2e-18]]], dtype=np.float64),
         density=np.array([1000.0], dtype=np.float64),
-        concentration=np.array([4.0, 8.0], dtype=np.float64),
-        charge=np.array([1.0, -1.0], dtype=np.float64),
-        volume=2.0,
+        concentration=np.array([[4.0, 8.0]], dtype=np.float64),
+        charge=np.array([[1.0, -1.0]], dtype=np.float64),
+        volume=np.array([2.0]),
+        distribution_type="particle_resolved",
     )
-    partitioning = GasSpecies(
-        name="partitioning",
-        molar_mass=0.1,
-        concentration=3.0,
-        partitioning=True,
-    )
-    gas_only = GasSpecies(
-        name=np.array(["gas_a", "gas_b"]),
-        molar_mass=np.array([0.02, 0.03], dtype=np.float64),
-        concentration=np.array([5.0, 7.0], dtype=np.float64),
-        partitioning=False,
+    gas = GasData(
+        name=["partitioning", "gas_a", "gas_b"],
+        molar_mass=np.array([0.1, 0.02, 0.03], dtype=np.float64),
+        concentration=np.array([[3.0, 5.0, 7.0]], dtype=np.float64),
+        partitioning=np.array([True, False, False]),
     )
     return Aerosol(
-        atmosphere=Atmosphere(
-            temperature=298.15,
-            total_pressure=101325.0,
-            partitioning_species=partitioning,
-            gas_only_species=gas_only,
-        ),
         particles=particles,
+        gas=gas,
+        environment=EnvironmentData(
+            temperature=np.array([298.15]),
+            pressure=np.array([101325.0]),
+            saturation_ratio=np.zeros((1, 3)),
+        ),
     )
 
 
 def _cpu_adapter_concentrations(
     aerosol: Aerosol,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Copy all CPU adapter concentration domains."""
+    """Copy particle number density and both full-gas concentration domains."""
     return (
-        aerosol.particles.get_concentration().copy(),
-        np.asarray(
-            aerosol.atmosphere.partitioning_species.get_concentration()
+        (
+            aerosol.particles.concentration[0] / aerosol.particles.volume[0]
         ).copy(),
-        np.asarray(
-            aerosol.atmosphere.gas_only_species.get_concentration()
-        ).copy(),
+        aerosol.gas.concentration[0, aerosol.gas.partitioning].copy(),
+        aerosol.gas.concentration[0, ~aerosol.gas.partitioning].copy(),
     )
 
 

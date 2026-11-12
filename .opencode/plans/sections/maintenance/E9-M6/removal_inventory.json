@@ -504,7 +504,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete aggregate; all nine test assertions reviewed in aggregate_assertions.json with native successors.",
       "test_nodes": []
     },
     {
@@ -8724,7 +8724,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Native resolved particle/full-gas/environment fixture; real dilution exponential oracle and adapter lifecycle assertions retained.",
       "test_nodes": [
         {
           "name": "test_declarations_compare_hash_and_freeze_by_value",
@@ -9088,7 +9088,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete aggregate; all nine test assertions reviewed in aggregate_assertions.json with native successors.",
       "test_nodes": [
         {
           "name": "test_no_species_passes",
@@ -9168,7 +9168,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete aggregate; all nine test assertions reviewed in aggregate_assertions.json with native successors.",
       "test_nodes": [
         {
           "name": "test_str",
