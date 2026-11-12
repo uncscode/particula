@@ -257,3 +257,68 @@ with the full migrated workloads. Chemical-property assumptions and extrapolated
 high-temperature tables remain illustrative, not independently requalified.
 P4 is complete; P5–P7 and final repository-wide gates remain pending. No PR,
 push, merge, release, M6 deletion or performance qualification is claimed here.
+
+
+### P5 native boundary migration started (2026-11-11)
+
+Direct nucleation now tags particle-resolved counts and explicitly prepares a
+NucleationSpeciesMap binding for the exact transferred carriers and full gas
+order. Its independent inventory sums particle mass times counts plus gas mass
+density times represented volume. The regression executes both one- and two-m³
+cases, checks activated slots and binding ownership, and observes explicit
+transfer/preparation/dispatch/synchronization/restore order.
+
+The resident lifecycle example now carries explicit resolved metadata for one
+particle in 1e-6 m³. Restart inspection checks metadata, raw count, mass and
+volume preservation. The printed checkpoint compatibility version is corrected
+to schema-v5; this zero-duration example still performs no physical process.
+
+Validation on the current working changes with Warp 1.11.1 and
+WARP_CACHE_PATH=/tmp/particula-m5-warp:
+- `.venv/bin/pytest examples_tests/gpu_direct_nucleation_example_test.py -q
+  --no-cov`: 5 passed, including the standalone documented command.
+- `.venv/bin/pytest examples_tests/gpu_resident_session_example_test.py -q
+  --no-cov`: 11 passed.
+- `.venv/bin/python docs/Examples/gpu_resident_session.py`: exit 0, explicit
+  Warp CPU lifecycle completed. Host reports no CUDA-capable device.
+- Scoped Ruff check and format check for the four changed Python files passed.
+
+P5 remains in progress: the other six direct/resident sources, owning tests and
+complete phase gate are pending. No final full-suite evidence or PR yet.
+
+
+### P5 direct coagulation, condensation and five-process sequence
+
+The direct coagulation fixture now tags resolved counts, retains the six
+unit-count active slots and deliberately inactive material, and verifies
+extensive mass conservation. Those inactive slots are explicitly not advertised
+as canonical free slots for activation. Final restoration uses sync=False
+after the existing explicit synchronization.
+
+The condensation quick start preserves its original number density (1 m^-3
+per slot) by storing 1e-6 counts at 1e-6 m³. An explicit concrete species binding
+is prepared after transfer and reused across both calls. The energy regression
+now checks count-weighted extensive J with atol=1e-30; gas coupling retains its
+original density-space tolerance after dividing particle count-weighted change
+by volume. Disabled paths retain lazy kernel imports.
+
+The complete sequence retains all five original calls and time steps. Native
+coagulation rejected the former unequal 2/5 active counts, so the illustrative
+fixture now uses equal 2/2 counts, documented at construction. This changes the
+fixture inventory intentionally rather than bypassing native admission; it is
+not a calibrated population or a promise of legacy numerical parity. Both
+condensation and nucleation mappings are prepared explicitly for the exact
+transferred carriers. Test-only observations check species inventory at each
+stage, exponential dilution, bounded wall removal, and zero-time nucleation
+identity. The published example retains one final synchronization/restore with
+no intermediate inspection.
+
+Validation: five migrated P5 suites (direct nucleation, resident lifecycle,
+direct coagulation, direct condensation quick start, complete process sequence)
+run together via `.venv/bin/pytest <five owning example files> -q --no-cov`:
+61 passed in 11.92s. The three newly changed standalone sources each exited 0
+under `.venv/bin/python`, Warp 1.11.1 CPU, using
+WARP_CACHE_PATH=/tmp/particula-m5-warp. Scoped Ruff and format checks passed.
+Host CUDA discovery reports no CUDA-capable device; no CUDA evidence claimed.
+The parity walkthrough and resident multi-timestep/capture examples remain
+pending, as do the complete P5 gate, P6/P7 and final repository-wide gates.
