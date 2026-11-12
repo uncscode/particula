@@ -1430,10 +1430,10 @@
     {
       "path": "docs/Features/data-containers-and-gpu-foundations.md",
       "python_fences": 16,
-      "disposition": "partially migrated; full remaining-page audit pending",
-      "execution": "native construction snippet verified; broader snippets pending",
+      "disposition": "all native snippets executable; remaining long-form shape and boundary prose audit pending",
+      "execution": "all 16 Python fences execute on Warp CPU; activation and round-trip outcome assertions pass in 23-test process-guide suite",
       "phase": "P6",
-      "evidence": "examples_tests/native_state_access_example_test.py"
+      "evidence": "examples_tests/native_process_guides_test.py and examples_tests/native_state_access_example_test.py"
     },
     {
       "path": "docs/Features/dilution_strategy_system.md",

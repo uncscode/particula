@@ -650,3 +650,26 @@ installed-Warp host. Scoped Ruff check/format, git diff --check and strict
 MkDocs pass (`/tmp/m5-p6-selected-backend-mkdocs.log`). P6 remains In Progress;
 foundations, roadmap/API/navigation reconciliation, P7 and final full gates
 remain outstanding. No PR has been opened.
+
+### P6 foundations executable-snippet checkpoint (2026-11-11)
+
+Made the remaining foundations snippets executable in documented page order.
+CPU slot diagnostics now constructs a native two-slot resolved fixture at
+1e-6 m³ with one free slot. GPU activation explicitly uploads that fixture and
+allocates all same-device request/count/index sidecars, then activates exactly
+one unit-count request. The wall-loss illustration explicitly uploads the
+later native construction fixture and allocates caller-owned uint32 RNG state.
+No hidden transfers, capacity expansion or device fallback were introduced.
+
+All 16 Python fences execute on explicitly selected Warp CPU. Regression
+observations synchronize outside the published activation call and check exact
+slot masses/counts, activated count and unchanged CPU source, then verify native
+particle metadata/inventory, retained gas names and concentration, Warp (B,Sg)
+partitioning shape and restored environmental lanes. This is numerical snippet
+evidence; the long page's remaining shape/boundary prose is still pending audit.
+
+Validation: process-guide suite **23 passed in 6.02s**; scoped Ruff check/format,
+git diff --check and strict MkDocs pass
+(`/tmp/m5-p6-foundations-snippets-mkdocs.log`). CUDA initialization reported no
+CUDA-capable device; all required work here used explicit Warp CPU, with no
+capture/performance claim. P6, P7 and final full gates remain outstanding.
