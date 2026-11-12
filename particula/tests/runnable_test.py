@@ -6,7 +6,7 @@ and Process
 
 from unittest.mock import MagicMock
 
-from particula._legacy_aerosol import Aerosol
+from particula.aerosol import Aerosol
 from particula.runnable import RunnableABC, RunnableSequence
 
 

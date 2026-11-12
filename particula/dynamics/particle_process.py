@@ -426,10 +426,10 @@ class LegacyNucleation(RunnableABC):
 
     def execute(
         self,
-        aerosol: Aerosol | LegacyAerosol,
+        aerosol: _AerosolT,
         time_step: float | np.number,
         sub_steps: int | np.integer = 1,
-    ) -> Aerosol | LegacyAerosol:
+    ) -> _AerosolT:
         """Apply nucleation in equal sequential substeps.
 
         Each substep reads the gas concentration left by preceding successful
@@ -532,7 +532,7 @@ class Nucleation(RunnableABC):
         self.commit_config = commit_config
 
     def _state(
-        self, aerosol: Aerosol | LegacyAerosol
+        self, aerosol: Aerosol
     ) -> tuple[ParticleData, GasData, EnvironmentData]:
         """Validate current topology and configured injection alignment."""
         if not isinstance(aerosol, Aerosol):
@@ -589,17 +589,17 @@ class Nucleation(RunnableABC):
             saturation=saturation,
         )
 
-    def rate(self, aerosol: Aerosol | LegacyAerosol) -> float:
+    def rate(self, aerosol: Aerosol) -> float:
         """Return the current potential event density rate [m^-3 s^-1]."""
         _, gas, environment = self._state(aerosol)
         return self._rate(gas, environment)
 
     def execute(
         self,
-        aerosol: Aerosol | LegacyAerosol,
+        aerosol: Aerosol,
         time_step: float | np.number,
         sub_steps: int | np.integer = 1,
-    ) -> Aerosol | LegacyAerosol:
+    ) -> Aerosol:
         """Commit equal sequential source substeps and retain all identities."""
         duration = _native_duration(time_step, sub_steps)
         if sub_steps > _MAX_NUCLEATION_SUB_STEPS:
