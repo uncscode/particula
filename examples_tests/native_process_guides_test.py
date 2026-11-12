@@ -240,3 +240,45 @@ def test_backend_selection_guide_does_not_execute():
     assert adapter.calls == 0
     assert namespace["context"].resolve(namespace["request"]) is adapter
     assert adapter.calls == 0
+
+
+def test_foundations_complete_snippet_sequence():
+    """Explicit fixed-slot activation and round trips retain native values."""
+    wp = pytest.importorskip("warp")
+    page = FEATURES / "data-containers-and-gpu-foundations.md"
+    blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
+    namespace = {}
+    for block in blocks:
+        exec(compile(block, str(page), "exec"), namespace)  # noqa: S102
+        if "activate_slots_gpu(" in block:
+            wp.synchronize()
+            np.testing.assert_array_equal(
+                namespace["activated_counts"].numpy(), [1]
+            )
+            particles = namespace["particles"]
+            np.testing.assert_allclose(
+                particles.masses.numpy(),
+                [[[1e-18, 2e-18], [2e-18, 3e-18]]],
+                rtol=1e-12,
+            )
+            np.testing.assert_array_equal(
+                particles.concentration.numpy(), [[1.0, 1.0]]
+            )
+            # Explicit upload/activation does not mutate the CPU source.
+            np.testing.assert_array_equal(
+                namespace["particle_data"].concentration, [[1.0, 0.0]]
+            )
+    restored = namespace["restored_particle"]
+    assert restored.distribution_type == "particle_resolved"
+    np.testing.assert_allclose(restored.number_density, [1e6])
+    np.testing.assert_allclose(
+        restored.species_mass_inventory, [[1e-18, 2e-18]], rtol=1e-12
+    )
+    assert namespace["restored_gas"].name == ["Water", "H2SO4"]
+    np.testing.assert_array_equal(
+        namespace["restored_gas"].concentration, [[1e-6, 2e-10]]
+    )
+    assert namespace["gpu_gas"].partitioning.shape == (1, 2)
+    np.testing.assert_array_equal(
+        namespace["restored_environment"].saturation_ratio, [[0.5, 0.2]]
+    )

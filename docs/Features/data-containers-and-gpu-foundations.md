@@ -36,6 +36,10 @@ For migration walkthroughs and before/after examples, see
 and planned expansions, see the
 [Data-Oriented Design and GPU Roadmap](Roadmap/data-oriented-gpu.md).
 
+The Python snippets below share imports and state in page order. Warp examples
+require Warp installed and select its CPU device explicitly; no CUDA evidence
+is implied. Native transfers and caller-owned scratch remain visible.
+
 ## Public imports
 
 ### Concrete CPU structural alignment (P4)
@@ -803,8 +807,15 @@ post-writer rollback.
 fixed particle-resolved `ParticleData` storage:
 
 ```python
-from particula.particles import get_slot_diagnostics
+import numpy as np
+from particula.particles import ParticleData, get_slot_diagnostics
 
+particle_data = ParticleData(
+    masses=np.array([[[1e-18, 2e-18], [0.0, 0.0]]]),
+    concentration=np.array([[1.0, 0.0]]), charge=np.zeros((1, 2)),
+    density=np.array([1000.0, 1200.0]), volume=np.array([1e-6]),
+    distribution_type="particle_resolved",
+)
 free_indices, active_counts, free_counts = get_slot_diagnostics(particle_data)
 ```
 
@@ -848,7 +859,20 @@ Use the package-exported direct boundary when a caller-managed
 the CPU:
 
 ```python
+import warp as wp
+from particula.gpu import to_warp_particle_data
 from particula.gpu.kernels import activate_slots_gpu
+
+# Continue the fixed-capacity CPU example above with explicit Warp CPU storage.
+particles = to_warp_particle_data(particle_data, device="cpu")
+request_masses = wp.array([[[2e-18, 3e-18]]], dtype=wp.float64, device="cpu")
+request_concentration = wp.array([[1.0]], dtype=wp.float64, device="cpu")
+request_charge = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+requested_counts = wp.array([1], dtype=wp.int32, device="cpu")
+activated_counts = wp.zeros(1, dtype=wp.int32, device="cpu")
+free_indices = wp.zeros((1, 2), dtype=wp.int32, device="cpu")
+active_counts = wp.zeros(1, dtype=wp.int32, device="cpu")
+free_counts = wp.zeros(1, dtype=wp.int32, device="cpu")
 
 activated_counts, free_indices, active_counts, free_counts = (
     activate_slots_gpu(
@@ -1087,6 +1111,9 @@ re-exported by `particula.gpu.kernels` or `particula.gpu`:
 from particula.gpu.kernels import wall_loss_step_gpu
 from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
 
+# Use the native container construction immediately above; no hidden transfer.
+particles = to_warp_particle_data(particle_data, device="cpu")
+rng_states = wp.zeros(1, dtype=wp.uint32, device="cpu")
 config = NeutralWallLossConfig(
     geometry="spherical",
     wall_eddy_diffusivity=1.0e-4,  # m^2/s
