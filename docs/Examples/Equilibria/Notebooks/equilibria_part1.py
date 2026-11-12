@@ -181,6 +181,7 @@ plt.show()
 # In this notebook, we have journeyed through the process of defining a liquid-vapor equilibrium system and employing the binary activity model to calculate activity coefficients as a function of relative humidity (RH). We then used these coefficients to determine the equilibrium composition of the liquid and vapor phases. Finally, the results were visualized to demonstrate the impact of RH on aerosol behavior, which is essential for understanding atmospheric aerosol dynamics and their environmental implications.
 #
 
+# %%
 # Check finite, physically bounded condensed organic mass across the RH sweep.
 assert np.all(np.isfinite(total_oa_concentration))
 assert np.all(total_oa_concentration >= 0)

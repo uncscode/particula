@@ -85,7 +85,10 @@ velocities = wp.zeros(n_particles, dtype=wp.vec3, device=device)
 
 # Launch kernel
 dt = 0.001  # 1 ms timestep
-wp.launch(update_particle_positions, dim=n_particles, inputs=[positions, velocities, dt])
+wp.launch(
+    update_particle_positions, dim=n_particles,
+    inputs=[positions, velocities, dt], device=device,
+)
 
 # Synchronize and get results
 wp.synchronize()
