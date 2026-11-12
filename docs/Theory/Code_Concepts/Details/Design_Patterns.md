@@ -22,7 +22,13 @@ They are the building blocks of the simulation engine. They can be used in a pro
 Example:  
 
 ```python
+import numpy as np
 import particula as par
+
+particle_radius = np.array([100e-9, 200e-9])
+eddy_dissipation = 0.01  # m²/s³
+temperature = 298.15  # K
+fluid_density = 1.225  # kg/m³
 
 kernel = par.dynamics.get_turbulent_shear_kernel_st1956_via_system_state(
     particle_radius=particle_radius,
@@ -84,7 +90,7 @@ Benefits
 ## Naming conventions
 
 - **Functions** → `get_<quantity>[_via_system_state]`  
-- **Classes** → `<Descriptor><PatternName>` (`TurbulentShearCoagulationStrategy`, `PresetParticleRadiusBuilder`)  
+- **Classes** → `<Descriptor><PatternName>` (`TurbulentShearCoagulationStrategy`, `ParticleDataBuilder`)
 
 These rules make grep‑based discovery trivial and help LLMs auto‑suggest the correct object.
 

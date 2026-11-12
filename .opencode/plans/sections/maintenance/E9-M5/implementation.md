@@ -538,3 +538,30 @@ check/format and git diff --check pass. Strict MkDocs exits 0, built in 1.44s
 (`/tmp/m5-p6-native-source-guides-mkdocs.log`); informational navigation messages
 remain and are not claimed resolved. P6, P7 and final gates remain incomplete;
 no PR has been opened.
+
+### P6 design-pattern theory checkpoint (2026-11-11)
+
+Replaced executable facade construction in the object-oriented patterns guide
+with native aggregate/process composition and ParticleDataBuilder. Preserved
+its original 100/200/300 nm radii, 2.5 g/cm³ density, 1e2/1e3/1e4 cm⁻³ bin
+concentrations, neutral charge and surface-strategy construction. The native
+example computes per-particle masses explicitly and demonstrates stored versus
+derived fields. Corrected the explanation that builders inject methods or
+particle-owned physics. Fake factory/decorator examples are now real API calls;
+conceptual FancyBuilder/mixin sketches are explicitly text, not executable
+Python. No supported scientific example was removed.
+
+The design overview now supplies previously undefined functional-kernel inputs
+and names ParticleDataBuilder. Its functional/strategy snippets execute, with
+symmetry and cubic-radius scaling checked independently. The Activity index
+snippet is unchanged and checked against independently calculated ideal mole
+fractions; it needs no native aggregate migration.
+
+Validation: new exact-snippet theory suite reports **3 passed in 1.45s**;
+scoped Ruff check/format, git diff --check and strict MkDocs pass (log
+`/tmp/m5-p6-theory-guides-mkdocs.log`). Initial diff checking caught changed
+Markdown lines with trailing spaces; those changed lines were corrected.
+Inventory records these three page dispositions. The activity feature guide
+still contains incomplete recipes, and remaining theory/reference boundaries,
+API targets, navigation, P7 and full final gates remain outstanding. P6 remains
+In Progress and no PR has been opened.
